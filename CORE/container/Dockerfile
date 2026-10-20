@@ -99,6 +99,9 @@ RUN chmod 0755 /usr/local/bin/fix-lab-curl
 COPY install-firefox.sh /build/install-firefox.sh
 RUN sh /build/install-firefox.sh
 
+# Ensure the CORE GUI directory structure exists
+RUN mkdir -p /root/.coregui/xmls/topologies
+
 # Após o bloco RUN que instala o packages.txt
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
