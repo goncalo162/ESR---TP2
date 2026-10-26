@@ -30,7 +30,8 @@ ESR---TP2/
 │   │   ├── topology.properties         P substituir uso do JSON vazio
 │   │   └── streams-s1.properties / streams-s2.properties P dois fluxos por origem
 │   ├── src/test/java/.../ott/           E cinco placeholders; restantes testes P
-│   ├── src/test/resources/             E JSON vazios; fixtures binárias/properties P
+│   ├── src/test/resources/             E JSON vazios; fixtures de configuração ainda P
+│   │   └── protocol/                   E TASK-002: 45 pares .bin/.hex, manifesto e README
 │   └── target/                         E artefactos gerados antigos; não editar
 ├── CORE/                               E bancada preparada
 │   ├── container/                      E Dockerfile e pacotes

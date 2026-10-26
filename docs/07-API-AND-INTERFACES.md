@@ -73,9 +73,9 @@ Cada mensagem: uint32 big-endian length, seguido de exatamente length bytes; len
 
 Envelope, por ordem: version u8 (=1), type u8, requestId UUID (16 bytes), senderId string, senderInstance UUID (16 bytes). Comprimento mínimo com ID de um byte: 1+1+16+2+1+16=37 bytes. Não tratar IDs de um byte como malformados.
 
-Primitivas: u8/u16/u32 sem sinal na rede e lidos em tipos Java suficientes; i64 não negativo para sequências/custos/tempos de media; UUID em dois longs big-endian, bits preservados; bool u8 0/1. String = u16 de comprimento de bytes + UTF-8 estrito sem NUL; nodeId até 32 bytes ASCII, title até 512 bytes e 128 caracteres, mensagens de erro até 256 bytes. Lista = u16 count + elementos; node list até 64, path até 32. Não usar writeUTF/readUTF como se fossem UTF-8 comum. Bytes extra no fim do payload são erro de versão/formato. Todas as listas abaixo usam essa contagem.
+Primitivas: u8/u16/u32 sem sinal na rede e lidos em tipos Java suficientes; i64 não negativo para sequências/custos/tempos de media; UUID em dois longs big-endian, bits preservados; bool u8 0/1. String = u16 de comprimento de bytes + UTF-8 estrito sem NUL; nodeId até 32 bytes ASCII, title até 512 bytes e 128 pontos de código Unicode, mensagens de erro até 256 bytes. Lista = u16 count + elementos; node list até 64, path até 32. Não usar writeUTF/readUTF como se fossem UTF-8 comum. Bytes extra no fim do payload são erro de versão/formato. Todas as listas abaixo usam essa contagem.
 
-StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16, serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (zero se ainda desconhecida no bootstrap), host string até 253 bytes, controlPort u16, dataPort u16, role u8 (1 SERVER, 2 RELAY, 3 CLIENT). Um elemento não válido rejeita a mensagem inteira.
+StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16 (1–60), serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (zero apenas num Endpoint devolvido por REGISTER_OK quando ainda desconhecida), host string ASCII de 1–253 bytes, controlPort u16 e dataPort u16 (ambos 1–65535), role u8 (1 SERVER, 2 RELAY, 3 CLIENT). senderId, serverId e nodeId obedecem a [A-Za-z0-9_-]{1,32}; título tem 1–128 pontos de código Unicode e até 512 bytes UTF-8. A identidade no envelope é sempre a do emissor imediato, inclusive quando reencaminha anúncio de outra origem. Um elemento não válido rejeita a mensagem inteira.
 
 ## 4. Mensagens de controlo v1
 
@@ -101,7 +101,7 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 16 | TRACE_RESULT | streamId UUID, traceId UUID, visited lista nodeId; resposta pelo caminho inverso do pedido |
 | 17 | ERROR | code u16, relatedType u8, detail string; correlacionado por requestId |
 
-Bootstrap usa conexões TCP de pedido/resposta com framing igual e pode manter ligação para renovação; transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede mensagens 7–16. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder.
+Bootstrap usa conexões TCP de pedido/resposta com framing igual e pode manter ligação para renovação; transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede mensagens 7–16. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1–17; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
 
 STREAM_ANNOUNCE de uma fonte tem path=[serverId], custo=0 e sequência estritamente crescente por stream/epoch. Cada relay publica o seu path e custo acumulado; o recetor acrescenta-se antes de guardar/reenviar. Epoch muda a cada arranque do SERVER e coincide com sessionId dos datagramas. Ao ver nova época confirmada por anúncios de caminhos válidos, retirar a antiga até expirar o horizonte; não aceitar regresso a uma época retirada por anúncio atrasado.
 
@@ -152,3 +152,11 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 | VideoPlayer.showFrame(image) | imagem pronta → atualização visual | executa atualização Swing no EDT |
 
 As assinaturas Java concretas serão criadas nas tarefas correspondentes. Não criar todas as interfaces e classes antecipadamente só por constarem deste contrato.
+
+## 7. Perfil de ficheiro MJPEG confirmado na TASK-002
+
+O recurso docente movie.Mjpeg usa registos consecutivos: exatamente cinco bytes ASCII de dígitos decimais (0–9), com zeros à esquerda quando necessário e sem newline/separador, que indicam o tamanho L, seguidos de exatamente L bytes JPEG. O tamanho não inclui os cinco bytes do prefixo. Exemplo real: os primeiros bytes são 30 36 30 31 34, texto 06014, seguidos de 6014 bytes JPEG; o segundo registo começa no offset 6019. Não é MP4, AVI, multipart HTTP ou uma sequência de JPEG sem prefixos.
+
+EOF é limpo apenas entre registos. Prefixo parcial, caractere não decimal, comprimento zero ou JPEG truncado são erros. Neste perfil, L está entre 1 e 99999; o limite efetivo da fonte é o menor entre 99999, maxFrameBytes configurado e o máximo de 2 MiB do protocolo UDP. O limite UDP continua a servir outros tamanhos sintéticos nos testes de fragmentação; não altera a capacidade de cinco dígitos do ficheiro adotado. FPS não está codificado no ficheiro: continua a vir da configuração. O exemplo Java docente usa período de 100 ms (10 FPS), valor observado e não requisito obrigatório.
+
+A TASK-020 implementará o leitor robusto e validará descodificação JPEG; nesta tarefa houve apenas inspeção dos bytes e dos exemplos, sem copiar/implementar o leitor. Hashes, conteúdos identificados, proveniência e gates estão no [registo V-002](../experiments/task-002-contract-review.md). Referências binárias/hexadecimais de controlo e UDP: [fixtures](../Projeto/src/test/resources/protocol/README.md).

@@ -10,8 +10,8 @@ O enunciado tem precedência sobre documentação antiga. Escolhas deste plano p
 
 | ID | Informação / hipótese assumida | Impacto, responsável e gate |
 |---|---|---|
-| H-01 | O objetivo menciona áudio/vídeo/texto; a lista mínima exige vídeo. Hipótese: não são exigidos três subsistemas multimédia separados | Planear vídeo, sem áudio/texto novos. TASK-002 verifica se há instrução docente adicional. Se os três forem exigidos, rever requisitos e tarefas antes de implementar essa extensão |
-| H-02 | Fonte/formatos docentes e movie.Mjpeg ainda não inspecionados | TASK-002 verifica acesso cedo; TASK-020 exige inspeção real ou alternativa discutida com docente. Bloqueia leitor/reprodução se faltar recurso; não bloqueia TCP/rotas |
+| H-01 | O objetivo menciona áudio/vídeo/texto; a lista mínima exige vídeo. Hipótese mantida: não são exigidos três subsistemas separados | TASK-002: utilizador respondeu «Sem indicações adicionais conhecidas». Mantém-se vídeo; isto não é confirmação formal do docente. Rever plano se surgir instrução adicional |
+| H-02 | TASK-002 confirmou GET 200 do ZIP e formato de movie.Mjpeg: cinco dígitos ASCII + JPEG; 500 frames, cópias idênticas | [Hashes e quatro conteúdos identificados](../experiments/task-002-contract-review.md). TASK-020 prepara/valida os quatro media; TASK-030 verifica créditos/redistribuição, não explícitos no ZIP docente. Não bloqueia TASK-003 |
 | H-03 | X vizinhos não tem valor único; três é exemplo | Configurar grau por nó, folhas com 1, relays com mais. Não prometer X links ativos se vizinhos ainda não existem; mostrar desejado/ativo. TASK-003/007 |
 | H-04 | Um servidor/fluxo no exemplo contradiz mínimo de dois servidores × dois fluxos | Aplicar mínimo explícito e modelar tudo por stream desde início. Não é necessário esperar esclarecimento para cumprir o mínimo mais abrangente |
 | H-05 | Não há limiares numéricos de atraso, FPS, recuperação, N ou banda | Usar metas técnicas de docs/09 e medir. Não chamar incumprimento do PDF à mera falha de uma meta proposta |
@@ -19,9 +19,9 @@ O enunciado tem precedência sobre documentação antiga. Escolhas deste plano p
 | H-07 | Não se especifica se servidores alojam o mesmo conteúdo | Quatro UUID distintos, dois vídeos diferentes por origem; não há failover de conteúdo entre fontes. Falha de S1 torna A/B indisponíveis, preserva C/D |
 | H-08 | Formato artigo obrigatório, LNCS recomendado | Adotar LNCS e contar todas as páginas até 12. Sem autorização não excluir referências ou anexos da contagem |
 | H-09 | Figura 1 e cenários são sugestões, topologias XML são underlay | Criar cópias de cenários com terminais e mapear explicitamente overlay. Uso de routers para apps é possível no CORE, mas adota-se recomendação de terminais |
-| H-10 | Não há esquema de protocolo, exigência RTP ou de JSON | Usar contratos próprios de docs/07. Se a equipa docente exigir compatibilidade externa, rever contrato antes da TASK-019 |
+| H-10 | Não há esquema obrigatório, exigência RTP ou JSON; utilizador sem indicações adicionais conhecidas em TASK-002 | Contratos próprios v1 mantidos e clarificados com fixtures. Se surgir imposição docente de compatibilidade, rever antes da implementação afetada, sem chamar RTP ao pacote próprio |
 
-Perguntas para quando for necessário: há instrução docente adicional sobre H-01/H-10? Onde obter os exemplos e vídeos autorizados se o URL não estiver disponível? Quais são turno, grupo e datas reais? Estas perguntas não têm de parar o planeamento; os gates acima evitam afirmar decisões ou recursos confirmados sem evidência.
+Questões atualizadas pela TASK-002: H-01/H-10 foram consultadas com o utilizador, sem indicações adicionais conhecidas, e o URL docente esteve acessível nesta execução. Continuam pendentes a preparação/licenciamento dos media finais e turno, grupo e datas reais. Estas perguntas não têm de parar o planeamento; os gates acima evitam afirmar decisões ou recursos confirmados sem evidência.
 
 ## ADR-001 — Manter Java 21 e Maven
 
@@ -45,7 +45,7 @@ Estado: adotada no plano. Decisão: um parent confirmado por fluxo, conjunto de 
 
 ## ADR-006 — MJPEG simples e pacote próprio
 
-Estado: adotada com gate de formato H-02. Decisão: seguir a estratégia sugerida de frames independentes e reprodução Swing; vídeo é opaco nos relays. Não declarar RTP/RTSP: cabeçalho de 64 bytes proposto é protocolo próprio. Alternativas: RTP completo exige especificação/compatibilidade que o PDF não impõe; codecs interframe e FFmpeg aumentam dependências. Consequências: banda mais alta, fragmentação, perda de um fragmento descarta frame, quatro fontes distintas e formato de ficheiro confirmado antes do leitor. TASK-019–024.
+Estado: adotada; perfil de ficheiro confirmado em TASK-002, preparação dos restantes conteúdos e redistribuição ainda com gates H-02. Decisão: seguir a estratégia sugerida de frames independentes e reprodução Swing; vídeo é opaco nos relays. Não declarar RTP/RTSP: cabeçalho de 64 bytes proposto é protocolo próprio. Alternativas: RTP completo exige especificação/compatibilidade que o PDF não impõe; codecs interframe e FFmpeg aumentam dependências. Consequências: banda mais alta, fragmentação, perda de um fragmento descarta frame, quatro fontes distintas e formato de ficheiro confirmado antes do leitor. TASK-019–024.
 
 ## ADR-007 — Propriedades e binário sem dependências runtime
 
@@ -59,7 +59,7 @@ Estado: adotada no plano. Decisão: unitários e integração desde a primeira f
 
 | Risco | Probabilidade / impacto | Mitigação e evidência |
 |---|---|---|
-| Recurso docente indisponível | média / alta | TASK-002 verifica cedo; TASK-020 bloqueia leitor até formato real ou alternativa aprovada |
+| Recurso docente voltar a ficar indisponível ou media final por preparar | média / alta | TASK-002 confirmou acesso/hash/perfil; repetir obtenção quando necessário. TASK-020 prepara os restantes conteúdos e valida bytes/JPEG; TASK-030 trata distribuição |
 | Quatro aliases do mesmo vídeo | média / alta | Conteúdo/hash/inspeção visual por origem em V-020/024/027 |
 | Loop na alteração de parent | média / alta | Path vector + prefixo na ativação, candidatos válidos, revision e testes V-012/014/016 |
 | Supressão de rota melhor pelo flooding | média / alta | Reenvio de melhoria e fixture de chegada tardia V-012 |
@@ -77,3 +77,11 @@ Estado: adotada no plano. Decisão: unitários e integração desde a primeira f
 ## Diferenças face ao plano antigo
 
 Não tratar Java 21, RTP, GUI específica, FPS=25, LNCS ou X≥3 como obrigações do enunciado. LNCS é recomendação, limite de páginas é obrigatório. O suporte multi-stream é modelado desde a configuração, não acrescentado a tabelas com chave única no fim. O pacote próprio tem fragmentação explícita. A alternativa é guardada por vizinho e a troca de upstream inclui ACK/poda. A leitura de movie.Mjpeg fica dependente dos bytes reais, em vez de presumir um container.
+
+## ADR-009 — Fixar contratos e perfil MJPEG antes dos codecs
+
+Estado: adotada na TASK-002, 26-10-2026. Contexto: ainda não existe codec de produção; os comprimentos e os exemplos têm de poder servir de oráculo independente. Decisão: corpo mínimo TCP de 37 bytes, UDP com 64 bytes de cabeçalho e 1136 de payload máximo, restrições de identidade/enumeração explícitas, 45 pares binário/hex com manifesto e resultados esperados. Separar validade de formato de autorização/estado operacional.
+
+Corrigida uma contradição do invariante 1 de 06: a época pertence ao arranque do servidor e pode ser comum às suas streams; o estado de cada StreamKey continua isolado. Perfil do recurso docente confirmado em bytes e exemplos: cinco dígitos ASCII + L bytes JPEG, limite de 99999 neste perfil, distinto do máximo UDP de 2 MiB. Não se implementou leitor/codec.
+
+Alternativa rejeitada: produzir golden bytes com o próprio encoder ou presumir que .Mjpeg significa JPEG sem prefixos. Consequências: TASK-004/019 consomem fixtures fixas; TASK-020 usa o perfil confirmado e prepara os conteúdos distintos identificados. [Revisão, comandos, hashes e gates](../experiments/task-002-contract-review.md).

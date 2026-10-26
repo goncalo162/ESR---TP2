@@ -23,7 +23,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Gate: obter e inspecionar movie.Mjpeg/exemplo docente ou confirmar alternativa com o docente, como permite a etapa 4. Não assumir AVI, MP4 nem JPEG concatenado: verificar o delimitador real, incluindo eventual prefixo ASCII de comprimento. Definir leitor para o formato confirmado e documentar o perfil. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
+A TASK-002 confirmou o perfil docente: cinco bytes de dígitos decimais ASCII com L, seguidos de L bytes JPEG, limite de 99999 bytes por frame; ver secção 7 de [07](../../07-API-AND-INTERFACES.md) e [revisão V-002](../../../experiments/task-002-contract-review.md). Reobter o recurso por URL/hash se a cópia transitória de /tmp não existir. Preparar os conteúdos A/B e C/D identificados nessa revisão; B/C/D ainda são fontes MP4/MKV/MOV por descarregar/converter, não ficheiros MJPEG prontos. Não basta alterar a extensão. Registar parâmetros da preparação offline, créditos e hashes; sem acesso ao conteúdo ou formato compatível, o gate continua por resolver. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
@@ -35,7 +35,7 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Confirmar formato, proveniência e licença dos recursos; atualizar H-02.
+- [ ] Revalidar recurso docente pelo perfil/hash confirmado, preparar conteúdos distintos identificados e registar proveniência/créditos/condições pendentes em H-02.
 - [ ] Implementar leitura de um frame com EOF e truncatura explícitos.
 - [ ] Configurar dois vídeos distintos por cada servidor e registar hashes.
 - [ ] Agendar emissão ao FPS sem catch-up ilimitado e só com procura confirmada.

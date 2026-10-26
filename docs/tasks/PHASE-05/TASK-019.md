@@ -70,3 +70,7 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+### Referências fixadas pela TASK-002
+
+Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.

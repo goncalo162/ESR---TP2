@@ -5,7 +5,7 @@
 - ID: TASK-001
 - Fase: [PHASE-01 — Fundações, configuração e protocolo](../../phases/PHASE-01-FOUNDATION.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: DONE
 - Dependências: nenhuma.
 - Requisitos relacionados: [RP-006](../../02-REQUIREMENTS.md#rp-006).
 
@@ -35,10 +35,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Inspecionar git status, pom e ficheiros existentes; registar diferenças face à auditoria.
-- [ ] Confirmar java -version e mvn -version; verificar o POM efetivo e fixar engine/plugins de teste.
-- [ ] Executar build mínimo autorizado na futura construção e registar explicitamente número de testes, mesmo zero.
-- [ ] Documentar comando de teste e caminho para relatórios Surefire, sem declarar cobertura.
+- [x] Inspecionar git status, pom e ficheiros existentes; registar diferenças face à auditoria.
+- [x] Confirmar java -version e mvn -version; verificar o POM efetivo e fixar engine/plugins de teste.
+- [x] Executar build mínimo autorizado na futura construção e registar explicitamente número de testes, mesmo zero.
+- [x] Documentar comando de teste e caminho para relatórios Surefire, sem declarar cobertura.
 
 ## 8. Regras e restrições
 
@@ -52,21 +52,27 @@ JDK diferente, ausência de rede para dependências, permissões de cache Maven 
 
 V-001: inspeção do POM efetivo e build limpo com release 21; verificar engine escolhido. Zero testes nesta base não valida funcionalidades; repetir descoberta real em V-003.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: V-001 EXECUTADA com sucesso, com zero testes funcionais executados. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Build base documentado com versões fixadas.
-- [ ] Nenhuma classe vazia é marcada como implementada.
-- [ ] Comandos reproduzíveis e ausência inicial de cobertura registados.
-- [ ] Validação V-001 executada e evidência ligada no progresso.
+- [x] Build base documentado com versões fixadas.
+- [x] Nenhuma classe vazia é marcada como implementada.
+- [x] Comandos reproduzíveis e ausência inicial de cobertura registados.
+- [x] Validação V-001 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
-Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Nenhuma evidência de execução foi produzida por este ficheiro de planeamento.
+Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Execução e evidências registadas em [experiments/build-baseline.md](../../../experiments/build-baseline.md). A base Maven está validada; não há funcionalidade OTT implementada.
 
 ## 13. Notas para a IA implementadora
 
 Não implementar bootstrap ou transporte para conseguir um JAR aparentemente funcional.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+### Resultado da execução — 26-10-2026
+
+Java 21.0.12.1 selecionado por JAVA_HOME e Maven 3.6.3 confirmados. POM efetivo validado; clean package e test terminaram com BUILD SUCCESS. JUnit Jupiter 5.13.4 e Surefire 3.5.4 fixados, incluindo engine resolvido e âmbito test conferidos. Zero classes compiladas e zero testes executáveis; nenhum teste artificial foi criado. O bloqueio inicial de escrita na cache Maven foi resolvido por repetição autorizada com permissões alargadas.
+
+Todos os critérios desta tarefa foram cumpridos; sem bloqueios atuais. RP-006 está apenas parcialmente coberto. A próxima tarefa é TASK-002, não iniciada. Comandos, saídas e limitações: [baseline](../../../experiments/build-baseline.md).

@@ -29,7 +29,7 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existentes: protocol/MessageType.java, ControlMessage.java, MessageCodec.java e protocol/MessageCodecTest.java vazios; planeadas: fixtures em src/test/resources/protocol/.
+Existentes: protocol/MessageType.java, ControlMessage.java, MessageCodec.java e protocol/MessageCodecTest.java vazios; existentes desde TASK-002: [fixtures e manifesto](../../../Projeto/src/test/resources/protocol/README.md) em src/test/resources/protocol/; consumir sem regenerar expected bytes com o codec.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 

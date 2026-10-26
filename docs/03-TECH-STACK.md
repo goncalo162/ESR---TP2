@@ -12,7 +12,7 @@ O enunciado permite escolher linguagem e transporte. As escolhas abaixo são dec
 | DataInputStream/DataOutputStream, ByteBuffer | Formato binário pequeno e independente de serialização de objetos | Proposto; JSON não é exigido e os JSON existentes estão vazios |
 | Properties | Configuração de nós, topologia e catálogo de fontes | Proposto; evita biblioteca de parsing adicional; criar topology.properties em vez de implementar parser JSON próprio |
 | Swing/AWT + ImageIO | Janela simples de visualização de JPEG | Proposto; não requer JavaFX, FFmpeg como runtime nem browser |
-| JUnit Jupiter + Surefire | Testes unitários e de integração local | Proposto; TASK-001 fixa versões concretas compatíveis com JDK 21 e engine Jupiter e verifica descoberta real dos testes |
+| JUnit Jupiter 5.13.4 + Surefire 3.5.4 | Testes unitários e de integração local | Configurados em TASK-001 com scope test e engine resolvido; descoberta/execução de testes reais fica para TASK-003 |
 | CORE | Emulação IP, topologias, atrasos e falhas | Obrigatório como bancada principal; não substituível por testes localhost |
 | Docker/Compose | Reutilizar a bancada preparada | Conveniência existente; CORE nativo também poderia satisfazer o PDF |
 | tcpdump/tshark, iproute2 | Captura, contadores e inspeção de endereçamento | Ferramentas propostas; confirmar versões disponíveis na bancada |
@@ -33,4 +33,8 @@ Consulta em 26-10-2026 para confirmar capacidades, sem executar exemplos. As dec
 - Os [serviços CORE](https://coreemu.github.io/core/services.html) permitem iniciar processos nos nós; o plano prefere início manual para satisfazer RF-001 e facilitar demonstrações.
 - A página [do livro, Programming Assignments](https://gaia.cs.umass.edu/kurose_ross/programming.php) referencia exercícios de streaming RTSP/RTP. Isto não demonstra que o nosso protocolo proposto seja RTP.
 
-O endereço [ProgEx.zip do docente](https://www.di.uminho.pt/~flavio/ESR/ProgEx.zip), referido na p. 5 do PDF, não pôde ser inspecionado pela ferramenta web nesta sessão. Não se conhece ainda a estrutura interna do ZIP, licença ou codificação exata de movie.Mjpeg. TASK-020 confirma esses pontos antes de adaptar o leitor. Nenhum recurso foi descarregado ou instalado neste planeamento.
+Na sessão inicial de planeamento, a ferramenta web não conseguiu inspecionar [ProgEx.zip](https://www.di.uminho.pt/~flavio/ESR/ProgEx.zip). A TASK-002 obteve-o por curl com HTTP 200 e confirmou o formato de cinco dígitos ASCII + JPEG de movie.Mjpeg; não havia licença explícita no ZIP. [Revisão V-002](../experiments/task-002-contract-review.md) regista hashes, 500 frames e quatro conteúdos identificados. TASK-020 ainda implementará o leitor e preparará os outros media; TASK-030 verificará créditos/distribuição. Nenhum programa descarregado foi executado.
+
+## Configuração confirmada pela TASK-001
+
+Build validado em 26-10-2026 com Java 21.0.12.1 e Maven 3.6.3. Compiler 3.13.0 preservado; clean 3.4.1, resources 3.3.1, Surefire 3.5.4 e jar 3.4.2 fixados no POM para estabilizar o ciclo clean/package. JUnit Jupiter 5.13.4 inclui engine e API com scope test. Zero testes funcionais executados; não houve teste artificial. Valores efetivos, comandos, saídas e limites em [baseline](../experiments/build-baseline.md).

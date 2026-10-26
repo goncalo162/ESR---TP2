@@ -5,7 +5,7 @@
 - ID: TASK-002
 - Fase: [PHASE-01 — Fundações, configuração e protocolo](../../phases/PHASE-01-FOUNDATION.md)
 - Prioridade: P1
-- Estado: TODO
+- Estado: DONE
 - Dependências: [TASK-001](../PHASE-01/TASK-001.md).
 - Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005).
 
@@ -35,10 +35,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Rever o PDF contra RF/RC e distinguir recomendações.
-- [ ] Produzir exemplos mínimos válidos e malformados dos contratos de controlo e dados.
-- [ ] Verificar acesso a ProgEx.zip/movie.Mjpeg e registar origem/hash/formato se obtidos.
-- [ ] Registar decisões ou bloqueios concretos em docs/12 sem alterar requisitos obrigatórios.
+- [x] Rever o PDF contra RF/RC e distinguir recomendações.
+- [x] Produzir exemplos mínimos válidos e malformados dos contratos de controlo e dados.
+- [x] Verificar acesso a ProgEx.zip/movie.Mjpeg e registar origem/hash/formato se obtidos.
+- [x] Registar decisões ou bloqueios concretos em docs/12 sem alterar requisitos obrigatórios.
 
 ## 8. Regras e restrições
 
@@ -52,21 +52,27 @@ ZIP inacessível ou sem autorização de redistribuição; incoerência de campo
 
 V-002: revisão independente dos comprimentos, offsets, exemplos de identidade e tabela de requisitos; evidência de acesso ou falha de recurso, sem execução de streaming.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: V-002 EXECUTADA com sucesso, sem testes funcionais da aplicação. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Fixtures têm bytes e interpretação explícitos.
-- [ ] Não há conflito entre modelo e interface.
-- [ ] Situação dos recursos e hipóteses está registada; gates futuros têm tarefa responsável.
-- [ ] Validação V-002 executada e evidência ligada no progresso.
+- [x] Fixtures têm bytes e interpretação explícitos.
+- [x] Não há conflito entre modelo e interface.
+- [x] Situação dos recursos e hipóteses está registada; gates futuros têm tarefa responsável.
+- [x] Validação V-002 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
-Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Nenhuma evidência de execução foi produzida por este ficheiro de planeamento.
+Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Evidência de execução em [experiments/task-002-contract-review.md](../../../experiments/task-002-contract-review.md). RNF-005 continua parcialmente coberto.
 
 ## 13. Notas para a IA implementadora
 
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+### Resultado da execução — 26-10-2026
+
+45 pares .bin/.hex, manifesto e README criados e inspecionados: os 17 tipos TCP, limites/UTF-8 e cabeçalhos/fragmentos UDP têm exemplos e oráculos. Corrigido o invariante de serverEpoch e fixados os limites do perfil MJPEG de cinco dígitos. Recurso docente obtido com hash e 500 frames inspecionados; quatro conteúdos identificados, restantes ficheiros por preparar em TASK-020. Utilizador sem indicações docentes adicionais conhecidas; nenhuma mensagem foi enviada ao docente.
+
+Todos os critérios cumpridos; nenhum bloqueio atual desta tarefa. Fontes Java, POM e CORE preservados. TASK-003 é a próxima tarefa, ainda TODO e não iniciada. [Revisão completa](../../../experiments/task-002-contract-review.md) e [fixtures](../../../Projeto/src/test/resources/protocol/README.md).

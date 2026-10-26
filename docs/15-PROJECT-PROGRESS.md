@@ -1,14 +1,14 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: TODO. Documentação de planeamento criada; nenhuma tarefa de construção executada. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. TASK-001 e TASK-002 concluídas por pedido explícito do utilizador; TASK-003–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Próxima tarefa recomendada, quando a implementação for autorizada:** [TASK-001](tasks/PHASE-01/TASK-001.md). Não tem dependências funcionais. Dependências externas futuras ainda não tornam todas as tarefas BLOCKED.
+**Próxima tarefa recomendada:** [TASK-003](tasks/PHASE-01/TASK-003.md), ainda TODO e não iniciada. TASK-001/002 estão DONE, com [baseline](../experiments/build-baseline.md) e [V-002](../experiments/task-002-contract-review.md). Os gates de media/entrega não bloqueiam TASK-003.
 
 ## Fases
 
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
-| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | TODO | nenhuma; autorização de construção |
+| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | IN PROGRESS | TASK-001/002 autorizadas e concluídas |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | TODO | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
@@ -20,8 +20,8 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: TODO. 
 
 | ID | Objetivo | Dependências | Estado | Validação / evidência |
 |---|---|---|---|---|
-| [TASK-001](tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | TODO | V-001: NÃO EXECUTADO |
-| [TASK-002](tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | TODO | V-002: NÃO EXECUTADO |
+| [TASK-001](tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | DONE | V-001: EXECUTADA; [baseline](../experiments/build-baseline.md); zero testes funcionais |
+| [TASK-002](tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | DONE | V-002: EXECUTADA; [contratos, fixtures e recursos](../experiments/task-002-contract-review.md) |
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | TODO | V-003: NÃO EXECUTADO |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | TODO | V-004: NÃO EXECUTADO |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | TODO | V-005: NÃO EXECUTADO |
@@ -56,8 +56,8 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: TODO. 
 
 | Informação pendente | Tarefa responsável | Condição de desbloqueio | Estado inicial |
 |---|---|---|---|
-| Formato/proveniência/disponibilidade dos recursos MJPEG | TASK-002 / TASK-020 | Inspeção de recurso real ou alternativa discutida com docente | Pendente; gate futuro |
-| Instruções docentes adicionais sobre áudio/texto ou compatibilidade de protocolo | TASK-002 | Confirmar se existem; hipótese H-01/H-10 permanece explícita | Pendente, sem bloqueio do plano |
+| Recurso MJPEG e preparação dos quatro conteúdos | TASK-020 / TASK-030 | Perfil/hash docente confirmados; preparar B/C/D e verificar redistribuição | Acesso/formato confirmados em TASK-002; gates futuros de preparação/entrega |
+| Instruções docentes adicionais sobre áudio/texto ou compatibilidade de protocolo | H-01/H-10 | Utilizador respondeu sem indicações adicionais conhecidas | Hipóteses mantidas, sem confirmação formal docente |
 | Datas/conteúdo das duas avaliações | TASK-009 / TASK-018 | Informação docente e roteiro alinhado | Pendente |
 | Runtime/GUI/volumes CORE | TASK-025 | Verificação no ambiente real | Pendente |
 | Turno, grupo e prazo | TASK-030 / TASK-031 | Informação real fornecida pela equipa | Pendente |
@@ -86,3 +86,30 @@ Leitura integral do PDF por extração de texto e inspeção visual da figura 1 
 - Preservar: CORE, Projeto e documentação histórica não foram modificados pelo plano.
 
 Acrescentar novos handoffs seguindo [o guia](AI-IMPLEMENTATION-GUIDE.md). Não substituir resultados anteriores por afirmações genéricas de sucesso.
+
+## Execução da TASK-001 — 26-10-2026
+
+- Estado: DONE. PHASE-01 permanece IN PROGRESS; TASK-002–031 continuam TODO.
+- Revisão de partida: 04d02fef9f4646266de0fca428ca4d680597ba36; árvore inicialmente limpa.
+- Alterações: Projeto/pom.xml, .gitignore, experiments/build-baseline.md e documentação de estado/ambiente. Não se reorganizou Projeto/ nem se alterou Projeto/src.
+- Decisões: Java 21 e Maven preservados; Jupiter 5.13.4, Surefire 3.5.4 e versões dos plugins do ciclo clean/package fixadas. failIfNoTests=false é transitório até TASK-003.
+- Validação: POM efetivo, clean package e test com sucesso; engine/âmbito de testes conferidos. Zero .class e zero testes funcionais, sem relatórios Surefire de casos de teste.
+- Bloqueio resolvido: cache Maven só de leitura no sandbox; execução com permissões alargadas autorizada resolveu os downloads. Sem bloqueios atuais da TASK-001.
+- Evidência: [baseline, comandos e resultados reais](../experiments/build-baseline.md).
+- Requisito RP-006: IN PROGRESS, com base de testes concluída e restantes comportamentos pendentes. Nenhum requisito funcional é marcado DONE.
+- Próxima ação: ler TASK-002 quando a sua execução for pedida; não foi iniciada nesta sessão.
+- Preservar: fontes, configurações, testes placeholders e CORE sem alterações. Artefactos target regenerados pelo build não são funcionalidades implementadas.
+
+## Execução da TASK-002 — 26-10-2026
+
+- Estado: DONE; PHASE-01 continua IN PROGRESS e TASK-003–031 em TODO.
+- Partida: revisão 04d02fef9f4646266de0fca428ca4d680597ba36 com alterações locais da TASK-001 preservadas.
+- Novos artefactos: 45 pares .bin/.hex, manifesto e README em Projeto/src/test/resources/protocol; revisão em experiments/task-002-contract-review.md.
+- Decisões: ADR-009; mínimos/limites e identidade TCP/UDP explícitos; serverEpoch comum às streams da mesma origem, com estado por StreamKey; perfil MJPEG confirmado de cinco dígitos ASCII + JPEG.
+- Recursos: ZIP obtido em /tmp por curl autorizado, hashes e 500 frames inspecionados; três cópias representam um vídeo. A/B e C/D identificados, HEAD 200 das fontes B/C/D, ainda por preparar em TASK-020.
+- Utilizador: sem indicações adicionais conhecidas sobre áudio/texto ou RTP/RTSP; H-01/H-10 continuam explícitas. Não foi contactado docente ou terceiro.
+- Validação V-002: inspeção independente de tamanhos/offsets/hex/binário/hash, 22 casos aceites e 23 rejeitados quanto ao formato; nenhum codec, JUnit, build ou streaming executado nesta tarefa.
+- RNF-005: IN PROGRESS; especificação/fixtures não concluem implementação nem avaliação crítica final. RP-006 conserva o progresso da TASK-001.
+- Bloqueios atuais da TASK-002: nenhum. Gates futuros: preparação dos quatro media e condições de distribuição.
+- Próxima ação: ler TASK-003 quando a execução for pedida; não foi iniciada. Preservar as alterações anteriores e fontes Java/config/POM/CORE.
+- Evidência: [contratos e recursos](../experiments/task-002-contract-review.md), [fixtures](../Projeto/src/test/resources/protocol/README.md).

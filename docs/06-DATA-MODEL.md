@@ -9,7 +9,7 @@ Não existe persistência transacional. Ficheiros locais definem configuração 
 | NodeConfiguration | nodeId string ASCII 1–32, role enum, bindHost, advertisedHost, controlPort/dataPort int, bootstrapHost/Port, instanceId UUID novo | IDs [A-Za-z0-9_-]+; portas 1–65535; endpoint publicitado alcançável; instanceId não persiste |
 | Neighbor | nodeId, instanceId, endpoint TCP/UDP, connectionId UUID, state, lastSeen monotónico | No máximo uma conexão confirmada por nodeId; eventos antigos da connectionId são ignorados |
 | NodeRegistry | mapa nodeId → endpoints/papel/leaseUntil e grafo permitido | O grafo é simétrico, sem self-link, sem endpoint duplicado por namespace; membership expirável não apaga a configuração |
-| StreamInfo | streamId UUID, serverId nodeId, title string até 128, codec MJPEG, fps int, serverEpoch UUID | Stream UUID único em toda a configuração; cada UUID pertence a uma origem; pelo menos dois vídeos por origem na configuração final |
+| StreamInfo | streamId UUID, serverId nodeId, title string até 128 pontos de código Unicode, codec MJPEG, fps int, serverEpoch UUID | Stream UUID único em toda a configuração; cada UUID pertence a uma origem; pelo menos dois vídeos por origem na configuração final |
 | VideoDefinition | StreamInfo + mediaPath, loop boolean, maxFrameBytes | Path é exclusivamente configuração local de SERVER; nunca recebido do cliente; validar acessibilidade e conteúdo real |
 | StreamKey | streamId UUID | A origem é validada por StreamInfo; não usar título como chave |
 | RouteCandidate | StreamKey, serverId, epoch, upstreamNode, path list[nodeId], announceSeq long, costMicros long, hopCount, expiresAt | Um candidato por vizinho/stream; custo positivo e sem overflow; path começa na fonte e termina no nó local; epoch identifica arranque da fonte |
@@ -46,7 +46,7 @@ Vizinhos: DISCONNECTED → CONNECTING → HANDSHAKING → ACTIVE; falha/timeout 
 
 ## Invariantes verificáveis
 
-1. Route de S1/A não partilha destinos, epoch, seq ou subscrições com S1/B, S2/C ou S2/D.
+1. Cada StreamKey tem destinos, sequências de anúncio/frame, subscrições e buffers próprios. O serverEpoch identifica o arranque da origem e é partilhado pelas streams dessa mesma origem: S1/A e S1/B usam o mesmo serverEpoch, mas mantêm estado independente. S2 tem a sua própria época. Chaves de deduplicação incluem sempre streamId e epoch, nunca apenas epoch.
 2. Em estado estável cada nó não fonte tem um único upstream ativo por stream. Nenhum downstream é o upstream nem o próprio nó.
 3. Cada caminho anunciado contém IDs únicos; prefixo até à fonte é validado na ativação. Um caminho de anúncio não autoriza dados antes do ACK.
 4. A procura agregada é a união de consumidores locais e downstream válidos. Uma segunda ativação do mesmo child não duplica saída ou referência.

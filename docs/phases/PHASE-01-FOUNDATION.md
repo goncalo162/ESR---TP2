@@ -6,11 +6,11 @@ Obter um build Java reproduzível, configuração validada e codec de controlo s
 
 ## 2. Contexto
 
-Incremento 1 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+Incremento 1 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS; TASK-001 e TASK-002 concluídas, com [baseline](../../experiments/build-baseline.md) e [revisão dos contratos](../../experiments/task-002-contract-review.md). TASK-003/004 permanecem TODO.
 
 ## 3. Pré-requisitos
 
-Não requer aplicação funcional; exige apenas repositório e autorização futura para construção. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
+Não requer aplicação funcional; a execução de TASK-001 e TASK-002 foi autorizada pelo utilizador. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
 
 ## 4. Requisitos abrangidos
 
@@ -20,8 +20,8 @@ RF-001, RF-004, RF-012, RF-013, RNF-005, RP-001, RP-006. As descrições e crit�
 
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
-| [TASK-001](../tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | V-001 | TODO |
-| [TASK-002](../tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | V-002 | TODO |
+| [TASK-001](../tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | V-001 | DONE |
+| [TASK-002](../tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | V-002 | DONE |
 | [TASK-003](../tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | V-003 | TODO |
 | [TASK-004](../tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | V-004 | TODO |
 

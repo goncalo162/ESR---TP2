@@ -77,13 +77,13 @@ A lista seguinte especifica oráculos de aceitação e está ligada a [13](13-RE
 
 V-001: inspeção do POM efetivo e build limpo com release 21; verificar engine escolhido. Zero testes nesta base não valida funcionalidades; repetir descoberta real em V-003.
 
-Responsável: [TASK-001](tasks/PHASE-01/TASK-001.md). Requisitos: RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-001](tasks/PHASE-01/TASK-001.md). Requisitos: RP-006. Estado: EXECUTADA, com sucesso em 26-10-2026. [Evidência](../experiments/build-baseline.md): POM efetivo, build limpo e engine verificados; zero testes funcionais. Descoberta/execução de testes reais continua pendente para V-003.
 
 ### V-002 — Fixar contratos, fixtures e decisões pendentes
 
 V-002: revisão independente dos comprimentos, offsets, exemplos de identidade e tabela de requisitos; evidência de acesso ou falha de recurso, sem execução de streaming.
 
-Responsável: [TASK-002](tasks/PHASE-01/TASK-002.md). Requisitos: RNF-005. Estado: NÃO EXECUTADO.
+Responsável: [TASK-002](tasks/PHASE-01/TASK-002.md). Requisitos: RNF-005. Estado: EXECUTADA com sucesso em 26-10-2026. [Evidência](../experiments/task-002-contract-review.md): 45 pares binário/hex, 17 tipos TCP, offsets/limites UDP, recurso docente obtido/hash/perfil confirmados e quatro conteúdos identificados. Não foi executado codec, JUnit ou streaming.
 
 ### V-003 — Carregar e validar configurações de nós, grafo e streams
 

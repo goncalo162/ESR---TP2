@@ -1,0 +1,822 @@
+{
+  "fixtureFormat": "ott-v1-reference-fixtures",
+  "contract": "../../../../../docs/07-API-AND-INTERFACES.md",
+  "generatedBy": "TASK-002: literais hexadecimais e comprimentos calculados sem codec de produção",
+  "notes": [
+    "Fixtures aceites são válidas para o formato; não provam handshake, autorização ou estado de rota.",
+    "UUIDs e endpoints são valores de exemplo, não configuração operacional.",
+    "Payloads UDP sintéticos não são JPEG descodificável.",
+    "Fixtures truncadas simulam EOF no fim do ficheiro."
+  ],
+  "fixtures": [
+    {
+      "id": "tcp-register",
+      "binary": "tcp-register.bin",
+      "hex": "tcp-register.hex",
+      "bytes": 77,
+      "sha256": "17d40f40ad4fedaffba8d15708ce3248ddf93d92b61146b64e025871d5b8794b",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 73,
+          "version": 1,
+          "type": 1,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "endpoint": {
+            "nodeId": "S1",
+            "instanceId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+            "host": "10.0.0.1",
+            "controlPort": 5000,
+            "dataPort": 5001,
+            "role": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "tcp-register-ok",
+      "binary": "tcp-register-ok.bin",
+      "hex": "tcp-register-ok.hex",
+      "bytes": 82,
+      "sha256": "2be2be4cafbb150950eb5ac9ec9343096012f279e4acd25b1f414c1a0a065efa",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 78,
+          "version": 1,
+          "type": 2,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "B",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "leaseMs": 15000,
+          "neighborIds": [
+            "S1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-register-renew",
+      "binary": "tcp-register-renew.bin",
+      "hex": "tcp-register-renew.hex",
+      "bytes": 42,
+      "sha256": "0fb2de18c09d1713806e04470862583fd13629759ca5eb67411cb8fe0af82e39",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 38,
+          "version": 1,
+          "type": 3,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+        }
+      }
+    },
+    {
+      "id": "tcp-node-leave",
+      "binary": "tcp-node-leave.bin",
+      "hex": "tcp-node-leave.hex",
+      "bytes": 43,
+      "sha256": "330ea69abb5c2f71aa83aadf474ea7ec6bc62ff5607b69f7b2eaada63b744266",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 39,
+          "version": 1,
+          "type": 4,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "reason": 0
+        }
+      }
+    },
+    {
+      "id": "tcp-hello",
+      "binary": "tcp-hello.bin",
+      "hex": "tcp-hello.hex",
+      "bytes": 77,
+      "sha256": "14910ce9afee39c697b21368895463039d0b99704503be5c405d2930eefc4cd3",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 73,
+          "version": 1,
+          "type": 5,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "endpoint": {
+            "nodeId": "S1",
+            "instanceId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+            "host": "10.0.0.1",
+            "controlPort": 5000,
+            "dataPort": 5001,
+            "role": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "tcp-hello-ok-min",
+      "binary": "tcp-hello-ok-min.bin",
+      "hex": "tcp-hello-ok-min.hex",
+      "bytes": 41,
+      "sha256": "9eea55b90e80adf60ccb5e3b29ff052456e46d659f3bd9ce03481aa71d4d21a6",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 37,
+          "version": 1,
+          "type": 6,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "C",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+        }
+      }
+    },
+    {
+      "id": "tcp-probe-ping",
+      "binary": "tcp-probe-ping.bin",
+      "hex": "tcp-probe-ping.hex",
+      "bytes": 50,
+      "sha256": "e7a22dd2e3cdd7379746fc9e8f03c4863922dc24d4784620ed81fb8098ea8c43",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 46,
+          "version": 1,
+          "type": 7,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "probeId": 42
+        }
+      }
+    },
+    {
+      "id": "tcp-probe-pong",
+      "binary": "tcp-probe-pong.bin",
+      "hex": "tcp-probe-pong.hex",
+      "bytes": 50,
+      "sha256": "02780ed032effc78caebe82fd055bd7d8913486e1bc9fefaa986c1117c0ac21d",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 46,
+          "version": 1,
+          "type": 8,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "probeId": 42
+        }
+      }
+    },
+    {
+      "id": "tcp-stream-announce",
+      "binary": "tcp-stream-announce.bin",
+      "hex": "tcp-stream-announce.hex",
+      "bytes": 106,
+      "sha256": "1a3b59c1bd955489d142cad18d8e5e458615241451969b8d6fcc4bfb6cbdf546",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 102,
+          "version": 1,
+          "type": 9,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "serverId": "S1",
+          "title": "A",
+          "codec": 1,
+          "fps": 10,
+          "announceSeq": 1,
+          "costMicros": 0,
+          "path": [
+            "S1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-stream-withdraw",
+      "binary": "tcp-stream-withdraw.bin",
+      "hex": "tcp-stream-withdraw.hex",
+      "bytes": 82,
+      "sha256": "99cb8e1fdddc942ae4e6a066ba78df5c515e569169c8d90049b97759d2414eef",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 78,
+          "version": 1,
+          "type": 10,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "announceSeq": 1
+        }
+      }
+    },
+    {
+      "id": "tcp-activate",
+      "binary": "tcp-activate.bin",
+      "hex": "tcp-activate.hex",
+      "bytes": 112,
+      "sha256": "6c6d0b4f47038d26dad59f0a223d728d172230bbc32f2774ddec2716b03d0d19",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 108,
+          "version": 1,
+          "type": 11,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "C1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "subscriptionId": "fedcba98-7654-4321-8765-0123456789ab",
+          "revision": 1,
+          "leaseMs": 6000,
+          "expectedPath": [
+            "S1",
+            "C1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-activate-ack",
+      "binary": "tcp-activate-ack.bin",
+      "hex": "tcp-activate-ack.hex",
+      "bytes": 102,
+      "sha256": "9329e6f611f893e870b8c04aae28af4fb3b63b6fcc47566ec0de79849158be6f",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 98,
+          "version": 1,
+          "type": 12,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "subscriptionId": "fedcba98-7654-4321-8765-0123456789ab",
+          "revision": 1,
+          "grantedLeaseMs": 6000
+        }
+      }
+    },
+    {
+      "id": "tcp-deactivate",
+      "binary": "tcp-deactivate.bin",
+      "hex": "tcp-deactivate.hex",
+      "bytes": 98,
+      "sha256": "99e0a6b5e488819c3279a29c8019adc825d996470ae0ecc9cd9fc6d5ec087aed",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 94,
+          "version": 1,
+          "type": 13,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "C1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "subscriptionId": "fedcba98-7654-4321-8765-0123456789ab",
+          "revision": 1
+        }
+      }
+    },
+    {
+      "id": "tcp-subscription-renew",
+      "binary": "tcp-subscription-renew.bin",
+      "hex": "tcp-subscription-renew.hex",
+      "bytes": 112,
+      "sha256": "3920f2c5dc2ff152108f64e3a56ddeb4293906cb8500112542896450f818ee3d",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 108,
+          "version": 1,
+          "type": 14,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "C1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "subscriptionId": "fedcba98-7654-4321-8765-0123456789ab",
+          "revision": 1,
+          "leaseMs": 6000,
+          "expectedPath": [
+            "S1",
+            "C1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-route-trace",
+      "binary": "tcp-route-trace.bin",
+      "hex": "tcp-route-trace.hex",
+      "bytes": 97,
+      "sha256": "3a33476b70fc5644662d58d508d4fee197bc1974f852725175a3629252dfdf71",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 93,
+          "version": 1,
+          "type": 15,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "C1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "traceId": "11223344-5566-4788-99aa-bbccddeeff00",
+          "ttl": 32,
+          "visited": [
+            "C1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-trace-result",
+      "binary": "tcp-trace-result.bin",
+      "hex": "tcp-trace-result.hex",
+      "bytes": 84,
+      "sha256": "adb0cb1c81771ce0be756a018d7147b00b017d7b182f243815a26a3eef4fffbc",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 80,
+          "version": 1,
+          "type": 16,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "traceId": "11223344-5566-4788-99aa-bbccddeeff00",
+          "visited": [
+            "C1",
+            "S1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-error-no-route",
+      "binary": "tcp-error-no-route.bin",
+      "hex": "tcp-error-no-route.hex",
+      "bytes": 55,
+      "sha256": "a47f0d460fa3fb97b86e6dfaa06ad4c33d7252fd8e4251e96bb9ffd4f8e31fa9",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 51,
+          "version": 1,
+          "type": 17,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "code": 6,
+          "relatedType": 11,
+          "detail": "no route"
+        }
+      }
+    },
+    {
+      "id": "tcp-stream-announce-utf8",
+      "binary": "tcp-stream-announce-utf8.bin",
+      "hex": "tcp-stream-announce-utf8.hex",
+      "bytes": 109,
+      "sha256": "04eeec3dec5d9902cbb393184c2a029ad124160afdf4a62501da2d5a856179f0",
+      "expected": {
+        "outcome": "accept",
+        "stage": "control-codec",
+        "fields": {
+          "bodyLength": 105,
+          "version": 1,
+          "type": 9,
+          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+          "senderId": "S1",
+          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "serverEpoch": "deadbeef-0000-4000-8000-000000000001",
+          "serverId": "S1",
+          "title": "🎬",
+          "codec": 1,
+          "fps": 10,
+          "announceSeq": 1,
+          "costMicros": 0,
+          "path": [
+            "S1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tcp-invalid-short-prefix",
+      "binary": "tcp-invalid-short-prefix.bin",
+      "hex": "tcp-invalid-short-prefix.hex",
+      "bytes": 3,
+      "sha256": "709e80c88487a2411e1ee4dfb9f22a861492d20c4765150c0c794abd70f8147c",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing-eof",
+        "reason": "EOF antes dos quatro bytes do prefixo"
+      }
+    },
+    {
+      "id": "tcp-invalid-length-small",
+      "binary": "tcp-invalid-length-small.bin",
+      "hex": "tcp-invalid-length-small.hex",
+      "bytes": 40,
+      "sha256": "28b7fe240584bb6dfa001677f657afe91fb46606cafa75a7608e44ea4e4459a6",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing",
+        "reason": "length=36, inferior ao mínimo 37"
+      }
+    },
+    {
+      "id": "tcp-invalid-length-large",
+      "binary": "tcp-invalid-length-large.bin",
+      "hex": "tcp-invalid-length-large.hex",
+      "bytes": 4,
+      "sha256": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing",
+        "reason": "length=65537, superior ao máximo 65536; rejeitar antes de alocar"
+      }
+    },
+    {
+      "id": "tcp-invalid-truncated-body",
+      "binary": "tcp-invalid-truncated-body.bin",
+      "hex": "tcp-invalid-truncated-body.hex",
+      "bytes": 40,
+      "sha256": "04f12027a1d59f9deb909cd299d00f7b2a557f35bcbdecc4a56e94abc16fa3ed",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing-eof",
+        "reason": "prefixo declara 37, mas EOF após 36 bytes do corpo"
+      }
+    },
+    {
+      "id": "tcp-invalid-version",
+      "binary": "tcp-invalid-version.bin",
+      "hex": "tcp-invalid-version.hex",
+      "bytes": 41,
+      "sha256": "38c4e2cdd60b5b5367e0d17304d33c5478d409baa9d84bd82b7685198a0813cd",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "version=2 não suportada"
+      }
+    },
+    {
+      "id": "tcp-invalid-type",
+      "binary": "tcp-invalid-type.bin",
+      "hex": "tcp-invalid-type.hex",
+      "bytes": 41,
+      "sha256": "d20892696b15565af0dc156bb5ab8cb7a823c6b704903b21a57f67f253d478a9",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "type=255 não existe no envelope v1"
+      }
+    },
+    {
+      "id": "tcp-invalid-utf8",
+      "binary": "tcp-invalid-utf8.bin",
+      "hex": "tcp-invalid-utf8.hex",
+      "bytes": 41,
+      "sha256": "0626e5587e714ecd3e0be4f0ec3e730647abefa604d96bb561e1cd27549f5153",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "senderId contém octeto UTF-8 isolado 80"
+      }
+    },
+    {
+      "id": "tcp-invalid-trailing-byte",
+      "binary": "tcp-invalid-trailing-byte.bin",
+      "hex": "tcp-invalid-trailing-byte.hex",
+      "bytes": 42,
+      "sha256": "10e777824cf51febd5f3f5a36d681db2a720270c8c970127420a907195c43fc7",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "HELLO_OK tem um byte de payload inesperado"
+      }
+    },
+    {
+      "id": "tcp-invalid-negative-probe",
+      "binary": "tcp-invalid-negative-probe.bin",
+      "hex": "tcp-invalid-negative-probe.hex",
+      "bytes": 50,
+      "sha256": "023263e4f17098b29e5db8eb713d607bccf0978e03cdac02244e7f6445bbc43b",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "probeId i64=-1, fora do domínio não negativo"
+      }
+    },
+    {
+      "id": "tcp-invalid-role",
+      "binary": "tcp-invalid-role.bin",
+      "hex": "tcp-invalid-role.hex",
+      "bytes": 77,
+      "sha256": "de8db668ba416e9007ca6ab213aafe9e73866e3c53a4d56dfdc625c773b4257b",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "Endpoint.role=255, fora de SERVER/RELAY/CLIENT"
+      }
+    },
+    {
+      "id": "tcp-invalid-path-count",
+      "binary": "tcp-invalid-path-count.bin",
+      "hex": "tcp-invalid-path-count.hex",
+      "bytes": 267,
+      "sha256": "988762d5f23829aa0b821a54da558a11b2d61eb4f0b9edabc2b594efda16f422",
+      "expected": {
+        "outcome": "reject",
+        "stage": "control-codec",
+        "reason": "path.count=33 excede o máximo 32"
+      }
+    },
+    {
+      "id": "udp-min",
+      "binary": "udp-min.bin",
+      "hex": "udp-min.hex",
+      "bytes": 65,
+      "sha256": "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 0,
+          "mediaTimeUs": 0,
+          "frameLength": 1,
+          "fragmentIndex": 0,
+          "fragmentCount": 1,
+          "payloadBytes": 1
+        }
+      }
+    },
+    {
+      "id": "udp-small",
+      "binary": "udp-small.bin",
+      "hex": "udp-small.hex",
+      "bytes": 67,
+      "sha256": "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 7,
+          "mediaTimeUs": 10000,
+          "frameLength": 3,
+          "fragmentIndex": 0,
+          "fragmentCount": 1,
+          "payloadBytes": 3
+        }
+      }
+    },
+    {
+      "id": "udp-split-first",
+      "binary": "udp-split-first.bin",
+      "hex": "udp-split-first.hex",
+      "bytes": 1200,
+      "sha256": "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 8,
+          "mediaTimeUs": 40000,
+          "frameLength": 1137,
+          "fragmentIndex": 0,
+          "fragmentCount": 2,
+          "payloadBytes": 1136
+        }
+      }
+    },
+    {
+      "id": "udp-split-last",
+      "binary": "udp-split-last.bin",
+      "hex": "udp-split-last.hex",
+      "bytes": 65,
+      "sha256": "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 8,
+          "mediaTimeUs": 40000,
+          "frameLength": 1137,
+          "fragmentIndex": 1,
+          "fragmentCount": 2,
+          "payloadBytes": 1
+        }
+      }
+    },
+    {
+      "id": "udp-invalid-short-header",
+      "binary": "udp-invalid-short-header.bin",
+      "hex": "udp-invalid-short-header.hex",
+      "bytes": 63,
+      "sha256": "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "datagrama com menos de 64 bytes de cabeçalho"
+      }
+    },
+    {
+      "id": "udp-invalid-no-payload",
+      "binary": "udp-invalid-no-payload.bin",
+      "hex": "udp-invalid-no-payload.hex",
+      "bytes": 64,
+      "sha256": "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "cabeçalho sem payload, apesar de frameLength=3"
+      }
+    },
+    {
+      "id": "udp-invalid-magic",
+      "binary": "udp-invalid-magic.bin",
+      "hex": "udp-invalid-magic.hex",
+      "bytes": 67,
+      "sha256": "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "magic diferente de OTT1"
+      }
+    },
+    {
+      "id": "udp-invalid-version",
+      "binary": "udp-invalid-version.bin",
+      "hex": "udp-invalid-version.hex",
+      "bytes": 67,
+      "sha256": "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "version=2 não suportada"
+      }
+    },
+    {
+      "id": "udp-invalid-flags",
+      "binary": "udp-invalid-flags.bin",
+      "hex": "udp-invalid-flags.hex",
+      "bytes": 67,
+      "sha256": "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "flags reservadas diferentes de zero"
+      }
+    },
+    {
+      "id": "udp-invalid-header-length",
+      "binary": "udp-invalid-header-length.bin",
+      "hex": "udp-invalid-header-length.hex",
+      "bytes": 67,
+      "sha256": "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "headerLength=63, diferente de 64"
+      }
+    },
+    {
+      "id": "udp-invalid-index",
+      "binary": "udp-invalid-index.bin",
+      "hex": "udp-invalid-index.hex",
+      "bytes": 67,
+      "sha256": "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "index=1 não é inferior a count=1"
+      }
+    },
+    {
+      "id": "udp-invalid-count",
+      "binary": "udp-invalid-count.bin",
+      "hex": "udp-invalid-count.hex",
+      "bytes": 67,
+      "sha256": "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "count=2 não corresponde a ceil(3/1136)=1"
+      }
+    },
+    {
+      "id": "udp-invalid-zero-frame",
+      "binary": "udp-invalid-zero-frame.bin",
+      "hex": "udp-invalid-zero-frame.hex",
+      "bytes": 67,
+      "sha256": "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameLength=0, fora do intervalo 1..2097152"
+      }
+    },
+    {
+      "id": "udp-invalid-large-frame",
+      "binary": "udp-invalid-large-frame.bin",
+      "hex": "udp-invalid-large-frame.hex",
+      "bytes": 67,
+      "sha256": "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameLength=2097153, superior a 2 MiB"
+      }
+    },
+    {
+      "id": "udp-invalid-negative-seq",
+      "binary": "udp-invalid-negative-seq.bin",
+      "hex": "udp-invalid-negative-seq.hex",
+      "bytes": 67,
+      "sha256": "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameSeq i64=-1, fora do domínio não negativo"
+      }
+    },
+    {
+      "id": "udp-invalid-datagram-size",
+      "binary": "udp-invalid-datagram-size.bin",
+      "hex": "udp-invalid-datagram-size.hex",
+      "bytes": 1201,
+      "sha256": "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "1201 bytes, superior ao máximo de aplicação 1200"
+      }
+    }
+  ]
+}
