@@ -1,0 +1,72 @@
+# TASK-004 — Codificar e descodificar mensagens de controlo v1
+
+## 1. Identificação
+
+- ID: TASK-004
+- Fase: [PHASE-01 — Fundações, configuração e protocolo](../../phases/PHASE-01-FOUNDATION.md)
+- Prioridade: P0
+- Estado: TODO
+- Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-003](../PHASE-01/TASK-003.md).
+- Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005), [RP-006](../../02-REQUIREMENTS.md#rp-006).
+
+## 2. Objetivo
+
+Implementar um codec TCP com contrato inequívoco e limites de memória.
+
+## 3. Contexto
+
+Esta tarefa contribui para o resultado da fase: Configuração e mensagens de controlo validadas por testes locais, sem necessidade de CORE. A responsabilidade específica é codificar e descodificar mensagens de controlo v1. Consultar [arquitetura](../../04-ARCHITECTURE.md) e [rastreabilidade](../../13-REQUIREMENTS-TRACEABILITY.md) para a ligação ao sistema completo.
+
+## 4. Pré-requisitos
+
+Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
+
+## 5. Especificação técnica
+
+Implementar todos os tipos 1–17 e os tipos auxiliares da interface. O codec trata bytes, sem ativar rotas ou abrir sockets. Validar comprimento antes de alocar, strings UTF-8 estritas, contagens, tipos e ausência de bytes sobrantes. Distinguir EOF limpo entre mensagens de EOF a meio do prefixo/corpo. Suportar ID de um carácter e UUID com bits de sinal preservados.
+
+Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
+
+## 6. Ficheiros e componentes envolvidos
+
+Existentes: protocol/MessageType.java, ControlMessage.java, MessageCodec.java e protocol/MessageCodecTest.java vazios; planeadas: fixtures em src/test/resources/protocol/.
+
+Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
+
+## 7. Passos de implementação
+
+- [ ] Definir modelos de payload e enum com números estáveis.
+- [ ] Implementar escrita de frame e leitura completa limitada.
+- [ ] Validar payload específico e mapear erros de protocolo.
+- [ ] Comparar saída com fixtures independentes e testar duas mensagens concatenadas e leitura aos poucos.
+
+## 8. Regras e restrições
+
+Respeitar a natureza dos requisitos ligados: obrigações do PDF prevalecem; escolhas propostas só mudam com decisão registada. Usar o mínimo necessário e manter isolamento por stream. Não declarar testes executados sem resultados. Não adicionar funcionalidades, bibliotecas ou alterações de infraestrutura fora do objetivo. Rever [segurança](../../10-SECURITY.md) para as entradas e recursos afetados.
+
+## 9. Casos limite e tratamento de erros
+
+length negativo ao interpretar u32, frame acima de 64 KiB, UTF-8 inválido, type desconhecido, listas excessivas, socket que entrega um byte por leitura e EOF truncado.
+
+## 10. Testes necessários
+
+V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR, round-trip dos 17 tipos, leituras parciais, concatenação e rejeições sem alocação não limitada.
+
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+
+## 11. Critérios de aceitação
+
+- [ ] Bytes correspondem ao contrato e às fixtures independentes.
+- [ ] Mensagens parciais não se confundem com mensagens completas.
+- [ ] Entrada malformada produz erro controlado.
+- [ ] Validação V-004 executada e evidência ligada no progresso.
+
+## 12. Definition of Done
+
+Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Nenhuma evidência de execução foi produzida por este ficheiro de planeamento.
+
+## 13. Notas para a IA implementadora
+
+Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+
+Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
