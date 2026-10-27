@@ -51,8 +51,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.version}</version>
                 <configuration>
-                    <!-- TASK-001 allows zero tests; TASK-003 must require real tests. -->
-                    <failIfNoTests>false</failIfNoTests>
+                    <!-- A partir da TASK-003, um build sem testes é uma falha. -->
+                    <failIfNoTests>true</failIfNoTests>
                 </configuration>
             </plugin>
             <plugin>

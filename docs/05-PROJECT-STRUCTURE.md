@@ -17,7 +17,7 @@ ESR---TP2/
 │   ├── src/main/java/pt/uminho/esr/ott/ E pacotes preparados
 │   │   ├── app/                        E OttApplication
 │   │   ├── bootstrap/                  E BootstrapServer, NodeRegistry
-│   │   ├── config/                     E NodeConfiguration, ConfigurationLoader
+│   │   ├── config/                     E TASK-003: loader, NodeConfiguration, TopologyConfiguration, StreamConfiguration, erros agregados
 │   │   ├── overlay/                    E OverlayNode, NodeRole, Neighbor, NeighborManager
 │   │   ├── transport/                  E Transport, Connection
 │   │   ├── protocol/                   E ControlMessage, MessageType, MessageCodec
@@ -37,8 +37,7 @@ ESR---TP2/
 │   ├── container/                      E Dockerfile e pacotes
 │   ├── docker-compose.yml              E volumes/serviços
 │   ├── core-gui                        E launcher
-│   ├── topologies/cenario1.xml ... 3.xml E underlay inicial
-│   ├── topologies/ott-cenario1.xml ... 3.xml P cenários de validação com terminais
+│   ├── topologies/cenario1.xml ... 3.xml E reutilizar; variantes só por necessidade documentada
 │   └── volume/ott/                     P material de execução partilhado
 │       ├── ott-streaming-1.0-SNAPSHOT.jar
 │       ├── config/                     cópias específicas da experiência

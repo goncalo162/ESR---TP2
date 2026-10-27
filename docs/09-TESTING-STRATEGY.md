@@ -89,7 +89,7 @@ Responsável: [TASK-002](tasks/PHASE-01/TASK-002.md). Requisitos: RNF-005. Estad
 
 V-003: fixtures válidas/invalidas com diretório temporário, paths fora do cwd, ID de um carácter e quatro streams; Maven reporta testes executados e falha perante um requisito de configuração violado.
 
-Responsável: [TASK-003](tasks/PHASE-01/TASK-003.md). Requisitos: RF-001, RF-004, RF-012, RF-013, RP-001, RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-003](tasks/PHASE-01/TASK-003.md). Requisitos: RF-001, RF-004, RF-012, RF-013, RP-001, RP-006. Estado: EXECUTADA com sucesso em 27-10-2026: 65 testes JUnit de configuração, build limpo e controlo negativo sem testes. [Evidência V-003](../experiments/task-003-configuration-validation.md). Não valida transporte/streaming.
 
 ### V-004 — Codificar e descodificar mensagens de controlo v1
 

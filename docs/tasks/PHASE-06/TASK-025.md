@@ -23,20 +23,20 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Confirmar JDK/GUI no container e adequar apenas o necessário na futura implementação. Criar ott-cenario1.xml com quatro terminais overlay S,R,C1,C2; usar routers/switches de underlay adicionais sem os contar como nós overlay. Bootstrap é serviço adicional no host de S e não quinto nó de encaminhamento. Arestas overlay S–R,R–C1,R–C2; X por nó 1,3,1,1. Endereços e rotas IP reais devem ser retirados do cenário criado e registados numa tabela; não copiar IPs de outro cenário.
+Reutilizar CORE/topologies/cenario1.xml existente, sem criar uma topologia alternativa por defeito. Confirmar JDK/GUI e mapear os equipamentos atuais para os processos: Servidor→S, Router1→R, Cliente1→C1 e Cliente2→C2. No CORE é possível executar o relay no namespace Linux do router, como admite o enunciado (p. 2); a recomendação de terminais não obriga a recriar o cenário. Bootstrap é serviço adicional no host de S. Arestas overlay propostas S–R,R–C1,R–C2; X=1,3,1,1. Derivar os IPs/interfaces do XML e da sessão real; substituir os endpoints 127.0.0.1 dos exemplos locais por endereços CORE. Confirmar alcance antes de avaliar vídeo. Só propor alterações mínimas ao XML se uma limitação concreta impedir requisitos, preservando o original e registando motivo.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existentes: CORE/container/Dockerfile, docker-compose.yml e topologies/cenario1.xml; planeados: ott-cenario1.xml, CORE/volume/ott/ e experiments/scenario-1/.
+Existentes: CORE/container/Dockerfile, docker-compose.yml e CORE/topologies/cenario1.xml; planeados: perfis .properties específicos deste cenário em CORE/volume/ott/ e evidências em experiments/scenario-1/. Não há novo XML obrigatório.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
 ## 7. Passos de implementação
 
 - [ ] Validar runtime, X11, volume /volume e MTU, sem permissões globais desnecessárias.
-- [ ] Criar cópia de topologia com terminais para os relays e config de endpoints.
+- [ ] Abrir cenario1.xml existente e preparar a tabela processo→equipamento→IP/porto e os perfis de configuração correspondentes.
 - [ ] Copiar JAR/config/media e iniciar manualmente por terminal de nó CORE.
 - [ ] Capturar tronco e ramos durante play de um e dois clientes e após stop.
 

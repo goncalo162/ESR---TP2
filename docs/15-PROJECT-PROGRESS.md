@@ -1,14 +1,14 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. TASK-001 e TASK-002 concluídas por pedido explícito do utilizador; TASK-003–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. TASK-001, TASK-002 e TASK-003 concluídas por pedido explícito do utilizador; TASK-004–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Próxima tarefa recomendada:** [TASK-003](tasks/PHASE-01/TASK-003.md), ainda TODO e não iniciada. TASK-001/002 estão DONE, com [baseline](../experiments/build-baseline.md) e [V-002](../experiments/task-002-contract-review.md). Os gates de media/entrega não bloqueiam TASK-003.
+**Próxima tarefa recomendada:** [TASK-004](tasks/PHASE-01/TASK-004.md), ainda TODO e não iniciada. TASK-001/002 verificadas e TASK-003 concluída, com [65 testes e evidência](../experiments/task-003-configuration-validation.md).
 
 ## Fases
 
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
-| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | IN PROGRESS | TASK-001/002 autorizadas e concluídas |
+| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | IN PROGRESS | TASK-001/002/003 autorizadas e concluídas |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | TODO | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
@@ -22,7 +22,7 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: IN PRO
 |---|---|---|---|---|
 | [TASK-001](tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | DONE | V-001: EXECUTADA; [baseline](../experiments/build-baseline.md); zero testes funcionais |
 | [TASK-002](tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | DONE | V-002: EXECUTADA; [contratos, fixtures e recursos](../experiments/task-002-contract-review.md) |
-| [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | TODO | V-003: NÃO EXECUTADO |
+| [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | TODO | V-004: NÃO EXECUTADO |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | TODO | V-005: NÃO EXECUTADO |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Implementar registo bootstrap e descoberta configurada | TASK-003, TASK-005 | TODO | V-006: NÃO EXECUTADO |
@@ -113,3 +113,19 @@ Acrescentar novos handoffs seguindo [o guia](AI-IMPLEMENTATION-GUIDE.md). Não s
 - Bloqueios atuais da TASK-002: nenhum. Gates futuros: preparação dos quatro media e condições de distribuição.
 - Próxima ação: ler TASK-003 quando a execução for pedida; não foi iniciada. Preservar as alterações anteriores e fontes Java/config/POM/CORE.
 - Evidência: [contratos e recursos](../experiments/task-002-contract-review.md), [fixtures](../Projeto/src/test/resources/protocol/README.md).
+
+## Execução da TASK-003 — 27-10-2026
+
+- Partida: dffb4fc2c45715ef99ebcf7b0a7e948de70b83f4, árvore inicialmente limpa. Revalidados build e 45 fixtures das duas dependências; ambas completas segundo os respetivos critérios.
+- Estado: TASK-003 DONE; PHASE-01 continua IN PROGRESS; TASK-004–031 TODO.
+- Alterações: loader, modelos/erros imutáveis em config, enum NodeRole, propriedades de exemplo e catálogos separados por origem, testes ConfigurationLoaderTest; POM exige testes.
+- Contrato: carga UTF-8 estrita por perfil e por conjunto; sem DNS/sockets/leitura de vídeos; paths relativos ao ficheiro/media.base; ownership e UUID global por conjunto validado. Decisão ADR-010 e docs/07 atualizados.
+- Resultado real: clean package com Java 21.0.12.1/Maven 3.6.3 executou 65 testes, zero falhas/erros/skips. Provider JUnit Platform carregado. POM vazio em /tmp falhou com No tests to run!, como esperado.
+- Permissões: provider em falta resolvido por descarga autorizada; build final passou offline. Nenhum bloqueio atual.
+- Requisitos associados: IN PROGRESS, com configuração/testes locais como evidência parcial; não declarar servidores, overlay ou streaming funcionais.
+- Preservar: artefactos da TASK-002, CORE e evidências históricas sem alterações. Os vídeos continuam por preparar na TASK-020.
+- Próxima ação: TASK-004 quando solicitada; não foi iniciada. [Evidência detalhada](../experiments/task-003-configuration-validation.md).
+
+## Esclarecimento sobre CORE — 27-10-2026
+
+O utilizador reforçou o uso das topologias existentes. Registada ADR-011: reutilizar CORE/topologies/cenario1.xml, cenario2.xml e cenario3.xml; os perfis loopback da TASK-003 são exemplos locais de validação. Retirada a criação obrigatória de variantes nas TASK-025–027. Verificação apenas estrutural dos XML, sem alterar ficheiros CORE ou iniciar serviços. Nenhuma tarefa nova foi iniciada; TASK-004 permanece a próxima.

@@ -1,6 +1,6 @@
 # Interfaces e contratos propostos
 
-Todas as interfaces deste documento são propostas do plano. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+As interfaces de rede são propostas do plano, ainda por implementar. A API de configuração descrita abaixo foi implementada e testada na TASK-003. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
 
 ## 1. CLI e configuração
 
@@ -13,18 +13,30 @@ Códigos de saída propostos: 0 fim normal/help; 2 configuração/CLI inválida;
 | Propriedades | Tipo / comportamento |
 |---|---|
 | node.id, node.role, bind.host, advertised.host | obrigatórias; bind pode ser 0.0.0.0, advertised não pode ser wildcard |
-| control.port, data.port | inteiros; default proposto 5000 TCP / 5001 UDP nos nós overlay; BOOTSTRAP escuta control.port=5002 e não usa data.port; valores explícitos nos fixtures |
-| bootstrap.host, bootstrap.port | obrigatórias para nós; default de porto bootstrap proposto 5002 TCP |
+| control.port, data.port | inteiros obrigatórios 1–65535 nos nós overlay; BOOTSTRAP exige control.port e não aceita data.port; não há defaults implícitos no loader. Exemplos locais usam 5002 no bootstrap e 5100/5101 a 5400/5401 nos outros perfis |
+| bootstrap.host, bootstrap.port | obrigatórias para nós overlay; porta explícita, 5002 nos exemplos locais. Não se aplicam ao perfil BOOTSTRAP |
 | topology.file | só bootstrap; resolve relativamente ao ficheiro .properties, não ao cwd |
 | streams.file | só SERVER; resolve relativamente à configuração |
 | media.base | diretório local do servidor para resolver os paths autorizados |
-| node.ids | em topology.properties: lista CSV dos IDs sem espaços vazios |
+| node.ids | em topology.properties: lista CSV de 1–64 IDs, sem campos vazios/duplicados; cada nó exige pelo menos um vizinho permitido |
 | node.ID.host, node.ID.controlPort, node.ID.dataPort, node.ID.role | endpoints/papel de cada nó permitido |
 | node.ID.neighbors | lista CSV de IDs existentes; grafo simétrico, sem auto-vizinhança; X é o comprimento desta lista |
-| stream.ids | em streams.properties: UUID separados por vírgula |
+| stream.ids | no catálogo de cada origem: 2–256 UUID canónicos separados por vírgula; únicos no catálogo e no conjunto validado por loadDeployment |
 | stream.UUID.title, .file, .fps, .loop | título; path local; fps inteiro 1–60; loop true/false; mínimo final de dois ficheiros distintos por origem |
 
 O listener TCP pode usar bind.host wildcard. Para preservar a validação da origem UDP em nós multihomed, o socket UDP deve ser ligado ao endereço local advertised.host e data.port, enviando e recebendo no mesmo socket. Validar que esse endereço pertence ao nó e é alcançável pelos seus vizinhos. Não aceitar host/port incompatíveis para a identidade registada. Não deduzir IP publicitado de localhost nem do primeiro interface num nó CORE multihomed. O operador atribui IP roteável e confirma reachability no cenário. Não há variáveis de ambiente da aplicação obrigatórias; DISPLAY é do ambiente gráfico e JAVA_HOME do runtime.
+
+### Regras de configuração implementadas na TASK-003
+
+Ficheiros UTF-8 com sintaxe de java.util.Properties, incluindo escaping e continuação de linha. Rejeitar chaves desconhecidas, duplicadas após descodificar escapes, vazias ou incompatíveis com o papel. IDs/papéis/booleanos são estritos; loop só admite true/false. UUID deve ter 36 caracteres na forma canónica, sem versões abreviadas. Listas CSV não podem conter campos vazios ou duplicados. O limite inicial de 256 streams por catálogo é uma escolha de proteção do protótipo, não do enunciado.
+
+Paths de topology.file, streams.file e media.base são relativos ao ficheiro de configuração do nó; stream.UUID.file é relativo a media.base. Normalizar para paths absolutos e rejeitar escape lexical de media.base, referência à própria base e aliases do mesmo path dentro de uma origem. Os vídeos não têm de existir nesta tarefa: bytes, symlinks reais e diferença do conteúdo são validados em TASK-020 antes de abrir os media.
+
+Hosts são verificados sintaticamente, sem resolver DNS ou abrir sockets. Aceitam-se IPv4, IPv6 literal e hostnames ASCII; wildcard é exclusivo de bind.host. Comparação de endpoints é lexical após normalização simples (caixa, ponto final e representação decimal IPv4), por transporte/host/porto. Aliases DNS, identidade física do namespace, pertença do IP e bind/reachability são verificações futuras de transporte/CORE, não garantias da carga offline.
+
+load(path, expectedRole) valida um perfil, incluindo a topologia ou catálogo dependente. loadDeployment(paths) deve receber exatamente um perfil BOOTSTRAP e todos os perfis do seu grafo; verifica papéis/endpoints/contacto bootstrap e unicidade dos UUID entre as origens fornecidas. A configuração do servidor fixa o serverId dos seus fluxos. Não exigir duas origens em todos os cenários simples; os exemplos finais desta tarefa incluem duas, cada uma com dois UUID. instanceId e serverEpoch são gerados em execução, não pelo parser.
+
+A API devolve modelos imutáveis; em qualquer erro lança ConfigurationException com lista imutável de ConfigurationProblem(file, key, message), sem devolver configuração parcial. Não há CLI de execução nesta tarefa; OttApplication será implementada na TASK-008. [Código, testes e resultados V-003](../experiments/task-003-configuration-validation.md).
 
 ### Perfis mínimos de conteúdos
 
@@ -140,7 +152,8 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 
 | Interface conceptual | Entrada / saída | Garantia |
 |---|---|---|
-| ConfigurationLoader.load(path, role) | propriedades → configuração validada ou lista de erros | sem efeitos de rede |
+| ConfigurationLoader.load(path, role) | propriedades → NodeConfiguration ou ConfigurationException com problems | implementado na TASK-003, sem efeitos de rede |
+| ConfigurationLoader.loadDeployment(paths) | perfis completos → lista imutável ou problemas agregados | implementado na TASK-003; verifica grafo, endpoints, contacto bootstrap e unicidade global dos UUID |
 | Transport.sendControl(neighborId, message) | envio enfileirado → aceitação/erro | framing e backpressure; não implica ACK de aplicação |
 | NeighborManager.snapshot() | nenhum → vizinhos imutáveis | não expor mapas mutáveis |
 | NetworkMonitor.onPong(id, now) | sonda correlacionada → atualização de métrica/evento | relógio monotónico do emissor |

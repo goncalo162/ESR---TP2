@@ -18,7 +18,7 @@ O enunciado tem precedência sobre documentação antiga. Escolhas deste plano p
 | H-06 | Turno PL, grupo, prazos e datas de avaliações não fornecidos | TASK-009/018 confirma avaliações; TASK-030 exige x/y reais; TASK-031 exige prazo e confirmação da submissão. Não inventar nomes finais ou datas |
 | H-07 | Não se especifica se servidores alojam o mesmo conteúdo | Quatro UUID distintos, dois vídeos diferentes por origem; não há failover de conteúdo entre fontes. Falha de S1 torna A/B indisponíveis, preserva C/D |
 | H-08 | Formato artigo obrigatório, LNCS recomendado | Adotar LNCS e contar todas as páginas até 12. Sem autorização não excluir referências ou anexos da contagem |
-| H-09 | Figura 1 e cenários são sugestões, topologias XML são underlay | Criar cópias de cenários com terminais e mapear explicitamente overlay. Uso de routers para apps é possível no CORE, mas adota-se recomendação de terminais |
+| H-09 | Figura 1 e cenários são sugestões, topologias XML são underlay | Reutilizar os XML já existentes e mapear explicitamente os processos. Routers Linux podem alojar relays no CORE; terminais são recomendados pelo PDF, sem obrigar a recriar os cenários. Variantes apenas por necessidade demonstrada |
 | H-10 | Não há esquema obrigatório, exigência RTP ou JSON; utilizador sem indicações adicionais conhecidas em TASK-002 | Contratos próprios v1 mantidos e clarificados com fixtures. Se surgir imposição docente de compatibilidade, rever antes da implementação afetada, sem chamar RTP ao pacote próprio |
 
 Questões atualizadas pela TASK-002: H-01/H-10 foram consultadas com o utilizador, sem indicações adicionais conhecidas, e o URL docente esteve acessível nesta execução. Continuam pendentes a preparação/licenciamento dos media finais e turno, grupo e datas reais. Estas perguntas não têm de parar o planeamento; os gates acima evitam afirmar decisões ou recursos confirmados sem evidência.
@@ -85,3 +85,19 @@ Estado: adotada na TASK-002, 26-10-2026. Contexto: ainda não existe codec de pr
 Corrigida uma contradição do invariante 1 de 06: a época pertence ao arranque do servidor e pode ser comum às suas streams; o estado de cada StreamKey continua isolado. Perfil do recurso docente confirmado em bytes e exemplos: cinco dígitos ASCII + L bytes JPEG, limite de 99999 neste perfil, distinto do máximo UDP de 2 MiB. Não se implementou leitor/codec.
 
 Alternativa rejeitada: produzir golden bytes com o próprio encoder ou presumir que .Mjpeg significa JPEG sem prefixos. Consequências: TASK-004/019 consomem fixtures fixas; TASK-020 usa o perfil confirmado e prepara os conteúdos distintos identificados. [Revisão, comandos, hashes e gates](../experiments/task-002-contract-review.md).
+
+## ADR-010 — Carga estrita e validação conjunta da configuração
+
+Estado: adotada na TASK-003, 27-10-2026. Decisão: usar Reader UTF-8 e sintaxe Properties com deteção de chaves duplicadas depois dos escapes; rejeitar desconhecidas e inaplicáveis ao papel. Usar records e cópias imutáveis. Erros contêm ficheiro/propriedade e são agregados numa exceção sem estado parcial. Não preencher portas implicitamente: os perfis têm endpoints explícitos para tornar colisões verificáveis.
+
+load(path, expectedRole) valida um nó e ficheiros dependentes; loadDeployment(paths) valida o conjunto completo contra o grafo e verifica UUID globalmente únicos/associados à origem. Sem conhecer os outros perfis, a carga individual não afirma unicidade global. A validação offline usa apenas sintaxe e normalização lexical de hosts/paths, sem DNS, sockets ou bytes dos vídeos. Reachability, symlinks reais e conteúdos são gates posteriores. Limitar grafo a 64 IDs e catálogos a 256 streams por origem; estes limites de implementação não são números impostos pelo PDF.
+
+O enum NodeRole foi preenchido nesta tarefa por ser necessário à configuração tipada, sem implementar OverlayNode ou bootstrap de rede. Os exemplos locais têm cinco perfis, duas origens com dois UUID cada, grafo simétrico e portas distintas. A partir desta tarefa Surefire usa failIfNoTests=true; a cópia do POM sem testes falhou como esperado. [Resultados e 65 testes](../experiments/task-003-configuration-validation.md).
+
+## ADR-011 — Reutilizar as topologias CORE existentes
+
+Estado: adotada após esclarecimento do utilizador em 27-10-2026. Os XML cenario1/2/3 em CORE/topologies são a base de integração. O topology.properties criado na TASK-003 é um perfil local de teste com loopback, não substitui nem importa esses XML. CORE lê o XML para criar equipamentos/links/IP; a aplicação lê propriedades para definir papéis e vizinhanças overlay.
+
+A proposta inicial de criar ott-cenario*.xml por defeito foi retirada. Reutilizar os equipamentos/IP existentes, incluindo relays nos routers Linux quando adequado à bancada; só propor adaptação mínima se uma limitação concreta impedir um requisito. Um PC chamado Cliente pode alojar outro papel Java, incluindo a segunda origem. TASK-025–027 foram ajustadas, mantendo-se TODO. Nenhum XML foi alterado.
+
+Verificação estática dos XML: parsing concluído, IDs únicos, referências dos links válidas e grafo conectado nos três ficheiros. Cenario1 tem quatro equipamentos, cenario2 seis, cenario3 20 devices mais cinco networks/switches (25 equipamentos no total). Isto não valida o arranque, IP routing, reachability ou streaming no CORE; essas verificações continuam pendentes.

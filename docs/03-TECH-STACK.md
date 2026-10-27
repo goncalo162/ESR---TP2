@@ -12,7 +12,7 @@ O enunciado permite escolher linguagem e transporte. As escolhas abaixo são dec
 | DataInputStream/DataOutputStream, ByteBuffer | Formato binário pequeno e independente de serialização de objetos | Proposto; JSON não é exigido e os JSON existentes estão vazios |
 | Properties | Configuração de nós, topologia e catálogo de fontes | Proposto; evita biblioteca de parsing adicional; criar topology.properties em vez de implementar parser JSON próprio |
 | Swing/AWT + ImageIO | Janela simples de visualização de JPEG | Proposto; não requer JavaFX, FFmpeg como runtime nem browser |
-| JUnit Jupiter 5.13.4 + Surefire 3.5.4 | Testes unitários e de integração local | Configurados em TASK-001 com scope test e engine resolvido; descoberta/execução de testes reais fica para TASK-003 |
+| JUnit Jupiter 5.13.4 + Surefire 3.5.4 | Testes unitários e de integração local | Configurados em TASK-001; desde TASK-003 executam testes reais de configuração, com failIfNoTests=true |
 | CORE | Emulação IP, topologias, atrasos e falhas | Obrigatório como bancada principal; não substituível por testes localhost |
 | Docker/Compose | Reutilizar a bancada preparada | Conveniência existente; CORE nativo também poderia satisfazer o PDF |
 | tcpdump/tshark, iproute2 | Captura, contadores e inspeção de endereçamento | Ferramentas propostas; confirmar versões disponíveis na bancada |
@@ -38,3 +38,7 @@ Na sessão inicial de planeamento, a ferramenta web não conseguiu inspecionar [
 ## Configuração confirmada pela TASK-001
 
 Build validado em 26-10-2026 com Java 21.0.12.1 e Maven 3.6.3. Compiler 3.13.0 preservado; clean 3.4.1, resources 3.3.1, Surefire 3.5.4 e jar 3.4.2 fixados no POM para estabilizar o ciclo clean/package. JUnit Jupiter 5.13.4 inclui engine e API com scope test. Zero testes funcionais executados; não houve teste artificial. Valores efetivos, comandos, saídas e limites em [baseline](../experiments/build-baseline.md).
+
+## Validação funcional de configuração na TASK-003
+
+Em 27-10-2026, o JUnit Platform executou 65 casos reais de configuração com sucesso. Surefire já exige testes, e uma cópia temporária do POM sem testes falhou como esperado. Não foram adicionadas dependências runtime nem alteradas as versões fixadas. O carregador usa Reader UTF-8/Properties e URI apenas para parsing sintático, sem DNS. [Relatório V-003](../experiments/task-003-configuration-validation.md).

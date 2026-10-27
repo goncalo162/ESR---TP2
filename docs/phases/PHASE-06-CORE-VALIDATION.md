@@ -35,7 +35,7 @@ O gate anterior e as dependências de cada tarefa são cumulativos. A tarefa ini
 
 ## 8. Componentes afetados
 
-CORE/container e volumes quando necessário; topologias ott-cenario1/2/3; configurações e experiments. Os caminhos precisos e a distinção existente/planeado estão nas tarefas e em [05](../05-PROJECT-STRUCTURE.md).
+CORE/container e volumes quando necessário; topologias existentes CORE/topologies/cenario1.xml, cenario2.xml e cenario3.xml; perfis de configuração por cenário e experiments. Variantes do XML apenas por necessidade concreta documentada, preservando os originais. Os caminhos precisos estão nas tarefas e em [05](../05-PROJECT-STRUCTURE.md).
 
 ## 9. Entregáveis
 

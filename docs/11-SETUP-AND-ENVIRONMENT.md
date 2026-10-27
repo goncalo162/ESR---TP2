@@ -1,6 +1,6 @@
 # Ambiente de desenvolvimento e execução futura
 
-**Classificação:** O = observado por leitura ou disponibilidade do executável; P = proposto e ainda não validado; V = executado e verificado no ambiente indicado. TASK-001 validou a base Maven no host, sem testes funcionais; [evidência](../experiments/build-baseline.md). Comandos de CORE, GUI e aplicação continuam propostos.
+**Classificação:** O = observado por leitura ou disponibilidade do executável; P = proposto e ainda não validado; V = executado e verificado no ambiente indicado. TASK-001 validou a base Maven no host; TASK-003 acrescentou 65 testes reais de configuração e build limpo com sucesso. [V-001](../experiments/build-baseline.md), [V-003](../experiments/task-003-configuration-validation.md). Comandos de CORE, GUI e aplicação continuam propostos.
 
 ## Pré-requisitos
 
@@ -18,8 +18,8 @@ Os comandos seguintes partem da raiz ou do diretório indicado. São exemplos fu
 | Diretório | Comando | Estado e condição |
 |---|---|---|
 | raiz | java -version; mvn -version; docker --version | V: Java/Maven verificados em TASK-001; docker --version não executado, continua P para TASK-025 |
-| Projeto | mvn clean package | V em TASK-001 com JAVA_HOME do JDK 21; BUILD SUCCESS, sem classes/funcionalidades implementadas |
-| Projeto | mvn test | V em TASK-001 com JDK 21; BUILD SUCCESS, zero testes. Só valida comportamento após TASK-003 |
+| Projeto | mvn clean package | V em TASK-001 e TASK-003 com JAVA_HOME do JDK 21; build final inclui classes de configuração e 65 testes aprovados |
+| Projeto | mvn test | V em TASK-001 (zero testes na base inicial) e TASK-003 (65 testes de configuração aprovados) com JDK 21 |
 | Projeto | mvn -Dtest=MessageCodecTest test | P: classe existe vazia, só executável após TASK-004 |
 | Projeto | mvn verify | P: depois de TASK-024 deve executar testes unitários/integração com convenção *Test; sem depender de profile inexistente |
 | CORE | bash setup.sh | O como script de build; P em execução; usa Docker e pode requerer rede; TASK-025 |
@@ -39,7 +39,7 @@ No CORE o caminho proposto do JAR é /volume/ott/ott-streaming-1.0-SNAPSHOT.jar 
 2. TASK-008 permite iniciar nós reais. Em localhost atribuir control/data ports diferentes a cada processo; em CORE podem repetir os portos em namespaces IP distintos.
 3. TASK-020 confirma formato/distribuição dos vídeos e perfis. Não descarregar e executar exemplos automaticamente como instalação.
 4. TASK-024 valida ponta a ponta localmente antes da emulação.
-5. TASK-025 verifica imagem, runtime, DISPLAY, paths/volumes e cria topologia de quatro terminais; TASK-026/027 criam os outros cenários.
+5. TASK-025 verifica imagem/runtime/DISPLAY/volumes e reutiliza CORE/topologies/cenario1.xml; TASK-026/027 usam cenario2.xml e cenario3.xml. Mapear processos e criar configurações com IPs reais. Não substituir os XML por novas topologias sem necessidade demonstrada.
 6. Abrir topologia pela GUI, iniciar a sessão, confirmar interfaces e rotas IP, preencher a tabela nodeId→host CORE→IP→portos, e só depois iniciar processos manualmente.
 7. Guardar manifestos e usar exatamente a configuração verificada nos resultados.
 
@@ -76,8 +76,14 @@ env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B -Dstyle.color=never clea
 env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B -Dstyle.color=never test
 ~~~
 
-Os três comandos acima foram verificados com sucesso. O caminho do JDK é específico deste host; adaptar noutros ambientes mantendo Java 21. Requer cache Maven gravável e rede quando faltarem dependências. O POM mantém failIfNoTests=false só para a base inicial; TASK-003 deve exigir testes reais. Relatórios futuros: Projeto/target/surefire-reports/; nesta etapa não foram produzidos relatórios de casos de teste. Ver [baseline](../experiments/build-baseline.md) para resultados e falhas de permissões resolvidas.
+Os três comandos acima foram verificados com sucesso. O caminho do JDK é específico deste host; adaptar noutros ambientes mantendo Java 21. Requer cache Maven gravável e rede quando faltarem dependências. O POM usava failIfNoTests=false só para a base inicial; desde TASK-003 usa true e a ausência de testes faz falhar o build. Relatórios futuros: Projeto/target/surefire-reports/; nesta etapa não foram produzidos relatórios de casos de teste. Ver [baseline](../experiments/build-baseline.md) para resultados e falhas de permissões resolvidas.
 
 ## Recursos identificados na TASK-002
 
 O ZIP docente esteve acessível e o perfil de movie.Mjpeg foi confirmado; [V-002](../experiments/task-002-contract-review.md) contém URL, hashes, formato e inspeção. As cópias do ZIP são o mesmo vídeo, não três streams distintas. Foram identificados A/B para S1 e C/D para S2, mas B/C/D ainda precisam de descarga/preparação na TASK-020. As fixtures binárias em Projeto/src/test/resources/protocol são dados sintéticos de contrato e não vídeos reproduzíveis. Nenhum comando de streaming, GUI ou CORE passou a validado por esta inspeção.
+
+## Configuração e testes disponíveis após TASK-003
+
+Os perfis em Projeto/src/main/resources/config já contêm propriedades válidas, grafo simétrico e dois catálogos por origem; JSON vazio e streams.properties histórico não são carregados. A API de carga está em [07](07-API-AND-INTERFACES.md). Não existe ainda main funcional para iniciar um nó; não executar os comandos de aplicação antes de TASK-008. Os quatro paths de media são metadados: preparação/validação dos ficheiros continua em TASK-020.
+
+O comando Maven de testes com JDK 21 executou 65 casos e produz TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml em Projeto/target/surefire-reports/. Esses resultados substituem a ausência de relatórios da base inicial; o baseline antigo continua como histórico. A primeira execução com testes reais precisou de descarregar o provider Surefire JUnit Platform com permissão autorizada; depois o build limpo passou em modo offline.

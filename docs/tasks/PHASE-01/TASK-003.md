@@ -5,7 +5,7 @@
 - ID: TASK-003
 - Fase: [PHASE-01 — Fundações, configuração e protocolo](../../phases/PHASE-01-FOUNDATION.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: DONE
 - Dependências: [TASK-001](../PHASE-01/TASK-001.md), [TASK-002](../PHASE-01/TASK-002.md).
 - Requisitos relacionados: [RF-001](../../02-REQUIREMENTS.md#rf-001), [RF-004](../../02-REQUIREMENTS.md#rf-004), [RF-012](../../02-REQUIREMENTS.md#rf-012), [RF-013](../../02-REQUIREMENTS.md#rf-013), [RP-001](../../02-REQUIREMENTS.md#rp-001), [RP-006](../../02-REQUIREMENTS.md#rp-006).
 
@@ -35,10 +35,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Criar modelos imutáveis para valores de configuração.
-- [ ] Implementar parsing estrito e erros agregados com chave e origem.
-- [ ] Preencher exemplos .properties e substituir o uso planeado de JSON vazio por propriedades.
-- [ ] Criar testes positivos/negativos e exigir testes realmente descobertos pelo Maven.
+- [x] Criar modelos imutáveis para valores de configuração.
+- [x] Implementar parsing estrito e erros agregados com chave e origem.
+- [x] Preencher exemplos .properties e substituir o uso planeado de JSON vazio por propriedades.
+- [x] Criar testes positivos/negativos e exigir testes realmente descobertos pelo Maven.
 
 ## 8. Regras e restrições
 
@@ -52,21 +52,27 @@ Ficheiro inexistente, chave duplicada ou desconhecida, CSV vazio, path relativo,
 
 V-003: fixtures válidas/invalidas com diretório temporário, paths fora do cwd, ID de um carácter e quatro streams; Maven reporta testes executados e falha perante um requisito de configuração violado.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: V-003 EXECUTADA, 65 testes com sucesso e controlo negativo de ausência de testes verificado. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Configuração válida carrega sem rede.
-- [ ] Erros identificam a propriedade e não deixam estado parcial.
-- [ ] Há dois servidores com dois UUID por servidor nos exemplos finais.
-- [ ] Validação V-003 executada e evidência ligada no progresso.
+- [x] Configuração válida carrega sem rede.
+- [x] Erros identificam a propriedade e não deixam estado parcial.
+- [x] Há dois servidores com dois UUID por servidor nos exemplos finais.
+- [x] Validação V-003 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
-Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Nenhuma evidência de execução foi produzida por este ficheiro de planeamento.
+Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Evidências em [V-003](../../../experiments/task-003-configuration-validation.md), com revalidação de TASK-001/002 antes de iniciar.
 
 ## 13. Notas para a IA implementadora
 
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+### Resultado — 27-10-2026
+
+ConfigurationLoader e modelos imutáveis implementados, erros agregados por ficheiro/propriedade, perfis locais preenchidos e unicidade global verificada por loadDeployment. Topologia/catálogos são carregados sem rede e sem bytes de vídeo. NodeRole é apenas o enum partilhado da configuração; runtime de overlay não foi implementado.
+
+Build limpo com Java 21 e Maven 3.6.3: 65 testes, zero falhas/erros/skips. failIfNoTests=true confirmado também por execução de uma cópia do POM sem testes, que falhou como esperado. Critérios cumpridos, nenhum bloqueio atual. TASK-004 fica TODO, não iniciada. [Relatório completo](../../../experiments/task-003-configuration-validation.md).

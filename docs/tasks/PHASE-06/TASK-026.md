@@ -23,13 +23,13 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Criar seis terminais overlay S,R1,R2,R3,C1,C2 e arestas S–R1,S–R2,R1–R3,R2–R3,R3–C1,R3–C2. Este grafo é uma variante do desenho sugerido na p. 5, mantendo seis nós e caminhos alternativos; não é uma transcrição literal da figura. Adicionar underlay suficiente sem confundir contagem. Fixar duas condições de atraso para tornar um caminho preferível e depois inverter. Testar separadamente morte de processo relay, quebra de TCP/UDP da aresta overlay e falha física com recuperação IP. Só a primeira/segunda prova demonstra inequivocamente adaptação da aplicação; registar a rota IP antes/depois da terceira.
+Reutilizar CORE/topologies/cenario2.xml e os seis equipamentos atuais: Servidor, Router1/2/3 e Cliente1/2. Definir explicitamente onde correm S, R1/R2/R3 e C1/C2; os routers Linux do CORE podem alojar os relays sem perder o seu papel IP. Construir o grafo de vizinhança a partir de endpoints alcançáveis nesse cenário, verificando caminhos alternativos e a sua dependência da underlay. As ligações overlay podem atravessar vários links IP; não são obrigadas a replicar todas as arestas físicas. Não criar outro XML por defeito nem impor o grafo alternativo anteriormente proposto. Fixar duas condições de atraso para tornar um caminho preferível e depois inverter. Testar separadamente morte de processo relay, quebra de TCP/UDP da aresta overlay e falha física com recuperação IP. Só a primeira/segunda prova demonstra inequivocamente adaptação da aplicação; registar a rota IP antes/depois da terceira.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existente: CORE/topologies/cenario2.xml; planeados: ott-cenario2.xml e experiments/scenario-2/.
+Existente: CORE/topologies/cenario2.xml; planeados: perfis .properties para os seus processos e experiments/scenario-2/. Só adaptar o XML por necessidade concreta documentada, preservando o original.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 

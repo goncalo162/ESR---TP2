@@ -60,7 +60,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-008](tasks/PHASE-02/TASK-008.md).
 - Validação: V-003, V-008 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Iniciar manualmente servidor, relay e cliente em processos independentes; cada um escuta no endpoint configurado e reporta o seu papel.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rf-002"></a>
@@ -102,7 +102,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md).
 - Validação: V-003, V-006, V-007 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Um nó iniciado apenas com configuração local e contacto bootstrap recebe os endpoints dos vizinhos permitidos, sem precisar de os fornecer na CLI.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rf-005"></a>
@@ -214,7 +214,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md).
 - Validação: V-003, V-012, V-020, V-024, V-027 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Executar dois processos de origem, em nós de teste identificados, com catálogos próprios e anúncios simultâneos; bootstrap não conta como servidor de vídeo.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rf-013"></a>
@@ -228,7 +228,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md).
 - Validação: V-003, V-020, V-024, V-027 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Configurar quatro UUID e pelo menos dois conteúdos visualmente distintos em cada servidor; registar origem, ficheiro, hash e evidência de reprodução. Aliases do mesmo ficheiro não bastam.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rf-014"></a>
@@ -447,7 +447,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md).
 - Validação: V-003, V-012, V-023, V-024 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Mostrar UUID, título e origem dos anúncios ainda válidos; selecionar um fluxo sem confundir fontes.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rp-002"></a>
@@ -517,7 +517,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-001](tasks/PHASE-01/TASK-001.md), [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md).
 - Validação: V-001, V-003, V-004, V-005, V-007, V-010, V-011, V-014, V-019, V-021, V-022 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Validar limites antes de alocar; injetar relógio/transportes nos testes; filas e caches têm máximo e política de overflow; não aceitar objetos Java serializados da rede.
-- Estado atual: IN PROGRESS — TASK-001 DONE; V-001 concluída com [evidência](../experiments/build-baseline.md), sem testes funcionais. As restantes tarefas deste requisito estão pendentes.
+- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 
 <a id="rp-007"></a>

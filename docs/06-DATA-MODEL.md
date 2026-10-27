@@ -6,7 +6,7 @@ Não existe persistência transacional. Ficheiros locais definem configuração 
 
 | Entidade | Campos e tipos propostos | Validação / relações |
 |---|---|---|
-| NodeConfiguration | nodeId string ASCII 1–32, role enum, bindHost, advertisedHost, controlPort/dataPort int, bootstrapHost/Port, instanceId UUID novo | IDs [A-Za-z0-9_-]+; portas 1–65535; endpoint publicitado alcançável; instanceId não persiste |
+| NodeConfiguration | sourceFile Path, nodeId string ASCII 1–32, role NodeRole, bindHost, advertisedHost, controlPort/dataPort int, contacto bootstrap opcional, paths opcionais, topologia opcional e lista de streams | Modelo imutável implementado em TASK-003. Portas 1–65535; dataPort=0 apenas no BOOTSTRAP sem UDP. Verifica sintaxe de endpoint; alcance é futuro. instanceId só é gerado na execução, TASK-008 |
 | Neighbor | nodeId, instanceId, endpoint TCP/UDP, connectionId UUID, state, lastSeen monotónico | No máximo uma conexão confirmada por nodeId; eventos antigos da connectionId são ignorados |
 | NodeRegistry | mapa nodeId → endpoints/papel/leaseUntil e grafo permitido | O grafo é simétrico, sem self-link, sem endpoint duplicado por namespace; membership expirável não apaga a configuração |
 | StreamInfo | streamId UUID, serverId nodeId, title string até 128 pontos de código Unicode, codec MJPEG, fps int, serverEpoch UUID | Stream UUID único em toda a configuração; cada UUID pertence a uma origem; pelo menos dois vídeos por origem na configuração final |
@@ -19,6 +19,10 @@ Não existe persistência transacional. Ficheiros locais definem configuração 
 | StreamPacket | streamId UUID, sessionId UUID, frameSeq long, mediaTimeUs long, frameLength int, fragmentIndex/count int, payload byte[] | sessionId corresponde ao serverEpoch atual; bytes e limites em [07](07-API-AND-INTERFACES.md) |
 | FrameAssembly | (streamId,sessionId,frameSeq), firstSeen, deadline, expectedLength/count, bitmap, fragments | Máximo oito frames em montagem por stream; verificar coerência em todos os fragmentos; remover no prazo |
 | Counters | pacotes/bytes por fluxo e direção, descartes por razão, mudanças de rota, frames recebidos/mostrados | Incrementos monotónicos na execução; snapshots com RUN-ID; não confundir perdas IP com frames não reconstruídos |
+
+## Modelos de configuração disponíveis
+
+Desde TASK-003, config contém NodeConfiguration, TopologyConfiguration (mapa de nós e sets de vizinhos imutáveis), StreamConfiguration (UUID, serverId, título, mediaFile, FPS e loop) e problemas agregados ConfigurationProblem/ConfigurationException. São metadados de arranque e não substituem tabelas de vizinhos/rotas, catálogo dinâmico ou StreamInfo com epoch, que pertencem às fases seguintes. A configuração não gera UUID de instância, não resolve DNS nem abre sockets. [API e limites](07-API-AND-INTERFACES.md), [evidência V-003](../experiments/task-003-configuration-validation.md).
 
 ## Estados
 

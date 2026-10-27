@@ -23,19 +23,19 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Usar a figura 1 como inspiração, preservando overlay menor que underlay. Criar dois terminais de origem S1/S2, cinco relays R1..R5 e cinco clientes C1..C5; bootstrap no host S1. Grafo proposto: S1–R1,S1–R2,S2–R2,S2–R3,R1–R4,R2–R4,R2–R5,R3–R5,R4–R5,R4–C1,R4–C2,R5–C3,R5–C4,R5–C5. O grafo permite alternativas; cada aresta e endereço é verificado no cenário real. S1 oferece A/B e S2 C/D distintos. Testar distribuição entre os quatro UUID e cinco clientes na mesma stream.
+Reutilizar CORE/topologies/cenario3.xml, inspirado na figura 1. O XML contém dez PCs, dez routers e cinco switches; os nomes Servidor/Cliente não limitam o papel do processo Java. Reaproveitar os PCs para duas origens, relays e pelo menos cinco clientes: uma distribuição possível é dois servidores, três relays e cinco clientes nos dez PCs existentes, com bootstrap no host S1. Definir vizinhanças e caminhos alternativos sobre os IPs reais, mantendo a overlay menor que a underlay. O número de cinco relays do desenho inicial era uma proposta, não requisito. S1 oferece A/B e S2 C/D. Não criar equipamentos/novo XML por defeito; só propor uma adaptação mínima se os requisitos não forem demonstráveis com os existentes, preservando o original.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existente: CORE/topologies/cenario3.xml; planeados: ott-cenario3.xml e experiments/scenario-3/.
+Existente: CORE/topologies/cenario3.xml; planeados: perfis .properties que mapeiam os processos para os equipamentos existentes e experiments/scenario-3/. Não há novo XML obrigatório.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
 ## 7. Passos de implementação
 
-- [ ] Criar terminais e tabela completa de mapeamento, sem depender dos nomes antigos.
+- [ ] Atribuir papéis aos equipamentos existentes e criar a tabela completa de processo→equipamento→IP/porto.
 - [ ] Verificar alcance IP e grafo simétrico com origens e relays.
 - [ ] Executar consumo combinado e concentração numa stream.
 - [ ] Interromper um relay e uma origem separadamente, observando isolamento.
