@@ -4,7 +4,7 @@ Trabalho Prático Nº 2 da unidade curricular de Engenharia de Serviços em Rede
 
 ## Estado atual
 
-TASK-001–005 concluídas; PHASE-02 IN PROGRESS. Configuração, codec e transporte TCP implementados, com dials assíncronos, filas limitadas, eventos e shutdown. Build com 146 testes aprovados (65 configuração, 66 codec, 15 transporte). Sockets loopback reais na mesma JVM; ainda sem overlay entre processos/streaming. Bootstrap previsto só para descoberta inicial, conforme ADR-013.
+TASK-001–005 concluídas; PHASE-02 IN PROGRESS. Configuração, codec e transporte TCP implementados, com dials assíncronos, filas limitadas, eventos e shutdown. Build com 149 testes aprovados (65 configuração, 66 codec, 18 transporte). Sockets loopback reais na mesma JVM; ainda sem overlay entre processos/streaming. Bootstrap previsto só para descoberta inicial, conforme ADR-013.
 
 ## Documentação
 

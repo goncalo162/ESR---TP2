@@ -12,13 +12,13 @@ Shutdown fecha listener/sockets, limpa filas e termina workers, com deadline glo
 
 ## Testes e resultados
 
-Executados 15 testes com sockets TCP reais em loopback na mesma JVM: quatro produtores simultâneos, fixture independente, framing parcial/concatenado, recusa/porta ocupada, mensagens inválidas, peer lento, overflow, admissão, cancelamento, reconexão explícita e shutdown durante I/O/dial.
+Executados 18 testes com sockets TCP reais em loopback na mesma JVM: quatro produtores simultâneos, fixture independente, framing parcial/concatenado, recusa/porta ocupada, mensagens inválidas, peer lento, overflow, admissão, cancelamento, reconexão explícita e shutdown durante I/O/dial, erros nos callbacks de abertura/fecho, callback preso com timeout e shutdown simultâneo em duas ligações.
 
-`mvn -B -ntp clean verify` passou **146 testes**, sem falhas/erros/skips: 65 configuração, 66 codec e 15 transporte. macOS 14.6.1 x86_64, Temurin 21.0.13+9 e Maven 3.9.9. [Evidência](../experiments/task-005-transport-validation.md), [log do build](../experiments/task-005-build.log).
+`mvn -B -ntp clean verify` passou **149 testes**, sem falhas/erros/skips: 65 configuração, 66 codec e 18 transporte. macOS 14.6.1 x86_64, Temurin 21.0.13+9 e Maven 3.9.9. [Evidência](../experiments/task-005-transport-validation.md), [log da revisão](../experiments/task-005-review-build.log).
 
 ## Texto factual reutilizável
 
-O plano de controlo utiliza ligações TCP bidirecionais com enquadramento binário v1. Cada ligação possui leitor e escritor exclusivos, fila de saída limitada e identidade própria para correlacionar eventos ao longo de reconexões. O estabelecimento é assíncrono e as falhas de formato ou saturação são tratadas localmente, preservando as restantes ligações. O encerramento liberta I/O pendente, sockets e workers. A validação do transporte acrescentou 15 testes aos 131 testes de configuração e codec, totalizando 146 casos aprovados num build limpo.
+O plano de controlo utiliza ligações TCP bidirecionais com enquadramento binário v1. Cada ligação possui leitor e escritor exclusivos, fila de saída limitada e identidade própria para correlacionar eventos ao longo de reconexões. O estabelecimento é assíncrono e as falhas de formato ou saturação são tratadas localmente, preservando as restantes ligações. O encerramento liberta I/O pendente, sockets e workers. A validação do transporte acrescentou 18 testes aos 131 testes de configuração e codec, totalizando 149 casos aprovados num build limpo.
 
 ## Limites e continuação
 

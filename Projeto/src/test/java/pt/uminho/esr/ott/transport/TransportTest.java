@@ -332,6 +332,96 @@ class TransportTest {
         }
     }
 
+    @Test void failingOpenAndClosedCallbacksDoNotRetainConnectionSlots() throws Exception {
+        var events = new Events() {
+            @Override public void connectionOpen(Connection c) {
+                super.connectionOpen(c);
+                throw new IllegalStateException("open callback failed");
+            }
+            @Override public void connectionClosed(Connection c, Connection.CloseReason reason) {
+                super.connectionClosed(c, reason);
+                throw new IllegalStateException("closed callback failed");
+            }
+        };
+        var options = new Transport.Options(2, 1, WAIT, WAIT);
+        try (var receiver = new Transport(ephemeral(), events, options);
+             var sender = new Transport(ephemeral(), new Events())) {
+            for (int i = 0; i < 2; i++) {
+                sender.connect(receiver.localAddress()).get(3, TimeUnit.SECONDS);
+                Connection c = take(events.opened);
+                assertEquals(new Closed(c.id(), Connection.CloseReason.CALLBACK_ERROR), take(events.closed));
+                eventually(() -> receiver.connectionCount() == 0);
+            }
+            terminated(receiver);
+        }
+    }
+
+    @Test void blockedCallbackMakesShutdownTimeoutExplicitAndCanThenTerminate() throws Exception {
+        var entered = new CountDownLatch(1);
+        var release = new CompletableFuture<Void>();
+        var events = new Events() {
+            @Override public void message(Connection c, ControlMessage message) {
+                entered.countDown();
+                release.join(); // Deliberately violates the non-blocking callback contract.
+            }
+        };
+        var options = new Transport.Options(2, 2, WAIT, Duration.ofMillis(100));
+        try (var receiver = new Transport(ephemeral(), events, options);
+             var sender = new Transport(ephemeral(), new Events())) {
+            try {
+                Connection c = sender.connect(receiver.localAddress()).get(3, TimeUnit.SECONDS);
+                take(events.opened);
+                assertEquals(Connection.SendResult.ACCEPTED, c.send(ping(1)));
+                assertTrue(entered.await(3, TimeUnit.SECONDS));
+                IllegalStateException error = assertThrows(IllegalStateException.class, receiver::close);
+                assertTrue(error.getMessage().contains("did not terminate"));
+                assertFalse(receiver.awaitTermination(Duration.ofMillis(10)));
+            } finally {
+                release.complete(null);
+            }
+            terminated(receiver);
+            assertEquals(0, receiver.connectionCount());
+            assertEquals(Connection.CloseReason.SHUTDOWN, take(events.closed).reason());
+            assertTrue(events.closed.isEmpty());
+        }
+    }
+
+    @Test void simultaneousShutdownFromTwoCallbacksDoesNotJoinEachOther() throws Exception {
+        var arrived = new CountDownLatch(2);
+        var finished = new CountDownLatch(2);
+        var release = new CompletableFuture<Void>();
+        final Transport[] holder = new Transport[1];
+        var events = new Events() {
+            @Override public void message(Connection c, ControlMessage message) {
+                arrived.countDown();
+                release.join();
+                holder[0].close();
+                finished.countDown();
+            }
+        };
+        try (var receiver = new Transport(ephemeral(), events);
+             var left = new Transport(ephemeral(), new Events());
+             var right = new Transport(ephemeral(), new Events())) {
+            holder[0] = receiver;
+            try {
+                Connection a = left.connect(receiver.localAddress()).get(3, TimeUnit.SECONDS);
+                Connection b = right.connect(receiver.localAddress()).get(3, TimeUnit.SECONDS);
+                take(events.opened); take(events.opened);
+                assertEquals(Connection.SendResult.ACCEPTED, a.send(ping(1)));
+                assertEquals(Connection.SendResult.ACCEPTED, b.send(ping(2)));
+                assertTrue(arrived.await(3, TimeUnit.SECONDS));
+                release.complete(null);
+                assertTrue(finished.await(3, TimeUnit.SECONDS));
+                assertTrue(receiver.awaitTermination(WAIT));
+                assertEquals(0, receiver.connectionCount());
+                assertNotEquals(take(events.closed).connectionId(), take(events.closed).connectionId());
+                assertTrue(events.closed.isEmpty());
+            } finally {
+                release.complete(null);
+            }
+        }
+    }
+
     @Test void validatesLimitsAndRejectsUnresolvedEndpoints() throws Exception {
         assertThrows(IllegalArgumentException.class, () -> new Transport.Options(0, 1, WAIT, WAIT));
         assertThrows(IllegalArgumentException.class, () -> new Transport.Options(257, 1, WAIT, WAIT));

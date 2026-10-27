@@ -1,6 +1,6 @@
 # Ambiente de desenvolvimento e execução futura
 
-Estado atual após TASK-005: Temurin 21.0.13, Maven 3.9.9, 146 testes aprovados. Java/Maven e VS Code locais já estavam configurados; as versões e paths Linux da TASK-001 abaixo são históricos. CORE/GUI continuam pendentes. [V-005](../experiments/task-005-transport-validation.md).
+Estado atual após TASK-005: Temurin 21.0.13, Maven 3.9.9, 149 testes aprovados. Java/Maven e VS Code locais já estavam configurados; as versões e paths Linux da TASK-001 abaixo são históricos. CORE/GUI continuam pendentes. [V-005](../experiments/task-005-transport-validation.md).
 
 **Classificação:** O = observado por leitura ou disponibilidade do executável; P = proposto e ainda não validado; V = executado e verificado no ambiente indicado. TASK-001 validou a base Maven no host; TASK-003 acrescentou 65 testes reais de configuração e build limpo com sucesso. [V-001](../experiments/build-baseline.md), [V-003](../experiments/task-003-configuration-validation.md). Comandos de CORE, GUI e aplicação continuam propostos.
 
@@ -23,7 +23,7 @@ Os comandos seguintes partem da raiz ou do diretório indicado. A tabela disting
 | Projeto | mvn clean package | V em TASK-001 e TASK-003 com JAVA_HOME do JDK 21; build final inclui classes de configuração e 65 testes aprovados |
 | Projeto | mvn test | V em TASK-001 (zero testes na base inicial) e TASK-003 (65 testes de configuração aprovados) com JDK 21 |
 | Projeto | mvn -Dtest=MessageCodecTest test | Classe implementada na TASK-004; suite executada pelo build completo com JDK 21 (66 casos de codec/integração) |
-| Projeto | mvn -B -ntp clean verify | V na TASK-005: 146 testes aprovados, incluindo 15 TCP reais |
+| Projeto | mvn -B -ntp clean verify | V na TASK-005: 149 testes aprovados, incluindo 18 TCP reais |
 | Projeto | mvn -Dtest=TransportTest test | Suite de 15 casos executada no build limpo; requer sockets locais |
 | CORE | bash setup.sh | O como script de build; P em execução; usa Docker e pode requerer rede; TASK-025 |
 | CORE | ./core-gui | O como launcher; P em execução nesta sessão; inicia container e GUI |
@@ -108,6 +108,6 @@ cd Projeto
 mvn -B -ntp clean verify
 ```
 
-Validação: Temurin 21.0.13+9, Maven 3.9.9, 146 testes (65+66+15), zero falhas/erros/skips. Testes TCP com sockets reais exigem permissão de bind/loopback e foram executados com permissões alargadas. Relatórios em Projeto/target/surefire-reports/; [log persistente](../experiments/task-005-build.log), [oráculos e limites](../experiments/task-005-transport-validation.md). Nenhum teste foi desativado.
+Validação: Temurin 21.0.13+9, Maven 3.9.9, 149 testes (65+66+18), zero falhas/erros/skips. Testes TCP com sockets reais exigem permissão de bind/loopback e foram executados com permissões alargadas. Relatórios em Projeto/target/surefire-reports/; [log da revisão](../experiments/task-005-review-build.log), [oráculos e limites](../experiments/task-005-transport-validation.md). Nenhum teste foi desativado.
 
 O JAR contém Transport/Connection, sem main funcional ou bootstrap/handshake implementados. Não iniciar Docker para os testes locais. Processos independentes/CORE/GUI permanecem nas tarefas próprias.

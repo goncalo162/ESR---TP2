@@ -29,7 +29,7 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existentes: transport/Transport.java e Connection.java; planeado: transport/TransportTest.java.
+Implementados: transport/Transport.java, Connection.java e o teste transport/TransportTest.java.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
@@ -52,7 +52,7 @@ Peer sem leitura, porta ocupada, conexão recusada, EOF parcial, duas threads a 
 
 V-005: dois endpoints loopback com portas efémeras trocam mensagens simultâneas intactas; parar um gera evento único; reconexão e saturação não deixam threads/sockets abertos.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: EXECUTADA, com 15 testes TCP aprovados e 146 testes no build limpo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: EXECUTADA e revista, com 18 testes TCP aprovados e 149 testes no build limpo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
@@ -76,3 +76,7 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
 Transport/Connection implementam listener e dial assíncrono com timeout, UUID por conexão, leitor/escritor únicos, eventos ordenados, fila/admissão limitadas, cancelamento e shutdown com deadline. Defaults: 256 frames, 64 reservas incluindo dials, connect 2 s e shutdown externo 3 s. Overflow fecha apenas a conexão saturada; callbacks devem retornar rapidamente. API em 07 e ADR-014 em 12.
 
 Build `mvn -B -ntp clean verify`: 146 testes aprovados (65 configuração, 66 codec, 15 transporte), zero falhas/erros/skips. Sockets reais em loopback; sem CORE/processos JVM independentes demonstrados. Preservados codec/fixtures corrigidos por ADR-013, enunciado, Java/Maven e configuração local. [Evidência](../../../experiments/task-005-transport-validation.md). PHASE-02 IN PROGRESS; TASK-006 continua TODO, apenas descoberta inicial sem registo vivo ou leases no bootstrap.
+
+### Revisão — 27-10-2026
+
+Revisão de contratos, implementação, recursos e testes sem defeito funcional confirmado no transporte. Acrescentados três testes de callbacks: falhas em open/closed sem retenção de slots, deadline explícito com callback preso e shutdown simultâneo por duas ligações sem join circular. Build limpo com 149 testes aprovados (18 TCP), zero falhas/erros/skips. [Evidência da revisão](../../../experiments/task-005-transport-validation.md#revisão-da-task-005--27-10-2026). Código do transporte preservado; TASK-005 permanece DONE. O fecho imediato continua a descartar fila: confirmar escrita completa da resposta será necessário na integração da TASK-006.

@@ -2,7 +2,7 @@
 
 Revisão de 26-10-2026. O objeto desta validação é a documentação e a sua cobertura planeada, não a aplicação. A análise usou o enunciado integral de cinco páginas, inspeção visual da figura 1 e dos cenários, confirmação de identidade das cópias do PDF e observação do repositório.
 
-> Registo histórico de 26-10-2026. Estado atual: TASK-001–005 DONE, PHASE-02 IN PROGRESS, 146 testes aprovados. [Progresso](15-PROJECT-PROGRESS.md), [V-005](../experiments/task-005-transport-validation.md).
+> Registo histórico de 26-10-2026. Estado atual: TASK-001–005 DONE, PHASE-02 IN PROGRESS, 149 testes aprovados. [Progresso](15-PROJECT-PROGRESS.md), [V-005](../experiments/task-005-transport-validation.md).
 
 ## Resultados estruturais
 
