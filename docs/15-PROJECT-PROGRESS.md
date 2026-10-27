@@ -1,14 +1,14 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. TASK-001, TASK-002 e TASK-003 concluídas por pedido explícito do utilizador; TASK-004–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; PHASE-02–07 e TASK-005–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Próxima tarefa recomendada:** [TASK-004](tasks/PHASE-01/TASK-004.md), ainda TODO e não iniciada. TASK-001/002 verificadas e TASK-003 concluída, com [65 testes e evidência](../experiments/task-003-configuration-validation.md).
+**Próxima tarefa recomendada:** [TASK-005](tasks/PHASE-02/TASK-005.md), ainda TODO e não iniciada. PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). [Material disponível para o relatório](PHASE-01-REPORT-NOTES.md).
 
 ## Fases
 
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
-| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | IN PROGRESS | TASK-001/002/003 autorizadas e concluídas |
+| [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | TODO | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
@@ -23,7 +23,7 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: IN PRO
 | [TASK-001](tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | DONE | V-001: EXECUTADA; [baseline](../experiments/build-baseline.md); zero testes funcionais |
 | [TASK-002](tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | DONE | V-002: EXECUTADA; [contratos, fixtures e recursos](../experiments/task-002-contract-review.md) |
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
-| [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | TODO | V-004: NÃO EXECUTADO |
+| [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | TODO | V-005: NÃO EXECUTADO |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Implementar registo bootstrap e descoberta configurada | TASK-003, TASK-005 | TODO | V-006: NÃO EXECUTADO |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
@@ -129,3 +129,16 @@ Acrescentar novos handoffs seguindo [o guia](AI-IMPLEMENTATION-GUIDE.md). Não s
 ## Esclarecimento sobre CORE — 27-10-2026
 
 O utilizador reforçou o uso das topologias existentes. Registada ADR-011: reutilizar CORE/topologies/cenario1.xml, cenario2.xml e cenario3.xml; os perfis loopback da TASK-003 são exemplos locais de validação. Retirada a criação obrigatória de variantes nas TASK-025–027. Verificação apenas estrutural dos XML, sem alterar ficheiros CORE ou iniciar serviços. Nenhuma tarefa nova foi iniciada; TASK-004 permanece a próxima.
+
+## Execução da TASK-004 e fecho da fase 1 — 27-10-2026
+
+- Partida: b67a1a719369746d7ee9a572b5ceda577f2368a8, árvore limpa. Dependências e dados persistidos presentes.
+- Estado: TASK-001–004 e PHASE-01 DONE; PHASE-02 e TASK-005 continuam TODO, sem implementação nesta sessão.
+- Código: 17 tipos de controlo, modelos imutáveis, encode/decode/read/write com framing, UTF-8, limites e erros; sem sockets/handlers.
+- Testes: golden bytes/decoding das 29 fixtures TCP, partial reads/EOF/concatenação e integração de configuração→mensagens em memória. As 45 fixtures e os XML CORE foram preservados.
+- Resultado final: Java 21.0.12.1/Maven 3.6.3, clean package com 131 testes (65+66), zero falhas/erros/skips; sem bloqueios.
+- Critérios da fase: quatro tarefas com evidência, configuração/codec integrados localmente, suite anterior sem regressão e documentação/rastreabilidade atualizadas.
+- Requisitos globais: permanecem IN PROGRESS; rede, rotas, vídeo, testes CORE e artigo/PDF final ainda pendentes.
+- Relatório: formatos de controlo e detalhes da base implementada/testes já têm material factual; arquitetura/interações completas e resultados de rede permanecem parciais. [Notas](PHASE-01-REPORT-NOTES.md).
+- Próxima ação: TASK-005 quando solicitada, seguindo o guia. Preservar o uso das topologias existentes conforme ADR-011.
+- Evidência: [V-004 e fecho](../experiments/task-004-codec-validation.md).

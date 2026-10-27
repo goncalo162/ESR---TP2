@@ -20,7 +20,7 @@ ESR---TP2/
 │   │   ├── config/                     E TASK-003: loader, NodeConfiguration, TopologyConfiguration, StreamConfiguration, erros agregados
 │   │   ├── overlay/                    E OverlayNode, NodeRole, Neighbor, NeighborManager
 │   │   ├── transport/                  E Transport, Connection
-│   │   ├── protocol/                   E ControlMessage, MessageType, MessageCodec
+│   │   ├── protocol/                   E TASK-004: ControlMessage, MessageType, MessageCodec, ErrorCode, ProtocolException
 │   │   ├── monitoring/                 E LinkMetrics, NetworkMonitor
 │   │   ├── routing/                    E Route, RouteMetric, RouteState, RoutingTable, RoutingService
 │   │   ├── streaming/                  E StreamInfo, StreamCatalog, StreamPacket, StreamForwarder
@@ -29,7 +29,7 @@ ESR---TP2/
 │   ├── src/main/resources/config/      E properties vazios e topology.json vazio
 │   │   ├── topology.properties         P substituir uso do JSON vazio
 │   │   └── streams-s1.properties / streams-s2.properties P dois fluxos por origem
-│   ├── src/test/java/.../ott/           E cinco placeholders; restantes testes P
+│   ├── src/test/java/.../ott/           E ConfigurationLoaderTest e MessageCodecTest; restantes placeholders/P
 │   ├── src/test/resources/             E JSON vazios; fixtures de configuração ainda P
 │   │   └── protocol/                   E TASK-002: 45 pares .bin/.hex, manifesto e README
 │   └── target/                         E artefactos gerados antigos; não editar

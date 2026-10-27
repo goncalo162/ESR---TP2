@@ -1,6 +1,6 @@
 # Interfaces e contratos propostos
 
-As interfaces de rede são propostas do plano, ainda por implementar. A API de configuração descrita abaixo foi implementada e testada na TASK-003. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. Transporte, handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
 
 ## 1. CLI e configuração
 
@@ -89,6 +89,16 @@ Primitivas: u8/u16/u32 sem sinal na rede e lidos em tipos Java suficientes; i64 
 
 StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16 (1–60), serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (zero apenas num Endpoint devolvido por REGISTER_OK quando ainda desconhecida), host string ASCII de 1–253 bytes, controlPort u16 e dataPort u16 (ambos 1–65535), role u8 (1 SERVER, 2 RELAY, 3 CLIENT). senderId, serverId e nodeId obedecem a [A-Za-z0-9_-]{1,32}; título tem 1–128 pontos de código Unicode e até 512 bytes UTF-8. A identidade no envelope é sempre a do emissor imediato, inclusive quando reencaminha anúncio de outra origem. Um elemento não válido rejeita a mensagem inteira.
 
+### API do codec implementada na TASK-004
+
+MessageCodec.encode(ControlMessage) devolve os bytes de exatamente um frame; decode(byte[]) exige exatamente um frame e rejeita bytes adicionais. write(message, OutputStream) valida/serializa antes de escrever no destino; read(InputStream) lê um frame completo e devolve Optional.empty apenas perante EOF limpo antes do prefixo. EOF a meio do prefixo/corpo é EOFException; campos incompletos num corpo já recebido são ProtocolException INVALID_MESSAGE. Comprimento superior ao máximo, incluindo u32 com bit de sinal, é rejeitado antes da alocação do corpo. Strings e listas também verificam máximos antes de alocar.
+
+ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
+
+O chamador gere flush/close e o único escritor por conexão. O codec não abre sockets. UUID são opacos e preservam todos os bits; a exceção de Endpoint.instanceId desconhecido aplica-se apenas a REGISTER_OK. u32 aceita 0..4294967295 e é exposto como long. Listas vazias, TTL zero ou percursos repetidos podem ter representação sintática; os handlers têm de verificar a validade operacional, origem/prefixo, ciclos, frescura e leases antes de agir. Host no Endpoint tem validação de domínio ASCII/comprimento; o handshake terá de o comparar com a configuração autorizada.
+
+[Implementação e 66 testes do codec](../experiments/task-004-codec-validation.md), incluindo comparação com todas as 29 fixtures TCP independentes. As 16 fixtures UDP permanecem dados de referência; o codec de dados é da TASK-019.
+
 ## 4. Mensagens de controlo v1
 
 Os números são fixados por este contrato. Campos do envelope não são repetidos nos payloads. Respostas preservam requestId do pedido; mensagens periódicas usam um UUID novo.
@@ -154,6 +164,7 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 |---|---|---|
 | ConfigurationLoader.load(path, role) | propriedades → NodeConfiguration ou ConfigurationException com problems | implementado na TASK-003, sem efeitos de rede |
 | ConfigurationLoader.loadDeployment(paths) | perfis completos → lista imutável ou problemas agregados | implementado na TASK-003; verifica grafo, endpoints, contacto bootstrap e unicidade global dos UUID |
+| MessageCodec.read/write e encode/decode | ControlMessage ↔ frame binário v1 | implementado na TASK-004; framing, EOF, UTF-8 e limites, sem sockets |
 | Transport.sendControl(neighborId, message) | envio enfileirado → aceitação/erro | framing e backpressure; não implica ACK de aplicação |
 | NeighborManager.snapshot() | nenhum → vizinhos imutáveis | não expor mapas mutáveis |
 | NetworkMonitor.onPong(id, now) | sonda correlacionada → atualização de métrica/evento | relógio monotónico do emissor |
@@ -164,7 +175,7 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 | FrameAssembler.accept(fragment, now) | → frame completo ou nenhum | armazenamento limitado e timeout |
 | VideoPlayer.showFrame(image) | imagem pronta → atualização visual | executa atualização Swing no EDT |
 
-As assinaturas Java concretas serão criadas nas tarefas correspondentes. Não criar todas as interfaces e classes antecipadamente só por constarem deste contrato.
+As APIs de configuração e codec acima já existem. As restantes assinaturas Java serão criadas nas tarefas correspondentes; a presença no desenho não significa implementação.
 
 ## 7. Perfil de ficheiro MJPEG confirmado na TASK-002
 

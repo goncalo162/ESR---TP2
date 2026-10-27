@@ -5,7 +5,7 @@
 - ID: TASK-004
 - Fase: [PHASE-01 — Fundações, configuração e protocolo](../../phases/PHASE-01-FOUNDATION.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: DONE
 - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-003](../PHASE-01/TASK-003.md).
 - Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005), [RP-006](../../02-REQUIREMENTS.md#rp-006).
 
@@ -35,10 +35,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Definir modelos de payload e enum com números estáveis.
-- [ ] Implementar escrita de frame e leitura completa limitada.
-- [ ] Validar payload específico e mapear erros de protocolo.
-- [ ] Comparar saída com fixtures independentes e testar duas mensagens concatenadas e leitura aos poucos.
+- [x] Definir modelos de payload e enum com números estáveis.
+- [x] Implementar escrita de frame e leitura completa limitada.
+- [x] Validar payload específico e mapear erros de protocolo.
+- [x] Comparar saída com fixtures independentes e testar duas mensagens concatenadas e leitura aos poucos.
 
 ## 8. Regras e restrições
 
@@ -52,21 +52,27 @@ length negativo ao interpretar u32, frame acima de 64 KiB, UTF-8 inválido, type
 
 V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR, round-trip dos 17 tipos, leituras parciais, concatenação e rejeições sem alocação não limitada.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: V-004 EXECUTADA; 66 testes de codec/integração e os 65 testes de configuração aprovados no build limpo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Bytes correspondem ao contrato e às fixtures independentes.
-- [ ] Mensagens parciais não se confundem com mensagens completas.
-- [ ] Entrada malformada produz erro controlado.
-- [ ] Validação V-004 executada e evidência ligada no progresso.
+- [x] Bytes correspondem ao contrato e às fixtures independentes.
+- [x] Mensagens parciais não se confundem com mensagens completas.
+- [x] Entrada malformada produz erro controlado.
+- [x] Validação V-004 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
-Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Nenhuma evidência de execução foi produzida por este ficheiro de planeamento.
+Todos os critérios acima satisfeitos, dependências verificadas, falhas relevantes resolvidas e [DoD](../../14-DEFINITION-OF-DONE.md) aplicável cumprida. Atualizar este estado, [15](../../15-PROJECT-PROGRESS.md) e [13](../../13-REQUIREMENTS-TRACEABILITY.md), distinguindo requisito parcialmente coberto de concluído. Evidência real em [V-004](../../../experiments/task-004-codec-validation.md). Não foram executadas interações de rede.
 
 ## 13. Notas para a IA implementadora
 
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+### Resultado — 27-10-2026
+
+MessageType, ControlMessage e MessageCodec implementados, com ErrorCode/ProtocolException. Os 17 tipos e todos os layouts TCP têm golden bytes independentes; testes cobrem leitura parcial, concatenação, EOF, UTF-8, limites, valores unsigned, UUID e erro controlado. Todas as 45 fixtures mantêm hashes originais. Integração local carrega os perfis e produz/recupera HELLO, anúncios e resposta bootstrap em memória.
+
+Build limpo: 131 testes (65 configuração + 66 codec), zero falhas/erros/skips; Java 21.0.12.1/Maven 3.6.3. Critérios desta tarefa satisfeitos, sem bloqueios. PHASE-01 concluída no âmbito definido. TASK-005 permanece TODO, não iniciada. Material de relatório: [notas da fase](../../PHASE-01-REPORT-NOTES.md).

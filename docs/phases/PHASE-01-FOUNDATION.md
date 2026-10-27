@@ -6,11 +6,11 @@ Obter um build Java reproduzível, configuração validada e codec de controlo s
 
 ## 2. Contexto
 
-Incremento 1 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS; TASK-001 e TASK-002 concluídas, com [baseline](../../experiments/build-baseline.md) e [revisão dos contratos](../../experiments/task-002-contract-review.md). TASK-003 concluída com [65 testes](../../experiments/task-003-configuration-validation.md); TASK-004 permanece TODO.
+Incremento 1 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). Estado atual: DONE. TASK-001–004 concluídas, com [131 testes no build limpo](../../experiments/task-004-codec-validation.md). O fecho cobre configuração e codec locais; nenhuma etapa de transporte/overlay/streaming é dada como executada por inferência.
 
 ## 3. Pré-requisitos
 
-Não requer aplicação funcional; a execução de TASK-001, TASK-002 e TASK-003 foi autorizada pelo utilizador. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
+Não requer aplicação funcional; a execução das quatro tarefas e o fecho da fase foram autorizados pelo utilizador. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
 
 ## 4. Requisitos abrangidos
 
@@ -23,7 +23,7 @@ RF-001, RF-004, RF-012, RF-013, RNF-005, RP-001, RP-006. As descrições e crit�
 | [TASK-001](../tasks/PHASE-01/TASK-001.md) | Validar a base Java e configurar testes | nenhuma | V-001 | DONE |
 | [TASK-002](../tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | V-002 | DONE |
 | [TASK-003](../tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | V-003 | DONE |
-| [TASK-004](../tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | V-004 | TODO |
+| [TASK-004](../tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | V-004 | DONE |
 
 ## 6. Ordem de execução
 
@@ -47,12 +47,12 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
 - [x] Configurações válidas/invalidas e paths relativos têm oráculos executados.
-- [ ] Codec passa fixtures independentes, mensagens concatenadas, leitura parcial e limites.
-- [ ] O resultado «Configuração e mensagens de controlo validadas por testes locais, sem necessidade de CORE.» é demonstrável no ambiente da fase.
-- [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
-- [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
+- [x] Codec passa fixtures independentes, mensagens concatenadas, leitura parcial e limites.
+- [x] O resultado «Configuração e mensagens de controlo validadas por testes locais, sem necessidade de CORE.» é demonstrável no ambiente da fase.
+- [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+- [x] Não há regressão nos componentes anteriores afetados pelas alterações.
 
 ## 12. Definition of Done
 
@@ -61,3 +61,7 @@ Cumprir [14](../14-DEFINITION-OF-DONE.md), incluindo evidência real e passagem 
 ## 13. Riscos e observações
 
 Confirmar recursos docentes cedo; o formato do vídeo não deve ser assumido. Consultar [12](../12-RISKS-AND-DECISIONS.md) para mitigação e responsável. Metas numéricas do plano são propostas; obrigações do PDF continuam vinculativas.
+
+### Fecho da fase — 27-10-2026
+
+V-001–004 têm evidência; configuração/codec integram-se em memória e o build executa 131 testes com sucesso. Não foram alterados CORE/topologies ou as fixtures de protocolo. Os requisitos globais permanecem parcialmente cumpridos, com limitações e estados em 13/15. [Notas para o relatório](../PHASE-01-REPORT-NOTES.md). Próxima tarefa recomendada: TASK-005, ainda TODO.

@@ -329,7 +329,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-002](tasks/PHASE-01/TASK-002.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-009](tasks/PHASE-02/TASK-009.md), [TASK-018](tasks/PHASE-04/TASK-018.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-029](tasks/PHASE-07/TASK-029.md), [TASK-031](tasks/PHASE-07/TASK-031.md).
 - Validação: V-002, V-004, V-009, V-018, V-028, V-029, V-031 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Ligar desenho e contratos a implementação futura, testes e apreciação crítica; incluir evidências e limitações, sem resultados inventados.
-- Estado atual: IN PROGRESS — TASK-002 DONE; [V-002 e fixtures](../experiments/task-002-contract-review.md) concluídas. Implementação, testes de comportamento e apreciação crítica ainda pendentes.
+- Estado atual: IN PROGRESS — configuração/especificação/codec da fase 1 têm [evidência V-004 e 131 testes](../experiments/task-004-codec-validation.md). As restantes tarefas e a aceitação integrada continuam pendentes.
 
 
 ## Restrições obrigatórias de teste e entrega
@@ -517,7 +517,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-001](tasks/PHASE-01/TASK-001.md), [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md).
 - Validação: V-001, V-003, V-004, V-005, V-007, V-010, V-011, V-014, V-019, V-021, V-022 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Validar limites antes de alocar; injetar relógio/transportes nos testes; filas e caches têm máximo e política de overflow; não aceitar objetos Java serializados da rede.
-- Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
+- Estado atual: IN PROGRESS — configuração/especificação/codec da fase 1 têm [evidência V-004 e 131 testes](../experiments/task-004-codec-validation.md). As restantes tarefas e a aceitação integrada continuam pendentes.
 
 
 <a id="rp-007"></a>

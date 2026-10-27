@@ -101,3 +101,11 @@ Estado: adotada após esclarecimento do utilizador em 27-10-2026. Os XML cenario
 A proposta inicial de criar ott-cenario*.xml por defeito foi retirada. Reutilizar os equipamentos/IP existentes, incluindo relays nos routers Linux quando adequado à bancada; só propor adaptação mínima se uma limitação concreta impedir um requisito. Um PC chamado Cliente pode alojar outro papel Java, incluindo a segunda origem. TASK-025–027 foram ajustadas, mantendo-se TODO. Nenhum XML foi alterado.
 
 Verificação estática dos XML: parsing concluído, IDs únicos, referências dos links válidas e grafo conectado nos três ficheiros. Cenario1 tem quatro equipamentos, cenario2 seis, cenario3 20 devices mais cinco networks/switches (25 equipamentos no total). Isto não valida o arranque, IP routing, reachability ou streaming no CORE; essas verificações continuam pendentes.
+
+## ADR-012 — Codec independente do transporte e fecho da fase 1
+
+Estado: adotada na TASK-004, 27-10-2026. Implementar os 17 tipos com IDs explícitos, payloads tipados/imutáveis e helpers de Endpoint/StreamInfo no pacote protocol. Configuração e codec partilham NodeRole, com mapeamento de rede explícito. Reusar payloads de layout igual sem implementar handlers.
+
+Decisão: read(InputStream) sinaliza EOF limpo com Optional.empty; truncatura de transporte é EOFException; corpo recebido com campos inválidos é ProtocolException. Prefixo e u32 são unsigned; validar comprimentos antes de alocar e saída antes de escrever no stream do chamador. Utilizar UTF-8 estrito, nunca modified UTF-8. O chamador mantém flush/close e serialização dos envios.
+
+O codec valida formato/domínio, não autorização, ciclos ou ativação de rotas. As fixtures permanecem independentes e inalteradas. Validação final: 65 testes de configuração + 66 de codec/integração local, todos aprovados. PHASE-01 fecha a base técnica; o transporte da Etapa 0 e a overlay da Etapa 1 do enunciado continuam nas fases seguintes. [V-004](../experiments/task-004-codec-validation.md), [material para relatório](PHASE-01-REPORT-NOTES.md). Nenhum XML CORE foi alterado.

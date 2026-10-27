@@ -95,7 +95,7 @@ Responsável: [TASK-003](tasks/PHASE-01/TASK-003.md). Requisitos: RF-001, RF-004
 
 V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR, round-trip dos 17 tipos, leituras parciais, concatenação e rejeições sem alocação não limitada.
 
-Responsável: [TASK-004](tasks/PHASE-01/TASK-004.md). Requisitos: RNF-005, RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-004](tasks/PHASE-01/TASK-004.md). Requisitos: RNF-005, RP-006. Estado: EXECUTADA com sucesso em 27-10-2026; 66 testes do codec/integração, 131 no build limpo. [Evidência V-004](../experiments/task-004-codec-validation.md). Não inclui conexões TCP reais ou codec UDP.
 
 ### V-005 — Estabelecer transporte TCP full-duplex com recursos limitados
 

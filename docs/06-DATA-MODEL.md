@@ -64,3 +64,7 @@ Vizinhos: DISCONNECTED → CONNECTING → HANDSHAKING → ACTIVE; falha/timeout 
 ## Persistência e evidência
 
 Guardar apenas configuração, vídeos e artefactos de experiência. Não criar base de dados ou ficheiros de checkpoint de rotas. Manifestos experimentais devem incluir hash de configuração, versão do JAR, conteúdo/ficheiros usados, seed quando houver jitter, nó/host, condições e tempos de falha. Os esquemas e limites são decisões técnicas: mudanças têm de atualizar [07](07-API-AND-INTERFACES.md), ADR e testes.
+
+## Modelos de controlo disponíveis após TASK-004
+
+protocol.ControlMessage contém o envelope e payloads imutáveis associados aos 17 tipos MessageType, com DTOs Endpoint e StreamInfo de rede. ErrorCode fixa os códigos 1–12 e ProtocolException classifica falhas de formato. Os DTOs de rede não substituem os serviços de vizinhança, routing ou catálogo dinâmico. O codec verifica tipos/domínios/limites; correspondência com ligação, autorização, caminhos e leases efetivos são responsabilidade dos handlers futuros. [API/contrato](07-API-AND-INTERFACES.md), [validação V-004](../experiments/task-004-codec-validation.md).

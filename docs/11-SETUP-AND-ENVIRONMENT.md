@@ -20,7 +20,7 @@ Os comandos seguintes partem da raiz ou do diretório indicado. São exemplos fu
 | raiz | java -version; mvn -version; docker --version | V: Java/Maven verificados em TASK-001; docker --version não executado, continua P para TASK-025 |
 | Projeto | mvn clean package | V em TASK-001 e TASK-003 com JAVA_HOME do JDK 21; build final inclui classes de configuração e 65 testes aprovados |
 | Projeto | mvn test | V em TASK-001 (zero testes na base inicial) e TASK-003 (65 testes de configuração aprovados) com JDK 21 |
-| Projeto | mvn -Dtest=MessageCodecTest test | P: classe existe vazia, só executável após TASK-004 |
+| Projeto | mvn -Dtest=MessageCodecTest test | Classe implementada na TASK-004; suite executada pelo build completo com JDK 21 (66 casos de codec/integração) |
 | Projeto | mvn verify | P: depois de TASK-024 deve executar testes unitários/integração com convenção *Test; sem depender de profile inexistente |
 | CORE | bash setup.sh | O como script de build; P em execução; usa Docker e pode requerer rede; TASK-025 |
 | CORE | ./core-gui | O como launcher; P em execução nesta sessão; inicia container e GUI |
@@ -87,3 +87,7 @@ O ZIP docente esteve acessível e o perfil de movie.Mjpeg foi confirmado; [V-002
 Os perfis em Projeto/src/main/resources/config já contêm propriedades válidas, grafo simétrico e dois catálogos por origem; JSON vazio e streams.properties histórico não são carregados. A API de carga está em [07](07-API-AND-INTERFACES.md). Não existe ainda main funcional para iniciar um nó; não executar os comandos de aplicação antes de TASK-008. Os quatro paths de media são metadados: preparação/validação dos ficheiros continua em TASK-020.
 
 O comando Maven de testes com JDK 21 executou 65 casos e produz TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml em Projeto/target/surefire-reports/. Esses resultados substituem a ausência de relatórios da base inicial; o baseline antigo continua como histórico. A primeira execução com testes reais precisou de descarregar o provider Surefire JUnit Platform com permissão autorizada; depois o build limpo passou em modo offline.
+
+## Fecho da fase 1 — TASK-004
+
+O comando com JDK 21, a partir de Projeto/, passou offline: env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B -o -Dstyle.color=never clean package. Resultado: 131 testes, zero falhas/erros/skips. Relatórios de ConfigurationLoaderTest e MessageCodecTest em target/surefire-reports/. O JAR contém a configuração e o codec; OttApplication ainda não tem main funcional. Os comandos de processo/CORE continuam futuros. [V-004](../experiments/task-004-codec-validation.md).

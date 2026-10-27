@@ -42,3 +42,7 @@ Build validado em 26-10-2026 com Java 21.0.12.1 e Maven 3.6.3. Compiler 3.13.0 p
 ## Validação funcional de configuração na TASK-003
 
 Em 27-10-2026, o JUnit Platform executou 65 casos reais de configuração com sucesso. Surefire já exige testes, e uma cópia temporária do POM sem testes falhou como esperado. Não foram adicionadas dependências runtime nem alteradas as versões fixadas. O carregador usa Reader UTF-8/Properties e URI apenas para parsing sintático, sem DNS. [Relatório V-003](../experiments/task-003-configuration-validation.md).
+
+## Fecho da fase 1 com codec de controlo
+
+TASK-004 implementou serialização binária com DataInputStream/DataOutputStream e UTF-8 estrito, sem ObjectInputStream/readUTF/writeUTF e sem dependências runtime novas. O build limpo passou 131 testes (65 configuração + 66 codec/integração local). Versões Maven/JDK e bibliotecas da base mantidas. A existência do formato pronto não inicia conexões TCP; o transporte é TASK-005. [V-004](../experiments/task-004-codec-validation.md), [contribuição para o relatório](PHASE-01-REPORT-NOTES.md).
