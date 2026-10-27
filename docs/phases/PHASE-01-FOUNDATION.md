@@ -60,6 +60,8 @@ Cumprir [14](../14-DEFINITION-OF-DONE.md), incluindo evidência real e passagem 
 
 ## 13. Riscos e observações
 
+Atualização posterior ao fecho: ADR-013 corrigiu o papel do bootstrap e o contrato/codec de descoberta antes da fase 2. Há 16 tipos ativos, código 3 retirado e resposta sem lease. [Revalidação atual](../../experiments/bootstrap-discovery-correction.md) mantém 131 testes aprovados e esta fase DONE. O fecho original abaixo conserva o histórico; as fixtures afetadas foram revistas intencionalmente nesta correção.
+
 Confirmar recursos docentes cedo; o formato do vídeo não deve ser assumido. Consultar [12](../12-RISKS-AND-DECISIONS.md) para mitigação e responsável. Metas numéricas do plano são propostas; obrigações do PDF continuam vinculativas.
 
 ### Fecho da fase — 27-10-2026

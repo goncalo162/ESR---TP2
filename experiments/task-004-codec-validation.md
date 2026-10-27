@@ -1,5 +1,7 @@
 # TASK-004 — Codec de controlo v1 e fecho da fase 1
 
+> Atualização posterior: esta evidência descreve o fecho original da TASK-004, com 17 tipos. Por instrução explícita do utilizador (ADR-013), o contrato atual tem 16 tipos ativos, código 3 retirado e REGISTER_OK sem lease, apenas com vizinhos configurados/instâncias desconhecidas. A [correção e nova validação](bootstrap-discovery-correction.md) substituem os detalhes antigos afetados, preservando estes resultados como histórico.
+
 Data: 27-10-2026. Resultado: **V-004 executada e PHASE-01 concluída no seu âmbito**. Build limpo com Java 21/Maven: 131 testes, zero falhas, erros ou skips; 65 de configuração e 66 de codec/integração local.
 
 ## Partida e limites

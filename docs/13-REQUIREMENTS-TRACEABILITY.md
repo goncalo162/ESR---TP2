@@ -44,6 +44,8 @@ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculo
 
 ## Interpretação dos estados
 
+Correção ADR-013 por instrução do utilizador: a parte bootstrap de RF-004/TASK-006 é apenas consulta inicial de localizações configuradas. Entrada/saída e unicidade de vizinhos em RF-002/003 continuam responsabilidade da overlay, não de registo central. V-006/007/009 foram alinhadas para consultas sem estado e reconexão sem bootstrap. [Codec e fixtures revalidados](../experiments/bootstrap-discovery-correction.md); nenhum requisito global é promovido a DONE por esta correção.
+
 RF/RNF/RC são obrigações quando assim identificadas em 02; RP são escolhas/recomendações adotadas. Uma recomendação só pode ser retirada por decisão explícita sem perder cobertura de obrigações. Nenhuma tarefa fica órfã: a coluna de requisitos de cada tarefa permite navegar no sentido inverso. As verificações de entrega V-029–031 usam inspeção de artefactos e confirmação humana, não testes de aplicação.
 
 Depois de alterar o plano, rever caminhos, dependências, requisitos ligados e o catálogo V-XXX. A validação estrutural inicial é descrita em [16](16-PLAN-VALIDATION.md).

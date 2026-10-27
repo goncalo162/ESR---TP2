@@ -6,7 +6,9 @@ Criadas na TASK-002 como dados de referência, antes de existir um codec da apli
 
 Cada caso tem um ficheiro .bin com os bytes efetivos e um .hex com os mesmos bytes em hexadecimal, em linhas de até 16 bytes. [manifest.json](manifest.json) contém comprimento, SHA-256, resultado esperado, fase de validação, valores interpretados ou motivo de rejeição. A fonte normativa do resultado é o contrato e a interpretação documentada, não o código que vier a ser testado.
 
-Há 45 casos: 29 TCP (18 aceites, incluindo os 17 tipos e uma variante UTF-8; 11 rejeitados) e 16 UDP (quatro aceites e 12 rejeitados). Os bytes foram escritos a partir de literais e comprimentos calculados separadamente, sem importar/usar encoder da aplicação. Foram revistos por uma inspeção temporária independente de offsets, tamanhos, hashes e fronteiras, sem criar um codec ou teste Java.
+Há 45 casos: 29 TCP (17 aceites, incluindo os 16 tipos ativos e uma variante UTF-8; 12 rejeitados) e 16 UDP (quatro aceites e 12 rejeitados). Os bytes foram escritos a partir de literais e comprimentos calculados separadamente, sem importar/usar encoder da aplicação. Foram revistos por uma inspeção temporária independente de offsets, tamanhos, hashes e fronteiras. A criação original na TASK-002 não executou codec; o codec/testes foram implementados depois, na TASK-004.
+
+Correção do bootstrap por instrução do utilizador, ADR-013: REGISTER_OK não contém lease e devolve apenas endpoints configurados, todos com instanceId zero. O código 3 foi retirado: a antiga fixture de renovação é agora [tcp-invalid-retired-type](tcp-invalid-retired-type.hex), com bytes preservados e resultado obrigatório reject. A revisão da fixture REGISTER_OK foi calculada por literais de envelope/count/Endpoint, sem usar o codec Java. [Motivo, compatibilidade e validação](../../../../../experiments/bootstrap-discovery-correction.md).
 
 TASK-004 deverá consumir os casos TCP: comparar encoding com bytes fixos, verificar os campos do decoding e rejeitar as entradas malformadas. TASK-019 deverá consumir os casos UDP. Testes de integração, autorização, caminhos/leases e JPEG real pertencem às respetivas tarefas. Não substituir os expected bytes por bytes gerados pelo codec testado nem reescrever estas fixtures só para obter testes verdes.
 
@@ -72,7 +74,9 @@ Todas as posições abaixo são offsets de bytes no ficheiro .bin, contando o pr
 | 74 | 2 | 5001, bytes 13 89 |
 | 76 | 1 | SERVER=1 |
 
-REGISTER tem o mesmo payload, mas type=1. REGISTER_OK usa emissor B e contém lease de 15000 ms, count=1 e o mesmo Endpoint. O campo instanceId zero só é permitido em Endpoints ainda desconhecidos devolvidos pelo bootstrap; estes exemplos usam identidade conhecida.
+REGISTER tem o mesmo payload, mas type=1; é uma consulta inicial sem inscrição ou atualização do endpoint. REGISTER_OK usa emissor B e contém apenas count=1 e o Endpoint configurado de S1, obrigatoriamente com instanceId zero. Não inclui lease nem disponibilidade. A identidade da instância no envelope é a do emissor imediato; o UUID zero aqui refere-se ao vizinho devolvido, não ao envelope.
+
+REGISTER_OK corrigido tem 78 bytes: prefixo=74, envelope de 37 bytes, count u16 no offset 41, Endpoint.nodeId nos offsets 43–46, instanceId zero nos offsets 47–62, host/portas/papel nos offsets 63–77. O payload começa diretamente pelo count, sem os quatro bytes de lease do layout antigo. SHA-256: 467e3d6a5ca8c806bb9ec57c08de7e0a967294acfb37283f6d750a171af6b55e.
 
 ### STREAM_ANNOUNCE e UTF-8
 
@@ -147,8 +151,8 @@ Os nomes ligam os .hex legíveis; o .bin correspondente e os campos esperados es
 | Caso | Transporte | Bytes | Resultado e etapa |
 |---|---|---:|---|
 | [tcp-register](tcp-register.hex) | TCP | 77 | accept / control-codec |
-| [tcp-register-ok](tcp-register-ok.hex) | TCP | 82 | accept / control-codec |
-| [tcp-register-renew](tcp-register-renew.hex) | TCP | 42 | accept / control-codec |
+| [tcp-register-ok](tcp-register-ok.hex) | TCP | 78 | accept / control-codec |
+| [tcp-invalid-retired-type](tcp-invalid-retired-type.hex) | TCP | 42 | reject / control-codec |
 | [tcp-node-leave](tcp-node-leave.hex) | TCP | 43 | accept / control-codec |
 | [tcp-hello](tcp-hello.hex) | TCP | 77 | accept / control-codec |
 | [tcp-hello-ok-min](tcp-hello-ok-min.hex) | TCP | 41 | accept / control-codec |
@@ -194,6 +198,6 @@ Os nomes ligam os .hex legíveis; o .bin correspondente e os campos esperados es
 
 ## Estado e limites da revisão
 
-V-002 conferiu pares binário/hex, tamanhos, hashes, cobertura dos 17 tipos, exemplos de campos, rejeições de comprimento/enum/UTF-8, offsets UDP e a fronteira de fragmentação de 1137 bytes. A verificação de referências locais e do manifesto faz parte da revisão. Não se executou nenhum codec da aplicação, teste JUnit ou streaming nesta tarefa, porque ainda não existem implementações desses componentes.
+V-002 conferiu originalmente pares binário/hex, tamanhos, hashes, cobertura dos então 17 tipos, exemplos de campos, rejeições de comprimento/enum/UTF-8, offsets UDP e a fronteira de fragmentação de 1137 bytes. A verificação de referências locais e do manifesto fez parte da revisão. Não se executou codec, JUnit ou streaming nessa tarefa; o codec foi criado na TASK-004. O inventário atual e a revisão normativa posterior constam no início deste documento e em ADR-013.
 
 Os scripts usados para gerar/inspecionar testemunhos são temporários em /tmp e não pertencem ao projeto. Este diretório contém dados de teste e documentação; não contém encoder, decoder, leitor de vídeo ou lógica de produção.

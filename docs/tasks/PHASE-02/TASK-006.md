@@ -1,4 +1,4 @@
-# TASK-006 — Implementar registo bootstrap e descoberta configurada
+# TASK-006 — Fornecer localização inicial dos vizinhos configurados
 
 ## 1. Identificação
 
@@ -15,7 +15,7 @@ Devolver a um nó conhecido os endpoints dos seus vizinhos permitidos.
 
 ## 3. Contexto
 
-Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO, entram e saem e reconectam; bootstrap não intermedeia tráfego. A responsabilidade específica é implementar registo bootstrap e descoberta configurada. Consultar [arquitetura](../../04-ARCHITECTURE.md) e [rastreabilidade](../../13-REQUIREMENTS-TRACEABILITY.md) para a ligação ao sistema completo.
+Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO, entram e saem e reconectam; bootstrap não intermedeia tráfego. A responsabilidade específica é responder à consulta inicial de vizinhos apenas a partir da configuração. O utilizador restringiu explicitamente o papel do bootstrap; não criar um controlador de nós ativos. Consultar [arquitetura](../../04-ARCHITECTURE.md), ADR-013 em [decisões](../../12-RISKS-AND-DECISIONS.md) e [rastreabilidade](../../13-REQUIREMENTS-TRACEABILITY.md).
 
 ## 4. Pré-requisitos
 
@@ -23,22 +23,25 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Usar o grafo simétrico carregado e a mesma interface TCP para REGISTER/OK/RENEW/LEAVE. Registar instância e lease, rejeitar identidade não configurada ou endpoint/papel incompatível. Responder também com vizinhos offline, para não depender da ordem de arranque. Registo concorrente com mesmo nodeId/instância é idempotente; nova instância só substitui a anterior após saída, lease expirado ou verificação explícita de falha, evitando expulsão arbitrária.
+Usar exclusivamente o grafo simétrico imutável carregado por ConfigurationLoader. Receber REGISTER como consulta: verificar correspondência de senderId com Endpoint.nodeId, identidade configurada e endpoint/papel compatíveis; responder com REGISTER_OK contendo apenas os endpoints dos vizinhos definidos no ficheiro. Nunca atualizar a configuração com os dados do pedido. Todos os instanceId dos vizinhos devolvidos são zero, sem consultar ou descobrir se estão ativos. Enviar a resposta completa e fechar a conexão de consulta; timeout, erro ou desconexão de um requerente não afetam o listener nem outras consultas.
+
+Pedidos repetidos, simultâneos ou de instâncias diferentes do mesmo ID recebem a mesma lista configurada; não há exclusividade ou inscrição no bootstrap. Duplicados ativos são tratados no handshake direto (TASK-007). Não criar NodeRegistry, leases, renovações, heartbeats, timers de membership, monitorização, tratamento de NODE_LEAVE, anúncio de streams ou cálculo de rotas. Código 3 está retirado e é inválido. Outras mensagens válidas do codec comum são operações inválidas neste handler: rejeitar com ERROR INVALID_MESSAGE quando for seguro e fechar, sem efeitos operacionais. Retentar a consulta apenas se não se obteve resposta; após sucesso não manter canal periódico com bootstrap.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existentes: bootstrap/BootstrapServer.java, NodeRegistry.java e bootstrap/BootstrapServerTest.java; planeado: fixtures topology.properties.
+Existentes: bootstrap/BootstrapServer.java contém apenas documentação; bootstrap/BootstrapServerTest.java é placeholder; config/TopologyConfiguration.java e resources/config/topology.properties já estão implementados/preenchidos. Implementar a consulta diretamente sobre TopologyConfiguration. O placeholder NodeRegistry.java foi removido por não existir registo operacional a implementar. Confirmar estes estados no início da tarefa.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
 ## 7. Passos de implementação
 
-- [ ] Criar registo e resposta de vizinhança a partir do grafo.
-- [ ] Implementar renovação, expiração e saída normal.
-- [ ] Validar duplicados e endpoints face à configuração.
-- [ ] Testar dois registos simultâneos e vizinho ainda offline.
+- [ ] Consultar a lista de vizinhos do requerente na configuração imutável.
+- [ ] Validar identidade/endpoint/papel sem persistir o pedido.
+- [ ] Enviar REGISTER_OK sem lease, com instâncias desconhecidas, e fechar a conexão de consulta.
+- [ ] Rejeitar operações alheias à consulta sem alterar estado da topologia.
+- [ ] Testar repetição/concorrência, duas instâncias do mesmo ID e vizinhos offline com resposta igual.
 
 ## 8. Regras e restrições
 
@@ -46,19 +49,20 @@ Respeitar a natureza dos requisitos ligados: obrigações do PDF prevalecem; esc
 
 ## 9. Casos limite e tratamento de erros
 
-Nó não permitido, registo repetido, mesmo ID vivo em duas instâncias, renovação tardia, topologia assimétrica e bootstrap indisponível. Não calcular rotas nem transportar streams.
+Nó não permitido, endpoint/papel incompatível, consulta repetida, duas instâncias do mesmo ID, vizinhos offline, requerente que fecha cedo, topologia assimétrica e bootstrap indisponível. Não distinguir online/offline nem arbitrar IDs vivos; a consulta não depende de saídas ou expiração. Não calcular rotas nem transportar streams.
 
 ## 10. Testes necessários
 
-V-006: registos recebem só os vizinhos definidos; lease expira com relógio falso; novo arranque pode recuperar identidade após expiração; tráfego de vizinhos não passa pelo bootstrap.
+V-006: consultas repetidas/concorrentes recebem só os vizinhos configurados, incluindo offline, com instanceId zero e sem lease; duas instâncias do mesmo ID recebem a mesma lista; operações não permitidas são rejeitadas sem alterar a configuração; a conexão fecha após a resposta completa e não existe renovação ou estado vivo no bootstrap.
 
 Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
 - [ ] Resposta corresponde ao grafo e respeita X por nó.
-- [ ] Membership expira sem remover configuração estática.
-- [ ] Erros não substituem um nó ativo indevidamente.
+- [ ] Resposta independe da disponibilidade e de consultas anteriores; não existem registo vivo, lease, renovação ou monitorização.
+- [ ] IDs e endpoints inválidos são rejeitados sem alterar a configuração ou bloquear outras consultas.
+- [ ] Conexão inicial é fechada após resposta; não há mensagens de saída/renovação para bootstrap.
 - [ ] Validação V-006 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done

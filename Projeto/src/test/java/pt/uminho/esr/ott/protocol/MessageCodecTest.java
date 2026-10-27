@@ -24,13 +24,13 @@ class MessageCodecTest {
     private static final UUID TRACE=UUID.fromString("11223344-5566-4788-99aa-bbccddeeff00");
     private static final UUID NIL=new UUID(0,0);
     private static final Endpoint ENDPOINT=new Endpoint("S1",INST,"10.0.0.1",5000,5001,NodeRole.SERVER);
+    private static final Endpoint CONFIGURED_ENDPOINT=new Endpoint("S1",NIL,"10.0.0.1",5000,5001,NodeRole.SERVER);
 
     // Valores interpretados do contrato, independentes do encoder e decoder.
     static Stream<Arguments> goldenVectors() {
         return Stream.of(
             Arguments.of("register",msg(MessageType.REGISTER,"S1",new EndpointPayload(ENDPOINT))),
-            Arguments.of("register-ok",msg(MessageType.REGISTER_OK,"B",new RegistrationResult(15000,List.of(ENDPOINT)))),
-            Arguments.of("register-renew",msg(MessageType.REGISTER_RENEW,"S1",Empty.INSTANCE)),
+            Arguments.of("register-ok",msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(CONFIGURED_ENDPOINT)))),
             Arguments.of("node-leave",msg(MessageType.NODE_LEAVE,"S1",new Leave(0))),
             Arguments.of("hello",msg(MessageType.HELLO,"S1",new EndpointPayload(ENDPOINT))),
             Arguments.of("hello-ok-min",msg(MessageType.HELLO_OK,"C",Empty.INSTANCE)),
@@ -69,7 +69,7 @@ class MessageCodecTest {
     }
 
     @ParameterizedTest @ValueSource(strings={"short-prefix","length-small","length-large","truncated-body",
-        "version","type","utf8","trailing-byte","negative-probe","role","path-count"})
+        "version","type","retired-type","utf8","trailing-byte","negative-probe","role","path-count"})
     void rejectsMalformedTcpFixtures(String name) throws Exception {
         byte[] bytes=fixture("invalid-"+name);
         IOException e=assertThrows(IOException.class,()->MessageCodec.decode(bytes));
@@ -133,7 +133,7 @@ class MessageCodecTest {
 
     @ParameterizedTest @ValueSource(longs={-1,4294967296L})
     void rejectsLeaseOutsideUnsigned32Domain(long lease){
-        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.REGISTER_OK,"B",new RegistrationResult(lease,List.of()))));
+        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.ACTIVATE_ACK,"S1",new ActivationAck(STREAM,EPOCH,SUB,1,lease))));
     }
 
     @Test void strictUtf8AndCodePointLimits() throws Exception {
@@ -149,11 +149,11 @@ class MessageCodecTest {
         assertEquals(41,MessageCodec.encode(msg(MessageType.HELLO_OK,"C",Empty.INSTANCE)).length);
         for(String id:List.of("","á","bad/id","a".repeat(33)))
             assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO_OK,id,Empty.INSTANCE)));
-        List<Endpoint> neighbors=IntStream.range(0,64).mapToObj(i->new Endpoint("N"+i,INST,"10.0.0.1",5000,5001,NodeRole.RELAY)).toList();
-        var m=msg(MessageType.REGISTER_OK,"B",new RegistrationResult(1,neighbors));assertEquals(m,MessageCodec.decode(MessageCodec.encode(m)));
+        List<Endpoint> neighbors=IntStream.range(0,64).mapToObj(i->new Endpoint("N"+i,NIL,"10.0.0.1",5000,5001,NodeRole.RELAY)).toList();
+        var m=msg(MessageType.REGISTER_OK,"B",new NeighborList(neighbors));assertEquals(m,MessageCodec.decode(MessageCodec.encode(m)));
         var excess=new ArrayList<>(neighbors);excess.add(ENDPOINT);
-        assertEquals(ErrorCode.RESOURCE_LIMIT,assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.REGISTER_OK,"B",new RegistrationResult(1,excess)))).errorCode());
-        byte[] frame=fixture("register-ok");frame[46]=65;
+        assertEquals(ErrorCode.RESOURCE_LIMIT,assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.REGISTER_OK,"B",new NeighborList(excess)))).errorCode());
+        byte[] frame=fixture("register-ok");frame[42]=65;
         assertEquals(ErrorCode.RESOURCE_LIMIT,assertThrows(ProtocolException.class,()->MessageCodec.decode(frame)).errorCode());
     }
 
@@ -168,7 +168,7 @@ class MessageCodecTest {
 
     @Test void endpointInstanceAndRolesFollowWireContract() throws Exception {
         var unknown=new Endpoint("N",NIL,"10.0.0.2",65535,65535,NodeRole.CLIENT);
-        var response=msg(MessageType.REGISTER_OK,"B",new RegistrationResult(1,List.of(unknown)));
+        var response=msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(unknown)));
         assertEquals(response,MessageCodec.decode(MessageCodec.encode(response)));
         assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"N",new EndpointPayload(unknown))));
         byte[] zero=fixture("hello");Arrays.fill(zero,46,62,(byte)0);assertThrows(ProtocolException.class,()->MessageCodec.decode(zero));
@@ -219,12 +219,30 @@ class MessageCodecTest {
     @Test void payloadListsAreDefensivelyCopied(){
         var list=new ArrayList<>(List.of("S1"));var a=new Announcement(new StreamInfo(STREAM,"S1","A",1,10,EPOCH),1,0,list);
         list.clear();assertEquals(List.of("S1"),a.path());assertThrows(UnsupportedOperationException.class,()->a.path().clear());
-        var neighbors=new ArrayList<>(List.of(ENDPOINT));var r=new RegistrationResult(1,neighbors);
+        var neighbors=new ArrayList<>(List.of(CONFIGURED_ENDPOINT));var r=new NeighborList(neighbors);
         neighbors.clear();assertEquals(1,r.neighbors().size());assertThrows(UnsupportedOperationException.class,()->r.neighbors().clear());
     }
 
     @Test void allMessageNumbersHaveIndependentVectors(){
-        assertEquals(IntStream.rangeClosed(1,17).boxed().toList(),goldenVectors().limit(17).map(a->((ControlMessage)a.get()[1]).type().code()).toList());
+        assertEquals(IntStream.rangeClosed(1,17).filter(code->code!=3).boxed().toList(),
+                goldenVectors().limit(16).map(a->((ControlMessage)a.get()[1]).type().code()).toList());
+        assertEquals(16,MessageType.values().length);
+    }
+
+    @Test void bootstrapReplyContainsOnlyConfiguredNeighbors() throws Exception {
+        byte[] bytes=fixture("register-ok");
+        // Envelope termina em 41; segue imediatamente count u16=1, sem lease.
+        assertEquals(78,bytes.length);assertArrayEquals(new byte[]{0,1},Arrays.copyOfRange(bytes,41,43));
+        assertEquals(List.of(CONFIGURED_ENDPOINT),((NeighborList)MessageCodec.decode(bytes).payload()).neighbors());
+        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(ENDPOINT)))));
+        byte[] liveInstance=bytes.clone();liveInstance[47]=1;
+        assertThrows(ProtocolException.class,()->MessageCodec.decode(liveInstance));
+        // Layout antigo tinha lease=15000 antes da lista: não é aceite no contrato corrigido.
+        var legacy=new ByteArrayOutputStream();legacy.write(bytes,4,37);
+        legacy.write(new byte[]{0,0,0x3a,(byte)0x98});legacy.write(bytes,41,bytes.length-41);
+        var framed=new ByteArrayOutputStream();new DataOutputStream(framed).writeInt(legacy.size());legacy.writeTo(framed);
+        assertThrows(ProtocolException.class,()->MessageCodec.decode(framed.toByteArray()));
+        assertEquals(ErrorCode.INVALID_MESSAGE,assertThrows(ProtocolException.class,()->MessageType.fromCode(3)).errorCode());
     }
 
     @Test void phaseOneConfigurationCanProduceAndRecoverControlFrames() throws Exception {
@@ -238,7 +256,7 @@ class MessageCodecTest {
             if(node.role()==NodeRole.BOOTSTRAP){
                 var endpoints=node.topology().orElseThrow().nodes().values().stream().map(n->
                         new Endpoint(n.nodeId(),NIL,n.host(),n.controlPort(),n.dataPort(),n.role())).toList();
-                var message=new ControlMessage(MessageType.REGISTER_OK,REQ,node.nodeId(),instance,new RegistrationResult(15000,endpoints));
+                var message=new ControlMessage(MessageType.REGISTER_OK,REQ,node.nodeId(),instance,new NeighborList(endpoints));
                 assertEquals(message,MessageCodec.read(new ByteArrayInputStream(MessageCodec.encode(message))).orElseThrow());
                 responses++;
             }else{

@@ -4,6 +4,8 @@ Este conjunto de documentos especifica um protótipo OTT que distribui vídeo em
 
 **Estado atual: PHASE-01 concluída.** TASK-001–004 DONE; PHASE-02–07/TASK-005–031 TODO. Configuração e codec de controlo v1 implementados, com [131 testes aprovados](../experiments/task-004-codec-validation.md). Transporte, overlay e vídeo ainda por implementar. [O que já pode entrar no relatório](PHASE-01-REPORT-NOTES.md).
 
+Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
+
 ## Fonte de verdade e precedência
 
 1. [Enunciado original, cinco páginas](../ESR-TP2-26-27.pdf).

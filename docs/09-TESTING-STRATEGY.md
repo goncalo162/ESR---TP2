@@ -21,7 +21,8 @@ Não deixar testes para o fim. Cada tarefa que altera comportamento inclui teste
 
 - Configuração: propriedades ausentes/desconhecidas/duplicadas, UUID repetido, dois vídeos por origem, simetria do grafo, paths relativos, endpoints e limites.
 - TCP: leitura de um byte, várias mensagens concatenadas, frame truncado, cliente lento, dois envios concorrentes e encerramento durante I/O.
-- Vizinhança: ordens diferentes de arranque, duplicado, peer não permitido, ligação antiga morre depois da nova, reconexão e lease de registo.
+- Descoberta: consultas sem estado ao bootstrap, repetição/concorrência, vizinhos offline, sem lease ou renovação e conexão curta após resposta.
+- Vizinhança: ordens diferentes de arranque, duplicado, peer não permitido, ligação antiga morre depois da nova e reconexão direta mesmo com bootstrap parado.
 - Rotas: primeiro anúncio mais caro que segundo, empate, TTL/path repetido, epoch nova/antiga, candidato expirado e custo com overflow.
 - Procura: dois consumidores no mesmo ramo, repetição de ACTIVATE, ACK atrasado após stop, cancelamento antigo, saída do último e lease expirado.
 - Adaptação: morte de relay, caminho alternativo inválido, partição, regresso, melhoria ruidosa junto do limiar e nova ativação falhada.
@@ -93,7 +94,7 @@ Responsável: [TASK-003](tasks/PHASE-01/TASK-003.md). Requisitos: RF-001, RF-004
 
 ### V-004 — Codificar e descodificar mensagens de controlo v1
 
-V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR, round-trip dos 17 tipos, leituras parciais, concatenação e rejeições sem alocação não limitada.
+V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR e descoberta, round-trip dos 16 tipos ativos, leituras parciais, concatenação e rejeições sem alocação não limitada. Código 3 e layout antigo de REGISTER_OK com lease são rejeitados; resposta atual só contém vizinhos configurados, com instanceId zero. Ver [correção do bootstrap](../experiments/bootstrap-discovery-correction.md); a evidência original de 17 tipos abaixo é histórica.
 
 Responsável: [TASK-004](tasks/PHASE-01/TASK-004.md). Requisitos: RNF-005, RP-006. Estado: EXECUTADA com sucesso em 27-10-2026; 66 testes do codec/integração, 131 no build limpo. [Evidência V-004](../experiments/task-004-codec-validation.md). Não inclui conexões TCP reais ou codec UDP.
 
@@ -103,15 +104,15 @@ V-005: dois endpoints loopback com portas efémeras trocam mensagens simultânea
 
 Responsável: [TASK-005](tasks/PHASE-02/TASK-005.md). Requisitos: RF-003, RNF-004, RP-006. Estado: NÃO EXECUTADO.
 
-### V-006 — Implementar registo bootstrap e descoberta configurada
+### V-006 — Fornecer localização inicial dos vizinhos configurados
 
-V-006: registos recebem só os vizinhos definidos; lease expira com relógio falso; novo arranque pode recuperar identidade após expiração; tráfego de vizinhos não passa pelo bootstrap.
+V-006: consultas repetidas/concorrentes recebem só os vizinhos configurados, incluindo offline, com instanceId zero e sem lease; duas instâncias do mesmo ID recebem a mesma lista; operações não permitidas são rejeitadas sem alterar a configuração; a conexão fecha após a resposta completa e não existe renovação ou estado vivo no bootstrap.
 
 Responsável: [TASK-006](tasks/PHASE-02/TASK-006.md). Requisitos: RF-002, RF-003, RF-004. Estado: NÃO EXECUTADO.
 
 ### V-007 — Gerir handshake, unicidade e reconexão de vizinhos
 
-V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado.
+V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado; após descoberta, desligar bootstrap e comprovar reconexão direta sem novas consultas.
 
 Responsável: [TASK-007](tasks/PHASE-02/TASK-007.md). Requisitos: RF-002, RF-003, RF-004, RNF-004, RP-006. Estado: NÃO EXECUTADO.
 
@@ -123,7 +124,7 @@ Responsável: [TASK-008](tasks/PHASE-02/TASK-008.md). Requisitos: RF-001, RF-002
 
 ### V-009 — Preparar evidência do primeiro marco intermédio
 
-V-009: outro elemento consegue repetir a demonstração e identificar registo, handshake, saída e reconexão nos logs.
+V-009: outro elemento consegue repetir a demonstração e identificar consulta inicial, handshake, saída e reconexão nos logs; os nós já descobertos reconectam com bootstrap parado, sem tráfego periódico para ele.
 
 Responsável: [TASK-009](tasks/PHASE-02/TASK-009.md). Requisitos: RNF-005, RC-007. Estado: NÃO EXECUTADO.
 

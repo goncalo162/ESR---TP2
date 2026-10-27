@@ -6,7 +6,8 @@
     "Fixtures aceites são válidas para o formato; não provam handshake, autorização ou estado de rota.",
     "UUIDs e endpoints são valores de exemplo, não configuração operacional.",
     "Payloads UDP sintéticos não são JPEG descodificável.",
-    "Fixtures truncadas simulam EOF no fim do ficheiro."
+    "Fixtures truncadas simulam EOF no fim do ficheiro.",
+    "Correção explícita do utilizador em 27-10-2026 / ADR-013: REGISTER_OK sem lease e com instâncias desconhecidas; código 3 retirado. Apenas a fixture REGISTER_OK altera bytes; a antiga renovação passa a oráculo negativo com bytes preservados."
   ],
   "fixtures": [
     {
@@ -40,42 +41,37 @@
       "id": "tcp-register-ok",
       "binary": "tcp-register-ok.bin",
       "hex": "tcp-register-ok.hex",
-      "bytes": 82,
-      "sha256": "2be2be4cafbb150950eb5ac9ec9343096012f279e4acd25b1f414c1a0a065efa",
+      "bytes": 78,
+      "sha256": "467e3d6a5ca8c806bb9ec57c08de7e0a967294acfb37283f6d750a171af6b55e",
       "expected": {
         "outcome": "accept",
         "stage": "control-codec",
         "fields": {
-          "bodyLength": 78,
+          "bodyLength": 74,
           "version": 1,
           "type": 2,
           "requestId": "00112233-4455-6677-8899-aabbccddeeff",
           "senderId": "B",
           "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
-          "leaseMs": 15000,
           "neighborIds": [
             "S1"
+          ],
+          "neighborInstanceIds": [
+            "00000000-0000-0000-0000-000000000000"
           ]
         }
       }
     },
     {
-      "id": "tcp-register-renew",
-      "binary": "tcp-register-renew.bin",
-      "hex": "tcp-register-renew.hex",
+      "id": "tcp-invalid-retired-type",
+      "binary": "tcp-invalid-retired-type.bin",
+      "hex": "tcp-invalid-retired-type.hex",
       "bytes": 42,
       "sha256": "0fb2de18c09d1713806e04470862583fd13629759ca5eb67411cb8fe0af82e39",
       "expected": {
-        "outcome": "accept",
+        "outcome": "reject",
         "stage": "control-codec",
-        "fields": {
-          "bodyLength": 38,
-          "version": 1,
-          "type": 3,
-          "requestId": "00112233-4455-6677-8899-aabbccddeeff",
-          "senderId": "S1",
-          "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
-        }
+        "reason": "type=3 retirado; bootstrap não mantém registo vivo nem recebe renovações"
       }
     },
     {

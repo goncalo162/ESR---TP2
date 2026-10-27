@@ -23,7 +23,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Integrar CLI e configuração com bootstrap ou núcleo de nó. Criar executor serial proprietário do estado e encaminhar callbacks para ele. Nesta fase comandos neighbors e quit funcionam; catalog/play explicam que a funcionalidade ainda não está implementada. Shutdown notifica LEAVE quando possível, fecha transporte e termina executores mesmo com bootstrap ausente. Logs incluem identidade de processo, connectionId e razão de saída.
+Integrar CLI e configuração com bootstrap ou núcleo de nó. Criar executor serial proprietário do estado e encaminhar callbacks para ele. Nesta fase comandos neighbors e quit funcionam; catalog/play explicam que a funcionalidade ainda não está implementada. Shutdown de um nó overlay notifica NODE_LEAVE apenas aos vizinhos diretos quando possível, fecha transporte e termina executores mesmo com bootstrap ausente. O papel BOOTSTRAP limita-se a consultas de vizinhança e não mantém membros, timers de registo ou sondas. Logs incluem identidade de processo, connectionId e razão de saída.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 

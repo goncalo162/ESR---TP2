@@ -17,6 +17,8 @@ Este plano não autoriza iniciar a construção durante a fase de planeamento. Q
 
 Implementar apenas a responsabilidade da tarefa atual; não criar arquitetura ou funcionalidades futuras por antecipação. Uma interface planeada não significa que o componente já existe. Usar fakes nas fronteiras ainda não implementadas, explicitando-os nos testes; não usá-los como prova de integração real.
 
+Regra explícita do utilizador (ADR-013): bootstrap serve exclusivamente a localização inicial dos vizinhos pela configuração. Não implementar registo vivo, leases/renovações, heartbeats, monitorização ou avisos de saída no bootstrap; código 3 foi retirado. Saídas, identidades de execução, reconexão e métricas pertencem aos vizinhos; leases de subscrição das streams permanecem no routing.
+
 Respeitar proprietário de estado, snapshots, limites, unidades, IDs/epochs e contratos de bytes. Testes devem verificar comportamento com oráculos independentes, incluindo os casos de erro da tarefa. Não adicionar dependências runtime sem razão e ADR. Evitar alterações ao Docker/underlay fora das tarefas próprias. Não substituir CORE por localhost para aceitação final.
 
 Uma alteração legítima de desenho deve atualizar ADR, modelo, interfaces, tarefa, testes e rastreabilidade antes de afetar tarefas futuras. Se contradizer o enunciado, parar a decisão afetada e pedir esclarecimento; a IA não pode dispensar requisitos obrigatórios. Não enviar mensagens à equipa/docente nem submeter artefactos externamente por inferência.

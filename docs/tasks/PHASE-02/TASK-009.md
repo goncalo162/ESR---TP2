@@ -25,6 +25,8 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 Preparar uma demonstração curta com bootstrap e três nós, início fora de ordem, HELLO, saída e reconexão. Registar comandos realmente executados, versões, configuração e observações. Confirmar data/conteúdo da primeira avaliação com docente; o plano não determina calendário académico. Não usar esta evidência para afirmar streaming ou roteamento ainda ausentes.
 
+Depois de todos obterem os vizinhos, parar o bootstrap e repetir a reconexão entre nós já descobertos. Registar que o bootstrap só participou na descoberta inicial e não recebe renovações, sondas ou avisos de saída. Um processo novo sem lista inicial continua a precisar do bootstrap; não confundir esse caso com reconexão dos existentes.
+
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
@@ -50,7 +52,7 @@ Avaliação pode exigir outro conteúdo ou ocorrer antes desta fase. Ajustar mar
 
 ## 10. Testes necessários
 
-V-009: outro elemento consegue repetir a demonstração e identificar registo, handshake, saída e reconexão nos logs.
+V-009: outro elemento consegue repetir a demonstração e identificar consulta inicial, handshake, saída e reconexão nos logs; os nós já descobertos reconectam com bootstrap parado, sem tráfego periódico para ele.
 
 Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 

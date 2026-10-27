@@ -1,5 +1,7 @@
 # Fase 1 — Material disponível para o relatório
 
+Atualização posterior ao fecho original: o utilizador limitou o bootstrap à localização inicial de vizinhos (ADR-013). Há agora 16 tipos ativos; código 3 retirado, REGISTER_OK sem lease e apenas com vizinhos configurados/instâncias desconhecidas. Os 45 pares de fixtures incluem 29 TCP (17 aceites e 12 rejeitados) e 16 UDP. [Revalidação: 131 testes aprovados](../experiments/bootstrap-discovery-correction.md). As referências a 17 tipos e os resultados de fecho abaixo descrevem a versão original; o relatório final deve usar o contrato atual em 07 e esta atualização.
+
 Estado em 27-10-2026: PHASE-01 concluída no âmbito de fundações, configuração e codec. Este documento identifica texto e evidência utilizáveis no artigo futuro; não é o relatório final nem declara toda a solução implementada.
 
 Fonte principal: [enunciado](../ESR-TP2-26-27.pdf), em particular a estrutura recomendada do relatório na p. 5 e os critérios de avaliação na p. 4.

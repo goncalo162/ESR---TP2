@@ -39,7 +39,7 @@ flowchart TD
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | PHASE-01 | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | V-003 |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | PHASE-01 | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | V-004 |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | PHASE-02 | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 |
-| [TASK-006](tasks/PHASE-02/TASK-006.md) | PHASE-02 | Implementar registo bootstrap e descoberta configurada | TASK-003, TASK-005 | V-006 |
+| [TASK-006](tasks/PHASE-02/TASK-006.md) | PHASE-02 | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | V-006 |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | PHASE-02 | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | PHASE-02 | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | PHASE-02 | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 |
