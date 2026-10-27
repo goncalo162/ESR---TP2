@@ -8,7 +8,7 @@ Transporte TCP/UDP, vizinhança, monitorização e robustez da comunicação. Ta
 
 Implementações principais: **8 tarefas**. Revisões principais: **10 tarefas**. A contagem não mede esforço; ajustar atribuições explicitamente nos documentos se a equipa redistribuir trabalho.
 
-A primeira implementação disponível é TASK-005. Antes de começar, acordar o contrato de transporte com Fillmore e os cenários de ciclo de vida com Denji; só depois marcar TASK-005 IN PROGRESS.
+O transporte da TASK-005 e os seus contratos estão disponíveis; consultar o [progresso atual](../15-PROJECT-PROGRESS.md) e a [evidência V-005](../../experiments/task-005-transport-validation.md). O próximo contributo previsto é a revisão da TASK-006 de Fillmore. A próxima implementação própria, TASK-007, depende da TASK-006 integrada.
 
 Não avançar para a próxima tarefa própria só por ser o menor número da sua lista. Exigir todas as dependências integradas e o fecho da fase anterior. Se não há tarefa pronta, preparar casos/revisões/documentação da fase atual; não escrever código de tarefas dependentes ou futuras para contornar o plano.
 

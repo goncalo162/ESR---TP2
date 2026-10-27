@@ -5,6 +5,8 @@
 - ID: TASK-005
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
+- Responsável atribuído: [Waheed](../../team/WAHEED.md).
+- Revisor atribuído: [Fillmore](../../team/FILLMORE.md).
 - Estado: DONE
 - Dependências: [TASK-004](../PHASE-01/TASK-004.md).
 - Requisitos relacionados: [RF-003](../../02-REQUIREMENTS.md#rf-003), [RNF-004](../../02-REQUIREMENTS.md#rnf-004), [RP-006](../../02-REQUIREMENTS.md#rp-006).

@@ -2,13 +2,15 @@
 
 Data de distribuição: 27-10-2026. Este documento atribui responsabilidade futura; não altera estados nem atesta trabalho executado. As TASK-001–004/PHASE-01 já estão DONE e não são redistribuídas retroativamente. Os estados vivos pertencem aos ficheiros TASK e a [15 — Progresso](../15-PROJECT-PROGRESS.md).
 
+> Este é o documento de trabalho do utilizador desta sessão, identificado como Fillmore em 27-10-2026.
+
 ## 1. Papel e ponto de partida
 
 Descoberta inicial, modelos/anúncios de rotas, ativação/poda/adaptação e fontes de vídeo. Também implementa o segundo cenário CORE e coordena a escrita do artigo.
 
 Implementações principais: **9 tarefas**. Revisões principais: **10 tarefas**. A contagem não mede esforço; ajustar atribuições explicitamente nos documentos se a equipa redistribuir trabalho.
 
-TASK-006 aguarda TASK-005 integrada. Agora pode rever com Waheed a API de transporte e preparar a especificação/casos de teste do bootstrap sem estado. Não iniciar a implementação da TASK-006 nem a marcar IN PROGRESS enquanto a dependência estiver por cumprir.
+Para ti, Fillmore, TASK-006 é a próxima implementação indicada no [progresso atual](../15-PROJECT-PROGRESS.md). Usar o transporte e os contratos da TASK-005, com [evidência V-005](../../experiments/task-005-transport-validation.md). Consultar a tarefa e confirmar a base integrada antes de iniciar; bootstrap exclusivamente para descoberta inicial, sem registo vivo ou leases. Atribuição não inicia automaticamente a tarefa.
 
 Não avançar para a próxima tarefa própria só por ser o menor número da sua lista. Exigir todas as dependências integradas e o fecho da fase anterior. Se não há tarefa pronta, preparar casos/revisões/documentação da fase atual; não escrever código de tarefas dependentes ou futuras para contornar o plano.
 

@@ -2,7 +2,7 @@
 
 ## Autorização e fonte de verdade
 
-Este plano não autoriza iniciar a construção durante a fase de planeamento. Quando o utilizador pedir implementação, executar uma tarefa de cada vez e respeitar o PDF. Ler [00](00-README.md) e [01](01-PROJECT-OVERVIEW.md), depois [02](02-REQUIREMENTS.md), [12](12-RISKS-AND-DECISIONS.md), [04](04-ARCHITECTURE.md), [06](06-DATA-MODEL.md) e [07](07-API-AND-INTERFACES.md). Não assumir que a documentação histórica é uma implementação existente.
+Este plano não autoriza iniciar a construção durante a fase de planeamento. Quando o utilizador pedir implementação, executar uma tarefa de cada vez e respeitar o PDF. Ler [00](00-README.md) e [01](01-PROJECT-OVERVIEW.md), depois [02](02-REQUIREMENTS.md), [12](12-RISKS-AND-DECISIONS.md), [04](04-ARCHITECTURE.md), [06](06-DATA-MODEL.md) e [07](07-API-AND-INTERFACES.md). Não assumir que a documentação histórica é uma implementação existente..
 
 ## Antes de cada tarefa
 

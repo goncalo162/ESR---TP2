@@ -2,6 +2,12 @@
 
 Data: 27-10-2026. Base observada: revisão 2e58ef5, PHASE-01/TASK-001–004 DONE; PHASE-02–07/TASK-005–031 TODO. Esta distribuição é documentação de responsabilidades e revisão. Não inicia implementação, não altera dependências ou critérios técnicos, não muda estados e não atribui retroativamente autoria à fase 1.
 
+> A base e a coluna «Estado na distribuição» abaixo são um retrato histórico. Para o estado atual e a próxima tarefa consultar [15 — Progresso](../15-PROJECT-PROGRESS.md). As orientações individuais devem ser lidas com as dependências atuais; a distribuição não prova autoria ou aceitação de revisão.
+
+## Contexto do utilizador
+
+O utilizador desta sessão é **Fillmore**, conforme indicação explícita em 27-10-2026. Para orientar o seu trabalho, consultar [a fila de Fillmore](FILLMORE.md): implementação da TASK-006 e revisão atribuída da TASK-005. Waheed mantém as atribuições previstas para transporte e revisão da TASK-006. Esta identificação não redistribui tarefas nem atribui automaticamente autoria aos trabalhos anteriores.
+
 ## 1. Documentos individuais e fontes de verdade
 
 - [Waheed](WAHEED.md): transporte, vizinhança, monitorização, recuperação, UDP/replicação, cenário 1 e pacote.

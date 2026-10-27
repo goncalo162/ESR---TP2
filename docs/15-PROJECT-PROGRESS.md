@@ -2,23 +2,19 @@
 
 Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
+**Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação da tua fila é TASK-006; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+
 **Próxima tarefa recomendada:** [TASK-006](tasks/PHASE-02/TASK-006.md), ainda TODO. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
 Histórico anterior à TASK-005 — correção posterior, por pedido explícito do utilizador: **bootstrap exclusivamente para localização inicial dos vizinhos**. Contrato/código/fixtures e tarefas futuras corrigidos por ADR-013; sem registo vivo, leases, renovações ou avisos de saída no bootstrap. [Evidência atual](../experiments/bootstrap-discovery-correction.md): 131 testes aprovados, 16 tipos ativos, código 3 retirado. PHASE-01 permanece DONE; PHASE-02 não foi iniciada.
 
-Handoff desta correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
+Handoff histórico da correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
 
-Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). Waheed é o responsável da próxima TASK-005 e Fillmore o revisor. As 27 tarefas futuras têm responsável/revisor nos próprios ficheiros; atribuição não altera TODO nem inicia a fase 2. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
+Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). A TASK-005 tem Waheed como responsável atribuído e Fillmore como revisor atribuído. A próxima tarefa é TASK-006, atribuída a Fillmore, com Waheed como revisor. As atribuições não substituem a evidência técnica nem alteram os estados das tarefas. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
 
 Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em docs/team/, metadados nas 27 TASK futuras e ligações/regras de revisão nos documentos gerais/fases. Validação documental confirmou cobertura, atribuições sem auto-revisão, dependências sem ciclos e referências válidas; código/CORE preservados. Não foram executados build/testes Java nesta alteração exclusivamente documental. Não há implementação em curso por efeito desta distribuição.
-
-Revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
-
-Correção posterior, por pedido explícito do utilizador: **bootstrap exclusivamente para localização inicial dos vizinhos**. Contrato/código/fixtures e tarefas futuras corrigidos por ADR-013; sem registo vivo, leases, renovações ou avisos de saída no bootstrap. [Evidência atual](../experiments/bootstrap-discovery-correction.md): 131 testes aprovados, 16 tipos ativos, código 3 retirado. PHASE-01 permanece DONE; PHASE-02 não foi iniciada.
-
-Handoff desta correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
 
 ## Fases
 
@@ -175,3 +171,8 @@ O utilizador reforçou o uso das topologias existentes. Registada ADR-011: reuti
 Revisão de partida: ebe39f4; árvore inicialmente limpa. Revistos contratos, concorrência, admissão/cancelamento, codec, filas, eventos e shutdown. Não foi identificado defeito funcional confirmado que exigisse alterar Transport/Connection. Acrescentados três testes para erros em callbacks open/closed, timeout perante callback preso e shutdown simultâneo a partir de duas ligações.
 
 `mvn -B -ntp clean verify`: 149 testes aprovados (65 configuração + 66 codec + 18 transporte), sem falhas/erros/skips. [Log da revisão](../experiments/task-005-review-build.log), [conclusões e limites](../experiments/task-005-transport-validation.md#revisão-da-task-005--27-10-2026). Totais documentais e referência ao TransportTest implementado atualizados. TASK-005 continua DONE; TASK-006 TODO. Mantém-se o limite de integração: send só confirma enfileiramento e close imediato pode descartar resposta pendente; o futuro bootstrap tem de confirmar escrita completa antes de fechar. CORE/JVMs separadas/timeout com descarte silencioso de SYN não foram ensaiados.
+
+
+## Atualização documental — 27-10-2026
+
+Alinhadas as notas da fase 1 com a revisão da TASK-005 (18 testes TCP, 149 no build). Corrigidas orientações de arranque nos documentos da equipa e a indicação da próxima tarefa: TASK-006, atribuída a Fillmore, com revisão atribuída a Waheed. A matriz da distribuição conserva o seu retrato histórico; estados vivos continuam nos TASK e neste documento. Removidas repetições de handoffs históricos. Alteração apenas documental; resultados de testes são os da revisão V-005, sem nova execução Java.
