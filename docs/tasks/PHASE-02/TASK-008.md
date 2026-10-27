@@ -6,6 +6,8 @@
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Denji](../../team/DENJI.md).
+- Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-006](../PHASE-02/TASK-006.md), [TASK-007](../PHASE-02/TASK-007.md).
 - Requisitos relacionados: [RF-001](../../02-REQUIREMENTS.md#rf-001), [RF-002](../../02-REQUIREMENTS.md#rf-002), [RNF-003](../../02-REQUIREMENTS.md#rnf-003), [RP-008](../../02-REQUIREMENTS.md#rp-008).
 

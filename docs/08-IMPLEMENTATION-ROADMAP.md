@@ -18,6 +18,12 @@ Estado em 27-10-2026: PHASE-01 DONE com TASK-001–004 concluídas e 131 testes 
 
 O gate de saída inclui a [DoD](14-DEFINITION-OF-DONE.md) da fase. Cada ficheiro de fase identifica requisitos, tarefas, riscos e validações. Um requisito transversal pode começar numa fase e só ser aceite noutra; consultar [13](13-REQUIREMENTS-TRACEABILITY.md).
 
+## Distribuição por três pessoas
+
+[Coordenação, matriz de todas as tarefas e momentos de revisão](team/00-COORDINATION.md). Filas individuais: [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). TASK-005–031 têm responsável principal e revisor distinto na identificação do próprio ficheiro. Atribuir não inicia a tarefa; revisão aceite e integração na base comum precedem DONE e disponibilização de dependências.
+
+As dependências/gates existentes são preservadas. As fases 02–04/06–07 são essencialmente sequenciais no plano atual; a principal abertura de implementação é 020 e 021 depois de 019, com 022/023 a avançar após as próprias dependências sem esperar por 020. Leitura, desenho de casos e revisão de contratos podem decorrer em paralelo na fase atual; não constituem autorização para implementar uma tarefa dependente antes do gate.
+
 ## Ordem e dependências
 
 ~~~mermaid

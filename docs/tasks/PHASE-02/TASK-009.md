@@ -6,6 +6,8 @@
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Denji](../../team/DENJI.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-008](../PHASE-02/TASK-008.md).
 - Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005), [RC-007](../../02-REQUIREMENTS.md#rc-007).
 

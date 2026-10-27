@@ -6,6 +6,8 @@
 - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Waheed](../../team/WAHEED.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-014](../PHASE-04/TASK-014.md), [TASK-015](../PHASE-04/TASK-015.md), [TASK-016](../PHASE-04/TASK-016.md), [TASK-017](../PHASE-04/TASK-017.md), [TASK-019](../PHASE-05/TASK-019.md).
 - Requisitos relacionados: [RF-007](../../02-REQUIREMENTS.md#rf-007), [RF-010](../../02-REQUIREMENTS.md#rf-010), [RF-011](../../02-REQUIREMENTS.md#rf-011), [RF-015](../../02-REQUIREMENTS.md#rf-015), [RNF-001](../../02-REQUIREMENTS.md#rnf-001), [RNF-002](../../02-REQUIREMENTS.md#rnf-002), [RP-006](../../02-REQUIREMENTS.md#rp-006).
 

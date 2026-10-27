@@ -6,6 +6,8 @@
 - Fase: [PHASE-07 — Relatório, empacotamento e defesa](../../phases/PHASE-07-DELIVERY.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Denji](../../team/DENJI.md).
+- Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-009](../PHASE-02/TASK-009.md), [TASK-018](../PHASE-04/TASK-018.md), [TASK-030](../PHASE-07/TASK-030.md).
 - Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005), [RC-005](../../02-REQUIREMENTS.md#rc-005), [RC-006](../../02-REQUIREMENTS.md#rc-006), [RC-007](../../02-REQUIREMENTS.md#rc-007).
 

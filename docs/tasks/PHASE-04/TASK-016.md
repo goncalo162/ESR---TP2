@@ -6,6 +6,8 @@
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Waheed](../../team/WAHEED.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-012](../PHASE-03/TASK-012.md), [TASK-014](../PHASE-04/TASK-014.md), [TASK-015](../PHASE-04/TASK-015.md).
 - Requisitos relacionados: [RF-002](../../02-REQUIREMENTS.md#rf-002), [RF-006](../../02-REQUIREMENTS.md#rf-006), [RF-009](../../02-REQUIREMENTS.md#rf-009), [RNF-003](../../02-REQUIREMENTS.md#rnf-003).
 

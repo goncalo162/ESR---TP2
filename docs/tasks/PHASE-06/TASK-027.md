@@ -6,6 +6,8 @@
 - Fase: [PHASE-06 — Integração e avaliação em CORE](../../phases/PHASE-06-CORE-VALIDATION.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Denji](../../team/DENJI.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-026](../PHASE-06/TASK-026.md).
 - Requisitos relacionados: [RF-007](../../02-REQUIREMENTS.md#rf-007), [RF-012](../../02-REQUIREMENTS.md#rf-012), [RF-013](../../02-REQUIREMENTS.md#rf-013), [RNF-002](../../02-REQUIREMENTS.md#rnf-002), [RC-001](../../02-REQUIREMENTS.md#rc-001), [RP-005](../../02-REQUIREMENTS.md#rp-005).
 

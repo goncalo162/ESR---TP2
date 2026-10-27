@@ -40,6 +40,10 @@ Java 21 e Maven, mantendo a estrutura existente. Bibliotecas padrão Java para s
 | [15 — Progresso](15-PROJECT-PROGRESS.md) | Estado e próxima tarefa |
 | [16 — Validação do plano](16-PLAN-VALIDATION.md) | Revisão documental e limites |
 | [Guia para IA](AI-IMPLEMENTATION-GUIDE.md) | Execução e retoma entre sessões |
+| [Coordenação da equipa](team/00-COORDINATION.md) | Matriz completa das 31 tarefas, dependências, revisões e integração |
+| [Waheed](team/WAHEED.md) | Oito implementações principais e dez revisões, com ordem e critérios |
+| [Fillmore](team/FILLMORE.md) | Nove implementações principais e dez revisões, com ordem e critérios |
+| [Denji](team/DENJI.md) | Dez implementações principais e sete revisões, com ordem e critérios |
 
 Na primeira sessão ler 01, 02, 12, 04, 06, 07, 08 e o guia. Depois consultar 15 e a tarefa disponível. As referências específicas de cada tarefa reduzem o contexto necessário nas sessões seguintes.
 

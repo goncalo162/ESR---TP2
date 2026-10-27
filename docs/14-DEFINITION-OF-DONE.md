@@ -5,6 +5,7 @@ O estado DONE exige evidência. Documentação, um ficheiro vazio, compilação 
 ## Tarefa
 
 - Dependências em DONE, ou exceção de execução justificada e aprovada que não viole requisito; nunca fingir que um pré-requisito existe.
+- Para TASK-005–031: revisor indicado aceita a versão final e alterações estão integradas na base comum antes de DONE; dependências de outras branches só contam após integração. Registar autor/revisor, versão e evidência segundo a [coordenação](team/00-COORDINATION.md). Esta regra não reabre a fase 1 já concluída.
 - Objetivo e todos os critérios da tarefa cumpridos; alterações limitadas ao seu âmbito.
 - Testes/verificações previstos executados e resultados reais registados. V-001 pode não conter testes funcionais; essa exceção é explícita e não se estende às tarefas seguintes.
 - Casos limite relevantes cobertos, erros controlados e recursos libertados. Não introduzir regressões nas funcionalidades afetadas.

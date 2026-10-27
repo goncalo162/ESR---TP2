@@ -6,6 +6,8 @@
 - Fase: [PHASE-07 — Relatório, empacotamento e defesa](../../phases/PHASE-07-DELIVERY.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Fillmore](../../team/FILLMORE.md).
+- Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-028](../PHASE-06/TASK-028.md).
 - Requisitos relacionados: [RNF-005](../../02-REQUIREMENTS.md#rnf-005), [RC-002](../../02-REQUIREMENTS.md#rc-002), [RC-003](../../02-REQUIREMENTS.md#rc-003), [RP-007](../../02-REQUIREMENTS.md#rp-007).
 

@@ -8,9 +8,9 @@ Este plano não autoriza iniciar a construção durante a fase de planeamento. Q
 
 1. Ler [15](15-PROJECT-PROGRESS.md), a fase em [08](08-IMPLEMENTATION-ROADMAP.md), a tarefa e os requisitos em [13](13-REQUIREMENTS-TRACEABILITY.md).
 2. Inspecionar o repositório real, instruções AGENTS.md aplicáveis, git status e alterações do utilizador. Comparar com a auditoria; não apagar trabalho existente.
-3. Confirmar que todas as dependências estão DONE e que os artefactos/testes que as justificam existem. Uma marca DONE desatualizada exige revisão.
+3. Confirmar que todas as dependências estão DONE e que os artefactos/testes que as justificam existem. Para TASK-005–031, confirmar também revisão aceite e integração na base comum; uma branch em desenvolvimento não é dependência disponível. Uma marca DONE desatualizada exige revisão.
 4. Verificar gates em docs/12 e as decisões/contratos citados. Diferenciar exigência do enunciado, hipótese, escolha técnica e sugestão.
-5. Selecionar o menor ID em TODO cujas dependências estão DONE e que pertence à fase atual. Se existir IN PROGRESS, rever handoff e retomar essa tarefa primeiro. A primeira é TASK-001.
+5. Consultar a [coordenação da equipa](team/00-COORDINATION.md) e o documento pessoal de Waheed/Fillmore/Denji. Respeitar a tarefa explicitamente pedida e a atribuição; numa escolha delegada, selecionar o menor ID próprio em TODO com dependências integradas e gate cumprido. Se existir IN PROGRESS da mesma pessoa, rever handoff e retomar primeiro. A primeira tarefa histórica foi TASK-001, já DONE; não a repetir por causa da distribuição.
 6. Marcar a tarefa IN PROGRESS no próprio ficheiro e em docs/15. Registar início, âmbito e validações planeadas, sem mudar as restantes para DONE.
 
 ## Durante a implementação
@@ -28,6 +28,8 @@ Uma alteração legítima de desenho deve atualizar ADR, modelo, interfaces, tar
 Executar verificações relevantes, guardar comandos, ambiente e resultados reais. Verificar todos os critérios e [14](14-DEFINITION-OF-DONE.md). Se falhar, investigar dentro do âmbito; sem evidência não marcar DONE. Testes não executáveis no ambiente ficam pendentes e explicados.
 
 Se cumprir, marcar DONE no ficheiro e em docs/15, ligar evidência em docs/13 e indicar próxima tarefa desbloqueada. Um requisito com várias tarefas só fica satisfeito quando todas e respetivas validações estiverem concluídas; estados parciais não equivalem a DONE. Registar alterações de decisão e repetir apenas verificações afetadas por mudanças novas.
+
+Para TASK-005–031, obter revisão do membro indicado no ficheiro TASK sobre a versão final e integrar na base comum antes de marcar DONE. Se o código local passa mas revisão/integração estão pendentes, manter IN PROGRESS com handoff explícito. Uma tarefa futura que aguarda normalmente a dependência continua TODO. Não modificar os mesmos ficheiros em paralelo no mesmo checkout, nem implementar tarefas atribuídas a outra pessoa sob pretexto de desbloquear a própria sem redistribuição documentada. O autor cria/executa os seus testes; o revisor verifica a evidência e resultados relevantes. A regra não reabre TASK-001–004.
 
 ## Bloqueios
 

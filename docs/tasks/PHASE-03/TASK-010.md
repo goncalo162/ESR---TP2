@@ -6,6 +6,8 @@
 - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Waheed](../../team/WAHEED.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-007](../PHASE-02/TASK-007.md), [TASK-008](../PHASE-02/TASK-008.md), [TASK-009](../PHASE-02/TASK-009.md).
 - Requisitos relacionados: [RF-003](../../02-REQUIREMENTS.md#rf-003), [RF-008](../../02-REQUIREMENTS.md#rf-008), [RF-014](../../02-REQUIREMENTS.md#rf-014), [RP-006](../../02-REQUIREMENTS.md#rp-006).
 

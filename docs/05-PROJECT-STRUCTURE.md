@@ -8,6 +8,7 @@ ESR---TP2/
 ├── docs/                               documentação criada neste planeamento
 │   ├── 00-README.md ... 16-PLAN-VALIDATION.md
 │   ├── AI-IMPLEMENTATION-GUIDE.md
+│   ├── team/                          coordenação comum e documentos WAHEED/FILLMORE/DENJI
 │   ├── phases/                         sete fases
 │   └── tasks/PHASE-01 ... PHASE-07       31 tarefas
 ├── Projeto/                            E raiz Maven

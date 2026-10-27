@@ -56,6 +56,8 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 12. Definition of Done
 
+Coordenação do fecho: [Fillmore](../team/FILLMORE.md), com revisão dos três membros segundo a [coordenação da equipa](../team/00-COORDINATION.md). Autor e revisor de cada TASK constam na identificação; a atribuição não altera dependências ou estados.
+
 Cumprir [14](../14-DEFINITION-OF-DONE.md), incluindo evidência real e passagem de contexto. Atualizar [15](../15-PROJECT-PROGRESS.md); marcar a fase DONE apenas depois de todas as tarefas e critérios.
 
 ## 13. Riscos e observações

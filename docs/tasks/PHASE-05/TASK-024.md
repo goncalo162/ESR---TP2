@@ -6,6 +6,8 @@
 - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Denji](../../team/DENJI.md).
+- Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-008](../PHASE-02/TASK-008.md), [TASK-018](../PHASE-04/TASK-018.md), [TASK-020](../PHASE-05/TASK-020.md), [TASK-021](../PHASE-05/TASK-021.md), [TASK-022](../PHASE-05/TASK-022.md), [TASK-023](../PHASE-05/TASK-023.md).
 - Requisitos relacionados: [RF-007](../../02-REQUIREMENTS.md#rf-007), [RF-012](../../02-REQUIREMENTS.md#rf-012), [RF-013](../../02-REQUIREMENTS.md#rf-013), [RF-015](../../02-REQUIREMENTS.md#rf-015), [RP-001](../../02-REQUIREMENTS.md#rp-001), [RP-008](../../02-REQUIREMENTS.md#rp-008).
 

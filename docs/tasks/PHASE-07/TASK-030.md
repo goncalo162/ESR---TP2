@@ -6,6 +6,8 @@
 - Fase: [PHASE-07 — Relatório, empacotamento e defesa](../../phases/PHASE-07-DELIVERY.md)
 - Prioridade: P0
 - Estado: TODO
+- Responsável: [Waheed](../../team/WAHEED.md).
+- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-029](../PHASE-07/TASK-029.md).
 - Requisitos relacionados: [RC-003](../../02-REQUIREMENTS.md#rc-003), [RC-004](../../02-REQUIREMENTS.md#rc-004), [RC-005](../../02-REQUIREMENTS.md#rc-005), [RP-008](../../02-REQUIREMENTS.md#rp-008).
 
