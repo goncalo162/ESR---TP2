@@ -66,4 +66,4 @@ Confirmar recursos docentes cedo; o formato do vídeo não deve ser assumido. Co
 
 ### Fecho da fase — 27-10-2026
 
-V-001–004 têm evidência; configuração/codec integram-se em memória e o build executa 131 testes com sucesso. Não foram alterados CORE/topologies ou as fixtures de protocolo. Os requisitos globais permanecem parcialmente cumpridos, com limitações e estados em 13/15. [Notas para o relatório](../PHASE-01-REPORT-NOTES.md). Próxima tarefa recomendada: TASK-005, ainda TODO.
+V-001–004 têm evidência; configuração/codec integram-se em memória e o build executa 131 testes com sucesso. Não foram alterados CORE/topologies ou as fixtures de protocolo. Os requisitos globais permanecem parcialmente cumpridos, com limitações e estados em 13/15. [Notas para o relatório](../PHASE-01-REPORT-NOTES.md). No fecho desta fase a próxima tarefa era TASK-005; atualmente está DONE e a próxima é TASK-006. [Progresso atual](../15-PROJECT-PROGRESS.md).
