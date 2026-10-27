@@ -2,6 +2,8 @@
 
 A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. Transporte, handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
 
+Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
+
 ## 1. CLI e configuração
 
 Sintaxe futura: java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role BOOTSTRAP|SERVER|RELAY|CLIENT --config CAMINHO. Caminho e papel são obrigatórios e devem coincidir com o ficheiro; opções desconhecidas são erro. --help apresenta utilização. BOOTSTRAP é um processo de controlo, separado do processo SERVER mesmo quando partilham host.
@@ -62,7 +64,6 @@ Valores abaixo são **hipóteses configuráveis**, sujeitos a validação experi
 | EWMA alpha | 0,2 |
 | Anúncio / validade de candidato | 2 s / 8 s |
 | Lease de subscrição / renovação | 6 s / 2 s |
-| Lease de registo / renovação | 15 s / 5 s |
 | Timeout de ACTIVATE / tentativas por ronda | 3 s / 3 |
 | Retry de vizinho/bootstrap | backoff 0,5 s até 5 s, jitter até 10% |
 | Melhoria para troca / observações / permanência | 20% / 3 / 5 s |
@@ -87,17 +88,17 @@ Envelope, por ordem: version u8 (=1), type u8, requestId UUID (16 bytes), sender
 
 Primitivas: u8/u16/u32 sem sinal na rede e lidos em tipos Java suficientes; i64 não negativo para sequências/custos/tempos de media; UUID em dois longs big-endian, bits preservados; bool u8 0/1. String = u16 de comprimento de bytes + UTF-8 estrito sem NUL; nodeId até 32 bytes ASCII, title até 512 bytes e 128 pontos de código Unicode, mensagens de erro até 256 bytes. Lista = u16 count + elementos; node list até 64, path até 32. Não usar writeUTF/readUTF como se fossem UTF-8 comum. Bytes extra no fim do payload são erro de versão/formato. Todas as listas abaixo usam essa contagem.
 
-StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16 (1–60), serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (zero apenas num Endpoint devolvido por REGISTER_OK quando ainda desconhecida), host string ASCII de 1–253 bytes, controlPort u16 e dataPort u16 (ambos 1–65535), role u8 (1 SERVER, 2 RELAY, 3 CLIENT). senderId, serverId e nodeId obedecem a [A-Za-z0-9_-]{1,32}; título tem 1–128 pontos de código Unicode e até 512 bytes UTF-8. A identidade no envelope é sempre a do emissor imediato, inclusive quando reencaminha anúncio de outra origem. Um elemento não válido rejeita a mensagem inteira.
+StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16 (1–60), serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (obrigatoriamente zero em REGISTER_OK, não zero em REGISTER/HELLO), host string ASCII de 1–253 bytes, controlPort u16 e dataPort u16 (ambos 1–65535), role u8 (1 SERVER, 2 RELAY, 3 CLIENT). O bootstrap fornece endpoints configurados, nunca a instância viva de um vizinho; esta é conhecida no HELLO direto. senderId, serverId e nodeId obedecem a [A-Za-z0-9_-]{1,32}; título tem 1–128 pontos de código Unicode e até 512 bytes UTF-8. A identidade no envelope é sempre a do emissor imediato, inclusive quando reencaminha anúncio de outra origem. Um elemento não válido rejeita a mensagem inteira.
 
 ### API do codec implementada na TASK-004
 
 MessageCodec.encode(ControlMessage) devolve os bytes de exatamente um frame; decode(byte[]) exige exatamente um frame e rejeita bytes adicionais. write(message, OutputStream) valida/serializa antes de escrever no destino; read(InputStream) lê um frame completo e devolve Optional.empty apenas perante EOF limpo antes do prefixo. EOF a meio do prefixo/corpo é EOFException; campos incompletos num corpo já recebido são ProtocolException INVALID_MESSAGE. Comprimento superior ao máximo, incluindo u32 com bit de sinal, é rejeitado antes da alocação do corpo. Strings e listas também verificam máximos antes de alocar.
 
-ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
+ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem 16 tipos ativos e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
 
 O chamador gere flush/close e o único escritor por conexão. O codec não abre sockets. UUID são opacos e preservam todos os bits; a exceção de Endpoint.instanceId desconhecido aplica-se apenas a REGISTER_OK. u32 aceita 0..4294967295 e é exposto como long. Listas vazias, TTL zero ou percursos repetidos podem ter representação sintática; os handlers têm de verificar a validade operacional, origem/prefixo, ciclos, frescura e leases antes de agir. Host no Endpoint tem validação de domínio ASCII/comprimento; o handshake terá de o comparar com a configuração autorizada.
 
-[Implementação e 66 testes do codec](../experiments/task-004-codec-validation.md), incluindo comparação com todas as 29 fixtures TCP independentes. As 16 fixtures UDP permanecem dados de referência; o codec de dados é da TASK-019.
+[Implementação e validação original do codec](../experiments/task-004-codec-validation.md); [correção e revalidação do bootstrap](../experiments/bootstrap-discovery-correction.md). As 29 fixtures TCP incluem agora 17 casos aceites e 12 rejeitados, incluindo o código 3 retirado. As 16 fixtures UDP permanecem dados de referência; o codec de dados é da TASK-019.
 
 ## 4. Mensagens de controlo v1
 
@@ -105,10 +106,10 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 
 | type | Nome | Payload por ordem / efeito |
 |---:|---|---|
-| 1 | REGISTER | Endpoint local; valida nó e papel contra grafo; atualiza lease |
-| 2 | REGISTER_OK | leaseMs u32, lista Endpoint dos vizinhos permitidos |
-| 3 | REGISTER_RENEW | sem campos; requer identidade registada |
-| 4 | NODE_LEAVE | reason u8 (0 normal, 1 erro); notifica bootstrap/vizinhos |
+| 1 | REGISTER | Endpoint local; pedido de consulta, valida identidade/endpoint/papel contra configuração sem guardar registo vivo |
+| 2 | REGISTER_OK | apenas lista Endpoint dos vizinhos configurados, todos com instanceId zero; sem lease ou disponibilidade |
+| 3 | Retirado/reservado | rejeitar como INVALID_MESSAGE; não implementar renovação de registo |
+| 4 | NODE_LEAVE | reason u8 (0 normal, 1 erro); notifica exclusivamente vizinhos diretos, nunca bootstrap |
 | 5 | HELLO | Endpoint local; permite validar conexão, identidade e UDP publicitado |
 | 6 | HELLO_OK | sem campos; confirma handshake |
 | 7 | PROBE_PING | probeId i64 |
@@ -123,7 +124,9 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 16 | TRACE_RESULT | streamId UUID, traceId UUID, visited lista nodeId; resposta pelo caminho inverso do pedido |
 | 17 | ERROR | code u16, relatedType u8, detail string; correlacionado por requestId |
 
-Bootstrap usa conexões TCP de pedido/resposta com framing igual e pode manter ligação para renovação; transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede mensagens 7–16. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1–17; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
+Bootstrap usa uma conexão TCP curta por consulta inicial: REGISTER → REGISTER_OK ou ERROR, seguido de fecho após envio completo. O requerente usa os endpoints configurados devolvidos para falar diretamente com os vizinhos. Falhas antes de obter resposta permitem retry limitado por tentativa; depois do sucesso não existem renovação, consultas periódicas, heartbeats ou NODE_LEAVE para bootstrap. Consultas repetidas não alteram a configuração; IDs duplicados/instâncias e saídas são geridos entre vizinhos. O handler de bootstrap só aceita REGISTER e responde da configuração, mesmo que os vizinhos estejam offline. O codec comum pode representar outras mensagens; isso não autoriza o handler de bootstrap a processá-las como operações suas.
+
+O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede mensagens 7–16, com 3 retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1, 2 e 4–17; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
 
 STREAM_ANNOUNCE de uma fonte tem path=[serverId], custo=0 e sequência estritamente crescente por stream/epoch. Cada relay publica o seu path e custo acumulado; o recetor acrescenta-se antes de guardar/reenviar. Epoch muda a cada arranque do SERVER e coincide com sessionId dos datagramas. Ao ver nova época confirmada por anúncios de caminhos válidos, retirar a antiga até expirar o horizonte; não aceitar regresso a uma época retirada por anúncio atrasado.
 

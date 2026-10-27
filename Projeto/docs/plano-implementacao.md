@@ -1,6 +1,8 @@
 # Plano Detalhado de Implementação e Arquitetura - ESR TP2 (2026/2027)
 ## Serviço Over-the-Top (OTT) para Entrega de Multimédia em Rede Overlay
 
+Nota de atualização: este é o plano histórico; o plano atual está em [docs/](../../docs/00-README.md). Por instrução explícita do utilizador / ADR-013, bootstrap serve apenas a localização inicial dos vizinhos a partir da configuração, sem registo vivo, renovação, monitorização ou avisos de saída. Aplicar sempre o [contrato atual](../../docs/07-API-AND-INTERFACES.md).
+
 Este documento apresenta a análise integral do enunciado do Trabalho Prático 2 de ESR, detalhando a arquitetura conceptual, as decisões de desenho, a especificação dos componentes e a **ordem cronológica passo a passo de implementação**.
 
 ---
@@ -45,8 +47,7 @@ pt.uminho.esr.ott
 │   └── OttApplication.java         # Ponto de entrada CLI (inicia Nó, Bootstrap, Servidor ou Cliente)
 │
 ├── bootstrap
-│   ├── BootstrapServer.java        # Registo central de nós e atribuição determinística/dinâmica de vizinhos
-│   └── NodeRegistry.java           # Tabela de nós ativos e topologia de vizinhança
+│   └── BootstrapServer.java        # Consulta inicial dos vizinhos configurados, sem tabela de nós ativos
 │
 ├── overlay
 │   ├── OverlayNode.java            # Núcleo do nó overlay (orquestrador de transporte, rotas e streams)
@@ -102,7 +103,7 @@ As mensagens de controlo trocadas entre nós (via canal TCP fiável) utilizam um
 ### 3.1 Tipos de Mensagens (`MessageType`)
 | Mensagem | Direção | Propósito |
 |---|---|---|
-| `BOOTSTRAP_REGISTER` | Nó $\rightarrow$ Bootstrap | Registo do nó ao iniciar (informa ID, IP, Portas de escuta). |
+| `BOOTSTRAP_REGISTER` | Nó $\rightarrow$ Bootstrap | Nome histórico da consulta inicial; identifica o nó, sem inscrição ou atualização de estado vivo. |
 | `BOOTSTRAP_RESPONSE` | Bootstrap $\rightarrow$ Nó | Devolve a lista de vizinhos designados ($X$ vizinhos com IP e portas). |
 | `NEIGHBOR_HELLO` | Nó $\rightarrow$ Vizinho | Estabelece e valida a ligação direta de vizinhança. |
 | `NEIGHBOR_KEEPALIVE` / `PROBE_PING` | Nó $\rightarrow$ Vizinho | Medição de RTT, monitorização contínua e confirmação de vida. |
@@ -110,7 +111,7 @@ As mensagens de controlo trocadas entre nós (via canal TCP fiável) utilizam um
 | `STREAM_ANNOUNCE` | Servidor $\rightarrow$ Overlay (Flooding) | Anúncio periódico de disponibilidade de uma stream com métrica acumulada. |
 | `ROUTE_ACTIVATE` (Join) | Cliente $\rightarrow$ Servidor (Hop-by-hop) | Mensagem de subscrição que ativa a rota e adiciona o nó à árvore de distribuição. |
 | `ROUTE_DEACTIVATE` (Prune) | Cliente $\rightarrow$ Servidor (Hop-by-hop) | Remove o vizinho da lista de destinos; se lista ficar vazia, propaga desativação a montante. |
-| `NODE_LEAVE` | Nó $\rightarrow$ Vizinhos / Bootstrap | Aviso de encerramento gracioso do nó. |
+| `NODE_LEAVE` | Nó $\rightarrow$ Vizinhos diretos | Aviso de encerramento gracioso; nunca é enviado ao bootstrap. |
 
 ---
 
@@ -145,11 +146,11 @@ flowchart TD
 ---
 
 ### Fase 1: Bootstrap Server e Camada de Vizinhança (Overlay Topology)
-**Objetivo:** Permitir que os nós arranquem, se registem no bootstrap, descubram vizinhos e estabeleçam ligações bidirecionais ativas.
+**Objetivo:** Permitir que os nós arranquem, consultem os vizinhos no bootstrap e estabeleçam ligações bidirecionais diretamente entre si.
 
-1. **Passo 1.1 - Servidor de Bootstrap (`BootstrapServer` & `NodeRegistry`):**
+1. **Passo 1.1 - Servidor de Bootstrap (`BootstrapServer`):**
    - O `BootstrapServer` escuta numa porta bem conhecida.
-   - Ao receber `BOOTSTRAP_REGISTER`, regista o nó em `NodeRegistry` e responde com `BOOTSTRAP_RESPONSE` contendo a lista de $X$ vizinhos (lidos de `topology.json` ou atribuídos segundo topologia definida).
+   - Ao receber a consulta inicial, devolve os $X$ vizinhos definidos em `topology.properties` e fecha a conexão após resposta. Não mantém membros, leases, renovações ou monitorização; vizinhos offline também são devolvidos. O contrato atual usa os nomes REGISTER/REGISTER_OK.
 2. **Passo 1.2 - Camada de Transporte (`Transport` e `Connection`):**
    - Criar `ServerSocket` TCP em cada nó para aceitar conexões de outros vizinhos.
    - Criar `Socket` de saída para os vizinhos fornecidos pelo bootstrap.
@@ -274,7 +275,7 @@ Para começar a trabalhar de imediato no código, segue esta lista de tarefas se
 |---|---|---|---|
 | **1º** | Protocolo & Codec | `ControlMessage.java`, `MessageType.java`, `MessageCodec.java` | Criar e testar serialização JSON de mensagens de controlo. |
 | **2º** | Configurações | `NodeConfiguration.java`, `ConfigurationLoader.java` | Conseguir carregar parâmetros de porta, IP e papel de ficheiro `.properties`. |
-| **3º** | Bootstrap Server | `BootstrapServer.java`, `NodeRegistry.java` | Criar servidor central que responde a registos e devolve vizinhos. |
+| **3º** | Bootstrap Server | `BootstrapServer.java` | Responder à consulta inicial com vizinhos configurados, sem registo central de nós ativos. |
 | **4º** | Comunicação Overlay | `Transport.java`, `Connection.java`, `NeighborManager.java` | Fazer nós ligarem-se entre si via TCP full-duplex e trocar `HELLO`. |
 | **5º** | Monitorização | `NetworkMonitor.java`, `LinkMetrics.java` | Implementar `PING`/`PONG` periódico e cálculo de RTT. |
 | **6º** | Tabela & Roteamento | `RoutingTable.java`, `RoutingService.java`, `Route.java` | Difundir `STREAM_ANNOUNCE` e calcular menor custo para cada stream. |

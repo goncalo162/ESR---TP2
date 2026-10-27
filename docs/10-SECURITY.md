@@ -12,7 +12,8 @@ Entradas não fiáveis: CLI, ficheiros de configuração, frame TCP, datagrama U
 |---|---|
 | Configuração | Validar propriedades, limites, endpoints e grafo antes de sockets; TASK-003 |
 | TCP | Framing máximo 64 KiB, UTF-8 estrito, enums/listas limitados e leitor/escritor únicos; TASK-004/005 |
-| Admissão | HELLO com identidade/instância e validação da allowlist; um canal por par; TASK-006/007 |
+| Descoberta inicial | Bootstrap valida apenas a consulta face à configuração; não guarda disponibilidade nem arbitra instâncias vivas; TASK-006 |
+| Admissão entre vizinhos | HELLO com identidade/instância e validação da allowlist; um canal por par; sem intervenção do bootstrap; TASK-007 |
 | Duplicados | Rejeitar identidade já viva, invalidar callbacks de conexão velha e correlacionar requests/revisions; TASK-007/014/015 |
 | Flooding | Vetor de caminho, validade, máximo de IDs, cache e rate limit; TASK-012 |
 | Subscrições | Aceitar apenas mensagens do child associado, com StreamKey, epoch e revisão corretos; lease e timeout; TASK-014/015 |

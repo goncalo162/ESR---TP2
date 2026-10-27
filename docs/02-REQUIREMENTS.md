@@ -101,7 +101,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Fases de implementação/validação: PHASE-01, PHASE-02; o requisito só está concluído após a última tarefa e validação relacionada.
 - Tarefas: [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md).
 - Validação: V-003, V-006, V-007 em [09](09-TESTING-STRATEGY.md).
-- Critério de aceitação: Um nó iniciado apenas com configuração local e contacto bootstrap recebe os endpoints dos vizinhos permitidos, sem precisar de os fornecer na CLI.
+- Critério de aceitação: Um nó iniciado apenas com configuração local e contacto bootstrap recebe os endpoints dos vizinhos permitidos, sem precisar de os fornecer na CLI. Por instrução explícita do utilizador (ADR-013), bootstrap só consulta a configuração e devolve essas localizações: sem registo vivo, leases, renovações, monitorização, avisos de saída ou cálculo/encaminhamento de rotas. Depois da descoberta, os nós comunicam e reconectam diretamente, mesmo com bootstrap parado.
 - Estado atual: IN PROGRESS — TASK-003 DONE; [configuração e 65 testes](../experiments/task-003-configuration-validation.md) como evidência parcial. As restantes tarefas e a aceitação integrada do requisito continuam pendentes.
 
 

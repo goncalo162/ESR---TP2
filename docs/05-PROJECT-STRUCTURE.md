@@ -16,7 +16,7 @@ ESR---TP2/
 │   ├── docs/                           E documentação histórica; não duplicar este plano
 │   ├── src/main/java/pt/uminho/esr/ott/ E pacotes preparados
 │   │   ├── app/                        E OttApplication
-│   │   ├── bootstrap/                  E BootstrapServer, NodeRegistry
+│   │   ├── bootstrap/                  E BootstrapServer apenas comentado; consulta da configuração em TASK-006, sem NodeRegistry
 │   │   ├── config/                     E TASK-003: loader, NodeConfiguration, TopologyConfiguration, StreamConfiguration, erros agregados
 │   │   ├── overlay/                    E OverlayNode, NodeRole, Neighbor, NeighborManager
 │   │   ├── transport/                  E Transport, Connection

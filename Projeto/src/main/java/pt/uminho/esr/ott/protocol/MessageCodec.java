@@ -99,13 +99,12 @@ public final class MessageCodec {
         return switch (type) {
             case REGISTER, HELLO -> new EndpointPayload(readEndpoint(in));
             case REGISTER_OK -> {
-                long lease = readU32(in);
                 int count = readCount(in, MAX_NEIGHBORS);
                 var neighbors = new ArrayList<Endpoint>(count);
                 for (int i = 0; i < count; i++) neighbors.add(readEndpoint(in));
-                yield new RegistrationResult(lease, neighbors);
+                yield new NeighborList(neighbors);
             }
-            case REGISTER_RENEW, HELLO_OK -> Empty.INSTANCE;
+            case HELLO_OK -> Empty.INSTANCE;
             case NODE_LEAVE -> new Leave(in.readUnsignedByte());
             case PROBE_PING, PROBE_PONG -> new Probe(in.readLong());
             case STREAM_ANNOUNCE -> new Announcement(readStream(in), in.readLong(), in.readLong(), readNodes(in));
@@ -124,12 +123,11 @@ public final class MessageCodec {
         switch (m.type()) {
             case REGISTER, HELLO -> writeEndpoint(out, payload(m, EndpointPayload.class).endpoint());
             case REGISTER_OK -> {
-                var p = payload(m, RegistrationResult.class);
-                out.writeInt((int) p.leaseMs());
+                var p = payload(m, NeighborList.class);
                 out.writeShort(p.neighbors().size());
                 for (var endpoint : p.neighbors()) writeEndpoint(out, endpoint);
             }
-            case REGISTER_RENEW, HELLO_OK -> { }
+            case HELLO_OK -> { }
             case NODE_LEAVE -> out.writeByte(payload(m, Leave.class).reason());
             case PROBE_PING, PROBE_PONG -> out.writeLong(payload(m, Probe.class).probeId());
             case STREAM_ANNOUNCE -> {
@@ -181,11 +179,11 @@ public final class MessageCodec {
         switch (m.type()) {
             case REGISTER, HELLO -> endpoint(payload(m, EndpointPayload.class).endpoint(), false);
             case REGISTER_OK -> {
-                var p = payload(m, RegistrationResult.class);
-                u32(p.leaseMs());limit(p.neighbors().size(), MAX_NEIGHBORS, "vizinhos");
+                var p = payload(m, NeighborList.class);
+                limit(p.neighbors().size(), MAX_NEIGHBORS, "vizinhos");
                 for (var e : p.neighbors()) endpoint(e, true);
             }
-            case REGISTER_RENEW, HELLO_OK -> payload(m, Empty.class);
+            case HELLO_OK -> payload(m, Empty.class);
             case NODE_LEAVE -> range(payload(m, Leave.class).reason(), 0, 1, "reason");
             case PROBE_PING, PROBE_PONG -> nonnegative(payload(m, Probe.class).probeId(), "probeId");
             case STREAM_ANNOUNCE -> {
@@ -254,6 +252,7 @@ public final class MessageCodec {
         nodeId(e.nodeId());uuid(e.instanceId());text(e.host(), 1, 253);
         require(e.host().chars().allMatch(c -> c > 32 && c < 127), "Host deve ser ASCII sem espaços");
         require(allowUnknown || !UNKNOWN_INSTANCE.equals(e.instanceId()), "instanceId desconhecido fora de REGISTER_OK");
+        require(!allowUnknown || UNKNOWN_INSTANCE.equals(e.instanceId()), "Bootstrap devolve apenas configuração, sem instância viva");
         range(e.controlPort(), 1, 65535, "controlPort");range(e.dataPort(), 1, 65535, "dataPort");
         require(e.role() != null && e.role() != NodeRole.BOOTSTRAP, "Papel de Endpoint inválido");
     }

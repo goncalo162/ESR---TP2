@@ -25,6 +25,8 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 Aplicar regra de iniciador por ordem de nodeId, validar HELLO/HELLO_OK e associar endpoint UDP publicitado à conexão. Só publicar ACTIVE após handshake válido. Agendar retries com backoff e jitter; vizinhos offline continuam desejados. Comparar connectionId e instanceId nos eventos para que a morte de uma conexão antiga não remova a nova.
 
+A lista inicial do bootstrap é configuração, sem estado de disponibilidade ou instância conhecida. Depois de obtida, manter e reconectar diretamente aos mesmos vizinhos, mesmo com bootstrap desligado. Não consultar bootstrap periodicamente ou numa falha de vizinho. Identidade de execução e duplicados são tratados localmente em HELLO, nunca por registo central ou lease de bootstrap.
+
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
@@ -35,7 +37,7 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Obter lista de vizinhos do bootstrap e iniciar os dials devidos.
+- [ ] Obter uma resposta inicial do bootstrap, fechar a conexão de consulta e iniciar os dials devidos.
 - [ ] Validar identidade, permissões e endpoints no HELLO.
 - [ ] Eliminar duplicados e publicar eventos de entrada/saída.
 - [ ] Repetir conexão após falha até shutdown, mantendo estado observável.
@@ -50,7 +52,7 @@ Início simultâneo, IDs iguais, HELLO em atraso, peer não autorizado e regress
 
 ## 10. Testes necessários
 
-V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado.
+V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado; após descoberta, desligar bootstrap e comprovar reconexão direta sem novas consultas.
 
 Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 

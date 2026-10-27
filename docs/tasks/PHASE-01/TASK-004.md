@@ -23,7 +23,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Implementar todos os tipos 1–17 e os tipos auxiliares da interface. O codec trata bytes, sem ativar rotas ou abrir sockets. Validar comprimento antes de alocar, strings UTF-8 estritas, contagens, tipos e ausência de bytes sobrantes. Distinguir EOF limpo entre mensagens de EOF a meio do prefixo/corpo. Suportar ID de um carácter e UUID com bits de sinal preservados.
+Implementar os tipos ativos 1, 2 e 4–17 e os tipos auxiliares da interface; código 3 retirado por ADR-013. REGISTER_OK contém apenas NeighborList, sem lease e com instanceId dos vizinhos obrigatoriamente zero. O codec trata bytes, sem ativar rotas ou abrir sockets. Validar comprimento antes de alocar, strings UTF-8 estritas, contagens, tipos e ausência de bytes sobrantes. Distinguir EOF limpo entre mensagens de EOF a meio do prefixo/corpo. Suportar ID de um carácter e UUID com bits de sinal preservados no envelope e campos opacos.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
@@ -50,7 +50,7 @@ length negativo ao interpretar u32, frame acima de 64 KiB, UTF-8 inválido, type
 
 ## 10. Testes necessários
 
-V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR, round-trip dos 17 tipos, leituras parciais, concatenação e rejeições sem alocação não limitada.
+V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR e descoberta, round-trip dos 16 tipos ativos, leituras parciais, concatenação e rejeições sem alocação não limitada. Rejeitar código 3, layout antigo de resposta com lease e vizinhos com instância viva na resposta bootstrap.
 
 Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado atual da validação: V-004 EXECUTADA; 66 testes de codec/integração e os 65 testes de configuração aprovados no build limpo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
@@ -67,11 +67,13 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 
 ## 13. Notas para a IA implementadora
 
+Correção posterior por instrução do utilizador: o contrato atual substitui a renovação de registo por código 3 retirado, e a resposta bootstrap por NeighborList sem lease e com instâncias desconhecidas. [Revalidação](../../../experiments/bootstrap-discovery-correction.md): 131 testes aprovados. A tarefa continua DONE; o resultado original abaixo não deve ser usado para reintroduzir registo vivo ou renovação.
+
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
 
-### Resultado — 27-10-2026
+### Resultado original — 27-10-2026
 
 MessageType, ControlMessage e MessageCodec implementados, com ErrorCode/ProtocolException. Os 17 tipos e todos os layouts TCP têm golden bytes independentes; testes cobrem leitura parcial, concatenação, EOF, UTF-8, limites, valores unsigned, UUID e erro controlado. Todas as 45 fixtures mantêm hashes originais. Integração local carrega os perfis e produz/recupera HELLO, anúncios e resposta bootstrap em memória.
 

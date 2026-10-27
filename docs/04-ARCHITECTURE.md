@@ -14,10 +14,10 @@ flowchart LR
   R3[Relay R3]
   C1[Cliente C1]
   C2[Cliente C2]
-  S1 -. registo TCP .-> B
-  R1 -. registo TCP .-> B
-  S2 -. registo TCP .-> B
-  C1 -. registo TCP .-> B
+  S1 -. consulta inicial TCP .-> B
+  R1 -. consulta inicial TCP .-> B
+  S2 -. consulta inicial TCP .-> B
+  C1 -. consulta inicial TCP .-> B
   S1 <--> R1
   S1 <--> R2
   S2 <--> R2
@@ -28,7 +28,7 @@ flowchart LR
   R3 <--> C2
 ~~~
 
-As linhas sólidas representam vizinhanças lógicas com TCP de controlo e endpoint UDP associado; o tráfego de vídeo usa somente a árvore ativa de cada stream. O desenho exemplifica caminhos alternativos e partilha, não substitui o mapeamento IP de cada experiência. Todos os nós usam bootstrap; só alguns registos são desenhados para legibilidade.
+As linhas sólidas representam vizinhanças lógicas com TCP de controlo e endpoint UDP associado; o tráfego de vídeo usa somente a árvore ativa de cada stream. O desenho exemplifica caminhos alternativos e partilha, não substitui o mapeamento IP de cada experiência. Todos os nós consultam inicialmente o bootstrap; só algumas consultas são desenhadas para legibilidade. Cada consulta tem resposta com a lista configurada e termina a ligação ao bootstrap.
 
 ## Componentes e responsabilidades
 
@@ -36,7 +36,7 @@ As linhas sólidas representam vizinhanças lógicas com TCP de controlo e endpo
 |---|---|
 | app | CLI, composição de serviços, início ordenado, comandos locais e encerramento |
 | config | Ler propriedades, validar IDs, endpoints, limites e relações; nenhum socket antes da validação |
-| bootstrap | Ler grafo permitido, devolver vizinhos e manter registo com lease; não anuncia vídeos ou calcula percursos |
+| bootstrap | Consultar o grafo configurado e devolver a localização dos vizinhos do requerente; sem registo de nós ativos, leases, renovações, monitorização, rotas ou encaminhamento |
 | transport | Conexões TCP, framing, filas e eventos; UDP de dados separado; não decide destinos |
 | overlay | Handshake, unicidade da ligação, reconexão e publicação de eventos de vizinhança |
 | monitoring | Sondas TCP correlacionadas, RTT EWMA e deteção de falhas; sem inferir bandwidth a partir de RTT |
@@ -49,7 +49,11 @@ Interfaces internas e mensagens em [07](07-API-AND-INTERFACES.md); entidades e e
 
 ## Construção da overlay
 
-O grafo permitido é estático, simétrico e configurado pelo operador; disponibilidade e conexões são dinâmicas. Cada nó conhece apenas o bootstrap e a sua própria identidade no arranque. O bootstrap devolve todos os vizinhos permitidos, incluindo os ainda offline, para permitir início em qualquer ordem. X corresponde ao grau pretendido desse nó; os clientes folha podem ter X=1. O registo de nós vivos serve diagnóstico, não impede tentar ligar a um vizinho que ainda não se registou.
+O grafo permitido é estático, simétrico e configurado pelo operador; disponibilidade e conexões são dinâmicas. Cada nó conhece apenas o bootstrap e a sua própria identidade no arranque. O bootstrap devolve todos os vizinhos permitidos, incluindo os ainda offline, para permitir início em qualquer ordem. X corresponde ao grau pretendido desse nó; os clientes folha podem ter X=1. A resposta depende apenas da configuração e da identidade consultada: não existe tabela de nós vivos, lease de registo, renovação, heartbeat ou notificação de saída no bootstrap.
+
+REGISTER é apenas o nome do pedido inicial de consulta; não cria uma inscrição duradoura. O Endpoint do requerente é validado contra a configuração, sem atualizar endereços ou guardar estado operacional. REGISTER_OK devolve a lista configurada, sem prazo de validade nem informação de disponibilidade; as instâncias dos vizinhos são desconhecidas (UUID zero) até HELLO direto. Após responder, a conexão de descoberta é encerrada. Retries só servem para obter uma resposta inicial em caso de falha; não há consultas periódicas nem nova consulta necessária para reconectar a vizinhos já conhecidos. Um reinício de processo pode voltar a consultar a mesma lista.
+
+Deteção de saídas, identidades duplicadas, reconexão e sondas pertencem aos nós vizinhos; anúncios, métricas, escolha/ativação de rotas e vídeo nunca passam pelo bootstrap. Os nós que já obtiveram a lista continuam a funcionar se o bootstrap parar. Estes comportamentos serão implementados na fase 2; a clarificação do contrato não implementa esse runtime.
 
 Entre cada par só o nodeId lexicograficamente menor inicia o canal; ambos aceitam HELLO e rejeitam duplicados. Uma nova instanceId invalida eventos antigos da mesma identidade. O iniciador repete tentativas com backoff limitado e jitter. As tentativas não alteram o grafo permitido. Após falha, reconecta ao mesmo vizinho e permite escolher outra rota já existente.
 

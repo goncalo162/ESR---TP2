@@ -1,5 +1,7 @@
 # Revisão de contratos e recursos — TASK-002 / V-002
 
+> Atualização posterior: esta evidência descreve a execução original da TASK-002. A correção explícita do bootstrap (ADR-013) alterou intencionalmente a fixture REGISTER_OK e reclassificou a antiga renovação como caso inválido, mantendo os bytes desta última. Usar o [contrato e evidência atuais](bootstrap-discovery-correction.md); não reintroduzir leases de registo ou renovação com base no histórico.
+
 Data: 26-10-2026. Estado: **V-002 executada; TASK-002 concluída**. A revisão fixa dados de referência e resolve ambiguidades dos formatos, sem implementar codecs, leitura de vídeo, rede ou reprodução.
 
 ## Partida e autorização

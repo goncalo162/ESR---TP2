@@ -13,7 +13,7 @@ public record ControlMessage(int version, MessageType type, UUID requestId,
         this(1, type, requestId, senderId, senderInstance, payload);
     }
 
-    public sealed interface Payload permits EndpointPayload, RegistrationResult, Empty,
+    public sealed interface Payload permits EndpointPayload, NeighborList, Empty,
             Leave, Probe, Announcement, Withdrawal, Activation, ActivationAck,
             Deactivation, Trace, TraceResult, ErrorPayload { }
 
@@ -26,8 +26,9 @@ public record ControlMessage(int version, MessageType type, UUID requestId,
 
     public record EndpointPayload(Endpoint endpoint) implements Payload { }
 
-    public record RegistrationResult(long leaseMs, List<Endpoint> neighbors) implements Payload {
-        public RegistrationResult { neighbors = List.copyOf(neighbors); }
+    /** Vizinhos configurados; sem lease ou estado vivo. instanceId dos vizinhos é zero. */
+    public record NeighborList(List<Endpoint> neighbors) implements Payload {
+        public NeighborList { neighbors = List.copyOf(neighbors); }
     }
 
     public enum Empty implements Payload { INSTANCE }

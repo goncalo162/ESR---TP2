@@ -18,7 +18,7 @@ Entregar uma aplicação executada manualmente em máquinas IP, com papéis de s
 ## Fluxos de utilização
 
 1. O operador inicia o bootstrap e depois servidores, relays e clientes em qualquer ordem suportada por tentativas de reconexão limitadas.
-2. Cada nó conhece o contacto bootstrap, recebe a lista permitida e estabelece canais TCP bidirecionais com vizinhos disponíveis.
+2. Cada nó conhece o contacto bootstrap, consulta uma vez a lista de vizinhos configurados e estabelece canais TCP bidirecionais diretamente com eles. Bootstrap não mantém membros ativos, leases ou renovações; após obter a lista, o nó não depende dele para manutenção/reconexão. Falha antes de obter resposta permite retry da consulta inicial.
 3. Servidores anunciam metadados de cada stream. Anúncios constroem candidatos a rotas e catálogo sem enviar vídeo.
 4. Um cliente escolhe um UUID de stream. A ativação segue o percurso inverso até à fonte; a fonte passa a enviar e os relays replicam conforme as subscrições.
 5. A saída de um cliente remove apenas o seu ramo. A última saída desativa a transmissão nesse segmento.

@@ -1,5 +1,7 @@
 # TASK-002 — Fixar contratos, fixtures e decisões pendentes
 
+> Atualização posterior: a execução original abaixo criou 17 tipos aceites. ADR-013 retirou a renovação de registo e reviu a resposta bootstrap; o inventário atual mantém 45 casos, com 16 tipos ativos. [Correção e revalidação](../../../experiments/bootstrap-discovery-correction.md). A tarefa mantém-se DONE.
+
 ## 1. Identificação
 
 - ID: TASK-002

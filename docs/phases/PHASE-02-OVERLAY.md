@@ -21,7 +21,7 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
 | [TASK-005](../tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 | TODO |
-| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Implementar registo bootstrap e descoberta configurada | TASK-003, TASK-005 | V-006 | TODO |
+| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | V-006 | TODO |
 | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | TODO |
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | TODO |
 | [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | TODO |
@@ -36,7 +36,7 @@ O gate anterior e as dependências de cada tarefa são cumulativos. A tarefa ini
 
 ## 8. Componentes afetados
 
-transport; bootstrap; overlay; app; registos e roteiro da primeira avaliação intermédia. Os caminhos precisos e a distinção existente/planeado estão nas tarefas e em [05](../05-PROJECT-STRUCTURE.md).
+transport; bootstrap de consulta inicial; overlay; app; logs e roteiro da primeira avaliação intermédia. O bootstrap consulta apenas a configuração: sem registo vivo, leases, renovações, monitorização ou avisos de saída. Os caminhos precisos e a distinção existente/planeado estão nas tarefas e em [05](../05-PROJECT-STRUCTURE.md).
 
 ## 9. Entregáveis
 
@@ -50,7 +50,8 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 - [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
 - [ ] Pelo menos três nós iniciam fora de ordem, trocam HELLO e reconectam sem canais duplicados.
-- [ ] Bootstrap fornece vizinhos sem ser intermediário de mensagens entre eles.
+- [ ] Bootstrap só fornece localização dos vizinhos a partir da configuração; não mantém disponibilidade ou registos com renovação.
+- [ ] Nós já descobertos reconectam diretamente com bootstrap parado, sem consultas periódicas ou avisos de saída para ele.
 - [ ] O resultado «Três ou mais nós trocam HELLO, entram e saem e reconectam; bootstrap não intermedeia tráfego.» é demonstrável no ambiente da fase.
 - [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
 - [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
