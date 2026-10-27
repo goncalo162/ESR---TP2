@@ -23,6 +23,8 @@ Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO,
 
 Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
 
+Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 permanece TODO; preservar ADR-013, sem membership/lease no bootstrap.
+
 ## 5. Especificação técnica
 
 Usar exclusivamente o grafo simétrico imutável carregado por ConfigurationLoader. Receber REGISTER como consulta: verificar correspondência de senderId com Endpoint.nodeId, identidade configurada e endpoint/papel compatíveis; responder com REGISTER_OK contendo apenas os endpoints dos vizinhos definidos no ficheiro. Nunca atualizar a configuração com os dados do pedido. Todos os instanceId dos vizinhos devolvidos são zero, sem consultar ou descobrir se estão ativos. Enviar a resposta completa e fechar a conexão de consulta; timeout, erro ou desconexão de um requerente não afetam o listener nem outras consultas.

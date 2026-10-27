@@ -86,7 +86,7 @@ VideoSource → pacing na origem → fragmentação → StreamForwarder → UDP 
 ## Concorrência e recursos
 
 - Um executor serial de eventos por nó é proprietário de vizinhos, rotas e subscrições; handlers publicam eventos sem editar esse estado diretamente.
-- Um leitor e uma fila/escritor por ligação TCP; a thread de leitura nunca espera por ACK que ela própria terá de receber.
+- Um leitor e uma fila/escritor por ligação TCP; a thread de leitura nunca espera por ACK que ela própria terá de receber. Implementado na TASK-005: threads virtuais, dials assíncronos, até 64 reservas e 256 frames por saída. Callbacks publicam eventos sem bloquear; composição do executor serial em TASK-008.
 - UDP ingress e egress usam filas limitadas e snapshots de rotas; saturação descarta dados e incrementa contador, sem bloquear indefinidamente o controlo.
 - Fonte usa scheduler com relógio monotónico, sem catch-up ilimitado após atraso. O cliente tem máximo de frames em montagem e deadline por frame.
 - Swing só recebe imagens prontas no EDT. A janela não executa rede, leitura de vídeo ou descodificação.

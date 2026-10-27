@@ -68,3 +68,7 @@ Guardar apenas configuração, vídeos e artefactos de experiência. Não criar 
 ## Modelos de controlo disponíveis após TASK-004
 
 protocol.ControlMessage contém o envelope e payloads imutáveis associados aos 16 tipos ativos MessageType (IDs 1, 2 e 4–17; 3 retirado). NeighborList contém apenas a lista de Endpoints configurados, sem lease; em REGISTER_OK, instanceId de todos os vizinhos é zero. O envelope conserva a identidade da instância emissora para correlação, sem constituir registo de disponibilidade. ErrorCode fixa os códigos 1–12 e ProtocolException classifica falhas de formato. Os DTOs de rede não substituem os serviços de vizinhança, routing ou catálogo dinâmico. O codec verifica tipos/domínios/limites; correspondência com ligação, autorização, caminhos e leases de subscrição efetivos são responsabilidade dos handlers futuros. [API/contrato](07-API-AND-INTERFACES.md), [validação original V-004](../experiments/task-004-codec-validation.md), [correção do bootstrap](../experiments/bootstrap-discovery-correction.md).
+
+## Transporte disponível desde TASK-005
+
+Connection possui UUID por ligação, endpoint remoto, fila limitada e razão terminal (primeira razão vence). UUID de conexão não autentica nodeId. Eventos ordenados open → mensagens → closed, sendo closed único; slots de admissão incluem dials e permanecem ocupados até os dois workers I/O terminarem. Shutdown fecha também tentativas pendentes. A associação a Neighbor pertence à TASK-007. [API](07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005).

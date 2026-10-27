@@ -2,7 +2,9 @@
 
 Este conjunto de documentos especifica um protótipo OTT que distribui vídeo em tempo real através de uma rede overlay com multicast aplicacional. A entrega final deve demonstrar pelo menos dois servidores, cada um com dois vídeos distintos, clientes simultâneos, caminhos alternativos e adaptação às condições de rede.
 
-**Estado atual: PHASE-01 concluída.** TASK-001–004 DONE; PHASE-02–07/TASK-005–031 TODO. Configuração e codec de controlo v1 implementados, com [131 testes aprovados](../experiments/task-004-codec-validation.md). Transporte, overlay e vídeo ainda por implementar. [O que já pode entrar no relatório](PHASE-01-REPORT-NOTES.md).
+**Estado atual: PHASE-01 concluída; PHASE-02 IN PROGRESS.** TASK-001–005 DONE; TASK-006–031 TODO. Configuração, codec e transporte TCP implementados, com [149 testes aprovados](../experiments/task-005-transport-validation.md). Descoberta bootstrap, gestão de vizinhos e vídeo continuam por implementar. Material para o relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+
+Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
 
 Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
 
@@ -51,6 +53,6 @@ Na primeira sessão ler 01, 02, 12, 04, 06, 07, 08 e o guia. Depois consultar 15
 
 PHASE-01 → PHASE-02 → PHASE-03 → PHASE-04 → PHASE-05 → PHASE-06 → PHASE-07. O [roadmap](08-IMPLEMENTATION-ROADMAP.md) liga os sete ficheiros de fase e identifica todas as tarefas. A ordem numérica TASK-001 a TASK-031 é uma ordenação válida das dependências.
 
-**Primeira tarefa, concluída:** [TASK-001 — Validar a base Java e configurar testes](tasks/PHASE-01/TASK-001.md). **TASK-002 concluída:** contratos/fixtures e recursos revistos. **TASK-003 concluída:** configuração implementada/testada. **TASK-004 e PHASE-01 concluídas:** codec e integração local testados. **Próxima tarefa:** [TASK-005](tasks/PHASE-02/TASK-005.md), ainda TODO; não iniciada nesta sessão. Executar as tarefas seguintes apenas no âmbito solicitado pelo utilizador.
+**Primeira tarefa, concluída:** [TASK-001 — Validar a base Java e configurar testes](tasks/PHASE-01/TASK-001.md). **TASK-002 concluída:** contratos/fixtures e recursos revistos. **TASK-003 concluída:** configuração implementada/testada. **TASK-004 e PHASE-01 concluídas:** codec e integração local testados. **TASK-005 concluída:** transporte TCP testado. **Próxima tarefa:** [TASK-006](tasks/PHASE-02/TASK-006.md), ainda TODO. Executar as tarefas seguintes apenas no âmbito solicitado pelo utilizador.
 
 Ao concluir uma tarefa, atualizar simultaneamente o seu estado, o progresso, a rastreabilidade dos requisitos satisfeitos e as evidências. Não converter TODO em DONE por existirem ficheiros vazios, documentação ou artefactos antigos em target/.

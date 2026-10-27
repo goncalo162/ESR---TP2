@@ -33,4 +33,4 @@ Validar versões e origem de dependências e exemplos em TASK-001/020; não exec
 
 ## Verificação
 
-Os testes de limites/identidade estão incluídos em V-003/004/005/006/007/012/014/015/019/021/022. A extração da entrega em V-030 verifica paths seguros e conteúdo apropriado. Um teste negativo deve provar rejeição e ausência de alteração do estado válido dos outros nós/fluxos. Nenhum resultado destes testes é alegado neste planeamento.
+Os testes de limites/identidade estão incluídos em V-003/004/005/006/007/012/014/015/019/021/022. A extração da entrega em V-030 verifica paths seguros e conteúdo apropriado. Um teste negativo deve provar rejeição e ausência de alteração do estado válido dos outros nós/fluxos. V-003/004/005 executadas: configuração, codec e limites TCP têm evidência local. Admissão por identidade/allowlist, rotas, UDP e entrega continuam pendentes. [V-005](../experiments/task-005-transport-validation.md).

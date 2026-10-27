@@ -49,4 +49,4 @@ A validação incluiu testemunhos binários definidos antes do codec e casos de 
 
 ## 5. Próxima execução
 
-PHASE-01 está DONE; TASK-005 é a próxima tarefa, ainda TODO. Retomar pelo [progresso](15-PROJECT-PROGRESS.md) e pelo [guia](AI-IMPLEMENTATION-GUIDE.md). Preservar os XML em CORE/topologies e as fixtures independentes. Não substituir observações locais por resultados CORE não executados.
+No fecho da PHASE-01 a próxima tarefa era TASK-005. Atualização: TASK-005 DONE com transporte TCP, 15 novos testes e 146 no build. Próxima TASK-006 TODO. O material anterior descreve a fase 1; [notas incrementais da fase 2](PHASE-02-REPORT-NOTES.md). Retomar pelo [progresso](15-PROJECT-PROGRESS.md) e pelo [guia](AI-IMPLEMENTATION-GUIDE.md). Preservar os XML em CORE/topologies e as fixtures independentes. Não substituir observações locais por resultados CORE não executados.

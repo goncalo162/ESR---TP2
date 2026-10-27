@@ -1,6 +1,8 @@
 # Interfaces e contratos propostos
 
-A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. Transporte, handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+
+Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
 
 Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
 
@@ -100,6 +102,20 @@ O chamador gere flush/close e o único escritor por conexão. O codec não abre 
 
 [Implementação e validação original do codec](../experiments/task-004-codec-validation.md); [correção e revalidação do bootstrap](../experiments/bootstrap-discovery-correction.md). As 29 fixtures TCP incluem agora 17 casos aceites e 12 rejeitados, incluindo o código 3 retirado. As 16 fixtures UDP permanecem dados de referência; o codec de dados é da TASK-019.
 
+### API de transporte implementada na TASK-005
+
+`new Transport(bind, listener[, options])` abre o listener TCP; porta 0 permite testes efémeros. `localAddress()` devolve o endpoint real. `connect(remote)` devolve `CompletableFuture<Connection>` e faz o dial fora do chamador, com timeout default de 2 s. Endpoints devem estar resolvidos: resolver DNS fora do executor serial do nó. Limite/falha/shutdown completa o futuro excecionalmente; cancelamento fecha o socket da tentativa, inclusive numa corrida com estabelecimento. Não há retries automáticos.
+
+`Connection.id()` devolve UUID único por ligação, ainda sem associação a nodeId. `send(message)` valida/serializa e devolve `ACCEPTED`, `CLOSED`, `OVERFLOW` ou `INVALID_MESSAGE`; a thread chamadora nunca escreve na rede. ACCEPTED significa enfileiramento, não entrega/ACK. O escritor único preserva frames e ordem da fila, inclusive com envios concorrentes. Fila default de 256 frames; overflow limpa a fila e fecha apenas a ligação saturada com OUTPUT_OVERFLOW. Uma mensagem inválida de saída não fecha uma ligação saudável.
+
+`Listener.connectionOpen`, `message` e `connectionClosed` executam sequencialmente no leitor da mesma ligação; fecho tem razão explícita e evento único. Ligações diferentes produzem callbacks em paralelo. Callbacks e continuations síncronas do futuro de dial devem terminar rapidamente, publicando no futuro executor do nó sem esperar por ACK ou por filas cheias. RuntimeException em open/message fecha a ligação com CALLBACK_ERROR; exceção no callback de fecho é isolada. EOF limpo, truncatura, protocolo e I/O têm razões distintas. Não se envia ERROR automaticamente sem contexto seguro.
+
+`Options` limita queueCapacity a 1–256 e maxConnections a 1–64 (defaults 256/64). Reservas incluem dials e permanecem até ambos os workers I/O terminarem. Um worker accept, um por dial pendente e dois por ligação; threads virtuais Java 21 sem fila de executor ilimitada. `connectionCount()` conta reservas pendentes/em terminação; `queuedMessages()` devolve profundidade da fila. Cada frame tem até 65540 bytes com prefixo; existe ainda um frame em escrita e serializações concorrentes dos chamadores. São limites de frames, sem medição de consumo máximo de memória.
+
+`close()` fecha listener/sockets, limpa filas e interrompe workers. Chamador externo aguarda um deadline global default de 3 s; timeout lança erro explícito se um callback bloquear. Chamado por callback, só inicia shutdown para evitar joins circulares. `awaitTermination(duration)` externo confirma terminação. Close é idempotente, sem acesso a bootstrap. `Connection.close()` solicita fecho local e notificação assíncrona. Atenção: ACCEPTED seguido imediatamente de close não garante envio; o futuro bootstrap da TASK-006 terá de confirmar a escrita completa da resposta antes de fechar, mediante mecanismo apropriado nessa tarefa.
+
+A assinatura conceptual `sendControl(neighborId, message)` depende do mapa futuro de vizinhos; nesta tarefa o envio usa Connection diretamente. Sem handshake, autorização, retries, CLI ou processos JVM independentes demonstrados. Os testes usam TCP real dentro da JVM de testes. Contrato bootstrap/NeighborList corrigido por ADR-013 preservado. [V-005](../experiments/task-005-transport-validation.md).
+
 ## 4. Mensagens de controlo v1
 
 Os números são fixados por este contrato. Campos do envelope não são repetidos nos payloads. Respostas preservam requestId do pedido; mensagens periódicas usam um UUID novo.
@@ -168,7 +184,7 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 | ConfigurationLoader.load(path, role) | propriedades → NodeConfiguration ou ConfigurationException com problems | implementado na TASK-003, sem efeitos de rede |
 | ConfigurationLoader.loadDeployment(paths) | perfis completos → lista imutável ou problemas agregados | implementado na TASK-003; verifica grafo, endpoints, contacto bootstrap e unicidade global dos UUID |
 | MessageCodec.read/write e encode/decode | ControlMessage ↔ frame binário v1 | implementado na TASK-004; framing, EOF, UTF-8 e limites, sem sockets |
-| Transport.sendControl(neighborId, message) | envio enfileirado → aceitação/erro | framing e backpressure; não implica ACK de aplicação |
+| Connection.send(message), Transport.connect(remote) | SendResult; CompletableFuture de dial | TASK-005 implementada; framing/backpressure, sem ACK; associação a neighborId em TASK-007 |
 | NeighborManager.snapshot() | nenhum → vizinhos imutáveis | não expor mapas mutáveis |
 | NetworkMonitor.onPong(id, now) | sonda correlacionada → atualização de métrica/evento | relógio monotónico do emissor |
 | RoutingService.onAnnouncement/activate/deactivate | evento → novo estado + mensagens | executado no proprietário serial do estado |
@@ -178,7 +194,7 @@ mediaTimeUs não é horário UTC e não permite medir atraso unidirecional entre
 | FrameAssembler.accept(fragment, now) | → frame completo ou nenhum | armazenamento limitado e timeout |
 | VideoPlayer.showFrame(image) | imagem pronta → atualização visual | executa atualização Swing no EDT |
 
-As APIs de configuração e codec acima já existem. As restantes assinaturas Java serão criadas nas tarefas correspondentes; a presença no desenho não significa implementação.
+As APIs de configuração, codec e transporte acima já existem. As restantes assinaturas Java serão criadas nas tarefas correspondentes; a presença no desenho não significa implementação.
 
 ## 7. Perfil de ficheiro MJPEG confirmado na TASK-002
 

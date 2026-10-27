@@ -1,6 +1,6 @@
 # Estrutura do projeto
 
-Os caminhos seguintes são relativos à raiz do repositório. **E** significa existente e observado; **P** significa planeado. E não significa implementado. A maior parte dos ficheiros Java/config/testes existentes está vazia; ver [01](01-PROJECT-OVERVIEW.md).
+Os caminhos seguintes são relativos à raiz do repositório. **E** significa existente e observado; **P** significa planeado. E não significa implementado. Configuração, codec e TCP estão implementados nas TASK-003–005; restantes componentes maioritariamente placeholders. [Auditoria histórica](01-PROJECT-OVERVIEW.md).
 
 ~~~text
 ESR---TP2/
@@ -12,7 +12,7 @@ ESR---TP2/
 │   ├── phases/                         sete fases
 │   └── tasks/PHASE-01 ... PHASE-07       31 tarefas
 ├── Projeto/                            E raiz Maven
-│   ├── pom.xml                         E build Java 21; testes por configurar
+│   ├── pom.xml                         E build Java 21; JUnit/Surefire configurados
 │   ├── README.md                       E atualizar em TASK-030
 │   ├── docs/                           E documentação histórica; não duplicar este plano
 │   ├── src/main/java/pt/uminho/esr/ott/ E pacotes preparados
@@ -20,20 +20,20 @@ ESR---TP2/
 │   │   ├── bootstrap/                  E BootstrapServer apenas comentado; consulta da configuração em TASK-006, sem NodeRegistry
 │   │   ├── config/                     E TASK-003: loader, NodeConfiguration, TopologyConfiguration, StreamConfiguration, erros agregados
 │   │   ├── overlay/                    E OverlayNode, NodeRole, Neighbor, NeighborManager
-│   │   ├── transport/                  E Transport, Connection
+│   │   ├── transport/                  E TASK-005: Transport, Connection (TCP, filas/eventos/shutdown)
 │   │   ├── protocol/                   E TASK-004: ControlMessage, MessageType, MessageCodec, ErrorCode, ProtocolException
 │   │   ├── monitoring/                 E LinkMetrics, NetworkMonitor
 │   │   ├── routing/                    E Route, RouteMetric, RouteState, RoutingTable, RoutingService
 │   │   ├── streaming/                  E StreamInfo, StreamCatalog, StreamPacket, StreamForwarder
 │   │   ├── server/                     E StreamingServer, VideoSource
 │   │   └── client/                     E StreamingClient, VideoPlayer
-│   ├── src/main/resources/config/      E properties vazios e topology.json vazio
-│   │   ├── topology.properties         P substituir uso do JSON vazio
-│   │   └── streams-s1.properties / streams-s2.properties P dois fluxos por origem
-│   ├── src/test/java/.../ott/           E ConfigurationLoaderTest e MessageCodecTest; restantes placeholders/P
-│   ├── src/test/resources/             E JSON vazios; fixtures de configuração ainda P
+│   ├── src/main/resources/config/      E perfis .properties válidos; topology.json histórico vazio
+│   │   ├── topology.properties         E TASK-003: grafo simétrico de desenvolvimento
+│   │   └── streams-s1.properties / streams-s2.properties E TASK-003: dois fluxos por origem
+│   ├── src/test/java/.../ott/           E ConfigurationLoaderTest, MessageCodecTest e TransportTest; restantes placeholders/P
+│   ├── src/test/resources/             E fixtures de protocolo; JSON históricos vazios
 │   │   └── protocol/                   E TASK-002: 45 pares .bin/.hex, manifesto e README
-│   └── target/                         E artefactos gerados antigos; não editar
+│   └── target/                         E artefactos de build; não usar como evidência isolada
 ├── CORE/                               E bancada preparada
 │   ├── container/                      E Dockerfile e pacotes
 │   ├── docker-compose.yml              E volumes/serviços
@@ -43,7 +43,7 @@ ESR---TP2/
 │       ├── ott-streaming-1.0-SNAPSHOT.jar
 │       ├── config/                     cópias específicas da experiência
 │       └── media/                      vídeos obtidos legalmente; não gerar neste plano
-├── experiments/                        P evidências futuras, apenas após execução
+├── experiments/                        E evidências V-001–005; experiências CORE ainda P
 │   ├── milestone-1/ ... milestone-2/
 │   └── scenario-1/ ... scenario-3/
 │       └── RUN-ID/                     manifesto, logs, CSV e capturas selecionadas
@@ -59,4 +59,4 @@ ESR---TP2/
 - Fontes MJPEG em disco são endereçadas por configuração. Não incluir ficheiros grandes ou com distribuição não autorizada no ZIP; documentar obtenção e verificar que a entrega continua reprodutível.
 - Os JSON existentes, vazios, não serão interpretados; TASK-003 cria propriedades válidas e TASK-025 documenta a opção. Remoção de placeholders só quando fizer parte de uma tarefa autorizada de implementação.
 - Evidências devem identificar execução e configuração. Não versionar target, caches, segredos nem todas as capturas indiscriminadamente. TASK-030 define exclusões e conteúdo necessário da entrega.
-- Atualizar ligações do README existente em TASK-030; nesta fase apenas docs/ é criada/modificada.
+- READMEs e documentação refletem TASK-005; rever entrega completa em TASK-030. Código implementado permanece em Projeto/src.

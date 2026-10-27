@@ -102,7 +102,7 @@ Responsável: [TASK-004](tasks/PHASE-01/TASK-004.md). Requisitos: RNF-005, RP-00
 
 V-005: dois endpoints loopback com portas efémeras trocam mensagens simultâneas intactas; parar um gera evento único; reconexão e saturação não deixam threads/sockets abertos.
 
-Responsável: [TASK-005](tasks/PHASE-02/TASK-005.md). Requisitos: RF-003, RNF-004, RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-005](tasks/PHASE-02/TASK-005.md). Requisitos: RF-003, RNF-004, RP-006. Estado: EXECUTADO — 18 testes TCP e 149 no build completo. [V-005](../experiments/task-005-transport-validation.md).
 
 ### V-006 — Fornecer localização inicial dos vizinhos configurados
 
