@@ -2,7 +2,7 @@
 
 Sete fases seguem dependências reais: formatos/configuração antes da rede; vizinhança antes de métricas/rotas; rotas antes de subscrições; árvores antes de vídeo integrado; integração local antes de CORE; evidências antes de relatório/entrega. Todas começam TODO. Há 31 tarefas com um oráculo V-XXX por tarefa.
 
-Estado em 27-10-2026: PHASE-01 DONE com TASK-001–004 concluídas e 131 testes aprovados; próxima tarefa TASK-005 ainda TODO. [Fecho e evidência](../experiments/task-004-codec-validation.md).
+Estado em 27-10-2026: PHASE-01 DONE; PHASE-02 IN PROGRESS, TASK-005 DONE. Build com 146 testes aprovados; próxima TASK-006 TODO. [Evidência](../experiments/task-005-transport-validation.md).
 
 ## Fases e entregáveis
 

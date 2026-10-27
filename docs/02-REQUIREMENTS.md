@@ -88,7 +88,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md).
 - Validação: V-005, V-006, V-007, V-010 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Estabelecer uma ligação lógica bidirecional por vizinho permitido disponível; repetir tentativas para vizinhos indisponíveis e mostrar grau desejado/atual. X é configurável por nó e limitado pela topologia, não fixado em três.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — [V-005: transporte TCP validado](../experiments/task-005-transport-validation.md); restantes tarefas e aceitação integrada pendentes.
 
 
 <a id="rf-004"></a>
@@ -315,7 +315,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-025](tasks/PHASE-06/TASK-025.md).
 - Validação: V-005, V-007, V-025 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Os links overlay são sockets TCP/UDP entre processos; não usar multicast IP para substituir replicação aplicacional; distinguir caminho overlay de rota IP.
-- Estado inicial: TODO.
+- Estado atual: IN PROGRESS — [V-005: transporte TCP validado](../experiments/task-005-transport-validation.md); restantes tarefas e aceitação integrada pendentes.
 
 
 <a id="rnf-005"></a>
@@ -517,7 +517,7 @@ Não há requisitos explícitos de autenticação, base de dados, framework, per
 - Tarefas: [TASK-001](tasks/PHASE-01/TASK-001.md), [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md).
 - Validação: V-001, V-003, V-004, V-005, V-007, V-010, V-011, V-014, V-019, V-021, V-022 em [09](09-TESTING-STRATEGY.md).
 - Critério de aceitação: Validar limites antes de alocar; injetar relógio/transportes nos testes; filas e caches têm máximo e política de overflow; não aceitar objetos Java serializados da rede.
-- Estado atual: IN PROGRESS — configuração/especificação/codec da fase 1 têm [evidência V-004 e 131 testes](../experiments/task-004-codec-validation.md). As restantes tarefas e a aceitação integrada continuam pendentes.
+- Estado atual: IN PROGRESS — configuração/especificação/codec da fase 1 têm [evidência V-004 e 131 testes](../experiments/task-004-codec-validation.md). O transporte limitado tem [evidência V-005](../experiments/task-005-transport-validation.md); restantes tarefas e aceitação integrada pendentes.
 
 
 <a id="rp-007"></a>

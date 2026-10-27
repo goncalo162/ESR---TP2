@@ -1,5 +1,7 @@
 # Ambiente de desenvolvimento e execução futura
 
+Estado atual após TASK-005: Temurin 21.0.13, Maven 3.9.9, 146 testes aprovados. Java/Maven e VS Code locais já estavam configurados; as versões e paths Linux da TASK-001 abaixo são históricos. CORE/GUI continuam pendentes. [V-005](../experiments/task-005-transport-validation.md).
+
 **Classificação:** O = observado por leitura ou disponibilidade do executável; P = proposto e ainda não validado; V = executado e verificado no ambiente indicado. TASK-001 validou a base Maven no host; TASK-003 acrescentou 65 testes reais de configuração e build limpo com sucesso. [V-001](../experiments/build-baseline.md), [V-003](../experiments/task-003-configuration-validation.md). Comandos de CORE, GUI e aplicação continuam propostos.
 
 ## Pré-requisitos
@@ -13,7 +15,7 @@
 
 ## Comandos e estado
 
-Os comandos seguintes partem da raiz ou do diretório indicado. São exemplos futuros. Antes de os usar, ler a tarefa responsável.
+Os comandos seguintes partem da raiz ou do diretório indicado. A tabela distingue comandos executados de exemplos futuros. Antes de os usar, ler a tarefa responsável.
 
 | Diretório | Comando | Estado e condição |
 |---|---|---|
@@ -21,7 +23,8 @@ Os comandos seguintes partem da raiz ou do diretório indicado. São exemplos fu
 | Projeto | mvn clean package | V em TASK-001 e TASK-003 com JAVA_HOME do JDK 21; build final inclui classes de configuração e 65 testes aprovados |
 | Projeto | mvn test | V em TASK-001 (zero testes na base inicial) e TASK-003 (65 testes de configuração aprovados) com JDK 21 |
 | Projeto | mvn -Dtest=MessageCodecTest test | Classe implementada na TASK-004; suite executada pelo build completo com JDK 21 (66 casos de codec/integração) |
-| Projeto | mvn verify | P: depois de TASK-024 deve executar testes unitários/integração com convenção *Test; sem depender de profile inexistente |
+| Projeto | mvn -B -ntp clean verify | V na TASK-005: 146 testes aprovados, incluindo 15 TCP reais |
+| Projeto | mvn -Dtest=TransportTest test | Suite de 15 casos executada no build limpo; requer sockets locais |
 | CORE | bash setup.sh | O como script de build; P em execução; usa Docker e pode requerer rede; TASK-025 |
 | CORE | ./core-gui | O como launcher; P em execução nesta sessão; inicia container e GUI |
 | raiz | docker exec core java -version | P: só com container ativo; verificar JDK real |
@@ -65,9 +68,9 @@ O Dockerfile inclui pacote openjdk-21-jdk-headless; a futura preparação deve v
 
 Os resultados dos comandos futuros devem substituir P por evidência específica, data, ambiente e tarefa, sem reescrever a história desta fase como se os comandos já tivessem sido executados.
 
-## Seleção de JDK verificada na TASK-001
+## Histórico: seleção de JDK na TASK-001
 
-No host desta execução, Maven por omissão usa Java 25. Para manter a base definida, usar JDK 21 apenas no processo Maven:
+No host da execução histórica da TASK-001, Maven por omissão usava Java 25. Para manter a base definida, usar JDK 21 apenas no processo Maven:
 
 ~~~bash
 cd Projeto
@@ -91,3 +94,20 @@ O comando Maven de testes com JDK 21 executou 65 casos e produz TEST-pt.uminho.e
 ## Fecho da fase 1 — TASK-004
 
 O comando com JDK 21, a partir de Projeto/, passou offline: env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B -o -Dstyle.color=never clean package. Resultado: 131 testes, zero falhas/erros/skips. Relatórios de ConfigurationLoaderTest e MessageCodecTest em target/surefire-reports/. O JAR contém a configuração e o codec; OttApplication ainda não tem main funcional. Os comandos de processo/CORE continuam futuros. [V-004](../experiments/task-004-codec-validation.md).
+
+## Ambiente macOS e TCP verificados na TASK-005
+
+Em macOS x86_64, JDK 21 em `$HOME/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home`; Maven em `$HOME/.local/apache-maven-3.9.9`. ~/.zshrc e VS Code locais já selecionam Java 21. Abrir novo terminal ou executar `source ~/.zshrc`; recarregar janela do editor se necessário. Adaptar paths em outras máquinas.
+
+```sh
+export JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$HOME/.local/apache-maven-3.9.9/bin:$PATH"
+java -version
+mvn -version
+cd Projeto
+mvn -B -ntp clean verify
+```
+
+Validação: Temurin 21.0.13+9, Maven 3.9.9, 146 testes (65+66+15), zero falhas/erros/skips. Testes TCP com sockets reais exigem permissão de bind/loopback e foram executados com permissões alargadas. Relatórios em Projeto/target/surefire-reports/; [log persistente](../experiments/task-005-build.log), [oráculos e limites](../experiments/task-005-transport-validation.md). Nenhum teste foi desativado.
+
+O JAR contém Transport/Connection, sem main funcional ou bootstrap/handshake implementados. Não iniciar Docker para os testes locais. Processos independentes/CORE/GUI permanecem nas tarefas próprias.

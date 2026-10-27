@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
 
 ## 2. Contexto
 
-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-006–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
 
 ## 3. Pré-requisitos
 
@@ -20,7 +20,7 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
 
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
-| [TASK-005](../tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 | TODO |
+| [TASK-005](../tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 | DONE |
 | [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | V-006 | TODO |
 | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | TODO |
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | TODO |

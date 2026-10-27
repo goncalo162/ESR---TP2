@@ -1,12 +1,12 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; PHASE-02–07 e TASK-005–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Próxima tarefa recomendada:** [TASK-005](tasks/PHASE-02/TASK-005.md), ainda TODO e não iniciada. PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). [Material disponível para o relatório](PHASE-01-REPORT-NOTES.md).
+**Próxima tarefa recomendada:** [TASK-006](tasks/PHASE-02/TASK-006.md), ainda TODO. TASK-005 DONE com [15 testes TCP e 146 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
-Revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
-Correção posterior, por pedido explícito do utilizador: **bootstrap exclusivamente para localização inicial dos vizinhos**. Contrato/código/fixtures e tarefas futuras corrigidos por ADR-013; sem registo vivo, leases, renovações ou avisos de saída no bootstrap. [Evidência atual](../experiments/bootstrap-discovery-correction.md): 131 testes aprovados, 16 tipos ativos, código 3 retirado. PHASE-01 permanece DONE; PHASE-02 não foi iniciada.
+Histórico anterior à TASK-005 — correção posterior, por pedido explícito do utilizador: **bootstrap exclusivamente para localização inicial dos vizinhos**. Contrato/código/fixtures e tarefas futuras corrigidos por ADR-013; sem registo vivo, leases, renovações ou avisos de saída no bootstrap. [Evidência atual](../experiments/bootstrap-discovery-correction.md): 131 testes aprovados, 16 tipos ativos, código 3 retirado. PHASE-01 permanece DONE; PHASE-02 não foi iniciada.
 
 Handoff desta correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
 
@@ -15,7 +15,7 @@ Handoff desta correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba246
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
-| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | TODO | PHASE-01 DONE |
+| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | IN PROGRESS | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
@@ -30,7 +30,7 @@ Handoff desta correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba246
 | [TASK-002](tasks/PHASE-01/TASK-002.md) | Fixar contratos, fixtures e decisões pendentes | TASK-001 | DONE | V-002: EXECUTADA; [contratos, fixtures e recursos](../experiments/task-002-contract-review.md) |
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
-| [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | TODO | V-005: NÃO EXECUTADO |
+| [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 15 testes TCP, 146 no build](../experiments/task-005-transport-validation.md) |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | TODO | V-006: NÃO EXECUTADO |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
@@ -149,3 +149,13 @@ O utilizador reforçou o uso das topologias existentes. Registada ADR-011: reuti
 - Relatório: formatos de controlo e detalhes da base implementada/testes já têm material factual; arquitetura/interações completas e resultados de rede permanecem parciais. [Notas](PHASE-01-REPORT-NOTES.md).
 - Próxima ação: TASK-005 quando solicitada, seguindo o guia. Preservar o uso das topologias existentes conforme ADR-011.
 - Evidência: [V-004 e fecho](../experiments/task-004-codec-validation.md).
+
+## Execução da TASK-005 — 27-10-2026
+
+- Revisão de partida: ebb825b; árvore inicialmente limpa. TASK-001–005 DONE, PHASE-02 IN PROGRESS; TASK-006–031 TODO. Este estado substitui as recomendações anteriores de início da TASK-005, conservadas como histórico.
+- Implementados Transport/Connection, 15 testes de transporte, evidência e documentação. Preservada ADR-013 de bootstrap exclusivamente para descoberta, codec corrigido e fixtures; transporte documentado em ADR-014.
+- Java 21.0.13/Maven 3.9.9 e configuração VS Code já estavam instalados. Enunciado Markdown e três figuras presentes e verificados.
+- `mvn -B -ntp clean verify`: 146 testes, zero falhas/erros/skips. Sockets loopback executados com permissões alargadas. [Log e limites](../experiments/task-005-transport-validation.md).
+- RF-003/RNF-004/RP-006 parcialmente cobertos. Sem bloqueios atuais; todos os critérios TASK-005 verificados. CORE, JVMs separadas e streaming não demonstrados.
+- READMEs, setup, estrutura, segurança, notas de relatório, tarefas e rastreabilidade alinhados. Próxima ação: abrir TASK-006 quando solicitada, sem membership/leases no bootstrap.
+- Preservar correções documentais e código de descoberta existentes. Sem commits, uploads ou alterações CORE.

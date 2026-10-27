@@ -46,3 +46,7 @@ Em 27-10-2026, o JUnit Platform executou 65 casos reais de configuração com su
 ## Fecho da fase 1 com codec de controlo
 
 TASK-004 implementou serialização binária com DataInputStream/DataOutputStream e UTF-8 estrito, sem ObjectInputStream/readUTF/writeUTF e sem dependências runtime novas. O build limpo passou 131 testes (65 configuração + 66 codec/integração local). Versões Maven/JDK e bibliotecas da base mantidas. A existência do formato pronto não inicia conexões TCP; o transporte é TASK-005. [V-004](../experiments/task-004-codec-validation.md), [contribuição para o relatório](PHASE-01-REPORT-NOTES.md).
+
+## Transporte TCP — TASK-005
+
+Socket/ServerSocket com threads virtuais Java 21, admissão limitada e um leitor/escritor por ligação. Nenhuma dependência runtime nova. Validado em macOS x86_64, Temurin 21.0.13 e Maven 3.9.9: 15 testes TCP e 146 no build completo. O contrato de descoberta corrigido por ADR-013 foi preservado. [API](07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../experiments/task-005-transport-validation.md).
