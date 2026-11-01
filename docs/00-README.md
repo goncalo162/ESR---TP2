@@ -23,6 +23,8 @@ Java 21 e Maven, mantendo a estrutura existente. Bibliotecas padrão Java para s
 
 ## Índice e leitura
 
+Para preparar a discussão das decisões, árvores, monitorização e flooding, consultar o [guia do checkpoint 1](CHECKPOINT-1-PREPARACAO.md), que distingue o desenho previsto da implementação existente.
+
 | Documento | Utilização |
 |---|---|
 | [01 — Visão geral](01-PROJECT-OVERVIEW.md) | Contexto, âmbito, auditoria do repositório |

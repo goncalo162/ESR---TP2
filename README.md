@@ -9,6 +9,7 @@ Trabalho prático de Engenharia de Serviços em Rede: entrega de vídeo através
 - [Arquitetura](docs/04-ARCHITECTURE.md)
 - [Ambiente de desenvolvimento](docs/11-SETUP-AND-ENVIRONMENT.md)
 - [Progresso e tarefas](docs/15-PROJECT-PROGRESS.md)
+- [Preparação para o checkpoint 1](docs/CHECKPOINT-1-PREPARACAO.md)
 
 ## Compilar e testar
 
