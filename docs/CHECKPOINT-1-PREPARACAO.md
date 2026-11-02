@@ -2,7 +2,9 @@
 
 Análise do repositório em **01-11-2026**, revisão observada `6360a64`. Guia para explicar e defender as decisões do projeto, com especial atenção às árvores, monitorização, flooding e gestão dos fluxos.
 
-**Como estudar:** começar pelo discurso da secção 1; compreender o exemplo das secções 5–9; responder às perguntas da secção 15 sem consultar o texto; usar a secção 17 para a revisão final.
+**Como estudar:** começar pelo discurso da secção 1; compreender o exemplo das secções 5–9; responder às perguntas da secção 15 sem consultar o texto; usar a secção 17 para a revisão final. A [secção 19](#perguntas-esclarecidas) reúne as perguntas esclarecidas durante a preparação, com exemplos de streams, overlay, anúncios e recuperação do R2.
+
+**Atualização de 02-11-2026:** acrescentados os esclarecimentos da secção 19 e corrigidas as referências à reconexão após reinício. O [ADD](../add.md) é a referência das decisões aceites. Os fluxos descritos como previstos explicam o desenho a implementar; esta atualização não representa novos resultados de execução nem altera a evidência histórica da secção 2.
 
 **Âmbito da análise:** o repositório contém o enunciado, o plano, decisões e notas para o relatório das fases 1 e 2. Não foi encontrado um relatório final de resultados. Este guia cruza essa documentação com o código existente. Os exemplos numéricos são didáticos e não resultados experimentais.
 
@@ -101,7 +103,7 @@ Uma nova `instanceId` distingue um processo reiniciado. A `connectionId` disting
 
 ### 4.4. O que acontece se o bootstrap parar?
 
-Os nós que já obtiveram a lista continuam a comunicar e podem reconectar diretamente aos mesmos vizinhos. Um processo que ainda precise de obter a lista inicial fica dependente da recuperação do bootstrap. Um processo reiniciado pode voltar a consultá-lo.
+Os nós que já obtiveram a lista e a conservam em memória continuam a comunicar e podem reconectar diretamente aos mesmos vizinhos. Um processo que arranca pela primeira vez ou reinicia precisa de consultar o bootstrap para obter a sua lista autorizada: o desenho não prevê persistência operacional dessa lista. Se o bootstrap estiver indisponível, esse arranque fica dependente da sua recuperação.
 
 O grafo permitido é estático; a disponibilidade dos processos e das ligações é dinâmica. Entrar dinamicamente significa arrancar um nó já configurado, sem reiniciar toda a overlay. Introduzir IDs e vizinhanças arbitrárias durante a execução fica fora do fluxo básico.
 
@@ -349,6 +351,8 @@ O RTT das sondas TCP inclui rede, filas, retransmissões e processamento aplicac
 
 A escolha fornece um indicador simples de qualidade e congestionamento, mas pode não detetar uma limitação de capacidade com RTT ainda baixo. Para avaliar o serviço também se devem medir débito, filas, frames completos, frames apresentados e interrupções.
 
+**Limitação aceite no ADD, ADR-025:** se apenas o vídeo UDP falhar e o controlo TCP continuar saudável, não há um mecanismo adicional que garanta a deteção e a troca automática de rota. Essa situação deve ser medida e apresentada como limitação do projeto.
+
 Fontes: [TASK-010](tasks/PHASE-03/TASK-010.md), [ADR-004](12-RISKS-AND-DECISIONS.md) e [estratégia experimental](09-TESTING-STRATEGY.md).
 
 ## 9. Mudança de rota: falha e melhoria sustentada
@@ -488,7 +492,7 @@ Utilizar a overlay de seis nós da secção 5 e uma stream A originada em S. Est
 6. **C2 entra:** R3 agrega a nova procura ao ramo confirmado. R2–R3 continua com uma cópia por datagrama.
 7. **C1 sai:** apenas o seu ramo é removido; C2 continua a receber.
 8. **R2 falha:** os nós afetados invalidam esse vizinho. R3 tenta S–R1–R3, se o candidato e os prefixos continuarem válidos. A falha ignora a histerese; pode haver interrupção até ao novo ACK.
-9. **R2 regressa:** reconecta diretamente aos vizinhos conhecidos. Anúncios novos voltam a disponibilizar esse caminho. Se for melhor de forma sustentada e cumprir a permanência, pode ocorrer nova troca confirmada.
+9. **R2 regressa:** se conservou a lista de vizinhos, tenta reconectar diretamente; se o processo reiniciou, precisa primeiro de voltar ao bootstrap. Após handshake e medição, novos anúncios periódicos podem voltar a disponibilizar um caminho válido através de R2. A troca por qualidade exige melhoria sustentada, permanência e confirmação do novo ramo. Ver o [passo a passo da secção 19.4](#regresso-r2).
 10. **C2 sai:** a última procura desaparece e a poda propaga-se até S. O vídeo para; os anúncios e as sondas continuam.
 
 Se S morrer no passo 8, a alternativa por R1 não resolve: os dois percursos terminam na mesma origem que deixou de existir.
@@ -667,6 +671,8 @@ Se houver apenas cinco minutos para rever: reler a secção 1, o exemplo complet
 
 | Tema | Documento/código principal |
 |---|---|
+| Decisões aceites e respetiva validação | [ADD](../add.md) |
+| Requisitos consolidados e critérios de aceitação | [Specs](../specs.md) |
 | Obrigações e avaliação | [Enunciado original](../ESR-TP2-26-27.pdf) e [transcrição](ENUNCIADO.md) |
 | Justificações e alternativas | [Riscos, hipóteses e decisões](12-RISKS-AND-DECISIONS.md) |
 | Componentes e interações | [Arquitetura](04-ARCHITECTURE.md) |
@@ -682,3 +688,191 @@ Se houver apenas cinco minutos para rever: reler a secção 1, o exemplo complet
 | Transporte implementado | [Transport.java](../Projeto/src/main/java/pt/uminho/esr/ott/transport/Transport.java) e [Connection.java](../Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java) |
 
 Este guia prepara a explicação do estado analisado. A implementação e os resultados obtidos depois desta revisão devem ser atualizados antes de usar as afirmações de estado numa defesa posterior.
+
+<a id="perguntas-esclarecidas"></a>
+
+## 19. Perguntas esclarecidas durante a preparação
+
+Esta secção reúne as respostas às dúvidas discutidas, segundo o desenho aceite no [ADD](../add.md). Para estudar por tema:
+
+- [Servidor, stream e árvore](#streams-e-arvores).
+- [Overlay, CORE e configuração](#overlay-e-core).
+- [Origem, periodicidade e propagação dos anúncios](#anuncios-periodicos).
+- [Regresso de R2 e eventual mudança de caminho](#regresso-r2).
+
+<a id="streams-e-arvores"></a>
+
+### 19.1. As streams são os servidores? O que é uma stream e o que é uma árvore?
+
+**Uma stream é um fluxo de vídeo identificado; um servidor é o processo que o disponibiliza; a árvore é o conjunto de ramos ativos que o transporta até aos consumidores.**
+
+| Conceito | Significado no projeto | Exemplo |
+|---|---|---|
+| Servidor de conteúdos/origem | Processo Java com papel `SERVER`, catálogo e ficheiros de vídeo | S1 disponibiliza A e B |
+| Stream | Fluxo com UUID próprio, título, codec e FPS; transporta frames ao longo do tempo | A pode corresponder à transmissão de um dos ficheiros de S1 |
+| Relay | Processo que encaminha controlo e replica datagramas para os ramos subscritos | R1 recebe A uma vez e envia-a para dois filhos |
+| Cliente | Processo que escolhe uma stream, recebe os fragmentos e apresenta os frames | C1 e C2 subscrevem A |
+| Árvore ativa de A | Subconjunto das ligações overlay usado para entregar A aos consumidores atuais | S1 → R1 → C1 e C2 |
+
+No cenário final estão previstas **duas origens e quatro streams**: S1 disponibiliza A/B e S2 disponibiliza C/D. As letras são nomes didáticos; no protocolo cada stream tem um UUID. Ter quatro streams não exige quatro servidores.
+
+Os ficheiros fornecem os frames MJPEG. Quando há procura confirmada, a origem transmite os frames segundo o FPS configurado, fragmentados em datagramas UDP. Os clientes que subscrevem a mesma stream partilham a transmissão corrente; cada subscrição não inicia uma reprodução independente desde o início do ficheiro.
+
+**Porque é que se fala numa árvore por stream?** Porque cada stream tem origem, consumidores e estado de encaminhamento próprios. Em estado estável, cada nó participante recebe essa stream de um único upstream confirmado e pode distribuí-la por vários filhos.
+
+```mermaid
+flowchart LR
+    S1["S1: origem de A e B"] -->|"A: uma cópia"| R1["R1"]
+    R1 -->|"A"| C1["C1"]
+    R1 -->|"A"| C2["C2"]
+    S1 -->|"B: outra árvore"| R2["R2"]
+    R2 -->|"B"| C3["C3"]
+```
+
+Este desenho mostra duas árvores a usar parte da mesma overlay. A partilha do tronco S1–R1 evita enviar duas cópias de A nessa ligação. B pode escolher outro caminho; também poderia coincidir com o de A se os candidatos e a procura o justificassem. A saída do último consumidor permite podar os ramos de vídeo dessa stream, mantendo o controlo e os anúncios.
+
+**Resposta curta para o checkpoint:** “O servidor produz streams; cada stream identifica uma transmissão de vídeo; a árvore liga a origem aos seus consumidores e replica o vídeo apenas nos pontos de ramificação.”
+
+<a id="overlay-e-core"></a>
+
+### 19.2. O que é a rede overlay? Como se relaciona com o CORE e como é composta?
+
+**A overlay é o grafo de vizinhanças lógicas entre processos da aplicação OTT, construído sobre uma rede IP que já permite a sua comunicação.** Convém distinguir três níveis:
+
+| Nível | O que contém | Quem o define |
+|---|---|---|
+| Underlay IP no CORE | Equipamentos emulados, interfaces, ligações, endereços e encaminhamento IP | Cenário CORE e serviços de rede |
+| Overlay da aplicação | Nós `SERVER`, `RELAY` e `CLIENT`, endpoints e vizinhos autorizados | Perfis dos processos e ficheiro de topologia fornecido ao bootstrap |
+| Árvore de uma stream | Ligações ativas para entregar essa stream aos consumidores | Anúncios, escolha de rota e subscrições confirmadas |
+
+Uma ligação overlay pode atravessar vários routers IP. O Java escolhe o vizinho aplicacional a que envia; o encaminhamento IP determina o percurso físico até ao endereço desse vizinho. Um equipamento CORE só integra a overlay se nele estiver a correr um processo OTT com esse papel. O nome “Router1” no CORE, por si só, não inicia um relay Java.
+
+**Como é feita a passagem do cenário CORE para a overlay?** É um mapeamento explícito de configuração. A aplicação não importa nem converte automaticamente o XML do CORE:
+
+1. Criar/abrir o cenário CORE e garantir conectividade IP entre os equipamentos escolhidos.
+2. Decidir onde corre cada processo OTT, com `node.id`, papel, endereço anunciado e portas TCP/UDP.
+3. Escrever os perfis dos processos e a topologia com as vizinhanças permitidas, simétricas e com endpoints coerentes.
+4. Arrancar o bootstrap e os processos. Cada processo consulta o bootstrap para obter os seus vizinhos configurados.
+5. Estabelecer ligações TCP diretas, validar `HELLO`/`HELLO_OK` e iniciar sondas e anúncios. Os pedidos dos clientes ativam depois as árvores de vídeo.
+
+O bootstrap fornece a lista configurada, incluindo endpoints de nós que podem estar desligados. A ligação e o handshake entre os próprios vizinhos determinam se existe comunicação naquele momento. O bootstrap não escolhe as árvores nem fica no caminho do vídeo.
+
+**Exemplo concreto do repositório:** o mapeamento previsto para [cenario1.xml](../CORE/topologies/cenario1.xml), na TASK-025, é:
+
+| Equipamento CORE | Endereço(s) no XML | Processo previsto |
+|---|---|---|
+| Servidor | `10.0.0.20/24` | Origem S e um processo bootstrap separado |
+| Router1 | `10.0.0.1/24`, `10.0.1.1/24`, `10.0.2.1/24` | Relay R |
+| Cliente1 | `10.0.2.20/24` | Cliente C1 |
+| Cliente2 | `10.0.1.20/24` | Cliente C2 |
+
+A overlay deste ensaio pode ter as arestas S–R, R–C1 e R–C2. O endereço anunciado por R tem de ser alcançável pelos seus vizinhos e corresponder à configuração validada; a existência do XML não prova que as rotas IP ou os processos já tenham sido testados. Este cenário simples também não substitui o cenário final com duas origens e quatro streams.
+
+O [topology.properties local](../Projeto/src/main/resources/config/topology.properties) tem outro grafo: S1–S2, S1–R1, S2–R1 e R1–C1, com processos em `127.0.0.1` e portas distintas. Serve para execução na mesma máquina. Ao distribuir os processos por nós CORE, é necessário configurar endereços alcançáveis: `127.0.0.1` dentro de um nó refere-se ao próprio nó.
+
+**Que vantagens e desvantagens traz a overlay?**
+
+| Vantagem | Consequência ou limite |
+|---|---|
+| Partilha os troncos da distribuição | Reduz cópias nas ligações comuns; exige replicação e estado nos relays |
+| Funciona sobre IP unicast, sem exigir multicast IP | A aplicação passa a gerir descoberta, árvores, falhas e poda |
+| Permite escolher caminhos por stream com RTT observado | Acrescenta sondas/anúncios; RTT não mede capacidade nem perda UDP |
+| Permite reconexão direta com vizinhos já conhecidos | Um processo novo ou reiniciado continua a precisar do bootstrap |
+| Permite alternativas no grafo lógico | Só recupera se houver alternativa válida; ligações overlay diferentes podem partilhar o mesmo enlace físico |
+
+Também há custo de CPU, memória, largura de banda de saída e atraso nos relays, além da configuração manual do mapeamento CORE/OTT. No grafo local, C1 só tem R1 como vizinho: não existe um caminho alternativo para C1 se R1 falhar. Parar o processo Java de R1 também é diferente de parar o router IP em que corre: o sistema pode continuar a encaminhar pacotes IP.
+
+**Resposta curta para o checkpoint:** “O CORE fornece a rede IP; nós configuramos os processos e as suas vizinhanças para formar a overlay; dentro dessa overlay, os pedidos ativam uma árvore de distribuição por stream.”
+
+<a id="anuncios-periodicos"></a>
+
+### 19.3. De onde vêm os anúncios? O servidor envia-os periodicamente ou continuamente?
+
+**Cada origem gera periodicamente um `STREAM_ANNOUNCE` por stream que disponibiliza. O intervalo por omissão é de 2 segundos por stream**, configurado por `routing.announce.interval.ms=2000`. A emissão mantém-se mesmo sem espectadores. Há mensagens em intervalos regulares, não um envio ininterrupto num ciclo sem espera.
+
+No exemplo final, S1 gera anúncios de A e B; S2 gera anúncios de C e D. O agendamento da emissão cabe à lógica de routing da origem. Os relays recebem e propagam esses anúncios segundo as regras de flooding. O bootstrap não anuncia conteúdos.
+
+| Tráfego | Origem e utilização | Transporte |
+|---|---|---|
+| `STREAM_ANNOUNCE` | Origem divulga stream e percurso; vizinhos propagam versões válidas | TCP de controlo |
+| Sondas e respostas | Vizinhos medem RTT e detetam falhas de controlo | TCP de controlo |
+| `ACTIVATE` e ACK | Consumidor pede um ramo e recebe confirmação a montante | TCP de controlo |
+| Frames de vídeo | Origem transmite para os ramos com procura confirmada; relays replicam | UDP |
+
+**Como é criado e transformado um anúncio?** A origem começa com custo zero e caminho contendo apenas o seu ID. Exemplo legível, sem representar a codificação binária real:
+
+```text
+tipo: STREAM_ANNOUNCE
+streamId: A                 (A representa aqui um UUID)
+serverId: S
+serverEpoch: E1             (E1 representa o UUID deste arranque da origem)
+announceSeq: 42
+costMicros: 0
+path: [S]
+metadados: título, codec MJPEG, FPS
+```
+
+A origem envia aos vizinhos ligados. Cada recetor valida a mensagem, usa uma medição válida da ligação ao emissor e acrescenta o próprio ID ao percurso:
+
+```text
+S gera:           path=[S]          custo=0
+R2 recebe de S:   path=[S,R2]       custo=0 + 8 000 = 8 000 µs
+R3 recebe de R2:  path=[S,R2,R3]    custo=8 000 + 6 000 = 14 000 µs
+```
+
+São somas dos RTTs EWMA das ligações, não atrasos unidirecionais exatos do vídeo. O anúncio reenviado mantém a stream, origem, época e sequência da geração; o emissor imediato no envelope passa a ser o nó que o reencaminha.
+
+**Todos reenviam sempre tudo?** Não. O flooding é controlado: propaga a primeira chegada válida e melhorias estritas da mesma geração, com cache e limites de taxa. Não devolve diretamente ao emissor. Rejeita percursos incoerentes, com IDs repetidos ou com o próprio recetor já no caminho, e respeita o limite de 32 IDs. Assim, a overlay pode ter ciclos sem fazer circular anúncios indefinidamente. Uma chegada posterior mais barata pode ser útil, pelo que um simples booleano “já vi” não basta.
+
+**Para que serve repetir os anúncios?** Para renovar a validade dos candidatos, manter o catálogo e permitir que nós novos ou reconectados aprendam os caminhos. O TTL por omissão de um candidato é 8 segundos. A sequência cresce por stream dentro da época da origem, distinguindo gerações novas de duplicados. Se a origem reiniciar, muda `serverEpoch`; se apenas um relay reiniciar, muda a instância desse relay, mantendo-se a época da origem.
+
+Não é necessário pressupor um anúncio extraordinário imediato quando R2 se liga: os anúncios periódicos seguintes permitem a redescoberta. Quando o último cliente sai, o vídeo pode parar e a árvore ser podada; anúncios e monitorização continuam. A perda de uma ligação ou a expiração de candidatos retira caminhos que deixaram de ser válidos.
+
+**Resposta curta para o checkpoint:** “As origens anunciam cada stream de 2 em 2 segundos por omissão, mesmo sem espectadores. Os relays propagam os anúncios por TCP com custo e caminho acumulados; o vídeo UDP só segue ramos ativados.”
+
+<a id="regresso-r2"></a>
+
+### 19.4. Quando R2 regressa, como reaparece o caminho e quando há troca?
+
+Considere-se este exemplo didático, com custos correspondentes à soma dos RTTs EWMA:
+
+```mermaid
+flowchart LR
+    S["S: origem de A"] ---|"10 ms"| R1["R1"]
+    R1 ---|"12 ms"| R3["R3"]
+    S ---|"8 ms"| R2["R2"]
+    R2 ---|"6 ms"| R3
+    R3 --> C1["C1"]
+    R3 --> C2["C2"]
+```
+
+Enquanto R2 está indisponível, R3 pode receber A através de R1, com custo de 22 ms. O regresso de R2 permite procurar a alternativa de 14 ms, mas **uma ligação recuperada não equivale a uma troca de upstream confirmada**.
+
+| Passo | O que acontece no desenho previsto |
+|---|---|
+| 1. Recuperar vizinhos | Se R2 manteve o processo e a lista em memória, tenta os endpoints conhecidos. Se reiniciou, consulta primeiro o bootstrap. |
+| 2. Restabelecer controlo | Os vizinhos fazem as tentativas com backoff, usando a regra de iniciativa por menor `nodeId`, e validam `HELLO`/`HELLO_OK`. Mantém-se um canal por par. |
+| 3. Medir a ligação | As sondas fornecem RTT válido para calcular custos; estar ligado não fornece, por si só, um custo utilizável. |
+| 4. Reaprender caminhos | Os anúncios periódicos da origem chegam a R2; este pode propagá-los para R3 com o percurso e custo atualizados. |
+| 5. Guardar alternativa | R3 valida o anúncio e guarda o candidato através de R2. O vídeo pode continuar a chegar de R1. |
+| 6. Avaliar qualidade | Com o upstream atual válido, exige-se a melhoria, as observações consecutivas e a permanência mínima. |
+| 7. Confirmar novo ramo | R3 envia `ACTIVATE` a R2. O pedido prossegue a montante até à origem ou a um ramo ativo compatível. O ACK regressa após confirmação. |
+| 8. Concluir troca | Só após o ACK R3 publica o novo upstream confirmado e desativa o ramo antigo. R1 só poda a montante se não tiver outros consumidores. |
+
+**Que anúncios tornam o caminho válido?** Os que demonstram um percurso atual até à origem sem passar pelo próprio R3. Se R2 apenas tiver aprendido a stream através de R3, o caminho anunciado de volta contém R3 e é rejeitado por R3. Reconectar a R2 não cria automaticamente uma alternativa útil.
+
+**O que significa “melhor de forma sustentada e cumprir a permanência”?** No perfil por omissão, a troca por qualidade exige:
+
+- Redução relativa do custo de pelo menos **20%**, com custo estritamente menor.
+- **Três observações consecutivas válidas** de melhoria; reler o mesmo estado não conta como observação nova.
+- Pelo menos **5 segundos desde a última troca confirmada de upstream**, segundo `routing.switch.min.dwell.ms=5000`.
+
+No exemplo, `(22 − 14) / 22 ≈ 36,4%`: o limiar de custo é satisfeito. Ainda é necessário cumprir as observações e a permanência e obter o ACK da ativação. Os 5 segundos não são uma espera obrigatória contada a partir do regresso de R2, e as três observações não significam necessariamente três períodos de anúncios.
+
+**E se o caminho atual também tiver falhado?** Sem upstream válido, a recuperação não espera pelos limiares de melhoria ou permanência: tenta ativar uma alternativa válida e atual. Se não existir nenhuma, mantém `UNAVAILABLE` e a intenção de subscrição, aguardando um caminho que possa ser confirmado.
+
+**E se ninguém estiver a ver a stream?** Os anúncios voltam a disponibilizar o candidato e o catálogo, mas não é necessário ativar um ramo de vídeo até existir procura. Descobrir uma rota e transportar vídeo são etapas distintas.
+
+Durante uma troca planeada pode existir tráfego temporário nos dois ramos; não se promete uma transição sem qualquer interrupção ou duplicação. Em estado estável há um upstream confirmado por stream e por nó participante. A recuperação automática aqui descrita responde às falhas detetadas pelo controlo TCP; a falha exclusiva de UDP com TCP saudável mantém-se a limitação aceite na ADR-025.
+
+**Resposta curta para o checkpoint:** “R2 recupera as ligações e as medições. Novos anúncios permitem a R3 reaprender um caminho por R2. Se a alternativa justificar a troca, R3 ativa-a, espera pelo ACK e só depois desliga o ramo antigo.”
