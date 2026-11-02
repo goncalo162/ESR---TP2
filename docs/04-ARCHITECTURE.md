@@ -1,5 +1,7 @@
 # Arquitetura
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 ## Estrutura geral
 
 Um único projeto Java, executado em processos separados. SERVER, RELAY e CLIENT partilham o núcleo OverlayNode. BOOTSTRAP é um serviço de descoberta autónomo, que pode correr na mesma máquina de um servidor sem ser um nó de encaminhamento adicional. Não existe coordenador central das rotas nem base de dados.

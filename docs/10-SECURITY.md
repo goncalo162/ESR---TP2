@@ -1,5 +1,7 @@
 # Segurança proporcional ao protótipo
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 O enunciado não exige autenticação de utilizadores, TLS, proteção de dados pessoais nem operação pública na Internet. A solução proposta é um protótipo em laboratório controlado; a allowlist de nós serve consistência da topologia e não comprova identidade criptográfica. Não inventar um sistema de contas ou declarar confidencialidade que TCP/UDP simples não oferecem.
 
 ## Fronteiras e ameaças relevantes

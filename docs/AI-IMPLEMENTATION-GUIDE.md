@@ -1,5 +1,7 @@
 # Guia para a IA implementadora
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 ## Autorização e fonte de verdade
 
 Este plano não autoriza iniciar a construção durante a fase de planeamento. Quando o utilizador pedir implementação, executar uma tarefa de cada vez e respeitar o PDF. Ler [00](00-README.md) e [01](01-PROJECT-OVERVIEW.md), depois [02](02-REQUIREMENTS.md), [12](12-RISKS-AND-DECISIONS.md), [04](04-ARCHITECTURE.md), [06](06-DATA-MODEL.md) e [07](07-API-AND-INTERFACES.md). Não assumir que a documentação histórica é uma implementação existente..
@@ -8,9 +10,9 @@ Este plano não autoriza iniciar a construção durante a fase de planeamento. Q
 
 1. Ler [15](15-PROJECT-PROGRESS.md), a fase em [08](08-IMPLEMENTATION-ROADMAP.md), a tarefa e os requisitos em [13](13-REQUIREMENTS-TRACEABILITY.md).
 2. Inspecionar o repositório real, instruções AGENTS.md aplicáveis, git status e alterações do utilizador. Comparar com a auditoria; não apagar trabalho existente.
-3. Confirmar que todas as dependências estão DONE e que os artefactos/testes que as justificam existem. Para TASK-005–031, confirmar também revisão aceite e integração na base comum; uma branch em desenvolvimento não é dependência disponível. Uma marca DONE desatualizada exige revisão.
+3. Confirmar que todas as dependências estão DONE e que os artefactos/testes que as justificam existem. Para TASK-005–032, confirmar também revisão aceite e integração na base comum; uma branch em desenvolvimento não é dependência disponível. Uma marca DONE desatualizada exige revisão.
 4. Verificar gates em docs/12 e as decisões/contratos citados. Diferenciar exigência do enunciado, hipótese, escolha técnica e sugestão.
-5. Consultar a [coordenação da equipa](team/00-COORDINATION.md) e o documento pessoal de Waheed/Fillmore/Denji. Respeitar a tarefa explicitamente pedida e a atribuição; numa escolha delegada, selecionar o menor ID próprio em TODO com dependências integradas e gate cumprido. Se existir IN PROGRESS da mesma pessoa, rever handoff e retomar primeiro. A primeira tarefa histórica foi TASK-001, já DONE; não a repetir por causa da distribuição.
+5. Consultar a [coordenação da equipa](team/00-COORDINATION.md) e o documento pessoal de Waheed/Fillmore/Denji. Respeitar a tarefa explicitamente pedida e a atribuição; numa escolha delegada, selecionar o primeiro IMP próprio pronto na ordem topológica do ADD, com dependências integradas e gate cumprido. Se existir IN PROGRESS da mesma pessoa, rever handoff e retomar primeiro. A primeira tarefa histórica foi TASK-001, já DONE; não a repetir por causa da distribuição.
 6. Marcar a tarefa IN PROGRESS no próprio ficheiro e em docs/15. Registar início, âmbito e validações planeadas, sem mudar as restantes para DONE.
 
 ## Durante a implementação
@@ -29,7 +31,7 @@ Executar verificações relevantes, guardar comandos, ambiente e resultados reai
 
 Se cumprir, marcar DONE no ficheiro e em docs/15, ligar evidência em docs/13 e indicar próxima tarefa desbloqueada. Um requisito com várias tarefas só fica satisfeito quando todas e respetivas validações estiverem concluídas; estados parciais não equivalem a DONE. Registar alterações de decisão e repetir apenas verificações afetadas por mudanças novas.
 
-Para TASK-005–031, obter revisão do membro indicado no ficheiro TASK sobre a versão final e integrar na base comum antes de marcar DONE. Se o código local passa mas revisão/integração estão pendentes, manter IN PROGRESS com handoff explícito. Uma tarefa futura que aguarda normalmente a dependência continua TODO. Não modificar os mesmos ficheiros em paralelo no mesmo checkout, nem implementar tarefas atribuídas a outra pessoa sob pretexto de desbloquear a própria sem redistribuição documentada. O autor cria/executa os seus testes; o revisor verifica a evidência e resultados relevantes. A regra não reabre TASK-001–004.
+Para TASK-005–032, obter revisão do membro indicado no ficheiro TASK sobre a versão final e integrar na base comum antes de marcar DONE. Se o código local passa mas revisão/integração estão pendentes, manter IN PROGRESS com handoff explícito. Uma tarefa futura que aguarda normalmente a dependência continua TODO. Não modificar os mesmos ficheiros em paralelo no mesmo checkout, nem implementar tarefas atribuídas a outra pessoa sob pretexto de desbloquear a própria sem redistribuição documentada. O autor cria/executa os seus testes; o revisor verifica a evidência e resultados relevantes. A regra não reabre TASK-001–004.
 
 ## Bloqueios
 
@@ -49,7 +51,7 @@ BLOCKED inclui motivo, evidência, condição de desbloqueio, responsável e imp
 
 ## Retomar numa sessão nova
 
-Ler 00, 15, este guia, 12, a fase atual e o ficheiro da tarefa em curso. Consultar 02/04/06/07 apenas nas partes relevantes e verificar código/evidência. Não confiar em memória de conversas anteriores nem em target/. Confirmar git diff antes de editar. O menor ID pronto em 15 é sugestão; as dependências reais continuam a mandar.
+Ler 00, 15, este guia, 12, a fase atual e o ficheiro da tarefa em curso. Consultar 02/04/06/07 apenas nas partes relevantes e verificar código/evidência. Não confiar em memória de conversas anteriores nem em target/. Confirmar git diff antes de editar. A ordem topológica do ADD é a sugestão; as dependências reais continuam a mandar.
 
 Ao terminar uma sessão, acrescentar em docs/15 um handoff com:
 
@@ -66,3 +68,22 @@ Alterações do utilizador a preservar:
 ~~~
 
 Manter passagem curta e factual, ligando logs extensos em vez de os copiar. Uma sessão interrompida deixa a tarefa IN PROGRESS; a seguinte revê o estado antes de continuar. Não criar commits, uploads ou mensagens externas apenas porque figuram como possibilidade neste guia; seguir a autorização real do utilizador.
+
+
+## Execução através dos bolts specsmd
+
+O [guia Construction](18-CONSTRUCTION-BOLTS.md) organiza a continuação sem
+substituir os TASK. O primeiro bolt verifica a base DONE; os seguintes cobrem
+TASK-006–032. Executar um IMP de cada vez segundo implementation_tasks, com
+testes/revisão/integração antes de a consumir como dependência. Atualizar bolt,
+história e construction-log, conservando TASK/docs/15 como estado vivo.
+
+
+## Fonte normativa atual e atomicidade
+
+Construction lê [add.md](../add.md) e [specs.md](../specs.md) antes de executar.
+O primeiro bolt verifica a base; 019-overlay implementa TASK-032 antes de
+002-overlay/TASK-006. Executar implementation_tasks (um IMP) e não toda uma
+TASK composta em cada bolt. Preservar critérios/revisão/integração dos pais.
+Mudança inviável: parar a parte afetada, propor ADR de substituição e aguardar
+aprovação conforme ADD secção 11. Não manter decisão alternativa neste guia.

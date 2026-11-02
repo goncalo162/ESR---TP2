@@ -1,0 +1,27 @@
+agents:
+  inception:
+    required_context:
+      - path: project.yaml
+        critical: false
+    optional_context:
+      - path: standards/tech-stack.md
+    on_missing_critical:
+      action: continue
+  construction:
+    required_context:
+      - path: standards/tech-stack.md
+        critical: true
+      - path: standards/coding-standards.md
+        critical: true
+      - path: standards/execution-contract.md
+        critical: true
+    optional_context:
+      - path: standards/system-architecture.md
+      - path: standards/api-conventions.md
+      - path: standards/decision-index.md
+    on_missing_critical:
+      action: warn
+  operations:
+    required_context:
+      - path: operations/handoff.md
+        critical: false

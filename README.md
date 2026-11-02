@@ -4,12 +4,17 @@ Trabalho prático de Engenharia de Serviços em Rede: entrega de vídeo através
 
 ## Documentação
 
+- [ADD — arquitetura normativa](add.md)
+- [Especificação consolidada](specs.md)
+
+
 - [Enunciado](docs/ENUNCIADO.md)
 - [Índice da documentação](docs/00-README.md)
 - [Arquitetura](docs/04-ARCHITECTURE.md)
 - [Ambiente de desenvolvimento](docs/11-SETUP-AND-ENVIRONMENT.md)
 - [Progresso e tarefas](docs/15-PROJECT-PROGRESS.md)
 - [Preparação para o checkpoint 1](docs/CHECKPOINT-1-PREPARACAO.md)
+- [Bolts Construction por fases](docs/18-CONSTRUCTION-BOLTS.md)
 
 ## Compilar e testar
 

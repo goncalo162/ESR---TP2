@@ -25,7 +25,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-Reutilizar CORE/topologies/cenario2.xml e os seis equipamentos atuais: Servidor, Router1/2/3 e Cliente1/2. Definir explicitamente onde correm S, R1/R2/R3 e C1/C2; os routers Linux do CORE podem alojar os relays sem perder o seu papel IP. Construir o grafo de vizinhança a partir de endpoints alcançáveis nesse cenário, verificando caminhos alternativos e a sua dependência da underlay. As ligações overlay podem atravessar vários links IP; não são obrigadas a replicar todas as arestas físicas. Não criar outro XML por defeito nem impor o grafo alternativo anteriormente proposto. Fixar duas condições de atraso para tornar um caminho preferível e depois inverter. Testar separadamente morte de processo relay, quebra de TCP/UDP da aresta overlay e falha física com recuperação IP. Só a primeira/segunda prova demonstra inequivocamente adaptação da aplicação; registar a rota IP antes/depois da terceira.
+Reutilizar CORE/topologies/cenario2.xml e os seis equipamentos atuais: Servidor, Router1/2/3 e Cliente1/2. Definir explicitamente onde correm S, R1/R2/R3 e C1/C2; os routers Linux do CORE podem alojar os relays sem perder o seu papel IP. Construir o grafo de vizinhança a partir de endpoints alcançáveis nesse cenário, verificando caminhos alternativos e a sua dependência da underlay. As ligações overlay podem atravessar vários links IP; não são obrigadas a replicar todas as arestas físicas. Não criar outro XML por defeito nem impor o grafo alternativo anteriormente proposto. Fixar duas condições de atraso para tornar um caminho preferível e depois inverter. Testar separadamente morte de processo relay, quebra de TCP/UDP da aresta overlay e falha física com recuperação IP. Falha de processo ou da ligação TCP deve provocar recuperação aplicacional quando há alternativa. No ensaio exclusivo de UDP, com TCP/sondas saudáveis, a resposta 3B aprova declarar a limitação: não exigir troca de parent nem recuperação automática. Registar perda/frames e ausência de mecanismo de deteção UDP. Uma falha física pode ser resolvida pelo IP; registar a rota IP antes/depois.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
@@ -55,6 +55,8 @@ A alternativa overlay pode partilhar underlay com o ramo falhado; assegurar que 
 V-026: três repetições por condição; medir fim do vídeo antes e primeiro frame após falha; snapshots e logs mostram parent alterado; jitter pequeno não gera oscilações; um consumidor sair não interrompe o outro.
 
 Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+
+Resposta 3B / ADR-025: ensaio de bloqueio exclusivo UDP deve ser separado das falhas TCP/processo; não apresentar recuperação IP ou descarte como recuperação automática da overlay.
 
 ## 11. Critérios de aceitação
 

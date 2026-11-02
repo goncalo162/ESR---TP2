@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–032 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação da tua fila é TASK-006; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+**Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Próxima tarefa recomendada:** [TASK-006](tasks/PHASE-02/TASK-006.md), ainda TODO. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+**Próxima tarefa de código:** [TASK-032](tasks/PHASE-02/TASK-032.md), ainda TODO, após o bolt de verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -12,7 +12,7 @@ Histórico anterior à TASK-005 — correção posterior, por pedido explícito 
 
 Handoff histórico da correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
 
-Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). A TASK-005 tem Waheed como responsável atribuído e Fillmore como revisor atribuído. A próxima tarefa é TASK-006, atribuída a Fillmore, com Waheed como revisor. As atribuições não substituem a evidência técnica nem alteram os estados das tarefas. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
+Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). A TASK-005 tem Waheed como responsável atribuído e Fillmore como revisor atribuído. A próxima tarefa legada de Fillmore é TASK-006, com Waheed como revisor, após a nova TASK-032 transversal. As atribuições não substituem a evidência técnica nem alteram os estados das tarefas. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
 
 Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em docs/team/, metadados nas 27 TASK futuras e ligações/regras de revisão nos documentos gerais/fases. Validação documental confirmou cobertura, atribuições sem auto-revisão, dependências sem ciclos e referências válidas; código/CORE preservados. Não foram executados build/testes Java nesta alteração exclusivamente documental. Não há implementação em curso por efeito desta distribuição.
 
@@ -21,7 +21,7 @@ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
-| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 | IN PROGRESS | PHASE-01 DONE |
+| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 e TASK-032 | IN PROGRESS | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
@@ -37,7 +37,8 @@ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
-| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | TODO | V-006: NÃO EXECUTADO |
+| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | TODO | V-032: NÃO EXECUTADO |
+| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
@@ -176,3 +177,32 @@ Revisão de partida: ebe39f4; árvore inicialmente limpa. Revistos contratos, co
 ## Atualização documental — 27-10-2026
 
 Alinhadas as notas da fase 1 com a revisão da TASK-005 (18 testes TCP, 149 no build). Corrigidas orientações de arranque nos documentos da equipa e a indicação da próxima tarefa: TASK-006, atribuída a Fillmore, com revisão atribuída a Waheed. A matriz da distribuição conserva o seu retrato histórico; estados vivos continuam nos TASK e neste documento. Removidas repetições de handoffs históricos. Alteração apenas documental; resultados de testes são os da revisão V-005, sem nova execução Java.
+
+
+## Preparação de bolts Construction — 02-11-2026
+
+Utilizador pediu revisão/correção de artefactos e bolts faseados com validação;
+confirmou Construction como executor. [Auditoria](17-INCEPTION-AUDIT.md) e
+[guia](18-CONSTRUCTION-BOLTS.md): sete unidades, 27 histórias e 18 bolts planeados.
+TASK-001–005 continuam DONE; TASK-006–031 TODO. Nenhum bolt iniciado, build/teste
+Java/CORE ou revisão humana nova presumidos. Os 149 testes são evidência histórica.
+
+Consolidadas ADR-013/014; extensão de escrita planeada em TASK-006/ADR-015;
+repetições removidas e cenário S3/indicação de arranque corrigidos. Código,
+fixtures, XML e distribuição/revisores preservados. Próxima ação de construção
+preparada: 001-base-validada; primeiro código novo continua TASK-006 após a base.
+
+
+## Consolidação ADD e replaneamento — 02-11-2026
+
+Respostas do utilizador 1A/2A/3B/4A incorporadas em [specs](../specs.md) e
+[ADD](../add.md). O ADD é a arquitetura normativa para Construction, com 26 ADR,
+40 entradas, sete unidades e 33 tarefas IMP/bolts/histórias; os 18 IDs anteriores
+conservam-se. A contagem de 18 na preparação anterior é histórica.
+
+TASK-001–005 continuam DONE. TASK-006–031 e a nova TASK-032 continuam TODO;
+nenhum IMP/bolt iniciado. Primeiro: 001-base-validada; primeiro código novo:
+019-overlay/TASK-032; depois 002-overlay/TASK-006.
+TASK-020/025/026/031 têm partes e só fecham após todas elas. Deteção automática
+continua TCP; UDP-only é limitação documentada. Sem ferramentas de qualidade novas.
+Código Java, fixtures e XML preservados; build Java/GUI/CORE não executados aqui.

@@ -1,5 +1,7 @@
 # Rastreabilidade de requisitos
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Estado inicial do plano: TODO para todos os requisitos. Estado atual: RF-001/003/004/012/013, RP-001/006 e RNF-004/005 em IN PROGRESS; os restantes requisitos continuam TODO. PHASE-01/TASK-001–004 e TASK-005 estão DONE com configuração, codec e TCP testados; overlay completa/streaming pendentes. Cobertura planeada não equivale a cumprimento. Os detalhes e fontes estão em [02](02-REQUIREMENTS.md); V-XXX é definido em [09](09-TESTING-STRATEGY.md). Todas as obrigações e recomendações adotadas têm tarefas concretas e um oráculo.
 
 Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculos relevantes estiverem concluídos. Pode passar a IN PROGRESS com evidência parcial ou BLOCKED com causa concreta; nunca usar DONE por a documentação estar escrita. Registar ligações para evidências na coluna final durante a implementação.
@@ -49,3 +51,12 @@ Correção ADR-013 por instrução do utilizador: a parte bootstrap de RF-004/TA
 RF/RNF/RC são obrigações quando assim identificadas em 02; RP são escolhas/recomendações adotadas. Uma recomendação só pode ser retirada por decisão explícita sem perder cobertura de obrigações. Nenhuma tarefa fica órfã: a coluna de requisitos de cada tarefa permite navegar no sentido inverso. As verificações de entrega V-029–031 usam inspeção de artefactos e confirmação humana, não testes de aplicação.
 
 Depois de alterar o plano, rever caminhos, dependências, requisitos ligados e o catálogo V-XXX. A validação estrutural inicial é descrita em [16](16-PLAN-VALIDATION.md).
+
+
+## Extensões e matriz normativa do ADD
+
+Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+[ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
+O índice derivado inclui as partes IMP e não transforma a cobertura documental
+em implementação DONE.

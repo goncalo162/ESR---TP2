@@ -1,5 +1,7 @@
 # Roadmap de implementação
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Sete fases seguem dependências reais: formatos/configuração antes da rede; vizinhança antes de métricas/rotas; rotas antes de subscrições; árvores antes de vídeo integrado; integração local antes de CORE; evidências antes de relatório/entrega. Todas começam TODO. Há 31 tarefas com um oráculo V-XXX por tarefa.
 
 Estado em 27-10-2026: PHASE-01 DONE; PHASE-02 IN PROGRESS, TASK-005 DONE. Build com 149 testes aprovados; próxima TASK-006 TODO. [Evidência](../experiments/task-005-transport-validation.md).
@@ -45,7 +47,8 @@ flowchart TD
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | PHASE-01 | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | V-003 |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | PHASE-01 | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | V-004 |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | PHASE-02 | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 |
-| [TASK-006](tasks/PHASE-02/TASK-006.md) | PHASE-02 | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | V-006 |
+| [TASK-032](tasks/PHASE-02/TASK-032.md) | PHASE-02 | Parametrização operacional validada | TASK-003, TASK-005 | V-032 |
+| [TASK-006](tasks/PHASE-02/TASK-006.md) | PHASE-02 | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | PHASE-02 | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | PHASE-02 | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | PHASE-02 | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 |
@@ -72,7 +75,7 @@ flowchart TD
 | [TASK-030](tasks/PHASE-07/TASK-030.md) | PHASE-07 | Empacotar código e verificar reprodução da entrega | TASK-029 | V-030 |
 | [TASK-031](tasks/PHASE-07/TASK-031.md) | PHASE-07 | Preparar defesa e checklist de submissão humana | TASK-009, TASK-018, TASK-030 | V-031 |
 
-TASK-001 → ... → TASK-031 é uma ordem total válida, sem obrigar trabalho paralelo. Dentro de uma fase pode escolher-se uma tarefa independente pronta; o gate anterior mantém-se. Não avançar para vídeo para esconder problemas de rotas. A primeira tarefa é [TASK-001](tasks/PHASE-01/TASK-001.md).
+A ordem original TASK-001 → ... → TASK-031 passa a inserir TASK-032 antes de TASK-006, sem obrigar trabalho paralelo. Dentro de uma fase pode escolher-se uma tarefa independente pronta; o gate anterior mantém-se. Não avançar para vídeo para esconder problemas de rotas. TASK-001–005 já estão concluídas; a próxima implementação é [TASK-032](tasks/PHASE-02/TASK-032.md), após verificar a base existente; TASK-006 depende dela.
 
 ## Marcos e calendário
 
@@ -83,3 +86,11 @@ O PDF prevê oito aulas ao longo de nove semanas. Como hipótese de organizaçã
 ## Critérios globais para progressão
 
 Concluir testes no momento de cada tarefa, preservar evidências e atualizar [15](15-PROJECT-PROGRESS.md). Falha de uma meta técnica implica análise; falta de um requisito obrigatório impede fecho. Gates externos de vídeo, turno/grupo e submissão estão identificados em [12](12-RISKS-AND-DECISIONS.md). Não existe trabalho de produção autorizado nesta fase de planeamento.
+
+
+## Ordem atual após ADD
+
+O [ADD](../add.md) e o [guia dos bolts](18-CONSTRUCTION-BOLTS.md) definem a ordem
+topológica atual: verificar base, TASK-032 e depois TASK-006. TASK-032 foi
+acrescentada por resposta 2A; as 31 tarefas e contagens anteriores são o plano
+de origem. A nova ordem não se obtém ordenando IDs numericamente.

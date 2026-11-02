@@ -1,0 +1,46 @@
+# Esquema local de adaptação do plano existente ao specsmd.
+structure:
+  - path: intents/
+  - path: bolts/
+  - path: standards/
+  - path: operations/
+project_config:
+  path: memory-bank/project.yaml
+schema:
+  intents: memory-bank/intents/{intent-name}/
+  requirements: memory-bank/intents/{intent-name}/requirements.md
+  system_context: memory-bank/intents/{intent-name}/system-context.md
+  units: memory-bank/intents/{intent-name}/units/{unit-name}/
+  stories: memory-bank/intents/{intent-name}/units/{unit-name}/stories/
+  bolts: memory-bank/bolts/{bolt-id}/
+  bolt-artifacts: memory-bank/bolts/{bolt-id}/
+  standards: memory-bank/standards/
+  operations: memory-bank/operations/
+  story-index: memory-bank/story-index.md
+  inception-log: memory-bank/intents/{intent-name}/inception-log.md
+  construction-log: memory-bank/intents/{intent-name}/units/{unit-name}/construction-log.md
+  decision-index: memory-bank/standards/decision-index.md
+  ownership:
+    inception: [intents, units, stories, story-index, bolts]
+    construction: [units, bolts, decision-index]
+    operations: [operations]
+naming:
+  intents:
+    format: "{NNN}-{intent-name}"
+  units:
+    format: "{UUU}-{unit-name}"
+  stories:
+    format: "{SSS}-{title-slug}.md"
+  bolts:
+    format: "{BBB}-{unit-name}/"
+conventions:
+  timestamps:
+    format: ISO 8601 UTC with time
+    pattern: YYYY-MM-DDTHH:MM:SSZ
+story-index:
+  enabled: true
+  mode: single-file
+  path: memory-bank/story-index.md
+
+architecture_source: add.md
+specification_source: specs.md

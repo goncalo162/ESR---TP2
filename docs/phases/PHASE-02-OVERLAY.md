@@ -21,14 +21,15 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
 | [TASK-005](../tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 | DONE |
-| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005 | V-006 | TODO |
+| [TASK-032](../tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | V-032 | TODO |
+| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 | TODO |
 | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | TODO |
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | TODO |
 | [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | TODO |
 
 ## 6. Ordem de execução
 
-TASK-005 → TASK-006 → TASK-007 → TASK-008 → TASK-009. Esta ordem é segura; não iniciar a fase seguinte antes de cumprir o gate desta fase. A estrutura permite trabalho independente dentro da fase se as dependências explícitas estiverem concluídas e o progresso ficar coerente.
+TASK-005 (DONE) → TASK-032 → TASK-006 → TASK-007 → TASK-008 → TASK-009. Esta ordem é segura; não iniciar a fase seguinte antes de cumprir o gate desta fase. A estrutura permite trabalho independente dentro da fase se as dependências explícitas estiverem concluídas e o progresso ficar coerente.
 
 ## 7. Dependências
 

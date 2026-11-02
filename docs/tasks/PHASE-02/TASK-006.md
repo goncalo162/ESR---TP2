@@ -8,7 +8,7 @@
 - Estado: TODO
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
-- Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](../PHASE-02/TASK-005.md).
+- Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](../PHASE-02/TASK-005.md), [TASK-032](TASK-032.md).
 - Requisitos relacionados: [RF-002](../../02-REQUIREMENTS.md#rf-002), [RF-003](../../02-REQUIREMENTS.md#rf-003), [RF-004](../../02-REQUIREMENTS.md#rf-004).
 
 ## 2. Objetivo
@@ -31,11 +31,15 @@ Usar exclusivamente o grafo simétrico imutável carregado por ConfigurationLoad
 
 Pedidos repetidos, simultâneos ou de instâncias diferentes do mesmo ID recebem a mesma lista configurada; não há exclusividade ou inscrição no bootstrap. Duplicados ativos são tratados no handshake direto (TASK-007). Não criar NodeRegistry, leases, renovações, heartbeats, timers de membership, monitorização, tratamento de NODE_LEAVE, anúncio de streams ou cálculo de rotas. Código 3 está retirado e é inválido. Outras mensagens válidas do codec comum são operações inválidas neste handler: rejeitar com ERROR INVALID_MESSAGE quando for seguro e fechar, sem efeitos operacionais. Retentar a consulta apenas se não se obteve resposta; após sucesso não manter canal periódico com bootstrap.
 
+Integração de escrita / ADR-015: acrescentar ao transporte uma confirmação assíncrona de escrita/flush, concluída pelo escritor exclusivo depois do frame inteiro. Encadear o fecho da consulta nessa conclusão, com prazo limitado; nunca bloquear o callback de leitura. Terminar confirmações pendentes em falha, cancelamento, overflow ou shutdown. Preservar a semântica de send=ACCEPTED, o codec e os bytes v1; esta extensão pertence à TASK-006, sem reabrir TASK-005.
+
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
 ## 6. Ficheiros e componentes envolvidos
 
 Existentes: bootstrap/BootstrapServer.java contém apenas documentação; bootstrap/BootstrapServerTest.java é placeholder; config/TopologyConfiguration.java e resources/config/topology.properties já estão implementados/preenchidos. Implementar a consulta diretamente sobre TopologyConfiguration. O placeholder NodeRegistry.java foi removido por não existir registo operacional a implementar. Confirmar estes estados no início da tarefa.
+
+ADR-015 envolve também transport/Connection.java e, se necessário para integrar o ciclo de vida, Transport.java; acrescentar casos à TransportTest.java e BootstrapServerTest.java. A extensão de confirmação de escrita mantém os limites/semântica pública existentes e a regressão V-005.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
@@ -67,6 +71,7 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 - [ ] Resposta independe da disponibilidade e de consultas anteriores; não existem registo vivo, lease, renovação ou monitorização.
 - [ ] IDs e endpoints inválidos são rejeitados sem alterar a configuração ou bloquear outras consultas.
 - [ ] Conexão inicial é fechada após resposta; não há mensagens de saída/renovação para bootstrap.
+- [ ] Confirmação de escrita/flush tem prazo e termina em sucesso ou erro; testes observam resposta completa antes de EOF e não deixam futures pendentes após falha/shutdown.
 - [ ] Validação V-006 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done

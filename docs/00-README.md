@@ -1,19 +1,20 @@
 # Plano de implementação — ESR TP2 2026/2027
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Este conjunto de documentos especifica um protótipo OTT que distribui vídeo em tempo real através de uma rede overlay com multicast aplicacional. A entrega final deve demonstrar pelo menos dois servidores, cada um com dois vídeos distintos, clientes simultâneos, caminhos alternativos e adaptação às condições de rede.
 
-**Estado atual: PHASE-01 concluída; PHASE-02 IN PROGRESS.** TASK-001–005 DONE; TASK-006–031 TODO. Configuração, codec e transporte TCP implementados, com [149 testes aprovados](../experiments/task-005-transport-validation.md). Descoberta bootstrap, gestão de vizinhos e vídeo continuam por implementar. Material para o relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
-
-Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
+**Estado atual: PHASE-01 concluída; PHASE-02 IN PROGRESS.** TASK-001–005 DONE; TASK-006–032 TODO. Configuração, codec e transporte TCP implementados, com [149 testes aprovados](../experiments/task-005-transport-validation.md). Descoberta bootstrap, gestão de vizinhos e vídeo continuam por implementar. Material para o relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
 Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
 
 ## Fonte de verdade e precedência
 
 1. [Enunciado original, cinco páginas](../ESR-TP2-26-27.pdf).
-2. Requisitos explícitos transcritos analiticamente em [02](02-REQUIREMENTS.md).
-3. Decisões e hipóteses identificadas em [12](12-RISKS-AND-DECISIONS.md).
-4. Contratos, tarefas e restantes documentos deste plano.
+2. [specs.md](../specs.md), com os critérios consolidados e aliases.
+3. [Intent do projeto](../memory-bank/intents/001-ott-streaming/requirements.md).
+4. Documentação e contratos incorporados pelo [ADD](../add.md), arquitetura normativa.
+5. Código existente e evidência, sem substituir os requisitos superiores.
 
 A cópia [em Projeto/docs](../Projeto/docs/ESR-TP2-26-27-1.pdf) tem o mesmo SHA-256: 34a0f7e493987e85c019d060a0196a0e66b55a2ff5de4f6b68a0468a23879342. A menção inicial a um servidor/fluxo é um exemplo simplificado; o mínimo explícito de dois servidores com dois fluxos cada prevalece no plano. A documentação antiga de Projeto/docs é contexto histórico, não uma especificação adicional. Divergências estão registadas em [12](12-RISKS-AND-DECISIONS.md).
 
@@ -21,7 +22,12 @@ A cópia [em Projeto/docs](../Projeto/docs/ESR-TP2-26-27-1.pdf) tem o mesmo SHA-
 
 Java 21 e Maven, mantendo a estrutura existente. Bibliotecas padrão Java para sockets, serialização binária e reprodução Swing; JUnit Jupiter apenas para testes. Controlo TCP, vídeo MJPEG fragmentado sobre UDP, bootstrap por topologia configurada, anúncios com caminho explícito, métrica RTT, subscrição e poda de árvores por fluxo. CORE é a bancada principal. Não há base de dados, serviços web nem autenticação de utilizadores no âmbito definido.
 
+Continuação specsmd: [auditoria](17-INCEPTION-AUDIT.md) e [bolts Construction](18-CONSTRUCTION-BOLTS.md), preservando estados e critérios das TASK.
+
 ## Índice e leitura
+
+- [ADD — arquitetura normativa](../add.md)
+- [Especificação consolidada](../specs.md)
 
 Para preparar a discussão das decisões, árvores, monitorização e flooding, consultar o [guia do checkpoint 1](CHECKPOINT-1-PREPARACAO.md), que distingue o desenho previsto da implementação existente.
 
@@ -55,6 +61,6 @@ Na primeira sessão ler 01, 02, 12, 04, 06, 07, 08 e o guia. Depois consultar 15
 
 PHASE-01 → PHASE-02 → PHASE-03 → PHASE-04 → PHASE-05 → PHASE-06 → PHASE-07. O [roadmap](08-IMPLEMENTATION-ROADMAP.md) liga os sete ficheiros de fase e identifica todas as tarefas. A ordem numérica TASK-001 a TASK-031 é uma ordenação válida das dependências.
 
-**Primeira tarefa, concluída:** [TASK-001 — Validar a base Java e configurar testes](tasks/PHASE-01/TASK-001.md). **TASK-002 concluída:** contratos/fixtures e recursos revistos. **TASK-003 concluída:** configuração implementada/testada. **TASK-004 e PHASE-01 concluídas:** codec e integração local testados. **TASK-005 concluída:** transporte TCP testado. **Próxima tarefa:** [TASK-006](tasks/PHASE-02/TASK-006.md), ainda TODO. Executar as tarefas seguintes apenas no âmbito solicitado pelo utilizador.
+**Primeira tarefa, concluída:** [TASK-001 — Validar a base Java e configurar testes](tasks/PHASE-01/TASK-001.md). **TASK-002 concluída:** contratos/fixtures e recursos revistos. **TASK-003 concluída:** configuração implementada/testada. **TASK-004 e PHASE-01 concluídas:** codec e integração local testados. **TASK-005 concluída:** transporte TCP testado. **Próximo código novo:** [TASK-032](tasks/PHASE-02/TASK-032.md), após verificar a base; TASK-006 depende dela. Executar as tarefas seguintes apenas no âmbito solicitado pelo utilizador.
 
 Ao concluir uma tarefa, atualizar simultaneamente o seu estado, o progresso, a rastreabilidade dos requisitos satisfeitos e as evidências. Não converter TODO em DONE por existirem ficheiros vazios, documentação ou artefactos antigos em target/.

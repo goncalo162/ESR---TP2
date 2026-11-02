@@ -1,8 +1,8 @@
 # Interfaces e contratos propostos
 
-A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
 
-Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
+A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; handlers e restantes interfaces de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
 
 Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
 
@@ -57,7 +57,7 @@ Os aliases são rótulos do plano; a chave na rede é o UUID. Os nomes de fichei
 
 ## 2. Parâmetros e limites iniciais
 
-Valores abaixo são **hipóteses configuráveis**, sujeitos a validação experimental em TASK-028; nunca requisitos numéricos do enunciado.
+A tabela conserva os valores de partida do plano. O ADD, secção 6.3, distingue parâmetros operacionais opcionais e hard caps binários/de proteção. TASK-032 implementará apenas as chaves operacionais aprovadas. Não tornar formatos/fragmentos v1 configuráveis por inferência desta tabela.
 
 | Parâmetro | Inicial |
 |---|---:|
@@ -113,6 +113,8 @@ O chamador gere flush/close e o único escritor por conexão. O codec não abre 
 `Options` limita queueCapacity a 1–256 e maxConnections a 1–64 (defaults 256/64). Reservas incluem dials e permanecem até ambos os workers I/O terminarem. Um worker accept, um por dial pendente e dois por ligação; threads virtuais Java 21 sem fila de executor ilimitada. `connectionCount()` conta reservas pendentes/em terminação; `queuedMessages()` devolve profundidade da fila. Cada frame tem até 65540 bytes com prefixo; existe ainda um frame em escrita e serializações concorrentes dos chamadores. São limites de frames, sem medição de consumo máximo de memória.
 
 `close()` fecha listener/sockets, limpa filas e interrompe workers. Chamador externo aguarda um deadline global default de 3 s; timeout lança erro explícito se um callback bloquear. Chamado por callback, só inicia shutdown para evitar joins circulares. `awaitTermination(duration)` externo confirma terminação. Close é idempotente, sem acesso a bootstrap. `Connection.close()` solicita fecho local e notificação assíncrona. Atenção: ACCEPTED seguido imediatamente de close não garante envio; o futuro bootstrap da TASK-006 terá de confirmar a escrita completa da resposta antes de fechar, mediante mecanismo apropriado nessa tarefa.
+
+Extensão planeada em TASK-006 / ADR-015: confirmação assíncrona de escrita/flush concluída pelo escritor depois de escrever o frame inteiro, permitindo fechar a consulta bootstrap só após essa conclusão. A operação terá prazo e conclusão excecional em falha/fecho/overflow/shutdown, sem bloquear callbacks. Ainda não existe no código; a API fixada pelo ADD é Connection.sendAndFlush(ControlMessage), devolvendo CompletableFuture<Void>. Fila vazia não prova escrita completa e flush não prova entrega remota ou ACK. A semântica atual de send permanece.
 
 A assinatura conceptual `sendControl(neighborId, message)` depende do mapa futuro de vizinhos; nesta tarefa o envio usa Connection diretamente. Sem handshake, autorização, retries, CLI ou processos JVM independentes demonstrados. Os testes usam TCP real dentro da JVM de testes. Contrato bootstrap/NeighborList corrigido por ADR-013 preservado. [V-005](../experiments/task-005-transport-validation.md).
 
@@ -171,7 +173,7 @@ Formato próprio v1; **não é RTP**, não usa multicast IP e não assume compat
 | 62 | 2 | fragmentCount u16, 1..1847 |
 | 64 | variável | payload, 1..1136 bytes |
 
-fragmentCount = ceil(frameLength/1136); cada fragmento exceto o último tem 1136 bytes, último tem o resto não nulo. O datagrama é no máximo 1200 bytes de aplicação. Não contar IP/UDP nesses 1200; verificar MTU efetivo da bancada e reduzir o limite se necessário. O relay reenvia os mesmos bytes sem alterar sequência, stream ou origem temporal.
+fragmentCount = ceil(frameLength/1136); cada fragmento exceto o último tem 1136 bytes, último tem o resto não nulo. O datagrama é no máximo 1200 bytes de aplicação. Não contar IP/UDP nesses 1200; verificar MTU efetivo da bancada; se incompatível, documentar o gate e propor revisão do contrato/fixtures por ADR, sem reduzir silenciosamente o fragmento v1 por nó. O relay reenvia os mesmos bytes sem alterar sequência, stream ou origem temporal.
 
 Aceitação: endpoint UDP recebido coincide com HELLO do upstream confirmado; stream/epoch ativas; índice, tamanho, magic e versão válidos. Metadados são consistentes durante a montagem. Duplicados são ignorados. Frame incompleto ao deadline é descartado; não há retransmissão. A janela dedup de 512 frames é limitada, rejeita frames mais antigos que a janela e não renova leases. Nenhum datagrama por si só cria ou ativa rota.
 
@@ -203,3 +205,14 @@ O recurso docente movie.Mjpeg usa registos consecutivos: exatamente cinco bytes 
 EOF é limpo apenas entre registos. Prefixo parcial, caractere não decimal, comprimento zero ou JPEG truncado são erros. Neste perfil, L está entre 1 e 99999; o limite efetivo da fonte é o menor entre 99999, maxFrameBytes configurado e o máximo de 2 MiB do protocolo UDP. O limite UDP continua a servir outros tamanhos sintéticos nos testes de fragmentação; não altera a capacidade de cinco dígitos do ficheiro adotado. FPS não está codificado no ficheiro: continua a vir da configuração. O exemplo Java docente usa período de 100 ms (10 FPS), valor observado e não requisito obrigatório.
 
 A TASK-020 implementará o leitor robusto e validará descodificação JPEG; nesta tarefa houve apenas inspeção dos bytes e dos exemplos, sem copiar/implementar o leitor. Hashes, conteúdos identificados, proveniência e gates estão no [registo V-002](../experiments/task-002-contract-review.md). Referências binárias/hexadecimais de controlo e UDP: [fixtures](../Projeto/src/test/resources/protocol/README.md).
+
+
+## 8. Parametrização e falha exclusiva UDP
+
+Resposta 2A: chaves/defaults/papéis/relações de RuntimeConfiguration estão no
+[ADD, secção 6.3](../add.md). A carga offline mantém defaults dos perfis atuais
+e valida antes de sockets. Não muda os bytes v1 ou a semântica de send.
+
+Resposta 3B / ADR-025: deteção automática continua a usar TCP/sondas. Bloqueio
+apenas de UDP com controlo saudável não garante troca de parent/recuperação.
+O teste deve documentar interrupção/counters e essa limitação sem criar watchdog.

@@ -1,5 +1,7 @@
 # Requisitos, restrições e critérios de aceitação
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Fonte: [PDF original](../ESR-TP2-26-27.pdf), cinco páginas. RF = funcional; RNF = qualidade/arquitetura; RC = restrição de avaliação/entrega; RP = recomendação ou escolha técnica adotada. Cada identificação é única. P0 = obrigatório a cumprir para a entrega; P1 = necessário para a solução técnica escolhida; P2 = recomendação de menor prioridade. Prioridade não dispensa requisito obrigatório.
 
 A lista mínima da p. 3 exige duas origens com pelo menos dois vídeos cada; a referência a um único fluxo na p. 2 é uma simplificação, não limite do modelo. As etapas 0–4 são sugestões de estratégia e ordem. Java, Maven, TCP/UDP separados, MJPEG, numeração e GUI são escolhas do plano, com a natureza identificada abaixo.

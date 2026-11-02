@@ -1,11 +1,13 @@
 # Definition of Done
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 O estado DONE exige evidência. Documentação, um ficheiro vazio, compilação com zero testes ou presença de artefacto antigo não provam comportamento implementado. Não existe declaração de conformidade final com base apenas neste plano.
 
 ## Tarefa
 
 - Dependências em DONE, ou exceção de execução justificada e aprovada que não viole requisito; nunca fingir que um pré-requisito existe.
-- Para TASK-005–031: revisor indicado aceita a versão final e alterações estão integradas na base comum antes de DONE; dependências de outras branches só contam após integração. Registar autor/revisor, versão e evidência segundo a [coordenação](team/00-COORDINATION.md). Esta regra não reabre a fase 1 já concluída.
+- Para TASK-005–032: revisor indicado aceita a versão final e alterações estão integradas na base comum antes de DONE; dependências de outras branches só contam após integração. Registar autor/revisor, versão e evidência segundo a [coordenação](team/00-COORDINATION.md). Esta regra não reabre a fase 1 já concluída.
 - Objetivo e todos os critérios da tarefa cumpridos; alterações limitadas ao seu âmbito.
 - Testes/verificações previstos executados e resultados reais registados. V-001 pode não conter testes funcionais; essa exceção é explícita e não se estende às tarefas seguintes.
 - Casos limite relevantes cobertos, erros controlados e recursos libertados. Não introduzir regressões nas funcionalidades afetadas.
@@ -35,3 +37,11 @@ Todas as suas tarefas concluídas, entregável verificável, teste de integraç�
 Além da conclusão técnica: artigo até 12 páginas, ZIP/RAR permitido com código e instruções reproduzíveis, nomes com turno/grupo reais, marcos intermédios e defesa preparados conforme docente. A equipa confirma upload na troca de ficheiros do grupo Blackboard e a versão submetida é a validada. Requisitos de entrega RC-002–007 só passam a satisfeitos com os seus artefactos e confirmações.
 
 Datas não fornecidas, recurso não obtido, teste não executado e upload não confirmado são pendências, nunca sucesso presumido. Nenhuma submissão é feita neste planeamento.
+
+
+## Tarefas IMP e pais compostos
+
+O ADD define uma tarefa IMP por bolt. Cada parte tem testes/output limitados;
+TASK-020/025/026/031 só ficam DONE após todas as partes, critérios e revisão.
+TASK-032 é transversal Construction; registar revisor humano distinto do autor
+antes de DONE. A arquitetura aprovada não é aprovação da implementação.

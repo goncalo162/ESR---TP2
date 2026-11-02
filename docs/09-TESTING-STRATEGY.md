@@ -1,5 +1,7 @@
 # Estratégia de testes e experiências futuras
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Este documento define validações a executar durante a construção. **Não há testes da aplicação executados neste planeamento.** Cada V-XXX corresponde à validação principal de TASK-XXX; pode conter vários testes automatizados e verificações manuais. Não confundir existência de teste, execução, sucesso e evidência preservada.
 
 ## Camadas e momento
@@ -32,7 +34,7 @@ Não deixar testes para o fim. Cada tarefa que altera comportamento inclui teste
 
 ## Cenários e oráculos
 
-S1 de quatro nós mede partilha: S→R→C1/C2. S2 de seis nós mede caminhos alternativos: S→R1/R2→R3→C1/C2. S3 de duas origens, cinco relays e cinco clientes, inspirado na figura 1, valida quatro streams e escala. Configurações detalhadas em TASK-025–027 e mapeamento a endereços reais criado nessas tarefas.
+S1 de quatro nós mede partilha: S→R→C1/C2. S2 de seis nós mede caminhos alternativos: S→R1/R2→R3→C1/C2. S3 valida duas origens, cinco clientes e quatro streams, reutilizando o XML existente. Uma distribuição possível nos dez PCs é duas origens, três relays e cinco clientes, conforme TASK-027; cinco relays eram apenas uma proposta inicial. Configurações detalhadas em TASK-025–027 e mapeamento a endereços reais criado nessas tarefas.
 
 Para uma janela estável e sem perda configurada, agrupar datagramas por (streamId, sessionId, frameSeq, fragmentIndex) em cada ligação lógica. No segmento comum cada chave deve ocorrer uma vez na direção de dados, mesmo com dois ou cinco clientes a jusante. Comparar janela de sequências comuns aos pontos de captura; excluir warm-up, troca de rota e final de captura. Não somar a mesma transmissão observada em interfaces underlay distintas como redundância da overlay.
 
@@ -107,6 +109,8 @@ Responsável: [TASK-005](tasks/PHASE-02/TASK-005.md). Requisitos: RF-003, RNF-00
 ### V-006 — Fornecer localização inicial dos vizinhos configurados
 
 V-006: consultas repetidas/concorrentes recebem só os vizinhos configurados, incluindo offline, com instanceId zero e sem lease; duas instâncias do mesmo ID recebem a mesma lista; operações não permitidas são rejeitadas sem alterar a configuração; a conexão fecha após a resposta completa e não existe renovação ou estado vivo no bootstrap.
+
+Complemento ADR-015: observar frame de resposta completo seguido de EOF; testar peer lento/erro de escrita e shutdown com confirmação pendente. Futures de escrita terminam em sucesso/erro dentro do prazo, sem bloquear callbacks; ACCEPTED ou fila vazia não contam como prova de escrita. Reexecutar a regressão de transporte afetada pela extensão em TASK-006.
 
 Responsável: [TASK-006](tasks/PHASE-02/TASK-006.md). Requisitos: RF-002, RF-003, RF-004. Estado: NÃO EXECUTADO.
 
@@ -259,3 +263,25 @@ Responsável: [TASK-030](tasks/PHASE-07/TASK-030.md). Requisitos: RC-003, RC-004
 V-031: ensaio cronometrado reproduz tópicos de avaliação; revisão dos dois nomes e grupo; confirmação humana documenta upload correto sem exposição de credenciais.
 
 Responsável: [TASK-031](tasks/PHASE-07/TASK-031.md). Requisitos: RNF-005, RC-005, RC-006, RC-007. Estado: NÃO EXECUTADO.
+
+
+### V-032 — Parametrização operacional
+
+Defaults preservam perfis atuais; overrides válidos chegam ao consumidor.
+Chaves desconhecidas/inaplicáveis/duplicadas, NaN/infinito, tipos, intervalos,
+overflow e relações inválidas produzem erro agregado antes de sockets.
+Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: NÃO EXECUTADO.
+
+### V-ADD — Coerência do documento mestre e dos incrementos
+
+Verificar 13 secções, aliases/critérios, ADR com drivers/alternativas/consequências,
+matriz REQ/NFR/CON/INT→ADR→componente→IMP→teste, referências e DAG/etapas.
+Não é teste da aplicação ou aprovação humana. Comando: python3 scripts/validate-planning.py.
+
+### Provas parciais e limitação UDP
+
+V-020-A/B/C, V-025-A/B, V-026-A/B e V-031-A/B delimitam as partes dos pais no ADD.
+O V pai só fecha quando todas as partes e critérios originais estão satisfeitos.
+3B: V-026-A separa TCP/processo de UDP-only; controlo saudável não garante recuperação
+de vídeo. O resultado negativo fica na avaliação. 4A mantém Maven/JUnit e oráculos
+críticos, sem CI/linter/percentagem global obrigatórios.

@@ -1,5 +1,7 @@
 # Modelo de dados e invariantes
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 Não existe persistência transacional. Ficheiros locais definem configuração e conteúdos; o estado operacional é reconstruído a cada arranque. Não carregar rotas ou subscrições de uma execução anterior. Relógios de expiração usam tempo monotónico local; timestamps civis servem apenas logs.
 
 ## Identidades e entidades

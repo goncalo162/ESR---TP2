@@ -1,8 +1,10 @@
 # Riscos, hipóteses e decisões
 
+> Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+
 ## Estado da informação
 
-Não há bloqueio à elaboração deste plano nem ao início futuro de TASK-001. Existem dependências que bloquearão tarefas específicas caso não sejam resolvidas a tempo. Todas as tarefas começam TODO, incluindo as que têm gates; BLOCKED só será usado durante execução quando a condição efetivamente impedir trabalho.
+Estado atualizado em 02-11-2026: TASK-001–005 estão DONE; TASK-006–031 continuam TODO. Não há bloqueio documental ao planeamento da continuação. Existem dependências que bloquearão tarefas específicas caso não sejam resolvidas a tempo; BLOCKED só será usado durante execução quando a condição efetivamente impedir trabalho. A próxima implementação é TASK-006, após verificar a base existente.
 
 O enunciado tem precedência sobre documentação antiga. Escolhas deste plano podem ser revistas por ADR, desde que continuem a satisfazer as obrigações. Uma hipótese não equivale a resposta do docente.
 
@@ -33,7 +35,7 @@ Estado: adotada no plano. Contexto: o PDF permite TCP ou UDP e exige vídeo com 
 
 ## ADR-003 — Bootstrap por grafo permitido
 
-Estado: adotada, com âmbito corrigido por ADR-013 a pedido explícito do utilizador. Decisão: estratégia 2 sugerida, apenas consulta inicial dos vizinhos definidos num ficheiro simétrico. Não há inscrição de membros, registo vivo, lease, renovação, monitorização ou avisos de saída no bootstrap. Estado das conexões e rotas permanece distribuído. Alternativas: vizinhos manuais na CLI ou descoberta totalmente dinâmica. Consequência: grafo não muda arbitrariamente durante execução; nós configurados podem entrar/sair. Novos IDs exigem edição/recarregamento planeado da configuração e nova consulta dos afetados, fora do fluxo básico. O requisito de entrada dinâmica é satisfeito por processos configurados que entram sem reiniciar a overlay. Bootstrap indisponível não interrompe nós que já obtiveram a lista, incluindo a sua reconexão direta, mas impede descoberta inicial de novos processos. TASK-006/007/008.
+Estado: Substituída por ADR-013 no ADD; esta descrição conserva a proveniência da escolha e a sua correção. Decisão: estratégia 2 sugerida, apenas consulta inicial dos vizinhos definidos num ficheiro simétrico. Não há inscrição de membros, registo vivo, lease, renovação, monitorização ou avisos de saída no bootstrap. Estado das conexões e rotas permanece distribuído. Alternativas: vizinhos manuais na CLI ou descoberta totalmente dinâmica. Consequência: grafo não muda arbitrariamente durante execução; nós configurados podem entrar/sair. Novos IDs exigem edição/recarregamento planeado da configuração e nova consulta dos afetados, fora do fluxo básico. O requisito de entrada dinâmica é satisfeito por processos configurados que entram sem reiniciar a overlay. Bootstrap indisponível não interrompe nós que já obtiveram a lista, incluindo a sua reconexão direta, mas impede descoberta inicial de novos processos. TASK-006/007/008.
 
 ## ADR-004 — Anúncios com path vector e métrica RTT
 
@@ -104,8 +106,39 @@ Verificação estática dos XML: parsing concluído, IDs únicos, referências d
 
 ## ADR-012 — Codec independente do transporte e fecho da fase 1
 
-Estado: adotada na TASK-004, 27-10-2026. Implementar os 17 tipos com IDs explícitos, payloads tipados/imutáveis e helpers de Endpoint/StreamInfo no pacote protocol. Configuração e codec partilham NodeRole, com mapeamento de rede explícito. Reusar payloads de layout igual sem implementar handlers.
+Estado: adotada na TASK-004, 27-10-2026. O contrato original tinha 17 tipos; após ADR-013 tem 16 tipos ativos, com o código 3 retirado. IDs explícitos, payloads tipados/imutáveis e helpers de Endpoint/StreamInfo no pacote protocol. Configuração e codec partilham NodeRole, com mapeamento de rede explícito. Reusar payloads de layout igual sem implementar handlers.
 
 Decisão: read(InputStream) sinaliza EOF limpo com Optional.empty; truncatura de transporte é EOFException; corpo recebido com campos inválidos é ProtocolException. Prefixo e u32 são unsigned; validar comprimentos antes de alocar e saída antes de escrever no stream do chamador. Utilizar UTF-8 estrito, nunca modified UTF-8. O chamador mantém flush/close e serialização dos envios.
 
 O codec valida formato/domínio, não autorização, ciclos ou ativação de rotas. As fixtures permanecem independentes e inalteradas. Validação final: 65 testes de configuração + 66 de codec/integração local, todos aprovados. PHASE-01 fecha a base técnica; o transporte da Etapa 0 e a overlay da Etapa 1 do enunciado continuam nas fases seguintes. [V-004](../experiments/task-004-codec-validation.md), [material para relatório](PHASE-01-REPORT-NOTES.md). Nenhum XML CORE foi alterado.
+
+## ADR-013 — Bootstrap exclusivamente para descoberta inicial
+
+Estado: decisão do utilizador de 27-10-2026, já refletida no contrato e codec; registo consolidado em 02-11-2026. Contexto: referências a esta decisão existiam sem uma secção própria neste índice.
+
+Decisão: REGISTER/REGISTER_OK são consulta/resposta do grafo imutável configurado. Devolver também vizinhos offline, com instanceId zero. Não guardar disponibilidade, exclusividade de IDs vivos, leases, renovações, sondas ou avisos de saída no bootstrap. Código 3 retirado; rejeitar os bytes do antigo REGISTER_OK com lease. A descoberta inicial termina depois de a resposta ser completamente escrita. Vizinhança, instâncias, reconexão e falhas pertencem aos pares diretos; leases de streams pertencem ao routing.
+
+Alternativa rejeitada: registo central de membros com renovação periódica. Consequências: nós que conservam a lista reconectam sem bootstrap; processos sem lista inicial dependem dele. Esta decisão não implementa BootstrapServer ou NeighborManager. [Correção e revalidação do codec](../experiments/bootstrap-discovery-correction.md). TASK-006/007/008/009 continuam por executar.
+
+## ADR-014 — Transporte TCP assíncrono com recursos limitados
+
+Estado: implementada e revista em TASK-005, 27-10-2026; registo consolidado em 02-11-2026 a partir da evidência existente. Decisão: um leitor e um escritor por conexão, fila limitada de saída, dials assíncronos, callbacks ordenados por ligação e shutdown com prazo. Defaults: 256 frames por saída, 64 reservas incluindo dials, connect de 2 s e shutdown externo de 3 s. Threads virtuais não eliminam a necessidade destes limites.
+
+send=ACCEPTED confirma apenas enfileiramento. Overflow fecha a ligação saturada; close pode descartar a fila. Não há ACK aplicacional, retries, handshake ou fecho gracioso de resposta garantidos nesta API. Alternativa rejeitada: escritas de rede bloqueantes nos handlers ou filas ilimitadas. [18 testes TCP e 149 no build histórico](../experiments/task-005-transport-validation.md). A nova preparação documental não executa novamente estes testes.
+
+## ADR-015 — Confirmar escrita da resposta antes de fechar a descoberta
+
+Estado: decisão de integração adotada para TASK-006 no planeamento de 02-11-2026; ainda não implementada. Contexto: TASK-006 exige resposta completa seguida de EOF, mas a API atual só confirma enfileiramento e o close imediato pode perder a resposta.
+
+Decisão: acrescentar em TASK-006 uma operação assíncrona de confirmação de escrita/flush, concluída pelo escritor exclusivo depois de escrever o frame completo. O bootstrap encadeia a conclusão com o fecho e aplica prazo limitado a consultas/peers lentos; nunca bloqueia o callback de leitura. Falha, cancelamento, overflow ou shutdown têm de terminar as confirmações pendentes sem as deixar suspensas. O ADD fixa a API Connection.sendAndFlush(ControlMessage): CompletableFuture<Void>.
+
+Não equiparar fila vazia a escrita concluída, nem escrita/flush a entrega remota ou ACK aplicacional. Manter a semântica de send e a compatibilidade dos bytes v1. V-006 deve incluir resposta completa seguida de EOF e falhas durante escrita; repetir os testes de transporte afetados. Esta extensão pertence a TASK-006 e não reabre TASK-005 nem inventa um resultado de validação.
+
+
+## Consolidação no ADD — 02-11-2026
+
+O [ADD](../add.md) mantém ADR-001–015 e acrescenta ADR-016–026. Este ficheiro
+é proveniência histórica, não o local para criar decisões concorrentes.
+1A: specs consolidado; 2A: configuração operacional em TASK-032;
+3B: limitação de recuperação UDP-only; 4A: sem ferramentas/limiar percentual novos.
+Nova decisão ou substituição é registada no ADD e no seu índice.

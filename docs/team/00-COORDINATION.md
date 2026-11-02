@@ -169,3 +169,13 @@ Qualquer redistribuição ou revisão para mais paralelismo deve manter um autor
 Verificação documental em 27-10-2026: 31 tarefas na matriz, 27 tarefas futuras com responsável/revisor diferentes e filas pessoais de implementação/revisão consistentes com os metadados TASK. Estados, dependências e especificações técnicas das 31 tarefas preservados face à revisão 2e58ef5; apenas metadados de atribuição foram acrescentados às futuras. Grafo de dependências sem ciclos; TASK-005 é a única implementação inicial desbloqueada.
 
 Conferidas 2191 referências relativas a ficheiros em docs/ e experiments/, sem destinos em falta, e estrutura obrigatória das TASK preservada. Os 168 ficheiros existentes sob Projeto/ e CORE/ considerados na verificação, excluindo target, mantêm os hashes e não foram adicionados ficheiros de implementação. git diff --check passou. Não foram executados testes Java ou experiências CORE nesta distribuição documental; a evidência de 131 testes citada nos documentos pertence à execução anterior da fase 1.
+
+
+## Atualização pelo ADD — 02-11-2026
+
+Preservam-se os responsáveis/revisores das TASK-001–031. A nova TASK-032
+(parametrização operacional, antes de TASK-006) é trabalho transversal de
+Construction; um revisor humano distinto do autor deve ser designado antes
+do DONE. Não se atribui aceitação a um membro por inferência.
+O ADD divide os pais 020/025/026/031; as revisões e integração do pai continuam
+exigidas. Ordem normativa no ADD, sem selecionar por ID numérico.

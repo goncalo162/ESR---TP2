@@ -1,0 +1,5181 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-11-02T15:45:31Z",
+  "architecture_source": "add.md",
+  "specification_source": "specs.md",
+  "approval": {
+    "responses": [
+      "1A",
+      "2A",
+      "3B",
+      "4A"
+    ],
+    "scope": "consolidação documental, sem execução"
+  },
+  "requirements": {
+    "REQ-001": {
+      "id": "REQ-001",
+      "legacy_id": "RF-001",
+      "title": "Executar nós como aplicações em máquinas IP",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Iniciar manualmente servidor, relay e cliente em processos independentes; cada um escuta no endpoint configurado e reporta o seu papel.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-001",
+      "tasks": [
+        "TASK-003",
+        "TASK-008"
+      ],
+      "tests": [
+        "V-003",
+        "V-008"
+      ]
+    },
+    "REQ-002": {
+      "id": "REQ-002",
+      "legacy_id": "RF-002",
+      "title": "Entrada e saída dinâmica de nós",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Adicionar um nó a uma overlay em execução, removê-lo com encerramento normal e abrupto, e observar atualização de vizinhos e rotas sem reinício dos restantes.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-002",
+      "tasks": [
+        "TASK-006",
+        "TASK-007",
+        "TASK-008",
+        "TASK-015",
+        "TASK-016"
+      ],
+      "tests": [
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-015",
+        "V-016"
+      ]
+    },
+    "REQ-003": {
+      "id": "REQ-003",
+      "legacy_id": "RF-003",
+      "title": "Estabelecer e manter X vizinhos TCP ou UDP",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Estabelecer uma ligação lógica bidirecional por vizinho permitido disponível; repetir tentativas para vizinhos indisponíveis e mostrar grau desejado/atual. X é configurável por nó e limitado pela topologia, não fixado em três.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-003",
+      "tasks": [
+        "TASK-005",
+        "TASK-006",
+        "TASK-007",
+        "TASK-010"
+      ],
+      "tests": [
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-010"
+      ]
+    },
+    "REQ-004": {
+      "id": "REQ-004",
+      "legacy_id": "RF-004",
+      "title": "Descobrir vizinhos por contacto conhecido",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Um nó iniciado apenas com configuração local e contacto bootstrap recebe os endpoints dos vizinhos permitidos, sem precisar de os fornecer na CLI. Por instrução explícita do utilizador (ADR-013), bootstrap só consulta a configuração e devolve essas localizações: sem registo vivo, leases, renovações, monitorização, avisos de saída ou cálculo/encaminhamento de rotas. Depois da descoberta, os nós comunicam e reconectam diretamente, mesmo com bootstrap parado.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-004",
+      "tasks": [
+        "TASK-003",
+        "TASK-006",
+        "TASK-007"
+      ],
+      "tests": [
+        "V-003",
+        "V-006",
+        "V-007"
+      ]
+    },
+    "REQ-005": {
+      "id": "REQ-005",
+      "legacy_id": "RF-005",
+      "title": "Manter tabela por fluxo com custo, origem, destinos e estado",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Expor snapshot de cada StreamKey com custo, upstream, conjunto de downstream e estado; mudanças num fluxo não alteram os restantes. Não limitar o modelo a uma única stream.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-005",
+      "tasks": [
+        "TASK-011",
+        "TASK-012",
+        "TASK-014",
+        "TASK-015"
+      ],
+      "tests": [
+        "V-011",
+        "V-012",
+        "V-014",
+        "V-015"
+      ]
+    },
+    "REQ-006": {
+      "id": "REQ-006",
+      "legacy_id": "RF-006",
+      "title": "Suportar caminhos alternativos",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Numa topologia com dois caminhos overlay até à mesma fonte, guardar alternativa válida e restabelecer receção após falha do upstream, quando a conectividade o permite.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-006",
+      "tasks": [
+        "TASK-011",
+        "TASK-012",
+        "TASK-016",
+        "TASK-026"
+      ],
+      "tests": [
+        "V-011",
+        "V-012",
+        "V-016",
+        "V-026"
+      ]
+    },
+    "REQ-007": {
+      "id": "REQ-007",
+      "legacy_id": "RF-007",
+      "title": "Servir vários clientes em simultâneo",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Dois clientes consomem a mesma stream e clientes diferentes consomem streams distintas sem interferência; parar um cliente não interrompe o outro.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-007",
+      "tasks": [
+        "TASK-014",
+        "TASK-015",
+        "TASK-021",
+        "TASK-024",
+        "TASK-027"
+      ],
+      "tests": [
+        "V-014",
+        "V-015",
+        "V-021",
+        "V-024",
+        "V-027"
+      ]
+    },
+    "REQ-008": {
+      "id": "REQ-008",
+      "legacy_id": "RF-008",
+      "title": "Monitorizar a rede overlay",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Medir RTT por vizinho com sondas correlacionadas, detetar falta de resposta e disponibilizar métricas datadas; não apresentar RTT TCP como perda de vídeo ou largura de banda disponível.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-008",
+      "tasks": [
+        "TASK-010",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-010",
+        "V-028"
+      ]
+    },
+    "REQ-009": {
+      "id": "REQ-009",
+      "legacy_id": "RF-009",
+      "title": "Atualizar rotas perante entradas, saídas e condições de rede",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Demonstrar recuperação após falha e regresso de relay, expiração de anúncios e troca de rota por aumento sustentado de RTT; partição produz estado UNAVAILABLE.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-009",
+      "tasks": [
+        "TASK-012",
+        "TASK-015",
+        "TASK-016",
+        "TASK-017",
+        "TASK-026"
+      ],
+      "tests": [
+        "V-012",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-026"
+      ]
+    },
+    "REQ-010": {
+      "id": "REQ-010",
+      "legacy_id": "RF-010",
+      "title": "Reencaminhar dados segundo a tabela",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Aceitar dados apenas do upstream ativo da stream e época corretos; enviar apenas para downstream ativos, uma vez por destino; stream desconhecida/inativa é descartada.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-010",
+      "tasks": [
+        "TASK-013",
+        "TASK-019",
+        "TASK-021"
+      ],
+      "tests": [
+        "V-013",
+        "V-019",
+        "V-021"
+      ]
+    },
+    "REQ-011": {
+      "id": "REQ-011",
+      "legacy_id": "RF-011",
+      "title": "Partilhar segmentos comuns e replicar nos pontos de ramificação",
+      "nature": "Obrigatório pelo comportamento descrito.",
+      "priority": "P0.",
+      "acceptance": "Em estado estável, dois clientes a jusante partilham uma única cópia de cada datagrama no segmento comum; a prova combina contadores e captura por ligação lógica.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-011",
+      "tasks": [
+        "TASK-014",
+        "TASK-015",
+        "TASK-021",
+        "TASK-025",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-014",
+        "V-015",
+        "V-021",
+        "V-025",
+        "V-028"
+      ]
+    },
+    "REQ-012": {
+      "id": "REQ-012",
+      "legacy_id": "RF-012",
+      "title": "Disponibilizar pelo menos dois servidores de conteúdos",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Executar dois processos de origem, em nós de teste identificados, com catálogos próprios e anúncios simultâneos; bootstrap não conta como servidor de vídeo.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-012",
+      "tasks": [
+        "TASK-003",
+        "TASK-012",
+        "TASK-020",
+        "TASK-024",
+        "TASK-027"
+      ],
+      "tests": [
+        "V-003",
+        "V-012",
+        "V-020",
+        "V-024",
+        "V-027"
+      ]
+    },
+    "REQ-013": {
+      "id": "REQ-013",
+      "legacy_id": "RF-013",
+      "title": "Cada servidor oferece pelo menos dois vídeos distintos",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Configurar quatro UUID e pelo menos dois conteúdos visualmente distintos em cada servidor; registar origem, ficheiro, hash e evidência de reprodução. Aliases do mesmo ficheiro não bastam.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-013",
+      "tasks": [
+        "TASK-003",
+        "TASK-020",
+        "TASK-024",
+        "TASK-027"
+      ],
+      "tests": [
+        "V-003",
+        "V-020",
+        "V-024",
+        "V-027"
+      ]
+    },
+    "REQ-014": {
+      "id": "REQ-014",
+      "legacy_id": "RF-014",
+      "title": "Usar métricas de rede para construir rotas",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "O custo é calculado de RTT medido e acumulado; alterar o atraso de um caminho pode alterar a seleção, após histerese documentada; saltos só desempata.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-014",
+      "tasks": [
+        "TASK-010",
+        "TASK-011",
+        "TASK-012",
+        "TASK-017",
+        "TASK-026"
+      ],
+      "tests": [
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-017",
+        "V-026"
+      ]
+    },
+    "REQ-015": {
+      "id": "REQ-015",
+      "legacy_id": "RF-015",
+      "title": "Entregar e reproduzir vídeo com objetivo de tempo real",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Receber vídeo identificável dos quatro fluxos e reproduzi-lo continuamente em cliente; demonstrar pacing, buffers limitados e descarte de frames atrasados. Limiares numéricos são metas técnicas, não promessas do PDF.",
+      "origin": "docs/02-REQUIREMENTS.md#rf-015",
+      "tasks": [
+        "TASK-019",
+        "TASK-020",
+        "TASK-021",
+        "TASK-022",
+        "TASK-023",
+        "TASK-024"
+      ],
+      "tests": [
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024"
+      ]
+    },
+    "NFR-001": {
+      "id": "NFR-001",
+      "legacy_id": "RNF-001",
+      "title": "Atraso baixo e utilização eficiente de largura de banda",
+      "nature": "Obrigatório qualitativo.",
+      "priority": "P0.",
+      "acceptance": "Medir RTT, FPS, interrupção, overhead e tráfego por segmento; comparar duas condições de rede e discutir limites. Não declarar garantia absoluta de ausência de perdas.",
+      "origin": "docs/02-REQUIREMENTS.md#rnf-001",
+      "tasks": [
+        "TASK-017",
+        "TASK-019",
+        "TASK-020",
+        "TASK-021",
+        "TASK-022",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-017",
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-028"
+      ]
+    },
+    "NFR-002": {
+      "id": "NFR-002",
+      "legacy_id": "RNF-002",
+      "title": "Escalabilidade para N clientes",
+      "nature": "Obrigatório qualitativo.",
+      "priority": "P0.",
+      "acceptance": "Comparar 1, 2 e 5 clientes na topologia complexa, com capacidade disponível, verificando que o tronco comum não cresce proporcionalmente ao número de clientes da mesma stream.",
+      "origin": "docs/02-REQUIREMENTS.md#rnf-002",
+      "tasks": [
+        "TASK-021",
+        "TASK-027",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-021",
+        "V-027",
+        "V-028"
+      ]
+    },
+    "NFR-003": {
+      "id": "NFR-003",
+      "legacy_id": "RNF-003",
+      "title": "Fiabilidade sob alterações e falhas",
+      "nature": "Obrigatório qualitativo.",
+      "priority": "P0.",
+      "acceptance": "Não bloquear permanentemente após falha de nó; recuperar com alternativa ou apresentar indisponibilidade; reconexão não mantém subscrições fantasma indefinidas.",
+      "origin": "docs/02-REQUIREMENTS.md#rnf-003",
+      "tasks": [
+        "TASK-008",
+        "TASK-015",
+        "TASK-016",
+        "TASK-017",
+        "TASK-022",
+        "TASK-026"
+      ],
+      "tests": [
+        "V-008",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-022",
+        "V-026"
+      ]
+    },
+    "NFR-004": {
+      "id": "NFR-004",
+      "legacy_id": "RNF-004",
+      "title": "Overlay aplicacional sobre transporte IP",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Os links overlay são sockets TCP/UDP entre processos; não usar multicast IP para substituir replicação aplicacional; distinguir caminho overlay de rota IP.",
+      "origin": "docs/02-REQUIREMENTS.md#rnf-004",
+      "tasks": [
+        "TASK-005",
+        "TASK-007",
+        "TASK-025"
+      ],
+      "tests": [
+        "V-005",
+        "V-007",
+        "V-025"
+      ]
+    },
+    "NFR-005": {
+      "id": "NFR-005",
+      "legacy_id": "RNF-005",
+      "title": "Especificação, implementação e avaliação crítica verificáveis",
+      "nature": "Obrigatório de avaliação.",
+      "priority": "P0.",
+      "acceptance": "Ligar desenho e contratos a implementação futura, testes e apreciação crítica; incluir evidências e limitações, sem resultados inventados.",
+      "origin": "docs/02-REQUIREMENTS.md#rnf-005",
+      "tasks": [
+        "TASK-002",
+        "TASK-004",
+        "TASK-009",
+        "TASK-018",
+        "TASK-028",
+        "TASK-029",
+        "TASK-031"
+      ],
+      "tests": [
+        "V-002",
+        "V-004",
+        "V-009",
+        "V-018",
+        "V-028",
+        "V-029",
+        "V-031"
+      ]
+    },
+    "CON-001": {
+      "id": "CON-001",
+      "legacy_id": "RC-001",
+      "title": "Usar CORE como bancada principal",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Validar solução integrada no CORE em cenários incrementalmente representativos, com ficheiros, endereços, processos e condições reproduzíveis.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-001",
+      "tasks": [
+        "TASK-025",
+        "TASK-026",
+        "TASK-027",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-025",
+        "V-026",
+        "V-027",
+        "V-028"
+      ]
+    },
+    "CON-002": {
+      "id": "CON-002",
+      "legacy_id": "RC-002",
+      "title": "Relatório em formato de artigo",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Produzir PDF em formato de artigo que descreva desenho, protocolos, implementação, testes, conclusões e crítica.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-002",
+      "tasks": [
+        "TASK-029"
+      ],
+      "tests": [
+        "V-029"
+      ]
+    },
+    "CON-003": {
+      "id": "CON-003",
+      "legacy_id": "RC-003",
+      "title": "Relatório com máximo de 12 páginas",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Contar todas as páginas do PDF final, incluindo referências e anexos incorporados; total até 12, salvo esclarecimento docente expresso.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-003",
+      "tasks": [
+        "TASK-029",
+        "TASK-030"
+      ],
+      "tests": [
+        "V-029",
+        "V-030"
+      ]
+    },
+    "CON-004": {
+      "id": "CON-004",
+      "legacy_id": "RC-004",
+      "title": "Arquivo de código ZIP ou RAR",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Gerar ZIP, opção proposta, que extrai e permite repetir build/testes com instruções; não omitir ficheiros/configurações necessários.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-004",
+      "tasks": [
+        "TASK-030"
+      ],
+      "tests": [
+        "V-030"
+      ]
+    },
+    "CON-005": {
+      "id": "CON-005",
+      "legacy_id": "RC-005",
+      "title": "Nomes de entrega com turno e grupo",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "Usar ESR-TP2-PLx-Gy-Rel.pdf e ESR-TP2-PLx-Gy-Codigo.zip; obter x/y reais antes da entrega, sem os inventar.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-005",
+      "tasks": [
+        "TASK-030",
+        "TASK-031"
+      ],
+      "tests": [
+        "V-030",
+        "V-031"
+      ]
+    },
+    "CON-006": {
+      "id": "CON-006",
+      "legacy_id": "RC-006",
+      "title": "Submeter na troca de ficheiros do grupo Blackboard",
+      "nature": "Obrigatório explícito.",
+      "priority": "P0.",
+      "acceptance": "A equipa submete os dois artefactos no grupo correto em elearning.uminho.pt e guarda confirmação; documentação não equivale a upload.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-006",
+      "tasks": [
+        "TASK-031"
+      ],
+      "tests": [
+        "V-031"
+      ]
+    },
+    "CON-007": {
+      "id": "CON-007",
+      "legacy_id": "RC-007",
+      "title": "Preparar duas avaliações intermédias e defesa final",
+      "nature": "Obrigatório de avaliação.",
+      "priority": "P0.",
+      "acceptance": "Preparar duas demonstrações intermédias reproduzíveis e defesa final, alinhando datas e conteúdo com o docente antes das sessões.",
+      "origin": "docs/02-REQUIREMENTS.md#rc-007",
+      "tasks": [
+        "TASK-009",
+        "TASK-018",
+        "TASK-031"
+      ],
+      "tests": [
+        "V-009",
+        "V-018",
+        "V-031"
+      ]
+    },
+    "REQ-016": {
+      "id": "REQ-016",
+      "legacy_id": "RP-001",
+      "title": "Catálogo e seleção explícita de stream",
+      "nature": "Decisão técnica proposta.",
+      "priority": "P1.",
+      "acceptance": "Mostrar UUID, título e origem dos anúncios ainda válidos; selecionar um fluxo sem confundir fontes.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-001",
+      "tasks": [
+        "TASK-003",
+        "TASK-012",
+        "TASK-023",
+        "TASK-024"
+      ],
+      "tests": [
+        "V-003",
+        "V-012",
+        "V-023",
+        "V-024"
+      ]
+    },
+    "REQ-017": {
+      "id": "REQ-017",
+      "legacy_id": "RP-002",
+      "title": "Ativar sob pedido e podar ramo sem recetores",
+      "nature": "Recomendação adotada.",
+      "priority": "P1.",
+      "acceptance": "Sem subscritores não há vídeo no ramo; dois clientes partilham uma ativação a montante; saída do último remove o ramo, por cancelamento ou expiração de lease.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-002",
+      "tasks": [
+        "TASK-014",
+        "TASK-015"
+      ],
+      "tests": [
+        "V-014",
+        "V-015"
+      ]
+    },
+    "REQ-018": {
+      "id": "REQ-018",
+      "legacy_id": "RP-003",
+      "title": "MJPEG, pacotes numerados e janela de reprodução",
+      "nature": "Estratégia sugerida adotada.",
+      "priority": "P1.",
+      "acceptance": "Validar o formato real de movie.Mjpeg antes de escrever o leitor; numerar frames, fragmentar/reconstituir e mostrar imagens numa janela. Pacote proposto não é declarado RTP.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-003",
+      "tasks": [
+        "TASK-019",
+        "TASK-020",
+        "TASK-022",
+        "TASK-023"
+      ],
+      "tests": [
+        "V-019",
+        "V-020",
+        "V-022",
+        "V-023"
+      ]
+    },
+    "REQ-019": {
+      "id": "REQ-019",
+      "legacy_id": "RP-004",
+      "title": "Diagnóstico do percurso antes do vídeo",
+      "nature": "Recomendação adotada.",
+      "priority": "P1.",
+      "acceptance": "Usar ROUTE_TRACE sintético e logs para comprovar o percurso selecionado sem depender da GUI ou de ficheiros de vídeo.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-004",
+      "tasks": [
+        "TASK-013"
+      ],
+      "tests": [
+        "V-013"
+      ]
+    },
+    "REQ-020": {
+      "id": "REQ-020",
+      "legacy_id": "RP-005",
+      "title": "Testar cenários de 4, 6 e overlay complexa",
+      "nature": "Cenários sugeridos adotados.",
+      "priority": "P1.",
+      "acceptance": "Demonstrar 4 e 6 processos overlay nos cenários simples e uma overlay complexa inspirada na figura 1, com extensão explícita para duas fontes.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-005",
+      "tasks": [
+        "TASK-025",
+        "TASK-026",
+        "TASK-027"
+      ],
+      "tests": [
+        "V-025",
+        "V-026",
+        "V-027"
+      ]
+    },
+    "REQ-021": {
+      "id": "REQ-021",
+      "legacy_id": "RP-006",
+      "title": "Código testável, entradas validadas e recursos limitados",
+      "nature": "Recomendação técnica.",
+      "priority": "P1.",
+      "acceptance": "Validar limites antes de alocar; injetar relógio/transportes nos testes; filas e caches têm máximo e política de overflow; não aceitar objetos Java serializados da rede.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-006",
+      "tasks": [
+        "TASK-001",
+        "TASK-003",
+        "TASK-004",
+        "TASK-005",
+        "TASK-007",
+        "TASK-010",
+        "TASK-011",
+        "TASK-014",
+        "TASK-019",
+        "TASK-021",
+        "TASK-022"
+      ],
+      "tests": [
+        "V-001",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-007",
+        "V-010",
+        "V-011",
+        "V-014",
+        "V-019",
+        "V-021",
+        "V-022"
+      ]
+    },
+    "REQ-022": {
+      "id": "REQ-022",
+      "legacy_id": "RP-007",
+      "title": "Adotar formato LNCS para o artigo",
+      "nature": "Recomendação adotada.",
+      "priority": "P2.",
+      "acceptance": "Usar template LNCS obtido de fonte oficial compatível; distinguir recomendação de formato de artigo obrigatório.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-007",
+      "tasks": [
+        "TASK-029"
+      ],
+      "tests": [
+        "V-029"
+      ]
+    },
+    "REQ-023": {
+      "id": "REQ-023",
+      "legacy_id": "RP-008",
+      "title": "Documentar comandos, logs e operação reproduzível",
+      "nature": "Recomendação técnica.",
+      "priority": "P1.",
+      "acceptance": "Guardar passos, versões, configuração e evidência correlacionada por stream e nó; validar instruções numa extração limpa do pacote.",
+      "origin": "docs/02-REQUIREMENTS.md#rp-008",
+      "tasks": [
+        "TASK-008",
+        "TASK-013",
+        "TASK-024",
+        "TASK-025",
+        "TASK-028",
+        "TASK-030"
+      ],
+      "tests": [
+        "V-008",
+        "V-013",
+        "V-024",
+        "V-025",
+        "V-028",
+        "V-030"
+      ]
+    },
+    "REQ-024": {
+      "id": "REQ-024",
+      "legacy_id": null,
+      "title": "Configuração operacional opcional, centralizada e validada",
+      "nature": "Decisão explícita do utilizador, resposta 2A",
+      "priority": "P1",
+      "acceptance": "Sem propriedades opcionais, usar os defaults de add.md; aceitar apenas chaves/papéis/tipos/intervalos e relações válidos, rejeitando o conjunto antes de sockets quando inválido. Uma substituição válida chega ao componente consumidor. Limites binários v1 não são parâmetros de afinação.",
+      "origin": "registo de aprovação 1A/2A/3B/4A em add.md, secção 13",
+      "tasks": [
+        "TASK-032"
+      ],
+      "tests": [
+        "V-032"
+      ]
+    },
+    "CON-008": {
+      "id": "CON-008",
+      "legacy_id": null,
+      "title": "Deteção automática de falhas limitada ao plano TCP",
+      "nature": "Decisão explícita do utilizador, resposta 3B",
+      "priority": "P1",
+      "acceptance": "Manter sondas TCP e falhas de transporte como gatilho de recuperação. Bloquear apenas UDP com TCP saudável deve ser demonstrado como limitação, sem garantir troca de parent ou recuperação automática. Contadores/descarte continuam observáveis.",
+      "origin": "registo de aprovação 1A/2A/3B/4A em add.md, secção 13",
+      "tasks": [
+        "TASK-010",
+        "TASK-016",
+        "TASK-026",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-010",
+        "V-016",
+        "V-026",
+        "V-028"
+      ]
+    },
+    "CON-009": {
+      "id": "CON-009",
+      "legacy_id": null,
+      "title": "Qualidade com ferramentas existentes, sem limiar percentual global",
+      "nature": "Decisão explícita do utilizador, resposta 4A",
+      "priority": "P1",
+      "acceptance": "Usar Maven/JUnit, validações documentais e cenários críticos; não introduzir CI, linter ou cobertura percentual global obrigatória nesta versão. Todas as verificações aplicáveis devem passar ou permanecer explicitamente pendentes.",
+      "origin": "registo de aprovação 1A/2A/3B/4A em add.md, secção 13",
+      "tasks": [
+        "TASK-001",
+        "TASK-004",
+        "TASK-005",
+        "TASK-032"
+      ],
+      "tests": [
+        "V-001",
+        "V-004",
+        "V-005",
+        "V-032"
+      ]
+    },
+    "INT-001": {
+      "id": "INT-001",
+      "legacy_id": null,
+      "title": "Concluir o serviço OTT segundo as fontes do projeto",
+      "nature": "Intent existente 001-ott-streaming",
+      "priority": "P1",
+      "acceptance": "Preservar o âmbito e os trabalhos concluídos, construir os incrementos em falta e validar a solução integrada, distinguindo conclusão técnica e submissão humana.",
+      "origin": "memory-bank/intents/001-ott-streaming/requirements.md",
+      "tasks": [
+        "TASK-001",
+        "TASK-024",
+        "TASK-027",
+        "TASK-031"
+      ],
+      "tests": [
+        "V-001",
+        "V-024",
+        "V-027",
+        "V-031"
+      ]
+    },
+    "INT-002": {
+      "id": "INT-002",
+      "legacy_id": null,
+      "title": "Architecture Decision Document mestre e execução rastreável por Construction",
+      "nature": "Pedido atual do utilizador e respostas 1A/2A/3B/4A",
+      "priority": "P1",
+      "acceptance": "add.md contém as 13 secções pedidas, todas as ADR com driver/alternativa/consequência/validação, matriz sem órfãos e tarefas S/M executáveis por sessão. Bolts consultam o ADD e não contêm decisões concorrentes.",
+      "origin": "registo de aprovação 1A/2A/3B/4A em add.md, secção 13",
+      "tasks": [
+        "TASK-032"
+      ],
+      "tests": [
+        "V-ADD",
+        "V-032"
+      ]
+    }
+  },
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "title": "Java 21 e Maven",
+      "status": "Aceite",
+      "drivers": [
+        "NFR-004",
+        "REQ-021"
+      ],
+      "context": "A base já usa Java release 21 e Maven; a linguagem é livre no PDF.",
+      "decision": "Manter Java 21 e o POM existente, sem dependências runtime novas; JUnit apenas em testes.",
+      "alternatives": "Python: obriga a descartar base/testes sem necessidade do enunciado.",
+      "consequences": "Reutiliza trabalho e biblioteca padrão; exige JDK 21 e java.desktop no ambiente CORE.",
+      "components": [
+        "config",
+        "protocol",
+        "transport",
+        "app"
+      ],
+      "files": [
+        "Projeto/pom.xml"
+      ],
+      "source_tasks": [
+        "TASK-001",
+        "TASK-025"
+      ],
+      "tests": [
+        "V-001",
+        "V-025"
+      ]
+    },
+    {
+      "id": "ADR-002",
+      "title": "TCP de controlo e UDP de vídeo",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-003",
+        "REQ-015",
+        "NFR-001"
+      ],
+      "context": "Sinalização precisa de ordem; vídeo privilegia atualidade em vez de entrega tardia.",
+      "decision": "Usar TCP full-duplex persistente entre vizinhos e datagramas UDP próprios para vídeo; bootstrap usa consulta TCP curta.",
+      "alternatives": "Tudo TCP: retransmissões/filas propagam atraso de vídeo. Tudo UDP: exige fiabilidade própria para controlo.",
+      "consequences": "Dois endpoints e tratamento explícito de perda/reordenação; UDP não garante qualidade ou entrega.",
+      "components": [
+        "transport",
+        "streaming",
+        "client"
+      ],
+      "files": [
+        "transport/Transport.java",
+        "streaming/StreamPacket.java"
+      ],
+      "source_tasks": [
+        "TASK-005",
+        "TASK-019",
+        "TASK-021",
+        "TASK-022"
+      ],
+      "tests": [
+        "V-005",
+        "V-019",
+        "V-021",
+        "V-022"
+      ]
+    },
+    {
+      "id": "ADR-003",
+      "title": "Bootstrap por grafo permitido — registo histórico",
+      "status": "Substituída",
+      "drivers": [
+        "REQ-004"
+      ],
+      "context": "A opção original foi refinada pela instrução explícita que limita o bootstrap.",
+      "decision": "Esta entrada deixa de orientar implementação; aplicar ADR-013, que mantém grafo configurado e exclui membership vivo.",
+      "alternatives": "Registo central com leases: contraria a correção explícita do utilizador.",
+      "consequences": "Preserva histórico sem dois contratos concorrentes de descoberta.",
+      "components": [
+        "bootstrap"
+      ],
+      "files": [
+        "bootstrap/BootstrapServer.java"
+      ],
+      "source_tasks": [
+        "TASK-006"
+      ],
+      "tests": [
+        "V-006"
+      ]
+    },
+    {
+      "id": "ADR-004",
+      "title": "Anúncios path vector e custo RTT",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-005",
+        "REQ-006",
+        "REQ-014",
+        "NFR-003",
+        "REQ-016",
+        "REQ-019"
+      ],
+      "context": "Existem caminhos alternativos e um anúncio melhor pode chegar depois do primeiro.",
+      "decision": "Guardar candidato por vizinho/stream; somar RTT EWMA, desempatar por saltos e ID; reenviar primeira chegada e melhorias estritas da geração.",
+      "alternatives": "Saltos apenas: ignora variação de atraso. Link-state global/Dijkstra: requer disseminação e estado globais adicionais.",
+      "consequences": "Paths/cache aumentam estado; prefixos têm de ser validados na ativação. RTT não mede capacidade ou perda UDP.",
+      "components": [
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "files": [
+        "monitoring/NetworkMonitor.java",
+        "routing/RoutingService.java",
+        "routing/RoutingTable.java"
+      ],
+      "source_tasks": [
+        "TASK-010",
+        "TASK-011",
+        "TASK-012",
+        "TASK-013"
+      ],
+      "tests": [
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-013"
+      ]
+    },
+    {
+      "id": "ADR-005",
+      "title": "Árvores sob procura, ACK, revisões e leases",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-007",
+        "REQ-011",
+        "REQ-017",
+        "NFR-003",
+        "REQ-010",
+        "NFR-002"
+      ],
+      "context": "Clientes partilham troncos; crashes e mensagens atrasadas não podem deixar ramos fantasma.",
+      "decision": "Manter um upstream confirmado e conjuntos de downstream/consumidores por stream; ativar só após ACK compatível, renovar e podar procura agregada.",
+      "alternatives": "Subscrição por cliente final a montante duplica tráfego; só DEACTIVATE sem lease não limpa crashes.",
+      "consequences": "Mais estados e correlação; tráfego transitório nos dois ramos é permitido numa troca confirmada, cópia única em estado estável.",
+      "components": [
+        "routing"
+      ],
+      "files": [
+        "routing/Route.java",
+        "routing/Subscription.java",
+        "routing/RoutingService.java"
+      ],
+      "source_tasks": [
+        "TASK-014",
+        "TASK-015",
+        "TASK-016",
+        "TASK-017"
+      ],
+      "tests": [
+        "V-014",
+        "V-015",
+        "V-016",
+        "V-017"
+      ]
+    },
+    {
+      "id": "ADR-006",
+      "title": "MJPEG independente, UDP próprio e Swing",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-015",
+        "REQ-018"
+      ],
+      "context": "Perfil docente confirmado usa cinco dígitos ASCII seguidos de JPEG; o PDF não impõe RTP.",
+      "decision": "Ler esse perfil com limites, usar frames independentes e player Swing; relays reenviam bytes sem descodificar JPEG.",
+      "alternatives": "RTP completo/RTSP: compatibilidade não exigida e trabalho extra. Codecs interframe: dependências e recuperação mais complexas.",
+      "consequences": "Mais banda; um fragmento perdido pode descartar o frame. GUI real e quatro conteúdos continuam obrigatórios na demonstração adotada.",
+      "components": [
+        "server",
+        "streaming",
+        "client"
+      ],
+      "files": [
+        "server/VideoSource.java",
+        "client/VideoPlayer.java"
+      ],
+      "source_tasks": [
+        "TASK-019",
+        "TASK-020",
+        "TASK-021",
+        "TASK-022",
+        "TASK-023",
+        "TASK-024"
+      ],
+      "tests": [
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024"
+      ]
+    },
+    {
+      "id": "ADR-007",
+      "title": "Propriedades UTF-8 e binário sem dependências runtime",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-021",
+        "NFR-004"
+      ],
+      "context": "Não existe obrigação JSON; as propriedades e o codec já estão implementados.",
+      "decision": "Manter .properties para configuração e tipos binários explícitos para controlo/dados; nunca ObjectInputStream da rede.",
+      "alternatives": "JSON com biblioteca externa é viável, mas acrescenta dependência sem satisfazer necessidade adicional.",
+      "consequences": "Contratos e validações próprios têm de ser testados; propriedades operacionais são estendidas por ADR-016.",
+      "components": [
+        "config",
+        "protocol"
+      ],
+      "files": [
+        "config/ConfigurationLoader.java",
+        "protocol/MessageCodec.java"
+      ],
+      "source_tasks": [
+        "TASK-003",
+        "TASK-004",
+        "TASK-019",
+        "TASK-032"
+      ],
+      "tests": [
+        "V-003",
+        "V-004",
+        "V-019",
+        "V-032"
+      ]
+    },
+    {
+      "id": "ADR-008",
+      "title": "Testes incrementais e aceitação no CORE",
+      "status": "Aceite",
+      "drivers": [
+        "NFR-005",
+        "CON-001",
+        "REQ-020",
+        "REQ-021"
+      ],
+      "context": "Documentação ou build sem testes não demonstram interações distribuídas.",
+      "decision": "Validar cada incremento com oráculo próprio, integração progressiva, GUI e os três cenários CORE antes de alegar conclusão integrada.",
+      "alternatives": "Testar só no fim aumenta custo de diagnóstico; usar só loopback não comprova a bancada requerida.",
+      "consequences": "Mais recolha de evidência; permite separar erro local, controlo, vídeo e underlay.",
+      "components": [
+        "tests",
+        "experiments"
+      ],
+      "files": [
+        "Projeto/src/test/java",
+        "CORE/topologies",
+        "experiments/"
+      ],
+      "source_tasks": [
+        "TASK-001",
+        "TASK-004",
+        "TASK-005",
+        "TASK-009",
+        "TASK-018",
+        "TASK-024",
+        "TASK-025",
+        "TASK-026",
+        "TASK-027",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-001",
+        "V-004",
+        "V-005",
+        "V-009",
+        "V-018",
+        "V-024",
+        "V-025",
+        "V-026",
+        "V-027",
+        "V-028"
+      ]
+    },
+    {
+      "id": "ADR-009",
+      "title": "Fixtures independentes e perfil confirmado",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-018",
+        "REQ-021",
+        "NFR-005"
+      ],
+      "context": "O encoder não pode ser o oráculo dos próprios bytes; extensão Mjpeg não define container por si.",
+      "decision": "Preservar as 45 fixtures e manifesto como referências independentes e o perfil de cinco dígitos; interpretar os tipos atuais com ADR-013.",
+      "alternatives": "Gerar expected bytes com o encoder esconde erros simétricos; presumir JPEG sem prefixos contradiz os bytes observados.",
+      "consequences": "Alterações legítimas de contrato requerem revisão de fixtures/proveniência; dados sintéticos UDP não provam JPEG ou reprodução.",
+      "components": [
+        "protocol",
+        "server",
+        "tests"
+      ],
+      "files": [
+        "Projeto/src/test/resources/protocol",
+        "server/VideoSource.java"
+      ],
+      "source_tasks": [
+        "TASK-002",
+        "TASK-004",
+        "TASK-019",
+        "TASK-020"
+      ],
+      "tests": [
+        "V-002",
+        "V-004",
+        "V-019",
+        "V-020"
+      ]
+    },
+    {
+      "id": "ADR-010",
+      "title": "Carga estrita e configuração imutável",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-001",
+        "REQ-004",
+        "REQ-012",
+        "REQ-013",
+        "REQ-021"
+      ],
+      "context": "Erros de grafo, UUID e endpoints devem falhar antes de abrir sockets.",
+      "decision": "Rejeitar chaves desconhecidas/duplicadas/inaplicáveis, validar deployment e devolver records/cópias imutáveis com erros agregados; estender apenas as chaves de ADR-016.",
+      "alternatives": "Defaults implícitos para identidades/portas ou aceitação permissiva ocultam erro e colisões.",
+      "consequences": "Carga offline não comprova DNS, IP local, symlinks reais ou conteúdo de vídeos.",
+      "components": [
+        "config"
+      ],
+      "files": [
+        "config/ConfigurationLoader.java",
+        "config/NodeConfiguration.java"
+      ],
+      "source_tasks": [
+        "TASK-003",
+        "TASK-032"
+      ],
+      "tests": [
+        "V-003",
+        "V-032"
+      ]
+    },
+    {
+      "id": "ADR-011",
+      "title": "Reutilizar os XML CORE existentes",
+      "status": "Aceite",
+      "drivers": [
+        "CON-001",
+        "REQ-020",
+        "NFR-004"
+      ],
+      "context": "O utilizador já escolheu os cenários existentes; overlay não é cópia de links IP.",
+      "decision": "Reutilizar cenario1/2/3.xml, mapear processos/IP/portas e só adaptar o mínimo se uma limitação concreta o exigir, preservando o original.",
+      "alternatives": "Gerar outras topologias por defeito descarta preparação e pode confundir underlay/overlay.",
+      "consequences": "Relays podem correr em routers Linux do CORE; IPs e diversidade de caminhos têm de ser verificados em execução.",
+      "components": [
+        "CORE",
+        "experiments"
+      ],
+      "files": [
+        "CORE/topologies/cenario1.xml",
+        "CORE/topologies/cenario2.xml",
+        "CORE/topologies/cenario3.xml"
+      ],
+      "source_tasks": [
+        "TASK-025",
+        "TASK-026",
+        "TASK-027"
+      ],
+      "tests": [
+        "V-025",
+        "V-026",
+        "V-027"
+      ]
+    },
+    {
+      "id": "ADR-012",
+      "title": "Codec separado de transporte e contexto",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-021",
+        "NFR-005"
+      ],
+      "context": "O stream TCP pode fragmentar/juntar mensagens; formato válido não autoriza uma operação.",
+      "decision": "Preservar framing 37..65536, UTF-8 estrito, IDs explícitos e distinção EOF limpo/truncatura/formato; handlers verificam identidade, caminhos e estado.",
+      "alternatives": "Misturar codec e sockets dificulta testar bytes; usar writeUTF ou ordinal altera o contrato.",
+      "consequences": "Codec e runtime têm testes e responsabilidades distintos; 16 tipos ativos e código 3 rejeitado.",
+      "components": [
+        "protocol",
+        "transport",
+        "overlay"
+      ],
+      "files": [
+        "protocol/MessageCodec.java",
+        "protocol/ControlMessage.java"
+      ],
+      "source_tasks": [
+        "TASK-004",
+        "TASK-005",
+        "TASK-007"
+      ],
+      "tests": [
+        "V-004",
+        "V-005",
+        "V-007"
+      ]
+    },
+    {
+      "id": "ADR-013",
+      "title": "Bootstrap só para localização inicial",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-004",
+        "REQ-002",
+        "INT-001"
+      ],
+      "context": "Instrução explícita anterior do utilizador retirou renovação e estado vivo do bootstrap.",
+      "decision": "REGISTER/REGISTER_OK consultam grafo imutável, incluindo offline com instanceId zero; responder e fechar. Não guardar membros, leases, sondas, saída ou rotas.",
+      "alternatives": "Membership central com heartbeat/lease volta a criar a dependência operacional que foi excluída.",
+      "consequences": "Nós com lista conservada reconectam sem bootstrap; novos processos sem lista precisam da descoberta inicial.",
+      "components": [
+        "bootstrap",
+        "overlay"
+      ],
+      "files": [
+        "bootstrap/BootstrapServer.java",
+        "overlay/NeighborManager.java"
+      ],
+      "source_tasks": [
+        "TASK-006",
+        "TASK-007",
+        "TASK-008",
+        "TASK-009"
+      ],
+      "tests": [
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-009"
+      ]
+    },
+    {
+      "id": "ADR-014",
+      "title": "TCP assíncrono com recursos limitados",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-003",
+        "REQ-021",
+        "NFR-003"
+      ],
+      "context": "O transporte existente usa leitor/escritor exclusivos e queues limitadas.",
+      "decision": "Manter dials assíncronos, ordem de callbacks por ligação, reservas limitadas e shutdown com deadline; send=ACCEPTED continua a significar enfileiramento.",
+      "alternatives": "Escritas bloqueantes no handler ou filas ilimitadas comprometem progresso e memória.",
+      "consequences": "Overflow fecha só a ligação afetada; threads virtuais não dispensam limites; timeout/callback preso devem ser explícitos.",
+      "components": [
+        "transport"
+      ],
+      "files": [
+        "transport/Connection.java",
+        "transport/Transport.java"
+      ],
+      "source_tasks": [
+        "TASK-005",
+        "TASK-006",
+        "TASK-008"
+      ],
+      "tests": [
+        "V-005",
+        "V-006",
+        "V-008"
+      ]
+    },
+    {
+      "id": "ADR-015",
+      "title": "Confirmação assíncrona de escrita da resposta",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-004",
+        "REQ-021",
+        "NFR-003"
+      ],
+      "context": "Fechar depois de send=ACCEPTED pode descartar a resposta do bootstrap.",
+      "decision": "Adicionar Connection.sendAndFlush(ControlMessage): CompletableFuture<Void>; concluir no escritor após write/flush completos e só então fechar a consulta, com prazo finito.",
+      "alternatives": "Esperar por queuedMessages=0 não prova escrita; bloquear callback pode impedir progresso. Um novo ACK remoto não é necessário para esta garantia local.",
+      "consequences": "Falha/overflow/close/shutdown terminam futures; cancelamento não promete desfazer bytes já enviados. Escrita concluída não é entrega/ACK remoto.",
+      "components": [
+        "transport",
+        "bootstrap"
+      ],
+      "files": [
+        "transport/Connection.java",
+        "bootstrap/BootstrapServer.java"
+      ],
+      "source_tasks": [
+        "TASK-006"
+      ],
+      "tests": [
+        "V-005",
+        "V-006"
+      ]
+    },
+    {
+      "id": "ADR-016",
+      "title": "Parâmetros centrais e overrides validados",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-024",
+        "REQ-021",
+        "NFR-001",
+        "INT-002"
+      ],
+      "context": "A resposta 2A aprovou corrigir a ausência de parametrização no loader.",
+      "decision": "Adicionar RuntimeConfiguration imutável, defaults e chaves do secção 6.3; aplicar validação de tipos/papéis/relações antes de sockets e injetar valores nos consumidores.",
+      "alternatives": "Constantes dispersas exigem recompilar experiências; propriedades permissivas ou wire limits configuráveis permitem estados incompatíveis.",
+      "consequences": "Nova tarefa TASK-032 e regressão dos perfis antigos; afinação não altera formatos v1, identidade ou hard caps.",
+      "components": [
+        "config",
+        "app",
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "files": [
+        "config/RuntimeConfiguration.java",
+        "config/ConfigurationLoader.java",
+        "config/NodeConfiguration.java",
+        "app/OttApplication.java"
+      ],
+      "source_tasks": [
+        "TASK-032",
+        "TASK-008",
+        "TASK-010",
+        "TASK-017",
+        "TASK-021",
+        "TASK-022"
+      ],
+      "tests": [
+        "V-032",
+        "V-008",
+        "V-010",
+        "V-017",
+        "V-021",
+        "V-022"
+      ]
+    },
+    {
+      "id": "ADR-017",
+      "title": "Um projeto com componentes e proprietário serial do estado",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-001",
+        "REQ-005",
+        "NFR-004",
+        "REQ-021"
+      ],
+      "context": "Vizinhos, rotas e subscrições são alterados por eventos concorrentes.",
+      "decision": "Manter um JAR/processos por papel e os pacotes atuais; um executor serial por nó possui o estado e publica snapshots imutáveis para UDP.",
+      "alternatives": "Microserviços ou locks em todos os handlers acrescentam coordenação sem necessidade; mutação direta por I/O cria corridas.",
+      "consequences": "Fila de eventos é limitada e callbacks não bloqueiam; saturação é erro operacional observado.",
+      "components": [
+        "app",
+        "overlay",
+        "routing",
+        "streaming"
+      ],
+      "files": [
+        "app/OttApplication.java",
+        "overlay/OverlayNode.java",
+        "routing/RoutingTable.java"
+      ],
+      "source_tasks": [
+        "TASK-008",
+        "TASK-011",
+        "TASK-021"
+      ],
+      "tests": [
+        "V-008",
+        "V-011",
+        "V-021"
+      ]
+    },
+    {
+      "id": "ADR-018",
+      "title": "Estado volátil e identidades por stream/execução",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-005",
+        "REQ-012",
+        "REQ-013",
+        "NFR-003"
+      ],
+      "context": "Um reinício não pode reativar dados, rotas ou subscrições de uma execução anterior.",
+      "decision": "Guardar estado operacional só em memória; nodeId é estável, instanceId/connectionId e serverEpoch distinguem execuções; streamId separa sequências, árvores e buffers.",
+      "alternatives": "Persistir rotas/leases exige recuperação transacional e pode restaurar estado obsoleto; usar título como chave causa colisões.",
+      "consequences": "Reinício reconstrói estado e interrompe a stream dessa origem; a época é comum às streams da mesma origem, mas nunca chave única de dedup.",
+      "components": [
+        "config",
+        "overlay",
+        "routing",
+        "streaming"
+      ],
+      "files": [
+        "overlay/Neighbor.java",
+        "routing/Route.java",
+        "streaming/StreamPacket.java"
+      ],
+      "source_tasks": [
+        "TASK-007",
+        "TASK-011",
+        "TASK-012",
+        "TASK-014",
+        "TASK-022"
+      ],
+      "tests": [
+        "V-007",
+        "V-011",
+        "V-012",
+        "V-014",
+        "V-022"
+      ]
+    },
+    {
+      "id": "ADR-019",
+      "title": "Handshake, iniciador determinístico e reconexão direta",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "NFR-003"
+      ],
+      "context": "Arranques simultâneos e callbacks de ligações antigas podem duplicar ou apagar vizinhos.",
+      "decision": "Só o menor nodeId inicia o canal; HELLO valida grafo/endpoint/instância; uma conexão confirmada por par, retries com backoff/jitter e comparação de connectionId/instanceId.",
+      "alternatives": "Primeiro socket que chega é não determinístico; nova consulta bootstrap a cada falha contraria ADR-013.",
+      "consequences": "Nova instância exige renegociar subscrições. Um ID já vivo não é resolvido por registo central ou autenticação criptográfica.",
+      "components": [
+        "overlay",
+        "transport"
+      ],
+      "files": [
+        "overlay/NeighborManager.java",
+        "overlay/Neighbor.java"
+      ],
+      "source_tasks": [
+        "TASK-007",
+        "TASK-008"
+      ],
+      "tests": [
+        "V-007",
+        "V-008"
+      ]
+    },
+    {
+      "id": "ADR-020",
+      "title": "Erros tipados, falhas locais e shutdown limitado",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-021",
+        "NFR-003",
+        "REQ-001"
+      ],
+      "context": "Entrada inválida ou peer lento não deve matar o nó nem bloquear outras streams.",
+      "decision": "Usar os códigos de erro existentes, correlação requestId e razões locais; configurar antes de sockets, isolar falhas de ligação/stream e encerrar recursos com prazo.",
+      "alternatives": "Exceções/stack traces na rede expõem detalhes e não são contrato; retries ou joins ilimitados impedem terminação.",
+      "consequences": "Sem resposta ERROR se o envelope for inseguro; intenção de consumo sobrevive a indisponibilidade, não a subscrição de uma conexão morta.",
+      "components": [
+        "protocol",
+        "transport",
+        "app",
+        "routing",
+        "client"
+      ],
+      "files": [
+        "protocol/ErrorCode.java",
+        "transport/Connection.java",
+        "app/OttApplication.java"
+      ],
+      "source_tasks": [
+        "TASK-004",
+        "TASK-005",
+        "TASK-008",
+        "TASK-016",
+        "TASK-024"
+      ],
+      "tests": [
+        "V-004",
+        "V-005",
+        "V-008",
+        "V-016",
+        "V-024"
+      ]
+    },
+    {
+      "id": "ADR-021",
+      "title": "Segurança de laboratório e validação de fronteiras",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-021",
+        "CON-001",
+        "NFR-003"
+      ],
+      "context": "O âmbito é laboratório controlado; não há exigência de contas/TLS.",
+      "decision": "Validar allowlist/contexto HELLO, endpoints UDP, paths de media e comprimentos antes de alocar; não alegar autenticação criptográfica ou confidencialidade.",
+      "alternatives": "TLS/contas/chaves próprias acrescentam âmbito; confiar cegamente em mensagens compromete consistência e recursos.",
+      "consequences": "Spoofing em rede hostil fica por resolver; exposição pública exige nova ADR. Bootstrap sem membresia e dados UDP não criam autorização.",
+      "components": [
+        "config",
+        "overlay",
+        "streaming",
+        "server"
+      ],
+      "files": [
+        "config/ConfigurationLoader.java",
+        "overlay/NeighborManager.java",
+        "streaming/StreamForwarder.java",
+        "server/VideoSource.java"
+      ],
+      "source_tasks": [
+        "TASK-003",
+        "TASK-007",
+        "TASK-019",
+        "TASK-020",
+        "TASK-021"
+      ],
+      "tests": [
+        "V-003",
+        "V-007",
+        "V-019",
+        "V-020",
+        "V-021"
+      ]
+    },
+    {
+      "id": "ADR-022",
+      "title": "Observabilidade local e experiências reproduzíveis",
+      "status": "Aceite",
+      "drivers": [
+        "NFR-005",
+        "REQ-008",
+        "REQ-023"
+      ],
+      "context": "É necessário distinguir RTT, perda de datagramas, frame incompleto e frame não mostrado.",
+      "decision": "Registar eventos com nó/instância/stream/request, custos e motivo de troca; expor snapshots de métricas/counters e recolher manifestos RUN-ID, CSV e capturas nas experiências.",
+      "alternatives": "Usar apenas FPS visual não atribui causas; uma stack externa de métricas acrescenta dependências sem requisito.",
+      "consequences": "Contadores acumulados precisam de deltas; capturas underlay não contam como transmissões overlay distintas. Sem relógio comum não medir atraso unidirecional.",
+      "components": [
+        "monitoring",
+        "app",
+        "streaming",
+        "experiments"
+      ],
+      "files": [
+        "monitoring/LinkMetrics.java",
+        "app/OttApplication.java",
+        "streaming/StreamForwarder.java",
+        "experiments/"
+      ],
+      "source_tasks": [
+        "TASK-008",
+        "TASK-010",
+        "TASK-013",
+        "TASK-021",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-008",
+        "V-010",
+        "V-013",
+        "V-021",
+        "V-028"
+      ]
+    },
+    {
+      "id": "ADR-023",
+      "title": "Entrega reproduzível, artigo e integração Git",
+      "status": "Aceite",
+      "drivers": [
+        "CON-002",
+        "CON-003",
+        "CON-004",
+        "CON-005",
+        "CON-006",
+        "CON-007",
+        "REQ-022",
+        "REQ-023"
+      ],
+      "context": "A entrega tem formato/nome/reprodução próprios e revisão da equipa.",
+      "decision": "Produzir artigo até 12 páginas com LNCS adotado, ZIP validado por extração limpa e nomes reais; preservar revisão por TASK e base comum; upload é humano.",
+      "alternatives": "Só entregar JAR omite fontes/configuração; upload automatizado exige credenciais e não substitui confirmação. Trabalhar todos no mesmo checkout mistura alterações.",
+      "consequences": "Gates de PL/grupo/prazo/créditos e submissão permanecem. Branches sugeridas por TASK; commits só quando autorizados.",
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "files": [
+        "README.md",
+        "docs/team/00-COORDINATION.md",
+        "experiments/"
+      ],
+      "source_tasks": [
+        "TASK-009",
+        "TASK-018",
+        "TASK-029",
+        "TASK-030",
+        "TASK-031"
+      ],
+      "tests": [
+        "V-009",
+        "V-018",
+        "V-029",
+        "V-030",
+        "V-031"
+      ]
+    },
+    {
+      "id": "ADR-024",
+      "title": "ADD mestre e incrementos atómicos rastreáveis",
+      "status": "Aceite",
+      "drivers": [
+        "INT-001",
+        "INT-002",
+        "NFR-005"
+      ],
+      "context": "As decisões estavam distribuídas e alguns bolts agregavam tarefas extensas.",
+      "decision": "Construction consulta add.md primeiro; executar uma tarefa IMP S/M por bolt, com dependências, decisões e critérios explícitos; manter aliases TASK/REQ e atualizar índices/validador.",
+      "alternatives": "Manter documentos e bolts como autoridades paralelas permite divergência; renumerar os IDs existentes quebra referências.",
+      "consequences": "Mais incrementos e índices derivados; decisões inviáveis exigem parar a parte afetada, propor substituição e aguardar aprovação, sem alterar silenciosamente o âmbito.",
+      "components": [
+        "planning"
+      ],
+      "files": [
+        "add.md",
+        "specs.md",
+        "memory-bank/bolts",
+        "scripts/validate-planning.py"
+      ],
+      "source_tasks": [
+        "TASK-001",
+        "TASK-032"
+      ],
+      "tests": [
+        "V-ADD",
+        "V-032"
+      ]
+    },
+    {
+      "id": "ADR-025",
+      "title": "Sem recuperação automática de falha exclusiva UDP",
+      "status": "Aceite",
+      "drivers": [
+        "CON-008",
+        "REQ-008",
+        "REQ-009"
+      ],
+      "context": "Resposta 3B: o controlo TCP pode estar saudável enquanto dados UDP se perdem.",
+      "decision": "Manter deteção por TCP/sondas; testar bloqueio apenas UDP como limitação assumida. Não adicionar watchdog, feedback de vídeo ou novas mensagens para rerouting.",
+      "alternatives": "Deteção de silêncio UDP poderia recuperar mais falhas, mas exigiria política de falsos positivos e novo mecanismo fora da opção aprovada.",
+      "consequences": "Pode ocorrer interrupção indefinida de vídeo com parent TCP ativo. Descarte/counters não significam recuperação; resultado deve constar da avaliação.",
+      "components": [
+        "monitoring",
+        "routing",
+        "experiments"
+      ],
+      "files": [
+        "monitoring/NetworkMonitor.java",
+        "docs/tasks/PHASE-06/TASK-026.md"
+      ],
+      "source_tasks": [
+        "TASK-010",
+        "TASK-016",
+        "TASK-026",
+        "TASK-028"
+      ],
+      "tests": [
+        "V-010",
+        "V-016",
+        "V-026",
+        "V-028"
+      ]
+    },
+    {
+      "id": "ADR-026",
+      "title": "Qualidade sem ferramentas ou limiar percentual novos",
+      "status": "Aceite",
+      "drivers": [
+        "CON-009",
+        "REQ-021",
+        "NFR-005"
+      ],
+      "context": "Resposta 4A mantém a estratégia existente; o enunciado não fixa percentagem de cobertura.",
+      "decision": "Usar Maven/JUnit e validação de artefactos/casos críticos. Não introduzir CI, linter dedicado ou limiar global de cobertura nesta versão.",
+      "alternatives": "JaCoCo/linters/CI podem ajudar, mas criam configuração/manutenção e não foram escolhidos para este âmbito.",
+      "consequences": "Execuções e evidência têm de ser feitas/registadas; ausência de pipeline não dispensa regressão, revisão, GUI ou CORE.",
+      "components": [
+        "tests",
+        "planning"
+      ],
+      "files": [
+        "Projeto/pom.xml",
+        "scripts/validate-planning.py"
+      ],
+      "source_tasks": [
+        "TASK-001",
+        "TASK-004",
+        "TASK-005",
+        "TASK-032"
+      ],
+      "tests": [
+        "V-001",
+        "V-004",
+        "V-005",
+        "V-032",
+        "V-ADD"
+      ]
+    }
+  ],
+  "implementation_tasks": [
+    {
+      "id": "IMP-001",
+      "bolt": "001-base-validada",
+      "unit": "001-base-validada",
+      "source_tasks": [
+        "TASK-001",
+        "TASK-002",
+        "TASK-003",
+        "TASK-004",
+        "TASK-005"
+      ],
+      "part": null,
+      "title": "Verificar a base herdada",
+      "requires_bolts": [],
+      "requirements": [
+        "CON-009",
+        "INT-001",
+        "INT-002",
+        "NFR-004",
+        "NFR-005",
+        "REQ-001",
+        "REQ-003",
+        "REQ-004",
+        "REQ-012",
+        "REQ-013",
+        "REQ-016",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-001",
+        "ADR-002",
+        "ADR-007",
+        "ADR-008",
+        "ADR-009",
+        "ADR-010",
+        "ADR-012",
+        "ADR-014",
+        "ADR-020",
+        "ADR-021",
+        "ADR-024",
+        "ADR-026"
+      ],
+      "test_ids": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-ADD"
+      ],
+      "tests": [
+        "V-001: inspeção do POM efetivo e build limpo com release 21; verificar engine escolhido. Zero testes nesta base não valida funcionalidades; repetir descoberta real em V-003.",
+        "V-002: revisão independente dos comprimentos, offsets, exemplos de identidade e tabela de requisitos; evidência de acesso ou falha de recurso, sem execução de streaming.",
+        "V-003: fixtures válidas/invalidas com diretório temporário, paths fora do cwd, ID de um carácter e quatro streams; Maven reporta testes executados e falha perante um requisito de configuração violado.",
+        "V-004: golden bytes para HELLO/ANNOUNCE/ACTIVATE/ERROR e descoberta, round-trip dos 16 tipos ativos, leituras parciais, concatenação e rejeições sem alocação não limitada. Rejeitar código 3, layout antigo de resposta com lease e vizinhos com instância viva na resposta bootstrap.",
+        "V-005: dois endpoints loopback com portas efémeras trocam mensagens simultâneas intactas; parar um gera evento único; reconexão e saturação não deixam threads/sockets abertos."
+      ],
+      "criteria": [
+        "Confirmar componentes reais e manter TASK-001–005 DONE, sem os reimplementar.",
+        "Conferir 45 fixtures, 16 tipos ativos e o ADD/specs/DAG antes de libertar nova construção.",
+        "Executar a regressão existente no ambiente de Construction, guardando um novo log; 149 é total histórico, não resultado atual."
+      ],
+      "files": [
+        "Projeto/pom.xml",
+        "Projeto/src/main/java/pt/uminho/esr/ott/config/",
+        "Projeto/src/main/java/pt/uminho/esr/ott/protocol/",
+        "Projeto/src/main/java/pt/uminho/esr/ott/transport/",
+        "Projeto/src/test/"
+      ],
+      "size": "S",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md",
+      "story_id": "001-verificar-base",
+      "source_phase": "BASELINE",
+      "owner": "histórico",
+      "reviewer": "histórico",
+      "requires_units": [],
+      "enables_bolts": [
+        "002-overlay",
+        "003-overlay",
+        "004-overlay",
+        "019-overlay",
+        "020-overlay"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-002",
+      "bolt": "019-overlay",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-032"
+      ],
+      "part": null,
+      "title": "Implementar parametrização operacional",
+      "requires_bolts": [
+        "001-base-validada"
+      ],
+      "requirements": [
+        "CON-009",
+        "INT-001",
+        "INT-002",
+        "REQ-021",
+        "REQ-024"
+      ],
+      "adr_ids": [
+        "ADR-007",
+        "ADR-010",
+        "ADR-016",
+        "ADR-024",
+        "ADR-026"
+      ],
+      "test_ids": [
+        "V-032"
+      ],
+      "tests": [
+        "V-032: perfis atuais mantêm os defaults; overrides válidos são preservados;\nvalores/papéis/relações inválidos produzem ConfigurationException agregada,\nsem sockets/estado parcial; regressão de configuração/codec/transporte preservada."
+      ],
+      "criteria": [
+        "Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.",
+        "Carregamento inválido falha antes de rede e sem configuração parcial.",
+        "Perfis existentes continuam válidos sem propriedades novas.",
+        "V-032 e revisão/integração exigidas têm evidência real."
+      ],
+      "files": [
+        "config/RuntimeConfiguration.java",
+        "config/NodeConfiguration.java",
+        "config/ConfigurationLoader.java",
+        "config/ConfigurationLoaderTest.java"
+      ],
+      "size": "M",
+      "gates": [
+        "G-REVIEW-032"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md",
+      "story_id": "005-implementar-parametrizacao-operacional",
+      "source_phase": "PHASE-02",
+      "owner": "Construction",
+      "reviewer": "Equipa",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "002-overlay",
+        "020-overlay"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-003",
+      "bolt": "002-overlay",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-006"
+      ],
+      "part": null,
+      "title": "Descoberta inicial e escrita confirmada",
+      "requires_bolts": [
+        "001-base-validada",
+        "019-overlay"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "adr_ids": [
+        "ADR-003",
+        "ADR-013",
+        "ADR-014",
+        "ADR-015",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-006"
+      ],
+      "tests": [
+        "V-006: consultas repetidas/concorrentes recebem só os vizinhos configurados, incluindo offline, com instanceId zero e sem lease; duas instâncias do mesmo ID recebem a mesma lista; operações não permitidas são rejeitadas sem alterar a configuração; a conexão fecha após a resposta completa e não existe renovação ou estado vivo no bootstrap."
+      ],
+      "criteria": [
+        "Resposta corresponde ao grafo e respeita X por nó.",
+        "Resposta independe da disponibilidade e de consultas anteriores; não existem registo vivo, lease, renovação ou monitorização.",
+        "IDs e endpoints inválidos são rejeitados sem alterar a configuração ou bloquear outras consultas.",
+        "Conexão inicial é fechada após resposta; não há mensagens de saída/renovação para bootstrap.",
+        "Confirmação de escrita/flush tem prazo e termina em sucesso ou erro; testes observam resposta completa antes de EOF e não deixam futures pendentes após falha/shutdown.",
+        "Validação V-006 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "bootstrap/BootstrapServer.java",
+        "transport/Connection.java",
+        "transport/Transport.java",
+        "bootstrap/BootstrapServerTest.java",
+        "transport/TransportTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md",
+      "story_id": "001-fornecer-localizacao-inicial-dos-vizinhos-configurados",
+      "source_phase": "PHASE-02",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "003-overlay"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-004",
+      "bolt": "003-overlay",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-007"
+      ],
+      "part": null,
+      "title": "Estabelecer e reconectar vizinhos",
+      "requires_bolts": [
+        "001-base-validada",
+        "002-overlay"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-004",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-012",
+        "ADR-013",
+        "ADR-018",
+        "ADR-019",
+        "ADR-021",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-007"
+      ],
+      "tests": [
+        "V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado; após descoberta, desligar bootstrap e comprovar reconexão direta sem novas consultas."
+      ],
+      "criteria": [
+        "Uma conexão confirmada por vizinho.",
+        "Entrada tardia e reconexão funcionam.",
+        "Endereço UDP só é aceite após handshake.",
+        "Validação V-007 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "overlay/Neighbor.java",
+        "overlay/NeighborManager.java",
+        "overlay/NeighborManagerTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md",
+      "story_id": "002-gerir-handshake-unicidade-e-reconexao-de-vizinhos",
+      "source_phase": "PHASE-02",
+      "owner": "Waheed",
+      "reviewer": "Denji",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "020-overlay"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-005",
+      "bolt": "020-overlay",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-008"
+      ],
+      "part": null,
+      "title": "Compor CLI e ciclo de processo",
+      "requires_bolts": [
+        "001-base-validada",
+        "003-overlay",
+        "019-overlay"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-003",
+        "REQ-001",
+        "REQ-002",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-013",
+        "ADR-014",
+        "ADR-016",
+        "ADR-017",
+        "ADR-019",
+        "ADR-020",
+        "ADR-022",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-008"
+      ],
+      "tests": [
+        "V-008: subprocessos locais iniciam por CLI, mostram vizinhos e terminam; configuração inválida não abre porto; interrupção e erro de um peer não deixam processo preso."
+      ],
+      "criteria": [
+        "BOOTSTRAP, SERVER, RELAY e CLIENT arrancam no papel pedido.",
+        "Códigos de erro e logs são coerentes.",
+        "O fim de um processo não exige reiniciar os restantes.",
+        "Validação V-008 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "app/OttApplication.java",
+        "overlay/OverlayNode.java",
+        "app/OttApplicationTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md",
+      "story_id": "003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel",
+      "source_phase": "PHASE-02",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "004-overlay",
+        "022-rotas"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-006",
+      "bolt": "004-overlay",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-009"
+      ],
+      "part": null,
+      "title": "Demonstrar o primeiro marco",
+      "requires_bolts": [
+        "001-base-validada",
+        "020-overlay"
+      ],
+      "requirements": [
+        "CON-007",
+        "INT-001",
+        "INT-002",
+        "NFR-005"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-013",
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-009"
+      ],
+      "tests": [
+        "V-009: outro elemento consegue repetir a demonstração e identificar consulta inicial, handshake, saída e reconexão nos logs; os nós já descobertos reconectam com bootstrap parado, sem tráfego periódico para ele."
+      ],
+      "criteria": [
+        "Roteiro repetível e logs datados disponíveis.",
+        "Limitações da versão intermédia explicitadas.",
+        "Situação da avaliação registada sem datas inventadas.",
+        "Validação V-009 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "experiments/milestone-1/"
+      ],
+      "size": "S",
+      "gates": [
+        "G-ASSESSMENTS"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md",
+      "story_id": "004-preparar-evidencia-do-primeiro-marco-intermedio",
+      "source_phase": "PHASE-02",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "005-rotas",
+        "006-rotas",
+        "021-rotas",
+        "022-rotas"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-007",
+      "bolt": "005-rotas",
+      "unit": "003-rotas",
+      "source_tasks": [
+        "TASK-010"
+      ],
+      "part": null,
+      "title": "Medir RTT e detetar falhas TCP",
+      "requires_bolts": [
+        "004-overlay"
+      ],
+      "requirements": [
+        "CON-008",
+        "INT-001",
+        "INT-002",
+        "REQ-003",
+        "REQ-008",
+        "REQ-014",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-004",
+        "ADR-016",
+        "ADR-022",
+        "ADR-024",
+        "ADR-025"
+      ],
+      "test_ids": [
+        "V-010"
+      ],
+      "tests": [
+        "V-010: relógio falso confirma EWMA, reset após nova instância, perda de três sondas e ausência de falso positivo por um timeout; EOF invalida imediatamente."
+      ],
+      "criteria": [
+        "RTT é calculado sem comparar relógios de máquinas diferentes.",
+        "Falhas são correlacionadas à conexão correta.",
+        "Métrica sem amostra não é publicada como zero confiável.",
+        "Validação V-010 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "monitoring/NetworkMonitor.java",
+        "monitoring/LinkMetrics.java",
+        "monitoring/NetworkMonitorTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md",
+      "story_id": "001-medir-rtt-e-publicar-falhas-de-vizinhanca",
+      "source_phase": "PHASE-03",
+      "owner": "Waheed",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "002-overlay"
+      ],
+      "enables_bolts": [
+        "021-rotas"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-008",
+      "bolt": "021-rotas",
+      "unit": "003-rotas",
+      "source_tasks": [
+        "TASK-011"
+      ],
+      "part": null,
+      "title": "Modelar candidatos e snapshots",
+      "requires_bolts": [
+        "004-overlay",
+        "005-rotas"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-005",
+        "REQ-006",
+        "REQ-014",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-004",
+        "ADR-017",
+        "ADR-018",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-011"
+      ],
+      "tests": [
+        "V-011: custos e desempate calculados com fixtures de resultados conhecidos; quatro streams não interferem; alternativa é preservada e snapshot não pode ser alterado por consumidor."
+      ],
+      "criteria": [
+        "Cada fluxo tem custo, origem, destinos e estado.",
+        "Empates são reproduzíveis e caminhos inválidos rejeitados.",
+        "Expirar um candidato não apaga alternativas válidas.",
+        "Validação V-011 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/Route.java",
+        "routing/RouteCandidate.java",
+        "routing/RouteState.java",
+        "routing/RouteMetric.java",
+        "routing/RoutingTable.java",
+        "routing/RoutingTableTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md",
+      "story_id": "002-modelar-candidatos-custos-e-snapshots-por-stream",
+      "source_phase": "PHASE-03",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "002-overlay"
+      ],
+      "enables_bolts": [
+        "006-rotas"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-009",
+      "bolt": "006-rotas",
+      "unit": "003-rotas",
+      "source_tasks": [
+        "TASK-012"
+      ],
+      "part": null,
+      "title": "Difundir anúncios e catálogo",
+      "requires_bolts": [
+        "004-overlay",
+        "021-rotas"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-005",
+        "REQ-006",
+        "REQ-009",
+        "REQ-012",
+        "REQ-014",
+        "REQ-016"
+      ],
+      "adr_ids": [
+        "ADR-004",
+        "ADR-018",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-012"
+      ],
+      "tests": [
+        "V-012: grafo em losango e grafo cíclico convergem para custo esperado; segunda chegada melhor é aceite; quatro streams aparecem; retirar uma origem não remove streams da outra; flooding estabiliza."
+      ],
+      "criteria": [
+        "Catálogo inclui origem e validade dos quatro fluxos.",
+        "Melhores caminhos e alternativas ficam disponíveis.",
+        "Cache, seq, epoch e path impedem tempestade e regressão a época retirada.",
+        "Validação V-012 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/RoutingService.java",
+        "streaming/StreamInfo.java",
+        "streaming/StreamCatalog.java",
+        "routing/RoutingServiceTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md",
+      "story_id": "003-difundir-anuncios-e-construir-catalogo-e-rotas",
+      "source_phase": "PHASE-03",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "002-overlay"
+      ],
+      "enables_bolts": [
+        "022-rotas"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-010",
+      "bolt": "022-rotas",
+      "unit": "003-rotas",
+      "source_tasks": [
+        "TASK-013"
+      ],
+      "part": null,
+      "title": "Diagnosticar percursos pela CLI",
+      "requires_bolts": [
+        "004-overlay",
+        "006-rotas",
+        "020-overlay"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-010",
+        "REQ-019",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-004",
+        "ADR-022",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-013"
+      ],
+      "tests": [
+        "V-013: duas rotas alternativas produzem visited correto; NO_ROUTE e TTL são explícitos; não há ativação nem saída de vídeo após trace."
+      ],
+      "criteria": [
+        "Trace reflete a tabela de cada nó.",
+        "Falhas terminam por erro/timeout em prazo.",
+        "Diagnóstico não altera subscrições.",
+        "Validação V-013 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/RoutingService.java",
+        "app/OttApplication.java",
+        "routing/RouteTraceTest.java"
+      ],
+      "size": "S",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md",
+      "story_id": "004-diagnosticar-percursos-pela-tabela-de-rotas",
+      "source_phase": "PHASE-03",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "002-overlay"
+      ],
+      "enables_bolts": [
+        "007-arvores",
+        "008-arvores",
+        "009-arvores",
+        "023-arvores",
+        "024-arvores"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-011",
+      "bolt": "007-arvores",
+      "unit": "004-arvores",
+      "source_tasks": [
+        "TASK-014"
+      ],
+      "part": null,
+      "title": "Ativar procura com confirmação",
+      "requires_bolts": [
+        "022-rotas"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-005",
+        "REQ-007",
+        "REQ-011",
+        "REQ-017",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-005",
+        "ADR-018",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-014"
+      ],
+      "tests": [
+        "V-014: dois clientes em tronco comum geram uma subscrição no tronco; ACK atrasado/cancelado não ativa; prefixo incorreto gera PATH_CHANGED; streams independentes mantêm estados separados."
+      ],
+      "criteria": [
+        "Árvore ativa apenas após confirmação válida.",
+        "Uma referência agregada a montante por stream.",
+        "Repetições são idempotentes e erros não deixam PENDING eterno.",
+        "Validação V-014 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/Route.java",
+        "routing/Subscription.java",
+        "routing/RoutingService.java",
+        "routing/ActivationTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/004-arvores/stories/001-ativar-arvores-com-ack-e-procura-agregada.md",
+      "story_id": "001-ativar-arvores-com-ack-e-procura-agregada",
+      "source_phase": "PHASE-04",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "003-rotas"
+      ],
+      "enables_bolts": [
+        "023-arvores"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-012",
+      "bolt": "023-arvores",
+      "unit": "004-arvores",
+      "source_tasks": [
+        "TASK-015"
+      ],
+      "part": null,
+      "title": "Renovar e podar subscrições",
+      "requires_bolts": [
+        "007-arvores",
+        "022-rotas"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-003",
+        "REQ-002",
+        "REQ-005",
+        "REQ-007",
+        "REQ-009",
+        "REQ-011",
+        "REQ-017"
+      ],
+      "adr_ids": [
+        "ADR-005",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-015"
+      ],
+      "tests": [
+        "V-015: sair um de dois consumidores mantém tronco ativo; sair o último remove; relógio falso elimina lease órfão; cancelamento velho não remove ramo novo."
+      ],
+      "criteria": [
+        "Vídeo só permanece autorizado enquanto há procura efetiva.",
+        "Ramos órfãos desaparecem por timeout.",
+        "Outros consumidores e fluxos mantêm-se ativos.",
+        "Validação V-015 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/Subscription.java",
+        "routing/RoutingService.java",
+        "routing/SubscriptionLeaseTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md",
+      "story_id": "002-podar-ramos-renovar-leases-e-remover-procura-abandonada",
+      "source_phase": "PHASE-04",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "003-rotas"
+      ],
+      "enables_bolts": [
+        "008-arvores"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-013",
+      "bolt": "008-arvores",
+      "unit": "004-arvores",
+      "source_tasks": [
+        "TASK-016"
+      ],
+      "part": null,
+      "title": "Recuperar falhas do upstream TCP",
+      "requires_bolts": [
+        "022-rotas",
+        "023-arvores"
+      ],
+      "requirements": [
+        "CON-008",
+        "INT-001",
+        "INT-002",
+        "NFR-003",
+        "REQ-002",
+        "REQ-006",
+        "REQ-009"
+      ],
+      "adr_ids": [
+        "ADR-005",
+        "ADR-020",
+        "ADR-024",
+        "ADR-025"
+      ],
+      "test_ids": [
+        "V-016"
+      ],
+      "tests": [
+        "V-016: cortar upstream num losango leva a caminho alternativo sem ciclo; sem alternativa termina UNAVAILABLE; regresso permite recuperar; streams da outra origem continuam."
+      ],
+      "criteria": [
+        "Há recuperação quando existe caminho até à mesma fonte.",
+        "Ausência de caminho é visível e não produz laço.",
+        "Estado antigo não é reativado por mensagens atrasadas.",
+        "Validação V-016 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/RoutingService.java",
+        "routing/Route.java",
+        "routing/RecoveryTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/004-arvores/stories/003-recuperar-arvores-apos-falha-de-upstream.md",
+      "story_id": "003-recuperar-arvores-apos-falha-de-upstream",
+      "source_phase": "PHASE-04",
+      "owner": "Waheed",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "003-rotas"
+      ],
+      "enables_bolts": [
+        "024-arvores"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-014",
+      "bolt": "024-arvores",
+      "unit": "004-arvores",
+      "source_tasks": [
+        "TASK-017"
+      ],
+      "part": null,
+      "title": "Trocar parent com histerese",
+      "requires_bolts": [
+        "008-arvores",
+        "022-rotas"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "NFR-003",
+        "REQ-009",
+        "REQ-014"
+      ],
+      "adr_ids": [
+        "ADR-005",
+        "ADR-016",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-017"
+      ],
+      "tests": [
+        "V-017: séries temporais predeterminadas não oscilam junto do limiar; melhoria sustentada troca; falha troca sem esperar permanência; troca falhada mantém parent antigo válido."
+      ],
+      "criteria": [
+        "Política corresponde aos parâmetros documentados.",
+        "Um upstream é confirmado no snapshot.",
+        "Tráfego transitório e limites da troca são explicitados.",
+        "Validação V-017 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "routing/RoutingService.java",
+        "routing/RouteMetric.java",
+        "routing/RouteSwitchTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/004-arvores/stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md",
+      "story_id": "004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada",
+      "source_phase": "PHASE-04",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "003-rotas"
+      ],
+      "enables_bolts": [
+        "009-arvores"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-015",
+      "bolt": "009-arvores",
+      "unit": "004-arvores",
+      "source_tasks": [
+        "TASK-018"
+      ],
+      "part": null,
+      "title": "Demonstrar o segundo marco",
+      "requires_bolts": [
+        "022-rotas",
+        "024-arvores"
+      ],
+      "requirements": [
+        "CON-007",
+        "INT-001",
+        "INT-002",
+        "NFR-005"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-018"
+      ],
+      "tests": [
+        "V-018: reprodução independente da ativação/poda/failover usando logs e snapshots; revisão do material contra os critérios de gestão de fluxos e controlo do PDF."
+      ],
+      "criteria": [
+        "Demonstração mostra isolamento entre fluxos e procura agregada.",
+        "Falha e alteração de RTT têm evidência verificável.",
+        "Conteúdo e estado do marco estão registados.",
+        "Validação V-018 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "experiments/milestone-2/"
+      ],
+      "size": "S",
+      "gates": [
+        "G-ASSESSMENTS"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/004-arvores/stories/005-preparar-o-segundo-marco-com-arvores-e-adaptacao.md",
+      "story_id": "005-preparar-o-segundo-marco-com-arvores-e-adaptacao",
+      "source_phase": "PHASE-04",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "003-rotas"
+      ],
+      "enables_bolts": [
+        "010-video",
+        "011-video",
+        "012-video",
+        "013-video",
+        "025-video",
+        "026-video",
+        "027-video",
+        "028-video"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-016",
+      "bolt": "010-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-019"
+      ],
+      "part": null,
+      "title": "Codificar datagramas e fragmentos",
+      "requires_bolts": [
+        "009-arvores"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "REQ-010",
+        "REQ-015",
+        "REQ-018",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-002",
+        "ADR-006",
+        "ADR-007",
+        "ADR-009",
+        "ADR-021",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-019"
+      ],
+      "tests": [
+        "V-019: fixtures de bytes confirmam offsets 0–64; recombinação manual dos payloads recupera exatamente o frame; nenhum datagrama excede 1200 bytes; inputs inválidos são rejeitados."
+      ],
+      "criteria": [
+        "Formato coincide com contrato v1.",
+        "Limites são impostos antes de alocar.",
+        "Fragmentação cobre todas as fronteiras sem bytes perdidos.",
+        "Validação V-019 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "streaming/StreamPacket.java",
+        "streaming/StreamPacketTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md",
+      "story_id": "001-definir-codec-udp-e-fragmentacao-de-frames",
+      "source_phase": "PHASE-05",
+      "owner": "Waheed",
+      "reviewer": "Denji",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "011-video",
+        "012-video"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-017",
+      "bolt": "011-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-020"
+      ],
+      "part": "A",
+      "title": "Preparar quatro conteúdos distintos",
+      "requires_bolts": [
+        "009-arvores",
+        "010-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "REQ-012",
+        "REQ-013",
+        "REQ-015",
+        "REQ-018"
+      ],
+      "adr_ids": [
+        "ADR-006",
+        "ADR-009",
+        "ADR-021",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-020-A"
+      ],
+      "tests": [
+        "V-020-A: inspeção de todos os registos/JPEG e comparação de conteúdos/hashes; recurso indisponível mantém gate G-MEDIA."
+      ],
+      "criteria": [
+        "Quatro conteúdos identificáveis, dois por origem, preparados no perfil de cinco dígitos/JPEG.",
+        "Proveniência, parâmetros de preparação, hashes e FPS registados; cópias idênticas não contam como vídeos distintos.",
+        "Cada JPEG respeita o limite e é descodificável; condições de redistribuição ainda pendentes ficam explícitas para TASK-030."
+      ],
+      "files": [
+        "Projeto/src/main/resources/media/",
+        "experiments/media/manifest.json"
+      ],
+      "size": "M",
+      "gates": [
+        "G-MEDIA"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md",
+      "story_id": "002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao",
+      "source_phase": "PHASE-05",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "025-video"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-018",
+      "bolt": "025-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-020"
+      ],
+      "part": "B",
+      "title": "Ler o perfil MJPEG confirmado",
+      "requires_bolts": [
+        "009-arvores",
+        "011-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "REQ-012",
+        "REQ-013",
+        "REQ-015",
+        "REQ-018"
+      ],
+      "adr_ids": [
+        "ADR-006",
+        "ADR-009",
+        "ADR-021",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-020-B"
+      ],
+      "tests": [
+        "V-020-B: ficheiros de dois frames, leituras parciais, cada truncatura e limite; teste de ImageIO sem GUI."
+      ],
+      "criteria": [
+        "Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.",
+        "Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.",
+        "Fixtures independentes produzem os bytes esperados e o leitor fecha recursos."
+      ],
+      "files": [
+        "server/VideoSource.java",
+        "server/VideoSourceTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/007-ler-o-perfil-mjpeg-confirmado.md",
+      "story_id": "007-ler-o-perfil-mjpeg-confirmado",
+      "source_phase": "PHASE-05",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "026-video"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-019",
+      "bolt": "026-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-020"
+      ],
+      "part": "C",
+      "title": "Emitir fontes com pacing e procura",
+      "requires_bolts": [
+        "009-arvores",
+        "025-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "REQ-012",
+        "REQ-013",
+        "REQ-015",
+        "REQ-018"
+      ],
+      "adr_ids": [
+        "ADR-006",
+        "ADR-009",
+        "ADR-021",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-020-C"
+      ],
+      "tests": [
+        "V-020-C: relógio/scheduler falso demonstra pacing, suspensão/retoma, loop, EOF e isolamento."
+      ],
+      "criteria": [
+        "Emitir só com procura confirmada, ao FPS configurado, sem catch-up ilimitado.",
+        "Streams mantêm posição/seq/timeline independentes; loop preserva monotonia e EOF sem loop retira só essa stream.",
+        "Stop e shutdown cancelam emissão e fecham fontes sem afetar a outra origem."
+      ],
+      "files": [
+        "server/StreamingServer.java",
+        "server/StreamingServerTest.java",
+        "app/OttApplication.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/008-emitir-fontes-com-pacing-e-procura.md",
+      "story_id": "008-emitir-fontes-com-pacing-e-procura",
+      "source_phase": "PHASE-05",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "028-video"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-020",
+      "bolt": "012-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-021"
+      ],
+      "part": null,
+      "title": "Encaminhar datagramas pela árvore",
+      "requires_bolts": [
+        "009-arvores",
+        "010-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "NFR-002",
+        "REQ-007",
+        "REQ-010",
+        "REQ-011",
+        "REQ-015",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-002",
+        "ADR-006",
+        "ADR-016",
+        "ADR-017",
+        "ADR-021",
+        "ADR-022",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-021"
+      ],
+      "tests": [
+        "V-021: fonte→relay→dois sinks recebe uma cópia por fragmento no tronco e duas nas saídas; origem não autorizada/epoch velha não segue; saturar uma saída não bloqueia controlo nem outras streams."
+      ],
+      "criteria": [
+        "Envios correspondem apenas ao snapshot ativo.",
+        "Replicação é única por destino em estado estável.",
+        "Counters distinguem descarte, envio e entrega local.",
+        "Validação V-021 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "streaming/StreamForwarder.java",
+        "streaming/StreamForwarderTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/003-reencaminhar-e-replicar-datagramas-pela-arvore-ativa.md",
+      "story_id": "003-reencaminhar-e-replicar-datagramas-pela-arvore-ativa",
+      "source_phase": "PHASE-05",
+      "owner": "Waheed",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "027-video"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-021",
+      "bolt": "027-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-022"
+      ],
+      "part": null,
+      "title": "Reconstituir frames com prazo",
+      "requires_bolts": [
+        "009-arvores",
+        "012-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "NFR-003",
+        "REQ-015",
+        "REQ-018",
+        "REQ-021"
+      ],
+      "adr_ids": [
+        "ADR-002",
+        "ADR-006",
+        "ADR-016",
+        "ADR-018",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-022"
+      ],
+      "tests": [
+        "V-022: permutações determinísticas recuperam frame; perda expira; duplicado não aumenta memória nem deadline; flood não supera oito montagens; epoch novo limpa buffers. O teste de JPEG corrompido pertence ao decoder/player em V-023."
+      ],
+      "criteria": [
+        "Reordenação não corrompe frames completos.",
+        "Perda e overflow têm fim e razão observáveis.",
+        "Não existe espera ilimitada por um fragmento.",
+        "Validação V-022 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "client/FrameAssembler.java",
+        "client/FrameAssemblerTest.java"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/004-reconstituir-frames-com-buffers-e-prazo-limitados.md",
+      "story_id": "004-reconstituir-frames-com-buffers-e-prazo-limitados",
+      "source_phase": "PHASE-05",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "013-video"
+      ],
+      "bolt_type": "ddd-construction-bolt"
+    },
+    {
+      "id": "IMP-022",
+      "bolt": "013-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-023"
+      ],
+      "part": null,
+      "title": "Apresentar catálogo e vídeo Swing",
+      "requires_bolts": [
+        "009-arvores",
+        "027-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-015",
+        "REQ-016",
+        "REQ-018"
+      ],
+      "adr_ids": [
+        "ADR-006",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-023"
+      ],
+      "tests": [
+        "V-023: testar presenter e frame sink sem GUI; na bancada gráfica verificar vídeo, seleção e fecho manualmente, registando imagem/roteiro. Ausência de display é erro explicativo, não sucesso GUI."
+      ],
+      "criteria": [
+        "Janela reproduz frames de conteúdo identificável.",
+        "Seleção e stop respeitam uma subscrição local.",
+        "Rede e descodificação não bloqueiam EDT.",
+        "Validação V-023 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "client/StreamingClient.java",
+        "client/VideoPlayer.java",
+        "client/VideoPlayerTest.java"
+      ],
+      "size": "M",
+      "gates": [
+        "G-GUI"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/005-apresentar-catalogo-e-video-numa-janela-swing.md",
+      "story_id": "005-apresentar-catalogo-e-video-numa-janela-swing",
+      "source_phase": "PHASE-05",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "028-video"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-023",
+      "bolt": "028-video",
+      "unit": "005-video",
+      "source_tasks": [
+        "TASK-024"
+      ],
+      "part": null,
+      "title": "Integrar duas origens e quatro streams",
+      "requires_bolts": [
+        "009-arvores",
+        "013-video",
+        "026-video"
+      ],
+      "requirements": [
+        "INT-001",
+        "INT-002",
+        "REQ-007",
+        "REQ-012",
+        "REQ-013",
+        "REQ-015",
+        "REQ-016",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-006",
+        "ADR-008",
+        "ADR-020",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-024"
+      ],
+      "tests": [
+        "V-024: duas origens anunciam e fornecem quatro vídeos; sinks confirmam stream/session/conteúdo; partilha e isolamento são medidos; GUI reproduz pelo menos uma amostra de cada UUID com evidência."
+      ],
+      "criteria": [
+        "Quatro fluxos distintos são utilizáveis.",
+        "Partilha e isolamento passam a validação local.",
+        "Versão integrada encerra sem threads/sockets pendentes.",
+        "Validação V-024 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "app/OttApplication.java",
+        "Projeto/src/test/java/pt/uminho/esr/ott/integration/",
+        "Projeto/src/test/resources/"
+      ],
+      "size": "M",
+      "gates": [
+        "G-GUI"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/005-video/stories/006-integrar-duas-origens-e-quatro-streams-ponta-a-ponta.md",
+      "story_id": "006-integrar-duas-origens-e-quatro-streams-ponta-a-ponta",
+      "source_phase": "PHASE-05",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "004-arvores"
+      ],
+      "enables_bolts": [
+        "014-core",
+        "015-core",
+        "016-core",
+        "029-core",
+        "030-core",
+        "031-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-024",
+      "bolt": "014-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-025"
+      ],
+      "part": "A",
+      "title": "Preparar ambiente e mapa CORE",
+      "requires_bolts": [
+        "028-video"
+      ],
+      "requirements": [
+        "CON-001",
+        "INT-001",
+        "INT-002",
+        "NFR-004",
+        "REQ-011",
+        "REQ-020",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-001",
+        "ADR-008",
+        "ADR-011",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-025-A"
+      ],
+      "tests": [
+        "V-025-A: preflight e arranque/terminação dos processos; não alegar cópia única nesta preparação."
+      ],
+      "criteria": [
+        "JDK/JAR/volumes/display verificados em sessão CORE real.",
+        "Mapa S/R/C1/C2 e bootstrap, IPs/interfaces/portas e rotas IP documentados; advertised UDP pertence ao nó.",
+        "Perfis válidos e reachability confirmada sem substituir o XML por defeito."
+      ],
+      "files": [
+        "CORE/topologies/cenario1.xml",
+        "experiments/scenario-1/config/",
+        "experiments/scenario-1/environment.md"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE",
+        "G-GUI"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/001-preparar-core-e-comprovar-replicacao-no-cenario-de-quatro-nos.md",
+      "story_id": "001-preparar-core-e-comprovar-replicacao-no-cenario-de-quatro-nos",
+      "source_phase": "PHASE-06",
+      "owner": "Waheed",
+      "reviewer": "Denji",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "029-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-025",
+      "bolt": "029-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-025"
+      ],
+      "part": "B",
+      "title": "Medir partilha no cenário de quatro nós",
+      "requires_bolts": [
+        "014-core",
+        "028-video"
+      ],
+      "requirements": [
+        "CON-001",
+        "INT-001",
+        "INT-002",
+        "NFR-004",
+        "REQ-011",
+        "REQ-020",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-001",
+        "ADR-008",
+        "ADR-011",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-025-B"
+      ],
+      "tests": [
+        "V-025-B: cruzar (stream,session,frame,index) no tronco e nas saídas; distinguir warm-up e transição."
+      ],
+      "criteria": [
+        "Duas saídas recebem a mesma stream com uma cópia por chave no tronco estável sem perda configurada.",
+        "Parar um consumidor preserva o outro; depois do último stop a poda remove vídeo no prazo medido.",
+        "Capturas e contadores correspondem a ligações lógicas e manifestos identificam a versão/condições."
+      ],
+      "files": [
+        "experiments/scenario-1/",
+        "experiments/scenario-1/metrics.csv"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/005-medir-partilha-no-cenario-de-quatro-nos.md",
+      "story_id": "005-medir-partilha-no-cenario-de-quatro-nos",
+      "source_phase": "PHASE-06",
+      "owner": "Waheed",
+      "reviewer": "Denji",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "015-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-026",
+      "bolt": "015-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-026"
+      ],
+      "part": "A",
+      "title": "Validar falhas TCP e limitação UDP",
+      "requires_bolts": [
+        "028-video",
+        "029-core"
+      ],
+      "requirements": [
+        "CON-001",
+        "CON-008",
+        "INT-001",
+        "INT-002",
+        "NFR-003",
+        "REQ-006",
+        "REQ-009",
+        "REQ-014",
+        "REQ-020"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-011",
+        "ADR-024",
+        "ADR-025"
+      ],
+      "test_ids": [
+        "V-026-A"
+      ],
+      "tests": [
+        "V-026-A: três repetições, caminho antes/depois e interrupção; ensaio UDP-only em janela finita com perda/frames e parent observado."
+      ],
+      "criteria": [
+        "Morte de processo e quebra TCP recuperam por alternativa até à mesma origem, quando existe; partição fica UNAVAILABLE.",
+        "Bloqueio apenas UDP com sondas TCP saudáveis é registado como limitação, sem exigir recuperação ou troca de parent.",
+        "Ensaios têm deadline e cronologia; recuperação IP é distinguida da recuperação aplicacional."
+      ],
+      "files": [
+        "experiments/scenario-2/failures/",
+        "experiments/scenario-2/config/"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/002-demonstrar-alternativas-e-adaptacao-no-cenario-de-seis-nos.md",
+      "story_id": "002-demonstrar-alternativas-e-adaptacao-no-cenario-de-seis-nos",
+      "source_phase": "PHASE-06",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "030-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-027",
+      "bolt": "030-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-026"
+      ],
+      "part": "B",
+      "title": "Medir adaptação por RTT e estabilidade",
+      "requires_bolts": [
+        "015-core",
+        "028-video"
+      ],
+      "requirements": [
+        "CON-001",
+        "CON-008",
+        "INT-001",
+        "INT-002",
+        "NFR-003",
+        "REQ-006",
+        "REQ-009",
+        "REQ-014",
+        "REQ-020"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-011",
+        "ADR-024",
+        "ADR-025"
+      ],
+      "test_ids": [
+        "V-026-B"
+      ],
+      "tests": [
+        "V-026-B: condições fixas/invertidas e ruído; cruzar logs/snapshots, clocks locais e frames."
+      ],
+      "criteria": [
+        "Inverter atraso sustentado altera parent só após melhoria/observações/permanência válidas.",
+        "Ruído junto do limiar não provoca oscilação; falha TCP ignora histerese.",
+        "Três repetições mostram custos, motivo e interrupção, com limites/metas avaliados sem resultados inventados."
+      ],
+      "files": [
+        "experiments/scenario-2/adaptation/",
+        "experiments/scenario-2/metrics.csv"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/006-medir-adaptacao-por-rtt-e-estabilidade.md",
+      "story_id": "006-medir-adaptacao-por-rtt-e-estabilidade",
+      "source_phase": "PHASE-06",
+      "owner": "Fillmore",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "016-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-028",
+      "bolt": "016-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-027"
+      ],
+      "part": null,
+      "title": "Validar quatro streams e cinco clientes",
+      "requires_bolts": [
+        "028-video",
+        "030-core"
+      ],
+      "requirements": [
+        "CON-001",
+        "INT-001",
+        "INT-002",
+        "NFR-002",
+        "REQ-007",
+        "REQ-012",
+        "REQ-013",
+        "REQ-020"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-011",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-027"
+      ],
+      "tests": [
+        "V-027: quatro conteúdos identificáveis são recebidos de duas origens; cinco clientes funcionam dentro da capacidade configurada; falhas de uma origem não corrompem a outra; partilha no tronco tem evidência."
+      ],
+      "criteria": [
+        "Mínimo de dois servidores com dois vídeos cada demonstrado no CORE.",
+        "Cinco clientes e rotas alternativas têm evidência.",
+        "Falhas e isolamento são descritos com limites.",
+        "Validação V-027 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "experiments/scenario-3/",
+        "CORE/topologies/cenario3.xml"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/003-validar-cenario-complexo-com-duas-origens-e-cinco-clientes.md",
+      "story_id": "003-validar-cenario-complexo-com-duas-origens-e-cinco-clientes",
+      "source_phase": "PHASE-06",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "031-core"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-029",
+      "bolt": "031-core",
+      "unit": "006-core",
+      "source_tasks": [
+        "TASK-028"
+      ],
+      "part": null,
+      "title": "Consolidar métricas e limites",
+      "requires_bolts": [
+        "016-core",
+        "028-video"
+      ],
+      "requirements": [
+        "CON-001",
+        "CON-008",
+        "INT-001",
+        "INT-002",
+        "NFR-001",
+        "NFR-002",
+        "NFR-005",
+        "REQ-008",
+        "REQ-011",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-008",
+        "ADR-022",
+        "ADR-024",
+        "ADR-025"
+      ],
+      "test_ids": [
+        "V-028"
+      ],
+      "tests": [
+        "V-028: auditoria cruzada entre capturas, contadores e eventos de rota; tabela reproduzível de condições/resultados; análise distingue perda de datagrama, frame incompleto e frame não mostrado."
+      ],
+      "criteria": [
+        "Resultados são reais, datados e repetíveis.",
+        "Critérios de eficiência e adaptação têm evidência.",
+        "Limitações e desvios de metas estão documentados.",
+        "Validação V-028 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "experiments/metrics/",
+        "experiments/results/"
+      ],
+      "size": "M",
+      "gates": [
+        "G-CORE"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/006-core/stories/004-recolher-metricas-e-avaliar-resultados-e-limites.md",
+      "story_id": "004-recolher-metricas-e-avaliar-resultados-e-limites",
+      "source_phase": "PHASE-06",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "005-video"
+      ],
+      "enables_bolts": [
+        "017-entrega",
+        "018-entrega",
+        "032-entrega",
+        "033-entrega"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-030",
+      "bolt": "017-entrega",
+      "unit": "007-entrega",
+      "source_tasks": [
+        "TASK-029"
+      ],
+      "part": null,
+      "title": "Produzir e rever o artigo",
+      "requires_bolts": [
+        "031-core"
+      ],
+      "requirements": [
+        "CON-002",
+        "CON-003",
+        "INT-001",
+        "INT-002",
+        "NFR-005",
+        "REQ-022"
+      ],
+      "adr_ids": [
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-029"
+      ],
+      "tests": [
+        "V-029: revisão por checklist do enunciado; correspondência de figuras/tabelas com dados; contagem de páginas do PDF até 12; protocolo no artigo corresponde aos bytes e comportamento implementados."
+      ],
+      "criteria": [
+        "Artigo cobre arquitetura, protocolos, implementação e avaliação.",
+        "Até 12 páginas no ficheiro final.",
+        "Todas as afirmações experimentais têm evidência e limites.",
+        "Validação V-029 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "report/artigo.tex",
+        "report/artigo.pdf"
+      ],
+      "size": "M",
+      "gates": [],
+      "story": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/001-escrever-artigo-com-protocolos-e-avaliacao-critica.md",
+      "story_id": "001-escrever-artigo-com-protocolos-e-avaliacao-critica",
+      "source_phase": "PHASE-07",
+      "owner": "Fillmore",
+      "reviewer": "Denji",
+      "requires_units": [
+        "006-core"
+      ],
+      "enables_bolts": [
+        "018-entrega"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-031",
+      "bolt": "018-entrega",
+      "unit": "007-entrega",
+      "source_tasks": [
+        "TASK-030"
+      ],
+      "part": null,
+      "title": "Validar o pacote de entrega",
+      "requires_bolts": [
+        "017-entrega",
+        "031-core"
+      ],
+      "requirements": [
+        "CON-003",
+        "CON-004",
+        "CON-005",
+        "INT-001",
+        "INT-002",
+        "REQ-023"
+      ],
+      "adr_ids": [
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-030"
+      ],
+      "tests": [
+        "V-030: arquivo abre sem paths absolutos/escape; extração limpa passa instruções e testes; PDF abre e continua até 12 páginas; nomes e hashes correspondem ao manifesto."
+      ],
+      "criteria": [
+        "PDF e ZIP usam turno/grupo reais.",
+        "Entrega é reproduzível a partir da extração.",
+        "Não há segredos, caches ou dependências locais não documentadas.",
+        "Validação V-030 executada e evidência ligada no progresso."
+      ],
+      "files": [
+        "dist/",
+        "README.md",
+        "experiments/delivery-manifest.json"
+      ],
+      "size": "M",
+      "gates": [
+        "G-MEDIA-DISTRIBUTION",
+        "G-DELIVERY"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/002-empacotar-codigo-e-verificar-reproducao-da-entrega.md",
+      "story_id": "002-empacotar-codigo-e-verificar-reproducao-da-entrega",
+      "source_phase": "PHASE-07",
+      "owner": "Waheed",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "006-core"
+      ],
+      "enables_bolts": [
+        "032-entrega"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-032",
+      "bolt": "032-entrega",
+      "unit": "007-entrega",
+      "source_tasks": [
+        "TASK-031"
+      ],
+      "part": "A",
+      "title": "Preparar e ensaiar a defesa",
+      "requires_bolts": [
+        "018-entrega",
+        "031-core"
+      ],
+      "requirements": [
+        "CON-005",
+        "CON-006",
+        "CON-007",
+        "INT-001",
+        "INT-002",
+        "NFR-005"
+      ],
+      "adr_ids": [
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-031-A"
+      ],
+      "tests": [
+        "V-031-A: ensaio cronometrado e revisão da correspondência versão defendida/pacote."
+      ],
+      "criteria": [
+        "Ensaio cobre critérios de avaliação, decisões, demonstrações intermédias e limites conhecidos.",
+        "Roteiro identifica exatamente PDF/ZIP e versão validados e possui fallback de evidência real.",
+        "Prazo/grupo/artefactos conhecidos ou pendências explícitas; preparação não equivale a upload."
+      ],
+      "files": [
+        "experiments/defense/",
+        "docs/defesa-final.md"
+      ],
+      "size": "S",
+      "gates": [
+        "G-ASSESSMENTS",
+        "G-DELIVERY"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/003-preparar-defesa-e-checklist-de-submissao-humana.md",
+      "story_id": "003-preparar-defesa-e-checklist-de-submissao-humana",
+      "source_phase": "PHASE-07",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "006-core"
+      ],
+      "enables_bolts": [
+        "033-entrega"
+      ],
+      "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-033",
+      "bolt": "033-entrega",
+      "unit": "007-entrega",
+      "source_tasks": [
+        "TASK-031"
+      ],
+      "part": "B",
+      "title": "Registar a submissão humana",
+      "requires_bolts": [
+        "031-core",
+        "032-entrega"
+      ],
+      "requirements": [
+        "CON-005",
+        "CON-006",
+        "CON-007",
+        "INT-001",
+        "INT-002",
+        "NFR-005"
+      ],
+      "adr_ids": [
+        "ADR-023",
+        "ADR-024"
+      ],
+      "test_ids": [
+        "V-031-B"
+      ],
+      "tests": [
+        "V-031-B: inspeção humana da submissão e do manifesto; enquanto faltar confirmação, estado permanece pendente."
+      ],
+      "criteria": [
+        "A equipa confirma upload no grupo correto com nomes reais antes do prazo conhecido.",
+        "Registar data, versão/hashes e confirmação sem credenciais; IA não automatiza login nem presume upload.",
+        "TASK-031 e este bolt só ficam DONE/complete após essa confirmação humana."
+      ],
+      "files": [
+        "experiments/submission-confirmation.md"
+      ],
+      "size": "S",
+      "gates": [
+        "G-SUBMISSION",
+        "G-DELIVERY"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/004-registar-a-submissao-humana.md",
+      "story_id": "004-registar-a-submissao-humana",
+      "source_phase": "PHASE-07",
+      "owner": "Denji",
+      "reviewer": "Waheed",
+      "requires_units": [
+        "006-core"
+      ],
+      "enables_bolts": [],
+      "bolt_type": "simple-construction-bolt"
+    }
+  ],
+  "coverage": [
+    {
+      "requirement": "REQ-001",
+      "legacy_id": "RF-001",
+      "adrs": [
+        "ADR-010",
+        "ADR-017",
+        "ADR-020"
+      ],
+      "components": [
+        "app",
+        "client",
+        "config",
+        "overlay",
+        "protocol",
+        "routing",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-005"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-008",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-002",
+      "legacy_id": "RF-002",
+      "adrs": [
+        "ADR-013",
+        "ADR-019"
+      ],
+      "components": [
+        "bootstrap",
+        "overlay",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-003",
+        "IMP-004",
+        "IMP-005",
+        "IMP-012",
+        "IMP-013"
+      ],
+      "tests": [
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-015",
+        "V-016"
+      ]
+    },
+    {
+      "requirement": "REQ-003",
+      "legacy_id": "RF-003",
+      "adrs": [
+        "ADR-002",
+        "ADR-014",
+        "ADR-019"
+      ],
+      "components": [
+        "client",
+        "overlay",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-003",
+        "IMP-004",
+        "IMP-007"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-010",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-004",
+      "legacy_id": "RF-004",
+      "adrs": [
+        "ADR-003",
+        "ADR-010",
+        "ADR-013",
+        "ADR-015",
+        "ADR-019"
+      ],
+      "components": [
+        "bootstrap",
+        "config",
+        "overlay",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-003",
+        "IMP-004"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-005",
+      "legacy_id": "RF-005",
+      "adrs": [
+        "ADR-004",
+        "ADR-017",
+        "ADR-018"
+      ],
+      "components": [
+        "app",
+        "config",
+        "monitoring",
+        "overlay",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-008",
+        "IMP-009",
+        "IMP-011",
+        "IMP-012"
+      ],
+      "tests": [
+        "V-011",
+        "V-012",
+        "V-014",
+        "V-015"
+      ]
+    },
+    {
+      "requirement": "REQ-006",
+      "legacy_id": "RF-006",
+      "adrs": [
+        "ADR-004"
+      ],
+      "components": [
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-008",
+        "IMP-009",
+        "IMP-013",
+        "IMP-026",
+        "IMP-027"
+      ],
+      "tests": [
+        "V-011",
+        "V-012",
+        "V-016",
+        "V-026",
+        "V-026-A",
+        "V-026-B"
+      ]
+    },
+    {
+      "requirement": "REQ-007",
+      "legacy_id": "RF-007",
+      "adrs": [
+        "ADR-005"
+      ],
+      "components": [
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-011",
+        "IMP-012",
+        "IMP-020",
+        "IMP-023",
+        "IMP-028"
+      ],
+      "tests": [
+        "V-014",
+        "V-015",
+        "V-021",
+        "V-024",
+        "V-027"
+      ]
+    },
+    {
+      "requirement": "REQ-008",
+      "legacy_id": "RF-008",
+      "adrs": [
+        "ADR-022",
+        "ADR-025"
+      ],
+      "components": [
+        "app",
+        "experiments",
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-007",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-010",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "REQ-009",
+      "legacy_id": "RF-009",
+      "adrs": [
+        "ADR-025"
+      ],
+      "components": [
+        "experiments",
+        "monitoring",
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-009",
+        "IMP-012",
+        "IMP-013",
+        "IMP-014",
+        "IMP-026",
+        "IMP-027"
+      ],
+      "tests": [
+        "V-012",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-026",
+        "V-026-A",
+        "V-026-B"
+      ]
+    },
+    {
+      "requirement": "REQ-010",
+      "legacy_id": "RF-010",
+      "adrs": [
+        "ADR-005"
+      ],
+      "components": [
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-010",
+        "IMP-016",
+        "IMP-020"
+      ],
+      "tests": [
+        "V-013",
+        "V-019",
+        "V-021"
+      ]
+    },
+    {
+      "requirement": "REQ-011",
+      "legacy_id": "RF-011",
+      "adrs": [
+        "ADR-005"
+      ],
+      "components": [
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-011",
+        "IMP-012",
+        "IMP-020",
+        "IMP-024",
+        "IMP-025",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-014",
+        "V-015",
+        "V-021",
+        "V-025",
+        "V-025-A",
+        "V-025-B",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "REQ-012",
+      "legacy_id": "RF-012",
+      "adrs": [
+        "ADR-010",
+        "ADR-018"
+      ],
+      "components": [
+        "config",
+        "overlay",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-009",
+        "IMP-017",
+        "IMP-018",
+        "IMP-019",
+        "IMP-023",
+        "IMP-028"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-012",
+        "V-020",
+        "V-020-A",
+        "V-020-B",
+        "V-020-C",
+        "V-024",
+        "V-027",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-013",
+      "legacy_id": "RF-013",
+      "adrs": [
+        "ADR-010",
+        "ADR-018"
+      ],
+      "components": [
+        "config",
+        "overlay",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-017",
+        "IMP-018",
+        "IMP-019",
+        "IMP-023",
+        "IMP-028"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-020",
+        "V-020-A",
+        "V-020-B",
+        "V-020-C",
+        "V-024",
+        "V-027",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-014",
+      "legacy_id": "RF-014",
+      "adrs": [
+        "ADR-004"
+      ],
+      "components": [
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-007",
+        "IMP-008",
+        "IMP-009",
+        "IMP-014",
+        "IMP-026",
+        "IMP-027"
+      ],
+      "tests": [
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-017",
+        "V-026",
+        "V-026-A",
+        "V-026-B"
+      ]
+    },
+    {
+      "requirement": "REQ-015",
+      "legacy_id": "RF-015",
+      "adrs": [
+        "ADR-002",
+        "ADR-006"
+      ],
+      "components": [
+        "client",
+        "server",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-016",
+        "IMP-017",
+        "IMP-018",
+        "IMP-019",
+        "IMP-020",
+        "IMP-021",
+        "IMP-022",
+        "IMP-023"
+      ],
+      "tests": [
+        "V-019",
+        "V-020",
+        "V-020-A",
+        "V-020-B",
+        "V-020-C",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024"
+      ]
+    },
+    {
+      "requirement": "NFR-001",
+      "legacy_id": "RNF-001",
+      "adrs": [
+        "ADR-002",
+        "ADR-016"
+      ],
+      "components": [
+        "app",
+        "client",
+        "config",
+        "monitoring",
+        "routing",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-014",
+        "IMP-016",
+        "IMP-017",
+        "IMP-018",
+        "IMP-019",
+        "IMP-020",
+        "IMP-021",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-017",
+        "V-019",
+        "V-020",
+        "V-020-A",
+        "V-020-B",
+        "V-020-C",
+        "V-021",
+        "V-022",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "NFR-002",
+      "legacy_id": "RNF-002",
+      "adrs": [
+        "ADR-005"
+      ],
+      "components": [
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-020",
+        "IMP-028",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-021",
+        "V-027",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "NFR-003",
+      "legacy_id": "RNF-003",
+      "adrs": [
+        "ADR-004",
+        "ADR-005",
+        "ADR-014",
+        "ADR-015",
+        "ADR-018",
+        "ADR-019",
+        "ADR-020",
+        "ADR-021"
+      ],
+      "components": [
+        "app",
+        "bootstrap",
+        "client",
+        "config",
+        "monitoring",
+        "overlay",
+        "protocol",
+        "routing",
+        "server",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-005",
+        "IMP-012",
+        "IMP-013",
+        "IMP-014",
+        "IMP-021",
+        "IMP-026",
+        "IMP-027"
+      ],
+      "tests": [
+        "V-008",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-022",
+        "V-026",
+        "V-026-A",
+        "V-026-B"
+      ]
+    },
+    {
+      "requirement": "NFR-004",
+      "legacy_id": "RNF-004",
+      "adrs": [
+        "ADR-001",
+        "ADR-007",
+        "ADR-011",
+        "ADR-017"
+      ],
+      "components": [
+        "CORE",
+        "app",
+        "config",
+        "experiments",
+        "overlay",
+        "protocol",
+        "routing",
+        "streaming",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-004",
+        "IMP-024",
+        "IMP-025"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-007",
+        "V-025",
+        "V-025-A",
+        "V-025-B",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "NFR-005",
+      "legacy_id": "RNF-005",
+      "adrs": [
+        "ADR-008",
+        "ADR-009",
+        "ADR-012",
+        "ADR-022",
+        "ADR-024",
+        "ADR-026"
+      ],
+      "components": [
+        "app",
+        "experiments",
+        "monitoring",
+        "overlay",
+        "planning",
+        "protocol",
+        "server",
+        "streaming",
+        "tests",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-006",
+        "IMP-015",
+        "IMP-029",
+        "IMP-030",
+        "IMP-032",
+        "IMP-033"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-009",
+        "V-018",
+        "V-028",
+        "V-029",
+        "V-031",
+        "V-031-A",
+        "V-031-B",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "CON-001",
+      "legacy_id": "RC-001",
+      "adrs": [
+        "ADR-008",
+        "ADR-011",
+        "ADR-021"
+      ],
+      "components": [
+        "CORE",
+        "config",
+        "experiments",
+        "overlay",
+        "server",
+        "streaming",
+        "tests"
+      ],
+      "implementation_tasks": [
+        "IMP-024",
+        "IMP-025",
+        "IMP-026",
+        "IMP-027",
+        "IMP-028",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-025",
+        "V-025-A",
+        "V-025-B",
+        "V-026",
+        "V-026-A",
+        "V-026-B",
+        "V-027",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "CON-002",
+      "legacy_id": "RC-002",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-030"
+      ],
+      "tests": [
+        "V-029"
+      ]
+    },
+    {
+      "requirement": "CON-003",
+      "legacy_id": "RC-003",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-030",
+        "IMP-031"
+      ],
+      "tests": [
+        "V-029",
+        "V-030"
+      ]
+    },
+    {
+      "requirement": "CON-004",
+      "legacy_id": "RC-004",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-031"
+      ],
+      "tests": [
+        "V-030"
+      ]
+    },
+    {
+      "requirement": "CON-005",
+      "legacy_id": "RC-005",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-031",
+        "IMP-032",
+        "IMP-033"
+      ],
+      "tests": [
+        "V-030",
+        "V-031",
+        "V-031-A",
+        "V-031-B"
+      ]
+    },
+    {
+      "requirement": "CON-006",
+      "legacy_id": "RC-006",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-032",
+        "IMP-033"
+      ],
+      "tests": [
+        "V-031",
+        "V-031-A",
+        "V-031-B"
+      ]
+    },
+    {
+      "requirement": "CON-007",
+      "legacy_id": "RC-007",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-006",
+        "IMP-015",
+        "IMP-032",
+        "IMP-033"
+      ],
+      "tests": [
+        "V-009",
+        "V-018",
+        "V-031",
+        "V-031-A",
+        "V-031-B"
+      ]
+    },
+    {
+      "requirement": "REQ-016",
+      "legacy_id": "RP-001",
+      "adrs": [
+        "ADR-004"
+      ],
+      "components": [
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-009",
+        "IMP-022",
+        "IMP-023"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-012",
+        "V-023",
+        "V-024",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-017",
+      "legacy_id": "RP-002",
+      "adrs": [
+        "ADR-005"
+      ],
+      "components": [
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-011",
+        "IMP-012"
+      ],
+      "tests": [
+        "V-014",
+        "V-015"
+      ]
+    },
+    {
+      "requirement": "REQ-018",
+      "legacy_id": "RP-003",
+      "adrs": [
+        "ADR-006",
+        "ADR-009"
+      ],
+      "components": [
+        "client",
+        "protocol",
+        "server",
+        "streaming",
+        "tests"
+      ],
+      "implementation_tasks": [
+        "IMP-016",
+        "IMP-017",
+        "IMP-018",
+        "IMP-019",
+        "IMP-021",
+        "IMP-022"
+      ],
+      "tests": [
+        "V-019",
+        "V-020",
+        "V-020-A",
+        "V-020-B",
+        "V-020-C",
+        "V-022",
+        "V-023"
+      ]
+    },
+    {
+      "requirement": "REQ-019",
+      "legacy_id": "RP-004",
+      "adrs": [
+        "ADR-004"
+      ],
+      "components": [
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-010"
+      ],
+      "tests": [
+        "V-013"
+      ]
+    },
+    {
+      "requirement": "REQ-020",
+      "legacy_id": "RP-005",
+      "adrs": [
+        "ADR-008",
+        "ADR-011"
+      ],
+      "components": [
+        "CORE",
+        "experiments",
+        "tests"
+      ],
+      "implementation_tasks": [
+        "IMP-024",
+        "IMP-025",
+        "IMP-026",
+        "IMP-027",
+        "IMP-028"
+      ],
+      "tests": [
+        "V-025",
+        "V-025-A",
+        "V-025-B",
+        "V-026",
+        "V-026-A",
+        "V-026-B",
+        "V-027"
+      ]
+    },
+    {
+      "requirement": "REQ-021",
+      "legacy_id": "RP-006",
+      "adrs": [
+        "ADR-001",
+        "ADR-007",
+        "ADR-008",
+        "ADR-009",
+        "ADR-010",
+        "ADR-012",
+        "ADR-014",
+        "ADR-015",
+        "ADR-016",
+        "ADR-017",
+        "ADR-020",
+        "ADR-021",
+        "ADR-026"
+      ],
+      "components": [
+        "app",
+        "bootstrap",
+        "client",
+        "config",
+        "experiments",
+        "monitoring",
+        "overlay",
+        "planning",
+        "protocol",
+        "routing",
+        "server",
+        "streaming",
+        "tests",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-004",
+        "IMP-007",
+        "IMP-008",
+        "IMP-011",
+        "IMP-016",
+        "IMP-020",
+        "IMP-021"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-007",
+        "V-010",
+        "V-011",
+        "V-014",
+        "V-019",
+        "V-021",
+        "V-022",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "REQ-022",
+      "legacy_id": "RP-007",
+      "adrs": [
+        "ADR-023"
+      ],
+      "components": [
+        "delivery",
+        "report",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-030"
+      ],
+      "tests": [
+        "V-029"
+      ]
+    },
+    {
+      "requirement": "REQ-023",
+      "legacy_id": "RP-008",
+      "adrs": [
+        "ADR-022",
+        "ADR-023"
+      ],
+      "components": [
+        "app",
+        "delivery",
+        "experiments",
+        "monitoring",
+        "report",
+        "streaming",
+        "team"
+      ],
+      "implementation_tasks": [
+        "IMP-005",
+        "IMP-010",
+        "IMP-023",
+        "IMP-024",
+        "IMP-025",
+        "IMP-029",
+        "IMP-031"
+      ],
+      "tests": [
+        "V-008",
+        "V-013",
+        "V-024",
+        "V-025",
+        "V-025-A",
+        "V-025-B",
+        "V-028",
+        "V-030"
+      ]
+    },
+    {
+      "requirement": "REQ-024",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-016"
+      ],
+      "components": [
+        "app",
+        "config",
+        "monitoring",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-002"
+      ],
+      "tests": [
+        "V-032"
+      ]
+    },
+    {
+      "requirement": "CON-008",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-025"
+      ],
+      "components": [
+        "experiments",
+        "monitoring",
+        "routing"
+      ],
+      "implementation_tasks": [
+        "IMP-007",
+        "IMP-013",
+        "IMP-026",
+        "IMP-027",
+        "IMP-029"
+      ],
+      "tests": [
+        "V-010",
+        "V-016",
+        "V-026",
+        "V-026-A",
+        "V-026-B",
+        "V-028"
+      ]
+    },
+    {
+      "requirement": "CON-009",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-026"
+      ],
+      "components": [
+        "planning",
+        "tests"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-002"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-032",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "INT-001",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-013",
+        "ADR-024"
+      ],
+      "components": [
+        "bootstrap",
+        "overlay",
+        "planning"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-023",
+        "IMP-028",
+        "IMP-032",
+        "IMP-033"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-024",
+        "V-027",
+        "V-031",
+        "V-031-A",
+        "V-031-B",
+        "V-ADD"
+      ]
+    },
+    {
+      "requirement": "INT-002",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-016",
+        "ADR-024"
+      ],
+      "components": [
+        "app",
+        "config",
+        "monitoring",
+        "planning",
+        "routing",
+        "streaming"
+      ],
+      "implementation_tasks": [
+        "IMP-001",
+        "IMP-002"
+      ],
+      "tests": [
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-032",
+        "V-ADD"
+      ]
+    }
+  ],
+  "counts": {
+    "requirements": 40,
+    "adrs": 26,
+    "implementation_tasks": 33,
+    "bolts": 33,
+    "stories": 33,
+    "units": 7,
+    "source_tasks": 32
+  },
+  "parameters": [
+    [
+      "control.connect.timeout.ms",
+      2000,
+      "todos",
+      "1..2147483647 ms",
+      "timeout do dial"
+    ],
+    [
+      "control.shutdown.timeout.ms",
+      3000,
+      "todos",
+      "1..2147483647 ms",
+      "prazo global do shutdown"
+    ],
+    [
+      "control.max.connections",
+      64,
+      "todos",
+      "1..64",
+      "reservas incluindo dials"
+    ],
+    [
+      "control.queue.capacity",
+      256,
+      "todos",
+      "1..256",
+      "frames por saída TCP"
+    ],
+    [
+      "bootstrap.query.timeout.ms",
+      3000,
+      "todos",
+      "1..2147483647 ms",
+      "consulta inicial completa; deadline total após ligação"
+    ],
+    [
+      "overlay.hello.timeout.ms",
+      3000,
+      "overlay",
+      "1..2147483647 ms",
+      "handshake"
+    ],
+    [
+      "overlay.retry.initial.ms",
+      500,
+      "overlay",
+      "1..2147483647 ms",
+      "backoff inicial"
+    ],
+    [
+      "overlay.retry.max.ms",
+      5000,
+      "overlay",
+      "1..2147483647 ms",
+      "teto final incluindo jitter"
+    ],
+    [
+      "overlay.retry.jitter.percent",
+      10,
+      "overlay",
+      "0..100 inteiro",
+      "variação limitada pelo teto"
+    ],
+    [
+      "monitor.probe.interval.ms",
+      1000,
+      "overlay",
+      "1..2147483647 ms",
+      "uma sonda pendente por vizinho"
+    ],
+    [
+      "monitor.probe.timeout.ms",
+      1000,
+      "overlay",
+      "1..2147483647 ms",
+      "timeout por sonda"
+    ],
+    [
+      "monitor.probe.failures",
+      3,
+      "overlay",
+      "1..2147483647 inteiro",
+      "timeouts consecutivos"
+    ],
+    [
+      "monitor.ewma.alpha",
+      0.2,
+      "overlay",
+      "finito; 0 < alpha ≤ 1",
+      "suavização de RTT"
+    ],
+    [
+      "routing.announce.interval.ms",
+      2000,
+      "overlay",
+      "1..2147483647 ms",
+      "geração periódica"
+    ],
+    [
+      "routing.candidate.ttl.ms",
+      8000,
+      "overlay",
+      "1..2147483647 ms",
+      "validade do candidato"
+    ],
+    [
+      "routing.cache.capacity",
+      4096,
+      "overlay",
+      "1..4096",
+      "chaves de flooding"
+    ],
+    [
+      "routing.cache.ttl.ms",
+      16000,
+      "overlay",
+      "1..2147483647 ms",
+      "expiração da cache"
+    ],
+    [
+      "routing.flood.max.per.sec",
+      10,
+      "overlay",
+      "1..10",
+      "reenvios por stream/vizinho"
+    ],
+    [
+      "routing.activate.timeout.ms",
+      3000,
+      "overlay",
+      "1..2147483647 ms",
+      "tentativa de ativação"
+    ],
+    [
+      "routing.activate.attempts",
+      3,
+      "overlay",
+      "1..2147483647 inteiro",
+      "tentativas por ronda, sem loop ilimitado"
+    ],
+    [
+      "subscription.lease.ms",
+      6000,
+      "overlay",
+      "1..2147483647 ms",
+      "lease máximo concedido"
+    ],
+    [
+      "subscription.renew.ms",
+      2000,
+      "overlay",
+      "1..2147483647 ms",
+      "período máximo de renovação"
+    ],
+    [
+      "routing.switch.improvement.percent",
+      20,
+      "overlay",
+      "0..100 inteiro",
+      "redução relativa mínima; exigir custo estritamente menor"
+    ],
+    [
+      "routing.switch.observations",
+      3,
+      "overlay",
+      "1..2147483647 inteiro",
+      "observações consecutivas válidas"
+    ],
+    [
+      "routing.switch.min.dwell.ms",
+      5000,
+      "overlay",
+      "1..2147483647 ms",
+      "permanência após última troca"
+    ],
+    [
+      "node.events.capacity",
+      4096,
+      "overlay",
+      "1..4096",
+      "fila de eventos de controlo"
+    ],
+    [
+      "video.egress.capacity",
+      256,
+      "overlay",
+      "1..256",
+      "datagramas por saída"
+    ],
+    [
+      "video.reassembly.max.frames",
+      8,
+      "overlay",
+      "1..8",
+      "montagens por stream"
+    ],
+    [
+      "video.reassembly.deadline.ms",
+      250,
+      "overlay",
+      "1..2147483647 ms",
+      "prazo desde primeiro fragmento"
+    ],
+    [
+      "source.max.frame.bytes",
+      99999,
+      "SERVER",
+      "1..99999",
+      "limite local do perfil de cinco dígitos"
+    ]
+  ]
+}
