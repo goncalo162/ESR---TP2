@@ -55,3 +55,20 @@ specs.md e add.md criados; 40 entradas, 26 ADR, 33 IMP/bolts/histórias, sete un
 As quatro escolhas específicas estão aprovadas; a revisão final destes artefactos
 não é presumida. Nenhum bolt ou teste Java/GUI/CORE executado nesta reconciliação.
 Primeiro código novo depois da verificação da base: 019-overlay/TASK-032.
+
+## Revisão técnica de 2026-11-03
+
+Executada a opção de revisão selecionada pelo utilizador. A
+[revisão dos artefactos](inception-review.md) confirma sete unidades,
+33 histórias/IMP/bolts e cobertura direta das 40 entradas canónicas.
+Não foram identificadas lacunas impeditivas no planeamento revisto.
+
+[Validação atual](../../../experiments/inception-review-validation-2026-11-03.md):
+`python3 scripts/validate-planning.py --check-snapshot --report experiments/inception-review-validation-2026-11-03.md`.
+Resultado: zero erros, dependências sem ciclos e 219 hashes conferidos.
+Não foram executados testes Java, GUI, CORE ou qualquer bolt.
+
+Checkpoint 3: resumo de revisão preparado para aprovação humana. A seleção
+da revisão não é aprovação dos artefactos; status e checkpoint mantêm-se
+in-progress/artifact-review-pending. A transição para Construction é o
+checkpoint seguinte, após aprovação dos artefactos.
