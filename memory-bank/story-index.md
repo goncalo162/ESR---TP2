@@ -1,11 +1,18 @@
 # Índice global de histórias
 
-33 histórias geradas; nenhuma iniciada/concluída nesta reconciliação. IDs antigos conservados.
+33 histórias geradas na reconciliação inicial. IDs antigos conservados.
 GENERATED indica criação documental, não implementação. Fonte de arquitetura: [ADD](../add.md).
+
+Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+aprovados; [checkpoint 5 preparado](bolts/001-base-validada/closure-walkthrough.md),
+pendente de revisão final/integração. Nenhuma história marcada complete;
+as restantes 32 histórias/bolts não foram iniciadas.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED
 
 **Tarefa:** IMP-001. **Estado:** planned. **Bolt:** 001-base-validada.
+Estado do bolt: in-progress/test; verificação aprovada, fecho ainda não aplicado.
+O frontmatter da história será atualizado pela cascata de fecho, após integração.
 **Ficheiro:** [001-verificar-base](intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md).
 
 ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED

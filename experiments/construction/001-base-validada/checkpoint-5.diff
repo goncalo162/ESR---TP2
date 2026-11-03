@@ -1,0 +1,442 @@
+diff --git a/memory-bank/bolts/001-base-validada/bolt.md b/memory-bank/bolts/001-base-validada/bolt.md
+--- a/memory-bank/bolts/001-base-validada/bolt.md
++++ b/memory-bank/bolts/001-base-validada/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["001-verificar-base"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T21:32:04Z"
++updated: "2026-11-03T21:42:46Z"
+ started: "2026-11-03T21:03:35Z"
+ completed: null
+ current_stage: "test"
+-stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-03T21:22:32Z", "artifact": "implementation-walkthrough.md"}]
++stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-03T21:22:32Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-03T21:40:56Z", "artifact": "test-walkthrough.md"}]
+ requires_bolts: []
+ enables_bolts: ["002-overlay", "003-overlay", "004-overlay", "019-overlay", "020-overlay"]
+ requires_units: []
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 001-base-validada — Verificar a base herdada
+ 
+-## Retoma — checkpoint 4
++## Retoma — checkpoint 5
+ 
+ Planeamento iniciado em 2026-11-03T21:03:35Z, após leitura e comunicação do
+ estado ao utilizador. [Plano](implementation-plan.md) e
+@@ -54,16 +54,20 @@
+ Entregável do checkpoint 3: [implementation-walkthrough.md](implementation-walkthrough.md).
+ O utilizador aprovou o checkpoint 3, com registo em 2026-11-03T21:22:32Z,
+ e autorizou V-001–005/V-ADD, fixtures, POM/provider, clean verify com JDK 21
+-e teste manual. Implement concluído; bolt in-progress/test. Parar no checkpoint 4,
+-sem fechar o bolt. Apresentar qualquer lacuna antes de alterar fundações/testes.
++e teste manual. A execução parou no checkpoint 4 para revisão, sem fechar o bolt.
+ 
+ [Validação executada](test-walkthrough.md): regressão nova com 149 testes,
+ zero falhas/erros/skips; 45 fixtures conferidas; V-ADD sem erros; teste manual
+ com 22 verificações aprovadas. Resultados e limitações preparados em
+-2026-11-03T21:32:04Z, pendentes de revisão do checkpoint 4. Nenhuma alteração
++2026-11-03T21:32:04Z e aprovados explicitamente pelo utilizador, com registo em
++2026-11-03T21:40:56Z. Nenhuma alteração
+ das fundações/testes necessária. O build alterou apenas uma lista gerada
+ rastreada em Projeto/target/; os restantes 162 hashes de Projeto/ mantêm-se.
+-Test, critérios globais e fecho continuam por aprovar/concluir.
++Test concluído após essa aprovação. Os critérios técnicos abaixo estão cumpridos;
++o bolt permanece in-progress/test e completed=null enquanto o fecho aguarda
++revisão do checkpoint 5 e evidência de integração na base comum. A documentação
++local ainda não está integrada; não há autorização para commit/push.
++[Preparação do fecho](closure-walkthrough.md), sem iniciar outro bolt.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -80,15 +84,19 @@
+ 
+ 1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+-3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
++3. [x] **test** → `test-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 
+ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Confirmar componentes reais e manter TASK-001–005 DONE, sem os reimplementar.
+-- [ ] Conferir 45 fixtures, 16 tipos ativos e o ADD/specs/DAG antes de libertar nova construção.
+-- [ ] Executar a regressão existente no ambiente de Construction, guardando um novo log; 149 é total histórico, não resultado atual.
++- [x] Confirmar componentes reais e manter TASK-001–005 DONE, sem os reimplementar.
++- [x] Conferir 45 fixtures, 16 tipos ativos e o ADD/specs/DAG antes de libertar nova construção.
++- [x] Executar a regressão existente no ambiente de Construction, guardando um novo log; 149 é total histórico, não resultado atual.
++
++Os 149 testes do checkpoint 4 são resultado atual contado nos XML novos;
++a formulação do critério preserva a obrigação de não reutilizar a contagem histórica.
++Critérios técnicos cumpridos não substituem revisão/integração para estado complete.
+ 
+ ## Evidência e fecho
+ 
+diff --git a/memory-bank/bolts/001-base-validada/implementation-plan.md b/memory-bank/bolts/001-base-validada/implementation-plan.md
+--- a/memory-bank/bolts/001-base-validada/implementation-plan.md
++++ b/memory-bank/bolts/001-base-validada/implementation-plan.md
+@@ -15,7 +15,9 @@
+ 
+ Validação executada e apresentada no [relatório do checkpoint 4](test-walkthrough.md):
+ 149 testes aprovados, 45 fixtures, V-ADD sem erros e teste manual com 22 checks.
+-Aguardam revisão humana; a autorização de fecho não foi dada. As descrições
++O utilizador aprovou esses resultados, com registo em 2026-11-03T21:40:56Z,
++e autorizou apenas preparar o checkpoint 5. [Fecho preparado](closure-walkthrough.md),
++pendente de revisão final e integração, sem autorização para commit/push. As descrições
+ de estado inicial e verificações previstas abaixo documentam o plano aprovado.
+ 
+ ## Estado observado e fontes
+diff --git a/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md b/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
+--- a/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
++++ b/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
+@@ -5,7 +5,8 @@
+ 2026-11-03T21:16:53Z. Nenhuma suite, build, validação V-ADD ou teste manual
+ executados nesse checkpoint. As pendências/estados abaixo retratam a revisão
+ estática; a execução posterior está no [relatório do checkpoint 4](test-walkthrough.md),
+-com resultados preparados e revisão humana ainda pendente.
++com resultados aprovados pelo utilizador no checkpoint 4. O
++[checkpoint 5](closure-walkthrough.md) prepara o fecho; integração pendente.
+ 
+ ## Autorização e posição no bolt
+ 
+diff --git a/memory-bank/bolts/001-base-validada/implementation-walkthrough.md b/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
+--- a/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
++++ b/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
+@@ -6,7 +6,9 @@
+ checkpoint 3; a execução da validação foi autorizada depois dessa revisão.
+ 
+ Resultados posteriores: [validação do checkpoint 4](test-walkthrough.md),
+-executada após essa aprovação, aguardando revisão. As secções seguintes são
++executada após essa aprovação e aprovada pelo utilizador no checkpoint 4.
++[Checkpoint 5](closure-walkthrough.md) preparado, sem integração presumida.
++As secções seguintes são
+ o retrato do checkpoint 3; referências a pendências/autorização são desse momento.
+ 
+ ## Autorização e estado na apresentação do checkpoint 3
+diff --git a/memory-bank/bolts/001-base-validada/test-walkthrough.md b/memory-bank/bolts/001-base-validada/test-walkthrough.md
+--- a/memory-bank/bolts/001-base-validada/test-walkthrough.md
++++ b/memory-bank/bolts/001-base-validada/test-walkthrough.md
+@@ -1,8 +1,11 @@
+ # IMP-001 — Checkpoint 4: validação executada
+ 
+ Registo preparado em 2026-11-03T21:32:04Z, após aprovação explícita do
+-checkpoint 3, registada em 2026-11-03T21:22:32Z. O checkpoint 4 aguarda revisão
+-do utilizador. Bolt in-progress/test; sem fecho, integração ou commit presumidos.
++checkpoint 3, registada em 2026-11-03T21:22:32Z. O utilizador aprovou o checkpoint 4
++e os resultados apresentados, com registo em 2026-11-03T21:40:56Z, autorizando
++apenas o checkpoint 5. Test concluído; [fecho preparado](closure-walkthrough.md),
++sem integração ou commit presumidos. Os resultados abaixo são da execução do
++checkpoint 4; não foi necessário repetir Maven ou o teste manual para editar documentação.
+ 
+ ## Resultado e ambiente
+ 
+@@ -145,7 +148,8 @@
+ os dois auxiliares novos de auditoria/manual são evidência fora de Projeto/.
+ Nenhum commit, push, branch, deploy ou upload foi feito.
+ 
+-Parar no checkpoint 4. A revisão destes resultados pelo utilizador, a revisão
+-humana final e a integração ainda não são presumidas. A etapa test e os
+-critérios globais não são marcados concluídos antes dessa validação; bolt,
+-história e unidade permanecem in-progress. O checkpoint 5 não foi autorizado.
++O ponto de paragem do checkpoint 4 foi respeitado e os resultados foram depois
++aprovados explicitamente pelo utilizador. Test e os critérios técnicos do bolt
++estão concluídos. A revisão do fecho e a integração continuam pendentes no
++checkpoint 5; bolt/unidade permanecem in-progress e a história conserva planned
++até a cascata de fecho ser aplicada. Nenhum estado complete foi presumido.
+diff --git a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "BASELINE"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T21:32:04Z"
++updated: "2026-11-03T21:42:46Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
+@@ -28,4 +28,9 @@
+ 
+ ## Dependências e critérios de fecho
+ 
++Checkpoint 4 aprovado pelo utilizador, com registo em 2026-11-03T21:40:56Z.
++Plan/Implement/Test concluídos no bolt; [checkpoint 5 preparado](../../../../bolts/001-base-validada/closure-walkthrough.md).
++Unidade in-progress enquanto a revisão do fecho e a integração na base comum
++estiverem pendentes. Não se inicia 019-overlay por esta atualização.
++
+ Concluir verificação da base herdada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md b/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "001-base-validada"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T21:03:35Z"
+-updated: "2026-11-03T21:32:04Z"
++updated: "2026-11-03T21:42:46Z"
+ ---
+ 
+ # Registo Construction — 001-base-validada
+@@ -50,11 +50,23 @@
+   hashes rastreados de Projeto/ iguais, com única diferença na lista gerada
+   createdFiles.lst de target/ após o build. Nenhuma lacuna exige intervir nas
+   fundações. Bolt in-progress/test; história/unidade não concluídas.
+-- Próxima ação: apresentar resultados e diff e aguardar validação do checkpoint 4;
+-  fecho do checkpoint 5 continua por autorizar.
++- **2026-11-03T21:40:56Z**: aprovação explícita do checkpoint 4 e dos resultados
++  registada; autorizado apenas checkpoint 5. Test concluído e critérios técnicos
++  cumpridos. Commit/push e integração não autorizados/presumidos.
++- **2026-11-03T21:42:27Z**: mecanismo de fecho ensaiado em cópias temporárias.
++  Script instalado sem fs-extra/js-yaml e serialização incompatível com o subset
++  local; adaptador de evidência usa só Node builtin e preserva a cascata instalada.
++  Ensaio aprovado; nenhum fecho aplicado ao repositório real. Ver Q-C-02.
++- **2026-11-03T21:42:46Z**: checkpoint 5 preparado para revisão, com estados,
++  progresso/rastreabilidade, evidência e diff. TASK-001–005 continuam DONE;
++  nenhuma tarefa seguinte iniciada. Integração dos documentos locais ainda pendente.
++- Próxima ação: apresentar o checkpoint 5 e obter revisão final/confirmação da
++  integração antes de executar a cascata de fecho. Bolt/unidade in-progress;
++  história planned, sem implemented=true até esse fecho. Sem commits/push.
+ 
+ Plano: [implementation-plan.md](../../../../bolts/001-base-validada/implementation-plan.md).
+ Checkpoint 2: [interfaces e testes](../../../../bolts/001-base-validada/interfaces-and-test-map.md).
+ Checkpoint 3: [walkthrough](../../../../bolts/001-base-validada/implementation-walkthrough.md).
+ Checkpoint 4: [validação](../../../../bolts/001-base-validada/test-walkthrough.md).
++Checkpoint 5: [preparação do fecho](../../../../bolts/001-base-validada/closure-walkthrough.md).
+ Evidência: experiments/construction/001-base-validada/.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -1,11 +1,18 @@
+ # Índice global de histórias
+ 
+-33 histórias geradas; nenhuma iniciada/concluída nesta reconciliação. IDs antigos conservados.
++33 histórias geradas na reconciliação inicial. IDs antigos conservados.
+ GENERATED indica criação documental, não implementação. Fonte de arquitetura: [ADD](../add.md).
++
++Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
++aprovados; [checkpoint 5 preparado](bolts/001-base-validada/closure-walkthrough.md),
++pendente de revisão final/integração. Nenhuma história marcada complete;
++as restantes 32 histórias/bolts não foram iniciadas.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-001. **Estado:** planned. **Bolt:** 001-base-validada.
++Estado do bolt: in-progress/test; verificação aprovada, fecho ainda não aplicado.
++O frontmatter da história será atualizado pela cascata de fecho, após integração.
+ **Ficheiro:** [001-verificar-base](intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md).
+ 
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -55,6 +55,13 @@
+ 
+ ## Extensões e matriz normativa do ADD
+ 
++IMP-001: a verificação da base e os resultados do checkpoint 4 foram aprovados
++pelo utilizador, com registo em 2026-11-03T21:40:56Z. [Validação atual](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
++149 testes aprovados (65 configuração, 66 codec, 18 transporte), 45 fixtures,
++16 tipos ativos, V-ADD sem erros e teste manual com 22 checks. [Fecho preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
++pendente de revisão final/integração; nenhum requisito global é promovido a DONE.
++Os estados e evidências legados acima conservam-se como histórico das TASK.
++
+ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+ CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -17,6 +17,21 @@
+ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em docs/team/, metadados nas 27 TASK futuras e ligações/regras de revisão nos documentos gerais/fases. Validação documental confirmou cobertura, atribuições sem auto-revisão, dependências sem ciclos e referências válidas; código/CORE preservados. Não foram executados build/testes Java nesta alteração exclusivamente documental. Não há implementação em curso por efeito desta distribuição.
+ 
+ ## Fases
++
++Estado Construction atual — IMP-001: Plan/Implement/Test concluídos e resultados
++do checkpoint 4 aprovados pelo utilizador, com registo em 2026-11-03T21:40:56Z.
++[Checkpoint 5 preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
++aguardando revisão final e integração dos documentos na base comum. Bolt/unidade
++001-base-validada continuam IN PROGRESS; história ainda planned até a cascata
++de fecho. A verificação não reimplementou TASK-001–005 nem promove requisitos
++globais a DONE. Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032,
++ainda não iniciado e dependente do fecho da base.
++
++[Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
++149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
++e 22 checks manuais. POM/fontes/configuração/fixtures/testes intactos; só a lista
++gerada createdFiles.lst mudou em Projeto/target/ pelo build. Sem GUI/CORE,
++commit/push ou integração presumidos. A DoD foi revista e preservada.
+ 
+ | Fase | Tarefas | Estado | Dependência / gate |
+ |---|---|---|---|
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -21,3 +21,24 @@
+   apresentando lacunas antes de alterar fundações/testes e parando para revisão.
+   Não se autoriza omitir a regressão com log novo ou o teste manual na validação.
+   Não altera o procedimento dos restantes IMP nem requer nova ADR.
++
++## Q-C-02 — Compatibilidade do mecanismo de fecho
++
++- Registo do diagnóstico/ensaio: 2026-11-03T21:42:27Z; apenas IMP-001/checkpoint 5.
++- Estado: resolvida tecnicamente em cópia temporária; fecho real ainda não aplicado.
++- O script local não existe; o instalado em /home/luis/.specsmd/aidlc/scripts/bolt-complete.cjs
++  falha por falta de fs-extra. Também não está disponível js-yaml. A inspeção
++  do serializer mostra YAML genérico, incompatível com os valores JSON do
++  parser local; não se alterou esse parser nem se instalaram dependências.
++- Solução de ferramenta: [preload](../experiments/construction/001-base-validada/bolt-complete-json-frontmatter.cjs)
++  que fornece apenas as quatro operações fs-extra utilizadas a partir de Node
++  builtin e load/dump do subset local, preservando a lógica/cascata instalada.
++- [Ensaio isolado](../experiments/construction/001-base-validada/completion-tool-compatibility.json):
++  execução nativa falha antes de escrever; com adaptação, código 0, metadados
++  aceites pelo parser local, bolt/história/unidade completos só na cópia,
++  intent e os outros 32 bolts preservados. Sem fecho real ou história editada
++  manualmente. A primeira tentativa do auxiliar de ensaio assumia a presença
++  das dependências; o diagnóstico e o log foram preservados.
++- Impacto: nenhum no runtime Java, wire, âmbito ou ADR; é adaptação de ferramenta
++  ao esquema já existente. Não dispensa revisão final nem integração, exigidas
++  pelo utilizador/DoD antes do estado complete.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -248,9 +248,9 @@
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "669b0432b2f297254e34eacd3e19592b2db636be9230ab25578aece0cd19b907",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "e98ab4c0dbfd9b2f4921329d79b509e4d6ff37605815bdf64e4682b9d590a11e",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "6a1cc68dec9c40c23cdc6c90aa4555b71824a4e0331db097ce5b9bf53e16efc0",
++    "docs/15-PROJECT-PROGRESS.md": "39fbfd1e24511b15de50866866dd50c5af2966d177f13836b6a2043c1635482b",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+     "docs/18-CONSTRUCTION-BOLTS.md": "4148a1b56af0352c3e0ab7db132d524e2aec8455b3cfe52cc2bfdfbac5549f0e",
+@@ -303,7 +303,7 @@
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
+   },
+-  "updated": "2026-11-03T20:54:11Z",
++  "updated": "2026-11-03T21:45:46Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -455,6 +455,18 @@
+         "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+         "docs/team/00-COORDINATION.md": "f6bb6d48fbb48a6c619b7766a1a0f12d52051aadc852067445d8b104a4c3927c"
+       }
++    },
++    {
++      "updated": "2026-11-03T21:45:46Z",
++      "reason": "IMP-001 checkpoint 4 aprovado; preparação autorizada do checkpoint 5, com progresso/rastreabilidade e integração explicitamente pendente. Sem mudança de requisitos/arquitetura/código.",
++      "previous_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "669b0432b2f297254e34eacd3e19592b2db636be9230ab25578aece0cd19b907",
++        "docs/15-PROJECT-PROGRESS.md": "6a1cc68dec9c40c23cdc6c90aa4555b71824a4e0331db097ce5b9bf53e16efc0"
++      },
++      "updated_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "e98ab4c0dbfd9b2f4921329d79b509e4d6ff37605815bdf64e4682b9d590a11e",
++        "docs/15-PROJECT-PROGRESS.md": "39fbfd1e24511b15de50866866dd50c5af2966d177f13836b6a2043c1635482b"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/001-base-validada/closure-walkthrough.md b/memory-bank/bolts/001-base-validada/closure-walkthrough.md
+--- /dev/null
++++ b/memory-bank/bolts/001-base-validada/closure-walkthrough.md
+@@ -0,0 +1,96 @@
++# IMP-001 — Checkpoint 5: preparação do fecho
++
++Checkpoint 4 e resultados aprovados explicitamente pelo utilizador, com registo
++em 2026-11-03T21:40:56Z. Autorizado avançar apenas para o checkpoint 5.
++Preparação registada em 2026-11-03T21:42:46Z; nenhum commit/push autorizado.
++
++## Critérios e revisão
++
++| Critério | Evidência/estado |
++|---|---|
++| Componentes reais e TASK-001–005 DONE preservadas | Inspeção aprovada nos checkpoints 2/3; POM/fontes/configuração/fixtures/testes sem alterações |
++| 45 fixtures, 16 tipos e ADD/specs/DAG conferidos | Auditoria independente e V-ADD aprovados no checkpoint 4 |
++| Regressão existente com log novo | clean verify/JDK 21: 149 testes, zero falhas/erros/skips; relatórios Surefire novos |
++| Teste manual adequado à base | 22 CHECK_PASS: configuração/codec/TCP/shutdown e reutilização de porta |
++| Revisão dos resultados | Aprovação explícita do utilizador do checkpoint 4; não atribuída por inferência a outra pessoa |
++| Revisão documental final e integração | Pendentes; os documentos do bolt continuam locais e não há evidência de integração na base comum |
++
++Relatório: [test-walkthrough](test-walkthrough.md). Evidência aceita no checkpoint 4
++em experiments/construction/001-base-validada/, preservada sem sobrescrever logs,
++XML, auditoria ou manifesto desse checkpoint. Não se repetiu Maven/teste manual
++por alterações documentais; a validação documental é executada novamente.
++GUI/CORE/vídeo não foram executados nem são comprovados pelo loopback.
++
++## Estados e alcance do checkpoint
++
++Plan, Implement e Test concluídos; a última etapa tem como data de conclusão
++o registo real da aprovação do checkpoint 4. Os três critérios técnicos do bolt
++estão assinalados. O bolt continua in-progress/test, completed=null: não há etapa
++"closure" no tipo local, pelo que o fecho pendente é explicado no corpo/registo.
++Unidade in-progress. História conserva planned/sem implemented=true até a
++cascata de fecho; o índice explicita esse estado e a execução do bolt.
++
++TASK-001–005 mantêm DONE; TASK-006–032 e os outros 32 bolts não foram iniciados.
++Nenhum requisito global, fase, intent, GUI/CORE ou entrega é declarado concluído.
++Atualizados progresso, rastreabilidade, índice, registo e apontadores locais.
++DoD e critérios dos TASK pais foram revistos sem alterar as regras ou o seu estado.
++O próximo código pelo DAG é IMP-002/019-overlay/TASK-032, apenas após fecho da base
++e pedido de execução; o seu revisor distinto mantém-se gate próprio.
++
++## Integração e mecanismo de fecho
++
++A [DoD](../../../docs/14-DEFINITION-OF-DONE.md) exige revisão/integração para DONE;
++a [coordenação, secções 6–7](../../../docs/team/00-COORDINATION.md#6-ramos-ficheiros-partilhados-e-integração)
++permite revisão por diff local e exige integração pela prática Git da equipa.
++A aprovação dos resultados é real; integração ainda não foi comprovada.
++Não se cria commit, branch ou push para presumir essa integração. Não é um
++gate externo novo: preserva a condição de fecho já reiterada pelo utilizador.
++
++O mecanismo obrigatório da skill bolt-start foi inspecionado e ensaiado em
++cópias temporárias. O script instalado não tem fs-extra/js-yaml disponíveis;
++o seu YAML genérico não respeita o subset JSON do validador local. [Q-C-02](../../../docs/construction-duvidas.md#q-c-02--compatibilidade-do-mecanismo-de-fecho)
++regista a adaptação de ferramenta, sem nova ADR ou dependência runtime.
++
++O [adaptador](../../../experiments/construction/001-base-validada/bolt-complete-json-frontmatter.cjs)
++usa apenas Node builtin, restringe as substituições ao script instalado e mantém
++a lógica de atualização de bolt/história/unidade/intent. O
++[ensaio](../../../experiments/construction/001-base-validada/completion-tool-compatibility.json)
++teve código 0 com metadados aceites pelo parser; o
++[log](../../../experiments/construction/001-base-validada/completion-rehearsal-json-subset.log)
++mostra uma história atualizada, unidade concluída e intent preservado por ter
++seis unidades incompletas, exclusivamente na cópia. Não é prova de fecho real.
++Os outros 32 bolts permaneceram intactos; o script instalado não foi editado.
++
++Comando preparado para aplicar o fecho na raiz, apenas após revisão/integração
++confirmadas, não executado neste repositório:
++
++```sh
++node --require ./experiments/construction/001-base-validada/bolt-complete-json-frontmatter.cjs /home/luis/.specsmd/aidlc/scripts/bolt-complete.cjs 001-base-validada
++```
++
++Depois, conferir cascata, checkboxes/índice/progresso e timestamps reais, validar
++documentação e guardar a saída real. Não atribuir à execução em cópia o valor
++de completed do bolt real. Não se pede nova aprovação dos resultados do checkpoint 4.
++
++## Diff e evidência final desta preparação
++
++Baseline antes do checkpoint 5: checkpoint-5-baseline.json, com textos e hashes
++de toda a evidência anterior. Diff incremental: checkpoint-5.diff; cumulativo
++do bolt: bolt-through-checkpoint-5.diff; scripts auxiliares: checkpoint-5-evidence-scripts.diff.
++O pre-existing.diff continua a separar as alterações de Inception.
++O manifesto de fontes atualiza apenas os hashes de docs/13 e docs/15, com
++motivo e hashes anteriores preservados; nenhuma fonte de código é ressincronizada.
++
++Os 162/163 hashes de Projeto/ iguais e a única lista gerada alterada pelo build
++mantêm-se como no checkpoint 4. A preservação detalhada, git diff --check, estados
++e numstat ficam em checkpoint-5-preservation.json. Nenhuma nova execução Java,
++medição, data docente, aprovação pessoal, integração ou upload é inventado.
++
++Validação documental desta preparação em 2026-11-03T21:45:46Z:
++[V-ADD com snapshot](../../../experiments/construction/001-base-validada/planning-validation-checkpoint-5.md),
++zero erros, 220 hashes e 45 fixtures conferidos. O relatório guarda a hora e
++a contagem de referências da execução mais recente após os apontadores finais.
++
++Parar no checkpoint 5 para revisão deste fecho e confirmação da integração na
++base comum. O estado complete só será aplicado quando essa condição estiver
++satisfeita; não iniciar outro bolt por inferência.

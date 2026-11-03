@@ -1,0 +1,375 @@
+diff --git a/memory-bank/bolts/001-base-validada/bolt.md b/memory-bank/bolts/001-base-validada/bolt.md
+--- a/memory-bank/bolts/001-base-validada/bolt.md
++++ b/memory-bank/bolts/001-base-validada/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["001-verificar-base"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T21:16:53Z"
++updated: "2026-11-03T21:32:04Z"
+ started: "2026-11-03T21:03:35Z"
+ completed: null
+-current_stage: "implement"
+-stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}]
++current_stage: "test"
++stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-03T21:22:32Z", "artifact": "implementation-walkthrough.md"}]
+ requires_bolts: []
+ enables_bolts: ["002-overlay", "003-overlay", "004-overlay", "019-overlay", "020-overlay"]
+ requires_units: []
+@@ -35,26 +35,35 @@
+ ---
+ # Bolt 001-base-validada — Verificar a base herdada
+ 
+-## Retoma — checkpoint 3
++## Retoma — checkpoint 4
+ 
+ Planeamento iniciado em 2026-11-03T21:03:35Z, após leitura e comunicação do
+ estado ao utilizador. [Plano](implementation-plan.md) e
+ [Q-C-01](../../../docs/construction-duvidas.md#q-c-01--testes-primeiro-no-imp-001)
+ aprovados explicitamente pelo utilizador, com registo em 2026-11-03T21:08:48Z.
+ Etapa plan concluída. O utilizador aprovou também o checkpoint 2, com registo
+-em 2026-11-03T21:16:53Z, e autorizou somente preparar o checkpoint 3: walkthrough
+-e diffs. Implement continua em curso; não executar build, regressão, V-ADD ou
+-teste manual antes da validação deste checkpoint.
++em 2026-11-03T21:16:53Z, e autorizou preparar o checkpoint 3: walkthrough
++e diffs. Esse checkpoint foi apresentado sem executar a validação.
+ O pedido do utilizador impõe cinco checkpoints, aplicados às etapas locais.
+ 
+ [Interfaces e mapeamento dos testes](interfaces-and-test-map.md) preparados
+ por inspeção em 2026-11-03T21:13:13Z e aprovados no checkpoint 2.
+ Nenhuma lacuna de âmbito que exija alterar fundações/testes identificada por
+-leitura. Nenhum build, suite, V-ADD ou teste manual executado neste checkpoint.
++leitura. Nenhum build, suite, V-ADD ou teste manual foi executado no checkpoint 2.
+ 
+ Entregável do checkpoint 3: [implementation-walkthrough.md](implementation-walkthrough.md).
+-O bolt permanece in-progress/implement, com apenas plan em stages_completed,
+-até à aprovação dos entregáveis e autorização da validação.
++O utilizador aprovou o checkpoint 3, com registo em 2026-11-03T21:22:32Z,
++e autorizou V-001–005/V-ADD, fixtures, POM/provider, clean verify com JDK 21
++e teste manual. Implement concluído; bolt in-progress/test. Parar no checkpoint 4,
++sem fechar o bolt. Apresentar qualquer lacuna antes de alterar fundações/testes.
++
++[Validação executada](test-walkthrough.md): regressão nova com 149 testes,
++zero falhas/erros/skips; 45 fixtures conferidas; V-ADD sem erros; teste manual
++com 22 verificações aprovadas. Resultados e limitações preparados em
++2026-11-03T21:32:04Z, pendentes de revisão do checkpoint 4. Nenhuma alteração
++das fundações/testes necessária. O build alterou apenas uma lista gerada
++rastreada em Projeto/target/; os restantes 162 hashes de Projeto/ mantêm-se.
++Test, critérios globais e fecho continuam por aprovar/concluir.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -70,7 +79,7 @@
+ ## Etapas e validação
+ 
+ 1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+-2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
++2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 
+ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+@@ -85,6 +94,6 @@
+ 
+ - Testes: V-001, V-002, V-003, V-004, V-005, V-ADD, detalhados no ADD; guardar comandos, ambiente, resultados e limites.
+ - Outputs e ficheiros: consultar [IMP-001](../../../add.md#imp-001).
+-- Prova futura: `experiments/construction/001-base-validada/` e relatório local do bolt.
++- Prova atual: `experiments/construction/001-base-validada/` e [relatório de validação](test-walkthrough.md).
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+diff --git a/memory-bank/bolts/001-base-validada/implementation-plan.md b/memory-bank/bolts/001-base-validada/implementation-plan.md
+--- a/memory-bank/bolts/001-base-validada/implementation-plan.md
++++ b/memory-bank/bolts/001-base-validada/implementation-plan.md
+@@ -2,14 +2,21 @@
+ 
+ Preparado em 2026-11-03T21:03:35Z. Checkpoint 1 e Q-C-01 aprovados pelo utilizador,
+ com registo em 2026-11-03T21:08:48Z. Checkpoint 2 aprovado pelo utilizador,
+-com registo em 2026-11-03T21:16:53Z; continuação autorizada apenas até ao checkpoint 3.
++com registo em 2026-11-03T21:16:53Z. Checkpoint 3 aprovado pelo utilizador,
++com registo em 2026-11-03T21:22:32Z; validação autorizada apenas até ao checkpoint 4.
+ Bolt/unidade: 001-base-validada. Tipo: simple-construction-bolt.
+ Etapas locais: Plan → Implement → Test, com os cinco checkpoints explícitos
+ do utilizador. O plano não autoriza automaticamente o checkpoint seguinte.
+ 
+ Inspeção do checkpoint 2 aprovada: [interfaces e mapeamento dos testes](interfaces-and-test-map.md).
+-Preparar o [walkthrough](implementation-walkthrough.md) e os diffs, parando no
+-checkpoint 3. Build, regressão e teste manual continuam por executar na validação.
++O [walkthrough](implementation-walkthrough.md) e os diffs foram aprovados no
++checkpoint 3. Autorizada a validação, incluindo build, regressão e teste manual;
++parar no checkpoint 4, sem fechar o bolt ou alterar fundações/testes por inferência.
++
++Validação executada e apresentada no [relatório do checkpoint 4](test-walkthrough.md):
++149 testes aprovados, 45 fixtures, V-ADD sem erros e teste manual com 22 checks.
++Aguardam revisão humana; a autorização de fecho não foi dada. As descrições
++de estado inicial e verificações previstas abaixo documentam o plano aprovado.
+ 
+ ## Estado observado e fontes
+ 
+diff --git a/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md b/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
+--- a/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
++++ b/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
+@@ -3,7 +3,9 @@
+ Inspeção estática preparada em 2026-11-03T21:11:16Z.
+ Estado: checkpoint 2 aprovado explicitamente pelo utilizador, com registo em
+ 2026-11-03T21:16:53Z. Nenhuma suite, build, validação V-ADD ou teste manual
+-executados neste checkpoint. Autorizado somente preparar o checkpoint 3.
++executados nesse checkpoint. As pendências/estados abaixo retratam a revisão
++estática; a execução posterior está no [relatório do checkpoint 4](test-walkthrough.md),
++com resultados preparados e revisão humana ainda pendente.
+ 
+ ## Autorização e posição no bolt
+ 
+diff --git a/memory-bank/bolts/001-base-validada/implementation-walkthrough.md b/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
+--- a/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
++++ b/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
+@@ -1,17 +1,22 @@
+ # IMP-001 — Walkthrough da base verificada por leitura
+ 
+ Preparação do checkpoint 3: 2026-11-03T21:16:53Z.
+-Estado: aguarda validação humana; nenhuma execução de build, regressão,
+-V-ADD ou teste manual foi realizada durante os checkpoints deste bolt.
++Estado: checkpoint 3 aprovado explicitamente pelo utilizador, com registo em
++2026-11-03T21:22:32Z. As pendências abaixo descrevem o estado apresentado no
++checkpoint 3; a execução da validação foi autorizada depois dessa revisão.
+ 
+-## Autorização e estado
++Resultados posteriores: [validação do checkpoint 4](test-walkthrough.md),
++executada após essa aprovação, aguardando revisão. As secções seguintes são
++o retrato do checkpoint 3; referências a pendências/autorização são desse momento.
++
++## Autorização e estado na apresentação do checkpoint 3
+ 
+ O utilizador aprovou o checkpoint 1 e Q-C-01 exclusivamente para IMP-001,
+-e aprovou depois o checkpoint 2. A autorização atual permite somente preparar
++e aprovou depois o checkpoint 2. A autorização então vigente permitia preparar
+ este walkthrough e os diffs, distinguindo as alterações preexistentes, e parar
+ no checkpoint 3. Não autoriza executar a validação ou concluir o bolt.
+ 
+-O bolt 001-base-validada está in-progress, current_stage=implement. Apenas
++O bolt 001-base-validada estava in-progress, current_stage=implement. Apenas
+ plan está em stages_completed. Implement aguarda a revisão destes entregáveis;
+ Test e o fecho ainda não começaram. Não há dependências anteriores nem gates
+ externos adicionais no [IMP-001](../../../add.md#imp-001).
+@@ -121,5 +126,6 @@
+    test-walkthrough.md apenas depois das execuções; não declarar fecho antes
+    de critérios cumpridos, verificações, revisão humana e integração.
+ 
+-A revisão do checkpoint 3 é uma paragem explícita. O roteiro acima não é
+-execução ou autorização automática do build, da regressão ou do teste manual.
++A revisão do checkpoint 3 foi aprovada explicitamente. O roteiro acima foi
++autorizado apenas até ao checkpoint 4; resultados devem ser registados num
++test-walkthrough posterior às execuções. O fecho do bolt continua por autorizar.
+diff --git a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "BASELINE"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T21:16:53Z"
++updated: "2026-11-03T21:32:04Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md b/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "001-base-validada"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T21:03:35Z"
+-updated: "2026-11-03T21:16:53Z"
++updated: "2026-11-03T21:32:04Z"
+ ---
+ 
+ # Registo Construction — 001-base-validada
+@@ -28,10 +28,33 @@
+   distinguindo alterações do bolt e as preexistentes. Manter verificações
+   de execução pendentes e parar antes de build, regressão, V-ADD ou teste manual.
+   O fecho continua sujeito a critérios, verificações, revisão humana e integração.
+-- Próxima ação: apresentar o checkpoint 3 e aguardar validação; os checkpoints
+-  4–5 continuam sem autorização de execução. Implement permanece em curso.
++- **2026-11-03T21:22:32Z**: aprovação explícita do checkpoint 3 registada.
++  Implement concluído e test iniciado. Autorizados apenas V-001–005/V-ADD,
++  fixtures/POM/provider, clean verify com JDK 21 e teste manual proposto.
++  Apresentar lacunas antes de alterar fundações/testes; parar no checkpoint 4,
++  sem fechar o bolt. Resultados ainda por executar neste registo de arranque.
++- **2026-11-03T21:24:58Z**: clean verify com JDK 21 concluído, BUILD SUCCESS,
++  149 testes, zero falhas/erros/skips: configuração 65, codec 66, transporte 18.
++  A primeira tentativa na sandbox teve 18 erros de sockets proibidos; log e XML
++  preservados. Repetição fora da sandbox autorizada, sem mudar código/testes.
++  POM efetivo/provider/engine conferidos nos artefactos dessa execução.
++- **2026-11-03T21:27:23Z**: auditoria independente das 45 fixtures aprovada,
++  incluindo hash/hex/tamanhos/offsets e contratos TCP/UDP. Corrigida apenas uma
++  suposição de offset variável no auxiliar de evidência; bytes existentes intactos.
++- **2026-11-03T21:29:44Z**: teste manual configuração/codec/TCP/shutdown concluído
++  em JShell/JDK 21, 22 CHECK_PASS e MANUAL_PASS. A tentativa com engine local
++  falhou ao carregar uma classe antes dos checks; engine padrão executou o mesmo
++  roteiro. Não é execução GUI/CORE nem revisão humana independente.
++- **2026-11-03T21:32:04Z**: relatório de validação preparado para revisão do
++  checkpoint 4; V-ADD aprovado. POM/fontes/fixtures/testes preservados; 162/163
++  hashes rastreados de Projeto/ iguais, com única diferença na lista gerada
++  createdFiles.lst de target/ após o build. Nenhuma lacuna exige intervir nas
++  fundações. Bolt in-progress/test; história/unidade não concluídas.
++- Próxima ação: apresentar resultados e diff e aguardar validação do checkpoint 4;
++  fecho do checkpoint 5 continua por autorizar.
+ 
+ Plano: [implementation-plan.md](../../../../bolts/001-base-validada/implementation-plan.md).
+ Checkpoint 2: [interfaces e testes](../../../../bolts/001-base-validada/interfaces-and-test-map.md).
+ Checkpoint 3: [walkthrough](../../../../bolts/001-base-validada/implementation-walkthrough.md).
++Checkpoint 4: [validação](../../../../bolts/001-base-validada/test-walkthrough.md).
+ Evidência: experiments/construction/001-base-validada/.
+diff --git a/memory-bank/bolts/001-base-validada/test-walkthrough.md b/memory-bank/bolts/001-base-validada/test-walkthrough.md
+--- /dev/null
++++ b/memory-bank/bolts/001-base-validada/test-walkthrough.md
+@@ -0,0 +1,151 @@
++# IMP-001 — Checkpoint 4: validação executada
++
++Registo preparado em 2026-11-03T21:32:04Z, após aprovação explícita do
++checkpoint 3, registada em 2026-11-03T21:22:32Z. O checkpoint 4 aguarda revisão
++do utilizador. Bolt in-progress/test; sem fecho, integração ou commit presumidos.
++
++## Resultado e ambiente
++
++V-001–005/V-ADD executados no âmbito da base herdada, sem alterar POM, fontes,
++configuração, fixtures ou testes existentes. A regressão nova terminou com
++**149 testes, zero falhas, zero erros e zero skips**. O teste manual proposto
++terminou com **22 verificações aprovadas**. Nenhuma lacuna observada exige
++alterar fundações/testes ou substituir uma ADR.
++
++Ramo Denji; HEAD 4fe6791178828e72ea48c71d46146f9c8cd4c6f9. Linux, Maven 3.6.3,
++JDK 21.0.12.1 em /usr/lib/jvm/java-21-openjdk-amd64. JAVA_HOME foi selecionado
++para os comandos Maven; o JDK por omissão do ambiente não foi alterado.
++Os metadados dos comandos registam início/fim reais e códigos de saída.
++
++| Oráculo | Resultado atual | Evidência |
++|---|---|---|
++| V-001 | POM efetivo: release 21, Surefire 3.5.4, failIfNoTests=true; provider JUnitPlatformProvider e engine Jupiter 5.13.4 observados; clean verify aprovado | [POM](../../../experiments/construction/001-base-validada/effective-pom.xml), [resumo Surefire](../../../experiments/construction/001-base-validada/surefire-summary.json) |
++| V-002 | 45 fixtures conferidas por tamanho/SHA-256/binário/hex; revisão independente de offsets e identidades; proveniência do recurso consultada na evidência histórica | [Auditoria](../../../experiments/construction/001-base-validada/fixture-audit.json), [revisão histórica TASK-002](../../../experiments/task-002-contract-review.md) |
++| V-003 | ConfigurationLoaderTest: 65 testes aprovados; descoberta real e casos do mapa do checkpoint 2 | [XML de configuração](../../../experiments/construction/001-base-validada/surefire-local-tcp/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml) |
++| V-004 | MessageCodecTest: 66 testes aprovados; golden bytes, 16 tipos e rejeições existentes preservados | [XML do codec](../../../experiments/construction/001-base-validada/surefire-local-tcp/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml) |
++| V-005 | TransportTest: 18 testes aprovados com TCP loopback real; concorrência, reconexão, saturação e shutdown existentes | [XML de transporte](../../../experiments/construction/001-base-validada/surefire-local-tcp/TEST-pt.uminho.esr.ott.transport.TransportTest.xml) |
++| V-ADD | Validador documental/snapshot aprovado: zero erros | [Relatório documental](../../../experiments/construction/001-base-validada/planning-validation.md) |
++| Manual | Configuração/codec/TCP/shutdown: 22 CHECK_PASS e MANUAL_PASS | [Log](../../../experiments/construction/001-base-validada/manual-smoke-default-engine.log) |
++
++## Comandos e regressão nova
++
++A partir de Projeto/, com JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64:
++
++```sh
++mvn -B -ntp org.apache.maven.plugins:maven-help-plugin:3.5.1:effective-pom -Doutput=/home/luis/ESR/ESR---TP2/experiments/construction/001-base-validada/effective-pom.xml
++mvn -B -ntp clean verify
++```
++
++O help plugin já estava em cache; foi usado para inspeção, sem mudar o POM.
++O POM efetivo contém somente junit-jupiter 5.13.4 com scope test como dependência
++direta; nenhuma dependência runtime nova foi introduzida. O provider aparece
++no log Maven; o engine e Java 21 constam do classpath/propriedades dos XML novos.
++
++| Suite | Testes | Falhas | Erros | Skips |
++|---|---:|---:|---:|---:|
++| ConfigurationLoaderTest | 65 | 0 | 0 | 0 |
++| MessageCodecTest | 66 | 0 | 0 | 0 |
++| TransportTest | 18 | 0 | 0 | 0 |
++| Total atual | 149 | 0 | 0 | 0 |
++
++A execução aprovada ocorreu em 2026-11-03T21:24:54Z–21:24:58Z; código 0,
++BUILD SUCCESS. [Log completo novo](../../../experiments/construction/001-base-validada/clean-verify-local-tcp.log)
++e [comando/ambiente](../../../experiments/construction/001-base-validada/clean-verify-local-tcp-command.json).
++Os XML/txt dessa execução foram copiados para surefire-local-tcp antes de
++qualquer outra operação de build. O resumo regista hashes dos XML/POM/JAR.
++O total 149 desta tabela foi contado nos relatórios atuais, independentemente
++do total histórico coincidir. Classes de teste futuras vazias não contam.
++
++A primeira tentativa, em 2026-11-03T21:23:56Z–21:23:59Z, terminou com código 1:
++149 testes, zero falhas, 18 erros de transporte por SocketException/Operação
++não permitida na sandbox. O [log inicial](../../../experiments/construction/001-base-validada/clean-verify.log)
++e os relatórios em surefire-sandbox foram preservados. O mesmo clean verify
++foi repetido fora da sandbox após autorização da execução com TCP local.
++Não foi necessário corrigir código, enfraquecer testes ou trocar TCP por mocks.
++
++## Fixtures e coerência documental
++
++A [auditoria independente](../../../experiments/construction/001-base-validada/fixture-audit.py)
++usa apenas Python standard library e leitura direta, sem recorrer ao codec
++Java para construir os bytes esperados. Resultado em 2026-11-03T21:27:23Z:
++17 TCP aceites, 12 TCP rejeitados, 4 UDP aceites e 12 UDP rejeitados; 45 casos.
++Confere tamanhos, SHA-256 e equivalência .bin/.hex, envelope e códigos ativos
++1, 2, 4–17, sete amostras de offsets HELLO_OK/HELLO/REGISTER_OK/ANNOUNCE/
++ANNOUNCE UTF-8/ACTIVATE/ERROR, instância zero na resposta bootstrap e ausência
++de lease. As observações dos casos inválidos e os campos UDP constam do JSON.
++Confere cabeçalho UDP 64, datagrama até 1200, payload até 1136 e reconstrução
++do payload sintético de 1137 bytes. Isto não é execução de um codec UDP/vídeo.
++
++A primeira versão do auxiliar assumia path.count no offset 100 em todos os
++ANNOUNCE. A fixture inválida usa senderId N32, com três bytes, e o campo está
++em 101. O auxiliar foi corrigido para derivar offsets das strings/envelope;
++fixtures e código Java permaneceram intactos. O JSON regista esta correção.
++
++V-002 consulta a evidência de acesso/hash do recurso docente registada na
++revisão TASK-002. Não foi repetido o download, não se afirma disponibilidade
++atual dos URLs nem preparação/reprodução dos quatro conteúdos. A correspondência
++dos requisitos e identidades está no mapa aprovado e na validação V-ADD.
++
++Comando documental, a partir da raiz:
++
++```sh
++python3 scripts/validate-planning.py --check-snapshot --report experiments/construction/001-base-validada/planning-validation.md
++```
++
++São conferidos 40 requisitos/constraints/intents, 35 aliases, 26 ADR, matriz
++40/40, 7 unidades, 33 histórias/IMP/bolts, 32 TASK pai, DAG/gates, 45 fixtures
++e 220 hashes de fontes. Os três XML CORE são analisados, sem executar CORE.
++O relatório contém a hora e a contagem de referências da última execução.
++O texto genérico do validador sobre 149 históricos refere-se ao alcance desse
++script; os resultados Java atuais estão nos relatórios Surefire acima.
++
++## Teste manual executado
++
++Após o build, o roteiro aprovado foi executado pelo agente em JShell/JDK 21,
++com TCP loopback real, callbacks que publicam em filas limitadas e esperas
++com prazo. [Roteiro executável](../../../experiments/construction/001-base-validada/manual-smoke.jsh)
++e [metadados](../../../experiments/construction/001-base-validada/manual-smoke-default-engine-command.json).
++
++```sh
++/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell --class-path target/classes /home/luis/ESR/ESR---TP2/experiments/construction/001-base-validada/manual-smoke.jsh
++```
++
++Execução 2026-11-03T21:29:42Z–21:29:44Z, código 0, 22 CHECK_PASS:
++
++- Cinco perfis reais, duas origens, quatro UUID de streams distintos e vizinhos
++  S1=S2,R1, validados antes de abrir sockets.
++- Fixture HELLO independente de 77 bytes: campos/requestId/endpoint e bytes
++  reencodificados iguais; 16 tipos ativos e código 3 rejeitado.
++- Duas ligações abertas; PROBE_PING e PROBE_PONG efetivamente recebidos com
++  requestId comum e probeId 42, além da aceitação de envio.
++- Eventos de fecho únicos, terminação dos dois transportes, zero reservas,
++  nenhuma fila de callbacks saturada e reutilização da porta de escuta num
++  terceiro transporte também terminado.
++
++A tentativa anterior com --execution local falhou antes dos checks ao resolver
++a classe Connection; saída e comando preservados em manual-smoke.log e
++manual-smoke-command.json. O engine padrão executou o mesmo roteiro com êxito.
++Trata-se de execução operacional assistida das APIs, não de revisão humana
++independente, handshake overlay, cálculo de RTT, CLI, GUI, vídeo ou CORE.
++
++## Preservação, diff e paragem
++
++POM, código, recursos e testes não foram editados. Dos 163 ficheiros rastreados
++de Projeto/ da baseline, 162 mantêm os hashes; a única diferença é o ficheiro
++gerado target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst.
++O clean verify reordenou entradas e acrescentou seis classes de transporte já
++existentes nas fontes; não se trata de uma alteração das fundações.
++Este resultado gerado fica visível no diff, sem reposição artificial da lista
++antiga. Evidência de comparação em checkpoint-4-preservation.json.
++
++As alterações de Inception continuam separadas na baseline/pre-existing.diff.
++O diff documental incremental checkpoint-4.diff compara com o checkpoint 3
++aprovado; bolt-through-checkpoint-4.diff compara com o arranque do bolt.
++O diff gerado de Projeto/ é guardado separadamente em project-generated.diff;
++os dois auxiliares novos de auditoria/manual são evidência fora de Projeto/.
++Nenhum commit, push, branch, deploy ou upload foi feito.
++
++Parar no checkpoint 4. A revisão destes resultados pelo utilizador, a revisão
++humana final e a integração ainda não são presumidas. A etapa test e os
++critérios globais não são marcados concluídos antes dessa validação; bolt,
++história e unidade permanecem in-progress. O checkpoint 5 não foi autorizado.

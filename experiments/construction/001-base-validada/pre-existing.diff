@@ -1,0 +1,581 @@
+diff --git a/add.md b/add.md
+index ec77457..48b006a 100644
+--- a/add.md
++++ b/add.md
+@@ -1,6 +1,6 @@
+ # Architecture Decision Document — serviço OTT
+ 
+-Versão 1.0.1. Atualização: 2026-11-03T14:50:15Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
++Versão 1.0.2. Atualização: 2026-11-03T20:54:11Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
+ Respostas incorporadas: **1A, 2A, 3B, 4A**; clarificações aprovadas **CP-01, CP-02, CP-03**. Documento mestre para **Construction**.
+ Aceite é o estado da decisão de desenho; não afirma implementação ou resultado.
+ Nenhum bolt foi iniciado por gerar ou validar este documento.
+@@ -21,6 +21,13 @@ noutra fonte, entrada arbitrária de IDs não configurados e recuperação autom
+ de falha exclusiva UDP. Novas vizinhanças fora do grafo configurado ficam
+ adiadas como extra (CP-03). Não se acrescenta CI, linter ou limiar percentual global.
+ 
++Inception desta base foi concluído por instrução explícita do utilizador.
++Os extras que venham a ser pedidos serão definidos numa retoma posterior de
++Inception, com requisitos, decisões e bolts próprios. O âmbito atual não os
++inclui implicitamente; este fecho não constitui dispensa definitiva de extras
++da entrega. O seu planeamento futuro deve considerar integração e avaliação
++antes do artigo/pacote final que os inclua.
++
+ Atores: operador/equipa configura, inicia e avalia; espectador escolhe/termina
+ uma stream; docente avalia; Construction implementa e testa; revisores humanos
+ aceitam as versões atribuídas. Operations só opera uma versão integrada se pedido.
+@@ -1478,6 +1485,7 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
+ | CP-01 identidade no bootstrap | Aprovada: manter nodeId e REGISTER/REGISTER_OK; IP não substitui identidade nem consulta |
+ | CP-02 falha e regresso de nó | Aprovada: nós já configurados, incluindo entrada tardia; TASK-007/016, sem admissão de IDs desconhecidos |
+ | CP-03 novas arestas e extras | Aprovada: recuperar alternativas configuradas; novas vizinhanças fora do grafo adiadas como extra |
++| Fecho de Inception e extras posteriores | Aprovado pelo utilizador: fechar o âmbito atual e retomar Inception para criar bolts quando os extras forem pedidos |
+ | Media/licença da versão final | Gates de TASK-020/030 |
+ | GUI/CORE reais | Gates de execução, sem sucesso presumido |
+ | Revisor de TASK-032 | Pessoa distinta a designar antes do DONE |
+@@ -1491,11 +1499,16 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
+ | 2026-11-02T15:45:31Z | Limitação UDP/qualidade existente explícitas | Evitar promessas ou ferramentas não escolhidas |
+ | 2026-11-02T15:45:31Z | Reformular 18 bolts/acrescentar 15 | Um IMP S/M por bolt e gates por parte |
+ | 2026-11-03T14:50:15Z | ADD 1.0.1: esclarecer CP-01–03 em ADR-013/019 e âmbito | Utilizador aprovou manter nodeId, regresso configurado e adiar novas vizinhanças; sem novos requisitos/ADR/bolts |
+-
+-As escolhas 1A/2A/3B/4A e CP-01/02/03 estão aprovadas; documento/decomposição ficam
+-disponíveis para revisão. Não se presume aprovação de código, medição de metas,
+-execução de bolt ou submissão. Alterar âmbito, hard caps ou contrato exige a
+-aprovação da secção 11. Não há nova escolha arquitetural material pendente das
+-perguntas respondidas. Os apontamentos e a justificação das CP estão no
+-[relatório do checkpoint](docs/checkpoint_REPORT.md); gates de execução
+-permanecem abertos. A aprovação das CP não presume o fecho integral de Inception.
++| 2026-11-03T20:54:11Z | ADD 1.0.2: fecho aprovado de Inception e retoma futura para extras | Instrução explícita do utilizador; manter 33 bolts e planear os extras quando forem pedidos |
++
++As escolhas 1A/2A/3B/4A e CP-01/02/03 estão aprovadas. O utilizador aprovou
++também o fecho de Inception e dos artefactos revistos do âmbito atual em
++2026-11-03T20:54:11Z. Os apontamentos e a justificação das CP estão no
++[relatório do checkpoint](docs/checkpoint_REPORT.md); o
++[registo de fecho](memory-bank/intents/001-ott-streaming/inception-log.md)
++preserva a autorização e o resumo dos sete units/33 bolts. Não há escolha
++pendente que impeça o fecho desta base. Os extras aguardam pedidos concretos
++e planeamento posterior, sem apagar a base aprovada. Não se presume aprovação
++de código, medição de metas, execução de bolt ou submissão; gates de execução
++permanecem nas tarefas responsáveis. Alterar âmbito, hard caps ou contrato
++aplica a secção 11, considerando a autorização futura que o utilizador fornecer.
+diff --git a/docs/checkpoint_REPORT.md b/docs/checkpoint_REPORT.md
+index 790a363..b0ee658 100644
+--- a/docs/checkpoint_REPORT.md
++++ b/docs/checkpoint_REPORT.md
+@@ -110,3 +110,22 @@ TASK-029 continua responsável por explicar ganhos, custos, alternativas e
+ limitações destas escolhas, com evidência do comportamento implementado.
+ A tarefa de escrever/rever o artigo permanece pendente; a checklist acima
+ assinala apenas o fecho das decisões de planeamento.
++
++## 6. Fecho de Inception e extras posteriores — 03-11-2026
++
++Após a aprovação específica das CP-01–03, o utilizador instruiu explicitamente
++o fecho de Inception para o âmbito atual e indicou que voltará a esta fase
++para criar os bolts dos extras quando estes forem pedidos. A revisão final
++dos artefactos fica aprovada por essa instrução; não é necessário voltar a
++escolher os extras para fechar agora esta base.
++
++O plano atual mantém sete unidades e 33 histórias/IMP/bolts. Os extras ainda
++não especificados não são funcionalidades implicitamente incluídas nem ficam
++definitivamente dispensados da entrega. Na retoma de Inception serão definidos
++requisitos, critérios, impacto nas decisões e novos bolts, preservando os IDs
++e resultados existentes. A ordem deve assegurar integração e avaliação antes
++da versão final que inclua os extras.
++
++Este fecho não inicia Construction. O primeiro bolt preparado continua
++001-base-validada. Estado e autorização no
++[registo Inception](../memory-bank/intents/001-ott-streaming/inception-log.md).
+diff --git a/docs/team/00-COORDINATION.md b/docs/team/00-COORDINATION.md
+index cba1e9f..6019ea5 100644
+--- a/docs/team/00-COORDINATION.md
++++ b/docs/team/00-COORDINATION.md
+@@ -191,3 +191,14 @@ e no [ADD, secção 13](../../add.md#13-questões-em-aberto-e-changelog).
+ Mantêm-se os responsáveis/revisores das tarefas e a designação futura do
+ revisor distinto da TASK-032 antes do DONE. A decisão registada não atribui
+ revisão de código ou aprovação pessoal a qualquer membro por inferência.
++
++## Fecho de Inception — 03-11-2026
++
++O utilizador aprovou o fecho de Inception para o âmbito atual, com sete unidades
++e 33 bolts. Os extras serão especificados numa retoma posterior de Inception
++quando forem pedidos, acrescentando critérios, tarefas e bolts com dependências
++explícitas. Preservam-se as atribuições e revisões existentes. Se os extras
++integrarem a entrega, a sua integração e avaliação devem preceder o artigo e
++o pacote finais. Este fecho documental não inicia nenhum bolt de Construction.
++
++Autorização e resumo: [registo Inception](../../memory-bank/intents/001-ott-streaming/inception-log.md).
+diff --git a/memory-bank/architecture-traceability.json b/memory-bank/architecture-traceability.json
+index 962e1c5..48d42a7 100644
+--- a/memory-bank/architecture-traceability.json
++++ b/memory-bank/architecture-traceability.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "1.0.1",
+-  "updated": "2026-11-03T14:50:15Z",
++  "version": "1.0.2",
++  "updated": "2026-11-03T20:54:11Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "approval": {
+@@ -50,6 +50,15 @@
+           ]
+         }
+       ]
++    },
++    "inception_completion": {
++      "status": "complete",
++      "approved_at": "2026-11-03T20:54:11Z",
++      "approved_by": "user-in-session",
++      "source": "memory-bank/intents/001-ott-streaming/inception-log.md",
++      "scope": "Fecho dos artefactos revistos para o âmbito atual; sete unidades e 33 bolts.",
++      "extras": "Retomar Inception para definir e criar bolts quando os extras forem pedidos; sem dispensa definitiva de extras da entrega.",
++      "construction_started": false
+     }
+   },
+   "requirements": {
+diff --git a/memory-bank/intents/001-ott-streaming/checkpoint-feedback-review.md b/memory-bank/intents/001-ott-streaming/checkpoint-feedback-review.md
+index 9d858b4..66e1a22 100644
+--- a/memory-bank/intents/001-ott-streaming/checkpoint-feedback-review.md
++++ b/memory-bank/intents/001-ott-streaming/checkpoint-feedback-review.md
+@@ -14,9 +14,10 @@ manter nodeId, validar regresso/entrada tardia de nós configurados e adiar nova
+ vizinhanças. O [ADD, secção 13](../../../add.md#13-questões-em-aberto-e-changelog)
+ regista as aprovações sem alterar o âmbito de implementação existente.
+ 
+-A aprovação resolve CP-01–03; a revisão final dos restantes artefactos de
+-Inception mantém-se pendente. Conservam-se 40 entradas, 26 ADR e 33
+-histórias/IMP/bolts. A aprovação não representa execução ou revisão de código.
++A aprovação resolveu CP-01–03. Em 2026-11-03T20:54:11Z o utilizador aprovou
++também o fecho de Inception para o âmbito atual, remetendo os extras para
++planeamento posterior quando forem pedidos. Conservam-se 40 entradas, 26 ADR
++e 33 histórias/IMP/bolts. A aprovação não representa execução ou revisão de código.
+ 
+ ## CP-01 — Identificação por IP no bootstrap
+ 
+@@ -155,7 +156,7 @@ ao docente. A discussão qualitativa não elimina as medições já exigidas.
+ | Assunto | Estado identificado | Momento necessário |
+ |---|---|---|
+ | CP-01–03 | Aprovadas pelo utilizador em 03-11-2026; incorporadas no ADD e no relatório | Resolvidas; não aguardam nova escolha |
+-| Revisão final dos artefactos | Pendente no inception-log | Depois de incorporar as escolhas do checkpoint |
++| Revisão final dos artefactos | Fecho aprovado explicitamente pelo utilizador | Concluída para o âmbito atual |
+ | Revisor humano da TASK-032 | Equipa ainda deve designar pessoa distinta do autor | Antes do DONE da TASK-032; não impede rever/verificar a base |
+ | Media final e condições de distribuição | Gates G-MEDIA/G-MEDIA-DISTRIBUTION | TASK-020 e TASK-030 |
+ | Ambiente e provas GUI/CORE | Gates G-GUI/G-CORE | Nas tarefas de execução correspondentes |
+@@ -170,7 +171,8 @@ contratos existentes; não exigem novas ADR nem substituem as decisões aceites.
+ 
+ ## Próxima ação concreta
+ 
+-CP-01–03 estão resolvidas e documentadas; retomar a revisão final dos artefactos
+-de Inception. O primeiro bolt preparado continua 001-base-validada, seguido
+-de 019-overlay/TASK-032. Não foram executados bolts, testes Java, GUI ou CORE
+-para registar estas decisões.
++CP-01–03 estão resolvidas e documentadas e Inception está concluído para o
++âmbito atual. O primeiro bolt preparado continua 001-base-validada, seguido
++de 019-overlay/TASK-032. Quando forem pedidos extras, retomar Inception para
++definir o incremento e os novos bolts, preservando esta base aprovada.
++Não foram executados bolts, testes Java, GUI ou CORE para registar o fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/inception-log.md b/memory-bank/intents/001-ott-streaming/inception-log.md
+index d934466..3f8d41c 100644
+--- a/memory-bank/intents/001-ott-streaming/inception-log.md
++++ b/memory-bank/intents/001-ott-streaming/inception-log.md
+@@ -1,13 +1,61 @@
+ ---
+ intent: "001-ott-streaming"
+ created: "2026-11-02T15:02:08Z"
+-completed: null
+-status: "in-progress"
+-checkpoint: "artifact-review-pending"
++completed: "2026-11-03T20:54:11Z"
++status: "complete"
++checkpoint: "inception-complete"
+ ---
+ 
+ # Registo Inception
+ 
++## Fecho aprovado — 2026-11-03T20:54:11Z
++
++O utilizador instruiu explicitamente: "Quero fechar esta fase e mais tarde
++implementar extras que vão ser pedidos. Mais tarde volto a esta fase para
++criar os bolts para os extras. Agora quero fechar isto".
++
++Esta instrução aprova o fecho dos artefactos revistos para o âmbito atual.
++Inception fica concluído; a construção está preparada, sem iniciar qualquer
++bolt por este fecho. A definição e decomposição dos extras ficam para uma
++retoma posterior de Inception, quando houver pedidos concretos.
++
++## Resumo final
++
++| Elemento | Total |
++|---|---|
++| Entradas canónicas | 40: 24 REQ, cinco NFR, nove CON e dois INT |
++| Requisitos históricos preservados | 35: 15 RF, cinco RNF, sete RC e oito RP |
++| ADR | 26 |
++| Unidades | 7 |
++| Histórias / IMP / bolts planeados | 33 / 33 / 33 |
++
++## Pronto para Construction
++
++- [x] Requisitos do âmbito atual documentados e rastreados.
++- [x] Contexto definido e unidades preparadas.
++- [x] Histórias com critérios e bolts com dependências e validações.
++- [x] Revisão técnica e decisões CP-01–03 incorporadas.
++- [x] Aprovação humana do fecho recebida do utilizador.
++- [x] Extras remetidos para planeamento posterior, sem escolha implícita de funcionalidades.
++
++Primeiro bolt preparado: 001-base-validada; depois 019-overlay/TASK-032 e
++002-overlay/TASK-006, respeitando as dependências. A aprovação dos artefactos
++não substitui revisões de código, provas GUI/CORE ou confirmação de submissão.
++
++## Retoma futura para extras
++
++Quando os extras forem pedidos, voltar ao Inception para definir requisitos,
++critérios, impacto nas ADR e novas histórias/IMP/bolts. Preservar IDs e evidência
++do âmbito agora fechado; usar novos IDs de bolt e dependências explícitas.
++Se os extras integrarem a entrega, incluir a sua integração/avaliação antes
++do artigo e pacote finais. Não tratar o adiamento como dispensa definitiva
++de extras nem presumir que os 33 bolts atuais os cobrem.
++
++## Histórico de preparação e revisão
++
++As secções seguintes preservam os estados e decisões anteriores ao fecho;
++o estado atual é o registado no frontmatter e no resumo acima.
++
+ ## Âmbito e autorização
+ 
+ O utilizador pediu revisão/correção dos artefactos antes de gerar bolts faseados,
+@@ -24,7 +72,7 @@ organização ou de código é presumida.
+ - [x] 33 bolts individuais com etapas, dependências e validação.
+ - [x] Rastreabilidade e standards locais.
+ - [x] CP-01–03 aprovadas pelo utilizador e documentadas no ADD e no relatório do checkpoint.
+-- [ ] Revisão humana final dos novos artefactos.
++- [x] Revisão humana final dos artefactos aprovada pelo utilizador no fecho.
+ - [ ] Início de construção: nenhum bolt iniciado.
+ 
+ ## Decisões
+@@ -44,9 +92,12 @@ não equivale à revisão final de todos os artefactos ou à execução de Const
+ ## Validação e limites
+ 
+ [Relatório estrutural](../../../experiments/inception-planning-validation.md).
++Validação documental do fecho: [resultado atual](../../../experiments/inception-closure-validation-2026-11-03.md),
++com zero erros e 220 hashes conferidos; contagens e dependências preservadas.
+ Os checks documentais não são build/testes Java, rede, GUI/CORE ou aprovação.
+ O resultado Java mais recente continua a ser o log histórico de 149 testes.
+-Estado de Inception fica em revisão, sem marcar inception-complete por inferência.
++O estado atual é inception-complete por instrução explícita do utilizador;
++os relatos datados abaixo preservam os momentos anteriores de revisão.
+ 
+ ## Próxima ação preparada
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/inception-review.md b/memory-bank/intents/001-ott-streaming/inception-review.md
+index da34084..cba8e0d 100644
+--- a/memory-bank/intents/001-ott-streaming/inception-review.md
++++ b/memory-bank/intents/001-ott-streaming/inception-review.md
+@@ -1,10 +1,10 @@
+ # Revisão Inception — 001-ott-streaming
+ 
+-Revisão técnica: 2026-11-03T14:28:37Z. Revisão humana: pendente.
+-Resultado estrutural: não foram identificadas lacunas impeditivas no plano
+-anterior. Atualização de 2026-11-03T14:50:15Z: CP-01–03 aprovadas pelo utilizador
+-e incorporadas no ADD; revisão final dos restantes artefactos ainda pendente.
+-Esta revisão não inicia Construction nem declara a aprovação humana dos artefactos.
++Revisão técnica: 2026-11-03T14:28:37Z. Fecho aprovado pelo utilizador:
++2026-11-03T20:54:11Z. Estado: Inception concluído para o âmbito atual.
++Não foram identificadas lacunas impeditivas; CP-01–03 estão aprovadas e
++incorporadas. A instrução explícita para fechar a fase aprova os artefactos
++revistos, sem executar Construction ou antecipar a escolha dos extras.
+ 
+ ## Âmbito e fontes
+ 
+@@ -92,19 +92,26 @@ cobertos pelos 33 bolts atuais. As escolhas aprovadas confirmam o âmbito
+ existente, sem acrescentar requisitos, ADR ou bolts.
+ 
+ As propostas CP-01–03 estão resolvidas pela escolha explícita do utilizador.
+-O fecho de Inception aguarda apenas a aprovação final dos restantes artefactos;
++O utilizador aprovou também o fecho final dos artefactos do âmbito atual;
+ os gates de execução continuam nas tarefas responsáveis.
+ 
+ [Validação após a incorporação das decisões](../../../experiments/checkpoint-decisions-validation-2026-11-03.md):
+-zero erros, contagens e DAG preservados, 220 hashes conferidos. Esta é a
+-validação documental atual; os relatórios anteriores conservam o seu contexto.
++zero erros, contagens e DAG preservados, 220 hashes conferidos. O relatório
++conserva o contexto da incorporação das CP; a validação atual do fecho está abaixo.
+ 
+-## Próximos checkpoints
++[Validação documental do fecho](../../../experiments/inception-closure-validation-2026-11-03.md):
++zero erros, sete unidades prontas e 33 bolts planeados, sem ciclos ou referências
++quebradas. Não foram executados testes Java, GUI, CORE ou Construction.
+ 
+-1. CP-01–03 resolvidas e incorporadas; apresentar os artefactos para aprovação
+-   final no checkpoint 3, sem voltar a pedir as escolhas já aprovadas.
+-2. Após aprovação, concluir o registo Inception e atualizar o estado do intent.
+-3. Confirmar a transição para Construction no checkpoint 4. O primeiro bolt é
+-   001-base-validada; depois segue 019-overlay/TASK-032, antes de 002-overlay/TASK-006.
++## Fecho e continuidade
+ 
+-Nenhuma aprovação ou transição é inferida da seleção da opção de revisão.
++O checkpoint 3 está concluído pela aprovação explícita do fecho. O intent fica
++pronto para Construction; a execução do primeiro bolt será uma ação posterior.
++O primeiro bolt é 001-base-validada; depois segue 019-overlay/TASK-032, antes
++de 002-overlay/TASK-006.
++
++Os extras serão definidos numa retoma futura de Inception, quando forem
++pedidos, com requisitos/ADR/histórias/bolts próprios e integração antes da
++entrega que os inclua. O âmbito atual continua com 33 bolts; não se presume
++uma exclusão definitiva de extras do trabalho nem funcionalidades adicionais
++aprovadas agora. O fecho está registado no [inception-log](inception-log.md).
+diff --git a/memory-bank/intents/001-ott-streaming/requirements.md b/memory-bank/intents/001-ott-streaming/requirements.md
+index d44496a..a191a2c 100644
+--- a/memory-bank/intents/001-ott-streaming/requirements.md
++++ b/memory-bank/intents/001-ott-streaming/requirements.md
+@@ -1,11 +1,12 @@
+ ---
+ intent: "001-ott-streaming"
+ phase: "inception"
+-status: "draft"
++status: "inception-complete"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:02:08Z"
++updated: "2026-11-03T20:54:11Z"
++completed: "2026-11-03T20:54:11Z"
+ requirements_basis: "existing-project-documentation"
+-review_status: "pending-human-artifact-review"
++review_status: "approved-by-user"
+ ---
+ 
+ # Requisitos — concluir o serviço OTT existente
+@@ -16,7 +17,10 @@ Objetivo: concluir o projeto segundo os Markdown existentes, corrigir lacunas an
+ do agrupamento e preparar bolts faseados para **Construction**, com validação.
+ O âmbito e o executor foram fornecidos pelo utilizador. Reutilizam-se os critérios
+ existentes, sem nova numeração ou alteração das obrigações. Não se inicia implementação.
+-Revisão da nova organização: pendente; a base existente não implica aprovação destes artefactos.
++Revisão da organização aprovada pelo utilizador em 03-11-2026, com instrução
++explícita para fechar Inception no âmbito atual. Os extras serão definidos e
++planeados numa retoma posterior de Inception, quando forem pedidos; não
++impedem este fecho nem estão implicitamente implementados pelos bolts atuais.
+ 
+ Fonte normativa: [docs/02](../../../docs/02-REQUIREMENTS.md).
+ Owner abaixo significa responsabilidade primária; outros units contribuem pelas TASK.
+diff --git a/memory-bank/intents/001-ott-streaming/system-context.md b/memory-bank/intents/001-ott-streaming/system-context.md
+index f4a4772..c6463fc 100644
+--- a/memory-bank/intents/001-ott-streaming/system-context.md
++++ b/memory-bank/intents/001-ott-streaming/system-context.md
+@@ -1,7 +1,8 @@
+ ---
+ intent: "001-ott-streaming"
+-status: "draft"
++status: "context-defined"
+ created: "2026-11-02T15:02:08Z"
++updated: "2026-11-03T20:54:11Z"
+ ---
+ 
+ # Contexto do sistema OTT
+diff --git a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+index 9ed6f70..30c26ab 100644
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "001-base-validada"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "BASELINE"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+index 8e0aafe..f1a27af 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-02"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+index 7c2d25c..ec9c3e6 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-03"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+index 7e89db9..db31d0a 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "004-arvores"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-04"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+index 4f9786c..29aef81 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "005-video"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-05"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/006-core/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/006-core/unit-brief.md
+index cfb5449..131d5c1 100644
+--- a/memory-bank/intents/001-ott-streaming/units/006-core/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/006-core/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "006-core"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-06"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["NFR-002", "CON-001", "REQ-020"]
+diff --git a/memory-bank/intents/001-ott-streaming/units/007-entrega/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/007-entrega/unit-brief.md
+index 3f944fe..d62c9a4 100644
+--- a/memory-bank/intents/001-ott-streaming/units/007-entrega/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/007-entrega/unit-brief.md
+@@ -3,9 +3,9 @@ unit: "007-entrega"
+ intent: "001-ott-streaming"
+ phase: "inception"
+ source_phase: "PHASE-07"
+-status: "draft"
++status: "ready"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T20:54:11Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["CON-002", "CON-003", "CON-004", "CON-005", "CON-006", "CON-007", "REQ-022", "REQ-023", "INT-001"]
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+index ccd7eaf..37fe067 100644
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -234,7 +234,7 @@
+     "Projeto/src/test/resources/topologies/scenario-2.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "Projeto/src/test/resources/topologies/scenario-3.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "README.md": "7c38fdcdb6521a67429903df070d583e052d78e386133b390c3cdd250d5fa06b",
+-    "add.md": "04822c247704efe2c98dfe15800457df1e10dccc7b8a9cc6840246097fccc81c",
++    "add.md": "5ee9494c9fc39aad6821fd28c0a5a91ffad593ee2126f80eb70dde3eb286f8b4",
+     "docs/00-README.md": "43f6d833762005a3a1df4db9d40883474e6d8992f223255720f7e6627e45c504",
+     "docs/01-PROJECT-OVERVIEW.md": "1584e0f3c8c7fd88915b35486604b7f96fb55651fa67c55ee2c398380dbe1fef",
+     "docs/02-REQUIREMENTS.md": "2ca0861b12efee5e906e95f8e239ac9b2b0dded4bb0af8dfcd94f65e32a54e47",
+@@ -295,15 +295,15 @@
+     "docs/tasks/PHASE-07/TASK-029.md": "e8fbb9fe9b4ac3de6b10e824a70b5964a5521c60c356ea98e890c2897b865600",
+     "docs/tasks/PHASE-07/TASK-030.md": "e94f778de654ac8c3eae0063c3574947d12d9d9b2f14c6b5dc973327a43875c1",
+     "docs/tasks/PHASE-07/TASK-031.md": "acdcb1db643a8e58e41d340b2f5516d9c0a7256755144aeaa67c32dc3ccce29a",
+-    "docs/team/00-COORDINATION.md": "7a4dccd0ff28dbba12349d536c94a7584b5c9e903dfac31853c19242897aa394",
++    "docs/team/00-COORDINATION.md": "f6bb6d48fbb48a6c619b7766a1a0f12d52051aadc852067445d8b104a4c3927c",
+     "docs/team/DENJI.md": "b8b7c6e8373381212f8fe643606689ac75573e772094c31edd772afba177227c",
+     "docs/team/FILLMORE.md": "cf8824bee5a493fc9bcdda7500866e2a6220660cb025e54522bb49e140ef9759",
+     "docs/team/WAHEED.md": "fa9a2d9880a8d5f6c84a6b07bd100ac861577a9507144a1a7325a170ae055443",
+     "experiments/task-005-review-build.log": "879642a98b1ed65f8b55fd34f9fa824700d648608e789d8844ecc501401c28f2",
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+-    "docs/checkpoint_REPORT.md": "534c74a8a5e388f1ac2ce7b0bc70f30369499c4d7e2a7dc84f680f2fa09bb9f7"
++    "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
+   },
+-  "updated": "2026-11-03T14:50:15Z",
++  "updated": "2026-11-03T20:54:11Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -410,7 +410,7 @@
+     ]
+   },
+   "reconciliation": {
+-    "version": "ADD 1.0.1",
++    "version": "ADD 1.0.2",
+     "approved_responses": [
+       "1A",
+       "2A",
+@@ -422,7 +422,9 @@
+       "CP-01",
+       "CP-02",
+       "CP-03"
+-    ]
++    ],
++    "inception_status": "complete",
++    "extras_planning": "deferred-until-requested"
+   },
+   "snapshot_updates": [
+     {
+@@ -439,6 +441,20 @@
+         "docs/checkpoint_REPORT.md": "534c74a8a5e388f1ac2ce7b0bc70f30369499c4d7e2a7dc84f680f2fa09bb9f7"
+       },
+       "checkpoint_notes_before_decisions_sha256": "ae7adf4360aa77b96fd41f00397b456579c1b1362ddeea8793511f3a6d658746"
++    },
++    {
++      "updated": "2026-11-03T20:54:11Z",
++      "reason": "Fecho de Inception explicitamente autorizado; extras remetidos para planeamento posterior quando forem pedidos; âmbito atual e 33 bolts preservados.",
++      "previous_hashes": {
++        "add.md": "04822c247704efe2c98dfe15800457df1e10dccc7b8a9cc6840246097fccc81c",
++        "docs/checkpoint_REPORT.md": "534c74a8a5e388f1ac2ce7b0bc70f30369499c4d7e2a7dc84f680f2fa09bb9f7",
++        "docs/team/00-COORDINATION.md": "7a4dccd0ff28dbba12349d536c94a7584b5c9e903dfac31853c19242897aa394"
++      },
++      "updated_hashes": {
++        "add.md": "5ee9494c9fc39aad6821fd28c0a5a91ffad593ee2126f80eb70dde3eb286f8b4",
++        "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
++        "docs/team/00-COORDINATION.md": "f6bb6d48fbb48a6c619b7766a1a0f12d52051aadc852067445d8b104a4c3927c"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 9905dcf..317570c 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -2,6 +2,9 @@ project_type: cli-tool
+ application_kind: distributed-network-application
+ initialized_at: 2026-11-02T15:02:08Z
+ intent: 001-ott-streaming
++inception_status: complete
++inception_completed_at: 2026-11-03T20:54:11Z
++extras_planning: deferred-until-requested
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/scripts/validate-planning.py b/scripts/validate-planning.py
+index 773d69f..be9144a 100644
+--- a/scripts/validate-planning.py
++++ b/scripts/validate-planning.py
+@@ -340,7 +340,7 @@ def main():
+               "Validação estrutural/documental e de bytes de referência. Não executa Maven,",
+               "testes Java, rede entre processos, GUI, CORE ou submissão. Os 149 testes",
+               "continuam a ser evidência histórica, não resultado desta execução.",
+-              "A nova organização continua sujeita à revisão humana; nenhum bolt iniciado."]
++              "A validação não substitui a aprovação humana dos artefactos/tarefas; não executa bolts."]
+     if errors:
+         lines += ["", "## Erros", ""] + ["- " + e for e in errors]
+     report = "\n".join(lines) + "\n"

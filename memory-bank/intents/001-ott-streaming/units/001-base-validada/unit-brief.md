@@ -1,11 +1,11 @@
 ---
 unit: "001-base-validada"
 intent: "001-ott-streaming"
-phase: "inception"
+phase: "construction"
 source_phase: "BASELINE"
-status: "ready"
+status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T20:54:11Z"
+updated: "2026-11-03T21:42:46Z"
 unit_type: "cli"
 default_bolt_type: "simple-construction-bolt"
 owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
@@ -27,5 +27,10 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [ ] [001-verificar-base](stories/001-verificar-base.md) → [001-base-validada](../../../../bolts/001-base-validada/bolt.md); IMP-001 (S).
 
 ## Dependências e critérios de fecho
+
+Checkpoint 4 aprovado pelo utilizador, com registo em 2026-11-03T21:40:56Z.
+Plan/Implement/Test concluídos no bolt; [checkpoint 5 preparado](../../../../bolts/001-base-validada/closure-walkthrough.md).
+Unidade in-progress enquanto a revisão do fecho e a integração na base comum
+estiverem pendentes. Não se inicia 019-overlay por esta atualização.
 
 Concluir verificação da base herdada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.

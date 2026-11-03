@@ -1,0 +1,28 @@
+MANUAL_START 2026-11-03T21:42:26.035183806Z Java=21.0.12.1
+CHECK_PASS config_five_profiles
+CHECK_PASS config_two_origins
+CHECK_PASS config_four_distinct_stream_ids
+CHECK_PASS config_expected_neighbors
+CONFIG_PASS nodes=5 origins=2 streams=4 neighbors_S1=S2,R1
+CHECK_PASS fixture_type_and_sender
+CHECK_PASS fixture_request_id
+CHECK_PASS fixture_endpoint
+CHECK_PASS fixture_independent_bytes_roundtrip
+CHECK_PASS sixteen_active_types
+CHECK_PASS retired_type_3_rejected
+CODEC_PASS hello_bytes=77 active_types=16 retired_3=rejected
+TCP_LISTEN left=localhost/127.0.0.1:43345 right=localhost/127.0.0.1:44735
+CHECK_PASS tcp_both_connections_open
+CHECK_PASS tcp_ping_queued
+CHECK_PASS tcp_ping_actually_received
+CHECK_PASS tcp_pong_queued
+CHECK_PASS tcp_pong_actually_received
+CHECK_PASS tcp_local_close_event
+CHECK_PASS tcp_peer_close_event
+CHECK_PASS shutdown_both_transports_terminated
+CHECK_PASS shutdown_no_connection_reservations
+CHECK_PASS shutdown_unique_events_and_no_queue_overflow
+TCP_PASS request=d0ffb89a-b980-4b8b-9686-c15b65b907b1 probeId=42 actual_ping_and_pong=true
+CHECK_PASS shutdown_listening_port_reused
+CHECK_PASS shutdown_rebound_transport_terminated
+MANUAL_PASS 2026-11-03T21:42:26.165152629Z

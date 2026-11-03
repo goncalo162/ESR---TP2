@@ -1,0 +1,581 @@
+--- a/memory-bank/bolts/001-base-validada/bolt.md
++++ b/memory-bank/bolts/001-base-validada/bolt.md
+@@ -3,14 +3,14 @@
+ unit: "001-base-validada"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["001-verificar-base"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-03T21:16:53Z"
++started: "2026-11-03T21:03:35Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "implement"
++stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}]
+ requires_bolts: []
+ enables_bolts: ["002-overlay", "003-overlay", "004-overlay", "019-overlay", "020-overlay"]
+ requires_units: []
+@@ -35,6 +35,27 @@
+ ---
+ # Bolt 001-base-validada — Verificar a base herdada
+ 
++## Retoma — checkpoint 3
++
++Planeamento iniciado em 2026-11-03T21:03:35Z, após leitura e comunicação do
++estado ao utilizador. [Plano](implementation-plan.md) e
++[Q-C-01](../../../docs/construction-duvidas.md#q-c-01--testes-primeiro-no-imp-001)
++aprovados explicitamente pelo utilizador, com registo em 2026-11-03T21:08:48Z.
++Etapa plan concluída. O utilizador aprovou também o checkpoint 2, com registo
++em 2026-11-03T21:16:53Z, e autorizou somente preparar o checkpoint 3: walkthrough
++e diffs. Implement continua em curso; não executar build, regressão, V-ADD ou
++teste manual antes da validação deste checkpoint.
++O pedido do utilizador impõe cinco checkpoints, aplicados às etapas locais.
++
++[Interfaces e mapeamento dos testes](interfaces-and-test-map.md) preparados
++por inspeção em 2026-11-03T21:13:13Z e aprovados no checkpoint 2.
++Nenhuma lacuna de âmbito que exija alterar fundações/testes identificada por
++leitura. Nenhum build, suite, V-ADD ou teste manual executado neste checkpoint.
++
++Entregável do checkpoint 3: [implementation-walkthrough.md](implementation-walkthrough.md).
++O bolt permanece in-progress/implement, com apenas plan em stages_completed,
++até à aprovação dos entregáveis e autorização da validação.
++
+ ## Fonte normativa e âmbito
+ 
+ Ler [IMP-001](../../../add.md#imp-001) e as ADR aí indicadas antes de qualquer etapa. Este bolt executa **uma** tarefa atómica; o ADD define o que construir, como e porquê. Fonte legada: [TASK-001](../../../docs/tasks/PHASE-01/TASK-001.md), [TASK-002](../../../docs/tasks/PHASE-01/TASK-002.md), [TASK-003](../../../docs/tasks/PHASE-01/TASK-003.md), [TASK-004](../../../docs/tasks/PHASE-01/TASK-004.md), [TASK-005](../../../docs/tasks/PHASE-02/TASK-005.md).
+@@ -48,7 +69,7 @@
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **plan** → `implementation-plan.md`; validar a etapa contra IMP-001 e as ADR do ADD.
++1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-001 e as ADR do ADD.
+ 
+--- a/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/unit-brief.md
+@@ -1,11 +1,11 @@
+ ---
+ unit: "001-base-validada"
+ intent: "001-ott-streaming"
+-phase: "inception"
++phase: "construction"
+ source_phase: "BASELINE"
+-status: "ready"
++status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T20:54:11Z"
++updated: "2026-11-03T21:16:53Z"
+ unit_type: "cli"
+ default_bolt_type: "simple-construction-bolt"
+ owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
+--- /dev/null
++++ b/memory-bank/bolts/001-base-validada/implementation-plan.md
+@@ -0,0 +1,125 @@
++# IMP-001 — Plano de verificação da base herdada
++
++Preparado em 2026-11-03T21:03:35Z. Checkpoint 1 e Q-C-01 aprovados pelo utilizador,
++com registo em 2026-11-03T21:08:48Z. Checkpoint 2 aprovado pelo utilizador,
++com registo em 2026-11-03T21:16:53Z; continuação autorizada apenas até ao checkpoint 3.
++Bolt/unidade: 001-base-validada. Tipo: simple-construction-bolt.
++Etapas locais: Plan → Implement → Test, com os cinco checkpoints explícitos
++do utilizador. O plano não autoriza automaticamente o checkpoint seguinte.
++
++Inspeção do checkpoint 2 aprovada: [interfaces e mapeamento dos testes](interfaces-and-test-map.md).
++Preparar o [walkthrough](implementation-walkthrough.md) e os diffs, parando no
++checkpoint 3. Build, regressão e teste manual continuam por executar na validação.
++
++## Estado observado e fontes
++
++Inception concluído; unidade inicialmente ready e bolt inicialmente planned,
++sem artefactos de execução. Não existem dependências de bolt/unidade. TASK-001,
++002, 003, 004 e 005 estão DONE nos documentos das tarefas e em docs/15; os seus
++resultados anteriores não substituem esta regressão futura.
++
++Ramo atual: Denji. HEAD: 4fe6791178828e72ea48c71d46146f9c8cd4c6f9.
++Há 19 ficheiros rastreados modificados e um relatório não rastreado do fecho
++de Inception, anteriores a este arranque. A árvore Projeto/ não tem diff contra
++HEAD. Guardados [baseline e hashes](../../../experiments/construction/001-base-validada/baseline.json)
++e [diff preexistente](../../../experiments/construction/001-base-validada/pre-existing.diff)
++antes das alterações de arranque, para distinguir a evidência deste bolt.
++
++[PRESSUPOSTO] --bolt 001 identifica o único prefixo 001, isto é, 001-base-validada,
++cujo incremento é IMP-001 e cuja unidade é 001-base-validada. O placeholder
++{RAMO} não foi preenchido: conservar Denji sem criar/trocar ramos.
++
++O [ADD](../../../add.md) presente é v1.0.2, já aprovado no fecho de Inception;
++v1.0.1 referido no pedido é a versão anterior. As clarificações e o fecho não
++introduzem mudanças nos bytes ou no objetivo de IMP-001. Foram consultados
++enunciado, specs, intent/história/bolt, secções 2/5/6/8/9/10/11/12 do ADD,
++contratos 07 (3–7), testes 09, DoD 14, progresso 15 e a base Java/testes.
++
++## Objetivo e limites
++
++Aplicar [IMP-001](../../../add.md#imp-001): confirmar a base DONE sem a
++reimplementar, conferir 45 fixtures e os 16 tipos ativos e guardar regressão
++atual. A base contém configuração, codec e transporte; bootstrap é comentário,
++CLI/overlay/vídeo são trabalho futuro. A ausência desses serviços não é falha
++deste incremento. RuntimeConfiguration e sendAndFlush pertencem aos IMP seguintes.
++
++Na inspeção inicial não foi identificada divergência material que exija mudar
++uma ADR ou os componentes herdados. A execução ainda não foi validada. Qualquer
++falha futura que exija alterar as fundações interrompe a parte afetada para
++registo em docs/construction-duvidas.md e decisão do utilizador; ADR novas,
++se necessárias, usam ADR-033 em diante.
++
++## Ficheiros e entregáveis
++
++Os alvos de inspeção da secção 8 do ADD são Projeto/pom.xml, config/, protocol/,
++transport/ e Projeto/src/test/. Não está prevista alteração de produção, POM,
++fixtures ou testes existentes para um incremento de verificação.
++
++Criar/manter na pasta deste bolt: implementation-plan.md (este documento),
++implementation-walkthrough.md e test-walkthrough.md nas etapas respetivas;
++bolt.md regista somente etapas realmente executadas/aprovadas.
++
++Manter unit-brief.md e construction-log.md da unidade. Na aprovação de fecho,
++sincronizar a história, memory-bank/story-index.md e docs/13–15, sem declarar
++requisitos integrados nem reabrir TASK-001–005. O mecanismo de fecho exige
++inspeção antes de execução: não existe script local bolt-complete.cjs; existe
++o instalado em /home/luis/.specsmd/aidlc/scripts/bolt-complete.cjs. A sua execução
++no checkpoint 5 depende de verificar compatibilidade com este esquema local,
++sem sobrescrever índices/estados por assumir o template genérico.
++
++Evidência nova fica em experiments/construction/001-base-validada/: baseline,
++diffs, ambiente/comandos, relatório documental, POM efetivo quando aplicável,
++log completo do build e resumo extraído dos relatórios Surefire novos.
++Não produzir walkthroughs/resultados antes das respetivas execuções.
++
++## Oráculos e verificações previstas
++
++| Oráculo | Verificação |
++|---|---|
++| V-001 | POM efetivo, release 21, JUnit Jupiter/Surefire, failIfNoTests=true e build limpo |
++| V-002 | 45 fixtures binário/hex/hash, offsets/limites e proveniência da evidência histórica; não presumir novo download nem execução de media |
++| V-003 | ConfigurationLoaderTest: perfis, IDs/portas/papéis, erro agregado, paths fora do cwd, imutabilidade e quatro streams configuradas |
++| V-004 | MessageCodecTest: golden bytes, 16 tipos, rejeição de 3/layout antigo, UTF-8, truncatura/concatenação e limites antes da alocação |
++| V-005 | TransportTest: TCP loopback real, concorrência, limites, peer lento, cancelamento/fecho e terminação dos recursos |
++| V-ADD | scripts/validate-planning.py: estrutura, rastreabilidade, critérios, referências e DAG; snapshot é referência histórica, não impedimento a mudanças legítimas de estado |
++
++JDK por omissão: 25.0.4.1. JDK 21.0.12.1 disponível em
++/usr/lib/jvm/java-21-openjdk-amd64; Maven 3.6.3 confirmado com esse JDK.
++Selecionar JAVA_HOME apenas no processo de construção e registar o ambiente.
++Comando de validação, a partir de Projeto/:
++
++```sh
++env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B -ntp clean verify
++```
++
++O total de 149 testes é histórico; contar os relatórios Surefire produzidos
++pela nova execução e registar falhas/skips. Não alegar GUI, CORE, vídeo ou
++processos distribuídos a partir dos testes de configuração/codec/loopback.
++
++## ADR e gates
++
++ADR aplicáveis no bolt: 001, 002, 007, 008, 009, 010, 012, 014, 020, 021,
++024 e 026. As restrições de bootstrap/bytes continuam a seguir ADR-013.
++Sem dependências runtime novas, CI/linter/JaCoCo ou cobertura percentual nova.
++Nenhum gate externo adicional em IMP-001. Testes de transporte precisam de TCP
++local disponível; impedimentos do ambiente são reportados como tal, sem sucesso
++inventado. Não abrir serviços CORE ou obter media final neste incremento.
++
++Os checkpoints do utilizador exigem validação humana; a revisão atribuída e a
++integração histórica de TASK-005 não são aprovadas novamente por inferência.
++O fecho deste bolt não substitui revisões de código ou gates dos próximos IMP.
++
++## Sequência e pontos de paragem
++
++1. Estado/plano: apresentar este plano, diff e Q-C-01; parar sem testes.
++2. Autorizado: conferir assinaturas/records/enums e cobertura dos testes
++   existentes. A adaptação à base DONE em Q-C-01 foi aprovada exclusivamente
++   para IMP-001; apresentar lacunas reais antes de alterar fundações ou testes
++   e parar para validar no checkpoint 2.
++3. Produzir walkthrough da verificação autorizada, mostrar git diff --numstat
++   e distinguir as alterações preexistentes; parar antes da validação final.
++4. Executar a validação documental e mvn -B -ntp clean verify com log novo,
++   apresentar resultados reais e limitações; executar também um teste manual
++   adequado à base de configuração/codec/transporte e parar antes do fecho.
++5. Após aprovação: atualizar estados/evidência coerentes e apresentar diff.
++   Commit/push só mediante autorização explícita; não iniciar outro IMP.
+--- /dev/null
++++ b/memory-bank/bolts/001-base-validada/interfaces-and-test-map.md
+@@ -0,0 +1,180 @@
++# IMP-001 — Checkpoint 2: interfaces e testes existentes
++
++Inspeção estática preparada em 2026-11-03T21:11:16Z.
++Estado: checkpoint 2 aprovado explicitamente pelo utilizador, com registo em
++2026-11-03T21:16:53Z. Nenhuma suite, build, validação V-ADD ou teste manual
++executados neste checkpoint. Autorizado somente preparar o checkpoint 3.
++
++## Autorização e posição no bolt
++
++O utilizador aprovou explicitamente o checkpoint 1 e a adaptação Q-C-01 apenas
++para IMP-001. Autorizou conferir interfaces e mapear os testes existentes,
++apresentar qualquer lacuna real antes de alterar fundações/testes e parar no
++checkpoint 2. Regressão com log novo e teste manual continuam obrigatórios
++na validação. A autorização foi registada em 2026-11-03T21:08:48Z.
++
++| Etapa Simple | Checkpoint do utilizador | Estado |
++|---|---|---|
++| Plan | 1 — estado e plano | Concluído e aprovado |
++| Implement | 2 — interfaces e mapeamento | Inspeção aprovada pelo utilizador |
++| Implement | 3 — entregáveis e diff | Preparação autorizada; aguardar validação antes dos testes |
++| Test | 4 — regressão e teste manual | Ainda não executado |
++| Fecho do bolt | 5 — estados, revisão e integração | Ainda não executado |
++
++A etapa implement não está concluída pela aprovação isolada deste mapeamento.
++Fonte do incremento: [ADD/IMP-001](../../../add.md#imp-001).
++
++## Interfaces e modelos conferidos
++
++| Componente | API/modelo existente | Contrato observado |
++|---|---|---|
++| ConfigurationLoader | load(Path, NodeRole): NodeConfiguration; loadDeployment(Collection<Path>): List<NodeConfiguration>; ambas lançam ConfigurationException | Carga de propriedades/ficheiros e validação agregada; sem DNS, sockets ou leitura de bytes de media |
++| NodeConfiguration | Record com sourceFile, nodeId, role, bindHost, advertisedHost, controlPort, dataPort, bootstrap, topologyFile, streamsFile, mediaBase, topology e streams; BootstrapContact(host, port) | Campos opcionais explícitos; cópia defensiva de streams; dataPort zero apenas no perfil BOOTSTRAP validado |
++| TopologyConfiguration | Record (sourceFile, nodes); Node(nodeId, host, controlPort, dataPort, role, neighbors) | Cópias de mapa e conjuntos não modificáveis; o loader valida grafo, papéis e endpoints |
++| StreamConfiguration | Record (sourceFile, streamId, serverId, title, mediaFile, fps, loop) | Descritor local, sem ler vídeo; validação de domínio feita pelo loader |
++| ConfigurationException/Problem | problems(): List<ConfigurationProblem>; record (file, key, message) | Erros agregados com origem/propriedade e lista defensiva; não devolver configuração parcial |
++| NodeRole | BOOTSTRAP, SERVER, RELAY, CLIENT | Papéis de configuração; códigos de Endpoint no fio são explícitos no codec |
++| ControlMessage | Record (version, type, requestId, senderId, senderInstance, payload); construtor de versão 1 | Envelope existente; payload selado e tipado |
++| Payloads e descritores | Endpoint, StreamInfo, EndpointPayload, NeighborList, Leave, Probe, Announcement, Withdrawal, Activation, ActivationAck, Deactivation, Trace, TraceResult, ErrorPayload; Empty enum | NeighborList, Announcement, Activation, Trace e TraceResult copiam as listas; NeighborList não contém lease |
++| MessageType/ErrorCode | code(); fromCode(int) | 16 tipos ativos 1, 2 e 4–17; código 3 rejeitado; erros explícitos 1–12, sem ordinal no fio |
++| MessageCodec | encode(ControlMessage): byte[]; decode(byte[]): ControlMessage; write(ControlMessage, OutputStream): void; read(InputStream): Optional<ControlMessage> | Framing 37..65536 antes de alocar; UTF-8 estrito; EOF/truncatura/formato distintos; não abre sockets nem fecha/flush streams do chamador |
++| ProtocolException | IOException com errorCode() | Classifica erro de formato sem enviar resposta ou decidir política de ligação |
++| Transport | Transport(InetSocketAddress, Listener[, Options]); localAddress(); connect(InetSocketAddress): CompletableFuture<Connection>; connectionCount(); close(); awaitTermination(Duration): boolean | Dial assíncrono, endpoints resolvidos, reservas incluindo dials, sockets TCP reais, terminação com prazo |
++| Transport.Options | Record (queueCapacity, maxConnections, connectTimeout, shutdownTimeout); defaults() | Filas 1..256, conexões 1..64; defaults 256/64 e 2 s/3 s; durações positivas em ms limitadas a int |
++| Transport.Listener | connectionOpen(Connection); message(Connection, ControlMessage); connectionClosed(Connection, CloseReason) | Callbacks sequenciais por ligação no leitor; ligações distintas podem chamar em paralelo; publicar trabalho sem bloquear |
++| Connection | id(): UUID; remoteAddress(): InetSocketAddress; isOpen(): boolean; queuedMessages(): int; send(ControlMessage): SendResult; close() | send=ACCEPTED confirma enfileiramento; escritor exclusivo; fecho limpa fila e liberta reserva após ambos os workers |
++| Connection enums | SendResult: ACCEPTED/CLOSED/OVERFLOW/INVALID_MESSAGE; CloseReason: LOCAL_CLOSE/SHUTDOWN/PEER_EOF/TRUNCATED_FRAME/PROTOCOL_ERROR/IO_ERROR/OUTPUT_OVERFLOW/CALLBACK_ERROR | Overflow localizado e razões de fecho observáveis |
++
++Implementações consultadas: [configuração](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java),
++[records de configuração](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java),
++[grafo](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/TopologyConfiguration.java),
++[mensagens](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java),
++[codec](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java),
++[tipos](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java),
++[transporte](../../../Projeto/src/main/java/pt/uminho/esr/ott/transport/Transport.java) e
++[ligação](../../../Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java).
++As assinaturas concordam com o âmbito já disponível em docs/07; esta inspeção
++não demonstra execução bem-sucedida ou cobertura exaustiva.
++
++## Correspondência entre oráculos e verificações
++
++| Oráculo | Evidência existente identificada por leitura | O que fica por executar |
++|---|---|---|
++| V-001 | Projeto/pom.xml: release=21, JUnit Jupiter 5.13.4 apenas test, Surefire 3.5.4, failIfNoTests=true; plugins fixados | POM efetivo/provider realmente resolvido e build limpo com JDK 21 |
++| V-002 | Manifesto e README de fixtures: 45 casos declarados, 29 TCP e 16 UDP, binário/hex/SHA-256 e interpretação de offsets; notas de acesso ao recurso docente e correção ADR-013 | Recalcular os hashes e correspondência hex/bin; conferir limites/offsets, manter a distinção entre acesso histórico ao recurso e nova obtenção |
++| V-003 | ConfigurationLoaderTest: métodos abaixo, com @TempDir, exemplos reais e assertThrows para entradas inválidas | Descoberta e execução de ConfigurationLoaderTest no novo build; a contagem de 65 é histórica |
++| V-004 | MessageCodecTest: bytes independentes para 16 tipos mais variante UTF-8, 12 fixtures TCP inválidas e testes de fronteira/contexto abaixo | Execução nova da classe; a contagem de 66 é histórica |
++| V-005 | TransportTest: 18 métodos @Test visíveis, sockets loopback/portas efémeras, deadlines e verificação de terminação | Execução nova da classe; 18 métodos identificados não são 18 testes agora aprovados |
++| V-ADD | scripts/validate-planning.py: secções/requisitos/aliases, ADR/matriz, IMP/histórias/bolts, etapas/dependências, fixtures/XML e referências | Executar o validador na fase de validação; não substituir testes Java, revisão humana ou CORE |
++
++Testes consultados: [ConfigurationLoaderTest](../../../Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java),
++[MessageCodecTest](../../../Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java) e
++[TransportTest](../../../Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java).
++POM: [Projeto/pom.xml](../../../Projeto/pom.xml).
++Referências documentais: [manifesto de fixtures](../../../Projeto/src/test/resources/protocol/manifest.json),
++[interpretação das fixtures](../../../Projeto/src/test/resources/protocol/README.md),
++[acesso/formato histórico](../../../experiments/task-002-contract-review.md),
++[correção do bootstrap](../../../experiments/bootstrap-discovery-correction.md) e
++[validador V-ADD](../../../scripts/validate-planning.py).
++
++## V-003 — Casos localizados em ConfigurationLoaderTest
++
++| Parte do oráculo | Métodos existentes |
++|---|---|
++| Cinco perfis, duas origens, quatro UUID e ownership | loadsFiveRealProfilesAndFourDistinctOwnedStreams; deploymentRejectsUuidOwnedByTwoServers |
++| Imutabilidade e cópias | collectionsAreImmutable; loadsFiveRealProfilesAndFourDistinctOwnedStreams; aggregatesMissingFieldsWithFileAndProperty |
++| Paths fora do cwd e ID de um carácter | resolvesPathsAgainstConfigurationNotWorkingDirectory; acceptsOneCharacterIdAndUnresolvedHostnameWithoutNetwork |
++| Campos/ficheiros ausentes e erros agregados | aggregatesMissingFieldsWithFileAndProperty; missingFileIsAnExplicitConfigurationProblem; missingTopologyFileDoesNotReturnPartialNode |
++| Chaves duplicadas/inaplicáveis e UTF-8 | rejectsDuplicateDecodedProperties; rejectsUnknownAndRoleInapplicableKeys; rejectsInvalidUtf8AndMalformedUnicodeEscapes; acceptsPropertyContinuationAndUtf8Titles |
++| Papéis, IDs, portas e endereços | rejectsExpectedRoleMismatch; rejectsInvalidRoles; rejectsInvalidIds; rejectsInvalidPorts; rejectsUnusableAdvertisedHosts; permitsWildcardBindAndLiteralIpv6WithoutLookup |
++| Grafo e unicidade de endpoints | rejectsMalformedNodeLists; rejectsSelfUnknownAndAsymmetricNeighbors; rejectsDuplicateNeighborAndUnknownTopologyKey; rejectsDuplicateEndpointsWithinSameTransport; allowsSameNumericPortForTcpAndUdp; rejectsBootstrapAsForwardingNode |
++| Catálogos, títulos, UUID, FPS, loop e media.base | rejectsNonCanonicalUuid; rejectsRepeatedUuid; rejectsServerWithOnlyOneStream; rejectsInvalidFps; rejectsNonBooleanLoop; enforcesTitleUnicodeLimitsAndUtf8; rejectsAliasMediaAndEscapeOutsideBase; rejectsMissingFieldsAndUnknownCatalogKeys |
++| Deployment coerente e limites | deploymentRejectsRoleAndEndpointsDifferentFromTopology; deploymentRejectsWrongBootstrapContact; deploymentRejectsMissingAndDuplicateProfiles; deploymentDetectsCollisionWithBootstrapPort; rejectsOversizedNodeAndStreamLists; deploymentRejectsNodeAbsentFromAllowedGraph |
++
++Não há transporte/relógio falso necessário para executar o loader: a API é
++offline. Os @TempDir e ficheiros sintéticos pertencem aos testes existentes.
++Quatro streams configuradas não comprovam quatro conteúdos JPEG reais.
++
++## V-004 — Casos localizados em MessageCodecTest
++
++| Parte do oráculo | Métodos existentes |
++|---|---|
++| Golden bytes e todos os tipos | goldenVectors; matchesIndependentFixturesBothDirections; allMessageNumbersHaveIndependentVectors |
++| Leituras parciais, concatenação e EOF | readsOneByteAtATimeWithoutDependingOnAvailable; consecutiveMessagesRemainSeparate; eofAtBoundaryDiffersFromEveryTruncatedFrame |
++| Prefixos/limites antes de alocação e corpo incompleto | rejectsMalformedTcpFixtures; unsignedOversizedLengthRejectedBeforeBodyRead; fullLengthBoundsAndIncompleteFields |
++| u32/UUID/UTF-8 e limites de listas/IDs | unsigned32LeasesAndUuidBitsRoundTrip; rejectsLeaseOutsideUnsigned32Domain; strictUtf8AndCodePointLimits; validatesIdsAndMaximumNeighborCount; validatesPathsButDefersRoutingContext |
++| Instância/papéis e saída inválida | endpointInstanceAndRolesFollowWireContract; invalidModelsDoNotEmitPartialFrames; callerOwnsStreamLifetimeAndFlush |
++| Erros, cópias e contrato corrigido de descoberta | errorCodesAndUnknownRelatedTypeRoundTrip; payloadListsAreDefensivelyCopied; bootstrapReplyContainsOnlyConfiguredNeighbors |
++| Integração configuração/codec | phaseOneConfigurationCanProduceAndRecoverControlFrames |
++
++goldenVectors contém 17 vetores aceites para 16 tipos ativos: o vetor adicional
++é a variante UTF-8 de ANNOUNCE. O manifesto declara 17 TCP aceites e 12 rejeitados.
++Código 3, lease antigo em REGISTER_OK e instância viva no endpoint da resposta
++são explicitamente rejeitados nos testes atuais. Esta inspeção não executa o codec.
++
++## V-005 — Casos localizados em TransportTest
++
++| Parte do oráculo | Métodos existentes |
++|---|---|
++| Full-duplex e concorrência | concurrentSendersPreserveFullDuplexFramesAndPerSenderOrder |
++| Framing no TCP real | readsIndependentFixtureByteByByteThenConcatenatedFrames; truncatedPeerClosesOnceAndListenerAcceptsReplacement; truncatedBodyAndOversizedPrefixAreIsolated |
++| Bind/dial, admissão e cancelamento | occupiedPortAndRefusedDialDoNotLeaveWorkers; boundedConnectionAdmissionAndCancellation; inboundAdmissionRejectsExcessPeerWithoutKillingListener |
++| Peer lento, overflow e isolamento | slowPeerOverflowClosesOnlySaturatedConnection; invalidOutboundMessageDoesNotCloseHealthyConnection |
++| Shutdown e reconexão | shutdownReleasesPartialReaderIdleWriterAndAcceptPort; simultaneousLocalCloseEmitsOneEventAndReconnectGetsNewId; shutdownWithQueuedWritesToNonReadingPeerReclaimsBothWorkers; shutdownRacingOutboundDialsCompletesAllFuturesAndReleasesReservations |
++| Falhas de callbacks e prazo de terminação | failingCallbackIsLocalizedAndShutdownWorksFromCallback; failingOpenAndClosedCallbacksDoNotRetainConnectionSlots; blockedCallbackMakesShutdownTimeoutExplicitAndCanThenTerminate; simultaneousShutdownFromTwoCallbacksDoesNotJoinEachOther |
++| Limites e endpoints resolvidos | validatesLimitsAndRejectsUnresolvedEndpoints |
++
++A classe usa @Timeout(15), esperas limitadas e portas efémeras. Alguns callbacks
++deliberadamente bloqueados testam a deteção do incumprimento do contrato; não
++são recomendação para handlers reais. TCP real é necessário ao V-005, pelo
++que substituí-lo por um transporte falso eliminaria parte do próprio oráculo.
++Relógios falsos de monitorização/árvores pertencem aos IMP correspondentes.
++
++## V-ADD — Verificações localizadas no script
++
++- Requisitos/aliases/critérios: linhas 93–118; ADR/matriz/IMP e parâmetros:
++  120–177. Essas verificações leem ADD e os índices derivados.
++- Unidades, histórias e correspondência única: 185–215; campos/etapas,
++  identidade/critérios de bolt: 216–263; DAG, gates e bloqueios: 264–281.
++- Fixtures binário/hex/hash e parsing XML: 284–294; referências/âncoras:
++  295–326; snapshot opcional: 328–332.
++- O snapshot identifica as fontes; não é aprovação nem restauração de estado
++  antigo após uma mudança legítima. Parsing de XML não comprova sessão CORE.
++
++## Lacunas e trabalho corretamente fora deste IMP
++
++Não foi identificada por leitura uma lacuna de interface/caso exigido que
++justifique alterar as fundações ou os testes. Permanecem pendentes de prova
++o build/POM efetivo, execução JUnit, integridade/offsets das fixtures, V-ADD
++e o teste manual. Pendência de execução não é teste aprovado.
++
++RuntimeConfiguration e NodeConfiguration.runtime() ainda não existem: são
++trabalho de IMP-002/TASK-032. Connection.sendAndFlush ainda não existe: pertence
++a IMP-003/TASK-006. O bootstrap é comentário, a CLI não tem main e as classes
++de teste BootstrapServerTest/NeighborManagerTest/RoutingServiceTest/StreamForwarderTest
++são vazias. Estes são serviços/testes futuros; não comprovam funcionalidade
++nem impedem verificar a base existente. Não se propõe nova ADR ou alterar testes.
++
++## Teste manual a executar na validação
++
++Roteiro proposto, ainda não executado, após o novo clean verify:
++
++1. Usar JDK 21/JShell com classpath target/classes, a partir de Projeto/, e
++   guardar comandos/saída em experiments/construction/001-base-validada/.
++2. Carregar os cinco perfis reais com loadDeployment. Conferir cinco nós,
++   duas origens, quatro streams/UUID e vizinhanças, sem abrir sockets.
++3. Ler uma fixture TCP independente e confirmar os campos e a equivalência
++   dos bytes reencodificados, sem alterar o ficheiro esperado.
++4. Criar dois Transport com loopback e portas efémeras. Usar callbacks que
++   só publicam em filas limitadas, estabelecer a ligação e trocar PROBE_PING
++   e PROBE_PONG. Conferir mensagens/requestId/probeId efetivamente recebidos;
++   ACCEPTED isoladamente não comprova receção. Todas as esperas têm prazo.
++5. Fechar os dois transportes em finally, confirmar awaitTermination e reservas
++   libertadas; tentar reutilizar a porta após fecho e encerrar o JShell.
++6. Guardar resultados e limites reais. É um smoke manual das APIs disponíveis,
++   não uma demonstração de handshake, cálculo de RTT, CLI, vídeo ou CORE.
++
++A regressão completa terá log novo; o total de 149 mantém-se histórico até à
++nova execução. Fechar o bolt só após critérios, verificações, revisão humana
++e integração exigidas. O checkpoint 2 foi aprovado; parar no checkpoint 3 antes
++de executar a validação ou o teste manual.
+--- /dev/null
++++ b/memory-bank/bolts/001-base-validada/implementation-walkthrough.md
+@@ -0,0 +1,125 @@
++# IMP-001 — Walkthrough da base verificada por leitura
++
++Preparação do checkpoint 3: 2026-11-03T21:16:53Z.
++Estado: aguarda validação humana; nenhuma execução de build, regressão,
++V-ADD ou teste manual foi realizada durante os checkpoints deste bolt.
++
++## Autorização e estado
++
++O utilizador aprovou o checkpoint 1 e Q-C-01 exclusivamente para IMP-001,
++e aprovou depois o checkpoint 2. A autorização atual permite somente preparar
++este walkthrough e os diffs, distinguindo as alterações preexistentes, e parar
++no checkpoint 3. Não autoriza executar a validação ou concluir o bolt.
++
++O bolt 001-base-validada está in-progress, current_stage=implement. Apenas
++plan está em stages_completed. Implement aguarda a revisão destes entregáveis;
++Test e o fecho ainda não começaram. Não há dependências anteriores nem gates
++externos adicionais no [IMP-001](../../../add.md#imp-001).
++
++## O que foi produzido
++
++O incremento verifica TASK-001–005 DONE sem as reimplementar. A entrega até
++aqui é a inspeção e documentação da base existente, não uma funcionalidade
++nova. Foram produzidos:
++
++- [Plano](implementation-plan.md), aprovado no checkpoint 1.
++- [Q-C-01](../../../docs/construction-duvidas.md#q-c-01--testes-primeiro-no-imp-001),
++  resolvida: sem criar falhas artificiais para uma base DONE; a regressão
++  continua obrigatória e qualquer lacuna real precede mudanças de código/testes.
++- [Mapa de interfaces e oráculos](interfaces-and-test-map.md), aprovado no
++  checkpoint 2, com assinaturas, records, enums e testes existentes para
++  V-001–005/V-ADD. A aprovação é da revisão estática, não de execução de testes.
++- Estados e registo de Construction com autorizações e pontos de paragem.
++- Baseline, hashes e diffs em experiments/construction/001-base-validada/.
++
++Não foi alterado Projeto/pom.xml, código Java, configuração, fixtures ou testes.
++Não foram apagados/enfraquecidos testes, criadas APIs artificiais ou reabertas
++TASK-001–005. Não há nova ADR ou dependência. Permanecem os bytes v1 e os
++contratos de configuração/codec/transporte já existentes.
++
++## Base de comparação e alterações preexistentes
++
++Ramo: Denji. HEAD de referência:
++4fe6791178828e72ea48c71d46146f9c8cd4c6f9. O arranque deste bolt encontrou
++19 ficheiros rastreados alterados pelo fecho de Inception, mais o relatório
++experiments/inception-closure-validation-2026-11-03.md não rastreado.
++
++A [baseline de arranque](../../../experiments/construction/001-base-validada/baseline.json)
++regista os hashes desses ficheiros e dos 163 ficheiros rastreados de Projeto/.
++O [diff preexistente](../../../experiments/construction/001-base-validada/pre-existing.diff)
++guarda o estado documental anterior ao bolt; não é atribuído a IMP-001.
++
++Para distinguir as revisões:
++
++- [Checkpoint 1](../../../experiments/construction/001-base-validada/checkpoint-1.diff):
++  arranque, plano, dúvida e registos iniciais.
++- [Checkpoint 2](../../../experiments/construction/001-base-validada/checkpoint-2.diff):
++  aprovação do plano/Q-C-01 e mapeamento estático.
++- [Checkpoint 3 incremental](../../../experiments/construction/001-base-validada/checkpoint-3.diff):
++  aprovação do checkpoint 2, este walkthrough e atualização documental associada.
++- [Diff cumulativo do bolt](../../../experiments/construction/001-base-validada/bolt-through-checkpoint-3.diff):
++  conjunto dos entregáveis do bolt, contra a árvore existente ao seu arranque,
++  descontando o fecho de Inception. Inclui os documentos novos não rastreados,
++  que git diff isoladamente não apresenta.
++
++O unit-brief de 001-base-validada participa nas duas fases: a alteração para
++ready em Inception é preexistente; a passagem para construction/in-progress
++e os timestamps de Construction pertencem ao bolt. O diff cumulativo usa a
++baseline com hash para separar essas alterações no mesmo ficheiro.
++
++Os diffs completos contra HEAD também contêm a documentação anterior de
++Inception. Não os interpretar como autoria exclusiva de IMP-001 nem incluir
++essa documentação num commit por inferência. Não foram criados ramos, commits,
++push, deploy ou upload.
++
++## Critérios e verificações ainda pendentes
++
++| Critério de IMP-001 | Evidência disponível | Pendência |
++|---|---|---|
++| Confirmar componentes reais e preservar TASK-001–005 DONE | Código/POM/testes inspecionados, estados históricos preservados e revisão estática aprovada | Correlacionar com a execução nova e rever o fecho |
++| Conferir 45 fixtures, 16 tipos e coerência ADD/specs/DAG | Inventário declarado e casos de teste mapeados; enumeração e contratos lidos | Recalcular binário/hex/hash, conferir offsets e executar V-ADD |
++| Executar a regressão existente com log novo | Suites e comando identificados | Build completo e contagem/resultados novos ainda não executados |
++
++Nenhum critério global foi marcado como concluído apenas por escrever este
++walkthrough. O valor 149 continua histórico, sem representar um resultado novo.
++
++| Oráculo / prova | Estado nesta execução do bolt |
++|---|---|
++| V-001: POM efetivo, release/provider e build limpo | Pendente de execução |
++| V-002: fixtures/offsets e proveniência do recurso | Mapeado por leitura; verificação atual completa pendente |
++| V-003: ConfigurationLoaderTest | Mapeado; suite não executada |
++| V-004: MessageCodecTest | Mapeado; suite não executada |
++| V-005: TransportTest | Mapeado; suite não executada |
++| V-ADD: validação documental | Script inspecionado; não executado nesta retoma |
++| Teste manual configuração/codec/TCP/shutdown | Roteiro definido; ainda não executado |
++| Revisão humana e integração finais | Pendentes para fecho; aprovações dos checkpoints 1/2 não as substituem |
++
++Os checks de hash/diff da árvore de trabalho demonstram preservação de ficheiros;
++não substituem os oráculos funcionais/documentais acima. A existência de classes
++vazias de bootstrap/overlay/routing/vídeo é trabalho futuro, não êxito funcional.
++RuntimeConfiguration e sendAndFlush pertencem aos IMP seguintes. Nenhuma lacuna
++estática que exija alterar fundações/testes foi identificada ou corrigida aqui.
++
++## Validação proposta, a aguardar autorização
++
++No checkpoint 4, depois de aprovação explícita deste checkpoint:
++
++1. Confirmar ambiente e usar o JDK 21 instalado apenas no processo Maven;
++   Java/Maven observados no arranque: JDK 21.0.12.1 e Maven 3.6.3.
++2. Executar V-ADD e a verificação atual das fixtures/contratos aplicáveis,
++   registando comando, ambiente, resultados e limitações.
++3. Em Projeto/, executar env JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
++   mvn -B -ntp clean verify. Guardar log novo em
++   experiments/construction/001-base-validada/ e extrair contagens reais dos
++   relatórios Surefire produzidos pela execução, sem reutilizar target antigo.
++4. Executar o teste manual já proposto no checkpoint 2: cinco perfis, uma
++   fixture independente, troca PROBE_PING/PROBE_PONG entre dois transportes
++   loopback com portas efémeras, esperas limitadas, receção efetiva e shutdown.
++   Confirmar terminação/reservas e reutilização da porta; guardar comandos e
++   saída reais. Não confundir o smoke com handshake, cálculo de RTT ou CORE.
++5. Apresentar resultados, pendências e diff para revisão. Produzir
++   test-walkthrough.md apenas depois das execuções; não declarar fecho antes
++   de critérios cumpridos, verificações, revisão humana e integração.
++
++A revisão do checkpoint 3 é uma paragem explícita. O roteiro acima não é
++execução ou autorização automática do build, da regressão ou do teste manual.
+--- /dev/null
++++ b/memory-bank/intents/001-ott-streaming/units/001-base-validada/construction-log.md
+@@ -0,0 +1,37 @@
++---
++unit: "001-base-validada"
++intent: "001-ott-streaming"
++created: "2026-11-03T21:03:35Z"
++updated: "2026-11-03T21:16:53Z"
++---
++
++# Registo Construction — 001-base-validada
++
++- **2026-11-03T21:03:35Z**: bolt 001-base-validada iniciado em plan, após leitura
++  e comunicação do estado ao utilizador. Plano preparado para o checkpoint 1;
++  nenhuma etapa aprovada/concluída e nenhum build/teste executado.
++- Base: ramo Denji, HEAD 4fe6791178828e72ea48c71d46146f9c8cd4c6f9. Alterações
++  preexistentes de Inception preservadas na baseline e no diff da evidência.
++- **2026-11-03T21:08:48Z**: aprovação explícita do utilizador registada para
++  checkpoint 1 e Q-C-01, exclusivamente para IMP-001. Plan concluído; implement
++  iniciado apenas para a inspeção de interfaces e mapeamento dos testes do
++  checkpoint 2. Parar nesse checkpoint, apresentando lacunas antes de alterar
++  fundações ou testes. Regressão com log novo e teste manual adequado continuam
++  obrigatórios na validação. Nenhum build/teste executado nesta continuação.
++- **2026-11-03T21:13:13Z**: interfaces/records/enums conferidos por leitura;
++  mapeados testes existentes e verificações para V-001–005/V-ADD. Não foi
++  identificada lacuna que justifique alterar fundações/testes. Nenhuma suite,
++  build, V-ADD ou teste manual executados. Os 163 ficheiros da baseline de
++  Projeto/ mantêm os hashes; staged e unstaged diffs dessa pasta vazios.
++- **2026-11-03T21:16:53Z**: aprovação explícita do checkpoint 2 registada.
++  Autorizado somente preparar implementation-walkthrough e diffs no checkpoint 3,
++  distinguindo alterações do bolt e as preexistentes. Manter verificações
++  de execução pendentes e parar antes de build, regressão, V-ADD ou teste manual.
++  O fecho continua sujeito a critérios, verificações, revisão humana e integração.
++- Próxima ação: apresentar o checkpoint 3 e aguardar validação; os checkpoints
++  4–5 continuam sem autorização de execução. Implement permanece em curso.
++
++Plano: [implementation-plan.md](../../../../bolts/001-base-validada/implementation-plan.md).
++Checkpoint 2: [interfaces e testes](../../../../bolts/001-base-validada/interfaces-and-test-map.md).
++Checkpoint 3: [walkthrough](../../../../bolts/001-base-validada/implementation-walkthrough.md).
++Evidência: experiments/construction/001-base-validada/.
+--- /dev/null
++++ b/docs/construction-duvidas.md
+@@ -0,0 +1,23 @@
++# Dúvidas de Construction
++
++## Q-C-01 — Testes primeiro no IMP-001
++
++- Registada: 2026-11-03T21:03:35Z.
++- Estado: resolvida; adaptação aprovada exclusivamente para IMP-001.
++- Âmbito: IMP-001, bolt/unidade 001-base-validada.
++- Evidência: [IMP-001](../add.md#imp-001) exige verificar TASK-001–005 DONE sem
++  reimplementar; o pedido desta execução exige interfaces e testes primeiro,
++  com testes a falhar antes de implementar. Não há nova funcionalidade ou API
++  prevista neste incremento. O tipo Simple e a DoD excluem código/testes artificiais.
++- Proposta: no checkpoint 2 auditar assinaturas/records/enums e correspondência
++  entre os testes existentes e V-001–005/V-ADD; não acrescentar ou provocar uma
++  falha artificial só para imitar um ciclo de funcionalidade nova. Executar a
++  regressão com evidência nova na validação autorizada. Qualquer lacuna real
++  deve ser apresentada ao utilizador antes de alterar fundações/testes.
++- Impacto: nenhuma mudança de bytes, arquitetura, requisitos ou dependências;
++  adapta o procedimento de testes primeiro à natureza de verificação de IMP-001.
++- Aprovação: explícita pelo utilizador nesta sessão, registada em
++  2026-11-03T21:08:48Z. Apenas conferir interfaces e mapear testes no checkpoint 2,
++  apresentando lacunas antes de alterar fundações/testes e parando para revisão.
++  Não se autoriza omitir a regressão com log novo ou o teste manual na validação.
++  Não altera o procedimento dos restantes IMP nem requer nova ADR.

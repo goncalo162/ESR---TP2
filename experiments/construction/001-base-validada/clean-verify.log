@@ -1,0 +1,342 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:3.4.1:clean (default-clean) @ ott-streaming ---
+[INFO] Deleting /home/luis/ESR/ESR---TP2/Projeto/target
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 34 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 95 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.transport.TransportTest
+[ERROR] Tests run: 18, Failures: 0, Errors: 18, Skipped: 0, Time elapsed: 0.068 s <<< FAILURE! -- in pt.uminho.esr.ott.transport.TransportTest
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.simultaneousLocalCloseEmitsOneEventAndReconnectGetsNewId -- Time elapsed: 0.020 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.simultaneousLocalCloseEmitsOneEventAndReconnectGetsNewId(TransportTest.java:239)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.blockedCallbackMakesShutdownTimeoutExplicitAndCanThenTerminate -- Time elapsed: 0.003 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.TransportTest.blockedCallbackMakesShutdownTimeoutExplicitAndCanThenTerminate(TransportTest.java:369)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.shutdownRacingOutboundDialsCompletesAllFuturesAndReleasesReservations -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.shutdownRacingOutboundDialsCompletesAllFuturesAndReleasesReservations(TransportTest.java:319)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.boundedConnectionAdmissionAndCancellation -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.TransportTest.boundedConnectionAdmissionAndCancellation(TransportTest.java:186)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.slowPeerOverflowClosesOnlySaturatedConnection -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.TransportTest.slowPeerOverflowClosesOnlySaturatedConnection(TransportTest.java:202)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.readsIndependentFixtureByteByByteThenConcatenatedFrames -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.readsIndependentFixtureByteByByteThenConcatenatedFrames(TransportTest.java:117)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.failingCallbackIsLocalizedAndShutdownWorksFromCallback -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.failingCallbackIsLocalizedAndShutdownWorksFromCallback(TransportTest.java:271)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.occupiedPortAndRefusedDialDoNotLeaveWorkers -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.occupiedPortAndRefusedDialDoNotLeaveWorkers(TransportTest.java:169)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.invalidOutboundMessageDoesNotCloseHealthyConnection -- Time elapsed: 0 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.invalidOutboundMessageDoesNotCloseHealthyConnection(TransportTest.java:258)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.inboundAdmissionRejectsExcessPeerWithoutKillingListener -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.TransportTest.inboundAdmissionRejectsExcessPeerWithoutKillingListener(TransportTest.java:288)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.shutdownWithQueuedWritesToNonReadingPeerReclaimsBothWorkers -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.shutdownWithQueuedWritesToNonReadingPeerReclaimsBothWorkers(TransportTest.java:304)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.simultaneousShutdownFromTwoCallbacksDoesNotJoinEachOther -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.simultaneousShutdownFromTwoCallbacksDoesNotJoinEachOther(TransportTest.java:402)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.truncatedPeerClosesOnceAndListenerAcceptsReplacement -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.truncatedPeerClosesOnceAndListenerAcceptsReplacement(TransportTest.java:135)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.concurrentSendersPreserveFullDuplexFramesAndPerSenderOrder -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.concurrentSendersPreserveFullDuplexFramesAndPerSenderOrder(TransportTest.java:71)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.failingOpenAndClosedCallbacksDoNotRetainConnectionSlots -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.TransportTest.failingOpenAndClosedCallbacksDoNotRetainConnectionSlots(TransportTest.java:347)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.truncatedBodyAndOversizedPrefixAreIsolated -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.truncatedBodyAndOversizedPrefixAreIsolated(TransportTest.java:153)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.validatesLimitsAndRejectsUnresolvedEndpoints -- Time elapsed: 0.002 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.validatesLimitsAndRejectsUnresolvedEndpoints(TransportTest.java:430)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.transport.TransportTest.shutdownReleasesPartialReaderIdleWriterAndAcceptPort -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:62)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:53)
+	at pt.uminho.esr.ott.transport.TransportTest.shutdownReleasesPartialReaderIdleWriterAndAcceptPort(TransportTest.java:226)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Tests run: 65, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.276 s -- in pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Tests run: 66, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   TransportTest.blockedCallbackMakesShutdownTimeoutExplicitAndCanThenTerminate:369 » Socket Operação não permitida
+[ERROR]   TransportTest.boundedConnectionAdmissionAndCancellation:186 » Socket Operação não permitida
+[ERROR]   TransportTest.concurrentSendersPreserveFullDuplexFramesAndPerSenderOrder:71 » Socket Operação não permitida
+[ERROR]   TransportTest.failingCallbackIsLocalizedAndShutdownWorksFromCallback:271 » Socket Operação não permitida
+[ERROR]   TransportTest.failingOpenAndClosedCallbacksDoNotRetainConnectionSlots:347 » Socket Operação não permitida
+[ERROR]   TransportTest.inboundAdmissionRejectsExcessPeerWithoutKillingListener:288 » Socket Operação não permitida
+[ERROR]   TransportTest.invalidOutboundMessageDoesNotCloseHealthyConnection:258 » Socket Operação não permitida
+[ERROR]   TransportTest.occupiedPortAndRefusedDialDoNotLeaveWorkers:169 » Socket Operação não permitida
+[ERROR]   TransportTest.readsIndependentFixtureByteByByteThenConcatenatedFrames:117 » Socket Operação não permitida
+[ERROR]   TransportTest.shutdownRacingOutboundDialsCompletesAllFuturesAndReleasesReservations:319 » Socket Operação não permitida
+[ERROR]   TransportTest.shutdownReleasesPartialReaderIdleWriterAndAcceptPort:226 » Socket Operação não permitida
+[ERROR]   TransportTest.shutdownWithQueuedWritesToNonReadingPeerReclaimsBothWorkers:304 » Socket Operação não permitida
+[ERROR]   TransportTest.simultaneousLocalCloseEmitsOneEventAndReconnectGetsNewId:239 » Socket Operação não permitida
+[ERROR]   TransportTest.simultaneousShutdownFromTwoCallbacksDoesNotJoinEachOther:402 » Socket Operação não permitida
+[ERROR]   TransportTest.slowPeerOverflowClosesOnlySaturatedConnection:202 » Socket Operação não permitida
+[ERROR]   TransportTest.truncatedBodyAndOversizedPrefixAreIsolated:153 » Socket Operação não permitida
+[ERROR]   TransportTest.truncatedPeerClosesOnceAndListenerAcceptsReplacement:135 » Socket Operação não permitida
+[ERROR]   TransportTest.validatesLimitsAndRejectsUnresolvedEndpoints:430 » Socket Operação não permitida
+[INFO] 
+[ERROR] Tests run: 149, Failures: 0, Errors: 18, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.583 s
+[INFO] Finished at: 2026-11-03T21:23:59Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: 
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

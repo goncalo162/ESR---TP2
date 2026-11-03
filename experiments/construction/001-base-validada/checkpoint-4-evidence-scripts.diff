@@ -1,0 +1,245 @@
+diff --git a/experiments/construction/001-base-validada/fixture-audit.py b/experiments/construction/001-base-validada/fixture-audit.py
+--- /dev/null
++++ b/experiments/construction/001-base-validada/fixture-audit.py
+@@ -0,0 +1,142 @@
++"""Inspect contract bytes independently; does not invoke the Java codec."""
++from collections import Counter
++from datetime import datetime, timezone
++import hashlib
++import json
++from pathlib import Path
++import struct
++import uuid
++
++ROOT = Path(__file__).resolve().parents[3]
++FIXTURES = ROOT / "Projeto/src/test/resources/protocol"
++OUT = Path(__file__).resolve().parent
++manifest = json.loads((FIXTURES / "manifest.json").read_text())
++rows = []
++
++
++def u16(data, offset):
++    return struct.unpack_from(">H", data, offset)[0]
++
++
++def string(data, offset):
++    size = u16(data, offset)
++    return data[offset + 2:offset + 2 + size].decode("utf-8", errors="strict"), offset + 2 + size
++
++
++def envelope(data):
++    sender, offset = string(data, 22)
++    return {
++        "bodyLength": struct.unpack_from(">I", data)[0],
++        "version": data[4], "type": data[5],
++        "requestId": str(uuid.UUID(bytes=data[6:22])), "senderId": sender,
++        "senderInstance": str(uuid.UUID(bytes=data[offset:offset + 16])),
++    }, offset + 16
++
++
++def announcement_path_offset(data):
++    offset = envelope(data)[1] + 16
++    _, offset = string(data, offset)
++    _, offset = string(data, offset)
++    return offset + 1 + 2 + 16 + 8 + 8
++
++
++for item in manifest["fixtures"]:
++    data = (FIXTURES / item["binary"]).read_bytes()
++    assert len(data) == item["bytes"], item["id"]
++    assert hashlib.sha256(data).hexdigest() == item["sha256"], item["id"]
++    assert bytes.fromhex((FIXTURES / item["hex"]).read_text()) == data, item["id"]
++    row = {"id": item["id"], "bytes": len(data), "integrity": "pass",
++           "declared_outcome": item["expected"]["outcome"]}
++    if item["id"].startswith("tcp-") and item["expected"]["outcome"] == "accept":
++        observed, offset = envelope(data)
++        assert observed["bodyLength"] == len(data) - 4
++        assert 37 <= observed["bodyLength"] <= 65536
++        assert observed["version"] == 1 and observed["type"] in [1, 2, *range(4, 18)]
++        for key, value in observed.items():
++            assert item["expected"]["fields"][key] == value, (item["id"], key)
++        row.update(envelope=observed, payload_offset=offset)
++    if item["id"].startswith("udp-"):
++        violations = []
++        if len(data) < 64:
++            violations.append("short-header")
++        else:
++            magic, version, flags, header, stream, session, seq, media, length, index, count = struct.unpack_from(
++                ">4sBBH16s16sqqIHH", data)
++            fields = {"magic": magic.decode("ascii"), "version": version, "flags": flags,
++                      "headerLength": header, "streamId": str(uuid.UUID(bytes=stream)),
++                      "sessionId": str(uuid.UUID(bytes=session)), "frameSeq": seq,
++                      "mediaTimeUs": media, "frameLength": length, "fragmentIndex": index,
++                      "fragmentCount": count, "payloadBytes": len(data) - 64}
++            if magic != b"OTT1": violations.append("magic")
++            if version != 1: violations.append("version")
++            if flags != 0: violations.append("flags")
++            if header != 64: violations.append("header-length")
++            if not 1 <= length <= 2097152: violations.append("frame-length")
++            if seq < 0: violations.append("sequence")
++            if media < 0: violations.append("media-time")
++            if not 1 <= count <= 1847 or count != (length + 1135) // 1136:
++                violations.append("count")
++            if not 0 <= index < count: violations.append("index")
++            if not 65 <= len(data) <= 1200: violations.append("datagram-size")
++            expected_payload = 1136 if index < count - 1 else length - 1136 * (count - 1)
++            if len(data) - 64 != expected_payload: violations.append("payload-length")
++            row["header_fields"] = fields
++            if item["expected"]["outcome"] == "accept":
++                assert fields == item["expected"]["fields"], item["id"]
++        assert bool(violations) == (item["expected"]["outcome"] == "reject"), item["id"]
++        row["contract_violations"] = violations
++    rows.append(row)
++
++tcp_invalid_checks = {
++    "short-prefix": lambda b: len(b) < 4,
++    "length-small": lambda b: struct.unpack_from(">I", b)[0] == 36,
++    "length-large": lambda b: struct.unpack_from(">I", b)[0] == 65537,
++    "truncated-body": lambda b: struct.unpack_from(">I", b)[0] == 37 and len(b) - 4 == 36,
++    "version": lambda b: b[4] == 2,
++    "type": lambda b: b[5] == 255,
++    "retired-type": lambda b: b[5] == 3,
++    "utf8": lambda b: b[24:25] == bytes([0x80]),
++    "trailing-byte": lambda b: b[5] == 6 and len(b) > envelope(b)[1],
++    "negative-probe": lambda b: struct.unpack_from(">q", b, envelope(b)[1])[0] == -1,
++    "role": lambda b: b[-1] == 255,
++    "path-count": lambda b: u16(b, announcement_path_offset(b)) == 33,
++}
++for suffix, predicate in tcp_invalid_checks.items():
++    assert predicate((FIXTURES / ("tcp-invalid-" + suffix + ".bin")).read_bytes()), suffix
++
++minimum = (FIXTURES / "tcp-hello-ok-min.bin").read_bytes()
++hello = (FIXTURES / "tcp-hello.bin").read_bytes()
++reply = (FIXTURES / "tcp-register-ok.bin").read_bytes()
++announce = (FIXTURES / "tcp-stream-announce.bin").read_bytes()
++unicode_announce = (FIXTURES / "tcp-stream-announce-utf8.bin").read_bytes()
++activate = (FIXTURES / "tcp-activate.bin").read_bytes()
++error = (FIXTURES / "tcp-error-no-route.bin").read_bytes()
++assert len(minimum) == 41 and envelope(minimum)[1] == 41
++assert len(hello) == 77 and string(hello, 42)[0] == "S1"
++assert uuid.UUID(bytes=hello[46:62]).int != 0
++assert string(hello, 62)[0] == "10.0.0.1"
++assert (u16(hello, 72), u16(hello, 74), hello[76]) == (5000, 5001, 1)
++assert len(reply) == 78 and u16(reply, 41) == 1
++assert string(reply, 43)[0] == "S1" and reply[47:63] == bytes(16)
++assert string(announce, 62)[0] == "A" and u16(announce, 100) == 1
++assert string(unicode_announce, 62)[0] == "🎬" and u16(unicode_announce, 62) == 4
++assert struct.unpack_from(">I", activate, 98)[0] == 6000 and u16(activate, 102) == 2
++assert u16(error, 42) == 6 and error[44] == 11 and string(error, 45)[0] == "no route"
++first = (FIXTURES / "udp-split-first.bin").read_bytes()[64:]
++last = (FIXTURES / "udp-split-last.bin").read_bytes()[64:]
++assert first + last == b"\xab" * 1136 + b"\xcd"
++types = {row["envelope"]["type"] for row in rows if "envelope" in row}
++assert types == {1, 2, *range(4, 18)} and len(rows) == 45
++counts = Counter((item["id"].split("-")[0], item["expected"]["outcome"]) for item in manifest["fixtures"])
++result = {
++    "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
++    "status": "pass", "fixtures": len(rows), "active_tcp_types": sorted(types),
++    "counts": {"/".join(k): v for k, v in counts.items()},
++    "tcp_invalid_contract_observations": sorted(tcp_invalid_checks),
++    "offset_samples": ["HELLO_OK", "HELLO", "REGISTER_OK", "ANNOUNCE", "ANNOUNCE UTF-8", "ACTIVATE", "ERROR"],
++    "udp_split_payload_bytes": len(first + last), "rows": rows,
++    "audit_note": "Initial audit assumed path.count at offset 100 for every ANNOUNCE. The invalid fixture has senderId N32 (3 bytes), so its field is at 101. Audit corrected to derive offsets from envelope/strings; no fixture/application change.",
++    "scope": "Byte/hash/hex/offset audit independent of Java; UDP payload is synthetic, not a Java UDP codec or real video test.",
++}
++(OUT / "fixture-audit.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
++print("PASS: 45 fixtures; hash/hex/length; 16 active TCP types; seven TCP offset samples; all invalid contract observations; UDP split 1137 bytes.")
+diff --git a/experiments/construction/001-base-validada/manual-smoke.jsh b/experiments/construction/001-base-validada/manual-smoke.jsh
+--- /dev/null
++++ b/experiments/construction/001-base-validada/manual-smoke.jsh
+@@ -0,0 +1,95 @@
++import java.nio.file.*;
++import java.net.*;
++import java.time.*;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.*;
++
++void check(boolean ok, String label) {
++    if (!ok) throw new AssertionError(label);
++    System.out.println("CHECK_PASS " + label);
++}
++
++record ManualClosed(UUID id, Connection.CloseReason reason) {}
++
++class ManualEvents implements Transport.Listener {
++    final ArrayBlockingQueue<Connection> opened = new ArrayBlockingQueue<>(8);
++    final ArrayBlockingQueue<ControlMessage> messages = new ArrayBlockingQueue<>(8);
++    final ArrayBlockingQueue<ManualClosed> closed = new ArrayBlockingQueue<>(8);
++    final AtomicBoolean overflow = new AtomicBoolean();
++    public void connectionOpen(Connection c) { if (!opened.offer(c)) overflow.set(true); }
++    public void message(Connection c, ControlMessage m) { if (!messages.offer(m)) overflow.set(true); }
++    public void connectionClosed(Connection c, Connection.CloseReason reason) {
++        if (!closed.offer(new ManualClosed(c.id(), reason))) overflow.set(true);
++    }
++}
++
++void manualSmoke() throws Exception {
++    System.out.println("MANUAL_START " + Instant.now() + " Java=" + System.getProperty("java.version"));
++    Path configs = Path.of("src/main/resources/config");
++    var paths = List.of("bootstrap", "server-1", "server-2", "relay", "client").stream().map(n -> configs.resolve(n + ".properties")).toList();
++    var nodes = ConfigurationLoader.loadDeployment(paths);
++    var streams = nodes.stream().flatMap(n -> n.streams().stream()).toList();
++    check(nodes.size() == 5, "config_five_profiles");
++    check(nodes.stream().filter(n -> n.role() == pt.uminho.esr.ott.overlay.NodeRole.SERVER).count() == 2, "config_two_origins");
++    check(streams.size() == 4 && streams.stream().map(StreamConfiguration::streamId).distinct().count() == 4, "config_four_distinct_stream_ids");
++    var bootstrap = nodes.stream().filter(n -> n.role() == pt.uminho.esr.ott.overlay.NodeRole.BOOTSTRAP).findFirst().orElseThrow();
++    check(bootstrap.topology().orElseThrow().nodes().get("S1").neighbors().equals(Set.of("S2", "R1")), "config_expected_neighbors");
++    System.out.println("CONFIG_PASS nodes=5 origins=2 streams=4 neighbors_S1=S2,R1");
++
++    byte[] golden = Files.readAllBytes(Path.of("src/test/resources/protocol/tcp-hello.bin"));
++    ControlMessage decoded = MessageCodec.decode(golden);
++    var endpoint = ((ControlMessage.EndpointPayload) decoded.payload()).endpoint();
++    check(decoded.type() == MessageType.HELLO && decoded.senderId().equals("S1"), "fixture_type_and_sender");
++    check(decoded.requestId().equals(UUID.fromString("00112233-4455-6677-8899-aabbccddeeff")), "fixture_request_id");
++    check(endpoint.host().equals("10.0.0.1") && endpoint.controlPort() == 5000 && endpoint.dataPort() == 5001, "fixture_endpoint");
++    check(Arrays.equals(golden, MessageCodec.encode(decoded)), "fixture_independent_bytes_roundtrip");
++    check(MessageType.values().length == 16, "sixteen_active_types");
++    boolean retiredRejected = false;
++    try { MessageCodec.decode(Files.readAllBytes(Path.of("src/test/resources/protocol/tcp-invalid-retired-type.bin"))); }
++    catch (pt.uminho.esr.ott.protocol.ProtocolException e) { retiredRejected = e.errorCode() == ErrorCode.INVALID_MESSAGE; }
++    check(retiredRejected, "retired_type_3_rejected");
++    System.out.println("CODEC_PASS hello_bytes=" + golden.length + " active_types=16 retired_3=rejected");
++
++    var a = new ManualEvents();
++    var b = new ManualEvents();
++    var bind = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0);
++    InetSocketAddress reusable;
++    try (var left = new Transport(bind, a); var right = new Transport(bind, b)) {
++        reusable = left.localAddress();
++        System.out.println("TCP_LISTEN left=" + left.localAddress() + " right=" + right.localAddress());
++        Connection outgoing = left.connect(right.localAddress()).get(3, TimeUnit.SECONDS);
++        Connection openedLeft = a.opened.poll(3, TimeUnit.SECONDS);
++        Connection incoming = b.opened.poll(3, TimeUnit.SECONDS);
++        check(openedLeft != null && incoming != null && outgoing.id().equals(openedLeft.id()), "tcp_both_connections_open");
++        UUID request = UUID.randomUUID();
++        var ping = new ControlMessage(MessageType.PROBE_PING, request, "L", UUID.randomUUID(), new ControlMessage.Probe(42));
++        check(outgoing.send(ping) == Connection.SendResult.ACCEPTED, "tcp_ping_queued");
++        check(ping.equals(b.messages.poll(3, TimeUnit.SECONDS)), "tcp_ping_actually_received");
++        var pong = new ControlMessage(MessageType.PROBE_PONG, request, "R", UUID.randomUUID(), new ControlMessage.Probe(42));
++        check(incoming.send(pong) == Connection.SendResult.ACCEPTED, "tcp_pong_queued");
++        check(pong.equals(a.messages.poll(3, TimeUnit.SECONDS)), "tcp_pong_actually_received");
++        outgoing.close();
++        var closedLeft = a.closed.poll(3, TimeUnit.SECONDS);
++        var closedRight = b.closed.poll(3, TimeUnit.SECONDS);
++        check(closedLeft != null && closedLeft.id().equals(outgoing.id()), "tcp_local_close_event");
++        check(closedRight != null && closedRight.id().equals(incoming.id()), "tcp_peer_close_event");
++        left.close(); right.close();
++        check(left.awaitTermination(Duration.ofSeconds(3)) && right.awaitTermination(Duration.ofSeconds(3)), "shutdown_both_transports_terminated");
++        check(left.connectionCount() == 0 && right.connectionCount() == 0, "shutdown_no_connection_reservations");
++        check(a.closed.isEmpty() && b.closed.isEmpty() && !a.overflow.get() && !b.overflow.get(), "shutdown_unique_events_and_no_queue_overflow");
++        System.out.println("TCP_PASS request=" + request + " probeId=42 actual_ping_and_pong=true");
++    }
++    try (var rebound = new Transport(reusable, new ManualEvents())) {
++        check(rebound.localAddress().equals(reusable), "shutdown_listening_port_reused");
++        rebound.close();
++        check(rebound.awaitTermination(Duration.ofSeconds(3)), "shutdown_rebound_transport_terminated");
++    }
++    System.out.println("MANUAL_PASS " + Instant.now());
++}
++
++try { manualSmoke(); } catch (Throwable failure) { System.out.println("MANUAL_FAIL " + failure); failure.printStackTrace(System.out); }
++/exit

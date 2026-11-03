@@ -1,0 +1,737 @@
+{
+  "checked_at": "2026-11-03T21:27:23Z",
+  "status": "pass",
+  "fixtures": 45,
+  "active_tcp_types": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "counts": {
+    "tcp/accept": 17,
+    "tcp/reject": 12,
+    "udp/accept": 4,
+    "udp/reject": 12
+  },
+  "tcp_invalid_contract_observations": [
+    "length-large",
+    "length-small",
+    "negative-probe",
+    "path-count",
+    "retired-type",
+    "role",
+    "short-prefix",
+    "trailing-byte",
+    "truncated-body",
+    "type",
+    "utf8",
+    "version"
+  ],
+  "offset_samples": [
+    "HELLO_OK",
+    "HELLO",
+    "REGISTER_OK",
+    "ANNOUNCE",
+    "ANNOUNCE UTF-8",
+    "ACTIVATE",
+    "ERROR"
+  ],
+  "udp_split_payload_bytes": 1137,
+  "rows": [
+    {
+      "id": "tcp-register",
+      "bytes": 77,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 73,
+        "version": 1,
+        "type": 1,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-register-ok",
+      "bytes": 78,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 74,
+        "version": 1,
+        "type": 2,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "B",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 41
+    },
+    {
+      "id": "tcp-invalid-retired-type",
+      "bytes": 42,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-node-leave",
+      "bytes": 43,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 39,
+        "version": 1,
+        "type": 4,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-hello",
+      "bytes": 77,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 73,
+        "version": 1,
+        "type": 5,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-hello-ok-min",
+      "bytes": 41,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 37,
+        "version": 1,
+        "type": 6,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 41
+    },
+    {
+      "id": "tcp-probe-ping",
+      "bytes": 50,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 46,
+        "version": 1,
+        "type": 7,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-probe-pong",
+      "bytes": 50,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 46,
+        "version": 1,
+        "type": 8,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-stream-announce",
+      "bytes": 106,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 102,
+        "version": 1,
+        "type": 9,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-stream-withdraw",
+      "bytes": 82,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 78,
+        "version": 1,
+        "type": 10,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-activate",
+      "bytes": 112,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 108,
+        "version": 1,
+        "type": 11,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-activate-ack",
+      "bytes": 102,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 98,
+        "version": 1,
+        "type": 12,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-deactivate",
+      "bytes": 98,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 94,
+        "version": 1,
+        "type": 13,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-subscription-renew",
+      "bytes": 112,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 108,
+        "version": 1,
+        "type": 14,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-route-trace",
+      "bytes": 97,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 93,
+        "version": 1,
+        "type": 15,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-trace-result",
+      "bytes": 84,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 80,
+        "version": 1,
+        "type": 16,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-error-no-route",
+      "bytes": 55,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 51,
+        "version": 1,
+        "type": 17,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-stream-announce-utf8",
+      "bytes": 109,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "envelope": {
+        "bodyLength": 105,
+        "version": 1,
+        "type": 9,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "payload_offset": 42
+    },
+    {
+      "id": "tcp-invalid-short-prefix",
+      "bytes": 3,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-length-small",
+      "bytes": 40,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-length-large",
+      "bytes": 4,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-truncated-body",
+      "bytes": 40,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-version",
+      "bytes": 41,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-type",
+      "bytes": 41,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-utf8",
+      "bytes": 41,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-trailing-byte",
+      "bytes": 42,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-negative-probe",
+      "bytes": 50,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-role",
+      "bytes": 77,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "tcp-invalid-path-count",
+      "bytes": 267,
+      "integrity": "pass",
+      "declared_outcome": "reject"
+    },
+    {
+      "id": "udp-min",
+      "bytes": 65,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 0,
+        "mediaTimeUs": 0,
+        "frameLength": 1,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 1
+      },
+      "contract_violations": []
+    },
+    {
+      "id": "udp-small",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": []
+    },
+    {
+      "id": "udp-split-first",
+      "bytes": 1200,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 8,
+        "mediaTimeUs": 40000,
+        "frameLength": 1137,
+        "fragmentIndex": 0,
+        "fragmentCount": 2,
+        "payloadBytes": 1136
+      },
+      "contract_violations": []
+    },
+    {
+      "id": "udp-split-last",
+      "bytes": 65,
+      "integrity": "pass",
+      "declared_outcome": "accept",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 8,
+        "mediaTimeUs": 40000,
+        "frameLength": 1137,
+        "fragmentIndex": 1,
+        "fragmentCount": 2,
+        "payloadBytes": 1
+      },
+      "contract_violations": []
+    },
+    {
+      "id": "udp-invalid-short-header",
+      "bytes": 63,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "contract_violations": [
+        "short-header"
+      ]
+    },
+    {
+      "id": "udp-invalid-no-payload",
+      "bytes": 64,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 0
+      },
+      "contract_violations": [
+        "datagram-size",
+        "payload-length"
+      ]
+    },
+    {
+      "id": "udp-invalid-magic",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "\u0000TT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "magic"
+      ]
+    },
+    {
+      "id": "udp-invalid-version",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 2,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "version"
+      ]
+    },
+    {
+      "id": "udp-invalid-flags",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 1,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "flags"
+      ]
+    },
+    {
+      "id": "udp-invalid-header-length",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 63,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "header-length"
+      ]
+    },
+    {
+      "id": "udp-invalid-index",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 1,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "index"
+      ]
+    },
+    {
+      "id": "udp-invalid-count",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 2,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "count",
+        "payload-length"
+      ]
+    },
+    {
+      "id": "udp-invalid-zero-frame",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 0,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "frame-length",
+        "count",
+        "payload-length"
+      ]
+    },
+    {
+      "id": "udp-invalid-large-frame",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 7,
+        "mediaTimeUs": 10000,
+        "frameLength": 2097153,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "frame-length",
+        "count",
+        "payload-length"
+      ]
+    },
+    {
+      "id": "udp-invalid-negative-seq",
+      "bytes": 67,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": -1,
+        "mediaTimeUs": 10000,
+        "frameLength": 3,
+        "fragmentIndex": 0,
+        "fragmentCount": 1,
+        "payloadBytes": 3
+      },
+      "contract_violations": [
+        "sequence"
+      ]
+    },
+    {
+      "id": "udp-invalid-datagram-size",
+      "bytes": 1201,
+      "integrity": "pass",
+      "declared_outcome": "reject",
+      "header_fields": {
+        "magic": "OTT1",
+        "version": 1,
+        "flags": 0,
+        "headerLength": 64,
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "sessionId": "deadbeef-0000-4000-8000-000000000001",
+        "frameSeq": 8,
+        "mediaTimeUs": 40000,
+        "frameLength": 1137,
+        "fragmentIndex": 0,
+        "fragmentCount": 2,
+        "payloadBytes": 1137
+      },
+      "contract_violations": [
+        "datagram-size",
+        "payload-length"
+      ]
+    }
+  ],
+  "audit_note": "Initial audit assumed path.count at offset 100 for every ANNOUNCE. The invalid fixture has senderId N32 (3 bytes), so its field is at 101. Audit corrected to derive offsets from envelope/strings; no fixture/application change.",
+  "scope": "Byte/hash/hex/offset audit independent of Java; UDP payload is synthetic, not a Java UDP codec or real video test."
+}

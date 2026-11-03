@@ -18,6 +18,21 @@ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em
 
 ## Fases
 
+Estado Construction atual — IMP-001: Plan/Implement/Test concluídos e resultados
+do checkpoint 4 aprovados pelo utilizador, com registo em 2026-11-03T21:40:56Z.
+[Checkpoint 5 preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
+aguardando revisão final e integração dos documentos na base comum. Bolt/unidade
+001-base-validada continuam IN PROGRESS; história ainda planned até a cascata
+de fecho. A verificação não reimplementou TASK-001–005 nem promove requisitos
+globais a DONE. Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032,
+ainda não iniciado e dependente do fecho da base.
+
+[Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+e 22 checks manuais. POM/fontes/configuração/fixtures/testes intactos; só a lista
+gerada createdFiles.lst mudou em Projeto/target/ pelo build. Sem GUI/CORE,
+commit/push ou integração presumidos. A DoD foi revista e preservada.
+
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |

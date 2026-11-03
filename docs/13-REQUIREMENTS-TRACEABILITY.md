@@ -55,6 +55,13 @@ Depois de alterar o plano, rever caminhos, dependências, requisitos ligados e o
 
 ## Extensões e matriz normativa do ADD
 
+IMP-001: a verificação da base e os resultados do checkpoint 4 foram aprovados
+pelo utilizador, com registo em 2026-11-03T21:40:56Z. [Validação atual](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+149 testes aprovados (65 configuração, 66 codec, 18 transporte), 45 fixtures,
+16 tipos ativos, V-ADD sem erros e teste manual com 22 checks. [Fecho preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
+pendente de revisão final/integração; nenhum requisito global é promovido a DONE.
+Os estados e evidências legados acima conservam-se como histórico das TASK.
+
 Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
 [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
 CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
