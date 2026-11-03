@@ -1,12 +1,60 @@
 ---
 intent: "001-ott-streaming"
 created: "2026-11-02T15:02:08Z"
-completed: null
-status: "in-progress"
-checkpoint: "artifact-review-pending"
+completed: "2026-11-03T20:54:11Z"
+status: "complete"
+checkpoint: "inception-complete"
 ---
 
 # Registo Inception
+
+## Fecho aprovado — 2026-11-03T20:54:11Z
+
+O utilizador instruiu explicitamente: "Quero fechar esta fase e mais tarde
+implementar extras que vão ser pedidos. Mais tarde volto a esta fase para
+criar os bolts para os extras. Agora quero fechar isto".
+
+Esta instrução aprova o fecho dos artefactos revistos para o âmbito atual.
+Inception fica concluído; a construção está preparada, sem iniciar qualquer
+bolt por este fecho. A definição e decomposição dos extras ficam para uma
+retoma posterior de Inception, quando houver pedidos concretos.
+
+## Resumo final
+
+| Elemento | Total |
+|---|---|
+| Entradas canónicas | 40: 24 REQ, cinco NFR, nove CON e dois INT |
+| Requisitos históricos preservados | 35: 15 RF, cinco RNF, sete RC e oito RP |
+| ADR | 26 |
+| Unidades | 7 |
+| Histórias / IMP / bolts planeados | 33 / 33 / 33 |
+
+## Pronto para Construction
+
+- [x] Requisitos do âmbito atual documentados e rastreados.
+- [x] Contexto definido e unidades preparadas.
+- [x] Histórias com critérios e bolts com dependências e validações.
+- [x] Revisão técnica e decisões CP-01–03 incorporadas.
+- [x] Aprovação humana do fecho recebida do utilizador.
+- [x] Extras remetidos para planeamento posterior, sem escolha implícita de funcionalidades.
+
+Primeiro bolt preparado: 001-base-validada; depois 019-overlay/TASK-032 e
+002-overlay/TASK-006, respeitando as dependências. A aprovação dos artefactos
+não substitui revisões de código, provas GUI/CORE ou confirmação de submissão.
+
+## Retoma futura para extras
+
+Quando os extras forem pedidos, voltar ao Inception para definir requisitos,
+critérios, impacto nas ADR e novas histórias/IMP/bolts. Preservar IDs e evidência
+do âmbito agora fechado; usar novos IDs de bolt e dependências explícitas.
+Se os extras integrarem a entrega, incluir a sua integração/avaliação antes
+do artigo e pacote finais. Não tratar o adiamento como dispensa definitiva
+de extras nem presumir que os 33 bolts atuais os cobrem.
+
+## Histórico de preparação e revisão
+
+As secções seguintes preservam os estados e decisões anteriores ao fecho;
+o estado atual é o registado no frontmatter e no resumo acima.
 
 ## Âmbito e autorização
 
@@ -24,7 +72,7 @@ organização ou de código é presumida.
 - [x] 33 bolts individuais com etapas, dependências e validação.
 - [x] Rastreabilidade e standards locais.
 - [x] CP-01–03 aprovadas pelo utilizador e documentadas no ADD e no relatório do checkpoint.
-- [ ] Revisão humana final dos novos artefactos.
+- [x] Revisão humana final dos artefactos aprovada pelo utilizador no fecho.
 - [ ] Início de construção: nenhum bolt iniciado.
 
 ## Decisões
@@ -44,9 +92,12 @@ não equivale à revisão final de todos os artefactos ou à execução de Const
 ## Validação e limites
 
 [Relatório estrutural](../../../experiments/inception-planning-validation.md).
+Validação documental do fecho: [resultado atual](../../../experiments/inception-closure-validation-2026-11-03.md),
+com zero erros e 220 hashes conferidos; contagens e dependências preservadas.
 Os checks documentais não são build/testes Java, rede, GUI/CORE ou aprovação.
 O resultado Java mais recente continua a ser o log histórico de 149 testes.
-Estado de Inception fica em revisão, sem marcar inception-complete por inferência.
+O estado atual é inception-complete por instrução explícita do utilizador;
+os relatos datados abaixo preservam os momentos anteriores de revisão.
 
 ## Próxima ação preparada
 

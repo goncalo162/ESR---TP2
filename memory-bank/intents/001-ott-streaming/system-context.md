@@ -1,7 +1,8 @@
 ---
 intent: "001-ott-streaming"
-status: "draft"
+status: "context-defined"
 created: "2026-11-02T15:02:08Z"
+updated: "2026-11-03T20:54:11Z"
 ---
 
 # Contexto do sistema OTT

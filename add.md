@@ -1,6 +1,6 @@
 # Architecture Decision Document — serviço OTT
 
-Versão 1.0.1. Atualização: 2026-11-03T14:50:15Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
+Versão 1.0.2. Atualização: 2026-11-03T20:54:11Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
 Respostas incorporadas: **1A, 2A, 3B, 4A**; clarificações aprovadas **CP-01, CP-02, CP-03**. Documento mestre para **Construction**.
 Aceite é o estado da decisão de desenho; não afirma implementação ou resultado.
 Nenhum bolt foi iniciado por gerar ou validar este documento.
@@ -20,6 +20,13 @@ Fora: DB, HTTP, contas, RTP/RTSP, multicast IP, pause/seek, failover do mesmo v�
 noutra fonte, entrada arbitrária de IDs não configurados e recuperação automática
 de falha exclusiva UDP. Novas vizinhanças fora do grafo configurado ficam
 adiadas como extra (CP-03). Não se acrescenta CI, linter ou limiar percentual global.
+
+Inception desta base foi concluído por instrução explícita do utilizador.
+Os extras que venham a ser pedidos serão definidos numa retoma posterior de
+Inception, com requisitos, decisões e bolts próprios. O âmbito atual não os
+inclui implicitamente; este fecho não constitui dispensa definitiva de extras
+da entrega. O seu planeamento futuro deve considerar integração e avaliação
+antes do artigo/pacote final que os inclua.
 
 Atores: operador/equipa configura, inicia e avalia; espectador escolhe/termina
 uma stream; docente avalia; Construction implementa e testa; revisores humanos
@@ -1478,6 +1485,7 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | CP-01 identidade no bootstrap | Aprovada: manter nodeId e REGISTER/REGISTER_OK; IP não substitui identidade nem consulta |
 | CP-02 falha e regresso de nó | Aprovada: nós já configurados, incluindo entrada tardia; TASK-007/016, sem admissão de IDs desconhecidos |
 | CP-03 novas arestas e extras | Aprovada: recuperar alternativas configuradas; novas vizinhanças fora do grafo adiadas como extra |
+| Fecho de Inception e extras posteriores | Aprovado pelo utilizador: fechar o âmbito atual e retomar Inception para criar bolts quando os extras forem pedidos |
 | Media/licença da versão final | Gates de TASK-020/030 |
 | GUI/CORE reais | Gates de execução, sem sucesso presumido |
 | Revisor de TASK-032 | Pessoa distinta a designar antes do DONE |
@@ -1491,11 +1499,16 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | 2026-11-02T15:45:31Z | Limitação UDP/qualidade existente explícitas | Evitar promessas ou ferramentas não escolhidas |
 | 2026-11-02T15:45:31Z | Reformular 18 bolts/acrescentar 15 | Um IMP S/M por bolt e gates por parte |
 | 2026-11-03T14:50:15Z | ADD 1.0.1: esclarecer CP-01–03 em ADR-013/019 e âmbito | Utilizador aprovou manter nodeId, regresso configurado e adiar novas vizinhanças; sem novos requisitos/ADR/bolts |
+| 2026-11-03T20:54:11Z | ADD 1.0.2: fecho aprovado de Inception e retoma futura para extras | Instrução explícita do utilizador; manter 33 bolts e planear os extras quando forem pedidos |
 
-As escolhas 1A/2A/3B/4A e CP-01/02/03 estão aprovadas; documento/decomposição ficam
-disponíveis para revisão. Não se presume aprovação de código, medição de metas,
-execução de bolt ou submissão. Alterar âmbito, hard caps ou contrato exige a
-aprovação da secção 11. Não há nova escolha arquitetural material pendente das
-perguntas respondidas. Os apontamentos e a justificação das CP estão no
-[relatório do checkpoint](docs/checkpoint_REPORT.md); gates de execução
-permanecem abertos. A aprovação das CP não presume o fecho integral de Inception.
+As escolhas 1A/2A/3B/4A e CP-01/02/03 estão aprovadas. O utilizador aprovou
+também o fecho de Inception e dos artefactos revistos do âmbito atual em
+2026-11-03T20:54:11Z. Os apontamentos e a justificação das CP estão no
+[relatório do checkpoint](docs/checkpoint_REPORT.md); o
+[registo de fecho](memory-bank/intents/001-ott-streaming/inception-log.md)
+preserva a autorização e o resumo dos sete units/33 bolts. Não há escolha
+pendente que impeça o fecho desta base. Os extras aguardam pedidos concretos
+e planeamento posterior, sem apagar a base aprovada. Não se presume aprovação
+de código, medição de metas, execução de bolt ou submissão; gates de execução
+permanecem nas tarefas responsáveis. Alterar âmbito, hard caps ou contrato
+aplica a secção 11, considerando a autorização futura que o utilizador fornecer.

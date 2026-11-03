@@ -340,7 +340,7 @@ def main():
               "Validação estrutural/documental e de bytes de referência. Não executa Maven,",
               "testes Java, rede entre processos, GUI, CORE ou submissão. Os 149 testes",
               "continuam a ser evidência histórica, não resultado desta execução.",
-              "A nova organização continua sujeita à revisão humana; nenhum bolt iniciado."]
+              "A validação não substitui a aprovação humana dos artefactos/tarefas; não executa bolts."]
     if errors:
         lines += ["", "## Erros", ""] + ["- " + e for e in errors]
     report = "\n".join(lines) + "\n"

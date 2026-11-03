@@ -110,3 +110,22 @@ TASK-029 continua responsável por explicar ganhos, custos, alternativas e
 limitações destas escolhas, com evidência do comportamento implementado.
 A tarefa de escrever/rever o artigo permanece pendente; a checklist acima
 assinala apenas o fecho das decisões de planeamento.
+
+## 6. Fecho de Inception e extras posteriores — 03-11-2026
+
+Após a aprovação específica das CP-01–03, o utilizador instruiu explicitamente
+o fecho de Inception para o âmbito atual e indicou que voltará a esta fase
+para criar os bolts dos extras quando estes forem pedidos. A revisão final
+dos artefactos fica aprovada por essa instrução; não é necessário voltar a
+escolher os extras para fechar agora esta base.
+
+O plano atual mantém sete unidades e 33 histórias/IMP/bolts. Os extras ainda
+não especificados não são funcionalidades implicitamente incluídas nem ficam
+definitivamente dispensados da entrega. Na retoma de Inception serão definidos
+requisitos, critérios, impacto nas decisões e novos bolts, preservando os IDs
+e resultados existentes. A ordem deve assegurar integração e avaliação antes
+da versão final que inclua os extras.
+
+Este fecho não inicia Construction. O primeiro bolt preparado continua
+001-base-validada. Estado e autorização no
+[registo Inception](../memory-bank/intents/001-ott-streaming/inception-log.md).

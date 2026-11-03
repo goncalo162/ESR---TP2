@@ -1,10 +1,10 @@
 # Revisão Inception — 001-ott-streaming
 
-Revisão técnica: 2026-11-03T14:28:37Z. Revisão humana: pendente.
-Resultado estrutural: não foram identificadas lacunas impeditivas no plano
-anterior. Atualização de 2026-11-03T14:50:15Z: CP-01–03 aprovadas pelo utilizador
-e incorporadas no ADD; revisão final dos restantes artefactos ainda pendente.
-Esta revisão não inicia Construction nem declara a aprovação humana dos artefactos.
+Revisão técnica: 2026-11-03T14:28:37Z. Fecho aprovado pelo utilizador:
+2026-11-03T20:54:11Z. Estado: Inception concluído para o âmbito atual.
+Não foram identificadas lacunas impeditivas; CP-01–03 estão aprovadas e
+incorporadas. A instrução explícita para fechar a fase aprova os artefactos
+revistos, sem executar Construction ou antecipar a escolha dos extras.
 
 ## Âmbito e fontes
 
@@ -92,19 +92,26 @@ cobertos pelos 33 bolts atuais. As escolhas aprovadas confirmam o âmbito
 existente, sem acrescentar requisitos, ADR ou bolts.
 
 As propostas CP-01–03 estão resolvidas pela escolha explícita do utilizador.
-O fecho de Inception aguarda apenas a aprovação final dos restantes artefactos;
+O utilizador aprovou também o fecho final dos artefactos do âmbito atual;
 os gates de execução continuam nas tarefas responsáveis.
 
 [Validação após a incorporação das decisões](../../../experiments/checkpoint-decisions-validation-2026-11-03.md):
-zero erros, contagens e DAG preservados, 220 hashes conferidos. Esta é a
-validação documental atual; os relatórios anteriores conservam o seu contexto.
+zero erros, contagens e DAG preservados, 220 hashes conferidos. O relatório
+conserva o contexto da incorporação das CP; a validação atual do fecho está abaixo.
 
-## Próximos checkpoints
+[Validação documental do fecho](../../../experiments/inception-closure-validation-2026-11-03.md):
+zero erros, sete unidades prontas e 33 bolts planeados, sem ciclos ou referências
+quebradas. Não foram executados testes Java, GUI, CORE ou Construction.
 
-1. CP-01–03 resolvidas e incorporadas; apresentar os artefactos para aprovação
-   final no checkpoint 3, sem voltar a pedir as escolhas já aprovadas.
-2. Após aprovação, concluir o registo Inception e atualizar o estado do intent.
-3. Confirmar a transição para Construction no checkpoint 4. O primeiro bolt é
-   001-base-validada; depois segue 019-overlay/TASK-032, antes de 002-overlay/TASK-006.
+## Fecho e continuidade
 
-Nenhuma aprovação ou transição é inferida da seleção da opção de revisão.
+O checkpoint 3 está concluído pela aprovação explícita do fecho. O intent fica
+pronto para Construction; a execução do primeiro bolt será uma ação posterior.
+O primeiro bolt é 001-base-validada; depois segue 019-overlay/TASK-032, antes
+de 002-overlay/TASK-006.
+
+Os extras serão definidos numa retoma futura de Inception, quando forem
+pedidos, com requisitos/ADR/histórias/bolts próprios e integração antes da
+entrega que os inclua. O âmbito atual continua com 33 bolts; não se presume
+uma exclusão definitiva de extras do trabalho nem funcionalidades adicionais
+aprovadas agora. O fecho está registado no [inception-log](inception-log.md).

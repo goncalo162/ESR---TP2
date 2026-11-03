@@ -1,11 +1,12 @@
 ---
 intent: "001-ott-streaming"
 phase: "inception"
-status: "draft"
+status: "inception-complete"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-02T15:02:08Z"
+updated: "2026-11-03T20:54:11Z"
+completed: "2026-11-03T20:54:11Z"
 requirements_basis: "existing-project-documentation"
-review_status: "pending-human-artifact-review"
+review_status: "approved-by-user"
 ---
 
 # Requisitos — concluir o serviço OTT existente
@@ -16,7 +17,10 @@ Objetivo: concluir o projeto segundo os Markdown existentes, corrigir lacunas an
 do agrupamento e preparar bolts faseados para **Construction**, com validação.
 O âmbito e o executor foram fornecidos pelo utilizador. Reutilizam-se os critérios
 existentes, sem nova numeração ou alteração das obrigações. Não se inicia implementação.
-Revisão da nova organização: pendente; a base existente não implica aprovação destes artefactos.
+Revisão da organização aprovada pelo utilizador em 03-11-2026, com instrução
+explícita para fechar Inception no âmbito atual. Os extras serão definidos e
+planeados numa retoma posterior de Inception, quando forem pedidos; não
+impedem este fecho nem estão implicitamente implementados pelos bolts atuais.
 
 Fonte normativa: [docs/02](../../../docs/02-REQUIREMENTS.md).
 Owner abaixo significa responsabilidade primária; outros units contribuem pelas TASK.

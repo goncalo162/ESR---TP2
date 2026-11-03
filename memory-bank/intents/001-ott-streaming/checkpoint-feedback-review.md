@@ -14,9 +14,10 @@ manter nodeId, validar regresso/entrada tardia de nós configurados e adiar nova
 vizinhanças. O [ADD, secção 13](../../../add.md#13-questões-em-aberto-e-changelog)
 regista as aprovações sem alterar o âmbito de implementação existente.
 
-A aprovação resolve CP-01–03; a revisão final dos restantes artefactos de
-Inception mantém-se pendente. Conservam-se 40 entradas, 26 ADR e 33
-histórias/IMP/bolts. A aprovação não representa execução ou revisão de código.
+A aprovação resolveu CP-01–03. Em 2026-11-03T20:54:11Z o utilizador aprovou
+também o fecho de Inception para o âmbito atual, remetendo os extras para
+planeamento posterior quando forem pedidos. Conservam-se 40 entradas, 26 ADR
+e 33 histórias/IMP/bolts. A aprovação não representa execução ou revisão de código.
 
 ## CP-01 — Identificação por IP no bootstrap
 
@@ -155,7 +156,7 @@ ao docente. A discussão qualitativa não elimina as medições já exigidas.
 | Assunto | Estado identificado | Momento necessário |
 |---|---|---|
 | CP-01–03 | Aprovadas pelo utilizador em 03-11-2026; incorporadas no ADD e no relatório | Resolvidas; não aguardam nova escolha |
-| Revisão final dos artefactos | Pendente no inception-log | Depois de incorporar as escolhas do checkpoint |
+| Revisão final dos artefactos | Fecho aprovado explicitamente pelo utilizador | Concluída para o âmbito atual |
 | Revisor humano da TASK-032 | Equipa ainda deve designar pessoa distinta do autor | Antes do DONE da TASK-032; não impede rever/verificar a base |
 | Media final e condições de distribuição | Gates G-MEDIA/G-MEDIA-DISTRIBUTION | TASK-020 e TASK-030 |
 | Ambiente e provas GUI/CORE | Gates G-GUI/G-CORE | Nas tarefas de execução correspondentes |
@@ -170,7 +171,8 @@ contratos existentes; não exigem novas ADR nem substituem as decisões aceites.
 
 ## Próxima ação concreta
 
-CP-01–03 estão resolvidas e documentadas; retomar a revisão final dos artefactos
-de Inception. O primeiro bolt preparado continua 001-base-validada, seguido
-de 019-overlay/TASK-032. Não foram executados bolts, testes Java, GUI ou CORE
-para registar estas decisões.
+CP-01–03 estão resolvidas e documentadas e Inception está concluído para o
+âmbito atual. O primeiro bolt preparado continua 001-base-validada, seguido
+de 019-overlay/TASK-032. Quando forem pedidos extras, retomar Inception para
+definir o incremento e os novos bolts, preservando esta base aprovada.
+Não foram executados bolts, testes Java, GUI ou CORE para registar o fecho.

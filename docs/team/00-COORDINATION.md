@@ -191,3 +191,14 @@ e no [ADD, secção 13](../../add.md#13-questões-em-aberto-e-changelog).
 Mantêm-se os responsáveis/revisores das tarefas e a designação futura do
 revisor distinto da TASK-032 antes do DONE. A decisão registada não atribui
 revisão de código ou aprovação pessoal a qualquer membro por inferência.
+
+## Fecho de Inception — 03-11-2026
+
+O utilizador aprovou o fecho de Inception para o âmbito atual, com sete unidades
+e 33 bolts. Os extras serão especificados numa retoma posterior de Inception
+quando forem pedidos, acrescentando critérios, tarefas e bolts com dependências
+explícitas. Preservam-se as atribuições e revisões existentes. Se os extras
+integrarem a entrega, a sua integração e avaliação devem preceder o artigo e
+o pacote finais. Este fecho documental não inicia nenhum bolt de Construction.
+
+Autorização e resumo: [registo Inception](../../memory-bank/intents/001-ott-streaming/inception-log.md).
