@@ -28,3 +28,14 @@ Fonte normativa: [ADD](../../add.md).
 - [ADR-024 — ADD mestre e incrementos atómicos rastreáveis](../../add.md#adr-024) — Aceite.
 - [ADR-025 — Sem recuperação automática de falha exclusiva UDP](../../add.md#adr-025) — Aceite.
 - [ADR-026 — Qualidade sem ferramentas ou limiar percentual novos](../../add.md#adr-026) — Aceite.
+
+## Clarificações aprovadas do checkpoint — 03-11-2026
+
+Fonte normativa: [ADD, secção 13](../../add.md#13-questões-em-aberto-e-changelog).
+
+- CP-01: manter nodeId e REGISTER/REGISTER_OK na consulta inicial; esclarece ADR-013/018.
+- CP-02: regresso e entrada tardia de nós configurados, com nova instância após reinício; esclarece ADR-013/018/019 e TASK-007/016.
+- CP-03: alternativas no grafo configurado; novas vizinhanças fora do grafo adiadas como extra; esclarece âmbito e ADR-013/019.
+
+As CP confirmam decisões existentes; conservam-se as 26 ADR. A aprovação do
+utilizador é documental, sem prova de implementação ou revisão individual de código.

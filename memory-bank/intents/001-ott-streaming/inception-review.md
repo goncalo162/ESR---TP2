@@ -1,7 +1,9 @@
 # Revisão Inception — 001-ott-streaming
 
 Revisão técnica: 2026-11-03T14:28:37Z. Revisão humana: pendente.
-Resultado: não foram identificadas lacunas impeditivas no planeamento revisto.
+Resultado estrutural: não foram identificadas lacunas impeditivas no plano
+anterior. Atualização de 2026-11-03T14:50:15Z: CP-01–03 aprovadas pelo utilizador
+e incorporadas no ADD; revisão final dos restantes artefactos ainda pendente.
 Esta revisão não inicia Construction nem declara a aprovação humana dos artefactos.
 
 ## Âmbito e fontes
@@ -75,9 +77,32 @@ tem recuperação automática; recuperação por alternativa exige caminho até 
 mesma origem; não há failover de conteúdo entre origens. Não se acrescentam
 CI, linter ou limiar percentual global de cobertura.
 
+## Atualização após os apontamentos do checkpoint
+
+O [relatório do checkpoint](../../../docs/checkpoint_REPORT.md) preserva os
+apontamentos e regista agora CP-01–03 como aprovadas pelo utilizador. A
+[revisão complementar](checkpoint-feedback-review.md) esclarece as decisões:
+manter nodeId/REGISTER na consulta inicial (CP-01), validar regresso e entrada
+tardia de nós já configurados (CP-02), e adiar novas vizinhanças fora do grafo
+como extra (CP-03). O ADD 1.0.1 incorpora as clarificações em ADR-013/019 e secção 13.
+
+Regresso de nós configurados e análise de trade-offs no artigo já estão
+planeados. Novas vizinhanças fora do grafo e IDs desconhecidos não estão
+cobertos pelos 33 bolts atuais. As escolhas aprovadas confirmam o âmbito
+existente, sem acrescentar requisitos, ADR ou bolts.
+
+As propostas CP-01–03 estão resolvidas pela escolha explícita do utilizador.
+O fecho de Inception aguarda apenas a aprovação final dos restantes artefactos;
+os gates de execução continuam nas tarefas responsáveis.
+
+[Validação após a incorporação das decisões](../../../experiments/checkpoint-decisions-validation-2026-11-03.md):
+zero erros, contagens e DAG preservados, 220 hashes conferidos. Esta é a
+validação documental atual; os relatórios anteriores conservam o seu contexto.
+
 ## Próximos checkpoints
 
-1. Apresentar esta revisão e obter aprovação dos artefactos no checkpoint 3.
+1. CP-01–03 resolvidas e incorporadas; apresentar os artefactos para aprovação
+   final no checkpoint 3, sem voltar a pedir as escolhas já aprovadas.
 2. Após aprovação, concluir o registo Inception e atualizar o estado do intent.
 3. Confirmar a transição para Construction no checkpoint 4. O primeiro bolt é
    001-base-validada; depois segue 019-overlay/TASK-032, antes de 002-overlay/TASK-006.

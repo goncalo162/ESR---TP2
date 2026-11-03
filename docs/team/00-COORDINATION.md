@@ -179,3 +179,15 @@ Construction; um revisor humano distinto do autor deve ser designado antes
 do DONE. Não se atribui aceitação a um membro por inferência.
 O ADD divide os pais 020/025/026/031; as revisões e integração do pai continuam
 exigidas. Ordem normativa no ADD, sem selecionar por ID numérico.
+
+## Decisões do checkpoint — 03-11-2026
+
+O utilizador aprovou CP-01–03 nesta sessão: manter nodeId e a consulta
+REGISTER/REGISTER_OK; demonstrar regresso/entrada tardia de nós configurados;
+recuperar alternativas configuradas e adiar novas vizinhanças fora do grafo
+como extra. Justificação e limites no [relatório do checkpoint](../checkpoint_REPORT.md)
+e no [ADD, secção 13](../../add.md#13-questões-em-aberto-e-changelog).
+
+Mantêm-se os responsáveis/revisores das tarefas e a designação futura do
+revisor distinto da TASK-032 antes do DONE. A decisão registada não atribui
+revisão de código ou aprovação pessoal a qualquer membro por inferência.

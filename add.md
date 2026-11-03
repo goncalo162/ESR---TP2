@@ -1,7 +1,7 @@
 # Architecture Decision Document — serviço OTT
 
-Versão 1.0.0. Atualização: 2026-11-02T15:45:31Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
-Respostas incorporadas: **1A, 2A, 3B, 4A**. Documento mestre para **Construction**.
+Versão 1.0.1. Atualização: 2026-11-03T14:50:15Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
+Respostas incorporadas: **1A, 2A, 3B, 4A**; clarificações aprovadas **CP-01, CP-02, CP-03**. Documento mestre para **Construction**.
 Aceite é o estado da decisão de desenho; não afirma implementação ou resultado.
 Nenhum bolt foi iniciado por gerar ou validar este documento.
 
@@ -18,7 +18,8 @@ Inclui testes incrementais, CORE, artigo e pacote reproduzível.
 
 Fora: DB, HTTP, contas, RTP/RTSP, multicast IP, pause/seek, failover do mesmo vídeo
 noutra fonte, entrada arbitrária de IDs não configurados e recuperação automática
-de falha exclusiva UDP. Não se acrescenta CI, linter ou limiar percentual global.
+de falha exclusiva UDP. Novas vizinhanças fora do grafo configurado ficam
+adiadas como extra (CP-03). Não se acrescenta CI, linter ou limiar percentual global.
 
 Atores: operador/equipa configura, inicia e avalia; espectador escolhe/termina
 uma stream; docente avalia; Construction implementa e testa; revisores humanos
@@ -331,6 +332,15 @@ as respostas recebidas; não dispensa revisão de artefactos nem afirma código 
 - **Impacto:** componentes bootstrap, overlay; ficheiros `bootstrap/BootstrapServer.java`, `overlay/NeighborManager.java`; origem TASK-006, TASK-007, TASK-008, TASK-009.
 - **Como validar:** V-006, V-007, V-008, V-009. Cumprir os critérios IMP e os oráculos das secções 8–9 com resultado e limites registados.
 
+Clarificação aprovada CP-01: a consulta inicial usa nodeId, com validação de
+senderId/Endpoint.nodeId e dos endpoints configurados. Mantêm-se REGISTER,
+REGISTER_OK e o envelope v1. O IP remoto está disponível no socket, mas não é
+a chave de identidade: vários processos podem partilhar IP e um nó pode usar
+interfaces diferentes. Usar só o IP para desencadear uma resposta sem pedido
+exigiria outro protocolo; mudar apenas a pesquisa não evita a descodificação
+já feita pelo transporte. Aceita-se o custo da leitura da consulta inicial,
+sem alegar benefício de desempenho medido para a alternativa rejeitada.
+
 <a id="adr-014"></a>
 ### ADR-014 — TCP assíncrono com recursos limitados
 
@@ -396,6 +406,16 @@ as respostas recebidas; não dispensa revisão de artefactos nem afirma código 
 - **Consequências, riscos e trade-offs:** Nova instância exige renegociar subscrições. Um ID já vivo não é resolvido por registo central ou autenticação criptográfica.
 - **Impacto:** componentes overlay, transport; ficheiros `overlay/NeighborManager.java`, `overlay/Neighbor.java`; origem TASK-007, TASK-008.
 - **Como validar:** V-007, V-008. Cumprir os critérios IMP e os oráculos das secções 8–9 com resultado e limites registados.
+
+Clarificações aprovadas CP-02/03: regresso e entrada tardia abrangem IDs já
+configurados. Um reinício mantém nodeId, cria nova instanceId e requer consulta
+inicial ao bootstrap; só o processo que conservou a lista em memória pode
+reconectar diretamente sem bootstrap. TASK-007/016 já cobrem esse âmbito.
+Recuperar ligações permitidas e escolher caminhos alternativos não cria novas
+vizinhanças. Arestas fora do grafo, mesmo entre IDs conhecidos, ficam adiadas;
+sem caminho válido até à mesma origem mantém-se UNAVAILABLE até surgir um
+caminho confirmável. O regresso de um relay não força troca de parent: aplicam-se
+validação, ACK e histerese quando o upstream atual continua válido.
 
 <a id="adr-020"></a>
 ### ADR-020 — Erros tipados, falhas locais e shutdown limitado
@@ -1455,6 +1475,9 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | Q-02 parâmetros sem suporte no loader | Resolvida 2A: ADR-016, TASK-032 e contrato 6.3 |
 | Q-03 falha exclusiva UDP | Resolvida 3B: limitação assumida, sem watchdog/rerouting novo |
 | Q-04 ferramentas/cobertura extra | Resolvida 4A: sem CI/linter ou percentagem global novos |
+| CP-01 identidade no bootstrap | Aprovada: manter nodeId e REGISTER/REGISTER_OK; IP não substitui identidade nem consulta |
+| CP-02 falha e regresso de nó | Aprovada: nós já configurados, incluindo entrada tardia; TASK-007/016, sem admissão de IDs desconhecidos |
+| CP-03 novas arestas e extras | Aprovada: recuperar alternativas configuradas; novas vizinhanças fora do grafo adiadas como extra |
 | Media/licença da versão final | Gates de TASK-020/030 |
 | GUI/CORE reais | Gates de execução, sem sucesso presumido |
 | Revisor de TASK-032 | Pessoa distinta a designar antes do DONE |
@@ -1467,9 +1490,12 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | 2026-11-02T15:45:31Z | Acrescentar TASK-032 e parametrização validada | Lacuna aprovada em 2A |
 | 2026-11-02T15:45:31Z | Limitação UDP/qualidade existente explícitas | Evitar promessas ou ferramentas não escolhidas |
 | 2026-11-02T15:45:31Z | Reformular 18 bolts/acrescentar 15 | Um IMP S/M por bolt e gates por parte |
+| 2026-11-03T14:50:15Z | ADD 1.0.1: esclarecer CP-01–03 em ADR-013/019 e âmbito | Utilizador aprovou manter nodeId, regresso configurado e adiar novas vizinhanças; sem novos requisitos/ADR/bolts |
 
-As quatro escolhas específicas estão aprovadas; documento/decomposição ficam
+As escolhas 1A/2A/3B/4A e CP-01/02/03 estão aprovadas; documento/decomposição ficam
 disponíveis para revisão. Não se presume aprovação de código, medição de metas,
 execução de bolt ou submissão. Alterar âmbito, hard caps ou contrato exige a
 aprovação da secção 11. Não há nova escolha arquitetural material pendente das
-quatro perguntas respondidas; gates de execução permanecem abertos.
+perguntas respondidas. Os apontamentos e a justificação das CP estão no
+[relatório do checkpoint](docs/checkpoint_REPORT.md); gates de execução
+permanecem abertos. A aprovação das CP não presume o fecho integral de Inception.

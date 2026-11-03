@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "updated": "2026-11-02T15:45:31Z",
+  "version": "1.0.1",
+  "updated": "2026-11-03T14:50:15Z",
   "architecture_source": "add.md",
   "specification_source": "specs.md",
   "approval": {
@@ -10,7 +10,47 @@
       "3B",
       "4A"
     ],
-    "scope": "consolidação documental, sem execução"
+    "scope": "consolidação documental, sem execução",
+    "checkpoint_decisions": {
+      "approved_at": "2026-11-03T14:50:15Z",
+      "approved_by": "user-in-session",
+      "source": "docs/checkpoint_REPORT.md#5-decisões-aprovadas--03-11-2026",
+      "scope": "Clarificações de identidade e âmbito existentes; sem execução ou aprovação global de Inception.",
+      "decisions": [
+        {
+          "id": "CP-01",
+          "status": "approved",
+          "decision": "Manter nodeId como identidade e chave da consulta; preservar REGISTER/REGISTER_OK e envelope v1.",
+          "adr_ids": [
+            "ADR-013",
+            "ADR-018"
+          ]
+        },
+        {
+          "id": "CP-02",
+          "status": "approved",
+          "decision": "Regresso e entrada tardia de nós configurados; sem admissão de IDs desconhecidos.",
+          "adr_ids": [
+            "ADR-013",
+            "ADR-018",
+            "ADR-019"
+          ],
+          "source_tasks": [
+            "TASK-007",
+            "TASK-016"
+          ]
+        },
+        {
+          "id": "CP-03",
+          "status": "approved",
+          "decision": "Recuperar alternativas configuradas; adiar novas vizinhanças fora do grafo como extra.",
+          "adr_ids": [
+            "ADR-013",
+            "ADR-019"
+          ]
+        }
+      ]
+    }
   },
   "requirements": {
     "REQ-001": {
