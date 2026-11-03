@@ -3,16 +3,16 @@ id: "001-base-validada"
 unit: "001-base-validada"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["001-verificar-base"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T21:42:46Z"
+updated: "2026-11-03T21:59:14Z"
 started: "2026-11-03T21:03:35Z"
-completed: null
-current_stage: "test"
-stages_completed: [{"name": "plan", "completed": "2026-11-03T21:08:48Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-03T21:22:32Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-03T21:40:56Z", "artifact": "test-walkthrough.md"}]
+completed: "2026-11-03T21:56:48Z"
+current_stage: null
+stages_completed: [{"name":"plan","completed":"2026-11-03T21:08:48Z","artifact":"implementation-plan.md"},{"name":"implement","completed":"2026-11-03T21:22:32Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-03T21:40:56Z","artifact":"test-walkthrough.md"}]
 requires_bolts: []
-enables_bolts: ["002-overlay", "003-overlay", "004-overlay", "019-overlay", "020-overlay"]
+enables_bolts: ["002-overlay","003-overlay","004-overlay","019-overlay","020-overlay"]
 requires_units: []
 blocks: false
 complexity:
@@ -22,20 +22,33 @@ complexity:
   testing_scope: 2
 execution_agent: "construction"
 source_phase: "BASELINE"
-source_tasks: ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005"]
-source_task_order: ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005"]
+source_tasks: ["TASK-001","TASK-002","TASK-003","TASK-004","TASK-005"]
+source_task_order: ["TASK-001","TASK-002","TASK-003","TASK-004","TASK-005"]
 implementation_tasks: ["IMP-001"]
 size: "S"
-validation_ids: ["V-001", "V-002", "V-003", "V-004", "V-005"]
-test_ids: ["V-001", "V-002", "V-003", "V-004", "V-005", "V-ADD"]
+validation_ids: ["V-001","V-002","V-003","V-004","V-005"]
+test_ids: ["V-001","V-002","V-003","V-004","V-005","V-ADD"]
 external_gates: []
-adr_ids: ["ADR-001", "ADR-002", "ADR-007", "ADR-008", "ADR-009", "ADR-010", "ADR-012", "ADR-014", "ADR-020", "ADR-021", "ADR-024", "ADR-026"]
-requirements: ["CON-009", "INT-001", "INT-002", "NFR-004", "NFR-005", "REQ-001", "REQ-003", "REQ-004", "REQ-012", "REQ-013", "REQ-016", "REQ-021"]
+adr_ids: ["ADR-001","ADR-002","ADR-007","ADR-008","ADR-009","ADR-010","ADR-012","ADR-014","ADR-020","ADR-021","ADR-024","ADR-026"]
+requirements: ["CON-009","INT-001","INT-002","NFR-004","NFR-005","REQ-001","REQ-003","REQ-004","REQ-012","REQ-013","REQ-016","REQ-021"]
 architecture_source: "add.md"
 ---
 # Bolt 001-base-validada — Verificar a base herdada
 
-## Retoma — checkpoint 5
+## Fecho — checkpoint 5 aprovado
+
+IMP-001 concluído pelo mecanismo validado em 2026-11-03T21:56:48Z, depois da
+integração efetiva da versão revista em main. Bolt/história/unidade complete;
+current_stage=null. [Prova de integração](../../../experiments/construction/001-base-validada/integration-proof.json)
+e [execução real do fecho](../../../experiments/construction/001-base-validada/completion-real.log).
+Inception: b603dc1dcef01a6cd38d0b89ee43695e686d5f49; versão revista IMP-001:
+d65f94740ef95ffc67d312f7fbccac7575c86f7a. O utilizador aprovou o fecho e autorizou
+commits/integração/push em 2026-11-03T21:51:13Z. Luis executou o teste manual:
+22 CHECK_PASS e MANUAL_PASS, com [log preservado](../../../experiments/construction/001-base-validada/manual-smoke-luis.log).
+TASK-001–005 permanecem DONE; nenhum outro IMP iniciado. Projeto/target/ excluído
+dos commits. [Relatório final](closure-walkthrough.md).
+
+### Histórico dos checkpoints
 
 Planeamento iniciado em 2026-11-03T21:03:35Z, após leitura e comunicação do
 estado ao utilizador. [Plano](implementation-plan.md) e
@@ -64,10 +77,7 @@ com 22 verificações aprovadas. Resultados e limitações preparados em
 das fundações/testes necessária. O build alterou apenas uma lista gerada
 rastreada em Projeto/target/; os restantes 162 hashes de Projeto/ mantêm-se.
 Test concluído após essa aprovação. Os critérios técnicos abaixo estão cumpridos;
-o bolt permanece in-progress/test e completed=null enquanto o fecho aguarda
-revisão do checkpoint 5 e evidência de integração na base comum. A documentação
-local ainda não está integrada; não há autorização para commit/push.
-[Preparação do fecho](closure-walkthrough.md), sem iniciar outro bolt.
+revisão final e integração foram depois confirmadas antes do fecho registado acima.
 
 ## Fonte normativa e âmbito
 
@@ -75,7 +85,7 @@ Ler [IMP-001](../../../add.md#imp-001) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [001-verificar-base](../../intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md).
+- [x] [001-verificar-base](../../intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md).
 - Dependências: nenhuma.
 - Unidade: [001-base-validada](../../intents/001-ott-streaming/units/001-base-validada/unit-brief.md).
 - Gates: nenhum adicional.

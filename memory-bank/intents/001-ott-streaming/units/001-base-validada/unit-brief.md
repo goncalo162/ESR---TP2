@@ -3,13 +3,14 @@ unit: "001-base-validada"
 intent: "001-ott-streaming"
 phase: "construction"
 source_phase: "BASELINE"
-status: "in-progress"
+status: "complete"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T21:42:46Z"
+updated: "2026-11-03T21:59:14Z"
 unit_type: "cli"
 default_bolt_type: "simple-construction-bolt"
-owned_requirements: ["NFR-005", "REQ-021", "CON-009", "INT-002"]
+owned_requirements: ["NFR-005","REQ-021","CON-009","INT-002"]
 requires_units: []
+completed: "2026-11-03T21:56:48Z"
 ---
 # Unidade — 001-base-validada
 
@@ -24,13 +25,14 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 ## Histórias e bolts
 
-- [ ] [001-verificar-base](stories/001-verificar-base.md) → [001-base-validada](../../../../bolts/001-base-validada/bolt.md); IMP-001 (S).
+- [x] [001-verificar-base](stories/001-verificar-base.md) → [001-base-validada](../../../../bolts/001-base-validada/bolt.md); IMP-001 (S).
 
 ## Dependências e critérios de fecho
 
 Checkpoint 4 aprovado pelo utilizador, com registo em 2026-11-03T21:40:56Z.
-Plan/Implement/Test concluídos no bolt; [checkpoint 5 preparado](../../../../bolts/001-base-validada/closure-walkthrough.md).
-Unidade in-progress enquanto a revisão do fecho e a integração na base comum
-estiverem pendentes. Não se inicia 019-overlay por esta atualização.
+Plan/Implement/Test concluídos; [checkpoint 5 aprovado e aplicado](../../../../bolts/001-base-validada/closure-walkthrough.md)
+em 2026-11-03T21:56:48Z, depois da integração da versão revista em main
+(d65f94740ef95ffc67d312f7fbccac7575c86f7a). Unidade complete, sem promover os
+requisitos globais a DONE. 019-overlay não foi iniciado.
 
 Concluir verificação da base herdada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.

@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["005-implementar-parametrizacao-operacional"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-03T22:00:19Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["001-base-validada"]
 enables_bolts: ["002-overlay", "020-overlay"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 2

@@ -4,15 +4,15 @@
 GENERATED indica criação documental, não implementação. Fonte de arquitetura: [ADD](../add.md).
 
 Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
-aprovados; [checkpoint 5 preparado](bolts/001-base-validada/closure-walkthrough.md),
-pendente de revisão final/integração. Nenhuma história marcada complete;
-as restantes 32 histórias/bolts não foram iniciadas.
+aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+as restantes 32 histórias/bolts não foram iniciadas. Intent ainda em construção.
 
-## 001-base-validada/001-verificar-base.md ✅ GENERATED
+## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
 
-**Tarefa:** IMP-001. **Estado:** planned. **Bolt:** 001-base-validada.
-Estado do bolt: in-progress/test; verificação aprovada, fecho ainda não aplicado.
-O frontmatter da história será atualizado pela cascata de fecho, após integração.
+**Tarefa:** IMP-001. **Estado:** complete. **Bolt:** 001-base-validada.
+Bolt/história/unidade complete pela cascata real em 2026-11-03T21:56:48Z;
+história implemented=true. Versão revista integrada em main: d65f947.
 **Ficheiro:** [001-verificar-base](intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md).
 
 ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED

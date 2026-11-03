@@ -3,8 +3,9 @@
 Registo preparado em 2026-11-03T21:32:04Z, após aprovação explícita do
 checkpoint 3, registada em 2026-11-03T21:22:32Z. O utilizador aprovou o checkpoint 4
 e os resultados apresentados, com registo em 2026-11-03T21:40:56Z, autorizando
-apenas o checkpoint 5. Test concluído; [fecho preparado](closure-walkthrough.md),
-sem integração ou commit presumidos. Os resultados abaixo são da execução do
+apenas o checkpoint 5. Test concluído; o [fecho](closure-walkthrough.md) foi depois
+aprovado e aplicado em 2026-11-03T21:56:48Z, após integração efetiva em main.
+Os resultados abaixo são da execução do
 checkpoint 4; não foi necessário repetir Maven ou o teste manual para editar documentação.
 
 ## Resultado e ambiente
@@ -159,10 +160,12 @@ O diff documental incremental checkpoint-4.diff compara com o checkpoint 3
 aprovado; bolt-through-checkpoint-4.diff compara com o arranque do bolt.
 O diff gerado de Projeto/ é guardado separadamente em project-generated.diff;
 os dois auxiliares novos de auditoria/manual são evidência fora de Projeto/.
-Nenhum commit, push, branch, deploy ou upload foi feito.
+Nos checkpoints 1–4 não foram feitos commits/push nem criados branches/deploys/uploads.
+Os commits e integração posteriores foram explicitamente autorizados e estão no
+relatório final do checkpoint 5.
 
 O ponto de paragem do checkpoint 4 foi respeitado e os resultados foram depois
 aprovados explicitamente pelo utilizador. Test e os critérios técnicos do bolt
-estão concluídos. A revisão do fecho e a integração continuam pendentes no
-checkpoint 5; bolt/unidade permanecem in-progress e a história conserva planned
-até a cascata de fecho ser aplicada. Nenhum estado complete foi presumido.
+estão concluídos. O utilizador aprovou também o fecho; a versão revista foi
+integrada em main e a cascata aplicada em 2026-11-03T21:56:48Z. Bolt, história
+e unidade complete, com provas reais no relatório do checkpoint 5.

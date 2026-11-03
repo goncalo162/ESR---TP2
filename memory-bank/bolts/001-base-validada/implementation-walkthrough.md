@@ -7,7 +7,8 @@ checkpoint 3; a execução da validação foi autorizada depois dessa revisão.
 
 Resultados posteriores: [validação do checkpoint 4](test-walkthrough.md),
 executada após essa aprovação e aprovada pelo utilizador no checkpoint 4.
-[Checkpoint 5](closure-walkthrough.md) preparado, sem integração presumida.
+[Checkpoint 5](closure-walkthrough.md) aprovado, integrado em main e concluído
+em 2026-11-03T21:56:48Z, com prova Git e execução real do mecanismo de fecho.
 As secções seguintes são
 o retrato do checkpoint 3; referências a pendências/autorização são desse momento.
 

@@ -2,7 +2,10 @@
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
-18 IDs antigos mantidos e 15 acrescentados. Nenhum bolt iniciado.
+18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+2026-11-03T21:56:48Z, após revisão e integração em main; os restantes 32 bolts
+permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
 
 ## Ordem de execução
 

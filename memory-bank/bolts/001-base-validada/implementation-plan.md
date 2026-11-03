@@ -16,8 +16,9 @@ parar no checkpoint 4, sem fechar o bolt ou alterar fundações/testes por infer
 Validação executada e apresentada no [relatório do checkpoint 4](test-walkthrough.md):
 149 testes aprovados, 45 fixtures, V-ADD sem erros e teste manual com 22 checks.
 O utilizador aprovou esses resultados, com registo em 2026-11-03T21:40:56Z,
-e autorizou apenas preparar o checkpoint 5. [Fecho preparado](closure-walkthrough.md),
-pendente de revisão final e integração, sem autorização para commit/push. As descrições
+e autorizou preparar o checkpoint 5. O fecho foi depois aprovado, integrado em
+main e aplicado em 2026-11-03T21:56:48Z: [relatório final](closure-walkthrough.md).
+Commits e push foram autorizados explicitamente. As descrições
 de estado inicial e verificações previstas abaixo documentam o plano aprovado.
 
 ## Estado observado e fontes

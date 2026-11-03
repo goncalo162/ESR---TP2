@@ -20,18 +20,22 @@ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em
 
 Estado Construction atual — IMP-001: Plan/Implement/Test concluídos e resultados
 do checkpoint 4 aprovados pelo utilizador, com registo em 2026-11-03T21:40:56Z.
-[Checkpoint 5 preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
-aguardando revisão final e integração dos documentos na base comum. Bolt/unidade
-001-base-validada continuam IN PROGRESS; história ainda planned até a cascata
-de fecho. A verificação não reimplementou TASK-001–005 nem promove requisitos
-globais a DONE. Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032,
-ainda não iniciado e dependente do fecho da base.
+[Checkpoint 5 aprovado e concluído](../memory-bank/bolts/001-base-validada/closure-walkthrough.md)
+em 2026-11-03T21:56:48Z, após integração da versão revista em main por fast-forward
+(d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+001-base-validada complete, com implemented=true na história. A verificação
+não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032, ainda não iniciado.
 
 [Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
-e 22 checks manuais. POM/fontes/configuração/fixtures/testes intactos; só a lista
-gerada createdFiles.lst mudou em Projeto/target/ pelo build. Sem GUI/CORE,
-commit/push ou integração presumidos. A DoD foi revista e preservada.
+e 22 checks manuais. Execução por Luis: [log original preservado](../experiments/construction/001-base-validada/manual-smoke-luis.log),
+22 CHECK_PASS e MANUAL_PASS. POM/fontes/configuração/fixtures/testes intactos;
+a lista gerada createdFiles.lst mudou apenas localmente em Projeto/target/ e
+foi excluída dos commits. Inception e IMP-001 em commits separados, com
+[proveniência](../experiments/construction/001-base-validada/inception-commit-provenance.json)
+e [integração comprovada](../experiments/construction/001-base-validada/integration-proof.json).
+DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|

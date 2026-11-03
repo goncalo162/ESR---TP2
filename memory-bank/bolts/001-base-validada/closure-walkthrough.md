@@ -1,4 +1,58 @@
-# IMP-001 — Checkpoint 5: preparação do fecho
+# IMP-001 — Checkpoint 5: fecho aprovado e aplicado
+
+**Bolt, história e unidade complete em 2026-11-03T21:56:48Z**, por execução
+real do mecanismo validado após integrar a versão revista em main. História
+implemented=true; current_stage=null e completed real no bolt. Todos os
+critérios de IMP-001 e Plan/Implement/Test concluídos; nenhum outro IMP iniciado.
+
+O utilizador aprovou o fecho e autorizou commits/integração/push, com registo em
+2026-11-03T21:51:13Z. [Autorização](../../../experiments/construction/001-base-validada/closure-authorization.json).
+Luis executou o roteiro: [22 CHECK_PASS e MANUAL_PASS](../../../experiments/construction/001-base-validada/manual-smoke-luis.log),
+com [origem/instantes/SHA-256](../../../experiments/construction/001-base-validada/manual-smoke-luis.json).
+A cópia é idêntica a /tmp/ott-imp001-manual.ijH5h9.log, que foi mantido.
+
+| Commit integrado | Âmbito |
+|---|---|
+| b603dc1dcef01a6cd38d0b89ee43695e686d5f49 | Inception: 20 ficheiros correspondem exatamente aos hashes anteriores ao bolt |
+| d65f94740ef95ffc67d312f7fbccac7575c86f7a | IMP-001 revisto: documentação, evidência, execução por Luis e mecanismo de fecho |
+
+[Proveniência](../../../experiments/construction/001-base-validada/inception-commit-provenance.json)
+e [integração comprovada](../../../experiments/construction/001-base-validada/integration-proof.json):
+main=Denji=d65f947 antes de fechar; tree 79710a1a693c841928fd197853b22e9f531ac7df,
+ancestralidade confirmada e zero alterações em Projeto/ nos commits. main recebeu
+git merge --ff-only Denji; não houve conflitos ou divergências remotas.
+
+Depois dessa integração foi executado o comando validado documentado abaixo.
+[Log real](../../../experiments/construction/001-base-validada/completion-real.log)
+e [metadados](../../../experiments/construction/001-base-validada/completion-real-command.json):
+código 0, uma história atualizada, unidade concluída e intent preservado por ter
+seis unidades incompletas. A execução real, e não o ensaio temporário, forneceu
+a data de conclusão. Script instalado/adaptador mantêm os hashes ensaiados.
+
+Atualizados estados/datas reais, checkboxes, índices, rastreabilidade e progresso.
+TASK-001–005 mantêm DONE; TASK-006–032 e os outros 32 bolts não foram iniciados.
+Nenhum requisito global, fase, intent, GUI/CORE ou entrega foi concluído por esta
+verificação. Projeto/target/ está excluído dos commits; a única alteração local
+gerada foi preservada. Os outros 162 hashes rastreados de Projeto/ são iguais.
+
+A evidência anterior permanece intacta. As regras locais de whitespace aplicam
+exceção só a logs/patches/saídas brutas para preservar bytes/hash; fontes, scripts,
+metadados e Markdown continuam com os checks normais. V-ADD é novamente executado
+sobre os estados finais; publicação Denji/main autorizada sem force push, com
+resultado e referências remotas a confirmar depois de executar.
+
+[Conferência final dos estados e preservação](../../../experiments/construction/001-base-validada/closure-final-proof.json)
+e [V-ADD final](../../../experiments/construction/001-base-validada/planning-validation-final.md),
+com zero erros. O metadado derivado blocks de 019-overlay passou a false porque
+a sua única dependência foi concluída; continua planned/started=null, sem iniciar
+outro IMP. O marcador GENERATED permanece no índice como proveniência documental,
+com estado complete explícito apenas na história concluída.
+
+## Retrato histórico da preparação, anterior à integração e ao fecho
+
+As secções seguintes preservam a revisão apresentada no checkpoint 5. As suas
+pendências e instruções no futuro descrevem aquele momento; o estado final é
+o registado acima, com os comprovativos de integração e execução real.
 
 Checkpoint 4 e resultados aprovados explicitamente pelo utilizador, com registo
 em 2026-11-03T21:40:56Z. Autorizado avançar apenas para o checkpoint 5.

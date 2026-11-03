@@ -2,7 +2,7 @@
 unit: "001-base-validada"
 intent: "001-ott-streaming"
 created: "2026-11-03T21:03:35Z"
-updated: "2026-11-03T21:51:13Z"
+updated: "2026-11-03T22:00:19Z"
 ---
 
 # Registo Construction — 001-base-validada
@@ -66,8 +66,26 @@ updated: "2026-11-03T21:51:13Z"
   divergência remota. Preservado o log de execução por Luis, com 22 CHECK_PASS
   e MANUAL_PASS em 2026-11-03T21:42:26Z; SHA-256 e origem guardados na evidência.
   Excluir Projeto/target/ dos commits. Nenhum novo IMP autorizado.
-- Próxima ação: integrar a versão revista, comprovar ancestralidade/conteúdo e
-  aplicar o mecanismo de fecho validado. Registar somente resultados reais.
+- **2026-11-03T21:53:59Z**: Inception commit b603dc1dcef01a6cd38d0b89ee43695e686d5f49;
+  20 ficheiros exatamente iguais aos hashes anteriores ao bolt.
+- **2026-11-03T21:55:48Z**: IMP-001 revisto no commit
+  d65f94740ef95ffc67d312f7fbccac7575c86f7a, com documentação/evidência e log de Luis.
+  Nenhum ficheiro de Projeto/ nos dois commits; target local preservado/excluído.
+- **2026-11-03T21:56:28Z**: integração em main comprovada por fast-forward;
+  main=Denji=d65f94740ef95ffc67d312f7fbccac7575c86f7a e ancestralidade confirmada.
+  V-ADD/snapshot sobre a versão integrada passou; nenhum conflito/divergência remota.
+- **2026-11-03T21:56:48Z**: mecanismo validado executado no repositório real/main,
+  código 0. Bolt/história/unidade complete; história implemented=true e current_stage
+  null no bolt. As outras seis unidades e os outros 32 bolts não foram concluídos.
+  Log real e metadados preservados. Fecho aprovado pelo utilizador, sem nova inferência.
+- **2026-11-03T22:00:19Z**: V-ADD final detetou dois metadados derivados a alinhar: marcador
+  GENERATED do índice (estado complete mantido separadamente) e blocks=false em
+  019-overlay após concluir a sua única dependência. Corrigidos sem alterar o
+  validador; 019-overlay continua planned, started=null, sem novo IMP iniciado.
+  Relatório da primeira tentativa preservado; sem lacuna de fundações/testes.
+- Próxima ação autorizada: publicar o fecho em Denji/main para origin sem force,
+  após validação final. Não iniciar outro IMP. O resultado efetivo dos pushes
+  será confirmado pelas referências remotas e comunicado depois da execução.
 
 Plano: [implementation-plan.md](../../../../bolts/001-base-validada/implementation-plan.md).
 Checkpoint 2: [interfaces e testes](../../../../bolts/001-base-validada/interfaces-and-test-map.md).

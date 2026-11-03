@@ -6,7 +6,8 @@ Estado: checkpoint 2 aprovado explicitamente pelo utilizador, com registo em
 executados nesse checkpoint. As pendências/estados abaixo retratam a revisão
 estática; a execução posterior está no [relatório do checkpoint 4](test-walkthrough.md),
 com resultados aprovados pelo utilizador no checkpoint 4. O
-[checkpoint 5](closure-walkthrough.md) prepara o fecho; integração pendente.
+[checkpoint 5](closure-walkthrough.md) foi aprovado e o fecho aplicado depois da
+integração em main, em 2026-11-03T21:56:48Z. Os estados abaixo são históricos.
 
 ## Autorização e posição no bolt
 

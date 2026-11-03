@@ -58,8 +58,11 @@ Depois de alterar o plano, rever caminhos, dependências, requisitos ligados e o
 IMP-001: a verificação da base e os resultados do checkpoint 4 foram aprovados
 pelo utilizador, com registo em 2026-11-03T21:40:56Z. [Validação atual](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
 149 testes aprovados (65 configuração, 66 codec, 18 transporte), 45 fixtures,
-16 tipos ativos, V-ADD sem erros e teste manual com 22 checks. [Fecho preparado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md),
-pendente de revisão final/integração; nenhum requisito global é promovido a DONE.
+16 tipos ativos, V-ADD sem erros e teste manual com 22 checks. Luis executou
+também o roteiro: [22 CHECK_PASS e MANUAL_PASS](../experiments/construction/001-base-validada/manual-smoke-luis.log).
+[Fecho aprovado e aplicado](../memory-bank/bolts/001-base-validada/closure-walkthrough.md)
+em 2026-11-03T21:56:48Z após integração em main (d65f947). Bolt/história/unidade
+complete; nenhum requisito global é promovido a DONE.
 Os estados e evidências legados acima conservam-se como histórico das TASK.
 
 Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no

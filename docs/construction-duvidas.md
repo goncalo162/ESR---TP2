@@ -25,7 +25,8 @@
 ## Q-C-02 — Compatibilidade do mecanismo de fecho
 
 - Registo do diagnóstico/ensaio: 2026-11-03T21:42:27Z; apenas IMP-001/checkpoint 5.
-- Estado: resolvida tecnicamente em cópia temporária; fecho real ainda não aplicado.
+- Estado: resolvida; ensaio em cópia temporária e fecho real aplicado após
+  aprovação/integração em 2026-11-03T21:56:48Z. [Saída real](../experiments/construction/001-base-validada/completion-real.log).
 - O script local não existe; o instalado em /home/luis/.specsmd/aidlc/scripts/bolt-complete.cjs
   falha por falta de fs-extra. Também não está disponível js-yaml. A inspeção
   do serializer mostra YAML genérico, incompatível com os valores JSON do
