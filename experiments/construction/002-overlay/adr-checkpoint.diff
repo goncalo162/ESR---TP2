@@ -1,0 +1,564 @@
+--- a/memory-bank/bolts/002-overlay/bolt.md
++++ b/memory-bank/bolts/002-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["001-fornecer-localizacao-inicial-dos-vizinhos-configurados"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T11:04:53Z"
++updated: "2026-11-04T11:29:33Z"
+ started: "2026-11-04T10:40:58Z"
+ completed: null
+-current_stage: "design"
+-stages_completed: [{"name": "model", "completed": "2026-11-04T10:50:52Z", "artifact": "ddd-01-domain-model.md"}]
++current_stage: "adr"
++stages_completed: [{"name": "model", "completed": "2026-11-04T10:50:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-04T11:25:40Z", "artifact": "ddd-02-technical-design.md"}]
+ requires_bolts: ["001-base-validada", "019-overlay"]
+ enables_bolts: ["003-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 002-overlay — Descoberta inicial e escrita confirmada
+ 
+-## Design preparado — checkpoint para revisão
++## Revisão ADR preparada — checkpoint para revisão
+ 
+ Iniciado em 2026-11-04T10:40:58Z, por seleção explícita do utilizador,
+ apenas a primeira etapa. Base Denji 4ac5808dacf6e97bfd3636d2788db363e926bc95,
+@@ -55,9 +55,15 @@
+ regista a aprovação. [Design](ddd-02-technical-design.md) preparado em 2026-11-04T11:04:53Z:
+ fila comum/inFlight, confirmações no escritor fora de locks, requestClose aditivo,
+ deadlines/saturação/shutdown, hosts normalizados e injeções/oráculos M01–M18.
+-current_stage=design; só Model em stages_completed, completed=null. Aguardar
+-aprovação antes de ADR/Implement/Test. Revisor atribuído Waheed: revisão final
+-e integração antes de DONE. Sem Java, commits/push, fecho ou outro IMP.
++Design aprovado explicitamente em 2026-11-04T11:25:40Z, incluindo requestClose sem espera
++e preservação de close público. Autorizada apenas ADR; [revisão preparada](adr-review.md)
++em 2026-11-04T11:29:33Z: conformidade com 013/014/015/017/020 e decisões transversais,
++necessidade das mudanças internas, limites/reservas e M01–M18 preservados.
++ADR-003 permanece substituída; nenhuma decisão aceite inviável/divergência
++material identificada nesta análise. Sem ADR nova ou alteração do ADD.
++current_stage=adr; Model/Design em stages_completed, completed=null. Aguardar
++aprovação antes de Implement/Test. Revisor atribuído Waheed: revisão final e
++integração antes de DONE. Sem Java, commits/push, fecho ou outro IMP.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -73,7 +79,7 @@
+ ## Etapas e validação
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-003 e as ADR do ADD.
+-2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-003 e as ADR do ADD.
++2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-003 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-003 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-003 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-003 e as ADR do ADD.
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-04T11:04:53Z"
++updated: "2026-11-04T11:29:33Z"
+ source_tasks: ["TASK-006"]
+ implementation_tasks: ["IMP-003"]
+ requirements: ["INT-001", "INT-002", "REQ-002", "REQ-003", "REQ-004"]
+@@ -24,8 +24,11 @@
+ Java ou testes executados nesta etapa. Model aprovado em 2026-11-04T10:50:52Z, com Q-C-04; autorizado apenas Design,
+ [preparado para revisão](../../../../../bolts/002-overlay/ddd-02-technical-design.md) em 2026-11-04T11:04:53Z.
+ Fila comum/inFlight, future fora de locks, requestClose/prazos, hosts normalizados
+-e M01–M18 definidos; nenhuma alteração/execução Java. Aguardar aprovação antes de
+-ADR/Implement/Test; sem implemented=true/fecho. Revisor Waheed, sem aceitação presumida.
++e M01–M18 definidos. Design aprovado em 2026-11-04T11:25:40Z, incluindo requestClose
++sem espera/close compatível. [Revisão ADR preparada](../../../../../bolts/002-overlay/adr-review.md)
++em 2026-11-04T11:29:33Z; sem divergência material/ADR nova identificadas. Aguardar aprovação
++antes de Implement/Test, sem alteração/execução Java ou implemented=true/fecho.
++Revisor Waheed e integração continuam pendentes, sem aceitação presumida.
+ 
+ 
+ Como responsável pelo serviço OTT, quero descoberta inicial e escrita confirmada, para cumprir os drivers INT-001, INT-002, REQ-002, REQ-003, REQ-004 com validação concreta.
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T11:04:53Z"
++updated: "2026-11-04T11:29:33Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -43,10 +43,12 @@
+ Bolt/história complete; revisão final confirmada por Luis, distinta da autoria
+ do agente Codex, e versão revista integrada em main (09a068f68eca473451e1e80a045c1cf9cf15a1b2).
+ G-REVIEW-032 cumprido. Unidade continua in-progress: 019-overlay complete,
+-002-overlay em Design e três bolts planned. IMP-003 iniciado em 2026-11-04T10:40:58Z,
++002-overlay em ADR e três bolts planned. IMP-003 iniciado em 2026-11-04T10:40:58Z,
+ apenas Model, por seleção explícita; [modelo preparado para revisão](../../../../bolts/002-overlay/ddd-01-domain-model.md).
+ Model aprovado em 2026-11-04T10:50:52Z, incluindo Q-C-04. [Design preparado para revisão](../../../../bolts/002-overlay/ddd-02-technical-design.md)
+-em 2026-11-04T11:04:53Z; aguardar aprovação antes de ADR/Implement/Test. Nenhuma mudança Java,
++em 2026-11-04T11:04:53Z, aprovado em 2026-11-04T11:25:40Z, incluindo requestClose.
++Autorizada apenas ADR, com [revisão preparada](../../../../bolts/002-overlay/adr-review.md)
++em 2026-11-04T11:29:33Z. Aguardar aprovação antes de Implement/Test. Nenhuma mudança Java,
+ execução V-006/regressão/manual, revisão final de Waheed ou integração do IMP-003
+ presumidas. A dependência 001-base-validada permanece concluída/integrada.
+ 
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-04T11:04:53Z"
++updated: "2026-11-04T11:29:33Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -154,3 +154,23 @@
+   ou fecho. Waheed continua revisor final atribuído, sem aceitação presumida.
+ 
+ Design IMP-003: [desenho para revisão](../../../../bolts/002-overlay/ddd-02-technical-design.md).
++
++- **2026-11-04T11:25:40Z**: Design do IMP-003 aprovado explicitamente pelo utilizador, incluindo
++  Transport.requestClose como início de shutdown sem espera e preservação de
++  close público. Design concluído, iniciado apenas ADR: conferir sobretudo
++  013/014/015/017/020 e necessidade das mudanças internas do transporte.
++  Manter conclusões fora de locks, reservas até ambos os workers terminarem,
++  limites de filas/timers e M01–M18 com tempo/escrita controláveis. Parar antes
++  de Implement/Test; inviabilidade aceite segue ADD 11, sem contornar o gate.
++
++- **2026-11-04T11:29:33Z**: revisão ADR do IMP-003 preparada: conformidade do Design aprovado
++  com ADR-013/014/015/017/020 e transversais; ADR-003 continua substituída.
++  PendingWrite/inFlight/admitidos e fecho fora de locks justificados pela ADR-015;
++  requestClose aprovado mantém close e reservas até ambos os workers terminarem.
++  Limites de filas/timers, deadline único e M01–M18 controlados preservados.
++  Nenhuma inviabilidade aceite/divergência material identificada nesta inspeção;
++  sem ADR nova, mudança do ADD/código ou execução Java. Parar para revisão antes
++  de Implement/Test, commit/push, integração ou fecho. Waheed permanece revisor
++  final atribuído, sem aceitação/contacto presumidos.
++
++ADR IMP-003: [revisão para aprovação](../../../../bolts/002-overlay/adr-review.md).
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -8,8 +8,8 @@
+ em 2026-11-03T21:56:48Z, após integração em main. Duas histórias complete:
+ 019-overlay/IMP-002 fechado em 2026-11-04T10:33:12Z, após as cinco etapas, revisão
+ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-003
+-com Model aprovado em 2026-11-04T10:50:52Z/Q-C-04 e apenas Design autorizado,
+-[preparado para revisão](bolts/002-overlay/ddd-02-technical-design.md) em 2026-11-04T11:04:53Z;
++com Model/Q-C-04 e Design aprovados (este em 2026-11-04T11:25:40Z), apenas ADR autorizada,
++[revisão preparada](bolts/002-overlay/adr-review.md) em 2026-11-04T11:29:33Z;
+ as restantes 30 histórias/bolts não foram iniciadas.
+ Intent ainda em construção.
+ 
+@@ -31,8 +31,8 @@
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-003. **Estado:** in-progress. **Bolt:** 002-overlay.
+-Model aprovado/Q-C-04; Design preparado para revisão em 2026-11-04T11:04:53Z.
+-M01–M18/V-006 planeados, sem alterações/testes Java; aguardar aprovação antes de ADR.
++Model/Q-C-04 e Design aprovados; revisão ADR preparada em 2026-11-04T11:29:33Z.
++M01–M18/V-006 planeados, sem alterações/testes Java; aguardar aprovação antes de Implement/Test.
+ Revisão final atribuída a Waheed e integração continuam pendentes.
+ **Ficheiro:** [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
+ 
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 IN PROGRESS (Design); TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 IN PROGRESS (ADR); TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e tem Model aprovado e apenas Design autorizado, agora preparado para revisão. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e tem Model/Design aprovados e apenas ADR autorizada, com revisão preparada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -34,13 +34,16 @@
+ Fecho pela cascata specsmd após integração. Nenhum outro IMP iniciado.
+ Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
+ 
+-Incremento atual: IMP-003/002-overlay/TASK-006, IN PROGRESS em Design, iniciado
++Incremento atual: IMP-003/002-overlay/TASK-006, IN PROGRESS em ADR, iniciado
+ em 2026-11-04T10:40:58Z. Model aprovado em 2026-11-04T10:50:52Z, incluindo Q-C-04.
+ [Design preparado para revisão](../memory-bank/bolts/002-overlay/ddd-02-technical-design.md)
+-em 2026-11-04T11:04:53Z: fila/futures/locks, requestClose, prazos/shutdown, normalização lexical e M01–M18.
++em 2026-11-04T11:04:53Z, aprovado em 2026-11-04T11:25:40Z, incluindo requestClose/close compatível.
++[Revisão ADR preparada](../memory-bank/bolts/002-overlay/adr-review.md) em 2026-11-04T11:29:33Z:
++conformidade com 013/014/015/017/020, alterações internas justificadas, limites e
++M01–M18 preservados; sem inviabilidade/divergência material identificada nesta inspeção.
+ Dependências integradas; 155 hashes de Projeto/ fora de target preservados.
+ Sem alteração de código/testes, build/regressão/manual deste incremento ou fecho.
+-Parar antes de ADR/Implement/Test. Responsável de origem Fillmore,
++Parar antes de Implement/Test. Responsável de origem Fillmore,
+ revisor atribuído Waheed; revisão final e integração não presumidas.
+ 
+ [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+@@ -73,7 +76,7 @@
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+ | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+-| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | IN PROGRESS | Model aprovado; Design para revisão; V-006: NÃO EXECUTADO |
++| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | IN PROGRESS | Model/Design aprovados; ADR para revisão; V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -9,7 +9,9 @@
+ G-REVIEW-032 cumprido: revisão final por Luis e versão revista integrada em main.
+ 002-overlay/IMP-003 com Model aprovado em 2026-11-04T10:50:52Z/Q-C-04;
+ [Design preparado para revisão](../memory-bank/bolts/002-overlay/ddd-02-technical-design.md) em 2026-11-04T11:04:53Z.
+-Sem alteração Java ou V-006 executado; parar antes de ADR/Implement/Test.
++Design aprovado em 2026-11-04T11:25:40Z, incluindo requestClose; autorizada apenas ADR,
++[revisão preparada](../memory-bank/bolts/002-overlay/adr-review.md) em 2026-11-04T11:29:33Z.
++Sem alteração Java ou V-006 executado; parar antes de Implement/Test.
+ Os restantes 30 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+--- a/docs/tasks/PHASE-02/TASK-006.md
++++ b/docs/tasks/PHASE-02/TASK-006.md
+@@ -23,7 +23,7 @@
+ 
+ Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
+ 
+-Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 com Model aprovado e apenas Design autorizado, após dependências integradas; preservar ADR-013, sem membership/lease no bootstrap.
++Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 com Model/Design aprovados e apenas ADR autorizada, após dependências integradas; preservar ADR-013, sem membership/lease no bootstrap.
+ 
+ ## 5. Especificação técnica
+ 
+@@ -109,3 +109,15 @@
+ relógio/escrita para M01–M18 nos cinco ficheiros. Sem alterações/execução Java;
+ V-006/regressão/manual e revisão final atribuída a Waheed pendentes. Parar antes
+ de ADR/Implement/Test; sem commits/push, integração deste IMP ou DONE.
++
++### Design aprovado — revisão ADR para aprovação
++
++Design aprovado em 2026-11-04T11:25:40Z, incluindo Transport.requestClose() sem espera
++com close público preservado. Autorizada apenas ADR, [revisão preparada](../../../memory-bank/bolts/002-overlay/adr-review.md)
++em 2026-11-04T11:29:33Z: 013/014/015/017/020 e transversais conformes ao desenho; ADR-003
++continua substituída. Alterações internas do transporte justificadas, conclusões
++fora de locks, reservas até ambos os workers terminarem e limites/relógio/escrita
++controláveis M01–M18 preservados. Sem inviabilidade material identificada nesta
++inspeção; sem ADR nova, código/testes executados ou alteração do ADD.
++Aguardar aprovação antes de Implement/Test; Waheed/revisão final e integração
++continuam exigidos antes de DONE. Sem commits/push ou fecho nesta etapa.
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -250,14 +250,14 @@
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+     "docs/13-REQUIREMENTS-TRACEABILITY.md": "3ac680f4b37754b0b5175bf9ed4a1893c79a5210381e6f0bb8b33a785d1ef251",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "64384e6554eb5c5308678533248f018986028756a9a4b7508d3d2577bff1ee91",
++    "docs/15-PROJECT-PROGRESS.md": "64b8b8ce9ded66b548ce1a1f65f47b244ad224059ef25ad7d3815b1988361397",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "eacd9817399f599d4a1fc3ca6adbd6a73ce514c83625e014874f3313046e1eb2",
++    "docs/18-CONSTRUCTION-BOLTS.md": "02a7d724a0dd5d5d07da80e00f35a52d503379cf6150518826a571e6bc6514fc",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+-    "docs/phases/PHASE-02-OVERLAY.md": "510176dc2a5f314afc39fc4cc51f387a05096fe84689c6f7952aebe4aabdadbb",
++    "docs/phases/PHASE-02-OVERLAY.md": "034b7b06ff768940f6dd17a13808f827df4efe9492760f2db3ebb2f182bb4e78",
+     "docs/phases/PHASE-03-ROUTING.md": "52b54397a001bbae7afcdb83690fbf04c768d95e4b9d214ab0557f3334e21c09",
+     "docs/phases/PHASE-04-FLOW-MANAGEMENT.md": "27b7d97c9b1161636a0e446caf75d4e89461bae5b3ddc891d7ca657bafef05fb",
+     "docs/phases/PHASE-05-STREAMING.md": "bd5ff93148be22f59fb8705d1567f9656c19bf6f38e616bb28651b814f27cdca",
+@@ -268,7 +268,7 @@
+     "docs/tasks/PHASE-01/TASK-003.md": "6e4a046fc7e40a28ec4b1bdfaeb60543524244e987b121698b755326ecbef41c",
+     "docs/tasks/PHASE-01/TASK-004.md": "1f60d41d53c5b79cd18d9c0ed766915d8972bea36df6496828a7d5e6df7e36fe",
+     "docs/tasks/PHASE-02/TASK-005.md": "358bd2e423749f1debb5b359c58c1065f51e52d3b631ecc867c927214636832d",
+-    "docs/tasks/PHASE-02/TASK-006.md": "7826eb2126364f3f9fa3bb9afa303e51abc68f7b2588d7f364a6b8be04187a96",
++    "docs/tasks/PHASE-02/TASK-006.md": "2dee229556915894c1eff5055229bb4e05496985d29cbbecb65043d2ec2f1c61",
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-04T11:04:53Z",
++  "updated": "2026-11-04T11:29:33Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -636,6 +636,22 @@
+         "docs/tasks/PHASE-02/TASK-006.md": "7826eb2126364f3f9fa3bb9afa303e51abc68f7b2588d7f364a6b8be04187a96",
+         "docs/phases/PHASE-02-OVERLAY.md": "510176dc2a5f314afc39fc4cc51f387a05096fe84689c6f7952aebe4aabdadbb"
+       }
++    },
++    {
++      "updated": "2026-11-04T11:29:33Z",
++      "reason": "IMP-003: utilizador aprovou Design, incluindo requestClose sem espera/close público preservado; autorizou apenas ADR. Registar aprovação, revisão das decisões 013/014/015/017/020/transversais e justificação das alterações internas sem inviabilidade material identificada. Sem Java, execução V-006/regressão/manual, ADR nova, integração ou DONE; parar antes de Implement/Test.",
++      "previous_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "64384e6554eb5c5308678533248f018986028756a9a4b7508d3d2577bff1ee91",
++        "docs/18-CONSTRUCTION-BOLTS.md": "eacd9817399f599d4a1fc3ca6adbd6a73ce514c83625e014874f3313046e1eb2",
++        "docs/tasks/PHASE-02/TASK-006.md": "7826eb2126364f3f9fa3bb9afa303e51abc68f7b2588d7f364a6b8be04187a96",
++        "docs/phases/PHASE-02-OVERLAY.md": "510176dc2a5f314afc39fc4cc51f387a05096fe84689c6f7952aebe4aabdadbb"
++      },
++      "updated_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "64b8b8ce9ded66b548ce1a1f65f47b244ad224059ef25ad7d3815b1988361397",
++        "docs/18-CONSTRUCTION-BOLTS.md": "02a7d724a0dd5d5d07da80e00f35a52d503379cf6150518826a571e6bc6514fc",
++        "docs/tasks/PHASE-02/TASK-006.md": "2dee229556915894c1eff5055229bb4e05496985d29cbbecb65043d2ec2f1c61",
++        "docs/phases/PHASE-02-OVERLAY.md": "034b7b06ff768940f6dd17a13808f827df4efe9492760f2db3ebb2f182bb4e78"
++      }
+     }
+   ]
+ }
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 IN PROGRESS em Design, após Model aprovado; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 IN PROGRESS em ADR, após Model/Design aprovados; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+--- a/memory-bank/bolts/002-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/002-overlay/ddd-01-domain-model.md
+@@ -4,7 +4,8 @@
+ este bolt e autorizou inicialmente apenas a primeira etapa. Model aprovado
+ explicitamente em 2026-11-04T10:50:52Z (registo), incluindo coerência de instância
+ e uma decisão de resposta por conexão, em [Q-C-04](../../../docs/construction-duvidas.md#q-c-04--coerência-da-instância-e-resposta-única-na-consulta-inicial).
+-Foi autorizada somente Design, agora [preparada para revisão](ddd-02-technical-design.md).
++[Design aprovado](ddd-02-technical-design.md) em 2026-11-04T11:25:40Z; continuação
++autorizada apenas em ADR, com [revisão para aprovação](adr-review.md).
+ As descrições da fronteira/casos abaixo são o modelo, não implementação ou V-006 executado.
+ 
+ Fontes, pela precedência aprovada: [enunciado, pp. 2–3](../../../ESR-TP2-26-27.pdf),
+@@ -266,5 +267,5 @@
+ Não contactar o revisor ou atribuir-lhe aceitação por inferência.
+ 
+ Checkpoint Model aprovado em 2026-11-04T10:50:52Z; Model registado em stages_completed.
+-Continuação autorizada apenas em Design, com current_stage=design, status=in-progress
++Continuação autorizada apenas em ADR, com current_stage=adr, status=in-progress
+ e completed=null. Sem código/testes Java, build, commits/push, fecho ou outro IMP.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -97,3 +97,9 @@
+   a revisão final atribuída a Waheed e integração continuam exigidas.
+ - Sem divergência arquitetural identificada por estas concretizações; nenhuma
+   ADR nova é criada neste registo.
++- Continuação posterior: Design aprovado explicitamente pelo utilizador, com
++  registo em 2026-11-04T11:25:40Z, incluindo Transport.requestClose() como início de
++  shutdown sem espera, preservando o comportamento público anterior de close().
++  Autorizada apenas a etapa ADR, com [revisão para aprovação](../memory-bank/bolts/002-overlay/adr-review.md).
++  Esta aprovação posterior substitui o limite de avanço anterior para Design;
++  Implement/Test, revisão final e integração continuam pendentes.
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -58,4 +58,9 @@
+ Endpoint.instanceId no REGISTER e uma decisão de resposta por conexão. Aplicam
+ ADR-013/014/015; ADR-003 permanece substituída. [Design para revisão](../bolts/002-overlay/ddd-02-technical-design.md)
+ explicita também a normalização lexical de hosts já documentada em docs/07,
+-sem DNS. Sem ADR nova; revisão ADR/Implement/Test ainda não autorizados.
++sem DNS. Design aprovado explicitamente em 2026-11-04T11:25:40Z, incluindo requestClose
++como início de shutdown sem espera e preservação de close público. Autorizada
++apenas ADR: [revisão de conformidade preparada](../bolts/002-overlay/adr-review.md)
++em 2026-11-04T11:29:33Z; sem inviabilidade/divergência material identificada nesta inspeção.
++ADR-013/014/015/017/020 e transversais reutilizadas; sem ADR nova ou alteração
++do ADD. Aguardar revisão antes de Implement/Test.
+--- a/memory-bank/bolts/002-overlay/ddd-02-technical-design.md
++++ b/memory-bank/bolts/002-overlay/ddd-02-technical-design.md
+@@ -1,9 +1,12 @@
+ # IMP-003 — Design: descoberta inicial e escrita confirmada
+ 
+-Design preparado para revisão, sem implementar Java ou executar V-006.
++Design aprovado explicitamente pelo utilizador em 2026-11-04T11:25:40Z (registo),
++incluindo requestClose sem espera e preservação do comportamento de close().
++Sem implementar Java ou executar V-006.
+ Model e as concretizações de [Q-C-04](../../../docs/construction-duvidas.md#q-c-04--coerência-da-instância-e-resposta-única-na-consulta-inicial)
+ foram aprovados explicitamente pelo utilizador, com registo em 2026-11-04T10:50:52Z.
+-Autorizada somente esta etapa; parar antes de ADR/Implement/Test.
++A continuação autorizada é apenas ADR, com [revisão para aprovação](adr-review.md);
++parar antes de Implement/Test.
+ 
+ Base: Denji 4ac5808dacf6e97bfd3636d2788db363e926bc95, dependências IMP-001/002
+ concluídas/integradas. Reutilizar [IMP-003](../../../add.md#imp-003),
+@@ -413,11 +416,12 @@
+ 
+ Nenhuma divergência arquitetural material identificada neste desenho;
+ Q-C-04 aplica as aprovações de Model, e normalização lexical já estava no contrato.
+-Confirmar formalmente as ADR na etapa seguinte, após aprovação de Design;
+-nenhuma ADR nova ou revisão da base é declarada aprovada por este documento.
++Revisão formal das ADR agora autorizada e [preparada para aprovação](adr-review.md);
++sem ADR nova ou revisão da base declarada aprovada por este documento.
+ 
+ V-006, regressão e manual deste incremento permanecem NÃO EXECUTADOS.
+ Os 824 testes referidos nos checkpoints anteriores pertencem ao IMP-002.
+ Não há gate externo adicional; critérios, revisão final atribuída a **Waheed**
+ e integração são exigidos antes de DONE. Sem contacto/aceitação presumidos,
+-commits/push, fecho ou outro IMP. Parar neste checkpoint de Design.
++commits/push, fecho ou outro IMP. Checkpoint Design aprovado; parar agora na
++revisão ADR antes de Implement/Test.
+--- a/memory-bank/bolts/002-overlay/adr-review.md
++++ b/memory-bank/bolts/002-overlay/adr-review.md
+@@ -0,0 +1,164 @@
++# IMP-003 — Etapa ADR: revisão do Design aprovado
++
++Design aprovado explicitamente pelo utilizador, com registo em
++2026-11-04T11:25:40Z, incluindo Transport.requestClose() como início de shutdown
++sem espera e preservação do comportamento público anterior de close().
++Autorizada apenas esta revisão ADR; apresentar o resultado e parar antes de
++Implement/Test. Esta análise documental não prova implementação ou execução.
++
++Fontes: [ADD secção 5](../../../add.md#5-registo-de-decisões),
++[interfaces/invariantes](../../../add.md#6-modelo-de-dados-e-contratos),
++[IMP-003](../../../add.md#imp-003), [regras ADD 11](../../../add.md#11-regras-para-os-agentes-de-implementação),
++[Model aprovado](ddd-01-domain-model.md), [Design aprovado](ddd-02-technical-design.md),
++[Q-C-04](../../../docs/construction-duvidas.md#q-c-04--coerência-da-instância-e-resposta-única-na-consulta-inicial),
++[contrato v1](../../../docs/07-API-AND-INTERFACES.md),
++[TASK-006](../../../docs/tasks/PHASE-02/TASK-006.md) e código atual de
++Connection/Transport/configuração/codec. Base: Denji
++4ac5808dacf6e97bfd3636d2788db363e926bc95; IMP-001/002 complete e integrados.
++
++## 1. Resultado da revisão
++
++As decisões aceites são reutilizadas. **ADR-003 permanece Substituída pela
++ADR-013** e não autoriza registo vivo ou leases. Não foi identificada decisão
++aceite inviável ou divergência material entre as obrigações do ADD, o Design
++aprovado e a base inspecionada. Não é necessária ADR nova/substituição nesta
++análise; não criar ADR-033 para duplicar estas decisões.
++
++A conformidade aqui é do desenho. V-006/M01–M18, regressão e manual continuam
++por executar; resultados antigos não são convertidos em prova deste incremento.
++As lacunas de código atuais (bootstrap só documental, sendAndFlush ausente)
++são precisamente a entrega planeada no IMP-003, não motivo para reabrir TASK-005
++ou dispensar testes.
++
++## 2. Decisões principais e conformidade
++
++| Decisão | Conformidade do Design aprovado | Prova futura e limite |
++|---|---|---|
++| [ADR-003](../../../add.md#adr-003) — substituída | Consultada só como histórico; ADR-013 governa o comportamento | M02–M10 não admitem renovação/estado vivo nem uma segunda arquitetura de bootstrap |
++| [ADR-013](../../../add.md#adr-013) — só localização inicial | REGISTER consulta o grafo imutável por nodeId. Resposta com adjacentes configurados, incluindo offline, instanceId zero e sem lease. Q-C-04 valida a instância do pedido e limita a decisão de resposta por conexão; não cria exclusividade por ID | M02–M10/M15: repetição, concorrência, duas instâncias do mesmo ID, resposta completa/EOF e ausência de alterações ao grafo. HELLO/reconexão/saída ficam nos IMP próprios |
++| [ADR-014](../../../add.md#adr-014) — transporte assíncrono limitado | send mantém ACCEPTED como admissão. send/sendAndFlush partilham ArrayBlockingQueue, escritor único e ordem de admissão. Não há I/O de saída no chamador ou callbacks à espera de escrita. Overflow TCP afeta só a conexão; reservas persistem até ambos os workers terminarem | M11–M17 e os 18 testes TT existentes: ordem, cancelamento, overflow localizado, callbacks e terminação. requestClose não muda close nem antecipa release |
++| [ADR-015](../../../add.md#adr-015) — confirmação de escrita | Future de sendAndFlush só tem sucesso após write e flush completos no escritor. O prazo total da consulta fecha socket e termina a pendência. Conjunto de admitidos inclui o intervalo entre take e inFlight; queuedMessages=0 não é prova | M09/M12–M16: driver bloqueia write/flush/dequeued, simula IOException e força corrida com fecho. Cancelamento terminal não promete retirar bytes. Sucesso local não é ACK remoto |
++| [ADR-017](../../../add.md#adr-017) — proprietário serial do estado | Core possui mapa/contextos/tickets; bridge, timer e whenComplete publicam eventos. connectionId e contexto esperado protegem callbacks tardios. Grafo é imutável; flag atómica de paragem é lifecycle, sem mutação concorrente do mapa | M04/M10/M13–M17: relógio/eventos manuais, consultas distintas do mesmo ID, eventos antigos e saturação. Fila serial ≤4096; cleanup permanece no owner |
++| [ADR-020](../../../add.md#adr-020) — erros e shutdown limitado | Erros/correlação existentes, sem detalhes sensíveis ou ERROR para envelope inseguro. Configurar antes de rede; timeout/erro normal de peer isolado. requestClose inicia fecho sem join; serviço coordena um único deadline e aguarda só o restante | M01/M05–M09/M12–M17: erro seguro, EOF/truncatura, peer lento, confirmações terminais, porta/threads/timers libertos. Callback que viola contrato rápido deve produzir timeout explícito, não sucesso inventado |
++
++## 3. Decisões transversais preservadas
++
++| Decisão | Aplicação neste incremento |
++|---|---|
++| [ADR-010](../../../add.md#adr-010) | Loader/records existentes permanecem. Fronteira do novo serviço verifica os dados consumidos antes do bind, incluindo configuração construída diretamente; erros agregados da carga não são substituídos. Normalização lexical de host acompanha o loader/contrato, sem DNS ou inferência por IP remoto (M01/M05/M06) |
++| [ADR-012](../../../add.md#adr-012) | Codec separado de autorização. Preservar bytes TCP 37..65536, UTF-8 estrito, 16 tipos e rejeição do código 3; UDP OTT1 64/1200/1136 intocado. Não adicionar tipo, payload, ACK ou ObjectInputStream. Fixtures independentes mantidas (M07–M09/M17/M18) |
++| [ADR-016](../../../add.md#adr-016) | Consumir apenas Control aplicável ao bootstrap, passando limites/timeouts a Options e à consulta; não inventar propriedade ou permitir override overlay no BOOTSTRAP. Options anterior de quatro argumentos preservado (M13/M14/M16/M18) |
++| [ADR-018](../../../add.md#adr-018) | nodeId estável, instanceId de execução e connectionId distintos. Nenhuma persistência de consultas/IDs vivos. A instância viva de um vizinho continua a ser conhecida por HELLO, não pelo bootstrap (M04/M05/M08/M10/M15) |
++| [ADR-021](../../../add.md#adr-021) | Validação contextual de allowlist/endpoints não é autenticação criptográfica. Nenhuma resolução DNS do pedido nem confiança no endereço remoto para reescrever a topologia; preservar validação/limites antes de alocar (M01/M05–M08/M17) |
++| [ADR-024](../../../add.md#adr-024) | Um IMP por bolt, apenas cinco ficheiros Java futuros e documentação pertinente; dependências integradas, índices/estados coerentes. Se inviável, aplicar secção 11 antes de intervir. Nenhuma fundação, fase ou requisito global reaberto/concluído por inferência |
++| [ADR-026](../../../add.md#adr-026) | Maven/JUnit/validador existentes. Sem dependência runtime, CI/linter/JaCoCo/limiar novos. Casos críticos/relógio/escrita controláveis e TCP real são provas distintas, com logs novos quando autorizados |
++
++## 4. Necessidade e limites das alterações internas ao transporte
++
++| Alteração futura | Limitação observada na base | Necessidade e compatibilidade |
++|---|---|---|
++| PendingWrite na fila comum | ArrayBlockingQueue<byte[]> não associa uma confirmação ao frame | Acrescentar associação privada, preservando a fila e capacidade. send sem future continua igual; sem fila prioritária/separada. Nenhum byte v1 muda |
++| inFlight e conjunto limitado de confirmações | writeLoop retira o frame com take; close limpa a fila, que já não contém esse frame | Cobrir fila + retirado/em escrita, incluindo a janela take/publicação. No máximo capacidade+1, teto 257, sem histórico. Remoção/publicação pelo escritor antes de workerFinished |
++| Região crítica curta em Connection.close | Método inteiro synchronized faz clear/close/interrupt no mesmo monitor | Proteger decisão/reason/admissão; fechar/interromper fora do monitor. complete* fora do monitor e de lifecycle, evitando executar continuations sob esses locks. Primeira razão de fecho mantém-se |
++| Snapshot e fecho fora de Transport.lifecycle | Transport.close chama Connection.close enquanto detém lifecycle | Copiar recursos e impedir novas admissões sob lifecycle; fechar recursos depois de o libertar. Não adquirir lifecycle dentro do monitor da conexão nem executar conclusões/join sob locks |
++| Transport.requestClose | close externo espera o budget do Transport; bootstrap precisa também coordenar core/timer | Extensão aditiva aprovada explicitamente: só inicia shutdown. close preserva espera externa e evita joins quando chamado por worker. awaitTermination continua a verificar terminação; requestClose não a prova |
++| Driver de escrita/injeções de pacote | Socket de loopback pequeno não controla o instante de write/flush nem a janela take/fecho | Overloads/tipos aninhados nos ficheiros autorizados; defaults públicos usam OutputStream real. Sem tornar classes extensíveis, dependência, reflexão ou alteração de codec/POM |
++
++Estas mudanças concretizam ADR-014/015/020. Não são uma política de transporte
++nova nem uma exceção para reescrever TASK-005: preservar construtores, Options,
++send, métricas existentes, reasons, contagem de reservas e todos os seus testes.
++O mecanismo de sucesso continua no escritor exclusivo, não num executor de
++conclusões/commonPool nem numa thread por future.
++
++**Reservas:** nem requestClose, nem limpeza da fila, conclusão do future ou
++callback connectionClosed libertam sozinhos a reserva. O release continua após
++remainingWorkers chegar a zero; o finally do escritor termina as confirmações
++antes de sinalizar o fim desse worker. A fase de erro do dial mantém também o
++seu cleanup/future. Snapshot de shutdown e attach/reserve precisam da verificação
++closed existente para cobrir sockets aceites/dials concorrentes.
++
++**Corridas:** o desenho fixa uma decisão terminal sob o monitor; publicação é
++posterior e fora dos locks. Fecho que ganha antes da decisão pós-flush pode
++produzir erro mesmo com bytes enviados. Decisão de sucesso ganha não é revertida
++por close posterior; cancel bem-sucedido do future permanece cancelamento mesmo
++se o escritor tentar complete depois. Não alegar rollback/entrega remota.
++
++## 5. Prazos, saturação e recursos
++
++Três prazos distintos de Control: dial (default 2000 ms), consulta total após
++connectionOpen (3000 ms) e shutdown global (3000 ms). Consulta conserva t0 antes
++da fila serial e nunca renova prazo por pedido adicional/bytes parciais. O timer
++fecha o canal por decisão serial; isso interrompe I/O e permite ao escritor
++terminar pendências. Future.orTimeout sem fechar socket seria insuficiente.
++O timeout de consulta não se torna watchdog de vizinhos ou timer de membership.
++
++sendAndFlush mantém a assinatura do ADD, sem novo parâmetro/propriedade de timeout.
++O prazo finito desta operação no bootstrap pertence à consulta; outros consumidores
++têm de coordenar o respetivo prazo/fecho. Isto não dispensa término das confirmações
++em qualquer fecho/shutdown. O serviço usa requestClose e esperas com o tempo
++restante de um único deadline real de shutdown, sem somar três budgets ou fazer
++join de si próprio. Tempo falso controla a semântica do Core; não congela waits
++de workers reais.
++
++Limites a conservar:
++
++- Reservas TCP ≤64, fila por conexão ≤256 e um frame retirado/em escrita;
++  no máximo 257 confirmações admitidas, sem lista histórica ilimitada.
++- Fila serial ≤4096, callbacks sem espera por espaço. Saturação da saída TCP
++  fecha só o peer; saturação da fila serial é o erro operacional do nó previsto
++  na ADR-017, com paragem observável/cleanup. Não confundir esse caso com timeout
++  normal de um peer, que deixa o listener e outras consultas operacionais.
++- Um ticket por contexto admitido, ≤64; cancelamento/removeOnCancelPolicy
++  evita acumular timers cancelados na implementação JDK. Não expor scheduler
++  para outras tarefas, criar tarefas periódicas ou aceitar chaves overlay.
++- Grafo e snapshots imutáveis; contextos/tickets removidos pelo owner em todos
++  os caminhos de fecho. Limites de wire/configuração não viram tuning por nó.
++
++## 6. Provas M01–M18 e condições da implementação futura
++
++M01–M18 estão definidos no Design e continuam obrigatórios, sem declarar nenhum
++executado por esta revisão. BootstrapServerTest terá Core/Channel/clock/deadlines/
++eventos controláveis; TransportTest terá driver write/flush/dequeued com barreiras
++e falhas controladas. Todos esses tipos ficam aninhados nos cinco ficheiros
++autorizados. TCP real complementa as provas: resposta completa seguida de EOF,
++isolamento de erro e libertação de socket/porta/workers. Fila vazia, sleeps ou
++loopback sem pressão não substituem as provas do instante de escrita ou timeout.
++
++Prioridades verificáveis para Implement, só depois de autorização:
++
++1. Introduzir casos novos e falhas reais dos comportamentos em falta; não criar
++   falhas artificiais nos 18 testes de transporte ou nos restantes testes existentes.
++2. Demonstrar write regressado/flush ainda bloqueado com future pendente e
++   fecho entre take e inFlight, sem future perdido (M09/M12/M15).
++3. Demonstrar overflow, cancelamento e shutdown com confirmações na fila e em
++   escrita, continuations de close sem lock/join circular e reservas só libertas
++   após ambos os workers terminarem (M11–M16).
++4. Demonstrar prazo total, eventos atrasados de outra consulta do mesmo ID,
++   saturação controlada e remoção de tickets/contextos (M04/M10/M13–M17).
++5. Executar regressão atual/JDK21 e conferir 45 fixtures, com novos logs/XML e
++   contagens reais; manual deste incremento e comandos repetíveis (M18).
++
++Nenhuma linha de teste pode ser apagada/enfraquecida para obter verde. As únicas
++alterações internas à base permitidas são as exigidas pelo IMP-003 e descritas
++no Design; necessidade de outro ficheiro ou decisão inviável exige parar e
++apresentar a lacuna antes de intervir.
++
++## 7. Aplicação da secção 11 do ADD e checkpoint
++
++Não se encontrou condição para propor ADR de substituição nesta inspeção.
++Se a implementação futura demonstrar que uma decisão aceite não é cumprível,
++parar a parte afetada, preservar comando/log/código e impacto, registar a próxima
++Q-C em docs/construction-duvidas.md, propor ADR-033 em diante e aguardar aprovação.
++Não reduzir hard caps/provas, deslocar conclusões para dentro de locks ou
++desmarcar obrigações para contornar essa condição.
++
++Checkpoint atual: **revisão ADR preparada, à espera de aprovação**. Bolt
++in-progress/adr, Model e Design em stages_completed, completed=null. V-006,
++regressão e manual permanecem NÃO EXECUTADOS para IMP-003; os 824 testes do
++IMP-002 são históricos relativamente a este incremento.
++
++Sem gate externo adicional no IMP-003; a revisão final atribuída a **Waheed**,
++os critérios/testes aplicáveis e a integração continuam exigidos antes de DONE.
++Não atribuir aceitação/contactar o revisor por inferência. Nesta etapa não há
++alteração de Java, execução de build/testes, commits/push, fecho ou outro IMP.
++Parar para revisão antes de Implement/Test.

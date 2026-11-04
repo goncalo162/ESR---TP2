@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------------
+Test set: pt.uminho.esr.ott.transport.TransportTest
+-------------------------------------------------------------------------------
+Tests run: 21, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.380 s <<< FAILURE! -- in pt.uminho.esr.ott.transport.TransportTest
+pt.uminho.esr.ott.transport.TransportTest.requestCloseIsAdditiveAndTerminatesWithoutWaitingInTheCall -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.NoSuchMethodException: pt.uminho.esr.ott.transport.Transport.requestClose()
+	at java.base/java.lang.Class.getMethod(Class.java:2397)
+	at pt.uminho.esr.ott.transport.TransportTest.requestCloseIsAdditiveAndTerminatesWithoutWaitingInTheCall(TransportTest.java:476)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.transport.TransportTest.mixedPlainAndConfirmedFramesUseTheSameWriterOrder -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoSuchMethodException: pt.uminho.esr.ott.transport.Connection.sendAndFlush(pt.uminho.esr.ott.protocol.ControlMessage)
+	at java.base/java.lang.Class.getMethod(Class.java:2397)
+	at pt.uminho.esr.ott.transport.TransportTest.confirmed(TransportTest.java:440)
+	at pt.uminho.esr.ott.transport.TransportTest.mixedPlainAndConfirmedFramesUseTheSameWriterOrder(TransportTest.java:463)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.transport.TransportTest.confirmedResponseCanBeReadCompletelyBeforeLocalClose -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoSuchMethodException: pt.uminho.esr.ott.transport.Connection.sendAndFlush(pt.uminho.esr.ott.protocol.ControlMessage)
+	at java.base/java.lang.Class.getMethod(Class.java:2397)
+	at pt.uminho.esr.ott.transport.TransportTest.confirmed(TransportTest.java:440)
+	at pt.uminho.esr.ott.transport.TransportTest.confirmedResponseCanBeReadCompletelyBeforeLocalClose(TransportTest.java:449)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

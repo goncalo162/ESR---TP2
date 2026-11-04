@@ -432,4 +432,259 @@ class TransportTest {
                     () -> transport.connect(InetSocketAddress.createUnresolved("example.invalid", 5000)));
         }
     }
+
+    // IMP-003: start with the actual missing APIs, without modifying earlier tests.
+    private static CompletableFuture<Void> confirmed(Connection c, ControlMessage message) throws Exception {
+        return c.sendAndFlush(message);
+    }
+
+    @Test void confirmedResponseCanBeReadCompletelyBeforeLocalClose() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events); var peer = new Socket()) {
+            peer.connect(transport.localAddress()); peer.setSoTimeout(3000);
+            Connection c = take(events.opened);
+            confirmed(c, ping(801)).get(3, TimeUnit.SECONDS);
+            c.close();
+            assertEquals(ping(801), pt.uminho.esr.ott.protocol.MessageCodec.read(peer.getInputStream()).orElseThrow());
+            assertTrue(pt.uminho.esr.ott.protocol.MessageCodec.read(peer.getInputStream()).isEmpty());
+            terminated(transport);
+        }
+    }
+
+    @Test void mixedPlainAndConfirmedFramesUseTheSameWriterOrder() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events); var peer = new Socket()) {
+            peer.connect(transport.localAddress()); peer.setSoTimeout(3000);
+            Connection c = take(events.opened);
+            assertEquals(Connection.SendResult.ACCEPTED, c.send(ping(810)));
+            var middle = confirmed(c, ping(811));
+            assertEquals(Connection.SendResult.ACCEPTED, c.send(ping(812)));
+            var last = confirmed(c, ping(813));
+            last.get(3, TimeUnit.SECONDS); assertTrue(middle.isDone());
+            for (int i = 810; i <= 813; i++)
+                assertEquals(ping(i), pt.uminho.esr.ott.protocol.MessageCodec.read(peer.getInputStream()).orElseThrow());
+            terminated(transport);
+        }
+    }
+
+    @Test void requestCloseIsAdditiveAndTerminatesWithoutWaitingInTheCall() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events)) {
+            transport.requestClose();
+            assertTrue(transport.awaitTermination(WAIT));
+            assertEquals(0, transport.connectionCount());
+        }
+    }
+    private static final class ControlledWriter implements Connection.WriteDriver {
+        final String pause;
+        final CountDownLatch entered = new CountDownLatch(1);
+        final CountDownLatch released = new CountDownLatch(1);
+        final BlockingQueue<byte[]> frames = new java.util.concurrent.ArrayBlockingQueue<>(8);
+        final boolean fail;
+        ControlledWriter(String pause, boolean fail) { this.pause = pause; this.fail = fail; }
+        private void step(String point) throws java.io.IOException {
+            if (!pause.equals(point)) return;
+            entered.countDown();
+            try {
+                if (!released.await(3, TimeUnit.SECONDS)) throw new java.io.IOException("Test driver deadline");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); throw new java.io.IOException("Test driver interrupted", e);
+            }
+            if (fail) throw new java.io.IOException("Injected " + point + " failure");
+        }
+        @Override public void dequeued() throws java.io.IOException { step("dequeued"); }
+        @Override public void write(byte[] frame) throws java.io.IOException { frames.add(frame.clone()); step("write"); }
+        @Override public void flush() throws java.io.IOException { step("flush"); }
+    }
+
+    @Test void confirmationRemainsPendingUntilFlushAndContinuationHoldsNoLocks() throws Exception {
+        var driver = new ControlledWriter("flush", false); var events = new Events();
+        try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), s -> driver);
+             var peer = new Socket()) {
+            peer.connect(transport.localAddress()); Connection c = take(events.opened);
+            var result = confirmed(c, ping(901));
+            assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+            assertFalse(result.isDone()); assertEquals(0, c.queuedMessages());
+            assertEquals(ping(901), pt.uminho.esr.ott.protocol.MessageCodec.decode(take(driver.frames)));
+            var callback = result.thenRun(() -> {
+                assertFalse(Thread.holdsLock(c));
+                var observed = new CompletableFuture<Void>();
+                Thread.ofVirtual().start(() -> {
+                    synchronized (c) { transport.connectionCount(); }
+                    observed.complete(null);
+                });
+                try { observed.get(1, TimeUnit.SECONDS); }
+                catch (Exception e) { throw new AssertionError("Continuation held an incompatible lock", e); }
+                transport.close(); // Current writer must not join itself or the reader.
+            });
+            driver.released.countDown(); callback.get(3, TimeUnit.SECONDS);
+            assertTrue(transport.awaitTermination(WAIT)); assertEquals(0, transport.connectionCount());
+        } finally { driver.released.countDown(); }
+    }
+
+    @Test void closeBetweenTakeAndInFlightPublicationDoesNotLoseConfirmation() throws Exception {
+        var driver = new ControlledWriter("dequeued", false); var events = new Events();
+        try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), s -> driver);
+             var peer = new Socket()) {
+            peer.connect(transport.localAddress()); Connection c = take(events.opened);
+            var result = confirmed(c, ping(902));
+            assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+            assertEquals(0, c.queuedMessages()); assertFalse(result.isDone());
+            c.close();
+            assertThrows(java.util.concurrent.ExecutionException.class, () -> result.get(3, TimeUnit.SECONDS));
+            terminated(transport); assertEquals(0, transport.connectionCount()); assertTrue(driver.frames.isEmpty());
+        } finally { driver.released.countDown(); }
+    }
+
+    @Test void overflowFailsQueuedAndInFlightConfirmationsButPreservesOtherPeer() throws Exception {
+        var driver = new ControlledWriter("write", false); var events = new Events();
+        var first = new java.util.concurrent.atomic.AtomicBoolean(true);
+        var options = new Transport.Options(1, 4, WAIT, WAIT);
+        try (var transport = new Transport(ephemeral(), events, options,
+                socket -> first.getAndSet(false) ? driver : Connection.SOCKET_WRITER.open(socket));
+             var peer = new Socket(); var healthy = new Socket()) {
+            peer.connect(transport.localAddress()); Connection c = take(events.opened);
+            var active = confirmed(c, ping(910)); assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+            var queued = confirmed(c, ping(911)); assertEquals(1, c.queuedMessages());
+            var rejected = confirmed(c, ping(912));
+            for (var f : java.util.List.of(active, queued, rejected))
+                assertThrows(java.util.concurrent.ExecutionException.class, () -> f.get(3, TimeUnit.SECONDS));
+            assertEquals(Connection.CloseReason.OUTPUT_OVERFLOW, take(events.closed).reason());
+            healthy.connect(transport.localAddress()); healthy.setSoTimeout(3000);
+            Connection good = take(events.opened); confirmed(good, ping(913)).get(3, TimeUnit.SECONDS);
+            assertEquals(ping(913), pt.uminho.esr.ott.protocol.MessageCodec.read(healthy.getInputStream()).orElseThrow());
+            terminated(transport); assertEquals(0, transport.connectionCount());
+        } finally { driver.released.countDown(); }
+    }
+
+    @Test void cancellationBeforeAndDuringWritingRemainsTerminalAfterClose() throws Exception {
+        var driver = new ControlledWriter("write", false); var events = new Events();
+        try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), s -> driver);
+             var peer = new Socket()) {
+            peer.connect(transport.localAddress()); Connection c = take(events.opened);
+            var active = confirmed(c, ping(920)); assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+            var queued = confirmed(c, ping(921));
+            assertTrue(active.cancel(true)); assertTrue(queued.cancel(false)); c.close();
+            driver.released.countDown(); terminated(transport);
+            assertTrue(active.isCancelled()); assertTrue(queued.isCancelled());
+            assertThrows(java.util.concurrent.CancellationException.class, active::join);
+            assertThrows(java.util.concurrent.CancellationException.class, queued::join);
+            assertEquals(0, c.queuedMessages()); assertEquals(0, transport.connectionCount());
+        } finally { driver.released.countDown(); }
+    }
+
+    @Test void invalidConfirmedMessagePreservesHealthyConnectionAndClosedSendFails() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events); var peer = new Socket()) {
+            peer.connect(transport.localAddress()); peer.setSoTimeout(3000); Connection c = take(events.opened);
+            var bad = confirmed(c, new ControlMessage(2, MessageType.PROBE_PING, UUID.randomUUID(), "N",
+                    UUID.randomUUID(), new ControlMessage.Probe(1)));
+            var error = assertThrows(java.util.concurrent.ExecutionException.class, () -> bad.get(3, TimeUnit.SECONDS));
+            assertInstanceOf(pt.uminho.esr.ott.protocol.ProtocolException.class, error.getCause()); assertTrue(c.isOpen());
+            confirmed(c, ping(930)).get(3, TimeUnit.SECONDS);
+            assertEquals(ping(930), pt.uminho.esr.ott.protocol.MessageCodec.read(peer.getInputStream()).orElseThrow());
+            c.close();
+            assertThrows(java.util.concurrent.ExecutionException.class, () -> confirmed(c, ping(931)).get(3, TimeUnit.SECONDS));
+            terminated(transport);
+        }
+    }
+
+    @Test void controlledWriteAndFlushErrorsTerminateAllAdmittedFutures() throws Exception {
+        for (String point : java.util.List.of("write", "flush")) {
+            var driver = new ControlledWriter(point, true); var events = new Events();
+            try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), s -> driver);
+                 var peer = new Socket()) {
+                peer.connect(transport.localAddress()); Connection c = take(events.opened);
+                var active = confirmed(c, ping(940)); assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+                var queued = confirmed(c, ping(941)); driver.released.countDown();
+                for (var f : java.util.List.of(active, queued)) {
+                    var ex = assertThrows(java.util.concurrent.ExecutionException.class, () -> f.get(3, TimeUnit.SECONDS));
+                    assertInstanceOf(java.io.IOException.class, ex.getCause());
+                }
+                terminated(transport); assertEquals(0, transport.connectionCount());
+            } finally { driver.released.countDown(); }
+        }
+    }
+
+    @Test void requestCloseDoesNotAwaitBlockedWriterAndReservationRemainsUntilBothWorkersEnd() throws Exception {
+        var entered = new CountDownLatch(1); var release = new CompletableFuture<Void>(); var events = new Events();
+        Connection.WriteDriver blocked = new Connection.WriteDriver() {
+            @Override public void write(byte[] bytes) { entered.countDown(); release.join(); }
+            @Override public void flush() { }
+        };
+        try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), s -> blocked);
+             var peer = new Socket()) {
+            try {
+                peer.connect(transport.localAddress()); Connection c = take(events.opened);
+                var active = confirmed(c, ping(950)); assertTrue(entered.await(3, TimeUnit.SECONDS));
+                var queued = confirmed(c, ping(951));
+                transport.requestClose();
+                assertFalse(transport.awaitTermination(Duration.ofMillis(10)));
+                assertEquals(1, transport.connectionCount()); // Reader exit cannot release a writer still running.
+                release.complete(null);
+                assertTrue(transport.awaitTermination(WAIT)); assertEquals(0, transport.connectionCount());
+                assertTrue(active.isCompletedExceptionally()); assertTrue(queued.isCompletedExceptionally());
+            } finally { release.complete(null); }
+        }
+    }
+
+    @Test void writerFactoryFailureIsLocalAndCannotLeaveWorkersOrReservations() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events, Transport.Options.defaults(), socket -> {
+            throw new java.io.IOException("Injected output factory failure");
+        }); var peer = new Socket()) {
+            peer.connect(transport.localAddress()); Connection c = take(events.opened);
+            var f = confirmed(c, ping(960));
+            assertThrows(java.util.concurrent.ExecutionException.class, () -> f.get(3, TimeUnit.SECONDS));
+            terminated(transport); assertEquals(0, transport.connectionCount());
+        }
+    }
+    @Test void concurrentPlainAndConfirmedSendersPreserveFramesAndPerLaneOrder() throws Exception {
+        var events = new Events();
+        try (var transport = new Transport(ephemeral(), events); var peer = new Socket();
+             var jobs = Executors.newVirtualThreadPerTaskExecutor()) {
+            peer.connect(transport.localAddress()); peer.setSoTimeout(3000); Connection c = take(events.opened);
+            var start = new CountDownLatch(1); var tasks = new ArrayList<java.util.concurrent.Future<?>>();
+            for (int lane = 0; lane < 4; lane++) {
+                final int sender = lane;
+                tasks.add(jobs.submit(() -> {
+                    start.await(); CompletableFuture<Void> last = null;
+                    for (int i = 0; i < 16; i++) {
+                        var message = ping(sender * 100 + i);
+                        if (i % 2 == 0) assertEquals(Connection.SendResult.ACCEPTED, c.send(message));
+                        else last = c.sendAndFlush(message);
+                    }
+                    last.get(3, TimeUnit.SECONDS); return null;
+                }));
+            }
+            start.countDown(); for (var task : tasks) task.get(3, TimeUnit.SECONDS);
+            int[] previous = {-1, -1, -1, -1}; var seen = new HashSet<Long>();
+            for (int i = 0; i < 64; i++) {
+                var m = pt.uminho.esr.ott.protocol.MessageCodec.read(peer.getInputStream()).orElseThrow();
+                long seq = ((ControlMessage.Probe) m.payload()).probeId(); int lane = (int) seq / 100;
+                assertTrue(seen.add(seq)); assertEquals(previous[lane] + 1, seq % 100); previous[lane]++;
+            }
+            assertArrayEquals(new int[]{15, 15, 15, 15}, previous); terminated(transport);
+        }
+    }
+
+    @Test void blockedFutureContinuationProducesExplicitShutdownTimeoutThenReleasesAllPendingWrites() throws Exception {
+        var driver = new ControlledWriter("flush", false); var events = new Events();
+        var callbackEntered = new CountDownLatch(1); var release = new CompletableFuture<Void>();
+        var options = new Transport.Options(2, 2, WAIT, Duration.ofMillis(100));
+        try (var transport = new Transport(ephemeral(), events, options, socket -> driver); var peer = new Socket()) {
+            try {
+                peer.connect(transport.localAddress()); Connection c = take(events.opened);
+                var active = c.sendAndFlush(ping(970)); assertTrue(driver.entered.await(3, TimeUnit.SECONDS));
+                var continuation = active.thenRun(() -> { callbackEntered.countDown(); release.join(); });
+                driver.released.countDown(); assertTrue(callbackEntered.await(3, TimeUnit.SECONDS));
+                var queued = c.sendAndFlush(ping(971));
+                assertThrows(IllegalStateException.class, transport::close);
+                assertFalse(transport.awaitTermination(Duration.ofMillis(10))); assertEquals(1, transport.connectionCount());
+                release.complete(null); continuation.get(3, TimeUnit.SECONDS);
+                assertTrue(transport.awaitTermination(WAIT)); assertEquals(0, transport.connectionCount());
+                assertTrue(queued.isCompletedExceptionally());
+            } finally { release.complete(null); driver.released.countDown(); }
+        }
+    }
 }

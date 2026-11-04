@@ -1,0 +1,170 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 35 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 95 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 7 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[ERROR] Tests run: 10, Failures: 7, Errors: 2, Skipped: 0, Time elapsed: 0.119 s <<< FAILURE! -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket -- Time elapsed: 0.058 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.util.concurrent.CompletableFuture.completeExceptionally(java.lang.Throwable)" because "failed.pending" is null
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket(BootstrapServerTest.java:265)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance(BootstrapServerTest.java:242)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:31)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:231)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported(BootstrapServerTest.java:256)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot(BootstrapServerTest.java:278)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.assertError(BootstrapServerTest.java:141)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects(BootstrapServerTest.java:231)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns -- Time elapsed: 0.004 s <<< ERROR!
+java.util.NoSuchElementException
+	at java.base/java.util.ArrayList.getFirst(ArrayList.java:439)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns(BootstrapServerTest.java:215)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState(BootstrapServerTest.java:151)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <16> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen(BootstrapServerTest.java:171)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.assertError(BootstrapServerTest.java:141)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries(BootstrapServerTest.java:192)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   BootstrapServerTest.coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects:231->assertError:141 expected: <1> but was: <0>
+[ERROR]   BootstrapServerTest.coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState:151 expected: <1> but was: <0>
+[ERROR]   BootstrapServerTest.coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen:171 expected: <16> but was: <0>
+[ERROR]   BootstrapServerTest.coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries:192->assertError:141 expected: <1> but was: <0>
+[ERROR]   BootstrapServerTest.coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported:256 expected: <false> but was: <true>
+[ERROR]   BootstrapServerTest.coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot:278 expected: not <null>
+[ERROR]   BootstrapServerTest.coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance:242 expected: not <null>
+[ERROR] Errors: 
+[ERROR]   BootstrapServerTest.coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns:215 » NoSuchElement
+[ERROR]   BootstrapServerTest.coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket:265 NullPointer Cannot invoke "java.util.concurrent.CompletableFuture.completeExceptionally(java.lang.Throwable)" because "failed.pending" is null
+[INFO] 
+[ERROR] Tests run: 10, Failures: 7, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.516 s
+[INFO] Finished at: 2026-11-04T11:50:11Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

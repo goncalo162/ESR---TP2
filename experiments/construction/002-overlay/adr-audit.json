@@ -1,0 +1,76 @@
+{
+  "review_prepared_at": "2026-11-04T11:29:33Z",
+  "design_approval_registered_at": "2026-11-04T11:25:40Z",
+  "review_type": "static design/ADR/code inspection; not Java execution",
+  "accepted_adrs_reused": [
+    "ADR-013",
+    "ADR-014",
+    "ADR-015",
+    "ADR-017",
+    "ADR-020",
+    "ADR-010",
+    "ADR-012",
+    "ADR-016",
+    "ADR-018",
+    "ADR-021",
+    "ADR-024",
+    "ADR-026"
+  ],
+  "historical_adr": {
+    "ADR-003": "superseded by ADR-013"
+  },
+  "new_adrs": [],
+  "accepted_decision_infeasible_identified": false,
+  "material_divergence_identified": false,
+  "internal_transport_changes_justified": [
+    "PendingWrite on common bounded queue",
+    "inFlight and bounded admitted confirmations",
+    "complete futures outside incompatible locks in writer",
+    "close snapshots outside lifecycle",
+    "requestClose additive, close semantics preserved",
+    "package-only nested write hooks for tests"
+  ],
+  "release_reservation": "only after both I/O workers finish, writer publications before workerFinished",
+  "limits": {
+    "queue_per_connection_max": 256,
+    "in_flight_max": 1,
+    "admitted_confirmations_max": 257,
+    "tcp_reservations_max": 64,
+    "serial_events_max": 4096,
+    "timers_max": "one per admitted context, <=64"
+  },
+  "oracles": [
+    "M01",
+    "M02",
+    "M03",
+    "M04",
+    "M05",
+    "M06",
+    "M07",
+    "M08",
+    "M09",
+    "M10",
+    "M11",
+    "M12",
+    "M13",
+    "M14",
+    "M15",
+    "M16",
+    "M17",
+    "M18"
+  ],
+  "clock_and_write_injections_preserved": true,
+  "java_changed": false,
+  "java_tests_executed": false,
+  "human_adr_review_approval": "pending",
+  "implement_test_authorized": false,
+  "assigned_final_reviewer": "Waheed",
+  "assigned_final_reviewer_acceptance": "pending",
+  "integration": "pending",
+  "protected_source_hashes": {
+    "docs/15-PROJECT-PROGRESS.md": "64b8b8ce9ded66b548ce1a1f65f47b244ad224059ef25ad7d3815b1988361397",
+    "docs/18-CONSTRUCTION-BOLTS.md": "02a7d724a0dd5d5d07da80e00f35a52d503379cf6150518826a571e6bc6514fc",
+    "docs/tasks/PHASE-02/TASK-006.md": "2dee229556915894c1eff5055229bb4e05496985d29cbbecb65043d2ec2f1c61",
+    "docs/phases/PHASE-02-OVERLAY.md": "034b7b06ff768940f6dd17a13808f827df4efe9492760f2db3ebb2f182bb4e78"
+  }
+}

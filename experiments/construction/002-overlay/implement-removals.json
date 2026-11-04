@@ -1,0 +1,189 @@
+{
+  "base": "4ac5808dacf6e97bfd3636d2788db363e926bc95",
+  "files": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java": [
+      {
+        "original_line": 1,
+        "text": "/*",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 2,
+        "text": " * O bootstrap serve apenas para o arranque dos nós: fornece a cada nó a lista",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 3,
+        "text": " * dos seus vizinhos adjacentes na rede overlay.",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 4,
+        "text": " * Após obter essa lista, o nó comunica diretamente com os seus vizinhos.",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 5,
+        "text": " * A lista provém apenas da configuração, incluindo vizinhos offline; pedidos",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 6,
+        "text": " * repetidos não criam registos, leases, renovações ou estado de disponibilidade.",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 7,
+        "text": " * O bootstrap não recebe avisos de saída nem monitoriza os nós. Identidades",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 8,
+        "text": " * de execução e duplicados são verificados diretamente no handshake dos vizinhos.",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 9,
+        "text": " * O bootstrap não intermedeia a comunicação entre nós nem reencaminha",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 10,
+        "text": " * mensagens de controlo ou fluxos multimédia.",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      },
+      {
+        "original_line": 11,
+        "text": " */",
+        "justification": "replace documentation-only placeholder with package/class/Javadoc implementing the same bootstrap restrictions"
+      }
+    ],
+    "Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java": [
+      {
+        "original_line": 24,
+        "text": "    private final ArrayBlockingQueue<byte[]> output;",
+        "justification": "associate frame and optional confirmation in same bounded queue"
+      },
+      {
+        "original_line": 56,
+        "text": "            if (output.offer(frame)) return SendResult.ACCEPTED;",
+        "justification": "retain admission/overflow result; close I/O outside monitor"
+      },
+      {
+        "original_line": 57,
+        "text": "            close(CloseReason.OUTPUT_OVERFLOW);",
+        "justification": "retain admission/overflow result; close I/O outside monitor"
+      },
+      {
+        "original_line": 58,
+        "text": "            return SendResult.OVERFLOW;",
+        "justification": "retain admission/overflow result; close I/O outside monitor"
+      },
+      {
+        "original_line": 85,
+        "text": "            var destination = socket.getOutputStream();",
+        "justification": "inject real/default or controlled writer"
+      },
+      {
+        "original_line": 87,
+        "text": "                byte[] frame = output.take();",
+        "justification": "track dequeued/in-flight frame and write same encoded bytes"
+      },
+      {
+        "original_line": 88,
+        "text": "                destination.write(frame);",
+        "justification": "track dequeued/in-flight frame and write same encoded bytes"
+      },
+      {
+        "original_line": 93,
+        "text": "        finally { close(CloseReason.IO_ERROR); workerFinished(); }",
+        "justification": "publish pending errors before writer workerFinished/release"
+      },
+      {
+        "original_line": 102,
+        "text": "    synchronized void close(CloseReason cause) {",
+        "justification": "split atomic close decision from socket/interrupt outside monitor"
+      },
+      {
+        "original_line": 103,
+        "text": "        if (reason != null) return;",
+        "justification": "split atomic close decision from socket/interrupt outside monitor"
+      }
+    ],
+    "Projeto/src/main/java/pt/uminho/esr/ott/transport/Transport.java": [
+      {
+        "original_line": 121,
+        "text": "            var connection = new Connection(this, socket, listener, options.queueCapacity());",
+        "justification": "pass optional package writer factory; public constructors unchanged"
+      },
+      {
+        "original_line": 171,
+        "text": "    /** Closes I/O first; external callers await a bounded deadline, callbacks initiate shutdown only. */",
+        "justification": "extract no-await requestClose; retain public close wrapper"
+      },
+      {
+        "original_line": 172,
+        "text": "    @Override public void close() {",
+        "justification": "extract no-await requestClose; retain public close wrapper"
+      },
+      {
+        "original_line": 176,
+        "text": "            try { server.close(); } catch (IOException ignored) { }",
+        "justification": "snapshot under lifecycle, close sockets/connections outside lock"
+      },
+      {
+        "original_line": 177,
+        "text": "            sockets.forEach((socket, connection) -> {",
+        "justification": "snapshot under lifecycle, close sockets/connections outside lock"
+      },
+      {
+        "original_line": 178,
+        "text": "                if (connection == null) closeSocket(socket);",
+        "justification": "snapshot under lifecycle, close sockets/connections outside lock"
+      },
+      {
+        "original_line": 179,
+        "text": "                else connection.close(Connection.CloseReason.SHUTDOWN);",
+        "justification": "snapshot under lifecycle, close sockets/connections outside lock"
+      },
+      {
+        "original_line": 180,
+        "text": "            });",
+        "justification": "snapshot under lifecycle, close sockets/connections outside lock"
+      },
+      {
+        "original_line": 183,
+        "text": "        boolean calledFromWorker = false;",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      },
+      {
+        "original_line": 184,
+        "text": "        for (Thread worker : snapshot) {",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      },
+      {
+        "original_line": 185,
+        "text": "            if (worker == Thread.currentThread()) calledFromWorker = true;",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      },
+      {
+        "original_line": 186,
+        "text": "            else worker.interrupt();",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      },
+      {
+        "original_line": 187,
+        "text": "        }",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      },
+      {
+        "original_line": 188,
+        "text": "        // Two callbacks may stop the transport simultaneously: neither may join the other.",
+        "justification": "interrupt phase in requestClose; close checks workers.contains for readers/writers without joins"
+      }
+    ],
+    "Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java": [],
+    "Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java": []
+  },
+  "original_transport_tests_removed": 0
+}

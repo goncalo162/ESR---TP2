@@ -5,7 +5,7 @@
 - ID: TASK-006
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](../PHASE-02/TASK-005.md), [TASK-032](TASK-032.md).
@@ -23,7 +23,7 @@ Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO,
 
 Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
 
-Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 permanece TODO; preservar ADR-013, sem membership/lease no bootstrap.
+Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 com cinco etapas concluídas e Test aprovado, fecho preparado, após dependências integradas; preservar ADR-013, sem membership/lease no bootstrap.
 
 ## 5. Especificação técnica
 
@@ -45,11 +45,11 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Consultar a lista de vizinhos do requerente na configuração imutável.
-- [ ] Validar identidade/endpoint/papel sem persistir o pedido.
-- [ ] Enviar REGISTER_OK sem lease, com instâncias desconhecidas, e fechar a conexão de consulta.
-- [ ] Rejeitar operações alheias à consulta sem alterar estado da topologia.
-- [ ] Testar repetição/concorrência, duas instâncias do mesmo ID e vizinhos offline com resposta igual.
+- [x] Consultar a lista de vizinhos do requerente na configuração imutável.
+- [x] Validar identidade/endpoint/papel sem persistir o pedido.
+- [x] Enviar REGISTER_OK sem lease, com instâncias desconhecidas, e fechar a conexão de consulta.
+- [x] Rejeitar operações alheias à consulta sem alterar estado da topologia.
+- [x] Testar repetição/concorrência, duas instâncias do mesmo ID e vizinhos offline com resposta igual.
 
 ## 8. Regras e restrições
 
@@ -67,12 +67,12 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Resposta corresponde ao grafo e respeita X por nó.
-- [ ] Resposta independe da disponibilidade e de consultas anteriores; não existem registo vivo, lease, renovação ou monitorização.
-- [ ] IDs e endpoints inválidos são rejeitados sem alterar a configuração ou bloquear outras consultas.
-- [ ] Conexão inicial é fechada após resposta; não há mensagens de saída/renovação para bootstrap.
-- [ ] Confirmação de escrita/flush tem prazo e termina em sucesso ou erro; testes observam resposta completa antes de EOF e não deixam futures pendentes após falha/shutdown.
-- [ ] Validação V-006 executada e evidência ligada no progresso.
+- [x] Resposta corresponde ao grafo e respeita X por nó.
+- [x] Resposta independe da disponibilidade e de consultas anteriores; não existem registo vivo, lease, renovação ou monitorização.
+- [x] IDs e endpoints inválidos são rejeitados sem alterar a configuração ou bloquear outras consultas.
+- [x] Conexão inicial é fechada após resposta; não há mensagens de saída/renovação para bootstrap.
+- [x] Confirmação de escrita/flush tem prazo e termina em sucesso ou erro; testes observam resposta completa antes de EOF e não deixam futures pendentes após falha/shutdown.
+- [x] Validação V-006 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -83,3 +83,69 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+
+## Arranque Construction — Model para revisão
+
+Iniciado em 2026-11-04T10:40:58Z por seleção explícita do utilizador, só a
+primeira etapa de 002-overlay/IMP-003. Base Denji
+4ac5808dacf6e97bfd3636d2788db363e926bc95, igual a main e referências locais de
+origin, árvore inicialmente limpa. Dependências IMP-001/002 complete/integradas.
+[Modelo](../../../memory-bank/bolts/002-overlay/ddd-01-domain-model.md) preparado
+em 2026-11-04T10:46:15Z: identidades/grafo/contextos, escrita antes de EOF,
+prazo total, limites e M01–M18 para V-006. Nenhum critério de implementação
+assinalado, nenhuma alteração Java/teste/build, nenhuma execução V-006 nova.
+Aguardar aprovação de Model antes de Design/ADR/Implement/Test. Revisor
+atribuído Waheed, sem aceitação presumida; revisão final e integração antes
+de DONE. Sem commits/push, fecho ou outro IMP nesta continuação.
+
+### Model aprovado — Design para revisão
+
+Aprovação explícita de Model registada em 2026-11-04T10:50:52Z: coerência de instância
+e resposta única em [Q-C-04](../../construction-duvidas.md#q-c-04--coerência-da-instância-e-resposta-única-na-consulta-inicial).
+Autorizado apenas Design, [preparado](../../../memory-bank/bolts/002-overlay/ddd-02-technical-design.md)
+em 2026-11-04T11:04:53Z: fila comum/inFlight, publicação de futures fora de locks, requestClose
+aditivo para budget de shutdown, normalização lexical de hosts e injeções de
+relógio/escrita para M01–M18 nos cinco ficheiros. Sem alterações/execução Java;
+V-006/regressão/manual e revisão final atribuída a Waheed pendentes. Parar antes
+de ADR/Implement/Test; sem commits/push, integração deste IMP ou DONE.
+
+### Design aprovado — revisão ADR para aprovação
+
+Design aprovado em 2026-11-04T11:25:40Z, incluindo Transport.requestClose() sem espera
+com close público preservado. Autorizada apenas ADR, [revisão preparada](../../../memory-bank/bolts/002-overlay/adr-review.md)
+em 2026-11-04T11:29:33Z: 013/014/015/017/020 e transversais conformes ao desenho; ADR-003
+continua substituída. Alterações internas do transporte justificadas, conclusões
+fora de locks, reservas até ambos os workers terminarem e limites/relógio/escrita
+controláveis M01–M18 preservados. Sem inviabilidade material identificada nesta
+inspeção; sem ADR nova, código/testes executados ou alteração do ADD.
+Aguardar aprovação antes de Implement/Test; Waheed/revisão final e integração
+continuam exigidos antes de DONE. Sem commits/push ou fecho nesta etapa.
+
+### Implement preparado para revisão
+
+ADR aprovada em 2026-11-04T11:37:45Z; autorizado apenas Implement. [Walkthrough](../../../memory-bank/bolts/002-overlay/implementation-walkthrough.md)
+preparado em 2026-11-04T12:08:01Z, com consultas/identidades/deadlines e escrita confirmada.
+Red real das APIs (23 testes/5 erros novos, 18 antigos aprovados) e do Core
+(10 testes/7 falhas/2 erros) guardados antes dos comportamentos correspondentes.
+Último incremento: 856 testes aprovados, zero falhas/erros/skips, incluindo TCP
+real e drivers/relógio controláveis. Cinco ficheiros +1226/−35, remoções
+justificadas, 150 hashes restantes e todos os testes anteriores preservados.
+M01–M18 mapeados; M18 parcial até clean verify/manual de Test. Parar para revisão
+antes de Test/fecho. Revisor final Waheed e integração continuam exigidos;
+sem commits/push, DONE ou outro IMP.
+
+### Test preparado para revisão
+
+Implement aprovado em 2026-11-04T12:18:01Z; autorizada apenas Test. [Relatório](../../../memory-bank/bolts/002-overlay/ddd-03-test-report.md)
+preparado em 2026-11-04T12:29:39Z: clean verify/JDK21/TCP real em 2026-11-04T12:18:10Z, saída 0,
+856 testes sem falhas/erros/skips. Manual agente Codex em 2026-11-04T12:22:53Z,
+34 CHECK_PASS/MANUAL_PASS/saída Java 0; [comandos pessoais](../../../experiments/construction/002-overlay/manual-bootstrap.md)
+disponíveis. V-006/M01–M18 executados tecnicamente, sem alterar os cinco ficheiros
+ou qualquer outro dos 155 ficheiros de Projeto/ fora de target durante Test.
+Test aprovado, com registo em 2026-11-04T14:05:14Z, incluindo repetição pessoal por Luis
+em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR.
+[Log pessoal preservado](../../../experiments/construction/002-overlay/test-manual-luis.log),
+separado de Codex. [Fecho preparado](../../../memory-bank/bolts/002-overlay/closure-walkthrough.md),
+commits/push de Denji autorizados. Revisão final atribuída a Waheed e integração
+em main pendentes; TASK-006 continua IN PROGRESS. Nenhum outro IMP iniciado.

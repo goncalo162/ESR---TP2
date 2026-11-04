@@ -1,0 +1,113 @@
+{
+  "prepared_at": "2026-11-04T12:08:01Z",
+  "cases": [
+    {
+      "id": "M01",
+      "methods": "BS coreInvalidDirectConfigurationsAreRejectedBeforeTransportFactory; additionalDirectTopologyViolationsFailBeforeNetworkOrTimers",
+      "proof": "Papel/grafo/endpoints inválidos sem chamada à factory, timer ou evento",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M02",
+      "methods": "BS coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+      "proof": "Quatro listas/endpoints/papéis e X, grafo intacto",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M03",
+      "methods": "BS queryReturnsConfiguredOfflineNeighborsThenEof",
+      "proof": "TCP real com portas reservadas/fechadas e recusa TCP comprovada; lista sem filtrar disponibilidade",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M04",
+      "methods": "BS coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen; simultaneousRealTcpQueriesFromDifferentInstancesReturnOnlyConfiguredNeighbors",
+      "proof": "16 canais controlados e 16 consultas TCP concorrentes; sem exclusividade por ID",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M05",
+      "methods": "BS coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries",
+      "proof": "Coerência de ID/instância, ID desconhecido e consulta seguinte válida",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M06",
+      "methods": "BS coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns; lexicalNormalizationMatchesExistingLoaderAndRejectsInvalidHosts",
+      "proof": "Host lexical/portas/papel; confronto com loader offline e rejeição de aliases físicos",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M07",
+      "methods": "BS coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects; malformedFramesAndEarlyCloseDoNotKillBootstrapListener",
+      "proof": "15 tipos ativos de fixtures, erro correlacionado, código 3 rejeitado no codec",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M08",
+      "methods": "BS coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState; queryReturnsConfiguredOfflineNeighborsThenEof",
+      "proof": "requestId/emissor/instância zero, sem lease; leitura pelo codec real",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M09",
+      "methods": "BS completeErrorThenEofAndTwoValidRequestsChooseOnlyOneResponse; TT confirmedResponseCanBeReadCompletelyBeforeLocalClose",
+      "proof": "REGISTER_OK/ERROR completos antes de EOF; uma resposta por ligação",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M10",
+      "methods": "BS coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+      "proof": "Avanço do relógio um dia após fecho sem timers ou alterações; sem renovação",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M11",
+      "methods": "TT mixedPlainAndConfirmedFramesUseTheSameWriterOrder; concurrentPlainAndConfirmedSendersPreserveFramesAndPerLaneOrder",
+      "proof": "Fila/escritor comuns, quatro lanes concorrentes, 18 testes antigos preservados",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M12",
+      "methods": "TT confirmationRemainsPendingUntilFlushAndContinuationHoldsNoLocks; controlledWriteAndFlushErrorsTerminateAllAdmittedFutures; writerFactoryFailureIsLocalAndCannotLeaveWorkersOrReservations; invalidConfirmedMessagePreservesHealthyConnectionAndClosedSendFails",
+      "proof": "Driver/barreiras provam flush, falhas e formato inválido sem matar ligação saudável",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M13",
+      "methods": "BS coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance; coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported; silentAndPartialRealTcpPeersExpireAndShutdownReleasesListenerPort",
+      "proof": "Prazo total controlado, fila/bytes adicionais não renovam, wrap e TCP silencioso/parcial",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M14",
+      "methods": "TT overflowFailsQueuedAndInFlightConfirmationsButPreservesOtherPeer; BS coreControlOverridesLimitContextsTimersAndTotalQueryDeadline",
+      "proof": "Fila 1 + frame em escrita; todos os futures terminam, outro peer progride; contextos/timers limitados",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M15",
+      "methods": "TT closeBetweenTakeAndInFlightPublicationDoesNotLoseConfirmation; cancellationBeforeAndDuringWritingRemainsTerminalAfterClose; BS coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance",
+      "proof": "Janela take/close forçada, cancel terminal e eventos antigos de outra instância",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M16",
+      "methods": "TT requestCloseDoesNotAwaitBlockedWriterAndReservationRemainsUntilBothWorkersEnd; blockedFutureContinuationProducesExplicitShutdownTimeoutThenReleasesAllPendingWrites; BS coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket",
+      "proof": "Reservas só após ambos workers, continuation sem locks, timeout explícito de callback que viola contrato, contextos/tickets limpos",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M17",
+      "methods": "BS malformedFramesAndEarlyCloseDoNotKillBootstrapListener; coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot",
+      "proof": "Erros locais com listener operacional; saturação serial distinta, erro/paragem e cleanup explícitos",
+      "status": "incremental passed"
+    },
+    {
+      "id": "M18",
+      "methods": "BS coreControlOverridesLimitContextsTimersAndTotalQueryDeadline; execução incremental das quatro classes",
+      "proof": "Overrides chegam a Options/deadline; 856 testes aprovados; clean verify/validação final e manual pendentes",
+      "status": "partial: clean verify/manual pending"
+    }
+  ]
+}

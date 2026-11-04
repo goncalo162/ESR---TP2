@@ -71,3 +71,52 @@
   [adr-review](../memory-bank/bolts/019-overlay/adr-review.md).
 - A aprovação abrange Design/gramática e autoriza somente a etapa ADR nesta
   continuação; não declara implementação, testes, revisão distinta ou integração.
+
+## Q-C-04 — Coerência da instância e resposta única na consulta inicial
+
+- Estado: resolvida; concretizações de Model aprovadas explicitamente pelo
+  utilizador nesta sessão, com registo em 2026-11-04T10:50:52Z.
+- Âmbito: IMP-003 / bolt 002-overlay / TASK-006, sem alterar o envelope v1.
+- Decisões aprovadas: no REGISTER, senderId corresponde a Endpoint.nodeId e
+  senderInstance corresponde a Endpoint.instanceId, não zero. Ambos descrevem
+  a execução do emissor imediato; esta validação de contexto não cria registo
+  vivo ou exclusividade entre pedidos de instâncias diferentes do mesmo nodeId.
+- Uma decisão de resposta por conexão de consulta. Depois de escolhida a
+  resposta, pedidos adicionais não iniciam outra operação/resposta nem renovam
+  o prazo. Design deve especificar como preservar o envio completo já pendente.
+- Fonte: pressupostos explícitos do [Model](../memory-bank/bolts/002-overlay/ddd-01-domain-model.md)
+  e aprovação do utilizador; aplica ADR-013/014/015. Não acrescenta tipos,
+  campos, ACK, lease, membership, hard caps, dependência ou âmbito.
+- Clarificação pedida para Design: comparar hosts pela normalização lexical
+  documentada (caixa/ponto final/IPv4 decimal), sem DNS nem inferência pelo IP
+  remoto; os detalhes devem respeitar o loader e o contrato existente.
+- Autorizado apenas Design: fila comum send/sendAndFlush, frame em escrita,
+  conclusões fora de locks incompatíveis, prazos/saturação/shutdown e injeções
+  de relógio/escrita com oráculos M01–M18 nos cinco ficheiros do IMP. Parar
+  antes de ADR/Implement/Test. Esta aprovação não aceita código ou fecha TASK;
+  a revisão final atribuída a Waheed e integração continuam exigidas.
+- Sem divergência arquitetural identificada por estas concretizações; nenhuma
+  ADR nova é criada neste registo.
+- Continuação posterior: Design aprovado explicitamente pelo utilizador, com
+  registo em 2026-11-04T11:25:40Z, incluindo Transport.requestClose() como início de
+  shutdown sem espera, preservando o comportamento público anterior de close().
+  Autorizada apenas a etapa ADR, com [revisão para aprovação](../memory-bank/bolts/002-overlay/adr-review.md).
+  Esta aprovação posterior substitui o limite de avanço anterior para Design;
+  Implement/Test, revisão final e integração continuam pendentes.
+- Continuação Implement: revisão ADR aprovada em 2026-11-04T11:37:45Z; autorizado
+  apenas Implement nos cinco ficheiros e documentação, com testes novos/red
+  real primeiro e incrementais controlados/TCP. Prova no [walkthrough](../memory-bank/bolts/002-overlay/implementation-walkthrough.md).
+  Sem decisão nova; parar antes da etapa Test ou fecho, mantendo revisão final
+  atribuída a Waheed e integração pendentes.
+- Continuação Test: Implement aprovado em 2026-11-04T12:18:01Z; autorizado apenas
+  clean verify/JDK21/TCP e manual reproduzível, com comandos para repetição
+  pessoal. [Relatório Test](../memory-bank/bolts/002-overlay/ddd-03-test-report.md)
+  com 856 testes e 34 checks do agente, sem alteração Java. Manter aprovação
+  de Test, repetição pessoal, revisão final e integração pendentes; sem fecho.
+
+- Continuação após Test: aprovação explícita registada em 2026-11-04T14:05:14Z, incluindo
+  856 testes e execução pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z,
+  34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. Log pessoal preservado e
+  separado do agente. Autorizados preparação do fecho, commits e push de Denji;
+  limite anterior sem commits/push substituído. Mantêm-se revisão final atribuída
+  a Waheed e integração antes de DONE; nenhuma decisão arquitetural nova.

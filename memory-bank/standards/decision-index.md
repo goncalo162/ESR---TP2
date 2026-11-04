@@ -50,3 +50,35 @@ Implement e [Test aprovados](../bolts/019-overlay/ddd-03-test-report.md): 824 te
 completos e repetição pessoal por Luis/25 checks confirmados. [Fecho concluído](../bolts/019-overlay/closure-walkthrough.md)
 em 2026-11-04T10:33:12Z, revisão final confirmada por Luis e versão revista integrada
 em main. G-REVIEW-032 cumprido; sem ADR nova.
+
+## Concretizações de Model aprovadas — IMP-003
+
+[Q-C-04](../../docs/construction-duvidas.md#q-c-04--coerência-da-instância-e-resposta-única-na-consulta-inicial),
+aprovação explícita registada em 2026-11-04T10:50:52Z: igualdade de senderInstance e
+Endpoint.instanceId no REGISTER e uma decisão de resposta por conexão. Aplicam
+ADR-013/014/015; ADR-003 permanece substituída. [Design para revisão](../bolts/002-overlay/ddd-02-technical-design.md)
+explicita também a normalização lexical de hosts já documentada em docs/07,
+sem DNS. Design aprovado explicitamente em 2026-11-04T11:25:40Z, incluindo requestClose
+como início de shutdown sem espera e preservação de close público. Autorizada
+apenas ADR: [revisão de conformidade preparada](../bolts/002-overlay/adr-review.md)
+em 2026-11-04T11:29:33Z; sem inviabilidade/divergência material identificada nesta inspeção.
+ADR-013/014/015/017/020 e transversais reutilizadas; sem ADR nova ou alteração
+do ADD. Aguardar revisão antes de Implement/Test.
+
+Revisão ADR aprovada em 2026-11-04T11:37:45Z; autorizado apenas Implement. [Walkthrough](../bolts/002-overlay/implementation-walkthrough.md)
+preparado em 2026-11-04T12:04:53Z: bootstrap e transporte nos cinco ficheiros, 856 testes
+incrementais aprovados, red real guardado e M01–M18 mapeados. Sem ADR nova,
+wire/caps alterados ou novo âmbito. Parar para revisão antes de Test/fecho;
+clean verify/manual e revisão final por Waheed/integração pendentes.
+
+Implement aprovado em 2026-11-04T12:18:01Z; autorizada apenas Test, com [relatório](../bolts/002-overlay/ddd-03-test-report.md)
+preparado em 2026-11-04T12:29:39Z: clean verify/JDK21 com 856 testes e manual Codex/34 checks,
+ambos saída 0. Sem código/ADR/dependência nova; cinco hashes de código iguais à
+versão aprovada e 155 ficheiros congelados. V-006/M01–M18 executados tecnicamente;
+repetição pessoal/aprovação Test, revisão final por Waheed e integração pendentes.
+
+Test do IMP-003 aprovado explicitamente, com registo em 2026-11-04T14:05:14Z, incluindo
+856 testes e execução pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z:
+34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../bolts/002-overlay/closure-walkthrough.md),
+commits e push de Denji autorizados. Nenhuma nova decisão arquitetural ou ADR;
+revisão final atribuída a Waheed e integração pendentes antes de DONE.

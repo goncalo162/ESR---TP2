@@ -1,0 +1,366 @@
+{
+  "captured_at": "2026-11-04T12:26:06Z",
+  "cases": [
+    {
+      "id": "M01",
+      "proof": "Papel/grafo/endpoints inválidos sem chamada à factory, timer ou evento",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "additionalDirectTopologyViolationsFailBeforeNetworkOrTimers",
+          "method": "additionalDirectTopologyViolationsFailBeforeNetworkOrTimers",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreInvalidDirectConfigurationsAreRejectedBeforeTransportFactory",
+          "method": "coreInvalidDirectConfigurationsAreRejectedBeforeTransportFactory",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M02",
+      "proof": "Quatro listas/endpoints/papéis e X, grafo intacto",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "method": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M03",
+      "proof": "TCP real com portas reservadas/fechadas e recusa TCP comprovada; lista sem filtrar disponibilidade",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "queryReturnsConfiguredOfflineNeighborsThenEof",
+          "method": "queryReturnsConfiguredOfflineNeighborsThenEof",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M04",
+      "proof": "16 canais controlados e 16 consultas TCP concorrentes; sem exclusividade por ID",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "simultaneousRealTcpQueriesFromDifferentInstancesReturnOnlyConfiguredNeighbors",
+          "method": "simultaneousRealTcpQueriesFromDifferentInstancesReturnOnlyConfiguredNeighbors",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen",
+          "method": "coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M05",
+      "proof": "Coerência de ID/instância, ID desconhecido e consulta seguinte válida",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries",
+          "method": "coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M06",
+      "proof": "Host lexical/portas/papel; confronto com loader offline e rejeição de aliases físicos",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns",
+          "method": "coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "lexicalNormalizationMatchesExistingLoaderAndRejectsInvalidHosts(Path)",
+          "method": "lexicalNormalizationMatchesExistingLoaderAndRejectsInvalidHosts",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": false
+    },
+    {
+      "id": "M07",
+      "proof": "15 tipos ativos de fixtures, erro correlacionado, código 3 rejeitado no codec",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects",
+          "method": "coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "malformedFramesAndEarlyCloseDoNotKillBootstrapListener",
+          "method": "malformedFramesAndEarlyCloseDoNotKillBootstrapListener",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M08",
+      "proof": "requestId/emissor/instância zero, sem lease; leitura pelo codec real",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "method": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "queryReturnsConfiguredOfflineNeighborsThenEof",
+          "method": "queryReturnsConfiguredOfflineNeighborsThenEof",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M09",
+      "proof": "REGISTER_OK/ERROR completos antes de EOF; uma resposta por ligação",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "completeErrorThenEofAndTwoValidRequestsChooseOnlyOneResponse",
+          "method": "completeErrorThenEofAndTwoValidRequestsChooseOnlyOneResponse",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "confirmedResponseCanBeReadCompletelyBeforeLocalClose",
+          "method": "confirmedResponseCanBeReadCompletelyBeforeLocalClose",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M10",
+      "proof": "Avanço do relógio um dia após fecho sem timers ou alterações; sem renovação",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "method": "coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M11",
+      "proof": "Fila/escritor comuns, quatro lanes concorrentes, 18 testes antigos preservados",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "concurrentPlainAndConfirmedSendersPreserveFramesAndPerLaneOrder",
+          "method": "concurrentPlainAndConfirmedSendersPreserveFramesAndPerLaneOrder",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "mixedPlainAndConfirmedFramesUseTheSameWriterOrder",
+          "method": "mixedPlainAndConfirmedFramesUseTheSameWriterOrder",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": false
+    },
+    {
+      "id": "M12",
+      "proof": "Driver/barreiras provam flush, falhas e formato inválido sem matar ligação saudável",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "writerFactoryFailureIsLocalAndCannotLeaveWorkersOrReservations",
+          "method": "writerFactoryFailureIsLocalAndCannotLeaveWorkersOrReservations",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "controlledWriteAndFlushErrorsTerminateAllAdmittedFutures",
+          "method": "controlledWriteAndFlushErrorsTerminateAllAdmittedFutures",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "invalidConfirmedMessagePreservesHealthyConnectionAndClosedSendFails",
+          "method": "invalidConfirmedMessagePreservesHealthyConnectionAndClosedSendFails",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "confirmationRemainsPendingUntilFlushAndContinuationHoldsNoLocks",
+          "method": "confirmationRemainsPendingUntilFlushAndContinuationHoldsNoLocks",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": false
+    },
+    {
+      "id": "M13",
+      "proof": "Prazo total controlado, fila/bytes adicionais não renovam, wrap e TCP silencioso/parcial",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance",
+          "method": "coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported",
+          "method": "coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "silentAndPartialRealTcpPeersExpireAndShutdownReleasesListenerPort",
+          "method": "silentAndPartialRealTcpPeersExpireAndShutdownReleasesListenerPort",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M14",
+      "proof": "Fila 1 + frame em escrita; todos os futures terminam, outro peer progride; contextos/timers limitados",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreControlOverridesLimitContextsTimersAndTotalQueryDeadline",
+          "method": "coreControlOverridesLimitContextsTimersAndTotalQueryDeadline",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "overflowFailsQueuedAndInFlightConfirmationsButPreservesOtherPeer",
+          "method": "overflowFailsQueuedAndInFlightConfirmationsButPreservesOtherPeer",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": false
+    },
+    {
+      "id": "M15",
+      "proof": "Janela take/close forçada, cancel terminal e eventos antigos de outra instância",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance",
+          "method": "coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "cancellationBeforeAndDuringWritingRemainsTerminalAfterClose",
+          "method": "cancellationBeforeAndDuringWritingRemainsTerminalAfterClose",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "closeBetweenTakeAndInFlightPublicationDoesNotLoseConfirmation",
+          "method": "closeBetweenTakeAndInFlightPublicationDoesNotLoseConfirmation",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": false
+    },
+    {
+      "id": "M16",
+      "proof": "Reservas só após ambos workers, continuation sem locks, timeout explícito de callback que viola contrato, contextos/tickets limpos",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket",
+          "method": "coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "blockedFutureContinuationProducesExplicitShutdownTimeoutThenReleasesAllPendingWrites",
+          "method": "blockedFutureContinuationProducesExplicitShutdownTimeoutThenReleasesAllPendingWrites",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.transport.TransportTest",
+          "name": "requestCloseDoesNotAwaitBlockedWriterAndReservationRemainsUntilBothWorkersEnd",
+          "method": "requestCloseDoesNotAwaitBlockedWriterAndReservationRemainsUntilBothWorkersEnd",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M17",
+      "proof": "Erros locais com listener operacional; saturação serial distinta, erro/paragem e cleanup explícitos",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot",
+          "method": "coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot",
+          "pass": true
+        },
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "malformedFramesAndEarlyCloseDoNotKillBootstrapListener",
+          "method": "malformedFramesAndEarlyCloseDoNotKillBootstrapListener",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    },
+    {
+      "id": "M18",
+      "proof": "Overrides chegam a Options/deadline; 856 testes aprovados; clean verify/validação final e manual pendentes",
+      "methods": [
+        {
+          "class": "pt.uminho.esr.ott.bootstrap.BootstrapServerTest",
+          "name": "coreControlOverridesLimitContextsTimersAndTotalQueryDeadline",
+          "method": "coreControlOverridesLimitContextsTimersAndTotalQueryDeadline",
+          "pass": true
+        }
+      ],
+      "status": "executed technical pass; human Test approval pending",
+      "manual_complement": true
+    }
+  ],
+  "M18": "clean verify and agent manual now executed; user repetition/Test approval/reviewer/integration pending"
+}

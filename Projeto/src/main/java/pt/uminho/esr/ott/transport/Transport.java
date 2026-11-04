@@ -44,6 +44,7 @@ public final class Transport implements AutoCloseable {
     private final InetSocketAddress address;
     private final Options options;
     private final Listener listener;
+    private final Connection.WriteDriverFactory writerFactory;
     // Includes outbound dials in progress; null means not connected yet.
     private final Map<Socket, Connection> sockets = new HashMap<>();
     private final Set<Thread> workers = new HashSet<>();
@@ -54,6 +55,12 @@ public final class Transport implements AutoCloseable {
     }
 
     public Transport(InetSocketAddress bind, Listener listener, Options options) throws IOException {
+        this(bind, listener, options, Connection.SOCKET_WRITER);
+    }
+
+    Transport(InetSocketAddress bind, Listener listener, Options options,
+              Connection.WriteDriverFactory writerFactory) throws IOException {
+        this.writerFactory = Objects.requireNonNull(writerFactory);
         this.options = Objects.requireNonNull(options);
         this.listener = Objects.requireNonNull(listener);
         requireResolved(bind);
@@ -118,7 +125,7 @@ public final class Transport implements AutoCloseable {
         synchronized (lifecycle) {
             if (closed || socket.isClosed()) throw new IOException("Transport or dial closed");
             socket.setTcpNoDelay(true);
-            var connection = new Connection(this, socket, listener, options.queueCapacity());
+            var connection = new Connection(this, socket, listener, options.queueCapacity(), writerFactory);
             sockets.put(socket, connection);
             connection.start();
             return connection;
@@ -168,24 +175,30 @@ public final class Transport implements AutoCloseable {
         try { socket.close(); } catch (IOException ignored) { }
     }
 
-    /** Closes I/O first; external callers await a bounded deadline, callbacks initiate shutdown only. */
-    @Override public void close() {
+    /** Initiates shutdown without awaiting workers or invoking future continuations. */
+    public void requestClose() {
+        Map<Socket, Connection> connections;
         Thread[] snapshot;
         synchronized (lifecycle) {
             closed = true;
-            try { server.close(); } catch (IOException ignored) { }
-            sockets.forEach((socket, connection) -> {
-                if (connection == null) closeSocket(socket);
-                else connection.close(Connection.CloseReason.SHUTDOWN);
-            });
+            connections = new HashMap<>(sockets);
             snapshot = workers.toArray(Thread[]::new);
         }
-        boolean calledFromWorker = false;
-        for (Thread worker : snapshot) {
-            if (worker == Thread.currentThread()) calledFromWorker = true;
-            else worker.interrupt();
-        }
-        // Two callbacks may stop the transport simultaneously: neither may join the other.
+        try { server.close(); } catch (IOException ignored) { }
+        connections.forEach((socket, connection) -> {
+            if (connection == null) closeSocket(socket);
+            else connection.close(Connection.CloseReason.SHUTDOWN);
+        });
+        for (Thread worker : snapshot)
+            if (worker != Thread.currentThread()) worker.interrupt();
+    }
+
+    /** Closes I/O first; external callers await a bounded deadline, callbacks initiate shutdown only. */
+    @Override public void close() {
+        boolean calledFromWorker;
+        synchronized (lifecycle) { calledFromWorker = workers.contains(Thread.currentThread()); }
+        requestClose();
+        // Reader and writer continuations must never join each other.
         if (calledFromWorker) return;
         if (!awaitTermination(options.shutdownTimeout()))
             throw new IllegalStateException("TCP workers did not terminate: check non-blocking callbacks");

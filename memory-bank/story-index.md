@@ -7,8 +7,11 @@ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resulta
 aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
 em 2026-11-03T21:56:48Z, após integração em main. Duas histórias complete:
 019-overlay/IMP-002 fechado em 2026-11-04T10:33:12Z, após as cinco etapas, revisão
-final por Luis e integração em main. G-REVIEW-032 cumprido; as restantes
-31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-003
+com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+registado em 2026-11-04T14:05:14Z; fecho preparado, revisão final/integração pendentes;
+as restantes 30 histórias/bolts não foram iniciadas.
+Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
 
@@ -27,7 +30,13 @@ G-REVIEW-032 cumprido: revisão final por Luis e integração da versão revista
 
 ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
 
-**Tarefa:** IMP-003. **Estado:** planned. **Bolt:** 002-overlay.
+**Tarefa:** IMP-003. **Estado:** in-progress. **Bolt:** 002-overlay.
+Cinco etapas concluídas; Test aprovado, registado em 2026-11-04T14:05:14Z.
+Clean verify: 856 testes/zero falhas; manuais separados Codex/Luis: 34 checks e
+saída 0 cada. Luis executou em 2026-11-04T13:58:36Z–13:58:38Z, mesmo JAR.
+M01–M18/V-006 executados. [Fecho preparado](bolts/002-overlay/closure-walkthrough.md);
+commits e push de Denji autorizados.
+Revisão final atribuída a Waheed e integração continuam pendentes.
 **Ficheiro:** [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
 
 ## 002-overlay/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md ✅ GENERATED

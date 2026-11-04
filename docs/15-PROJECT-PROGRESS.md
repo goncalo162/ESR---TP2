@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 IN PROGRESS (Test concluído/fecho preparado); TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e permanece TODO; nenhum outro IMP iniciado. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e tem as cinco etapas concluídas e Test aprovado; fecho preparado, revisão final atribuída e integração pendentes. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -33,6 +33,29 @@ G-REVIEW-032 cumprido: revisão final por Luis, distinta da autoria do agente Co
 e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
 Fecho pela cascata specsmd após integração. Nenhum outro IMP iniciado.
 Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
+
+Incremento atual: IMP-003/002-overlay/TASK-006, IN PROGRESS, Test concluído/fecho preparado, iniciado
+em 2026-11-04T10:40:58Z. Model aprovado em 2026-11-04T10:50:52Z, incluindo Q-C-04.
+[Design preparado para revisão](../memory-bank/bolts/002-overlay/ddd-02-technical-design.md)
+em 2026-11-04T11:04:53Z, aprovado em 2026-11-04T11:25:40Z, incluindo requestClose/close compatível.
+[Revisão ADR preparada](../memory-bank/bolts/002-overlay/adr-review.md) em 2026-11-04T11:29:33Z:
+conformidade com 013/014/015/017/020, alterações internas justificadas, limites e
+M01–M18 preservados; sem inviabilidade/divergência material identificada nesta inspeção.
+Revisão ADR aprovada em 2026-11-04T11:37:45Z; Implement autorizado e [preparado](../memory-bank/bolts/002-overlay/implementation-walkthrough.md)
+em 2026-11-04T12:08:01Z. Cinco ficheiros +1226/−35; 150 hashes restantes e os 18 testes
+anteriores de transporte preservados. Último incremento: 856 testes (740+66+31+19),
+zero falhas/erros/skips no incremento. Implement aprovado em 2026-11-04T12:18:01Z.
+[Relatório Test para revisão](../memory-bank/bolts/002-overlay/ddd-03-test-report.md): clean verify
+em 2026-11-04T12:18:10Z, 856 testes/zero falhas; manual Codex em 2026-11-04T12:22:53Z,
+34 CHECK_PASS/MANUAL_PASS/saída 0. M01–M18/V-006 com execução técnica local.
+Os 155 hashes estão congelados durante Test; listas target/ geradas separadas.
+Test aprovado, com registo em 2026-11-04T14:05:14Z, incluindo execução pessoal por Luis
+em 2026-11-04T13:58:36Z–13:58:38Z: 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR.
+[Log pessoal preservado](../experiments/construction/002-overlay/test-manual-luis.log),
+separado do agente. [Fecho preparado](../memory-bank/bolts/002-overlay/closure-walkthrough.md);
+commits e push de Denji autorizados, sem fecho antecipado.
+Responsável de origem Fillmore,
+revisor atribuído Waheed; revisão final e integração não presumidas.
 
 [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
@@ -64,7 +87,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
 | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
-| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | IN PROGRESS | Test aprovado: 856 testes, manuais Codex e Luis/34 checks/saída 0 cada; fecho preparado, revisão final Waheed/integração pendentes |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |

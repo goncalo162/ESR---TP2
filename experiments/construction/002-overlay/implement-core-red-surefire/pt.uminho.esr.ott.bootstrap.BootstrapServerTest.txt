@@ -1,0 +1,112 @@
+-------------------------------------------------------------------------------
+Test set: pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 7, Errors: 2, Skipped: 0, Time elapsed: 0.119 s <<< FAILURE! -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket -- Time elapsed: 0.058 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.util.concurrent.CompletableFuture.completeExceptionally(java.lang.Throwable)" because "failed.pending" is null
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreWriteFailureCancellationAndShutdownRemoveEveryContextAndTicket(BootstrapServerTest.java:265)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreTotalDeadlineClosesPendingWriteAndLateEventsCannotAffectAnotherInstance(BootstrapServerTest.java:242)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:31)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:231)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreQueueDelayAndNoRequestDoNotExtendDeadlineAndWrapIsSupported(BootstrapServerTest.java:256)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+	at org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:30)
+	at org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:304)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreSaturationFailsExplicitlyAndCleanupDoesNotNeedAnotherQueueSlot(BootstrapServerTest.java:278)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.assertError(BootstrapServerTest.java:141)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects(BootstrapServerTest.java:231)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns -- Time elapsed: 0.004 s <<< ERROR!
+java.util.NoSuchElementException
+	at java.base/java.util.ArrayList.getFirst(ArrayList.java:439)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreEndpointHostPortsAndRoleAreValidatedLexicallyWithoutDns(BootstrapServerTest.java:215)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreConfiguredNeighborsAndCorrelationAreIndependentOfHistoryAndOfflineState(BootstrapServerTest.java:151)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <16> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreDifferentInstancesOfSameIdCoexistAndOnlyOneResponseIsChosen(BootstrapServerTest.java:171)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.assertError(BootstrapServerTest.java:141)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.coreIdentityInstanceAndUnknownIdAreRejectedWithoutPoisoningLaterQueries(BootstrapServerTest.java:192)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

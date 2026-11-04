@@ -2,7 +2,7 @@
 unit: "002-overlay"
 intent: "001-ott-streaming"
 created: "2026-11-03T22:09:01Z"
-updated: "2026-11-04T10:34:52Z"
+updated: "2026-11-04T12:29:39Z"
 ---
 # Registo Construction — 002-overlay
 
@@ -116,3 +116,129 @@ Luis: [log pessoal preservado](../../../../../experiments/construction/019-overl
   fast-forward no commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2. Cascata specsmd executada
   com código 0: bolt/história complete, implemented=true; unidade in-progress
   com quatro bolts planned. G-REVIEW-032 cumprido. target/ excluído, nenhum outro IMP iniciado.
+
+- **2026-11-04T10:40:58Z**: iniciado 002-overlay/IMP-003/TASK-006, apenas Model, por seleção
+  explícita do utilizador. Leitura/estado comunicados antes de escrever; base
+  Denji 4ac5808dacf6e97bfd3636d2788db363e926bc95, árvore inicialmente limpa, dependências
+  001-base-validada e 019-overlay complete/integradas. Parar no checkpoint Model
+  antes de Design/ADR/Implement/Test. Revisor de origem Waheed, sem aceitação presumida.
+  Sem alteração Java, build, commit/push ou demonstração de rede nesta etapa.
+
+- **2026-11-04T10:46:15Z**: Model do IMP-003 preparado para revisão: grafo imutável e identidade
+  nodeId, contextos temporários por connectionId, estados da consulta, deadline
+  total/escrita confirmada e M01–M18 para V-006. Cinco ficheiros Java futuros,
+  nenhum alterado; preservados os 155 hashes fora de target. Detalhes de Design
+  pendentes; stages_completed vazio até aprovação. Correção derivada da tabela
+  PHASE-02: TASK-032 já DONE/integrada; TASK-006 agora IN PROGRESS/Model.
+  Sem nova decisão/ADR ou impedimento material identificado nesta análise;
+  V-006/build/regressão/manual e revisão final por Waheed continuam pendentes.
+  Parar em Model, sem commit/push ou outro IMP.
+
+Model IMP-003: [modelo para revisão](../../../../bolts/002-overlay/ddd-01-domain-model.md).
+
+- **2026-11-04T10:50:52Z**: Model do IMP-003 aprovado pelo utilizador, incluindo coerência
+  senderInstance/Endpoint.instanceId e uma decisão de resposta por conexão.
+  Registar Q-C-04; Model concluído e iniciado apenas Design. Autorizados fila
+  comum, futures/locks, prazos/saturação/shutdown, normalização lexical de hosts
+  e injeções de relógio/escrita para M01–M18 dentro dos cinco ficheiros.
+  Parar antes de ADR/Implement/Test; sem alterar código ou executar Java.
+
+- **2026-11-04T11:04:53Z**: Design do IMP-003 preparado para revisão: fila única com PendingWrite,
+  inFlight e registo limitado de confirmações; publicação no escritor fora de
+  locks, snapshot/fecho fora de lifecycle, requestClose aditivo e único budget
+  de shutdown. Hosts com normalização lexical existente, sem DNS/identidade IP.
+  Injeções Core/Channel/clock/deadlines/eventos e WriteDriver aninhadas nos cinco
+  ficheiros autorizados; M01–M18 com oráculos controlados e TCP real planeados.
+  Preservados 155 hashes de Projeto/ e evidências Model. Nenhuma alteração/teste
+  Java ou revisão ADR executados; parar antes de ADR/Implement/Test, commits/push
+  ou fecho. Waheed continua revisor final atribuído, sem aceitação presumida.
+
+Design IMP-003: [desenho para revisão](../../../../bolts/002-overlay/ddd-02-technical-design.md).
+
+- **2026-11-04T11:25:40Z**: Design do IMP-003 aprovado explicitamente pelo utilizador, incluindo
+  Transport.requestClose como início de shutdown sem espera e preservação de
+  close público. Design concluído, iniciado apenas ADR: conferir sobretudo
+  013/014/015/017/020 e necessidade das mudanças internas do transporte.
+  Manter conclusões fora de locks, reservas até ambos os workers terminarem,
+  limites de filas/timers e M01–M18 com tempo/escrita controláveis. Parar antes
+  de Implement/Test; inviabilidade aceite segue ADD 11, sem contornar o gate.
+
+- **2026-11-04T11:29:33Z**: revisão ADR do IMP-003 preparada: conformidade do Design aprovado
+  com ADR-013/014/015/017/020 e transversais; ADR-003 continua substituída.
+  PendingWrite/inFlight/admitidos e fecho fora de locks justificados pela ADR-015;
+  requestClose aprovado mantém close e reservas até ambos os workers terminarem.
+  Limites de filas/timers, deadline único e M01–M18 controlados preservados.
+  Nenhuma inviabilidade aceite/divergência material identificada nesta inspeção;
+  sem ADR nova, mudança do ADD/código ou execução Java. Parar para revisão antes
+  de Implement/Test, commit/push, integração ou fecho. Waheed permanece revisor
+  final atribuído, sem aceitação/contacto presumidos.
+
+ADR IMP-003: [revisão para aprovação](../../../../bolts/002-overlay/adr-review.md).
+
+- **2026-11-04T11:37:45Z**: revisão ADR aprovada explicitamente. Iniciado apenas Implement
+  nos cinco ficheiros e documentação: testes novos/falhas reais primeiro,
+  incrementais M01–M18, preservando testes/APIs/bytes/caps. Guardar logs;
+  parar antes de Test ou fecho, sem commits/push ou outro IMP.
+
+- **2026-11-04T11:39:11Z**: implement-api-red: 23 testes, 0 falhas, 5 erros, 0 skips; saída Maven 1. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T11:42:46Z**: implement-transport-green: 29 testes, 0 falhas, 0 erros, 0 skips; saída Maven 0. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T11:50:11Z**: implement-core-red: 10 testes, 7 falhas, 2 erros, 0 skips; saída Maven 1. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T11:51:39Z**: implement-bootstrap-green: 41 testes, 0 falhas, 0 erros, 0 skips; saída Maven 0. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T11:55:13Z**: implement-oracles: 48 testes, 0 falhas, 0 erros, 0 skips; saída Maven 0. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T11:58:10Z**: implement-incremental-final: 856 testes, 0 falhas, 0 erros, 0 skips; saída Maven 0. Logs/XML e hashes preservados em experiments/construction/002-overlay/.
+
+- **2026-11-04T12:04:53Z**: Implement preparado para revisão com bootstrap por grafo e
+  sendAndFlush/requestClose. M01–M18 mapeados; M18 parcial, clean verify/manual
+  de Test pendentes. Cinco ficheiros +1210/−35; 150 hashes restantes, testes
+  existentes e provas anteriores intactos. Remoções originais justificadas.
+  Parar antes de Test/fecho; Waheed/revisão final/integração pendentes. Sem
+  commits/push ou outro IMP.
+
+Implement IMP-003: [walkthrough para revisão](../../../../bolts/002-overlay/implementation-walkthrough.md).
+
+- **2026-11-04T12:06:56Z**: caso offline reforçado com portas TCP reservadas/fechadas
+  e recusa de ligação comprovada pelo teste antes da consulta. Nova execução
+  das quatro classes: 856 testes aprovados, zero falhas/erros/skips. Código de
+  produção igual ao incremento anterior; apenas este teste foi reforçado.
+- **2026-11-04T12:08:01Z**: walkthrough final preparado: cinco ficheiros +1226/−35, mapa
+  M01–M18 e remoções justificadas. M18/Test/clean verify/manual e revisão final
+  por Waheed/integração pendentes; parar antes de Test/fecho.
+
+- **2026-11-04T12:18:01Z**: Implement aprovado explicitamente; iniciada apenas Test. Autorizados
+  clean verify/JDK21/TCP real com log/XML/hashes novos, consolidação V-006/M01–M18
+  e manual reproduzível de consulta/erro/EOF/prazo/shutdown com comandos para
+  repetição pessoal. Parar antes do fecho, sem commits/push ou outro IMP.
+
+- **2026-11-04T12:18:10Z**: clean verify/JDK21/TCP real terminou com saída Maven 0,
+  856 testes/zero falhas/erros/skips (19 bootstrap, 740 configuração, 66 codec,
+  31 transporte). Quatro XML/txt novos arquivados; cinco hashes iguais a Implement.
+- **2026-11-04T12:22:53Z**: manual executado pelo agente Codex sobre o JAR validado:
+  34 CHECK_PASS/MANUAL_PASS, saída Java 0; consulta/erro/frame antes de EOF,
+  prazo/silêncio/parcial e shutdown com consulta pendente/porta reutilizável.
+  JAR SHA-256 2c3c063ac58692d1fd813d7e7564b00af7068906d156cc99126827847d2a9ccc; log do agente separado.
+- **2026-11-04T12:29:39Z**: relatório Test/M01–M18 preparado para revisão e roteiro/comandos
+  para repetição pessoal disponíveis. Execução técnica V-006 concluída localmente;
+  aprovação Test/repetição pessoal, revisão final por Waheed e integração pendentes.
+  Nenhum dos 155 ficheiros de Projeto/ fora de target alterado nesta etapa.
+  Parar antes de fecho/commit/push ou outro IMP.
+
+Test IMP-003: [relatório para revisão](../../../../bolts/002-overlay/ddd-03-test-report.md).
+Manual IMP-003: [roteiro pessoal](../../../../../experiments/construction/002-overlay/manual-bootstrap.md).
+
+- **2026-11-04T13:58:36.658445362Z → 2026-11-04T13:58:38.039499140Z**: execução pessoal
+  por Luis, 34 CHECK_PASS, MANUAL_PASS e JAVA_EXIT=0. JAR SHA-256
+  2c3c063ac58692d1fd813d7e7564b00af7068906d156cc99126827847d2a9ccc.
+- **2026-11-04T14:05:14Z**: aprovação explícita de Test registada; concluída a quinta etapa.
+  /tmp/ott-imp003-manual.sivs66.log preservado byte a byte em
+  experiments/construction/002-overlay/test-manual-luis.log, separado do agente;
+  SHA-256 6d7cc4eb76bc0487128c685f8143be1497255a9b7048aa655424a3a9781bcaa9.
+  Autorizada preparação do fecho e commits/push de Denji; revisão final atribuída
+  a Waheed e integração em main pendentes, sem bolt complete/DONE.
+- **2026-11-04T14:10:25Z**: [fecho preparado](../../../../bolts/002-overlay/closure-walkthrough.md),
+  com cinco etapas concluídas, evidência aprovada e pendências explícitas.
+  Nenhuma alteração Java nem nova execução Java nesta preparação. Nenhum outro IMP iniciado.

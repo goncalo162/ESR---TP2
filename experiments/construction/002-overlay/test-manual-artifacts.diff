@@ -1,0 +1,372 @@
+diff --git a/experiments/construction/002-overlay/ManualBootstrapCheck.java b/experiments/construction/002-overlay/ManualBootstrapCheck.java
+new file mode 100644
+index 0000000..cd80d1e
+--- /dev/null
++++ b/experiments/construction/002-overlay/ManualBootstrapCheck.java
+@@ -0,0 +1,192 @@
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.overlay.NodeRole;
++import pt.uminho.esr.ott.protocol.*;
++import java.io.*;
++import java.net.*;
++import java.nio.file.*;
++import java.security.MessageDigest;
++import java.time.*;
++import java.util.*;
++
++/** Manual source-file launcher against the built JAR, outside production and JUnit. */
++public class ManualBootstrapCheck {
++    private static int checks;
++    private static final UUID ZERO = new UUID(0, 0);
++    private static final int QUERY_MS = 500;
++    private record Exchange(ControlMessage reply, boolean eof) { }
++    private static void check(boolean value, String label) {
++        if (!value) throw new AssertionError(label);
++        checks++; System.out.println("CHECK_PASS " + label);
++    }
++    private static String sha(Path file) throws Exception {
++        return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file)));
++    }
++    private static UUID instance() {
++        UUID value; do { value = UUID.randomUUID(); } while (ZERO.equals(value)); return value;
++    }
++    private static ControlMessage register(NodeConfiguration config, String id, UUID execution, boolean wrongPort) {
++        var node = config.topology().orElseThrow().nodes().get(id);
++        int tcp = wrongPort ? node.controlPort() % 65535 + 1 : node.controlPort();
++        return new ControlMessage(MessageType.REGISTER, UUID.randomUUID(), id, execution,
++                new ControlMessage.EndpointPayload(new ControlMessage.Endpoint(id, execution,
++                        node.host(), tcp, node.dataPort(), node.role())));
++    }
++    private static Socket peer(InetSocketAddress address) throws IOException {
++        var socket = new Socket();
++        try { socket.connect(address, 3000); socket.setSoTimeout(5000); return socket; }
++        catch (IOException e) { socket.close(); throw e; }
++    }
++    private static Exchange exchange(InetSocketAddress address, ControlMessage... requests) throws Exception {
++        try (var socket = peer(address)) {
++            for (var request : requests) MessageCodec.write(request, socket.getOutputStream());
++            socket.getOutputStream().flush();
++            var reply = MessageCodec.read(socket.getInputStream()).orElseThrow(() -> new AssertionError("EOF before complete response"));
++            boolean eof = MessageCodec.read(socket.getInputStream()).isEmpty();
++            return new Exchange(reply, eof);
++        }
++    }
++    private static boolean closed(Socket socket) throws IOException {
++        try { return socket.getInputStream().read() == -1; }
++        catch (SocketException reset) {
++            System.out.println("OBSERVED peer_close=" + reset.getClass().getSimpleName()); return true;
++        }
++    }
++    private static void deadline(InetSocketAddress address, boolean partial) throws Exception {
++        String kind = partial ? "partial" : "silent";
++        try (var socket = peer(address)) {
++            long started = System.nanoTime();
++            if (partial) { socket.getOutputStream().write(new byte[]{0, 0}); socket.getOutputStream().flush(); }
++            socket.setSoTimeout(QUERY_MS / 2);
++            boolean waiting = false;
++            try { socket.getInputStream().read(); }
++            catch (SocketTimeoutException expected) { waiting = true; }
++            check(waiting, kind + "_before_deadline_still_open");
++            socket.setSoTimeout(5000);
++            check(closed(socket), kind + "_closed_at_query_deadline");
++            System.out.println("OBSERVED " + kind + "_elapsed_ms=" + Duration.ofNanos(System.nanoTime() - started).toMillis()
++                    + " configured_query_ms=" + QUERY_MS + " read_guard_ms=5000");
++        }
++    }
++    private static void run(Path temporary) throws Exception {
++        String[] ids = {"S1", "S2", "R1", "C1"};
++        NodeRole[] roles = {NodeRole.SERVER, NodeRole.SERVER, NodeRole.RELAY, NodeRole.CLIENT};
++        String[] neighbors = {"S2,R1", "S1,R1", "S1,S2,C1", "R1"};
++        var reservations = new ArrayList<ServerSocket>(); var ports = new ArrayList<Integer>();
++        try {
++            for (int i = 0; i < 5; i++) {
++                var socket = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
++                reservations.add(socket); ports.add(socket.getLocalPort());
++            }
++        } finally { for (var socket : reservations) socket.close(); }
++        StringBuilder topology = new StringBuilder("node.ids=S1,S2,R1,C1\n");
++        for (int i = 0; i < ids.length; i++) {
++            topology.append("node.%s.host=127.0.0.1\nnode.%s.controlPort=%d\nnode.%s.dataPort=%d\nnode.%s.role=%s\nnode.%s.neighbors=%s\n"
++                    .formatted(ids[i], ids[i], ports.get(i + 1), ids[i], 61001 + i, ids[i], roles[i], ids[i], neighbors[i]));
++        }
++        Path graph = temporary.resolve("topology.properties"), profile = temporary.resolve("bootstrap.properties");
++        Files.writeString(graph, topology);
++        Files.writeString(profile, """
++                node.id=B
++                node.role=BOOTSTRAP
++                bind.host=127.0.0.1
++                advertised.host=127.0.0.1
++                control.port=%d
++                topology.file=topology.properties
++                bootstrap.query.timeout.ms=500
++                control.shutdown.timeout.ms=3000
++                control.max.connections=8
++                control.queue.capacity=4
++                """.formatted(ports.getFirst()));
++        var hashes = Map.of(profile, sha(profile), graph, sha(graph));
++        System.out.println("TEMP_CONFIG_DIR " + temporary);
++        hashes.forEach((file, hash) -> System.out.println("CONFIG_SHA256 " + file.getFileName() + "=" + hash));
++        var config = ConfigurationLoader.load(profile, NodeRole.BOOTSTRAP);
++        check(config.role() == NodeRole.BOOTSTRAP && config.topology().orElseThrow().nodes().size() == 4, "valid_bootstrap_profile_and_four_nodes");
++        check(config.runtime().control().bootstrapQueryTimeout().toMillis() == QUERY_MS
++                && config.runtime().control().maxConnections() == 8 && config.runtime().control().queueCapacity() == 4, "validated_control_overrides");
++        int refused = 0;
++        for (var node : config.topology().orElseThrow().nodes().values()) try (var probe = new Socket()) {
++            try { probe.connect(new InetSocketAddress(node.host(), node.controlPort()), 500); }
++            catch (ConnectException expected) { refused++; }
++        }
++        check(refused == 4, "all_four_neighbor_tcp_ports_refuse_connections");
++        var before = config.topology().orElseThrow();
++        try (var service = new BootstrapServer(config)) {
++            var address = service.localAddress();
++            check(address.getPort() == config.controlPort(), "bootstrap_bound_to_configured_port");
++            var execution = instance(); var request = register(config, "R1", execution, false);
++            var valid = exchange(address, request); var reply = valid.reply();
++            check(reply.type() == MessageType.REGISTER_OK, "valid_reply_register_ok");
++            check(reply.requestId().equals(request.requestId()), "valid_request_id_correlated");
++            check(reply.senderId().equals("B") && !ZERO.equals(reply.senderInstance()), "valid_bootstrap_sender_and_execution");
++            var list = ((ControlMessage.NeighborList) reply.payload()).neighbors();
++            check(list.stream().map(ControlMessage.Endpoint::nodeId).toList().equals(List.of("S1", "S2", "C1")), "exact_configured_neighbor_ids");
++            check(list.stream().allMatch(ep -> {
++                var expected = before.nodes().get(ep.nodeId());
++                return ep.host().equals(expected.host()) && ep.controlPort() == expected.controlPort()
++                        && ep.dataPort() == expected.dataPort() && ep.role() == expected.role();
++            }), "neighbor_endpoints_and_roles_from_configuration");
++            check(list.stream().allMatch(ep -> ZERO.equals(ep.instanceId())), "neighbor_instances_are_zero");
++            check(valid.eof(), "complete_valid_response_before_eof");
++            var nextExecution = instance();
++            var repeated = exchange(address, register(config, "R1", nextExecution, false));
++            check(!nextExecution.equals(execution) && repeated.reply().payload().equals(reply.payload()), "new_instance_same_id_same_neighbor_list");
++            check(repeated.reply().senderInstance().equals(reply.senderInstance()), "bootstrap_instance_stable_across_queries");
++            check(repeated.eof(), "complete_repeated_response_before_eof");
++            var bad = register(config, "R1", instance(), true); var rejected = exchange(address, bad);
++            check(rejected.reply().type() == MessageType.ERROR
++                    && ((ControlMessage.ErrorPayload) rejected.reply().payload()).code() == ErrorCode.UNAUTHORIZED_NEIGHBOR,
++                    "wrong_endpoint_rejected");
++            check(rejected.reply().requestId().equals(bad.requestId())
++                    && ((ControlMessage.ErrorPayload) rejected.reply().payload()).relatedType() == MessageType.REGISTER.code(), "error_request_id_and_related_type");
++            check(rejected.eof(), "complete_error_response_before_eof");
++            var ping = new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "R1", instance(), new ControlMessage.Probe(1));
++            var alien = exchange(address, ping);
++            check(alien.reply().type() == MessageType.ERROR && alien.reply().requestId().equals(ping.requestId())
++                    && ((ControlMessage.ErrorPayload) alien.reply().payload()).code() == ErrorCode.INVALID_MESSAGE, "ping_rejected_as_invalid_operation");
++            check(alien.eof(), "complete_invalid_operation_error_before_eof");
++            var first = register(config, "S1", instance(), false);
++            var doubleRequest = exchange(address, first, register(config, "S2", instance(), false));
++            check(doubleRequest.reply().type() == MessageType.REGISTER_OK && doubleRequest.reply().requestId().equals(first.requestId())
++                    && doubleRequest.eof(), "one_response_for_two_requests_on_one_connection");
++            deadline(address, false); deadline(address, true);
++            var afterTimeout = exchange(address, register(config, "R1", instance(), false));
++            check(afterTimeout.reply().payload().equals(reply.payload()) && afterTimeout.eof(), "valid_query_after_peer_timeouts");
++            check(before.equals(config.topology().orElseThrow()) && hashes.get(profile).equals(sha(profile))
++                    && hashes.get(graph).equals(sha(graph)), "topology_and_configuration_files_unchanged");
++            try (var pending = peer(address)) {
++                pending.setSoTimeout(QUERY_MS / 2); boolean waiting = false;
++                try { pending.getInputStream().read(); } catch (SocketTimeoutException expected) { waiting = true; }
++                check(waiting, "pending_query_open_before_shutdown");
++                long started = System.nanoTime(); service.close();
++                check(true, "shutdown_returns_after_resource_termination");
++                System.out.println("OBSERVED shutdown_elapsed_ms=" + Duration.ofNanos(System.nanoTime() - started).toMillis()
++                        + " configured_shutdown_ms=" + config.runtime().control().shutdownTimeout().toMillis());
++                pending.setSoTimeout(5000); check(closed(pending), "shutdown_closes_pending_query");
++            }
++            service.close(); check(true, "shutdown_is_idempotent");
++            try (var rebound = new ServerSocket()) {
++                rebound.setReuseAddress(true); rebound.bind(address); check(rebound.isBound(), "listener_port_reusable_after_shutdown");
++            }
++        }
++    }
++    public static void main(String[] args) throws Exception {
++        if (args.length != 2) throw new IllegalArgumentException("Usage: ManualBootstrapCheck.java OPERATOR EXPECTED_JAR_SHA256");
++        System.out.println("MANUAL_START " + Instant.now() + " operator=" + args[0] + " Java=" + System.getProperty("java.version"));
++        check(Runtime.version().feature() == 21, "jdk_21");
++        Path jar = Path.of(BootstrapServer.class.getProtectionDomain().getCodeSource().getLocation().toURI());
++        check(Files.isRegularFile(jar) && sha(jar).equals(args[1]), "loaded_jar_matches_expected_sha256");
++        System.out.println("JAR_SHA256 " + sha(jar));
++        Path temporary = Files.createTempDirectory("ott-imp003-manual-");
++        try { run(temporary); }
++        catch (Exception | Error failure) { System.out.println("MANUAL_FAIL " + failure); throw failure; }
++        finally {
++            try (var files = Files.walk(temporary)) {
++                for (var file : files.sorted(Comparator.reverseOrder()).toList()) Files.delete(file);
++            }
++        }
++        check(!Files.exists(temporary), "temporary_configuration_removed");
++        System.out.println("MANUAL_PASS checks=" + checks + " operator=" + args[0] + " finished=" + Instant.now());
++    }
++}
+diff --git a/experiments/construction/002-overlay/manual-bootstrap.md b/experiments/construction/002-overlay/manual-bootstrap.md
+new file mode 100644
+index 0000000..5cb2809
+--- /dev/null
++++ b/experiments/construction/002-overlay/manual-bootstrap.md
+@@ -0,0 +1,76 @@
++# IMP-003 — Roteiro manual de consulta bootstrap
++
++Roteiro executado pelo agente Codex em 2026-11-04T12:22:51Z → 2026-11-04T12:22:53Z,
++saída Java 0, 34 CHECK_PASS e MANUAL_PASS.
++[Log do agente](test-manual.log) e [comando/hashes](test-manual-command.json).
++A tua repetição pessoal continua pendente; não equivale à revisão final atribuída
++a Waheed. Esta documentação não aprova Test nem fecha TASK-006/bolt.
++
++## Versão e âmbito
++
++JAR de `mvn -B -ntp clean verify`/JDK21, saída 0, 856 testes atuais aprovados.
++SHA-256 obrigatório para o roteiro:
++
++`2c3c063ac58692d1fd813d7e7564b00af7068906d156cc99126827847d2a9ccc`
++
++O launcher [ManualBootstrapCheck.java](ManualBootstrapCheck.java) fica fora de
++Projeto/src, Maven/JUnit e JAR. Usa somente a API pública do serviço/loader/codec,
++sem reflection ou seams de teste. Cria perfil/grafo temporários, escolhe cinco
++portas loopback, reserva-as/liberta-as e comprova recusa nas quatro de vizinhos.
++Os endpoints UDP são apenas configuração; não há tráfego de vídeo ou UDP.
++Não usa nem altera os perfis do projeto. No fim remove somente o diretório
++temporário que criou. Portas, UUID e instantes variam entre execuções.
++
++## Repetição pessoal — Bash, a partir da raiz
++
++Usa o JAR validado já disponível. O próprio roteiro verifica o hash antes de
++abrir rede. Os comandos guardam a saída e o exit code Java num log pessoal novo:
++
++```bash
++cd /home/luis/ESR/ESR---TP2
++set -o pipefail
++ott_manual_log=$(mktemp /tmp/ott-imp003-manual.XXXXXX.log)
++/usr/lib/jvm/java-21-openjdk-amd64/bin/java --class-path Projeto/target/ott-streaming-1.0-SNAPSHOT.jar experiments/construction/002-overlay/ManualBootstrapCheck.java Luis 2c3c063ac58692d1fd813d7e7564b00af7068906d156cc99126827847d2a9ccc 2>&1 | tee "$ott_manual_log"
++ott_java_exit=${PIPESTATUS[0]}
++printf 'JAVA_EXIT=%s\n' "$ott_java_exit" | tee -a "$ott_manual_log"
++printf 'LOG=%s\n' "$ott_manual_log"
++```
++
++Resultado esperado: **34 CHECK_PASS**, uma linha **MANUAL_PASS**, nenhuma linha
++MANUAL_FAIL, **JAVA_EXIT=0**. Se houver falha, conservar o log e o erro, sem o
++sobrescrever com uma execução posterior. Para a revisão, indica o caminho LOG
++e o resultado; a execução por Luis será preservada separadamente da do agente.
++O operador pode ter outro nome real, substituindo Luis no argumento.
++
++## O que os 34 checks verificam
++
++- JDK21 e JAR com hash esperado; perfil BOOTSTRAP e quatro nós, overrides válidos.
++- Quatro portas de vizinhos efetivamente recusam TCP; bootstrap liga-se à sua
++  porta configurada. A reserva é preparação do harness, não um nó vizinho ativo.
++- REGISTER válido devolve os adjacentes de R1, endpoints/papéis configurados,
++  instâncias zero, correlação e identidade da execução bootstrap.
++- Frame completo seguido de EOF; nova instância do mesmo nodeId recebe a mesma
++  lista e não muda a instância do bootstrap.
++- Endpoint errado → UNAUTHORIZED_NEIGHBOR; PING → INVALID_MESSAGE; correlação
++  e resposta completa/EOF também no erro. Dois pedidos na mesma conexão têm
++  apenas uma resposta, correlacionada com o primeiro.
++- Pedidos silencioso e parcial: leitura com guarda de 250 ms ainda aguarda;
++  depois fecho por prazo de consulta configurado em 500 ms, com guarda de leitura
++  de 5000 ms. São leituras TCP temporizadas, sem Thread.sleep.
++- Após esses timeouts o listener continua funcional; grafo/perfis ficam intactos.
++- Shutdown com uma consulta à espera, retorno normal após waits internos,
++  encerramento do peer, idempotência e reutilização da porta do listener.
++- Diretório temporário removido no fim. Hashes dos dois ficheiros temporários
++  são conferidos durante a execução e impressos no log; os bytes temporários
++  são eliminados, sendo o gerador/protocolo do roteiro a receita de repetição.
++
++Observações reais do agente: silent_elapsed_ms=504, partial_elapsed_ms=503,
++shutdown_elapsed_ms=4. São observações de uma execução local e do relógio
++monotónico do cliente; não são metas de overlay, garantia de desempenho ou
++latência unidirecional. Uma máquina sobrecarregada pode ultrapassar a guarda;
++a falha deve ser preservada como resultado dessa execução.
++
++TCP real local e API embutível não demonstram CLI/HELLO/processos overlay
++independentes, GUI, CORE, vídeo ou recuperação. As provas de write/flush,
++janela take/fecho, cancelamento e saturação usam os testes controlados da suíte,
++não a suposição de que um frame pequeno bloqueia um socket loopback.
+diff --git a/experiments/construction/002-overlay/run-manual.py b/experiments/construction/002-overlay/run-manual.py
+new file mode 100644
+index 0000000..7d57052
+--- /dev/null
++++ b/experiments/construction/002-overlay/run-manual.py
+@@ -0,0 +1,30 @@
++"""Capture the agent manual separately from the user's future repetition."""
++from pathlib import Path
++from datetime import datetime, timezone
++import subprocess, json, hashlib
++root = Path(__file__).resolve().parents[3]
++out = Path(__file__).resolve().parent
++meta = out / 'test-manual-command.json'
++if meta.exists(): raise SystemExit('Preserve existing evidence; choose a new name for another run')
++java = '/usr/lib/jvm/java-21-openjdk-amd64/bin/java'
++source = out / 'ManualBootstrapCheck.java'
++jar = root / 'Projeto/target/ott-streaming-1.0-SNAPSHOT.jar'
++expected = json.loads((out / 'test-clean-verify-command.json').read_text())['jar_sha256']
++assert hashlib.sha256(jar.read_bytes()).hexdigest() == expected
++cmd = [java, '--class-path', str(jar.relative_to(root)), str(source.relative_to(root)), 'Codex', expected]
++now = lambda: datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
++started = now()
++result = subprocess.run(cmd, cwd=root, text=True, capture_output=True, timeout=60)
++finished = now()
++log = out / 'test-manual.log'; log.write_text(result.stdout + result.stderr)
++data = dict(command=cmd, cwd=str(root), started=started, finished=finished, operator='Codex',
++            exit_code=result.returncode, check_pass=sum(s.startswith('CHECK_PASS ') for s in result.stdout.splitlines()),
++            manual_pass=sum(s.startswith('MANUAL_PASS ') for s in result.stdout.splitlines()),
++            log=str(log.relative_to(root)), log_sha256=hashlib.sha256(log.read_bytes()).hexdigest(),
++            script_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
++            jar_sha256_before=expected, jar_sha256_after=hashlib.sha256(jar.read_bytes()).hexdigest(),
++            scope='Agent manual over real local TCP and public service API; user repetition/reviewer/final approval pending.')
++meta.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
++print(result.stdout + result.stderr)
++print(json.dumps(data, ensure_ascii=False, indent=2))
++raise SystemExit(result.returncode)
+diff --git a/experiments/construction/002-overlay/run-clean-verify.py b/experiments/construction/002-overlay/run-clean-verify.py
+new file mode 100644
+index 0000000..d11f91b
+--- /dev/null
++++ b/experiments/construction/002-overlay/run-clean-verify.py
+@@ -0,0 +1,50 @@
++"""Capture a fresh full Test run; source hashes and every new Surefire report."""
++from pathlib import Path
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++import shutil
++import subprocess
++import time
++import xml.etree.ElementTree as ET
++
++root = Path(__file__).resolve().parents[3]
++out = Path(__file__).resolve().parent
++phase = 'test-clean-verify'
++if (out / (phase + '-command.json')).exists():
++    raise SystemExit('This evidence exists; use a new phase instead of overwriting it')
++source = json.loads((out / 'test-baseline.json').read_text())['source_sha256']
++assert all(hashlib.sha256((root / f).read_bytes()).hexdigest() == h for f, h in source.items())
++command = ['mvn', '-B', '-ntp', 'clean', 'verify']
++environment = dict(os.environ, JAVA_HOME='/usr/lib/jvm/java-21-openjdk-amd64')
++now = lambda: datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
++started, tick = now(), time.monotonic()
++result = subprocess.run(command, cwd=root / 'Projeto', env=environment, text=True, capture_output=True)
++finished, elapsed = now(), round(time.monotonic() - tick, 3)
++log = out / (phase + '.log')
++log.write_text(result.stdout + result.stderr)
++destination = out / (phase + '-surefire')
++reports = root / 'Projeto/target/surefire-reports'
++if reports.exists():
++    shutil.copytree(reports, destination)
++suites = []
++for item in sorted(destination.glob('TEST-*.xml')):
++    suite = ET.parse(item).getroot()
++    suites.append(dict(name=suite.attrib['name'],
++                       **{k: int(suite.attrib[k]) for k in ['tests', 'failures', 'errors', 'skipped']},
++                       java_version=next(x.attrib['value'] for x in suite.findall('./properties/property')
++                                         if x.attrib['name'] == 'java.version'),
++                       xml=str(item.relative_to(root)), sha256=hashlib.sha256(item.read_bytes()).hexdigest()))
++jar = root / 'Projeto/target/ott-streaming-1.0-SNAPSHOT.jar'
++metadata = dict(command=command, cwd=str(root / 'Projeto'), JAVA_HOME=environment['JAVA_HOME'],
++                started=started, finished=finished, elapsed_seconds=elapsed, exit_code=result.returncode,
++                log=str(log.relative_to(root)), suites=suites,
++                totals={k: sum(s[k] for s in suites) for k in ['tests', 'failures', 'errors', 'skipped']},
++                source_sha256_before=source,
++                source_sha256_after={f: hashlib.sha256((root / f).read_bytes()).hexdigest() for f in source},
++                jar_sha256=hashlib.sha256(jar.read_bytes()).hexdigest() if jar.exists() else None,
++                context='Full fresh clean verify with JDK21 and real local TCP; no closure or human approval implied.')
++(out / (phase + '-command.json')).write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
++print(json.dumps(metadata, ensure_ascii=False, indent=2))
++raise SystemExit(result.returncode)
