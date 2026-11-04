@@ -1,26 +1,35 @@
-# IMP-003 — Fecho preparado para revisão final
+# IMP-003 — Fecho concluído
 
 Preparado em 2026-11-04T14:10:25Z. Test aprovado explicitamente pelo utilizador,
 com registo em 2026-11-04T14:05:14Z, incluindo os 856 testes e o manual pessoal
 de Luis. Autorizados commits e push de Denji. Base do incremento:
 `4ac5808dacf6e97bfd3636d2788db363e926bc95`.
 
-## Estado e pendências
+## Estado final
 
-As cinco etapas Model → Design → ADR → Implement → Test estão concluídas.
-Os seis critérios técnicos têm evidência em V-006/M01–M18 e foram assinalados
-no bolt, história e TASK-006. O bolt e a história continuam **in-progress**;
-TASK-006 continua **IN PROGRESS**, completed=null e sem implemented=true.
-A unidade permanece em construção; 003-overlay e os restantes incrementos
-planeados não foram iniciados.
+Fecho concluído em **2026-11-04T14:18:23Z**, após confirmação da revisão pelo utilizador
+com registo em 2026-11-04T14:18:23Z: «fecha o bolt, a revisão esta feita».
+A revisão final estava atribuída a **Waheed**; o registo conserva a confirmação
+do utilizador, sem atribuir uma data de revisão que não foi fornecida.
 
-Para fechar, falta a aceitação da versão final pelo revisor atribuído **Waheed**
-e a integração da versão revista em main, conforme
-[TASK-006](../../../docs/tasks/PHASE-02/TASK-006.md) e
-[Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).
-A aprovação de Test por Luis não regista uma aceitação em nome de Waheed.
-O mecanismo bolt-complete e a cascata de estados ficam por aplicar depois
-dessas condições. Publicar Denji preserva este estado para revisão.
+Antes do fecho, main e Denji, locais e remotos, já apontavam para a versão revista
+`03345e9e1ab56ec04302676cca6fce32d168223d`. A [prova de integração](../../../experiments/construction/002-overlay/integration-proof.json)
+regista essa observação e os 155 hashes iguais à versão testada. Não foi necessário
+um novo merge para integrar a implementação nesta sessão.
+
+O [mecanismo specsmd](../../../experiments/construction/002-overlay/bolt-complete-command.json)
+foi executado com o adaptador validado nos bolts anteriores, saída **0**:
+[log completo](../../../experiments/construction/002-overlay/bolt-complete.log).
+Resultado: bolt **complete**, current_stage=null, completed=2026-11-04T14:18:23Z;
+história **complete**, implemented=true; TASK-006 **DONE**. As cinco etapas
+mantêm os seus instantes de conclusão reais.
+
+A unidade 002-overlay mantém **in-progress**, com 019-overlay/002-overlay complete
+e três bolts planned; o intent permanece em construção. Nenhum outro IMP foi
+iniciado. O campo derivado blocks de 003-overlay passou a false porque todas
+as suas dependências estão complete; mantém status=planned, started=null e
+nenhuma etapa iniciada. Todos os critérios técnicos, Test, revisão confirmada e integração
+exigidos pela [DoD](../../../docs/14-DEFINITION-OF-DONE.md) estão registados para este incremento.
 
 ## Resultados aprovados e proveniência
 
@@ -91,4 +100,15 @@ o registo atual prevalece para a aprovação Test e o estado de preparação.
 
 TCP loopback/API embutível não demonstram CLI/HELLO, JVMs overlay independentes,
 vídeo, GUI, CORE ou recuperação. Flush local não é ACK remoto. Nenhum desses
-resultados, revisão de Waheed, integração em main ou fecho foi presumido.
+resultados de GUI/CORE/vídeo foi presumido. A revisão final e a integração
+estão registadas acima, sem nova execução Java no fecho.
+
+## Validação do fecho
+
+V-ADD, git diff --check, preservação das 139 evidências anteriores e dos 155
+ficheiros de Projeto/ são conferidos no [resultado final](../../../experiments/construction/002-overlay/closure-results.json).
+O [diff do fecho](../../../experiments/construction/002-overlay/closure-documents.diff)
+usa a versão revista 03345e9e1ab56ec04302676cca6fce32d168223d como base. Este fecho altera somente estados,
+documentação e evidência; não modifica código, testes, fixtures ou dependências.
+A publicação do commit de fecho em Denji e main é verificada depois da criação
+do commit, sem force push.

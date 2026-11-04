@@ -96,8 +96,8 @@ parâmetros de método); não se contam loops internos como testes JUnit adicion
 
 M01–M18 têm agora execução técnica: M18 inclui clean verify e manual do agente,
 antes pendentes. V-006 está **executado localmente e aprovado em Test**, incluindo
-a repetição pessoal por Luis. Revisão final por Waheed e integração ainda pendentes
-para DONE. Relógio e
+a repetição pessoal por Luis. A revisão final atribuída a Waheed foi confirmada
+pelo utilizador e a versão revista integrada em main; fecho registado abaixo. Relógio e
 escrita controláveis comprovam deadlines/flush/janela take/fecho/overflow;
 TCP real comprova framing/EOF/isolamento/concorrência/terminação. Nenhum sleep
 ou fila vazia é aceite como prova de escrita.
@@ -130,9 +130,10 @@ Os diffs e a conferência final de hashes ficam nos artefactos test-*.diff/json.
   aos incrementos seguintes, não foi demonstrado por este bolt.
 
 Test aprovado e concluído em stages_completed, com registo em 2026-11-04T14:05:14Z.
-[Fecho preparado](closure-walkthrough.md). Bolt/história/TASK-006/unidade continuam
-em progresso, completed=null, sem implemented=true. Pendentes: revisão final
-atribuída a **Waheed** e integração em main, conforme DoD. O utilizador autorizou
-commits e push de Denji; não foi atribuída a Waheed uma aceitação não comunicada.
-Nenhum outro IMP iniciado. A execução Java é a preservada acima; esta preparação
-altera documentação/evidência, sem nova execução Java.
+[Fecho concluído](closure-walkthrough.md) em 2026-11-04T14:18:23Z: revisão final atribuída
+a Waheed confirmada pelo utilizador, com registo em 2026-11-04T14:18:23Z, e versão
+revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
+Mecanismo specsmd executado com saída 0: bolt/história complete, implemented=true,
+TASK-006 DONE; unidade permanece in-progress, três bolts planned. Nenhum outro
+IMP iniciado. Os resultados Java são os aprovados e preservados acima;
+este fecho altera documentação/evidência, sem nova execução Java.

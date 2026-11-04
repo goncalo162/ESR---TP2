@@ -82,3 +82,10 @@ Test do IMP-003 aprovado explicitamente, com registo em 2026-11-04T14:05:14Z, in
 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../bolts/002-overlay/closure-walkthrough.md),
 commits e push de Denji autorizados. Nenhuma nova decisão arquitetural ou ADR;
 revisão final atribuída a Waheed e integração pendentes antes de DONE.
+
+Fecho do IMP-003 confirmado pelo utilizador — «fecha o bolt, a revisão esta feita» —
+com registo em 2026-11-04T14:18:23Z. Revisão final atribuída a Waheed declarada concluída;
+versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
+Cascata specsmd executada em 2026-11-04T14:18:23Z: bolt/história complete, implemented=true,
+TASK-006 DONE, unidade in-progress. Sem nova decisão arquitetural, código ou ADR.
+[Prova e fecho](../bolts/002-overlay/closure-walkthrough.md).

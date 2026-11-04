@@ -242,3 +242,18 @@ Manual IMP-003: [roteiro pessoal](../../../../../experiments/construction/002-ov
 - **2026-11-04T14:10:25Z**: [fecho preparado](../../../../bolts/002-overlay/closure-walkthrough.md),
   com cinco etapas concluídas, evidência aprovada e pendências explícitas.
   Nenhuma alteração Java nem nova execução Java nesta preparação. Nenhum outro IMP iniciado.
+
+- **2026-11-04T14:18:23Z**: utilizador confirmou «fecha o bolt, a revisão esta feita»;
+  revisão final atribuída a Waheed declarada concluída. Verificado que main e
+  Denji, locais e remotos, já contêm 03345e9e1ab56ec04302676cca6fce32d168223d; 155 hashes de Projeto/ iguais à
+  versão testada e 139 evidências anteriores preservadas.
+- **2026-11-04T14:18:23Z**: 002-overlay completed — cinco etapas concluídas. Mecanismo
+  specsmd executado com adaptador validado, saída 0: bolt/história complete,
+  implemented=true, current_stage=null. TASK-006 DONE; unidade mantém in-progress,
+  três bolts planned. Sem código/build/manual novos ou outro IMP iniciado.
+  [Fecho](../../../../bolts/002-overlay/closure-walkthrough.md) e
+  [log do mecanismo](../../../../../experiments/construction/002-overlay/bolt-complete.log).
+
+- **2026-11-04T14:21:49Z**: V-ADD identificou o campo derivado blocks de 003-overlay ainda true.
+  Sincronizado para false após o fecho de todas as dependências; status=planned,
+  started=null, sem iniciar IMP-004. Repetida a validação documental.

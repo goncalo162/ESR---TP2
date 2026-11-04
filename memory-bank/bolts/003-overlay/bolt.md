@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-04T14:21:49Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["001-base-validada", "002-overlay"]
 enables_bolts: ["020-overlay"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

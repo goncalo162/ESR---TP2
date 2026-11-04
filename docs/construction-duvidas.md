@@ -120,3 +120,10 @@
   separado do agente. Autorizados preparação do fecho, commits e push de Denji;
   limite anterior sem commits/push substituído. Mantêm-se revisão final atribuída
   a Waheed e integração antes de DONE; nenhuma decisão arquitetural nova.
+
+- Fecho posterior do IMP-003: o utilizador confirmou «fecha o bolt, a revisão esta feita»,
+  com registo em 2026-11-04T14:18:23Z, concluindo a revisão final atribuída a Waheed.
+  Versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
+  Mecanismo specsmd executado em 2026-11-04T14:18:23Z: bolt/história complete, TASK-006 DONE;
+  unidade in-progress. Esta confirmação supera as pendências dos checkpoints
+  anteriores. Sem decisão arquitetural nova ou início de outro IMP.

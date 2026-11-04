@@ -17,9 +17,10 @@ Implement aprovado em 2026-11-04T12:18:01Z; apenas Test autorizado, [relatório 
 em 2026-11-04T12:29:39Z: clean verify com 856 testes e manual Codex/34 checks, saídas 0.
 V-006/M01–M18 executados. Test aprovado e concluído, com registo em 2026-11-04T14:05:14Z,
 incluindo repetição pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z, 34 checks/
-MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../memory-bank/bolts/002-overlay/closure-walkthrough.md);
-commits e push de Denji autorizados. Revisão final por Waheed e integração em main
-pendentes; 002-overlay continua in-progress, cinco etapas concluídas.
+MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho concluído](../memory-bank/bolts/002-overlay/closure-walkthrough.md)
+em 2026-11-04T14:18:23Z: revisão final atribuída a Waheed confirmada pelo utilizador,
+registada em 2026-11-04T14:18:23Z; versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
+002-overlay/história complete, implemented=true, TASK-006 DONE. Unidade continua in-progress.
 Os restantes 30 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
 
 ## Ordem de execução

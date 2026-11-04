@@ -3,15 +3,15 @@ id: "002-overlay"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["001-fornecer-localizacao-inicial-dos-vizinhos-configurados"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-04T14:05:14Z"
+updated: "2026-11-04T14:20:34Z"
 started: "2026-11-04T10:40:58Z"
-completed: null
-current_stage: "test"
-stages_completed: [{"name": "model", "completed": "2026-11-04T10:50:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-04T11:25:40Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-04T11:37:45Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-04T12:18:01Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-04T14:05:14Z", "artifact": "ddd-03-test-report.md"}]
-requires_bolts: ["001-base-validada", "019-overlay"]
+completed: "2026-11-04T14:18:23Z"
+current_stage: null
+stages_completed: [{"name":"model","completed":"2026-11-04T10:50:52Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-04T11:25:40Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-04T11:37:45Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-04T12:18:01Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-04T14:05:14Z","artifact":"ddd-03-test-report.md"}]
+requires_bolts: ["001-base-validada","019-overlay"]
 enables_bolts: ["003-overlay"]
 requires_units: ["001-base-validada"]
 blocks: false
@@ -29,13 +29,13 @@ size: "M"
 validation_ids: ["V-006"]
 test_ids: ["V-006"]
 external_gates: []
-adr_ids: ["ADR-003", "ADR-013", "ADR-014", "ADR-015", "ADR-024"]
-requirements: ["INT-001", "INT-002", "REQ-002", "REQ-003", "REQ-004"]
+adr_ids: ["ADR-003","ADR-013","ADR-014","ADR-015","ADR-024"]
+requirements: ["INT-001","INT-002","REQ-002","REQ-003","REQ-004"]
 architecture_source: "add.md"
 ---
 # Bolt 002-overlay — Descoberta inicial e escrita confirmada
 
-## Test aprovado — fecho preparado
+## Fecho concluído — IMP-003
 
 Iniciado em 2026-11-04T10:40:58Z, por seleção explícita do utilizador,
 apenas a primeira etapa. Base Denji 4ac5808dacf6e97bfd3636d2788db363e926bc95,
@@ -78,11 +78,12 @@ disponíveis e repetidos pessoalmente por Luis em 2026-11-04T13:58:36Z–13:58:3
 34 CHECK_PASS, MANUAL_PASS e JAVA_EXIT=0, mesmo hash do JAR validado.
 [Log pessoal preservado](../../../experiments/construction/002-overlay/test-manual-luis.log),
 separado do agente. Test aprovado explicitamente, com registo em 2026-11-04T14:05:14Z;
-concluídas as cinco etapas em stages_completed, current_stage=test, completed=null.
-[Fecho preparado](closure-walkthrough.md): critérios técnicos verificados;
-revisão final atribuída a Waheed e integração em main pendentes antes de DONE.
-Autorizados commits e push de Denji; esta publicação não conclui o bolt.
-Nenhum outro IMP iniciado.
+concluídas as cinco etapas em stages_completed. Revisão final atribuída a Waheed
+confirmada pelo utilizador — «fecha o bolt, a revisão esta feita» — com registo
+em 2026-11-04T14:18:23Z. Versão revista já integrada em main: 03345e9e1ab56ec04302676cca6fce32d168223d.
+[Fecho concluído](closure-walkthrough.md) em 2026-11-04T14:18:23Z pelo mecanismo specsmd:
+bolt/história complete, implemented=true na história, current_stage=null.
+TASK-006 DONE; unidade permanece in-progress, três bolts planned. Nenhum outro IMP iniciado.
 
 ## Fonte normativa e âmbito
 
@@ -90,7 +91,7 @@ Ler [IMP-003](../../../add.md#imp-003) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](../../intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
+- [x] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](../../intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
 - Dependências: [001-base-validada](../001-base-validada/bolt.md), [019-overlay](../019-overlay/bolt.md).
 - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
 - Gates: nenhum adicional.
@@ -118,6 +119,6 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 - Testes: V-006, detalhados no ADD; guardar comandos, ambiente, resultados e limites.
 - Outputs e ficheiros: consultar [IMP-003](../../../add.md#imp-003).
-- Prova futura: `experiments/construction/002-overlay/` e relatório local do bolt.
+- Evidência executada: `experiments/construction/002-overlay/`, relatório Test e walkthrough de fecho.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.

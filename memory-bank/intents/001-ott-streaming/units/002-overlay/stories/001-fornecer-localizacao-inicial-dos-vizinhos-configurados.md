@@ -2,16 +2,17 @@
 id: "001-fornecer-localizacao-inicial-dos-vizinhos-configurados"
 unit: "002-overlay"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 updated: "2026-11-04T12:29:39Z"
 source_tasks: ["TASK-006"]
 implementation_tasks: ["IMP-003"]
-requirements: ["INT-001", "INT-002", "REQ-002", "REQ-003", "REQ-004"]
-adr_ids: ["ADR-003", "ADR-013", "ADR-014", "ADR-015", "ADR-024"]
+requirements: ["INT-001","INT-002","REQ-002","REQ-003","REQ-004"]
+adr_ids: ["ADR-003","ADR-013","ADR-014","ADR-015","ADR-024"]
 bolt: "002-overlay"
 size: "M"
+implemented: true
 ---
 # História — Descoberta inicial e escrita confirmada
 

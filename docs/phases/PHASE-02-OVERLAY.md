@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
 
 ## 2. Contexto
 
-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 IN PROGRESS, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada; fecho preparado, revisão final por Waheed e integração pendentes; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
+Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
 
 ## 3. Pré-requisitos
 

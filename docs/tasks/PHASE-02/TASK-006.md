@@ -5,7 +5,7 @@
 - ID: TASK-006
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](../PHASE-02/TASK-005.md), [TASK-032](TASK-032.md).
@@ -23,7 +23,7 @@ Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO,
 
 Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
 
-Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 com cinco etapas concluídas e Test aprovado, fecho preparado, após dependências integradas; preservar ADR-013, sem membership/lease no bootstrap.
+Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; preservar ADR-013, sem membership/lease no bootstrap.
 
 ## 5. Especificação técnica
 
@@ -149,3 +149,15 @@ em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesm
 separado de Codex. [Fecho preparado](../../../memory-bank/bolts/002-overlay/closure-walkthrough.md),
 commits/push de Denji autorizados. Revisão final atribuída a Waheed e integração
 em main pendentes; TASK-006 continua IN PROGRESS. Nenhum outro IMP iniciado.
+
+### Fecho concluído
+
+Em 2026-11-04T14:18:23Z, o utilizador confirmou «fecha o bolt, a revisão esta feita»,
+relativamente à revisão final atribuída a Waheed. A versão revista
+03345e9e1ab56ec04302676cca6fce32d168223d já estava em main e Denji, locais e remotos, antes do fecho.
+[Prova](../../../experiments/construction/002-overlay/integration-proof.json).
+Mecanismo specsmd executado em 2026-11-04T14:18:23Z, saída 0:
+[log](../../../experiments/construction/002-overlay/bolt-complete.log).
+Bolt/história complete, implemented=true; TASK-006 DONE. Unidade in-progress,
+três bolts planned. Nenhum código alterado ou nova execução Java no fecho;
+856 testes e manuais Codex/Luis preservados. Nenhum outro IMP iniciado.

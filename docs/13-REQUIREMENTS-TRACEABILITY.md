@@ -83,10 +83,12 @@ Implement aprovado em 2026-11-04T12:18:01Z; [Test para revisão](../memory-bank/
 com clean verify/JDK21/856 testes e manual Codex/34 checks, saídas 0. V-006/M01–M18
 com execução técnica e Test aprovado, registado em 2026-11-04T14:05:14Z. Luis repetiu
 pessoalmente em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0,
-mesmo JAR e log separado de Codex. Fecho preparado, commits/push de Denji
-autorizados; revisão final por Waheed e integração pendentes. Código congelado durante Test.
-TASK/bolt/história/unidade continuam em progresso; não promove requisito global
-nem demonstra HELLO/CLI, streaming ou CORE.
+mesmo JAR e log separado de Codex. [Fecho concluído](../memory-bank/bolts/002-overlay/closure-walkthrough.md)
+em 2026-11-04T14:18:23Z, após revisão final atribuída a Waheed confirmada pelo utilizador,
+registada em 2026-11-04T14:18:23Z, e versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
+TASK-006 DONE, bolt/história complete, implemented=true. Unidade mantém in-progress;
+não promove requisito global nem demonstra HELLO/CLI, streaming ou CORE.
+Código congelado desde Test; nenhuma execução Java nova no fecho.
 
 Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
 [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.

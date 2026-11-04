@@ -1,0 +1,639 @@
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+index f9b5ea3..1a1a1a4 100644
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -2,7 +2,7 @@
+ 
+ > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+ 
+-A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; bootstrap de consulta e confirmação de escrita foram implementados localmente no IMP-003, com Test aprovado e fecho preparado, revisão final/integração pendentes. HELLO/CLI e restantes serviços de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
++A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; bootstrap de consulta e confirmação de escrita foram implementados localmente no IMP-003, com Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; TASK-006 DONE. HELLO/CLI e restantes serviços de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+ 
+ Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
+ 
+@@ -114,7 +114,7 @@ O chamador gere flush/close e o único escritor por conexão. O codec não abre
+ 
+ `close()` fecha listener/sockets, limpa filas e interrompe workers. Chamador externo aguarda um deadline global default de 3 s; timeout lança erro explícito se um callback bloquear. Chamado por callback, só inicia shutdown para evitar joins circulares. `awaitTermination(duration)` externo confirma terminação. Close é idempotente, sem acesso a bootstrap. `Connection.close()` solicita fecho local e notificação assíncrona. Atenção: ACCEPTED seguido imediatamente de close não garante envio; o bootstrap do IMP-003 usa sendAndFlush para confirmar a escrita completa antes de fechar. requestClose inicia shutdown sem espera; close mantém a espera externa/atalho dos workers. As reservas continuam até ambos os workers terminarem.
+ 
+-Extensão local implementada em TASK-006 / IMP-003 / ADR-015: Connection.sendAndFlush(ControlMessage) devolve CompletableFuture<Void>, com sucesso no escritor após frame inteiro e flush. Partilha a fila de send e acompanha também o frame retirado/em escrita; fecho/overflow/I/O/shutdown terminam confirmações fora dos locks, antes de release. Cancelamento não promete desfazer bytes. Fila vazia não prova escrita completa e flush não prova entrega remota/ACK; send mantém a semântica anterior. O deadline total da consulta fecha o socket e termina pendências; não se cria timeout genérico por frame. [Walkthrough e incrementais](../memory-bank/bolts/002-overlay/implementation-walkthrough.md): 856 testes incrementais aprovados; [Test com clean verify/JDK21 e manual Codex/34 checks](../memory-bank/bolts/002-overlay/ddd-03-test-report.md) executados e Test aprovado, sem alteração da implementação. Luis repetiu em 2026-11-04T13:58:36Z–13:58:38Z, 34 checks/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR; log pessoal separado do agente. Revisão final por Waheed e integração pendentes antes de DONE.
++Extensão local implementada em TASK-006 / IMP-003 / ADR-015: Connection.sendAndFlush(ControlMessage) devolve CompletableFuture<Void>, com sucesso no escritor após frame inteiro e flush. Partilha a fila de send e acompanha também o frame retirado/em escrita; fecho/overflow/I/O/shutdown terminam confirmações fora dos locks, antes de release. Cancelamento não promete desfazer bytes. Fila vazia não prova escrita completa e flush não prova entrega remota/ACK; send mantém a semântica anterior. O deadline total da consulta fecha o socket e termina pendências; não se cria timeout genérico por frame. [Walkthrough e incrementais](../memory-bank/bolts/002-overlay/implementation-walkthrough.md): 856 testes incrementais aprovados; [Test com clean verify/JDK21 e manual Codex/34 checks](../memory-bank/bolts/002-overlay/ddd-03-test-report.md) executados e Test aprovado, sem alteração da implementação. Luis repetiu em 2026-11-04T13:58:36Z–13:58:38Z, 34 checks/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR; log pessoal separado do agente. Revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-006 DONE, bolt 002-overlay complete.
+ 
+ BootstrapServer(NodeConfiguration) é serviço embutível com localAddress()/close(), validando antes de bind e normalizando lexicalmente hosts sem DNS do pedido. Só REGISTER, uma decisão por conexão, grafo imutável/instâncias zero/sem lease. Core serial/contextos limitados, timers canceláveis e shutdown com budget global. Composição CLI/HELLO continua no IMP-005/004, sem processos overlay completos demonstrados.
+ 
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+index af3e300..b53532f 100644
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -113,7 +113,7 @@ V-006: consultas repetidas/concorrentes recebem só os vizinhos configurados, in
+ Complemento ADR-015: observar frame de resposta completo seguido de EOF; testar peer lento/erro de escrita e shutdown com confirmação pendente. Futures de escrita terminam em sucesso/erro dentro do prazo, sem bloquear callbacks; ACCEPTED ou fila vazia não contam como prova de escrita. Reexecutar a regressão de transporte afetada pela extensão em TASK-006.
+ 
+ Responsável: [TASK-006](tasks/PHASE-02/TASK-006.md). Requisitos: RF-002, RF-003, RF-004. Estado: EXECUTADO LOCALMENTE E APROVADO EM TEST.
+-[Relatório](../memory-bank/bolts/002-overlay/ddd-03-test-report.md): clean verify/JDK21/TCP real em 2026-11-04T12:18:10Z, 856 testes (740 configuração +66 codec +31 transporte +19 bootstrap), zero falhas/erros/skips. M01–M18 consolidados; manual Codex em 2026-11-04T12:22:53Z, 34 CHECK_PASS/MANUAL_PASS/saída 0. Relógio/escrita controláveis complementam TCP real. Test aprovado, registado em 2026-11-04T14:05:14Z, incluindo repetição pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0 e mesmo hash do JAR, com log pessoal separado. Revisão final por Waheed e integração continuam pendentes; fecho preparado, sem DONE.
++[Relatório](../memory-bank/bolts/002-overlay/ddd-03-test-report.md): clean verify/JDK21/TCP real em 2026-11-04T12:18:10Z, 856 testes (740 configuração +66 codec +31 transporte +19 bootstrap), zero falhas/erros/skips. M01–M18 consolidados; manual Codex em 2026-11-04T12:22:53Z, 34 CHECK_PASS/MANUAL_PASS/saída 0. Relógio/escrita controláveis complementam TCP real. Test aprovado, registado em 2026-11-04T14:05:14Z, incluindo repetição pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0 e mesmo hash do JAR, com log pessoal separado. Revisão final atribuída a Waheed confirmada pelo utilizador, registada em 2026-11-04T14:18:23Z, e versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main. TASK-006 DONE/bolt complete em 2026-11-04T14:18:23Z; resultados Java preservados, sem nova execução no fecho.
+ 
+ ### V-007 — Gerir handshake, unicidade e reconexão de vizinhos
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index c20a328..af02d77 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -83,10 +83,12 @@ Implement aprovado em 2026-11-04T12:18:01Z; [Test para revisão](../memory-bank/
+ com clean verify/JDK21/856 testes e manual Codex/34 checks, saídas 0. V-006/M01–M18
+ com execução técnica e Test aprovado, registado em 2026-11-04T14:05:14Z. Luis repetiu
+ pessoalmente em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0,
+-mesmo JAR e log separado de Codex. Fecho preparado, commits/push de Denji
+-autorizados; revisão final por Waheed e integração pendentes. Código congelado durante Test.
+-TASK/bolt/história/unidade continuam em progresso; não promove requisito global
+-nem demonstra HELLO/CLI, streaming ou CORE.
++mesmo JAR e log separado de Codex. [Fecho concluído](../memory-bank/bolts/002-overlay/closure-walkthrough.md)
++em 2026-11-04T14:18:23Z, após revisão final atribuída a Waheed confirmada pelo utilizador,
++registada em 2026-11-04T14:18:23Z, e versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
++TASK-006 DONE, bolt/história complete, implemented=true. Unidade mantém in-progress;
++não promove requisito global nem demonstra HELLO/CLI, streaming ou CORE.
++Código congelado desde Test; nenhuma execução Java nova no fecho.
+ 
+ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index e685ea9..847dbd6 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 IN PROGRESS (Test concluído/fecho preparado); TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+-**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
++**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. A próxima tarefa por implementar é TASK-007. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e tem as cinco etapas concluídas e Test aprovado; fecho preparado, revisão final atribuída e integração pendentes. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Última tarefa concluída:** [TASK-006](tasks/PHASE-02/TASK-006.md), DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; bolt 002-overlay complete. TASK-032 permanece DONE/integrada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -12,7 +12,7 @@ Histórico anterior à TASK-005 — correção posterior, por pedido explícito
+ 
+ Handoff histórico da correção: partir da revisão 4105429a76f67a5acf0579db8719b0ba2460b549 com as notas locais da revisão de prontidão preservadas. Alterados apenas contrato/codec/testes/fixtures e documentação necessária; removido o placeholder vazio NodeRegistry. Build clean package offline com Java 21 passou em 27-10-2026 às 14:34:31 UTC. Sem bloqueios; abrir TASK-005 quando pedida a sua implementação. Os resultados originais das tarefas conservam-se como histórico, com notas apontando para ADR-013.
+ 
+-Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). A TASK-005 tem Waheed como responsável atribuído e Fillmore como revisor atribuído. A próxima tarefa legada de Fillmore é TASK-006, com Waheed como revisor, após a nova TASK-032 transversal. As atribuições não substituem a evidência técnica nem alteram os estados das tarefas. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
++Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATION.md); [Waheed](team/WAHEED.md), [Fillmore](team/FILLMORE.md) e [Denji](team/DENJI.md). A TASK-005 tem Waheed como responsável atribuído e Fillmore como revisor atribuído. TASK-006, atribuída a Fillmore e com Waheed como revisor, está DONE após TASK-032 e confirmação da revisão pelo utilizador. As atribuições não substituem a evidência técnica nem alteram os estados das tarefas. Estados continuam exclusivamente nos TASK e nesta tabela; os documentos pessoais são filas de trabalho, não cópias do progresso.
+ 
+ Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em docs/team/, metadados nas 27 TASK futuras e ligações/regras de revisão nos documentos gerais/fases. Validação documental confirmou cobertura, atribuições sem auto-revisão, dependências sem ciclos e referências válidas; código/CORE preservados. Não foram executados build/testes Java nesta alteração exclusivamente documental. Não há implementação em curso por efeito desta distribuição.
+ 
+@@ -25,7 +25,7 @@ em 2026-11-03T21:56:48Z, após integração da versão revista em main por fast-
+ (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+-Último incremento fechado: IMP-002/019-overlay/TASK-032, DONE em 2026-11-04T10:33:12Z, com cinco
++Incremento anterior fechado: IMP-002/019-overlay/TASK-032, DONE em 2026-11-04T10:33:12Z, com cinco
+ etapas concluídas e Test aprovado explicitamente em 2026-11-04T10:19:06Z (registo).
+ 824 testes completos aprovados; execução pessoal por Luis em 2026-11-04T10:15:14Z,
+ 25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmados. [Fecho concluído](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
+@@ -34,7 +34,7 @@ e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
+ Fecho pela cascata specsmd após integração. Nenhum outro IMP iniciado.
+ Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
+ 
+-Incremento atual: IMP-003/002-overlay/TASK-006, IN PROGRESS, Test concluído/fecho preparado, iniciado
++Último incremento fechado: IMP-003/002-overlay/TASK-006, DONE em 2026-11-04T14:18:23Z, iniciado
+ em 2026-11-04T10:40:58Z. Model aprovado em 2026-11-04T10:50:52Z, incluindo Q-C-04.
+ [Design preparado para revisão](../memory-bank/bolts/002-overlay/ddd-02-technical-design.md)
+ em 2026-11-04T11:04:53Z, aprovado em 2026-11-04T11:25:40Z, incluindo requestClose/close compatível.
+@@ -52,10 +52,11 @@ Os 155 hashes estão congelados durante Test; listas target/ geradas separadas.
+ Test aprovado, com registo em 2026-11-04T14:05:14Z, incluindo execução pessoal por Luis
+ em 2026-11-04T13:58:36Z–13:58:38Z: 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR.
+ [Log pessoal preservado](../experiments/construction/002-overlay/test-manual-luis.log),
+-separado do agente. [Fecho preparado](../memory-bank/bolts/002-overlay/closure-walkthrough.md);
+-commits e push de Denji autorizados, sem fecho antecipado.
+-Responsável de origem Fillmore,
+-revisor atribuído Waheed; revisão final e integração não presumidas.
++separado do agente. [Fecho concluído](../memory-bank/bolts/002-overlay/closure-walkthrough.md).
++Revisão final atribuída a Waheed confirmada pelo utilizador — «fecha o bolt, a revisão esta feita» —
++com registo em 2026-11-04T14:18:23Z. Versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main antes do fecho.
++Cascata specsmd: bolt/história complete, implemented=true; TASK-006 DONE.
++Unidade mantém in-progress; 003-overlay/IMP-004 continua planned, nenhum outro IMP iniciado.
+ 
+ [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+ 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+@@ -87,7 +88,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+ | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+-| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | IN PROGRESS | Test aprovado: 856 testes, manuais Codex e Luis/34 checks/saída 0 cada; fecho preparado, revisão final Waheed/integração pendentes |
++| [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index 236855d..c919c42 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -17,9 +17,10 @@ Implement aprovado em 2026-11-04T12:18:01Z; apenas Test autorizado, [relatório
+ em 2026-11-04T12:29:39Z: clean verify com 856 testes e manual Codex/34 checks, saídas 0.
+ V-006/M01–M18 executados. Test aprovado e concluído, com registo em 2026-11-04T14:05:14Z,
+ incluindo repetição pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z, 34 checks/
+-MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../memory-bank/bolts/002-overlay/closure-walkthrough.md);
+-commits e push de Denji autorizados. Revisão final por Waheed e integração em main
+-pendentes; 002-overlay continua in-progress, cinco etapas concluídas.
++MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho concluído](../memory-bank/bolts/002-overlay/closure-walkthrough.md)
++em 2026-11-04T14:18:23Z: revisão final atribuída a Waheed confirmada pelo utilizador,
++registada em 2026-11-04T14:18:23Z; versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
++002-overlay/história complete, implemented=true, TASK-006 DONE. Unidade continua in-progress.
+ Os restantes 30 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 5307451..a0f691c 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -120,3 +120,10 @@
+   separado do agente. Autorizados preparação do fecho, commits e push de Denji;
+   limite anterior sem commits/push substituído. Mantêm-se revisão final atribuída
+   a Waheed e integração antes de DONE; nenhuma decisão arquitetural nova.
++
++- Fecho posterior do IMP-003: o utilizador confirmou «fecha o bolt, a revisão esta feita»,
++  com registo em 2026-11-04T14:18:23Z, concluindo a revisão final atribuída a Waheed.
++  Versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
++  Mecanismo specsmd executado em 2026-11-04T14:18:23Z: bolt/história complete, TASK-006 DONE;
++  unidade in-progress. Esta confirmação supera as pendências dos checkpoints
++  anteriores. Sem decisão arquitetural nova ou início de outro IMP.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+index 1a4c128..ae3a933 100644
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 IN PROGRESS, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada; fecho preparado, revisão final por Waheed e integração pendentes; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-006.md b/docs/tasks/PHASE-02/TASK-006.md
+index a7c1e3b..19f62fa 100644
+--- a/docs/tasks/PHASE-02/TASK-006.md
++++ b/docs/tasks/PHASE-02/TASK-006.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-006
+ - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Fillmore](../../team/FILLMORE.md).
+ - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](../PHASE-02/TASK-005.md), [TASK-032](TASK-032.md).
+@@ -23,7 +23,7 @@ Esta tarefa contribui para o resultado da fase: Três ou mais nós trocam HELLO,
+ 
+ Concluir e verificar evidências das dependências acima. Confirmar o estado real dos ficheiros em [05](../../05-PROJECT-STRUCTURE.md) e os gates da fase em [12](../../12-RISKS-AND-DECISIONS.md). Ficheiros existentes podem estar vazios; os modelos e serviços planeados só ficam disponíveis após as suas tarefas. Não substituir dependências reais por componentes fictícios na demonstração de integração.
+ 
+-Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 com cinco etapas concluídas e Test aprovado, fecho preparado, após dependências integradas; preservar ADR-013, sem membership/lease no bootstrap.
++Dependências prontas após TASK-005: ConfigurationLoader, Transport.connect assíncrono, Connection.send e eventos ordenados por ligação. Callbacks não devem bloquear. [API disponível](../../07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005), [V-005](../../../experiments/task-005-transport-validation.md). TASK-006 DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; preservar ADR-013, sem membership/lease no bootstrap.
+ 
+ ## 5. Especificação técnica
+ 
+@@ -149,3 +149,15 @@ em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesm
+ separado de Codex. [Fecho preparado](../../../memory-bank/bolts/002-overlay/closure-walkthrough.md),
+ commits/push de Denji autorizados. Revisão final atribuída a Waheed e integração
+ em main pendentes; TASK-006 continua IN PROGRESS. Nenhum outro IMP iniciado.
++
++### Fecho concluído
++
++Em 2026-11-04T14:18:23Z, o utilizador confirmou «fecha o bolt, a revisão esta feita»,
++relativamente à revisão final atribuída a Waheed. A versão revista
++03345e9e1ab56ec04302676cca6fce32d168223d já estava em main e Denji, locais e remotos, antes do fecho.
++[Prova](../../../experiments/construction/002-overlay/integration-proof.json).
++Mecanismo specsmd executado em 2026-11-04T14:18:23Z, saída 0:
++[log](../../../experiments/construction/002-overlay/bolt-complete.log).
++Bolt/história complete, implemented=true; TASK-006 DONE. Unidade in-progress,
++três bolts planned. Nenhum código alterado ou nova execução Java no fecho;
++856 testes e manuais Codex/Luis preservados. Nenhum outro IMP iniciado.
+diff --git a/memory-bank/bolts/002-overlay/bolt.md b/memory-bank/bolts/002-overlay/bolt.md
+index 26ac447..d016338 100644
+--- a/memory-bank/bolts/002-overlay/bolt.md
++++ b/memory-bank/bolts/002-overlay/bolt.md
+@@ -3,15 +3,15 @@ id: "002-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["001-fornecer-localizacao-inicial-dos-vizinhos-configurados"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T14:05:14Z"
++updated: "2026-11-04T14:20:34Z"
+ started: "2026-11-04T10:40:58Z"
+-completed: null
+-current_stage: "test"
+-stages_completed: [{"name": "model", "completed": "2026-11-04T10:50:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-04T11:25:40Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-04T11:37:45Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-04T12:18:01Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-04T14:05:14Z", "artifact": "ddd-03-test-report.md"}]
+-requires_bolts: ["001-base-validada", "019-overlay"]
++completed: "2026-11-04T14:18:23Z"
++current_stage: null
++stages_completed: [{"name":"model","completed":"2026-11-04T10:50:52Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-04T11:25:40Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-04T11:37:45Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-04T12:18:01Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-04T14:05:14Z","artifact":"ddd-03-test-report.md"}]
++requires_bolts: ["001-base-validada","019-overlay"]
+ enables_bolts: ["003-overlay"]
+ requires_units: ["001-base-validada"]
+ blocks: false
+@@ -29,13 +29,13 @@ size: "M"
+ validation_ids: ["V-006"]
+ test_ids: ["V-006"]
+ external_gates: []
+-adr_ids: ["ADR-003", "ADR-013", "ADR-014", "ADR-015", "ADR-024"]
+-requirements: ["INT-001", "INT-002", "REQ-002", "REQ-003", "REQ-004"]
++adr_ids: ["ADR-003","ADR-013","ADR-014","ADR-015","ADR-024"]
++requirements: ["INT-001","INT-002","REQ-002","REQ-003","REQ-004"]
+ architecture_source: "add.md"
+ ---
+ # Bolt 002-overlay — Descoberta inicial e escrita confirmada
+ 
+-## Test aprovado — fecho preparado
++## Fecho concluído — IMP-003
+ 
+ Iniciado em 2026-11-04T10:40:58Z, por seleção explícita do utilizador,
+ apenas a primeira etapa. Base Denji 4ac5808dacf6e97bfd3636d2788db363e926bc95,
+@@ -78,11 +78,12 @@ disponíveis e repetidos pessoalmente por Luis em 2026-11-04T13:58:36Z–13:58:3
+ 34 CHECK_PASS, MANUAL_PASS e JAVA_EXIT=0, mesmo hash do JAR validado.
+ [Log pessoal preservado](../../../experiments/construction/002-overlay/test-manual-luis.log),
+ separado do agente. Test aprovado explicitamente, com registo em 2026-11-04T14:05:14Z;
+-concluídas as cinco etapas em stages_completed, current_stage=test, completed=null.
+-[Fecho preparado](closure-walkthrough.md): critérios técnicos verificados;
+-revisão final atribuída a Waheed e integração em main pendentes antes de DONE.
+-Autorizados commits e push de Denji; esta publicação não conclui o bolt.
+-Nenhum outro IMP iniciado.
++concluídas as cinco etapas em stages_completed. Revisão final atribuída a Waheed
++confirmada pelo utilizador — «fecha o bolt, a revisão esta feita» — com registo
++em 2026-11-04T14:18:23Z. Versão revista já integrada em main: 03345e9e1ab56ec04302676cca6fce32d168223d.
++[Fecho concluído](closure-walkthrough.md) em 2026-11-04T14:18:23Z pelo mecanismo specsmd:
++bolt/história complete, implemented=true na história, current_stage=null.
++TASK-006 DONE; unidade permanece in-progress, três bolts planned. Nenhum outro IMP iniciado.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -90,7 +91,7 @@ Ler [IMP-003](../../../add.md#imp-003) e as ADR aí indicadas antes de qualquer
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](../../intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
++- [x] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](../../intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
+ - Dependências: [001-base-validada](../001-base-validada/bolt.md), [019-overlay](../019-overlay/bolt.md).
+ - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -118,6 +119,6 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
+ 
+ - Testes: V-006, detalhados no ADD; guardar comandos, ambiente, resultados e limites.
+ - Outputs e ficheiros: consultar [IMP-003](../../../add.md#imp-003).
+-- Prova futura: `experiments/construction/002-overlay/` e relatório local do bolt.
++- Evidência executada: `experiments/construction/002-overlay/`, relatório Test e walkthrough de fecho.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+diff --git a/memory-bank/bolts/002-overlay/closure-walkthrough.md b/memory-bank/bolts/002-overlay/closure-walkthrough.md
+index 61596aa..58f406d 100644
+--- a/memory-bank/bolts/002-overlay/closure-walkthrough.md
++++ b/memory-bank/bolts/002-overlay/closure-walkthrough.md
+@@ -1,26 +1,35 @@
+-# IMP-003 — Fecho preparado para revisão final
++# IMP-003 — Fecho concluído
+ 
+ Preparado em 2026-11-04T14:10:25Z. Test aprovado explicitamente pelo utilizador,
+ com registo em 2026-11-04T14:05:14Z, incluindo os 856 testes e o manual pessoal
+ de Luis. Autorizados commits e push de Denji. Base do incremento:
+ `4ac5808dacf6e97bfd3636d2788db363e926bc95`.
+ 
+-## Estado e pendências
++## Estado final
+ 
+-As cinco etapas Model → Design → ADR → Implement → Test estão concluídas.
+-Os seis critérios técnicos têm evidência em V-006/M01–M18 e foram assinalados
+-no bolt, história e TASK-006. O bolt e a história continuam **in-progress**;
+-TASK-006 continua **IN PROGRESS**, completed=null e sem implemented=true.
+-A unidade permanece em construção; 003-overlay e os restantes incrementos
+-planeados não foram iniciados.
++Fecho concluído em **2026-11-04T14:18:23Z**, após confirmação da revisão pelo utilizador
++com registo em 2026-11-04T14:18:23Z: «fecha o bolt, a revisão esta feita».
++A revisão final estava atribuída a **Waheed**; o registo conserva a confirmação
++do utilizador, sem atribuir uma data de revisão que não foi fornecida.
+ 
+-Para fechar, falta a aceitação da versão final pelo revisor atribuído **Waheed**
+-e a integração da versão revista em main, conforme
+-[TASK-006](../../../docs/tasks/PHASE-02/TASK-006.md) e
+-[Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).
+-A aprovação de Test por Luis não regista uma aceitação em nome de Waheed.
+-O mecanismo bolt-complete e a cascata de estados ficam por aplicar depois
+-dessas condições. Publicar Denji preserva este estado para revisão.
++Antes do fecho, main e Denji, locais e remotos, já apontavam para a versão revista
++`03345e9e1ab56ec04302676cca6fce32d168223d`. A [prova de integração](../../../experiments/construction/002-overlay/integration-proof.json)
++regista essa observação e os 155 hashes iguais à versão testada. Não foi necessário
++um novo merge para integrar a implementação nesta sessão.
++
++O [mecanismo specsmd](../../../experiments/construction/002-overlay/bolt-complete-command.json)
++foi executado com o adaptador validado nos bolts anteriores, saída **0**:
++[log completo](../../../experiments/construction/002-overlay/bolt-complete.log).
++Resultado: bolt **complete**, current_stage=null, completed=2026-11-04T14:18:23Z;
++história **complete**, implemented=true; TASK-006 **DONE**. As cinco etapas
++mantêm os seus instantes de conclusão reais.
++
++A unidade 002-overlay mantém **in-progress**, com 019-overlay/002-overlay complete
++e três bolts planned; o intent permanece em construção. Nenhum outro IMP foi
++iniciado. O campo derivado blocks de 003-overlay passou a false porque todas
++as suas dependências estão complete; mantém status=planned, started=null e
++nenhuma etapa iniciada. Todos os critérios técnicos, Test, revisão confirmada e integração
++exigidos pela [DoD](../../../docs/14-DEFINITION-OF-DONE.md) estão registados para este incremento.
+ 
+ ## Resultados aprovados e proveniência
+ 
+@@ -91,4 +100,15 @@ o registo atual prevalece para a aprovação Test e o estado de preparação.
+ 
+ TCP loopback/API embutível não demonstram CLI/HELLO, JVMs overlay independentes,
+ vídeo, GUI, CORE ou recuperação. Flush local não é ACK remoto. Nenhum desses
+-resultados, revisão de Waheed, integração em main ou fecho foi presumido.
++resultados de GUI/CORE/vídeo foi presumido. A revisão final e a integração
++estão registadas acima, sem nova execução Java no fecho.
++
++## Validação do fecho
++
++V-ADD, git diff --check, preservação das 139 evidências anteriores e dos 155
++ficheiros de Projeto/ são conferidos no [resultado final](../../../experiments/construction/002-overlay/closure-results.json).
++O [diff do fecho](../../../experiments/construction/002-overlay/closure-documents.diff)
++usa a versão revista 03345e9e1ab56ec04302676cca6fce32d168223d como base. Este fecho altera somente estados,
++documentação e evidência; não modifica código, testes, fixtures ou dependências.
++A publicação do commit de fecho em Denji e main é verificada depois da criação
++do commit, sem force push.
+diff --git a/memory-bank/bolts/002-overlay/ddd-03-test-report.md b/memory-bank/bolts/002-overlay/ddd-03-test-report.md
+index 76b1449..77400d6 100644
+--- a/memory-bank/bolts/002-overlay/ddd-03-test-report.md
++++ b/memory-bank/bolts/002-overlay/ddd-03-test-report.md
+@@ -96,8 +96,8 @@ parâmetros de método); não se contam loops internos como testes JUnit adicion
+ 
+ M01–M18 têm agora execução técnica: M18 inclui clean verify e manual do agente,
+ antes pendentes. V-006 está **executado localmente e aprovado em Test**, incluindo
+-a repetição pessoal por Luis. Revisão final por Waheed e integração ainda pendentes
+-para DONE. Relógio e
++a repetição pessoal por Luis. A revisão final atribuída a Waheed foi confirmada
++pelo utilizador e a versão revista integrada em main; fecho registado abaixo. Relógio e
+ escrita controláveis comprovam deadlines/flush/janela take/fecho/overflow;
+ TCP real comprova framing/EOF/isolamento/concorrência/terminação. Nenhum sleep
+ ou fila vazia é aceite como prova de escrita.
+@@ -130,9 +130,10 @@ Os diffs e a conferência final de hashes ficam nos artefactos test-*.diff/json.
+   aos incrementos seguintes, não foi demonstrado por este bolt.
+ 
+ Test aprovado e concluído em stages_completed, com registo em 2026-11-04T14:05:14Z.
+-[Fecho preparado](closure-walkthrough.md). Bolt/história/TASK-006/unidade continuam
+-em progresso, completed=null, sem implemented=true. Pendentes: revisão final
+-atribuída a **Waheed** e integração em main, conforme DoD. O utilizador autorizou
+-commits e push de Denji; não foi atribuída a Waheed uma aceitação não comunicada.
+-Nenhum outro IMP iniciado. A execução Java é a preservada acima; esta preparação
+-altera documentação/evidência, sem nova execução Java.
++[Fecho concluído](closure-walkthrough.md) em 2026-11-04T14:18:23Z: revisão final atribuída
++a Waheed confirmada pelo utilizador, com registo em 2026-11-04T14:18:23Z, e versão
++revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
++Mecanismo specsmd executado com saída 0: bolt/história complete, implemented=true,
++TASK-006 DONE; unidade permanece in-progress, três bolts planned. Nenhum outro
++IMP iniciado. Os resultados Java são os aprovados e preservados acima;
++este fecho altera documentação/evidência, sem nova execução Java.
+diff --git a/memory-bank/bolts/003-overlay/bolt.md b/memory-bank/bolts/003-overlay/bolt.md
+index 10a6da1..7cfb052 100644
+--- a/memory-bank/bolts/003-overlay/bolt.md
++++ b/memory-bank/bolts/003-overlay/bolt.md
+@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
+ status: "planned"
+ stories: ["002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-04T14:21:49Z"
+ started: null
+ completed: null
+ current_stage: null
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["001-base-validada", "002-overlay"]
+ enables_bolts: ["020-overlay"]
+ requires_units: ["001-base-validada"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index 8adedb5..546691e 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -242,3 +242,18 @@ Manual IMP-003: [roteiro pessoal](../../../../../experiments/construction/002-ov
+ - **2026-11-04T14:10:25Z**: [fecho preparado](../../../../bolts/002-overlay/closure-walkthrough.md),
+   com cinco etapas concluídas, evidência aprovada e pendências explícitas.
+   Nenhuma alteração Java nem nova execução Java nesta preparação. Nenhum outro IMP iniciado.
++
++- **2026-11-04T14:18:23Z**: utilizador confirmou «fecha o bolt, a revisão esta feita»;
++  revisão final atribuída a Waheed declarada concluída. Verificado que main e
++  Denji, locais e remotos, já contêm 03345e9e1ab56ec04302676cca6fce32d168223d; 155 hashes de Projeto/ iguais à
++  versão testada e 139 evidências anteriores preservadas.
++- **2026-11-04T14:18:23Z**: 002-overlay completed — cinco etapas concluídas. Mecanismo
++  specsmd executado com adaptador validado, saída 0: bolt/história complete,
++  implemented=true, current_stage=null. TASK-006 DONE; unidade mantém in-progress,
++  três bolts planned. Sem código/build/manual novos ou outro IMP iniciado.
++  [Fecho](../../../../bolts/002-overlay/closure-walkthrough.md) e
++  [log do mecanismo](../../../../../experiments/construction/002-overlay/bolt-complete.log).
++
++- **2026-11-04T14:21:49Z**: V-ADD identificou o campo derivado blocks de 003-overlay ainda true.
++  Sincronizado para false após o fecho de todas as dependências; status=planned,
++  started=null, sem iniciar IMP-004. Repetida a validação documental.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md
+index 716ebc0..0f83828 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md
+@@ -2,16 +2,17 @@
+ id: "001-fornecer-localizacao-inicial-dos-vizinhos-configurados"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ updated: "2026-11-04T12:29:39Z"
+ source_tasks: ["TASK-006"]
+ implementation_tasks: ["IMP-003"]
+-requirements: ["INT-001", "INT-002", "REQ-002", "REQ-003", "REQ-004"]
+-adr_ids: ["ADR-003", "ADR-013", "ADR-014", "ADR-015", "ADR-024"]
++requirements: ["INT-001","INT-002","REQ-002","REQ-003","REQ-004"]
++adr_ids: ["ADR-003","ADR-013","ADR-014","ADR-015","ADR-024"]
+ bolt: "002-overlay"
+ size: "M"
++implemented: true
+ ---
+ # História — Descoberta inicial e escrita confirmada
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+index 5a63925..cc77208 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T12:29:39Z"
++updated: "2026-11-04T14:20:34Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -27,7 +27,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
+ ## Histórias e bolts
+ 
+ - [x] [005-implementar-parametrizacao-operacional](stories/005-implementar-parametrizacao-operacional.md) → [019-overlay](../../../../bolts/019-overlay/bolt.md); IMP-002 (M).
+-- [ ] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md) → [002-overlay](../../../../bolts/002-overlay/bolt.md); IMP-003 (M).
++- [x] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md) → [002-overlay](../../../../bolts/002-overlay/bolt.md); IMP-003 (M).
+ - [ ] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
+ - [ ] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
+ - [ ] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
+@@ -43,7 +43,7 @@ MANUAL_PASS e saída Java 0. [Fecho concluído](../../../../bolts/019-overlay/cl
+ Bolt/história complete; revisão final confirmada por Luis, distinta da autoria
+ do agente Codex, e versão revista integrada em main (09a068f68eca473451e1e80a045c1cf9cf15a1b2).
+ G-REVIEW-032 cumprido. Unidade continua in-progress: 019-overlay complete,
+-002-overlay com Test concluído/fecho preparado e três bolts planned. IMP-003 iniciado em 2026-11-04T10:40:58Z,
++002-overlay complete e três bolts planned. IMP-003 iniciado em 2026-11-04T10:40:58Z,
+ apenas Model, por seleção explícita; [modelo preparado para revisão](../../../../bolts/002-overlay/ddd-01-domain-model.md).
+ Model aprovado em 2026-11-04T10:50:52Z, incluindo Q-C-04. [Design preparado para revisão](../../../../bolts/002-overlay/ddd-02-technical-design.md)
+ em 2026-11-04T11:04:53Z, aprovado em 2026-11-04T11:25:40Z, incluindo requestClose.
+@@ -56,9 +56,10 @@ em 2026-11-04T12:08:01Z: cinco ficheiros +1226/−35 e 856 testes incrementais a
+ clean verify com 856 testes/zero falhas e manual Codex/34 checks/saída 0. Nenhuma
+ alteração Java durante Test. Test aprovado, com registo em 2026-11-04T14:05:14Z, incluindo
+ repetição pessoal por Luis em 2026-11-04T13:58:36Z–13:58:38Z, 34 CHECK_PASS/
+-MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../../../../bolts/002-overlay/closure-walkthrough.md),
+-commits/push de Denji autorizados; revisão final por Waheed e integração em main
+-continuam pendentes. Unidade/bolt/história mantêm in-progress.
++MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho concluído](../../../../bolts/002-overlay/closure-walkthrough.md)
++em 2026-11-04T14:18:23Z: revisão final atribuída a Waheed confirmada pelo utilizador,
++registada em 2026-11-04T14:18:23Z; versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
++Bolt/história complete, implemented=true, TASK-006 DONE; unidade mantém in-progress.
+ A dependência 001-base-validada permanece concluída/integrada.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+index c4342ba..09b5c7f 100644
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -242,22 +242,22 @@
+     "docs/04-ARCHITECTURE.md": "e0db6a9f224d8b3eef12e523d9746d8ef13246e30611c867ab760720f5cf897c",
+     "docs/05-PROJECT-STRUCTURE.md": "ccc8a76d12da6c47f1b7915760450326414ec6bdafd8710892c3ae845b824032",
+     "docs/06-DATA-MODEL.md": "3105f2c82ab84cc1b4c21238f50d5ae2d56306d32217bdb53c4df5d076dbd29d",
+-    "docs/07-API-AND-INTERFACES.md": "f076a645af4274b5db7b9bd45a60d05273827633b7730fba0f984ce4bd1d253c",
++    "docs/07-API-AND-INTERFACES.md": "673674000565bb9b6f0145883b7b750e265d65256aaf6624b0df79e78ca9e971",
+     "docs/08-IMPLEMENTATION-ROADMAP.md": "b8aff31a131a05746fe7908a4406a3b45f23684ea3d4ee4d1c5f560c098696bb",
+-    "docs/09-TESTING-STRATEGY.md": "e48a438f08b3dd99a9f5658d0f292abda275c57b1112d234c69751f1efe88c4e",
++    "docs/09-TESTING-STRATEGY.md": "f2ef01c1ea1a9b9ffc1a0e67c68b94e6040a9604251cbf930722864c7e6e9066",
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "5c0aaf7a96572fb71b2ac251adbfe7c0e532ca61016f668461e2491460d0f0b6",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "2b212d67e2e1eb572067deb3b54547ccc6685276a6ad8b30f479c72d9f071ff1",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "ea037c51a58e7cb1b71e6379459fc793c309dbd48840283ecea1b8467bb01b18",
++    "docs/15-PROJECT-PROGRESS.md": "ab2c4a2fb1ccf8747e193941626adc37701a102bf3d8b503b5339c3157bd3ed8",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "82e82279738429c34439be8386562629068ad2ab04b9ee0ec650059694a56f4a",
++    "docs/18-CONSTRUCTION-BOLTS.md": "f0f36bac89cdc74c6b4ca50bfe2097fb985cbe3274805642830fab8f52941ed1",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+-    "docs/phases/PHASE-02-OVERLAY.md": "cba0b470e03e89653f2e15176227e3c0322b05052eee502c463d968d22cc380f",
++    "docs/phases/PHASE-02-OVERLAY.md": "954df508232bfbc36ae7b17f9788cb612234e811bb0d044cd7e4dfe25fa5aa1e",
+     "docs/phases/PHASE-03-ROUTING.md": "52b54397a001bbae7afcdb83690fbf04c768d95e4b9d214ab0557f3334e21c09",
+     "docs/phases/PHASE-04-FLOW-MANAGEMENT.md": "27b7d97c9b1161636a0e446caf75d4e89461bae5b3ddc891d7ca657bafef05fb",
+     "docs/phases/PHASE-05-STREAMING.md": "bd5ff93148be22f59fb8705d1567f9656c19bf6f38e616bb28651b814f27cdca",
+@@ -268,7 +268,7 @@
+     "docs/tasks/PHASE-01/TASK-003.md": "6e4a046fc7e40a28ec4b1bdfaeb60543524244e987b121698b755326ecbef41c",
+     "docs/tasks/PHASE-01/TASK-004.md": "1f60d41d53c5b79cd18d9c0ed766915d8972bea36df6496828a7d5e6df7e36fe",
+     "docs/tasks/PHASE-02/TASK-005.md": "358bd2e423749f1debb5b359c58c1065f51e52d3b631ecc867c927214636832d",
+-    "docs/tasks/PHASE-02/TASK-006.md": "2492c85d55833e20a0a5c56609c9d51a369dd3c8157668c1197f719cb2c80e2b",
++    "docs/tasks/PHASE-02/TASK-006.md": "c762710cf64e75d42a0060481e762344e7fb9a95fdf35e6241d6e0081c2e7a6a",
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-04T14:10:25Z",
++  "updated": "2026-11-04T14:20:34Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -744,6 +744,28 @@
+         "docs/tasks/PHASE-02/TASK-006.md": "2492c85d55833e20a0a5c56609c9d51a369dd3c8157668c1197f719cb2c80e2b",
+         "docs/phases/PHASE-02-OVERLAY.md": "cba0b470e03e89653f2e15176227e3c0322b05052eee502c463d968d22cc380f"
+       }
++    },
++    {
++      "updated": "2026-11-04T14:20:34Z",
++      "reason": "Fecho autorizado do IMP-003: utilizador confirmou revisao final atribuida a Waheed; implementacao 03345e9 ja integrada em main/Denji local e remoto. Mecanismo specsmd executado com saida 0; bolt/historia complete, implemented=true, TASK-006 DONE, unidade in-progress. Resultados Java aprovados preservados; sem nova execucao Java ou outro IMP.",
++      "previous_hashes": {
++        "docs/07-API-AND-INTERFACES.md": "f076a645af4274b5db7b9bd45a60d05273827633b7730fba0f984ce4bd1d253c",
++        "docs/09-TESTING-STRATEGY.md": "e48a438f08b3dd99a9f5658d0f292abda275c57b1112d234c69751f1efe88c4e",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "5c0aaf7a96572fb71b2ac251adbfe7c0e532ca61016f668461e2491460d0f0b6",
++        "docs/15-PROJECT-PROGRESS.md": "ea037c51a58e7cb1b71e6379459fc793c309dbd48840283ecea1b8467bb01b18",
++        "docs/18-CONSTRUCTION-BOLTS.md": "82e82279738429c34439be8386562629068ad2ab04b9ee0ec650059694a56f4a",
++        "docs/tasks/PHASE-02/TASK-006.md": "2492c85d55833e20a0a5c56609c9d51a369dd3c8157668c1197f719cb2c80e2b",
++        "docs/phases/PHASE-02-OVERLAY.md": "cba0b470e03e89653f2e15176227e3c0322b05052eee502c463d968d22cc380f"
++      },
++      "updated_hashes": {
++        "docs/07-API-AND-INTERFACES.md": "673674000565bb9b6f0145883b7b750e265d65256aaf6624b0df79e78ca9e971",
++        "docs/09-TESTING-STRATEGY.md": "f2ef01c1ea1a9b9ffc1a0e67c68b94e6040a9604251cbf930722864c7e6e9066",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "2b212d67e2e1eb572067deb3b54547ccc6685276a6ad8b30f479c72d9f071ff1",
++        "docs/15-PROJECT-PROGRESS.md": "ab2c4a2fb1ccf8747e193941626adc37701a102bf3d8b503b5339c3157bd3ed8",
++        "docs/18-CONSTRUCTION-BOLTS.md": "f0f36bac89cdc74c6b4ca50bfe2097fb985cbe3274805642830fab8f52941ed1",
++        "docs/tasks/PHASE-02/TASK-006.md": "c762710cf64e75d42a0060481e762344e7fb9a95fdf35e6241d6e0081c2e7a6a",
++        "docs/phases/PHASE-02-OVERLAY.md": "954df508232bfbc36ae7b17f9788cb612234e811bb0d044cd7e4dfe25fa5aa1e"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+index 99a4674..b11e0bd 100644
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -82,3 +82,10 @@ Test do IMP-003 aprovado explicitamente, com registo em 2026-11-04T14:05:14Z, in
+ 34 CHECK_PASS/MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho preparado](../bolts/002-overlay/closure-walkthrough.md),
+ commits e push de Denji autorizados. Nenhuma nova decisão arquitetural ou ADR;
+ revisão final atribuída a Waheed e integração pendentes antes de DONE.
++
++Fecho do IMP-003 confirmado pelo utilizador — «fecha o bolt, a revisão esta feita» —
++com registo em 2026-11-04T14:18:23Z. Revisão final atribuída a Waheed declarada concluída;
++versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main antes do fecho.
++Cascata specsmd executada em 2026-11-04T14:18:23Z: bolt/história complete, implemented=true,
++TASK-006 DONE, unidade in-progress. Sem nova decisão arquitetural, código ou ADR.
++[Prova e fecho](../bolts/002-overlay/closure-walkthrough.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 770a875..ee4729b 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -5,11 +5,12 @@ GENERATED indica criação documental, não implementação. Fonte de arquitetur
+ 
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+-em 2026-11-03T21:56:48Z, após integração em main. Duas histórias complete:
++em 2026-11-03T21:56:48Z, após integração em main. Três histórias complete:
+ 019-overlay/IMP-002 fechado em 2026-11-04T10:33:12Z, após as cinco etapas, revisão
+ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-003
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+-registado em 2026-11-04T14:05:14Z; fecho preparado, revisão final/integração pendentes;
++registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
++pelo utilizador e integração da versão revista em main;
+ as restantes 30 histórias/bolts não foram iniciadas.
+ Intent ainda em construção.
+ 
+@@ -30,13 +31,13 @@ G-REVIEW-032 cumprido: revisão final por Luis e integração da versão revista
+ 
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-003. **Estado:** in-progress. **Bolt:** 002-overlay.
++**Tarefa:** IMP-003. **Estado:** complete. **Bolt:** 002-overlay; implemented=true.
+ Cinco etapas concluídas; Test aprovado, registado em 2026-11-04T14:05:14Z.
+ Clean verify: 856 testes/zero falhas; manuais separados Codex/Luis: 34 checks e
+ saída 0 cada. Luis executou em 2026-11-04T13:58:36Z–13:58:38Z, mesmo JAR.
+-M01–M18/V-006 executados. [Fecho preparado](bolts/002-overlay/closure-walkthrough.md);
+-commits e push de Denji autorizados.
+-Revisão final atribuída a Waheed e integração continuam pendentes.
++M01–M18/V-006 executados. [Fecho concluído](bolts/002-overlay/closure-walkthrough.md) em 2026-11-04T14:18:23Z.
++Revisão final atribuída a Waheed confirmada pelo utilizador; versão revista
++03345e9e1ab56ec04302676cca6fce32d168223d integrada em main antes do fecho. Unidade in-progress.
+ **Ficheiro:** [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](intents/001-ott-streaming/units/002-overlay/stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md).
+ 
+ ## 002-overlay/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md ✅ GENERATED
