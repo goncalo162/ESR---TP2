@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["001-fornecer-localizacao-inicial-dos-vizinhos-configurados"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-04T10:34:52Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["001-base-validada", "019-overlay"]
 enables_bolts: ["003-overlay"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

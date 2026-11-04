@@ -47,6 +47,6 @@ regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Des
 As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
 [revisão de conformidade](../bolts/019-overlay/adr-review.md) aprovada antes de código.
 Implement e [Test aprovados](../bolts/019-overlay/ddd-03-test-report.md): 824 testes
-completos e repetição pessoal por Luis/25 checks confirmados. [Fecho preparado](../bolts/019-overlay/closure-walkthrough.md),
-com revisor distinto designado/revisão final/integração pendentes em G-REVIEW-032.
-Sem ADR nova ou fecho presumido.
+completos e repetição pessoal por Luis/25 checks confirmados. [Fecho concluído](../bolts/019-overlay/closure-walkthrough.md)
+em 2026-11-04T10:33:12Z, revisão final confirmada por Luis e versão revista integrada
+em main. G-REVIEW-032 cumprido; sem ADR nova.

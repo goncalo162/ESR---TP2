@@ -1,0 +1,549 @@
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+index de9d622..589441f 100644
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -275,8 +275,9 @@ Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUTADO E APROVA
+ verify/JDK21 com 824 testes aprovados (740 configuração +66 codec +18 TCP real),
+ zero falhas/erros/skips; manual do agente com 25 checks e repetição pessoal por
+ Luis em 2026-11-04T10:15:14Z, 25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmada.
+-Test aprovado; revisor distinto designado, revisão final/integração pendentes
+-em G-REVIEW-032. Não declara DONE da tarefa/bolt.
++Test aprovado; revisão final confirmada por Luis, distinto do agente autor, e
++versão revista integrada em main. G-REVIEW-032 cumprido; tarefa/bolt fechados em
++2026-11-04T10:33:12Z. Resultados acima são da execução preservada, sem nova execução Java.
+ 
+ ### V-ADD — Coerência do documento mestre e dos incrementos
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index 4221477..8d31685 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -71,9 +71,10 @@ Clean verify/JDK21: 824 testes aprovados (740 configuração, 66 codec, 18 TCP r
+ zero falhas/erros/skips; 45 fixtures intactas e manual do agente com 25 checks.
+ D01–D17/V-032 executados e Test aprovado: Luis repetiu em 2026-11-04T10:15:14Z,
+ 25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada; log pessoal separado do agente.
+-[Fecho preparado](../memory-bank/bolts/019-overlay/closure-walkthrough.md), com
+-G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração.
+-Nenhum requisito global, TASK/bolt ou unidade promovido a DONE.
++[Fecho concluído](../memory-bank/bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z:
++TASK-032 DONE e bolt/história complete, revisão final confirmada por Luis e
++versão revista integrada em main. G-REVIEW-032 cumprido; unidade e requisitos
++globais mantêm os respetivos estados, sem antecipar consumers/GUI/CORE.
+ 
+ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 0d96b7b..ca1d42a 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS, com Test aprovado e fecho pendente de G-REVIEW-032. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+-**Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
++**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS, com Test aprovado no bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Última tarefa concluída:** [TASK-032](tasks/PHASE-02/TASK-032.md), DONE, com Test aprovado e bolt 019-overlay complete após revisão e integração. TASK-006 tem as dependências integradas e permanece TODO; nenhum outro IMP iniciado. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -25,12 +25,13 @@ em 2026-11-03T21:56:48Z, após integração da versão revista em main por fast-
+ (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+-Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS, com cinco
++Último incremento fechado: IMP-002/019-overlay/TASK-032, DONE em 2026-11-04T10:33:12Z, com cinco
+ etapas concluídas e Test aprovado explicitamente em 2026-11-04T10:19:06Z (registo).
+ 824 testes completos aprovados; execução pessoal por Luis em 2026-11-04T10:15:14Z,
+-25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmados. [Fecho preparado para revisão](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
+-G-REVIEW-032 pendente de revisor humano distinto designado, revisão final e
+-integração. Aprovação Test não implica DONE; sem fecho/commit/push ou outro IMP.
++25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmados. [Fecho concluído](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
++G-REVIEW-032 cumprido: revisão final por Luis, distinta da autoria do agente Codex,
++e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
++Fecho pela cascata specsmd após integração. Nenhum outro IMP iniciado.
+ Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
+ 
+ [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+@@ -62,7 +63,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Test aprovado: 824 testes e manual Luis/25 checks; fecho/G-REVIEW-032 pendentes |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index ea0c840..6aac1b5 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -5,8 +5,8 @@ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bol
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+ 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
+-com Test aprovado/concluído, com [fecho preparado para revisão](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
+-G-REVIEW-032 ainda pendente; 019-overlay permanece in-progress.
++complete em 2026-11-04T10:33:12Z, com [fecho concluído](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
++G-REVIEW-032 cumprido: revisão final por Luis e versão revista integrada em main.
+ Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+index 0594c82..eeb9dca 100644
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -5,9 +5,9 @@
+ - ID: TASK-032
+ - Fase: PHASE-02
+ - Prioridade: P1
+-- Estado: IN PROGRESS
+-- Responsável: [Construction](../../../memory-bank/standards/execution-contract.md), trabalho técnico transversal.
+-- Revisor: [Equipa](../../team/00-COORDINATION.md); designar membro distinto do autor antes de DONE, sem aprovação presumida.
++- Estado: DONE
++- Responsável: [Construction](../../../memory-bank/standards/execution-contract.md), trabalho técnico transversal; implementação produzida pelo agente Codex.
++- Revisor: Luis, humano distinto do agente Codex que produziu a implementação; revisão final confirmada nesta sessão («sim já revi»).
+ - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](TASK-005.md).
+ - Requisitos relacionados: [REQ-024](../../../specs.md#req-024), [RP-006](../../02-REQUIREMENTS.md#rp-006).
+ 
+@@ -70,7 +70,7 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
+ - [x] Chaves, defaults, papéis e relações correspondem ao ADD, secção 6.3.
+ - [x] Carregamento inválido falha antes de rede e sem configuração parcial.
+ - [x] Perfis existentes continuam válidos sem propriedades novas.
+-- [ ] V-032 e revisão/integração exigidas têm evidência real.
++- [x] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## 12. Definition of Done
+ 
+@@ -86,15 +86,16 @@ com tipos/assinaturas, conversões, compatibilidade, agregação de erros/casos
+ prova de consumidor sem sockets. Estas eram pendências na apresentação de Design;
+ Design/alpha aprovados em 2026-11-03T22:25:30Z, registados em
+ [Q-C-03](../../construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
+-Revisão ADR e Implement aprovados; [Test para revisão](../../../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
++Revisão ADR e Implement aprovados; [Test aprovado](../../../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
+ Clean verify/JDK21 em 2026-11-03T22:56:28Z: 824 testes aprovados, zero falhas/erros/
+ skips (740 configuração, 66 codec, 18 TCP real). Manual do agente: 25 checks e
+ MANUAL_PASS. Código igual à versão revista de Implement. Luis repetiu pessoalmente em
+ 2026-11-04T10:15:14Z: 25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada. Test
+ aprovado explicitamente, com registo em 2026-11-04T10:19:06Z; etapas concluídas.
+-[Fecho preparado para revisão](../../../memory-bank/bolts/019-overlay/closure-walkthrough.md).
+-G-REVIEW-032 pendente: revisor humano distinto designado, revisão final e integração.
+-Estado permanece IN PROGRESS; não marcar DONE enquanto faltar condição. Sem commits/push.
++[Fecho concluído](../../../memory-bank/bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z.
++G-REVIEW-032 cumprido: revisão final por Luis confirmada («sim já revi»), distinta
++da autoria do agente, e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
++Estado DONE após executar cascata specsmd; unit 002-overlay permanece in-progress.
+ 
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/bolts/002-overlay/bolt.md b/memory-bank/bolts/002-overlay/bolt.md
+index 88995c3..87ea5f1 100644
+--- a/memory-bank/bolts/002-overlay/bolt.md
++++ b/memory-bank/bolts/002-overlay/bolt.md
+@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
+ status: "planned"
+ stories: ["001-fornecer-localizacao-inicial-dos-vizinhos-configurados"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-04T10:34:52Z"
+ started: null
+ completed: null
+ current_stage: null
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["001-base-validada", "019-overlay"]
+ enables_bolts: ["003-overlay"]
+ requires_units: ["001-base-validada"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+index 31f3039..f9f6854 100644
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -3,16 +3,16 @@ id: "019-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-04T10:20:17Z"
++updated: "2026-11-04T10:34:52Z"
+ started: "2026-11-03T22:09:01Z"
+-completed: null
+-current_stage: "test"
+-stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-03T22:33:00Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-03T22:55:46Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-04T10:19:06Z", "artifact": "ddd-03-test-report.md"}]
++completed: "2026-11-04T10:33:12Z"
++current_stage: null
++stages_completed: [{"name":"model","completed":"2026-11-03T22:16:54Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-03T22:25:30Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-03T22:33:00Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-03T22:55:46Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-04T10:19:06Z","artifact":"ddd-03-test-report.md"}]
+ requires_bolts: ["001-base-validada"]
+-enables_bolts: ["002-overlay", "020-overlay"]
++enables_bolts: ["002-overlay","020-overlay"]
+ requires_units: ["001-base-validada"]
+ blocks: false
+ complexity:
+@@ -29,13 +29,13 @@ size: "M"
+ validation_ids: ["V-032"]
+ test_ids: ["V-032"]
+ external_gates: ["G-REVIEW-032"]
+-adr_ids: ["ADR-007", "ADR-010", "ADR-016", "ADR-024", "ADR-026"]
+-requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
++adr_ids: ["ADR-007","ADR-010","ADR-016","ADR-024","ADR-026"]
++requirements: ["CON-009","INT-001","INT-002","REQ-021","REQ-024"]
+ architecture_source: "add.md"
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
+ 
+-## Test concluído — fecho preparado para revisão
++## Fechado — IMP-002 integrado e revisto
+ 
+ Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
+ próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
+@@ -75,10 +75,10 @@ incluindo os 824 testes e a execução pessoal por Luis em 2026-11-04T10:15:14Z,
+ separado do agente. Test concluído em stages_completed; todas as cinco etapas
+ executadas/aprovadas. [Fecho preparado](closure-walkthrough.md) para revisão.
+ 
+-Bolt continua in-progress/test, completed=null: G-REVIEW-032 pendente de revisor
+-humano distinto designado, revisão final e integração. Não executar a cascata
+-complete enquanto faltar condição. Sem commits/push ou outro IMP. Código e
+-evidências de execução anteriores intactos; listas target/ separadas.
++Fechado em 2026-11-04T10:33:12Z pelo mecanismo specsmd, após revisão final
++confirmada por Luis e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
++G-REVIEW-032 cumprido; status=complete, current_stage=null. Evidências anteriores
++preservadas; listas target/ excluídas dos commits. Nenhum outro IMP iniciado.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -86,7 +86,7 @@ Ler [IMP-002](../../../add.md#imp-002) e as ADR aí indicadas antes de qualquer
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [005-implementar-parametrizacao-operacional](../../intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
++- [x] [005-implementar-parametrizacao-operacional](../../intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ - Dependências: [001-base-validada](../001-base-validada/bolt.md).
+ - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
+ - Gates: G-REVIEW-032.
+@@ -106,7 +106,7 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
+ - [x] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
+ - [x] Carregamento inválido falha antes de rede e sem configuração parcial.
+ - [x] Perfis existentes continuam válidos sem propriedades novas.
+-- [ ] V-032 e revisão/integração exigidas têm evidência real.
++- [x] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## Evidência e fecho
+ 
+@@ -122,5 +122,5 @@ O utilizador aprovou o fecho, commits e push e confirmou «sim já revi»
+ à pergunta sobre G-REVIEW-032. Revisor humano: Luis; implementação produzida
+ pelo agente Codex. Revisão final aceite sobre os quatro hashes de código
+ preservados em [final-review.json](../../../experiments/construction/019-overlay/final-review.json).
+-Esta autorização substitui a proibição anterior de commits/push. Integração
+-em main ainda por executar; só depois se aplica a cascata de fecho.
++Esta autorização substituiu a proibição anterior de commits/push. Integração
++em main verificada em 09a068f68eca473451e1e80a045c1cf9cf15a1b2; cascata concluída em 2026-11-04T10:33:12Z.
+diff --git a/memory-bank/bolts/019-overlay/closure-walkthrough.md b/memory-bank/bolts/019-overlay/closure-walkthrough.md
+index 1f640da..b781fb9 100644
+--- a/memory-bank/bolts/019-overlay/closure-walkthrough.md
++++ b/memory-bank/bolts/019-overlay/closure-walkthrough.md
+@@ -1,4 +1,47 @@
+-# IMP-002 — Fecho preparado para revisão
++# IMP-002 — Fecho concluído após revisão e integração
++Estado final: bolt/história **complete**, TASK-032 **DONE**, fecho em 2026-11-04T10:33:12Z.
++Cinco etapas aprovadas, V-032/824 testes e manual pessoal de Luis confirmados.
++G-REVIEW-032 cumprido: revisão final por **Luis**, distinta da implementação
++produzida pelo agente **Codex**, e versão revista integrada em main por
++fast-forward no commit `09a068f68eca473451e1e80a045c1cf9cf15a1b2`. Identidade Git é a configurada
++pelo utilizador; não é prova de que o agente seja uma pessoa da equipa.
++
++Mecanismo obrigatório executado com código 0, usando o adaptador já validado
++para o frontmatter JSON/YAML local; ferramenta e adaptador mantêm os hashes.
++[Comando e resultado](../../../experiments/construction/019-overlay/bolt-complete-command.json),
++[saída original](../../../experiments/construction/019-overlay/bolt-complete.log) e
++[prova de integração](../../../experiments/construction/019-overlay/integration-proof.json).
++
++```text
++Bolt status: in-progress → complete
++005-implementar-parametrizacao-operacional: in-progress → complete
++Stories: 1 updated, 0 skipped
++Unit has 4 incomplete bolt(s), status unchanged
++Intent has 6 incomplete unit(s), status unchanged
++Bolt Complete: 019-overlay
++```
++
++Unidade 002-overlay continua in-progress. Os outros 31 bolts continuam planned;
++002-overlay tem as dependências concluídas e blocks=false, sem ter sido iniciado.
++Nenhum requisito global, GUI/CORE, streaming ou entrega é declarado concluído.
++Listas geradas em Projeto/target/ excluídas de todos os commits deste incremento.
++A publicação dos ramos será confirmada pelo resultado real do push.
++
++## Validação final
++
++V-ADD executado após a cascata: zero erros, 221 hashes, 45 fixtures e
++3412 referências verificadas; [relatório](../../../experiments/construction/019-overlay/closure-validation.md).
++`git diff --check` passou. Os XML preservados mantêm 824 testes sem falhas/erros/skips;
++fontes e JAR iguais aos da execução aprovada. Integração por fast-forward de
++conteúdo idêntico, seguida de alterações só documentais; sem nova execução Java.
++[Conferência final de estados/hashes](../../../experiments/construction/019-overlay/closure-results.json).
++Os logs/XML/diffs brutos preservam os bytes; exceções de whitespace limitadas
++a esses artefactos no diretório de evidências, mantendo os checks de código/Markdown.
++
++## Preparação anterior — registo histórico
++
++O texto abaixo conserva o retrato anterior à autorização de fecho/publicação.
++As pendências e proibições desse retrato foram resolvidas/substituídas acima.
+ 
+ Test e os 824 testes aprovados explicitamente pelo utilizador, incluindo a sua
+ execução manual como **Luis** em 2026-11-04T10:15:14Z: 25 CHECK_PASS, MANUAL_PASS
+diff --git a/memory-bank/bolts/019-overlay/ddd-03-test-report.md b/memory-bank/bolts/019-overlay/ddd-03-test-report.md
+index 672c0a7..a291b84 100644
+--- a/memory-bank/bolts/019-overlay/ddd-03-test-report.md
++++ b/memory-bank/bolts/019-overlay/ddd-03-test-report.md
+@@ -145,7 +145,8 @@ do record de opções, não o wiring dos componentes futuros. Quatro UUID de str
+ configurados não provam quatro conteúdos preparados/reproduzidos.
+ 
+ Resultados de Test aprovados explicitamente pelo utilizador, com repetição
+-pessoal comprovada. Test concluído em stages_completed; bolt/história/unidade/
+-TASK-032 continuam em progresso. Pendentes: revisor humano distinto designado,
+-revisão final e integração antes de DONE. [Fecho preparado para revisão](closure-walkthrough.md).
+-Sem fecho, commit, push ou outro IMP.
++pessoal comprovada. Test concluído em stages_completed. Atualização de fecho:
++revisão final confirmada por Luis e versão revista integrada em main
++(09a068f68eca473451e1e80a045c1cf9cf15a1b2); G-REVIEW-032 cumprido. Bolt/história complete e
++TASK-032 DONE em 2026-11-04T10:33:12Z, após cascata specsmd.
++Unidade continua in-progress; [fecho concluído](closure-walkthrough.md). Nenhum outro IMP iniciado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index c0b9a9a..29b32ce 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-04T10:21:41Z"
++updated: "2026-11-04T10:34:52Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -110,3 +110,9 @@ Luis: [log pessoal preservado](../../../../../experiments/construction/019-overl
+   («sim já revi»): Luis, distinto do agente Codex que produziu a implementação.
+   Quatro hashes revistos preservados; identidade Git não é prova de autoria humana.
+   Preparar commit da versão revista, integrar em main e só então fechar.
++
++- **2026-11-04T10:33:12Z**: 019-overlay completed — cinco etapas aprovadas; revisão final
++  de Luis registada, implementação do agente Codex integrada em main por
++  fast-forward no commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2. Cascata specsmd executada
++  com código 0: bolt/história complete, implemented=true; unidade in-progress
++  com quatro bolts planned. G-REVIEW-032 cumprido. target/ excluído, nenhum outro IMP iniciado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+index 0729d23..9061b33 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -2,16 +2,17 @@
+ id: "005-implementar-parametrizacao-operacional"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-04T10:23:36Z"
++updated: "2026-11-04T10:34:52Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+-requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+-adr_ids: ["ADR-007", "ADR-010", "ADR-016", "ADR-024", "ADR-026"]
++requirements: ["CON-009","INT-001","INT-002","REQ-021","REQ-024"]
++adr_ids: ["ADR-007","ADR-010","ADR-016","ADR-024","ADR-026"]
+ bolt: "019-overlay"
+ size: "M"
++implemented: true
+ ---
+ # História — Implementar parametrização operacional
+ 
+@@ -21,9 +22,10 @@ Model aprovado no bolt 019-overlay, em 2026-11-03T22:16:54Z;
+ Design aprovado pelo utilizador em 2026-11-03T22:25:30Z;
+ revisão ADR, Implement e Test aprovados. Test concluído em 2026-11-04T10:19:06Z (registo),
+ 824 testes e manual pessoal de Luis com 25 checks/saída Java 0 confirmados.
+-[Fecho preparado](../../../../../bolts/019-overlay/closure-walkthrough.md), sem
+-implemented=true ou DONE. Pendentes: revisor humano distinto designado, revisão
+-final e integração. Esta repetição manual não designa o revisor.
++[Fecho concluído](../../../../../bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z:
++status=complete, implemented=true, por cascata specsmd. Luis confirmou a revisão
++final («sim já revi»), distinta da autoria de implementação do agente Codex.
++Versão revista integrada em main: 09a068f68eca473451e1e80a045c1cf9cf15a1b2. G-REVIEW-032 cumprido.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+@@ -34,7 +36,7 @@ A tarefa normativa é [IMP-002](../../../../../../add.md#imp-002); o bolt só or
+ - [x] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
+ - [x] Carregamento inválido falha antes de rede e sem configuração parcial.
+ - [x] Perfis existentes continuam válidos sem propriedades novas.
+-- [ ] V-032 e revisão/integração exigidas têm evidência real.
++- [x] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## Testes
+ 
+@@ -46,5 +48,5 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
+ 
+ - [TASK-032](../../../../../../docs/tasks/PHASE-02/TASK-032.md).
+ - Bolts anteriores: 001-base-validada.
+-- Responsável de origem: Construction; revisor: Equipa.
++- Responsável de origem: Construction; implementação: agente Codex; revisor humano: Luis.
+ - Gates: G-REVIEW-032.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+index 3ced8b1..adcda08 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T10:23:36Z"
++updated: "2026-11-04T10:34:52Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -26,7 +26,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
+ 
+ ## Histórias e bolts
+ 
+-- [ ] [005-implementar-parametrizacao-operacional](stories/005-implementar-parametrizacao-operacional.md) → [019-overlay](../../../../bolts/019-overlay/bolt.md); IMP-002 (M).
++- [x] [005-implementar-parametrizacao-operacional](stories/005-implementar-parametrizacao-operacional.md) → [019-overlay](../../../../bolts/019-overlay/bolt.md); IMP-002 (M).
+ - [ ] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md) → [002-overlay](../../../../bolts/002-overlay/bolt.md); IMP-003 (M).
+ - [ ] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
+ - [ ] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
+@@ -39,9 +39,10 @@ Design aprovado, com registo em 2026-11-03T22:25:30Z, incluindo alpha/Q-C-03.
+ Revisão ADR e Implement aprovados; Implement concluído em 2026-11-03T22:55:46Z.
+ Test aprovado pelo utilizador em 2026-11-04T10:19:06Z (registo), incluindo 824 testes
+ completos e a sua execução pessoal como Luis em 2026-11-04T10:15:14Z, 25 checks/
+-MANUAL_PASS e saída Java 0. [Fecho preparado para revisão](../../../../bolts/019-overlay/closure-walkthrough.md).
+-As cinco etapas de 019-overlay concluídas; bolt/história/unidade em progresso.
+-G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração;
+-restantes bolts planned. A aprovação de Test não é DONE nem nova implementação.
++MANUAL_PASS e saída Java 0. [Fecho concluído](../../../../bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z.
++Bolt/história complete; revisão final confirmada por Luis, distinta da autoria
++do agente Codex, e versão revista integrada em main (09a068f68eca473451e1e80a045c1cf9cf15a1b2).
++G-REVIEW-032 cumprido. Unidade continua in-progress: quatro bolts planned.
++Nenhum outro IMP iniciado.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+index 0defc41..c8192be 100644
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -244,16 +244,16 @@
+     "docs/06-DATA-MODEL.md": "3105f2c82ab84cc1b4c21238f50d5ae2d56306d32217bdb53c4df5d076dbd29d",
+     "docs/07-API-AND-INTERFACES.md": "cc83fe11878509c15a6b11d0a74d141f479b188c97acb56b2aa1d6ec5f70e83a",
+     "docs/08-IMPLEMENTATION-ROADMAP.md": "b8aff31a131a05746fe7908a4406a3b45f23684ea3d4ee4d1c5f560c098696bb",
+-    "docs/09-TESTING-STRATEGY.md": "f06ccfb06202a779a2b475908eefd2991dd59cb09d384a4e197800bc45161daa",
++    "docs/09-TESTING-STRATEGY.md": "24e3ac5667f0b2b0de257d6d0514769378a081d4d8d498ae790ec31c87737850",
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "374a659b82b0b2ab6b5e8db556c5e5a4095b25f8b0d5e188ba0dcfc1035324b7",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "3ac680f4b37754b0b5175bf9ed4a1893c79a5210381e6f0bb8b33a785d1ef251",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "dda6d350be55d7d204b32e84502459533cd9bc85287ea2421494ea2a79fbd1c3",
++    "docs/15-PROJECT-PROGRESS.md": "f78b38e739f350d5d366c8429ce188f725ba4e6ed56b48a05158b34a619f204f",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "bd7e9a90e03b8fe6dcd198a516ed3dbed8a0dde6d16b1e7f28671306758e720b",
++    "docs/18-CONSTRUCTION-BOLTS.md": "d73b088ba04d4721271f4461d69b80f91cfcf0abae7e5f585e9491e7207461c1",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "105e4daaa920937a1be0c3383e720e5e1fdfd43ca00c697810aaa9a47cda56c3",
++    "docs/tasks/PHASE-02/TASK-032.md": "e8b80b98301be37eaf92d412be065b913e3d5010bf22be9fbbc535eec60ca615",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-04T10:23:36Z",
++  "updated": "2026-11-04T10:34:52Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -586,6 +586,24 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "bd7e9a90e03b8fe6dcd198a516ed3dbed8a0dde6d16b1e7f28671306758e720b",
+         "docs/tasks/PHASE-02/TASK-032.md": "105e4daaa920937a1be0c3383e720e5e1fdfd43ca00c697810aaa9a47cda56c3"
+       }
++    },
++    {
++      "updated": "2026-11-04T10:34:52Z",
++      "reason": "IMP-002: utilizador autorizou fecho/commits/push e Luis confirmou revisão final, distinta do agente autor; versão revista integrada em main antes da cascata specsmd. Atualizar estados derivados/DONE sem alterar código nem resultados históricos; unidade continua em progresso, nenhum outro IMP iniciado.",
++      "previous_hashes": {
++        "docs/09-TESTING-STRATEGY.md": "f06ccfb06202a779a2b475908eefd2991dd59cb09d384a4e197800bc45161daa",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "374a659b82b0b2ab6b5e8db556c5e5a4095b25f8b0d5e188ba0dcfc1035324b7",
++        "docs/15-PROJECT-PROGRESS.md": "dda6d350be55d7d204b32e84502459533cd9bc85287ea2421494ea2a79fbd1c3",
++        "docs/18-CONSTRUCTION-BOLTS.md": "bd7e9a90e03b8fe6dcd198a516ed3dbed8a0dde6d16b1e7f28671306758e720b",
++        "docs/tasks/PHASE-02/TASK-032.md": "105e4daaa920937a1be0c3383e720e5e1fdfd43ca00c697810aaa9a47cda56c3"
++      },
++      "updated_hashes": {
++        "docs/09-TESTING-STRATEGY.md": "24e3ac5667f0b2b0de257d6d0514769378a081d4d8d498ae790ec31c87737850",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "3ac680f4b37754b0b5175bf9ed4a1893c79a5210381e6f0bb8b33a785d1ef251",
++        "docs/15-PROJECT-PROGRESS.md": "f78b38e739f350d5d366c8429ce188f725ba4e6ed56b48a05158b34a619f204f",
++        "docs/18-CONSTRUCTION-BOLTS.md": "d73b088ba04d4721271f4461d69b80f91cfcf0abae7e5f585e9491e7207461c1",
++        "docs/tasks/PHASE-02/TASK-032.md": "e8b80b98301be37eaf92d412be065b913e3d5010bf22be9fbbc535eec60ca615"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+index 43cbb9e..ee99dea 100644
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -47,6 +47,6 @@ regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Des
+ As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
+ [revisão de conformidade](../bolts/019-overlay/adr-review.md) aprovada antes de código.
+ Implement e [Test aprovados](../bolts/019-overlay/ddd-03-test-report.md): 824 testes
+-completos e repetição pessoal por Luis/25 checks confirmados. [Fecho preparado](../bolts/019-overlay/closure-walkthrough.md),
+-com revisor distinto designado/revisão final/integração pendentes em G-REVIEW-032.
+-Sem ADR nova ou fecho presumido.
++completos e repetição pessoal por Luis/25 checks confirmados. [Fecho concluído](../bolts/019-overlay/closure-walkthrough.md)
++em 2026-11-04T10:33:12Z, revisão final confirmada por Luis e versão revista integrada
++em main. G-REVIEW-032 cumprido; sem ADR nova.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 46b9f62..e039241 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -5,10 +5,10 @@ GENERATED indica criação documental, não implementação. Fonte de arquitetur
+ 
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+-em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-019-overlay/IMP-002 está in-progress/test, com as cinco etapas aprovadas/concluídas;
+-fecho pendente de revisor distinto, revisão final e integração;
+-as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
++em 2026-11-03T21:56:48Z, após integração em main. Duas histórias complete:
++019-overlay/IMP-002 fechado em 2026-11-04T10:33:12Z, após as cinco etapas, revisão
++final por Luis e integração em main. G-REVIEW-032 cumprido; as restantes
++31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+ 
+@@ -19,10 +19,10 @@ história implemented=true. Versão revista integrada em main: d65f947.
+ 
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
++**Tarefa:** IMP-002. **Estado:** complete. **Bolt:** 019-overlay.
+ Test aprovado: 824 testes completos e execução pessoal por Luis/25 checks/saída 0.
+-[Fecho preparado](bolts/019-overlay/closure-walkthrough.md); sem implemented=true/DONE.
+-Pendentes: revisor humano distinto designado, revisão final e integração.
++[Fecho concluído](bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z; implemented=true.
++G-REVIEW-032 cumprido: revisão final por Luis e integração da versão revista em main.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED

@@ -5,9 +5,9 @@
 - ID: TASK-032
 - Fase: PHASE-02
 - Prioridade: P1
-- Estado: IN PROGRESS
-- Responsável: [Construction](../../../memory-bank/standards/execution-contract.md), trabalho técnico transversal.
-- Revisor: [Equipa](../../team/00-COORDINATION.md); designar membro distinto do autor antes de DONE, sem aprovação presumida.
+- Estado: DONE
+- Responsável: [Construction](../../../memory-bank/standards/execution-contract.md), trabalho técnico transversal; implementação produzida pelo agente Codex.
+- Revisor: Luis, humano distinto do agente Codex que produziu a implementação; revisão final confirmada nesta sessão («sim já revi»).
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](TASK-005.md).
 - Requisitos relacionados: [REQ-024](../../../specs.md#req-024), [RP-006](../../02-REQUIREMENTS.md#rp-006).
 
@@ -70,7 +70,7 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - [x] Chaves, defaults, papéis e relações correspondem ao ADD, secção 6.3.
 - [x] Carregamento inválido falha antes de rede e sem configuração parcial.
 - [x] Perfis existentes continuam válidos sem propriedades novas.
-- [ ] V-032 e revisão/integração exigidas têm evidência real.
+- [x] V-032 e revisão/integração exigidas têm evidência real.
 
 ## 12. Definition of Done
 
@@ -86,15 +86,16 @@ com tipos/assinaturas, conversões, compatibilidade, agregação de erros/casos 
 prova de consumidor sem sockets. Estas eram pendências na apresentação de Design;
 Design/alpha aprovados em 2026-11-03T22:25:30Z, registados em
 [Q-C-03](../../construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
-Revisão ADR e Implement aprovados; [Test para revisão](../../../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
+Revisão ADR e Implement aprovados; [Test aprovado](../../../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
 Clean verify/JDK21 em 2026-11-03T22:56:28Z: 824 testes aprovados, zero falhas/erros/
 skips (740 configuração, 66 codec, 18 TCP real). Manual do agente: 25 checks e
 MANUAL_PASS. Código igual à versão revista de Implement. Luis repetiu pessoalmente em
 2026-11-04T10:15:14Z: 25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada. Test
 aprovado explicitamente, com registo em 2026-11-04T10:19:06Z; etapas concluídas.
-[Fecho preparado para revisão](../../../memory-bank/bolts/019-overlay/closure-walkthrough.md).
-G-REVIEW-032 pendente: revisor humano distinto designado, revisão final e integração.
-Estado permanece IN PROGRESS; não marcar DONE enquanto faltar condição. Sem commits/push.
+[Fecho concluído](../../../memory-bank/bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z.
+G-REVIEW-032 cumprido: revisão final por Luis confirmada («sim já revi»), distinta
+da autoria do agente, e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
+Estado DONE após executar cascata specsmd; unit 002-overlay permanece in-progress.
 
 Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
 a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.

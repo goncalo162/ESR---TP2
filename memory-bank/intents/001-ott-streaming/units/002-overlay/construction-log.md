@@ -2,7 +2,7 @@
 unit: "002-overlay"
 intent: "001-ott-streaming"
 created: "2026-11-03T22:09:01Z"
-updated: "2026-11-04T10:21:41Z"
+updated: "2026-11-04T10:34:52Z"
 ---
 # Registo Construction — 002-overlay
 
@@ -110,3 +110,9 @@ Luis: [log pessoal preservado](../../../../../experiments/construction/019-overl
   («sim já revi»): Luis, distinto do agente Codex que produziu a implementação.
   Quatro hashes revistos preservados; identidade Git não é prova de autoria humana.
   Preparar commit da versão revista, integrar em main e só então fechar.
+
+- **2026-11-04T10:33:12Z**: 019-overlay completed — cinco etapas aprovadas; revisão final
+  de Luis registada, implementação do agente Codex integrada em main por
+  fast-forward no commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2. Cascata specsmd executada
+  com código 0: bolt/história complete, implemented=true; unidade in-progress
+  com quatro bolts planned. G-REVIEW-032 cumprido. target/ excluído, nenhum outro IMP iniciado.

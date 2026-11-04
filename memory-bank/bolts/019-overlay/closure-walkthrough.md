@@ -1,4 +1,47 @@
-# IMP-002 — Fecho preparado para revisão
+# IMP-002 — Fecho concluído após revisão e integração
+Estado final: bolt/história **complete**, TASK-032 **DONE**, fecho em 2026-11-04T10:33:12Z.
+Cinco etapas aprovadas, V-032/824 testes e manual pessoal de Luis confirmados.
+G-REVIEW-032 cumprido: revisão final por **Luis**, distinta da implementação
+produzida pelo agente **Codex**, e versão revista integrada em main por
+fast-forward no commit `09a068f68eca473451e1e80a045c1cf9cf15a1b2`. Identidade Git é a configurada
+pelo utilizador; não é prova de que o agente seja uma pessoa da equipa.
+
+Mecanismo obrigatório executado com código 0, usando o adaptador já validado
+para o frontmatter JSON/YAML local; ferramenta e adaptador mantêm os hashes.
+[Comando e resultado](../../../experiments/construction/019-overlay/bolt-complete-command.json),
+[saída original](../../../experiments/construction/019-overlay/bolt-complete.log) e
+[prova de integração](../../../experiments/construction/019-overlay/integration-proof.json).
+
+```text
+Bolt status: in-progress → complete
+005-implementar-parametrizacao-operacional: in-progress → complete
+Stories: 1 updated, 0 skipped
+Unit has 4 incomplete bolt(s), status unchanged
+Intent has 6 incomplete unit(s), status unchanged
+Bolt Complete: 019-overlay
+```
+
+Unidade 002-overlay continua in-progress. Os outros 31 bolts continuam planned;
+002-overlay tem as dependências concluídas e blocks=false, sem ter sido iniciado.
+Nenhum requisito global, GUI/CORE, streaming ou entrega é declarado concluído.
+Listas geradas em Projeto/target/ excluídas de todos os commits deste incremento.
+A publicação dos ramos será confirmada pelo resultado real do push.
+
+## Validação final
+
+V-ADD executado após a cascata: zero erros, 221 hashes, 45 fixtures e
+3412 referências verificadas; [relatório](../../../experiments/construction/019-overlay/closure-validation.md).
+`git diff --check` passou. Os XML preservados mantêm 824 testes sem falhas/erros/skips;
+fontes e JAR iguais aos da execução aprovada. Integração por fast-forward de
+conteúdo idêntico, seguida de alterações só documentais; sem nova execução Java.
+[Conferência final de estados/hashes](../../../experiments/construction/019-overlay/closure-results.json).
+Os logs/XML/diffs brutos preservam os bytes; exceções de whitespace limitadas
+a esses artefactos no diretório de evidências, mantendo os checks de código/Markdown.
+
+## Preparação anterior — registo histórico
+
+O texto abaixo conserva o retrato anterior à autorização de fecho/publicação.
+As pendências e proibições desse retrato foram resolvidas/substituídas acima.
 
 Test e os 824 testes aprovados explicitamente pelo utilizador, incluindo a sua
 execução manual como **Luis** em 2026-11-04T10:15:14Z: 25 CHECK_PASS, MANUAL_PASS

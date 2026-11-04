@@ -71,9 +71,10 @@ Clean verify/JDK21: 824 testes aprovados (740 configuração, 66 codec, 18 TCP r
 zero falhas/erros/skips; 45 fixtures intactas e manual do agente com 25 checks.
 D01–D17/V-032 executados e Test aprovado: Luis repetiu em 2026-11-04T10:15:14Z,
 25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada; log pessoal separado do agente.
-[Fecho preparado](../memory-bank/bolts/019-overlay/closure-walkthrough.md), com
-G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração.
-Nenhum requisito global, TASK/bolt ou unidade promovido a DONE.
+[Fecho concluído](../memory-bank/bolts/019-overlay/closure-walkthrough.md) em 2026-11-04T10:33:12Z:
+TASK-032 DONE e bolt/história complete, revisão final confirmada por Luis e
+versão revista integrada em main. G-REVIEW-032 cumprido; unidade e requisitos
+globais mantêm os respetivos estados, sem antecipar consumers/GUI/CORE.
 
 Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
 [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.

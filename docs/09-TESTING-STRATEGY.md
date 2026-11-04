@@ -275,8 +275,9 @@ Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUTADO E APROVA
 verify/JDK21 com 824 testes aprovados (740 configuração +66 codec +18 TCP real),
 zero falhas/erros/skips; manual do agente com 25 checks e repetição pessoal por
 Luis em 2026-11-04T10:15:14Z, 25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmada.
-Test aprovado; revisor distinto designado, revisão final/integração pendentes
-em G-REVIEW-032. Não declara DONE da tarefa/bolt.
+Test aprovado; revisão final confirmada por Luis, distinto do agente autor, e
+versão revista integrada em main. G-REVIEW-032 cumprido; tarefa/bolt fechados em
+2026-11-04T10:33:12Z. Resultados acima são da execução preservada, sem nova execução Java.
 
 ### V-ADD — Coerência do documento mestre e dos incrementos
 

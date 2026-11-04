@@ -145,7 +145,8 @@ do record de opções, não o wiring dos componentes futuros. Quatro UUID de str
 configurados não provam quatro conteúdos preparados/reproduzidos.
 
 Resultados de Test aprovados explicitamente pelo utilizador, com repetição
-pessoal comprovada. Test concluído em stages_completed; bolt/história/unidade/
-TASK-032 continuam em progresso. Pendentes: revisor humano distinto designado,
-revisão final e integração antes de DONE. [Fecho preparado para revisão](closure-walkthrough.md).
-Sem fecho, commit, push ou outro IMP.
+pessoal comprovada. Test concluído em stages_completed. Atualização de fecho:
+revisão final confirmada por Luis e versão revista integrada em main
+(09a068f68eca473451e1e80a045c1cf9cf15a1b2); G-REVIEW-032 cumprido. Bolt/história complete e
+TASK-032 DONE em 2026-11-04T10:33:12Z, após cascata specsmd.
+Unidade continua in-progress; [fecho concluído](closure-walkthrough.md). Nenhum outro IMP iniciado.

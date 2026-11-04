@@ -3,16 +3,16 @@ id: "019-overlay"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["005-implementar-parametrizacao-operacional"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-04T10:20:17Z"
+updated: "2026-11-04T10:34:52Z"
 started: "2026-11-03T22:09:01Z"
-completed: null
-current_stage: "test"
-stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-03T22:33:00Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-03T22:55:46Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-04T10:19:06Z", "artifact": "ddd-03-test-report.md"}]
+completed: "2026-11-04T10:33:12Z"
+current_stage: null
+stages_completed: [{"name":"model","completed":"2026-11-03T22:16:54Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-03T22:25:30Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-03T22:33:00Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-03T22:55:46Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-04T10:19:06Z","artifact":"ddd-03-test-report.md"}]
 requires_bolts: ["001-base-validada"]
-enables_bolts: ["002-overlay", "020-overlay"]
+enables_bolts: ["002-overlay","020-overlay"]
 requires_units: ["001-base-validada"]
 blocks: false
 complexity:
@@ -29,13 +29,13 @@ size: "M"
 validation_ids: ["V-032"]
 test_ids: ["V-032"]
 external_gates: ["G-REVIEW-032"]
-adr_ids: ["ADR-007", "ADR-010", "ADR-016", "ADR-024", "ADR-026"]
-requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+adr_ids: ["ADR-007","ADR-010","ADR-016","ADR-024","ADR-026"]
+requirements: ["CON-009","INT-001","INT-002","REQ-021","REQ-024"]
 architecture_source: "add.md"
 ---
 # Bolt 019-overlay — Implementar parametrização operacional
 
-## Test concluído — fecho preparado para revisão
+## Fechado — IMP-002 integrado e revisto
 
 Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
 próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
@@ -75,10 +75,10 @@ incluindo os 824 testes e a execução pessoal por Luis em 2026-11-04T10:15:14Z,
 separado do agente. Test concluído em stages_completed; todas as cinco etapas
 executadas/aprovadas. [Fecho preparado](closure-walkthrough.md) para revisão.
 
-Bolt continua in-progress/test, completed=null: G-REVIEW-032 pendente de revisor
-humano distinto designado, revisão final e integração. Não executar a cascata
-complete enquanto faltar condição. Sem commits/push ou outro IMP. Código e
-evidências de execução anteriores intactos; listas target/ separadas.
+Fechado em 2026-11-04T10:33:12Z pelo mecanismo specsmd, após revisão final
+confirmada por Luis e integração em main do commit 09a068f68eca473451e1e80a045c1cf9cf15a1b2.
+G-REVIEW-032 cumprido; status=complete, current_stage=null. Evidências anteriores
+preservadas; listas target/ excluídas dos commits. Nenhum outro IMP iniciado.
 
 ## Fonte normativa e âmbito
 
@@ -86,7 +86,7 @@ Ler [IMP-002](../../../add.md#imp-002) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [005-implementar-parametrizacao-operacional](../../intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+- [x] [005-implementar-parametrizacao-operacional](../../intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
 - Dependências: [001-base-validada](../001-base-validada/bolt.md).
 - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
 - Gates: G-REVIEW-032.
@@ -106,7 +106,7 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 - [x] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
 - [x] Carregamento inválido falha antes de rede e sem configuração parcial.
 - [x] Perfis existentes continuam válidos sem propriedades novas.
-- [ ] V-032 e revisão/integração exigidas têm evidência real.
+- [x] V-032 e revisão/integração exigidas têm evidência real.
 
 ## Evidência e fecho
 
@@ -122,5 +122,5 @@ O utilizador aprovou o fecho, commits e push e confirmou «sim já revi»
 à pergunta sobre G-REVIEW-032. Revisor humano: Luis; implementação produzida
 pelo agente Codex. Revisão final aceite sobre os quatro hashes de código
 preservados em [final-review.json](../../../experiments/construction/019-overlay/final-review.json).
-Esta autorização substitui a proibição anterior de commits/push. Integração
-em main ainda por executar; só depois se aplica a cascata de fecho.
+Esta autorização substituiu a proibição anterior de commits/push. Integração
+em main verificada em 09a068f68eca473451e1e80a045c1cf9cf15a1b2; cascata concluída em 2026-11-04T10:33:12Z.
