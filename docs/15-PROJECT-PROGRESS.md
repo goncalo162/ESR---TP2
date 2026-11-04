@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–032 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS, com Test aprovado e fecho pendente de G-REVIEW-032. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Próxima tarefa de código:** [TASK-032](tasks/PHASE-02/TASK-032.md), ainda TODO, após o bolt de verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS, com Test aprovado no bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -25,12 +25,18 @@ em 2026-11-03T21:56:48Z, após integração da versão revista em main por fast-
 (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
 001-base-validada complete, com implemented=true na história. A verificação
 não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
-Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032, ainda não iniciado.
+Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS, com cinco
+etapas concluídas e Test aprovado explicitamente em 2026-11-04T10:19:06Z (registo).
+824 testes completos aprovados; execução pessoal por Luis em 2026-11-04T10:15:14Z,
+25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmados. [Fecho preparado para revisão](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
+G-REVIEW-032 pendente de revisor humano distinto designado, revisão final e
+integração. Aprovação Test não implica DONE; sem fecho/commit/push ou outro IMP.
+Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
 
-[Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+[Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
 e 22 checks manuais. Execução por Luis: [log original preservado](../experiments/construction/001-base-validada/manual-smoke-luis.log),
-22 CHECK_PASS e MANUAL_PASS. POM/fontes/configuração/fixtures/testes intactos;
+22 CHECK_PASS e MANUAL_PASS. Naquele incremento, POM/fontes/configuração/fixtures/testes intactos;
 a lista gerada createdFiles.lst mudou apenas localmente em Projeto/target/ e
 foi excluída dos commits. Inception e IMP-001 em commits separados, com
 [proveniência](../experiments/construction/001-base-validada/inception-commit-provenance.json)
@@ -56,7 +62,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
 | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | TODO | V-032: NÃO EXECUTADO |
+| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Test aprovado: 824 testes e manual Luis/25 checks; fecho/G-REVIEW-032 pendentes |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |

@@ -65,6 +65,16 @@ em 2026-11-03T21:56:48Z após integração em main (d65f947). Bolt/história/uni
 complete; nenhum requisito global é promovido a DONE.
 Os estados e evidências legados acima conservam-se como histórico das TASK.
 
+IMP-002/REQ-024: Test aprovado, incluindo repetição pessoal de Luis; [prova executada](../memory-bank/bolts/019-overlay/ddd-03-test-report.md),
+com 30 chaves/sete grupos, erros agregados e construtor anterior preservado.
+Clean verify/JDK21: 824 testes aprovados (740 configuração, 66 codec, 18 TCP real),
+zero falhas/erros/skips; 45 fixtures intactas e manual do agente com 25 checks.
+D01–D17/V-032 executados e Test aprovado: Luis repetiu em 2026-11-04T10:15:14Z,
+25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada; log pessoal separado do agente.
+[Fecho preparado](../memory-bank/bolts/019-overlay/closure-walkthrough.md), com
+G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração.
+Nenhum requisito global, TASK/bolt ou unidade promovido a DONE.
+
 Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
 [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
 CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.

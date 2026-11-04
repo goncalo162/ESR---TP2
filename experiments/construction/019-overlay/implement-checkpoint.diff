@@ -1,0 +1,1358 @@
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:27:22Z"
++updated: "2026-11-03T22:46:19Z"
+ started: "2026-11-03T22:09:01Z"
+ completed: null
+-current_stage: "adr"
+-stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}]
++current_stage: "implement"
++stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-03T22:33:00Z", "artifact": "adr-review.md"}]
+ requires_bolts: ["001-base-validada"]
+ enables_bolts: ["002-overlay", "020-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
+ 
+-## Etapa 3 — Revisão ADR preparada
++## Etapa 4 — Implement preparado para revisão
+ 
+ Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
+ próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
+@@ -52,11 +52,22 @@
+ 2026-11-03T22:27:22Z: conformidade do desenho com ADR-007/010/016/024/026,
+ sem divergência material ou necessidade de ADR nova identificada.
+ 
+-Bolt in-progress/adr, aguardando revisão antes de Implement/Test. Construtor
+-anterior, testes existentes, bytes v1 e hard caps preservados no desenho e na
+-árvore atual. G-REVIEW-032 pendente: revisor distinto designado, V-032/regressão/
+-manual executados, revisão final e integração antes de DONE; nada presumido.
+-Baseline/diff/conferência em experiments/construction/019-overlay/.
++Revisão ADR aprovada explicitamente pelo utilizador, com registo em 2026-11-03T22:33:00Z.
++Autorizado somente Implement e testes incrementais nos quatro ficheiros do IMP-002.
++[Walkthrough](implementation-walkthrough.md) preparado em 2026-11-03T22:46:19Z, com
++falhas reais antes dos comportamentos novos, implementação incremental e D01–D17.
++
++Última execução incremental: 806 testes aprovados (740 configuração + 66 codec),
++zero falhas/erros/skips. Foram preservados os 65 casos anteriores de configuração,
++os 66 de codec, o construtor de 13 argumentos, bytes v1 e hard caps. Apenas os
++quatro ficheiros autorizados de código/teste foram alterados/criados; as duas
++listas Maven em target/ são artefactos gerados. Nenhum teste existente removido.
++
++Bolt in-progress/implement; aguardar revisão antes da etapa Test ou fecho.
++G-REVIEW-032 permanece pendente: revisor distinto designado, validação completa
++atual, teste manual, revisão final e integração antes de DONE. O green incremental
++não satisfaz esses gates. Sem commit/push. Baseline/logs/diffs/conferência em
++experiments/construction/019-overlay/.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -73,7 +84,7 @@
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+-3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-002 e as ADR do ADD.
++3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 
+diff --git a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+--- a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+@@ -4,7 +4,9 @@
+ iniciar o próximo bolt e executar somente a primeira etapa. Model aprovado
+ explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z. A continuação
+ posterior está no [Design aprovado](ddd-02-technical-design.md) e na
+-[revisão ADR preparada](adr-review.md); Implement/Test não foram iniciados. As descrições de pendências abaixo retratam o checkpoint Model.
++[revisão ADR aprovada](adr-review.md). Implement autorizado, com
++[walkthrough para revisão](implementation-walkthrough.md); etapa Test não iniciada.
++As descrições de pendências abaixo retratam o checkpoint Model.
+ 
+ Fontes: [ADD 6.1–6.3](../../../add.md#6-modelo-de-dados-e-contratos),
+ [IMP-002](../../../add.md#imp-002), [REQ-024](../../../specs.md#req-024),
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T22:27:22Z"
++updated: "2026-11-03T22:46:19Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -36,9 +36,9 @@
+ 
+ 019-overlay/IMP-002: Model aprovado pelo utilizador em 2026-11-03T22:16:54Z;
+ Design aprovado, com registo em 2026-11-03T22:25:30Z, incluindo alpha/Q-C-03.
+-[Revisão ADR preparada](../../../../bolts/019-overlay/adr-review.md), sem divergência
+-material identificada. Autorizado apenas ADR; Implement/Test não iniciados e
+-restantes bolts continuam planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
+-ou execução Java nova é declarada por este arranque.
++Revisão ADR aprovada em 2026-11-03T22:33:00Z; [Implement preparado para revisão](../../../../bolts/019-overlay/implementation-walkthrough.md).
++806 testes incrementais aprovados (740 configuração + 66 codec), com logs reais.
++Etapa Test, regressão completa/manual e G-REVIEW-032 pendentes; restantes bolts
++continuam planned. A unidade não fica complete por esta implementação local.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:27:22Z"
++updated: "2026-11-03T22:46:19Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+ requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+@@ -19,9 +19,9 @@
+ 
+ Model aprovado no bolt 019-overlay, em 2026-11-03T22:16:54Z;
+ Design aprovado pelo utilizador em 2026-11-03T22:25:30Z;
+-[revisão ADR preparada](../../../../../bolts/019-overlay/adr-review.md), com Q-C-03
+-aprovada. Sem implemented=true, critérios funcionais ou V-032 concluídos.
+-Apenas ADR autorizado; Implement/Test ainda não iniciados.
++revisão ADR aprovada em 2026-11-03T22:33:00Z; [Implement preparado para revisão](../../../../../bolts/019-overlay/implementation-walkthrough.md).
++806 testes incrementais aprovados; sem implemented=true ou fecho presumidos.
++Etapa Test/regressão completa/manual, revisor distinto e integração pendentes.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-03T22:27:22Z"
++updated: "2026-11-03T22:46:19Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -48,3 +48,24 @@
+   documental não é prova de implementação. Aguardar revisão antes de Implement/Test.
+ 
+ ADR: [adr-review.md](../../../../bolts/019-overlay/adr-review.md).
++
++- **2026-11-03T22:33:00Z**: revisão ADR aprovada explicitamente pelo utilizador. Iniciado
++  apenas Implement, nos quatro ficheiros autorizados e documentação. Introduzir
++  casos V-032 e registar falhas reais, implementar incrementalmente e preservar
++  construtor/testes/erros/bytes/caps. Testes incrementais autorizados com logs;
++  parar antes da etapa Test/fecho. G-REVIEW-032 permanece pendente.
++- **2026-11-03T22:36:54Z**: primeiro red real: 739 testes de configuração,
++  130 falhas/160 erros novos; 65 casos anteriores aprovados. API/defaults mínimos,
++  sem guards/parsing completos. Log/XML preservados; testes antigos não alterados.
++- **2026-11-03T22:37:56Z**: guards/defaults: 127 testes selecionados aprovados.
++- **2026-11-03T22:39:28Z**: carga/overrides/erros agregados: 739 testes aprovados.
++- **2026-11-03T22:41:46Z**: última execução: 806 testes (740 configuração, 66 codec),
++  zero falhas/erros/skips. Inclui 65 casos de configuração anteriores e 675 novos.
++  Após o primeiro green, acrescentada cobertura de espaços/zeros e node.role obrigatório.
++- **2026-11-03T22:46:19Z**: walkthrough D01–D17 preparado para revisão. Só quatro ficheiros
++  autorizados de fonte/teste; duas linhas originais substituídas para runtime,
++  construtor de 13 argumentos mantido e nenhuma linha de teste antigo removida.
++  Etapa Test, clean verify/transporte/manual e G-REVIEW-032/revisão/integração
++  pendentes. Parar em Implement, sem commit/push ou fecho.
++
++Implement: [walkthrough](../../../../bolts/019-overlay/implementation-walkthrough.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -6,7 +6,7 @@
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+ em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-019-overlay/IMP-002 está in-progress/adr, com Model/Design aprovados e revisão ADR preparada;
++019-overlay/IMP-002 está in-progress/implement, com Model/Design/ADR aprovados;
+ as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -19,8 +19,8 @@
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
+-Etapa ADR: [revisão preparada](bolts/019-overlay/adr-review.md), após Model/Design e alpha/Q-C-03 aprovados;
+-nenhuma implementação ou V-032 executados.
++Etapa Implement: [walkthrough para revisão](bolts/019-overlay/implementation-walkthrough.md);
++806 testes incrementais aprovados. Test/regressão completa/manual e gate de revisão/integração pendentes.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em ADR, após aprovação de Design. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em Implement, após aprovação de ADR. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em ADR do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Implement do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -25,17 +25,18 @@
+ (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+-Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS apenas
+-em ADR após aprovação de Design/alpha pelo utilizador. [Revisão ADR preparada](../memory-bank/bolts/019-overlay/adr-review.md),
+-sem divergência material; [Q-C-03 aprovada](construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
+-V-032/build do novo incremento ainda não executados; sem código/testes alterados,
+-sem Implement/Test iniciados e sem aprovação de revisor distinto presumida. Os 149 testes
+-referidos abaixo pertencem ao IMP-001, não a esta etapa documental.
+-
+-[Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
++Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS em Implement,
++após revisão ADR aprovada em 2026-11-03T22:33:00Z. [Walkthrough para revisão](../memory-bank/bolts/019-overlay/implementation-walkthrough.md),
++com quatro ficheiros autorizados e D01–D17. Primeiro red real seguido de verdes;
++última execução: 806 testes aprovados (740 configuração + 66 codec), zero falhas/
++erros/skips. 65 casos anteriores de configuração e 66 de codec preservados.
++Etapa Test/regressão completa/transporte/manual, revisor distinto G-REVIEW-032,
++revisão final e integração pendentes. Sem fecho/commit/push de IMP-002.
++
++[Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+ 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+ e 22 checks manuais. Execução por Luis: [log original preservado](../experiments/construction/001-base-validada/manual-smoke-luis.log),
+-22 CHECK_PASS e MANUAL_PASS. POM/fontes/configuração/fixtures/testes intactos;
++22 CHECK_PASS e MANUAL_PASS. Naquele incremento, POM/fontes/configuração/fixtures/testes intactos;
+ a lista gerada createdFiles.lst mudou apenas localmente em Projeto/target/ e
+ foi excluída dos commits. Inception e IMP-001 em commits separados, com
+ [proveniência](../experiments/construction/001-base-validada/inception-commit-provenance.json)
+@@ -61,7 +62,7 @@
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model/Design aprovados; revisão ADR preparada; V-032: NÃO EXECUTADO |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Implement para revisão; V-032 incremental/806 testes verdes; Test completo pendente |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -5,7 +5,7 @@
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+ 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
+-em ADR, após Model/Design aprovados, com [revisão para validação](../memory-bank/bolts/019-overlay/adr-review.md).
++em Implement, após ADR aprovada, com [walkthrough para revisão](../memory-bank/bolts/019-overlay/implementation-walkthrough.md).
+ Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -44,9 +44,9 @@
+ ## 7. Passos de implementação
+ 
+ - [x] Modelar as opções, defaults, limites e regras cruzadas do ADD.
+-- [ ] Integrar carga estrita e erros agregados sem estado parcial.
+-- [ ] Testar defaults antigos, overrides válidos e rejeições/casos limite.
+-- [ ] Confirmar que um consumidor recebe os valores validados sem abrir rede.
++- [x] Integrar carga estrita e erros agregados sem estado parcial.
++- [x] Testar defaults antigos, overrides válidos e rejeições/casos limite.
++- [x] Confirmar que um consumidor recebe os valores validados sem abrir rede.
+ 
+ ## 8. Regras e restrições
+ 
+@@ -83,12 +83,14 @@
+ [Modelo preparado](../../../memory-bank/bolts/019-overlay/ddd-01-domain-model.md)
+ aprovado pelo utilizador em 2026-11-03T22:16:54Z. [Design aprovado](../../../memory-bank/bolts/019-overlay/ddd-02-technical-design.md),
+ com tipos/assinaturas, conversões, compatibilidade, agregação de erros/casos V-032 e
+-prova de consumidor sem sockets. Sem código/testes alterados ou V-032 executado;
++prova de consumidor sem sockets. Estas eram pendências na apresentação de Design;
+ Design/alpha aprovados em 2026-11-03T22:25:30Z, registados em
+ [Q-C-03](../../construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
+-[Revisão ADR preparada](../../../memory-bank/bolts/019-overlay/adr-review.md),
+-sem divergências materiais identificadas; parar antes de Implement/Test.
+-Gate de revisor distinto, V-032/regressão/manual, revisão/integração pendentes antes de DONE.
++Revisão ADR aprovada em 2026-11-03T22:33:00Z; [Implement preparado para revisão](../../../memory-bank/bolts/019-overlay/implementation-walkthrough.md).
++Última execução incremental: 806 testes aprovados (740 configuração + 66 codec),
++com red anterior e mapa D01–D17. Sem alteração de testes antigos/bytes/caps ou
++remoção do construtor anterior. Parar antes da etapa Test. Regressão completa,
++manual, revisor distinto, revisão final e integração pendentes antes de DONE.
+ 
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -92,9 +92,9 @@
+     "Projeto/src/main/java/pt/uminho/esr/ott/client/StreamingClient.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "Projeto/src/main/java/pt/uminho/esr/ott/client/VideoPlayer.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationException.java": "4f802354e8b0db63b8e7b4dd65fdc5255fd67db1a74073d4edc887e9e9103271",
+-    "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java": "d9ce0a7105ce2670ec3710a5af032e8de78499cced2523dfaea42e4b80821df7",
++    "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java": "a4c50dc39f4d113c1e88e237f5d05c8cc24a50c3e9c67d706cf0e43c320c02de",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationProblem.java": "92272119535ef7b87f90413c34cf8b32cc1fc65d025170ec8a17abb0d7b53332",
+-    "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java": "ca65292f06b1d67508f67bd82534ce49af5c2436fb5fed17ec318f6076b86247",
++    "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java": "0ea8cb3836dd38926081aa31391fa40df6f1f3eda0b356cc485f02b9955d946f",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/StreamConfiguration.java": "cfe159a59593e131aa227beb641fa48c573fac601c45fb048930dd9627f59689",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/TopologyConfiguration.java": "944f4c01b9c8a36249bba259f96beaa1643827731dfe1b2a98ad6eae95871194",
+     "Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+@@ -132,7 +132,7 @@
+     "Projeto/src/main/resources/config/topology.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "Projeto/src/main/resources/config/topology.properties": "2b448efa10ea89fa4593207bdada7ae715459cfd9d975030d9bacba439db1212",
+     "Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+-    "Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java": "d10794153bb559a5fcc1cdbed51e92db87f7c0f41577ab08e5c732351ead1328",
++    "Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java": "433a8db5ef1fd5ec0fc02f625f8008671a57cdacd4aa074ceda50de0fd19509e",
+     "Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java": "90814e108330c82be059a19cccb83da13312a4a0e1cfb99556a06f088b1081b9",
+     "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+@@ -244,16 +244,16 @@
+     "docs/06-DATA-MODEL.md": "3105f2c82ab84cc1b4c21238f50d5ae2d56306d32217bdb53c4df5d076dbd29d",
+     "docs/07-API-AND-INTERFACES.md": "cc83fe11878509c15a6b11d0a74d141f479b188c97acb56b2aa1d6ec5f70e83a",
+     "docs/08-IMPLEMENTATION-ROADMAP.md": "b8aff31a131a05746fe7908a4406a3b45f23684ea3d4ee4d1c5f560c098696bb",
+-    "docs/09-TESTING-STRATEGY.md": "8c1bad6f8a0eeb242607cec78cd72dfeba3d147340246d49aba87d1310d54c02",
++    "docs/09-TESTING-STRATEGY.md": "4d7738d89c1493cb124f9bf1e76f789d07c4c7608ec1561bc767398a4ef38074",
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "2370409b88da3146dfeb6d9c7ce15ab82b9385bd34be893321707797797274c5",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "625bbd9b92f0ec551d3bdb5c8e3a680e48aa09a42bf7234483c5c50691750a73",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "5e8118a149c348e3dd2e097514956b7184366397d261fe8180204bc21dc073a8",
++    "docs/15-PROJECT-PROGRESS.md": "f4f6a71544c438865914ac70515049cc101fc705e2144749f46f4475efb8ea1e",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "7526884ae2ca7a88b82a0bc2cd040da45fea4d58b4cf6662042cab978956394c",
++    "docs/18-CONSTRUCTION-BOLTS.md": "5b8924aeefcb4cc6dc080ae391af907ceae48038b1d300b33a2d2d921c72201a",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "3246dca4d87ba3088a9ff31acf8fd92771fbf304a98a56c731d1d32dceced6eb",
++    "docs/tasks/PHASE-02/TASK-032.md": "b39d4e881dc92e12308f8570f896606c6ce476c060523cd937b1188f3f057c37",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -301,9 +301,10 @@
+     "docs/team/WAHEED.md": "fa9a2d9880a8d5f6c84a6b07bd100ac861577a9507144a1a7325a170ae055443",
+     "experiments/task-005-review-build.log": "879642a98b1ed65f8b55fd34f9fa824700d648608e789d8844ecc501401c28f2",
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+-    "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
++    "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
++    "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-03T22:28:09Z",
++  "updated": "2026-11-03T22:47:20Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -523,6 +524,32 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "7526884ae2ca7a88b82a0bc2cd040da45fea4d58b4cf6662042cab978956394c",
+         "docs/tasks/PHASE-02/TASK-032.md": "3246dca4d87ba3088a9ff31acf8fd92771fbf304a98a56c731d1d32dceced6eb"
+       }
++    },
++    {
++      "updated": "2026-11-03T22:47:20Z",
++      "reason": "IMP-002 Implement explicitamente autorizado após ADR: quatro ficheiros de código/teste, red/green incremental e estados/evidência. Acrescentar RuntimeConfiguration ao snapshot, preservar hashes anteriores. Não implica etapa Test, revisão final, integração ou DONE.",
++      "previous_hashes": {
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java": "d9ce0a7105ce2670ec3710a5af032e8de78499cced2523dfaea42e4b80821df7",
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java": "ca65292f06b1d67508f67bd82534ce49af5c2436fb5fed17ec318f6076b86247",
++        "Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java": "d10794153bb559a5fcc1cdbed51e92db87f7c0f41577ab08e5c732351ead1328",
++        "docs/09-TESTING-STRATEGY.md": "8c1bad6f8a0eeb242607cec78cd72dfeba3d147340246d49aba87d1310d54c02",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "2370409b88da3146dfeb6d9c7ce15ab82b9385bd34be893321707797797274c5",
++        "docs/15-PROJECT-PROGRESS.md": "5e8118a149c348e3dd2e097514956b7184366397d261fe8180204bc21dc073a8",
++        "docs/18-CONSTRUCTION-BOLTS.md": "7526884ae2ca7a88b82a0bc2cd040da45fea4d58b4cf6662042cab978956394c",
++        "docs/tasks/PHASE-02/TASK-032.md": "3246dca4d87ba3088a9ff31acf8fd92771fbf304a98a56c731d1d32dceced6eb",
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": null
++      },
++      "updated_hashes": {
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java": "a4c50dc39f4d113c1e88e237f5d05c8cc24a50c3e9c67d706cf0e43c320c02de",
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java": "0ea8cb3836dd38926081aa31391fa40df6f1f3eda0b356cc485f02b9955d946f",
++        "Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java": "433a8db5ef1fd5ec0fc02f625f8008671a57cdacd4aa074ceda50de0fd19509e",
++        "docs/09-TESTING-STRATEGY.md": "4d7738d89c1493cb124f9bf1e76f789d07c4c7608ec1561bc767398a4ef38074",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "625bbd9b92f0ec551d3bdb5c8e3a680e48aa09a42bf7234483c5c50691750a73",
++        "docs/15-PROJECT-PROGRESS.md": "f4f6a71544c438865914ac70515049cc101fc705e2144749f46f4475efb8ea1e",
++        "docs/18-CONSTRUCTION-BOLTS.md": "5b8924aeefcb4cc6dc080ae391af907ceae48038b1d300b33a2d2d921c72201a",
++        "docs/tasks/PHASE-02/TASK-032.md": "b39d4e881dc92e12308f8570f896606c6ce476c060523cd937b1188f3f057c37",
++        "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+--- a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
++++ b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+@@ -2,14 +2,16 @@
+ 
+ Model aprovado explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z.
+ Design e gramática de alpha aprovados pelo utilizador, com registo em
+-2026-11-03T22:25:30Z. Autorizada apenas a [revisão ADR](adr-review.md), antes de Implement/Test.
+-As assinaturas e casos abaixo são propostas documentais; nenhum Java/teste foi
+-escrito ou executado. G-REVIEW-032 e as execuções de V-032/regressão/manual pendentes.
++2026-11-03T22:25:30Z. A [revisão ADR](adr-review.md) foi depois aprovada em
++2026-11-03T22:33:00Z, autorizando apenas Implement e testes incrementais.
++[Implementação local e resultados atuais](implementation-walkthrough.md): 806 testes
++incrementais aprovados; Test/regressão completa/manual/G-REVIEW-032 pendentes.
++As assinaturas e estados de execução abaixo retratam o Design aprovado.
+ 
+ Norma: [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
+ [IMP-002](../../../add.md#imp-002), [Model aprovado](ddd-01-domain-model.md) e
+ [TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md). ADR 007/010/016/024/026
+-preservadas; a revisão formal das ADR está preparada para validação, sem código.
++preservadas; revisão formal das ADR aprovada antes da implementação autorizada.
+ 
+ ## 1. Ficheiros e limites
+ 
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -45,5 +45,7 @@
+ [Q-C-03 — gramática decimal de alpha](../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha)
+ regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Design.
+ As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
+-[revisão de conformidade](../bolts/019-overlay/adr-review.md) preparada antes de código.
+-V-032 e G-REVIEW-032 continuam pendentes; não é aprovação de implementação.
++[revisão de conformidade](../bolts/019-overlay/adr-review.md) aprovada antes de código.
++[Implement para revisão](../bolts/019-overlay/implementation-walkthrough.md), com
++806 testes incrementais aprovados; Test completo/manual e G-REVIEW-032 continuam
++pendentes. Sem ADR nova ou aprovação de fecho/integração presumida.
+diff --git a/memory-bank/bolts/019-overlay/adr-review.md b/memory-bank/bolts/019-overlay/adr-review.md
+--- a/memory-bank/bolts/019-overlay/adr-review.md
++++ b/memory-bank/bolts/019-overlay/adr-review.md
+@@ -2,8 +2,10 @@
+ 
+ Design e gramática de alpha aprovados explicitamente pelo utilizador, com registo
+ em 2026-11-03T22:25:30Z. Autorizado apenas rever ADR-007/010/016/024/026 e registar
+-Q-C-03; parar para revisão antes de Implement/Test. Esta análise é documental:
+-não comprova implementação nem execução de V-032, regressão ou teste manual.
++Q-C-03. Revisão ADR aprovada pelo utilizador em 2026-11-03T22:33:00Z;
++[Implement autorizado e preparado para revisão](implementation-walkthrough.md), com
++806 testes incrementais aprovados. Esta análise ADR é documental; os resultados
++Java atuais, limites e pendências estão no walkthrough. Etapa Test não iniciada.
+ 
+ Fontes: [ADD secção 5](../../../add.md#5-registo-de-decisões),
+ [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
+@@ -72,9 +74,10 @@
+ 
+ ## Checkpoint ADR e condições de fecho
+ 
+-Revisão ADR preparada, ainda não aprovada. Bolt in-progress/adr; Model e Design
+-concluídos pelas aprovações reais, ADR ainda fora de stages_completed. Nenhuma
+-alteração em Projeto/, teste Java, regressão, manual, commit ou push nesta etapa.
++Revisão ADR aprovada e incluída em stages_completed. Na etapa ADR não houve
++alterações em Projeto/ ou execução Java; o trabalho posterior autorizado está no
++walkthrough de Implement. Bolt in-progress/implement, aguardando revisão antes
++de Test. Nenhum fecho ou commit/push foi autorizado para este incremento.
+ 
+ G-REVIEW-032 permanece pendente: designar revisor humano distinto do autor,
+ executar V-032/regressão/manual, obter revisão final e integrar antes de DONE.
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java b/Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java
+@@ -16,7 +16,8 @@
+         String advertisedHost, int controlPort, int dataPort,
+         Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
+         Optional<Path> streamsFile, Optional<Path> mediaBase,
+-        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams) {
++        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams,
++        RuntimeConfiguration runtime) {
+ 
+     public NodeConfiguration {
+         Objects.requireNonNull(sourceFile);
+@@ -29,7 +30,20 @@
+         Objects.requireNonNull(streamsFile);
+         Objects.requireNonNull(mediaBase);
+         Objects.requireNonNull(topology);
++        Objects.requireNonNull(runtime);
+         streams = List.copyOf(streams);
++    }
++
++    /** Compatibilidade com o construtor anterior à parametrização operacional. */
++    public NodeConfiguration(
++            Path sourceFile, String nodeId, NodeRole role, String bindHost,
++            String advertisedHost, int controlPort, int dataPort,
++            Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
++            Optional<Path> streamsFile, Optional<Path> mediaBase,
++            Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams) {
++        this(sourceFile, nodeId, role, bindHost, advertisedHost, controlPort, dataPort,
++                bootstrap, topologyFile, streamsFile, mediaBase, topology, streams,
++                RuntimeConfiguration.defaults());
+     }
+ 
+     /** Contacto conhecido para obter a vizinhança, sem resolução de DNS na carga. */
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java b/Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java
+@@ -10,6 +10,7 @@
+ import java.nio.file.InvalidPathException;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
++import java.time.Duration;
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.HashSet;
+@@ -28,6 +29,18 @@
+ public final class ConfigurationLoader {
+     private static final Set<String> COMMON_KEYS = Set.of(
+             "node.id", "node.role", "bind.host", "advertised.host", "control.port");
++    private static final Set<String> CONTROL_RUNTIME_KEYS = Set.of(
++            "control.connect.timeout.ms", "control.shutdown.timeout.ms", "control.max.connections",
++            "control.queue.capacity", "bootstrap.query.timeout.ms");
++    private static final Set<String> OVERLAY_RUNTIME_KEYS = Set.of(
++            "overlay.hello.timeout.ms", "overlay.retry.initial.ms", "overlay.retry.max.ms",
++            "overlay.retry.jitter.percent", "node.events.capacity", "monitor.probe.interval.ms",
++            "monitor.probe.timeout.ms", "monitor.probe.failures", "monitor.ewma.alpha",
++            "routing.announce.interval.ms", "routing.candidate.ttl.ms", "routing.cache.capacity",
++            "routing.cache.ttl.ms", "routing.flood.max.per.sec", "routing.activate.timeout.ms",
++            "routing.activate.attempts", "routing.switch.improvement.percent", "routing.switch.observations",
++            "routing.switch.min.dwell.ms", "subscription.lease.ms", "subscription.renew.ms",
++            "video.egress.capacity", "video.reassembly.max.frames", "video.reassembly.deadline.ms");
+     private static final String UUID_PATTERN =
+             "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
+ 
+@@ -106,12 +119,152 @@
+                 }
+             }
+         }
++        RuntimeConfiguration runtime = runtime(p, file, role, allowed, errors);
+         unknownKeys(p, allowed, file, errors);
+         if (errors.size() != start) return null;
+         return new NodeConfiguration(file, id, role, bind, advertised, control, data,
+                 Optional.ofNullable(bootstrap), Optional.ofNullable(topologyFile),
+                 Optional.ofNullable(streamsFile), Optional.ofNullable(mediaBase),
+-                Optional.ofNullable(topology), streams);
++                Optional.ofNullable(topology), streams, runtime);
++    }
++
++    /** Defaults apply only to absent keys; parsing failures never become effective values. */
++    private static RuntimeConfiguration runtime(Properties p, Path file, NodeRole role,
++                                                 Set<String> allowed, List<ConfigurationProblem> errors) {
++        int start = errors.size();
++        var defaults = RuntimeConfiguration.defaults();
++        allowed.addAll(CONTROL_RUNTIME_KEYS);
++        boolean overlayRole = role != null && role != NodeRole.BOOTSTRAP;
++        if (overlayRole) allowed.addAll(OVERLAY_RUNTIME_KEYS);
++        if (role == NodeRole.SERVER) allowed.add("source.max.frame.bytes");
++
++        var controlDefault = defaults.control();
++        Duration connect = optionalDuration(p, file, "control.connect.timeout.ms", controlDefault.connectTimeout(), errors);
++        Duration shutdown = optionalDuration(p, file, "control.shutdown.timeout.ms", controlDefault.shutdownTimeout(), errors);
++        Integer connections = optionalInteger(p, file, "control.max.connections", controlDefault.maxConnections(), 1, 64, errors);
++        Integer queue = optionalInteger(p, file, "control.queue.capacity", controlDefault.queueCapacity(), 1, 256, errors);
++        Duration query = optionalDuration(p, file, "bootstrap.query.timeout.ms", controlDefault.bootstrapQueryTimeout(), errors);
++        var control = allPresent(connect, shutdown, connections, queue, query)
++                ? new RuntimeConfiguration.Control(connect, shutdown, connections, queue, query) : null;
++
++        var overlay = defaults.overlay();
++        var monitoring = defaults.monitoring();
++        var routing = defaults.routing();
++        var subscription = defaults.subscription();
++        var video = defaults.video();
++        var source = defaults.source();
++        if (overlayRole) {
++            Duration hello = optionalDuration(p, file, "overlay.hello.timeout.ms", overlay.helloTimeout(), errors);
++            Duration initial = optionalDuration(p, file, "overlay.retry.initial.ms", overlay.retryInitial(), errors);
++            Duration maximum = optionalDuration(p, file, "overlay.retry.max.ms", overlay.retryMax(), errors);
++            Integer jitter = optionalInteger(p, file, "overlay.retry.jitter.percent", overlay.retryJitterPercent(), 0, 100, errors);
++            Integer events = optionalInteger(p, file, "node.events.capacity", overlay.eventsCapacity(), 1, 4096, errors);
++            boolean retryValid = runtimeRelation(initial, maximum, false, file, "overlay.retry.max.ms",
++                    "deve ser >= overlay.retry.initial.ms", errors);
++            overlay = allPresent(hello, initial, maximum, jitter, events) && retryValid
++                    ? new RuntimeConfiguration.Overlay(hello, initial, maximum, jitter, events) : null;
++
++            Duration probeInterval = optionalDuration(p, file, "monitor.probe.interval.ms", monitoring.probeInterval(), errors);
++            Duration probeTimeout = optionalDuration(p, file, "monitor.probe.timeout.ms", monitoring.probeTimeout(), errors);
++            Integer failures = optionalInteger(p, file, "monitor.probe.failures", monitoring.probeFailures(), 1, Integer.MAX_VALUE, errors);
++            Double alpha = optionalAlpha(p, file, "monitor.ewma.alpha", monitoring.ewmaAlpha(), errors);
++            monitoring = allPresent(probeInterval, probeTimeout, failures, alpha)
++                    ? new RuntimeConfiguration.Monitoring(probeInterval, probeTimeout, failures, alpha) : null;
++
++            Duration announce = optionalDuration(p, file, "routing.announce.interval.ms", routing.announceInterval(), errors);
++            Duration candidate = optionalDuration(p, file, "routing.candidate.ttl.ms", routing.candidateTtl(), errors);
++            Integer cacheCapacity = optionalInteger(p, file, "routing.cache.capacity", routing.cacheCapacity(), 1, 4096, errors);
++            Duration cacheTtl = optionalDuration(p, file, "routing.cache.ttl.ms", routing.cacheTtl(), errors);
++            Integer flood = optionalInteger(p, file, "routing.flood.max.per.sec", routing.floodMaxPerSecond(), 1, 10, errors);
++            Duration activateTimeout = optionalDuration(p, file, "routing.activate.timeout.ms", routing.activateTimeout(), errors);
++            Integer attempts = optionalInteger(p, file, "routing.activate.attempts", routing.activateAttempts(), 1, Integer.MAX_VALUE, errors);
++            Integer improvement = optionalInteger(p, file, "routing.switch.improvement.percent", routing.switchImprovementPercent(), 0, 100, errors);
++            Integer observations = optionalInteger(p, file, "routing.switch.observations", routing.switchObservations(), 1, Integer.MAX_VALUE, errors);
++            Duration dwell = optionalDuration(p, file, "routing.switch.min.dwell.ms", routing.switchMinDwell(), errors);
++            // Evaluate independently; a failure in one relation must not hide another.
++            boolean candidateValid = runtimeRelation(announce, candidate, true, file, "routing.candidate.ttl.ms",
++                    "deve ser > routing.announce.interval.ms", errors);
++            boolean cacheValid = runtimeRelation(candidate, cacheTtl, false, file, "routing.cache.ttl.ms",
++                    "deve ser >= routing.candidate.ttl.ms", errors);
++            routing = allPresent(announce, candidate, cacheCapacity, cacheTtl, flood, activateTimeout,
++                    attempts, improvement, observations, dwell) && candidateValid && cacheValid
++                    ? new RuntimeConfiguration.Routing(announce, candidate, cacheCapacity, cacheTtl, flood,
++                    activateTimeout, attempts, improvement, observations, dwell) : null;
++
++            Duration lease = optionalDuration(p, file, "subscription.lease.ms", subscription.lease(), errors);
++            Duration renew = optionalDuration(p, file, "subscription.renew.ms", subscription.renew(), errors);
++            boolean leaseValid = runtimeRelation(renew, lease, true, file, "subscription.renew.ms",
++                    "deve ser < subscription.lease.ms", errors);
++            subscription = allPresent(lease, renew) && leaseValid
++                    ? new RuntimeConfiguration.Subscription(lease, renew) : null;
++
++            Integer egress = optionalInteger(p, file, "video.egress.capacity", video.egressCapacity(), 1, 256, errors);
++            Integer frames = optionalInteger(p, file, "video.reassembly.max.frames", video.reassemblyMaxFrames(), 1, 8, errors);
++            Duration deadline = optionalDuration(p, file, "video.reassembly.deadline.ms", video.reassemblyDeadline(), errors);
++            video = allPresent(egress, frames, deadline) ? new RuntimeConfiguration.Video(egress, frames, deadline) : null;
++        }
++        if (role == NodeRole.SERVER) {
++            Integer bytes = optionalInteger(p, file, "source.max.frame.bytes", source.maxFrameBytes(), 1, 99999, errors);
++            source = bytes == null ? null : new RuntimeConfiguration.Source(bytes);
++        }
++        if (errors.size() != start) return null;
++        return new RuntimeConfiguration(control, overlay, monitoring, routing, subscription, video, source);
++    }
++
++    private static Integer optionalInteger(Properties p, Path file, String key, int defaultValue,
++                                            int min, int max, List<ConfigurationProblem> errors) {
++        String raw = p.getProperty(key);
++        if (raw == null) return defaultValue;
++        String value = raw.strip();
++        try {
++            if (!value.matches("[0-9]+")) throw new NumberFormatException();
++            int result = Integer.parseInt(value);
++            if (result < min || result > max) throw new NumberFormatException();
++            return result;
++        } catch (NumberFormatException ex) {
++            error(errors, file, key, "inteiro decimal esperado no intervalo " + min + ".." + max);
++            return null;
++        }
++    }
++
++    private static Duration optionalDuration(Properties p, Path file, String key,
++                                              Duration defaultValue, List<ConfigurationProblem> errors) {
++        Integer millis = optionalInteger(p, file, key, Math.toIntExact(defaultValue.toMillis()),
++                1, Integer.MAX_VALUE, errors);
++        return millis == null ? null : Duration.ofMillis(millis.longValue());
++    }
++
++    private static Double optionalAlpha(Properties p, Path file, String key, double defaultValue,
++                                         List<ConfigurationProblem> errors) {
++        String raw = p.getProperty(key);
++        if (raw == null) return defaultValue;
++        String value = raw.strip();
++        try {
++            // Q-C-03: full decimal token, no exponent/hex/suffix/sign/comma.
++            if (!value.matches("(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)")) throw new NumberFormatException();
++            double result = Double.parseDouble(value);
++            if (!Double.isFinite(result) || result <= 0 || result > 1) throw new NumberFormatException();
++            return result;
++        } catch (NumberFormatException ex) {
++            error(errors, file, key, "decimal com ponto, finito e no intervalo (0,1] esperado");
++            return null;
++        }
++    }
++
++    private static boolean allPresent(Object... values) {
++        for (Object value : values) if (value == null) return false;
++        return true;
++    }
++
++    private static boolean runtimeRelation(Duration left, Duration right, boolean strict, Path file,
++                                            String key, String message, List<ConfigurationProblem> errors) {
++        if (left == null || right == null) return false;
++        int comparison = left.compareTo(right);
++        if (strict ? comparison >= 0 : comparison > 0) {
++            error(errors, file, key, message);
++            return false;
++        }
++        return true;
+     }
+ 
+     private static TopologyConfiguration topology(Path file, List<ConfigurationProblem> errors) {
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java
+@@ -10,6 +10,7 @@
+ import java.nio.charset.StandardCharsets;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
++import java.time.Duration;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.stream.Collectors;
+@@ -406,4 +407,380 @@
+                 node.C1.neighbors=R1
+                 """;
+     }
++    // IMP-002 / V-032: D01-D17. Existing foundation tests above remain unchanged.
++    private record RuntimeCase(String group, String component, String key, String defaultValue,
++                               String override, int min, int max,
++                               java.util.function.Function<RuntimeConfiguration, Object> read) {
++        Object expected(String value) {
++            if (key.endsWith(".ms")) return Duration.ofMillis(Long.parseLong(value));
++            return key.equals("monitor.ewma.alpha") ? Double.valueOf(value) : (Object) Integer.valueOf(value);
++        }
++        @Override public String toString() { return key; }
++    }
++
++    private static java.util.stream.Stream<RuntimeCase> runtimeCases() {
++        int max = Integer.MAX_VALUE;
++        return java.util.stream.Stream.of(
++            new RuntimeCase("control", "connectTimeout", "control.connect.timeout.ms", "2000", "1111", 1, max, r -> r.control().connectTimeout()),
++            new RuntimeCase("control", "shutdownTimeout", "control.shutdown.timeout.ms", "3000", "2222", 1, max, r -> r.control().shutdownTimeout()),
++            new RuntimeCase("control", "maxConnections", "control.max.connections", "64", "13", 1, 64, r -> r.control().maxConnections()),
++            new RuntimeCase("control", "queueCapacity", "control.queue.capacity", "256", "7", 1, 256, r -> r.control().queueCapacity()),
++            new RuntimeCase("control", "bootstrapQueryTimeout", "bootstrap.query.timeout.ms", "3000", "1234", 1, max, r -> r.control().bootstrapQueryTimeout()),
++            new RuntimeCase("overlay", "helloTimeout", "overlay.hello.timeout.ms", "3000", "1234", 1, max, r -> r.overlay().helloTimeout()),
++            new RuntimeCase("overlay", "retryInitial", "overlay.retry.initial.ms", "500", "750", 1, max, r -> r.overlay().retryInitial()),
++            new RuntimeCase("overlay", "retryMax", "overlay.retry.max.ms", "5000", "6000", 1, max, r -> r.overlay().retryMax()),
++            new RuntimeCase("overlay", "retryJitterPercent", "overlay.retry.jitter.percent", "10", "25", 0, 100, r -> r.overlay().retryJitterPercent()),
++            new RuntimeCase("overlay", "eventsCapacity", "node.events.capacity", "4096", "99", 1, 4096, r -> r.overlay().eventsCapacity()),
++            new RuntimeCase("monitoring", "probeInterval", "monitor.probe.interval.ms", "1000", "1500", 1, max, r -> r.monitoring().probeInterval()),
++            new RuntimeCase("monitoring", "probeTimeout", "monitor.probe.timeout.ms", "1000", "1750", 1, max, r -> r.monitoring().probeTimeout()),
++            new RuntimeCase("monitoring", "probeFailures", "monitor.probe.failures", "3", "5", 1, max, r -> r.monitoring().probeFailures()),
++            new RuntimeCase("monitoring", "ewmaAlpha", "monitor.ewma.alpha", "0.2", "0.35", 0, 1, r -> r.monitoring().ewmaAlpha()),
++            new RuntimeCase("routing", "announceInterval", "routing.announce.interval.ms", "2000", "1000", 1, max, r -> r.routing().announceInterval()),
++            new RuntimeCase("routing", "candidateTtl", "routing.candidate.ttl.ms", "8000", "9000", 1, max, r -> r.routing().candidateTtl()),
++            new RuntimeCase("routing", "cacheCapacity", "routing.cache.capacity", "4096", "123", 1, 4096, r -> r.routing().cacheCapacity()),
++            new RuntimeCase("routing", "cacheTtl", "routing.cache.ttl.ms", "16000", "18000", 1, max, r -> r.routing().cacheTtl()),
++            new RuntimeCase("routing", "floodMaxPerSecond", "routing.flood.max.per.sec", "10", "7", 1, 10, r -> r.routing().floodMaxPerSecond()),
++            new RuntimeCase("routing", "activateTimeout", "routing.activate.timeout.ms", "3000", "1200", 1, max, r -> r.routing().activateTimeout()),
++            new RuntimeCase("routing", "activateAttempts", "routing.activate.attempts", "3", "4", 1, max, r -> r.routing().activateAttempts()),
++            new RuntimeCase("routing", "switchImprovementPercent", "routing.switch.improvement.percent", "20", "35", 0, 100, r -> r.routing().switchImprovementPercent()),
++            new RuntimeCase("routing", "switchObservations", "routing.switch.observations", "3", "5", 1, max, r -> r.routing().switchObservations()),
++            new RuntimeCase("routing", "switchMinDwell", "routing.switch.min.dwell.ms", "5000", "6500", 1, max, r -> r.routing().switchMinDwell()),
++            new RuntimeCase("subscription", "lease", "subscription.lease.ms", "6000", "9000", 1, max, r -> r.subscription().lease()),
++            new RuntimeCase("subscription", "renew", "subscription.renew.ms", "2000", "1500", 1, max, r -> r.subscription().renew()),
++            new RuntimeCase("video", "egressCapacity", "video.egress.capacity", "256", "123", 1, 256, r -> r.video().egressCapacity()),
++            new RuntimeCase("video", "reassemblyMaxFrames", "video.reassembly.max.frames", "8", "4", 1, 8, r -> r.video().reassemblyMaxFrames()),
++            new RuntimeCase("video", "reassemblyDeadline", "video.reassembly.deadline.ms", "250", "333", 1, max, r -> r.video().reassemblyDeadline()),
++            new RuntimeCase("source", "maxFrameBytes", "source.max.frame.bytes", "99999", "50000", 1, 99999, r -> r.source().maxFrameBytes()));
++    }
++
++    @Test
++    void runtimeDefaultsPreserveFiveRealProfiles() throws Exception { // D01
++        for (var node : ConfigurationLoader.loadDeployment(examplePaths(exampleDirectory()))) {
++            assertEquals(RuntimeConfiguration.defaults(), node.runtime());
++            for (var c : runtimeCases().toList()) assertEquals(c.expected(c.defaultValue()), c.read().apply(node.runtime()), c.key());
++        }
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeAllowedRoles() {
++        return runtimeCases().flatMap(c -> java.util.Arrays.stream(NodeRole.values())
++                .filter(role -> c.group().equals("control") || role != NodeRole.BOOTSTRAP
++                        && (!c.group().equals("source") || role == NodeRole.SERVER))
++                .map(role -> org.junit.jupiter.params.provider.Arguments.of(c, role)));
++    }
++
++    @ParameterizedTest(name = "{0} / {1}")
++    @org.junit.jupiter.params.provider.MethodSource("runtimeAllowedRoles")
++    void runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase c, NodeRole role) throws Exception { // D02,D06
++        var runtime = runtimeLoad(role, c.key() + "=" + c.override() + "\n").runtime();
++        for (var other : runtimeCases().toList()) {
++            String expected = other.key().equals(c.key()) ? c.override() : other.defaultValue();
++            assertEquals(other.expected(expected), other.read().apply(runtime), other.key());
++        }
++    }
++
++    private record RuntimeBoundary(String properties, String relationError) { }
++    private static RuntimeBoundary runtimeBoundary(RuntimeCase c, int value) {
++        var values = new java.util.LinkedHashMap<String, String>();
++        values.put(c.key(), Integer.toString(value));
++        String error = null;
++        switch (c.key()) {
++            case "overlay.retry.initial.ms" -> values.put("overlay.retry.max.ms", Integer.toString(Math.max(5000, value)));
++            case "overlay.retry.max.ms" -> values.put("overlay.retry.initial.ms", Integer.toString(Math.min(500, value)));
++            case "routing.announce.interval.ms" -> {
++                if (value == Integer.MAX_VALUE) error = "routing.candidate.ttl.ms";
++                else {
++                    values.put("routing.candidate.ttl.ms", Integer.toString(value + 1));
++                    values.put("routing.cache.ttl.ms", Integer.toString(Math.max(16000, value + 1)));
++                }
++            }
++            case "routing.candidate.ttl.ms" -> {
++                if (value == 1) error = c.key();
++                else {
++                    values.put("routing.announce.interval.ms", Integer.toString(Math.min(2000, value - 1)));
++                    values.put("routing.cache.ttl.ms", Integer.toString(Math.max(16000, value)));
++                }
++            }
++            case "routing.cache.ttl.ms" -> {
++                if (value == 1) {
++                    values.put("routing.announce.interval.ms", "1");
++                    values.put("routing.candidate.ttl.ms", "2"); error = c.key();
++                }
++            }
++            case "subscription.lease.ms" -> {
++                if (value == 1) error = "subscription.renew.ms";
++                else values.put("subscription.renew.ms", Integer.toString(Math.min(2000, value - 1)));
++            }
++            case "subscription.renew.ms" -> {
++                if (value == Integer.MAX_VALUE) error = c.key();
++                else values.put("subscription.lease.ms", Integer.toString(Math.max(6000, value + 1)));
++            }
++            default -> { }
++        }
++        return new RuntimeBoundary(values.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue() + "\n")
++                .collect(Collectors.joining()), error);
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeBoundaries() {
++        return runtimeCases().filter(c -> !c.key().equals("monitor.ewma.alpha"))
++                .flatMap(c -> java.util.stream.Stream.of(c.min(), c.max())
++                        .map(v -> org.junit.jupiter.params.provider.Arguments.of(c, v)));
++    }
++
++    @ParameterizedTest(name = "{0} / {1}")
++    @org.junit.jupiter.params.provider.MethodSource("runtimeBoundaries")
++    void runtimeScalarBoundariesRespectCrossRelations(RuntimeCase c, int value) throws Exception { // D03,D08
++        var boundary = runtimeBoundary(c, value);
++        if (boundary.relationError() != null) hasKey(failure(runtimeProfile(NodeRole.SERVER, boundary.properties()), NodeRole.SERVER), boundary.relationError());
++        else {
++            Object actual = c.read().apply(runtimeLoad(NodeRole.SERVER, boundary.properties()).runtime());
++            assertEquals(c.expected(Integer.toString(value)), actual);
++            if (actual instanceof Duration d) {
++                assertEquals((long) value * 1_000_000L, d.toNanos());
++                assertEquals(value, Math.toIntExact(d.toMillis()));
++            }
++        }
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeBadIntegers() {
++        return runtimeCases().filter(c -> !c.key().equals("monitor.ewma.alpha")).flatMap(c -> {
++            var values = new java.util.LinkedHashSet<>(List.of("", " ", "-1", "+1", "1.5", "1ms", "1_000", "2,000", "2147483648"));
++            values.add(Integer.toString(c.min() - 1)); values.add(Long.toString((long) c.max() + 1));
++            return values.stream().map(v -> org.junit.jupiter.params.provider.Arguments.of(c, v));
++        });
++    }
++
++    @ParameterizedTest(name = "{0} / [{1}]")
++    @org.junit.jupiter.params.provider.MethodSource("runtimeBadIntegers")
++    void runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase c, String value) throws Exception { // D04,D05
++        Path file = runtimeProfile(NodeRole.SERVER, c.key() + "=" + value + "\n");
++        var error = failure(file, NodeRole.SERVER); hasKey(error, c.key());
++        assertTrue(error.problems().stream().allMatch(problem -> problem.file().equals(file.toAbsolutePath())));
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeGoodAlpha() {
++        return java.util.stream.Stream.of(
++            org.junit.jupiter.params.provider.Arguments.of("1", 1d),
++            org.junit.jupiter.params.provider.Arguments.of("1.0", 1d),
++            org.junit.jupiter.params.provider.Arguments.of("0.2", .2d),
++            org.junit.jupiter.params.provider.Arguments.of(".2", .2d),
++            org.junit.jupiter.params.provider.Arguments.of("000.500", .5d),
++            org.junit.jupiter.params.provider.Arguments.of(" 0.25 ", .25d),
++            org.junit.jupiter.params.provider.Arguments.of("0." + "0".repeat(323) + "49", Double.MIN_VALUE));
++    }
++    @ParameterizedTest
++    @org.junit.jupiter.params.provider.MethodSource("runtimeGoodAlpha")
++    void runtimeAcceptsApprovedAlphaGrammar(String token, double expected) throws Exception { // D03,D04,Q-C-03
++        assertEquals(expected, runtimeLoad(NodeRole.CLIENT, "monitor.ewma.alpha=" + token + "\n").runtime().monitoring().ewmaAlpha());
++    }
++
++    private static java.util.stream.Stream<String> runtimeBadAlpha() {
++        return java.util.stream.Stream.concat(java.util.stream.Stream.of("", " ", "0", "0.0", "-0.2", "+0.2", "1.01", "NaN", "Infinity", "-Infinity",
++                "0,2", "2e-1", "0x1.0p-1", "0.2d", "0.2f", "1.", "0.2ms", "0.2_0"),
++                java.util.stream.Stream.of("0." + "0".repeat(399) + "1", "9".repeat(400) + ".0"));
++    }
++    @ParameterizedTest
++    @org.junit.jupiter.params.provider.MethodSource("runtimeBadAlpha")
++    void runtimeRejectsAlphaGrammarDomainAndUnderflow(String token) throws Exception { // D04
++        hasKey(failure(runtimeProfile(NodeRole.CLIENT, "monitor.ewma.alpha=" + token + "\n"), NodeRole.CLIENT), "monitor.ewma.alpha");
++    }
++
++    @Test
++    void runtimeAcceptsWhitespaceAndLeadingZeroIntegers() throws Exception { // D04
++        var runtime = runtimeLoad(NodeRole.SERVER,
++                "control.queue.capacity= 0007  \noverlay.hello.timeout.ms= 0009  \nsource.max.frame.bytes= 0001234  \n").runtime();
++        assertEquals(7, runtime.control().queueCapacity());
++        assertEquals(Duration.ofMillis(9), runtime.overlay().helloTimeout());
++        assertEquals(1234, runtime.source().maxFrameBytes());
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeForbiddenRoles() {
++        return runtimeCases().filter(c -> !c.group().equals("control")).flatMap(c -> {
++            var roles = c.group().equals("source") ? List.of(NodeRole.BOOTSTRAP, NodeRole.RELAY, NodeRole.CLIENT) : List.of(NodeRole.BOOTSTRAP);
++            return roles.stream().flatMap(role -> java.util.stream.Stream.of(c.defaultValue(), c.override())
++                    .map(value -> org.junit.jupiter.params.provider.Arguments.of(c, role, value)));
++        });
++    }
++    @ParameterizedTest(name = "{0} / {1} / {2}")
++    @org.junit.jupiter.params.provider.MethodSource("runtimeForbiddenRoles")
++    void runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase c, NodeRole role, String value) throws Exception { // D06
++        hasKey(failure(runtimeProfile(role, c.key() + "=" + value + "\n"), role), c.key());
++    }
++
++    @Test
++    void runtimeRejectsUnknownDuplicatesAndInvalidRoleWithoutFallback() throws Exception { // D07
++        hasKey(failure(runtimeProfile(NodeRole.CLIENT, "monitor.ewma.alpa=0.2\n"), NodeRole.CLIENT), "monitor.ewma.alpa");
++        for (String second : List.of("control.queue.capacity=9\n", "control.queue.capacit\\u0079=9\n")) {
++            var error = failure(runtimeProfile(NodeRole.CLIENT, "control.queue.capacity=7\n" + second), NodeRole.CLIENT);
++            assertTrue(error.problems().stream().anyMatch(e -> e.key().equals("control.queue.capacity") && e.message().contains("duplicada")));
++        }
++        Path badRole = runtimeProfile(NodeRole.CLIENT, "monitor.ewma.alpha=0.3\n");
++        write(badRole, Files.readString(badRole).replace("node.role=CLIENT", "node.role=INVALID"));
++        hasKey(failure(badRole, NodeRole.CLIENT), "node.role");
++    }
++
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeRelationCases() {
++        return java.util.stream.Stream.of(
++            org.junit.jupiter.params.provider.Arguments.of("overlay.retry.initial.ms=5000\noverlay.retry.max.ms=5000\n", ""),
++            org.junit.jupiter.params.provider.Arguments.of("overlay.retry.initial.ms=5001\noverlay.retry.max.ms=5000\n", "overlay.retry.max.ms"),
++            org.junit.jupiter.params.provider.Arguments.of("routing.announce.interval.ms=2000\nrouting.candidate.ttl.ms=2001\n", ""),
++            org.junit.jupiter.params.provider.Arguments.of("routing.announce.interval.ms=2000\nrouting.candidate.ttl.ms=2000\n", "routing.candidate.ttl.ms"),
++            org.junit.jupiter.params.provider.Arguments.of("routing.cache.ttl.ms=8000\n", ""),
++            org.junit.jupiter.params.provider.Arguments.of("routing.cache.ttl.ms=7999\n", "routing.cache.ttl.ms"),
++            org.junit.jupiter.params.provider.Arguments.of("subscription.renew.ms=5999\n", ""),
++            org.junit.jupiter.params.provider.Arguments.of("subscription.renew.ms=6000\n", "subscription.renew.ms"));
++    }
++    @ParameterizedTest
++    @org.junit.jupiter.params.provider.MethodSource("runtimeRelationCases")
++    void runtimeEnforcesFourCrossRelations(String properties, String errorKey) throws Exception { // D08
++        if (errorKey.isEmpty()) assertNotNull(runtimeLoad(NodeRole.CLIENT, properties));
++        else hasKey(failure(runtimeProfile(NodeRole.CLIENT, properties), NodeRole.CLIENT), errorKey);
++    }
++
++    @Test
++    void runtimeValidatesOverridesTogetherWithDefaults() throws Exception { // D09
++        String[][] pairs = {
++            {"overlay.retry.initial.ms=6000\n", "overlay.retry.max.ms=6000\n", "overlay.retry.max.ms"},
++            {"routing.announce.interval.ms=8000\n", "routing.candidate.ttl.ms=8001\n", "routing.candidate.ttl.ms"},
++            {"routing.candidate.ttl.ms=20000\n", "routing.cache.ttl.ms=20000\n", "routing.cache.ttl.ms"},
++            {"subscription.lease.ms=1000\n", "subscription.renew.ms=999\n", "subscription.renew.ms"}};
++        for (var pair : pairs) {
++            hasKey(failure(runtimeProfile(NodeRole.CLIENT, pair[0]), NodeRole.CLIENT), pair[2]);
++            assertNotNull(runtimeLoad(NodeRole.CLIENT, pair[0] + pair[1]));
++        }
++    }
++
++    @Test
++    void runtimeAggregatesIndependentLegacyAndRuntimeProblems() throws Exception { // D10
++        Path file = runtimeProfile(NodeRole.CLIENT, "control.queue.capacity=0\nmonitor.ewma.alpha=NaN\nvideo.reassembly.max.frames=9\nrouting.candidate.ttl.ms=1\n");
++        write(file, Files.readString(file).replace("control.port=5400", "control.port=0"));
++        var error = failure(file, NodeRole.CLIENT);
++        for (var key : List.of("control.port", "control.queue.capacity", "monitor.ewma.alpha", "video.reassembly.max.frames", "routing.candidate.ttl.ms")) hasKey(error, key);
++        assertTrue(error.problems().stream().allMatch(problem -> problem.file().equals(file.toAbsolutePath())));
++        assertThrows(UnsupportedOperationException.class, () -> error.problems().clear());
++    }
++    @Test
++    void runtimeDoesNotInventRelationErrorsFromInvalidOperands() throws Exception { // D11
++        var error = failure(runtimeProfile(NodeRole.CLIENT, "overlay.retry.initial.ms=invalid\noverlay.retry.max.ms=200\nsubscription.lease.ms=1\n"), NodeRole.CLIENT);
++        hasKey(error, "overlay.retry.initial.ms"); hasKey(error, "subscription.renew.ms");
++        assertFalse(error.problems().stream().anyMatch(problem -> problem.key().equals("overlay.retry.max.ms")));
++    }
++
++    private static Object rebuildRecord(Object original, String component, Object replacement) throws Exception {
++        var fields = original.getClass().getRecordComponents();
++        var types = new Class<?>[fields.length]; var values = new Object[fields.length];
++        boolean found = false;
++        for (int i = 0; i < fields.length; i++) {
++            types[i] = fields[i].getType(); values[i] = fields[i].getAccessor().invoke(original);
++            if (fields[i].getName().equals(component)) { values[i] = replacement; found = true; }
++        }
++        assertTrue(found, component);
++        try { return original.getClass().getConstructor(types).newInstance(values); }
++        catch (java.lang.reflect.InvocationTargetException ex) {
++            if (ex.getCause() instanceof RuntimeException cause) throw cause;
++            throw ex;
++        }
++    }
++    private static Object runtimeGroup(RuntimeConfiguration runtime, String group) throws Exception {
++        return RuntimeConfiguration.class.getMethod(group).invoke(runtime);
++    }
++    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments> runtimeBadDirectValues() {
++        return runtimeCases().flatMap(c -> {
++            List<Object> values;
++            if (c.key().endsWith(".ms")) values = List.of(Duration.ZERO, Duration.ofMillis(-1), Duration.ofNanos(1),
++                    Duration.ofMillis(1).plusNanos(1), Duration.ofSeconds(Long.MAX_VALUE), Duration.ofMillis((long) Integer.MAX_VALUE + 1));
++            else if (c.key().equals("monitor.ewma.alpha")) values = List.of(0d, -.1d, 1.1d, Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
++            else values = c.max() == Integer.MAX_VALUE ? List.of(c.min() - 1) : List.of(c.min() - 1, c.max() + 1);
++            return values.stream().map(value -> org.junit.jupiter.params.provider.Arguments.of(c, value));
++        });
++    }
++    @ParameterizedTest(name = "{0} / {1}")
++    @org.junit.jupiter.params.provider.MethodSource("runtimeBadDirectValues")
++    void runtimeConstructorsRejectInvalidValues(RuntimeCase c, Object value) throws Exception { // D12
++        Object group = runtimeGroup(RuntimeConfiguration.defaults(), c.group());
++        assertThrows(IllegalArgumentException.class, () -> rebuildRecord(group, c.component(), value));
++    }
++    @Test
++    void runtimeConstructorsRejectNullsAndInvalidRelations() throws Exception { // D12
++        var r = RuntimeConfiguration.defaults();
++        for (var name : List.of("control", "overlay", "monitoring", "routing", "subscription", "video", "source"))
++            assertThrows(NullPointerException.class, () -> rebuildRecord(r, name, null));
++        for (var c : runtimeCases().filter(x -> x.key().endsWith(".ms")).toList())
++            assertThrows(NullPointerException.class, () -> rebuildRecord(runtimeGroup(r, c.group()), c.component(), null));
++        assertThrows(IllegalArgumentException.class, () -> rebuildRecord(r.overlay(), "retryMax", Duration.ofMillis(499)));
++        assertThrows(IllegalArgumentException.class, () -> rebuildRecord(r.routing(), "candidateTtl", Duration.ofMillis(2000)));
++        assertThrows(IllegalArgumentException.class, () -> rebuildRecord(r.routing(), "cacheTtl", Duration.ofMillis(7999)));
++        assertThrows(IllegalArgumentException.class, () -> rebuildRecord(r.subscription(), "renew", Duration.ofMillis(6000)));
++    }
++
++    @Test
++    void runtimePreservesOldConstructorAndCanonicalOverrides() throws Exception { // D13
++        var n = runtimeLoad(NodeRole.SERVER, "");
++        var old = new NodeConfiguration(n.sourceFile(), n.nodeId(), n.role(), n.bindHost(), n.advertisedHost(), n.controlPort(), n.dataPort(),
++                n.bootstrap(), n.topologyFile(), n.streamsFile(), n.mediaBase(), n.topology(), n.streams());
++        assertEquals(n, old); assertEquals(RuntimeConfiguration.defaults(), old.runtime());
++        var input = new java.util.ArrayList<>(n.streams());
++        var changed = runtimeLoad(NodeRole.SERVER, "control.queue.capacity=7\n").runtime();
++        var canonical = new NodeConfiguration(n.sourceFile(), n.nodeId(), n.role(), n.bindHost(), n.advertisedHost(), n.controlPort(), n.dataPort(),
++                n.bootstrap(), n.topologyFile(), n.streamsFile(), n.mediaBase(), n.topology(), input, changed);
++        input.clear(); assertEquals(2, canonical.streams().size()); assertEquals(changed, canonical.runtime()); assertNotEquals(old, canonical);
++        assertThrows(UnsupportedOperationException.class, () -> canonical.streams().clear());
++        assertThrows(NullPointerException.class, () -> new NodeConfiguration(n.sourceFile(), n.nodeId(), n.role(), n.bindHost(), n.advertisedHost(), n.controlPort(), n.dataPort(),
++                n.bootstrap(), n.topologyFile(), n.streamsFile(), n.mediaBase(), n.topology(), n.streams(), null));
++    }
++    @Test
++    void runtimeOverridesReachTransportOptionsWithoutOpeningSockets() throws Exception { // D14
++        var control = runtimeLoad(NodeRole.CLIENT, "control.queue.capacity=7\ncontrol.max.connections=13\ncontrol.connect.timeout.ms=1111\ncontrol.shutdown.timeout.ms=2222\n").runtime().control();
++        var consumed = new pt.uminho.esr.ott.transport.Transport.Options(control.queueCapacity(), control.maxConnections(), control.connectTimeout(), control.shutdownTimeout());
++        assertEquals(7, consumed.queueCapacity()); assertEquals(13, consumed.maxConnections());
++        assertEquals(Duration.ofMillis(1111), consumed.connectTimeout()); assertEquals(Duration.ofMillis(2222), consumed.shutdownTimeout());
++    }
++    @Test
++    void runtimeDeploymentIsAtomicAndOptionsRemainPerNode() throws Exception { // D15
++        Path dir = copyExamples();
++        Files.writeString(dir.resolve("server-1.properties"), "control.queue.capacity=7\n", StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.APPEND);
++        Files.writeString(dir.resolve("client.properties"), "control.queue.capacity=8\n", StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.APPEND);
++        var nodes = ConfigurationLoader.loadDeployment(examplePaths(dir));
++        assertEquals(7, nodes.stream().filter(n -> n.nodeId().equals("S1")).findFirst().orElseThrow().runtime().control().queueCapacity());
++        assertEquals(8, nodes.stream().filter(n -> n.role() == NodeRole.CLIENT).findFirst().orElseThrow().runtime().control().queueCapacity());
++        Files.writeString(dir.resolve("client.properties"), "monitor.ewma.alpha=NaN\n", StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.APPEND);
++        var error = assertThrows(ConfigurationException.class, () -> ConfigurationLoader.loadDeployment(examplePaths(dir)));
++        hasKey(error, "monitor.ewma.alpha");
++        assertEquals(256, RuntimeConfiguration.defaults().control().queueCapacity());
++        assertEquals(RuntimeConfiguration.defaults(), ConfigurationLoader.load(exampleDirectory().resolve("client.properties"), NodeRole.CLIENT).runtime());
++    }
++    @Test
++    void runtimePropertiesStayOutOfTopologyAndCatalog() throws Exception { // D15
++        hasKey(failure(bootstrap(topology() + "control.queue.capacity=7\n"), NodeRole.BOOTSTRAP), "control.queue.capacity");
++        Path server = runtimeProfile(NodeRole.SERVER, "");
++        Files.writeString(temp.resolve("runtime-catalog.properties"), "control.queue.capacity=7\n", StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.APPEND);
++        hasKey(failure(server, NodeRole.SERVER), "control.queue.capacity");
++    }
++    @Test
++    void runtimeDefaultsDoNotReplaceRequiredConfiguration() throws Exception { // D16
++        for (String key : List.of("node.id", "node.role", "bind.host", "advertised.host", "control.port", "data.port", "bootstrap.host", "bootstrap.port")) {
++            Path file = runtimeProfile(NodeRole.CLIENT, "control.queue.capacity=7\n");
++            write(file, Files.readString(file).replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*\\R", ""));
++            hasKey(failure(file, NodeRole.CLIENT), key);
++        }
++        Path bootstrap = runtimeProfile(NodeRole.BOOTSTRAP, "control.queue.capacity=7\n");
++        write(bootstrap, Files.readString(bootstrap).replaceAll("(?m)^topology\\.file=.*\\R", "")); hasKey(failure(bootstrap, NodeRole.BOOTSTRAP), "topology.file");
++        for (String key : List.of("streams.file", "media.base")) {
++            Path file = runtimeProfile(NodeRole.SERVER, "control.queue.capacity=7\n");
++            write(file, Files.readString(file).replaceAll("(?m)^" + java.util.regex.Pattern.quote(key) + "=.*\\R", "")); hasKey(failure(file, NodeRole.SERVER), key);
++        }
++    }
++
++    private NodeConfiguration runtimeLoad(NodeRole role, String properties) throws Exception {
++        return ConfigurationLoader.load(runtimeProfile(role, properties), role);
++    }
++    private Path runtimeProfile(NodeRole role, String properties) throws IOException {
++        String body = profile(role, role == NodeRole.BOOTSTRAP ? "B" : role == NodeRole.SERVER ? "S1" : "C1",
++                role == NodeRole.BOOTSTRAP ? 5002 : 5400, role == NodeRole.BOOTSTRAP ? 0 : 5401);
++        if (role == NodeRole.BOOTSTRAP) {
++            write(temp.resolve("runtime-topology.properties"), topology()); body += "topology.file=runtime-topology.properties\n";
++        } else if (role == NodeRole.SERVER) {
++            write(temp.resolve("runtime-catalog.properties"), catalog()); body += "streams.file=runtime-catalog.properties\nmedia.base=media\n";
++        }
++        return write(temp.resolve("runtime-" + role + ".properties"), body + properties);
++    }
+ }
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -270,7 +270,11 @@
+ Defaults preservam perfis atuais; overrides válidos chegam ao consumidor.
+ Chaves desconhecidas/inaplicáveis/duplicadas, NaN/infinito, tipos, intervalos,
+ overflow e relações inválidas produzem erro agregado antes de sockets.
+-Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: NÃO EXECUTADO.
++Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUÇÃO INCREMENTAL
++em Implement: 740 testes de configuração e 66 de codec aprovados, após red real.
++[Mapa D01–D17/logs](../memory-bank/bolts/019-overlay/implementation-walkthrough.md).
++Etapa Test/regressão completa/transporte/manual e revisão/integração pendentes;
++os resultados incrementais não declaram este oráculo global concluído.
+ 
+ ### V-ADD — Coerência do documento mestre e dos incrementos
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -65,6 +65,13 @@
+ complete; nenhum requisito global é promovido a DONE.
+ Os estados e evidências legados acima conservam-se como histórico das TASK.
+ 
++IMP-002/REQ-024: implementação local para revisão, com 30 chaves/sete grupos,
++erros agregados e construtor anterior preservado. [Prova incremental](../memory-bank/bolts/019-overlay/implementation-walkthrough.md):
++806 testes aprovados (740 configuração, incluindo 675 novos, e 66 codec), com
++falhas reais antes da implementação completa. D01–D16 cobertos incrementalmente;
++D17 parcial até regressão completa/transporte/manual. G-REVIEW-032/revisão final/
++integração pendentes; nenhum requisito, TASK/bolt ou unidade promovido a DONE.
++
+ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+ CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
+diff --git a/memory-bank/bolts/019-overlay/implementation-walkthrough.md b/memory-bank/bolts/019-overlay/implementation-walkthrough.md
+--- /dev/null
++++ b/memory-bank/bolts/019-overlay/implementation-walkthrough.md
+@@ -0,0 +1,133 @@
++# IMP-002 — Implement: walkthrough para revisão
++
++Revisão ADR aprovada pelo utilizador, com registo em 2026-11-03T22:33:00Z.
++Autorizado somente Implement nos quatro ficheiros de IMP-002 e documentação,
++com casos V-032/falhas reais e testes incrementais. Bolt in-progress/implement;
++a etapa aguarda revisão, sem avançar para Test ou fecho.
++
++## Resultado local e âmbito
++
++Implementados os sete records de RuntimeConfiguration, os 30 defaults/chaves e
++validações, a extensão aditiva de NodeConfiguration e a carga estrita/agregada.
++O construtor anterior de 13 argumentos continua público e delega nos defaults;
++o novo canónico recebe runtime como 14.º componente. Testes antigos preservados.
++
++Só estes ficheiros de fonte/teste foram alterados/criados:
++
++- [RuntimeConfiguration.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java):
++  novo valor imutável com grupos Control/Overlay/Monitoring/Routing/Subscription/
++  Video/Source, guards também na construção direta e defaults centrais imutáveis.
++- [NodeConfiguration.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java):
++  runtime não nulo, overload anterior e List.copyOf(streams) preservado.
++- [ConfigurationLoader.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java):
++  allowlists por papel, parsing opcional, defaults só na ausência, quatro relações
++  e publicação somente após validar; os métodos públicos não mudaram.
++- [ConfigurationLoaderTest.java](../../../Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java):
++  casos novos acrescentados sem apagar/enfraquecer os testes existentes.
++
++Duration é validado antes de conversões, com precisão exata de ms e teto
++Integer.MAX_VALUE ms. Alpha segue a gramática aprovada em
++[Q-C-03](../../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha),
++com finitude/domínio e rejeição de underflow para zero. Tipos inválidos entram
++em ConfigurationException com file/key; não se usa default para esconder erro.
++Relações com operando inválido não inventam diagnósticos com sentinelas.
++
++POM, perfis, fixtures, codec, transporte e respetivos testes permanecem intactos.
++Sem sockets/threads/timers na carga ou no novo modelo; sem dependência runtime,
++mudança de bytes/caps, ADR nova ou âmbito adicional. Wiring real dos serviços
++permanece nos seus IMP. O consumidor offline é apenas o record Transport.Options.
++
++## Falhas reais e implementação incremental
++
++Comandos a partir da raiz, através de
++[run-incremental.py](../../../experiments/construction/019-overlay/run-incremental.py),
++que executa Maven em Projeto/ com JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64,
++captura stdout/stderr/código de saída e copia só os relatórios da seleção atual.
++JDK observado nos XML finais: 21.0.12.1. Cada fase tem nome/log novo.
++
++| Fase real | Seleção Maven (-Dtest) | Resultado |
++|---|---|---|
++| implement-red, 22:36:49Z–22:36:54Z | ConfigurationLoaderTest | Código 1; 739 testes, 130 falhas, 160 erros, zero skips |
++| implement-records-green, 22:37:53Z–22:37:56Z | ConfigurationLoaderTest#runtimeConstructorsRejectInvalidValues+runtimeConstructorsRejectNullsAndInvalidRelations+runtimeDefaultsPreserveFiveRealProfiles | Código 0; 127 testes, zero falhas/erros/skips |
++| implement-config-green, 22:39:24Z–22:39:28Z | ConfigurationLoaderTest | Código 0; 739 testes, zero falhas/erros/skips |
++| implement-config-codec-green, 22:41:41Z–22:41:46Z | ConfigurationLoaderTest,MessageCodecTest | Código 0; 806 testes = 740 configuração + 66 codec, zero falhas/erros/skips |
++
++As horas desta tabela são UTC de 2026-11-03. Os números não são somados entre
++fases, pois as seleções sobrepõem-se. A última execução contém 65 casos antigos
++de configuração, 675 novos e 66 de codec, todos aprovados. Uma nova verificação
++de inteiros com espaços/leading zeros foi acrescentada após o primeiro green;
++também se incluiu node.role entre as propriedades obrigatórias do caso D16.
++
++O primeiro red teve a API/defaults mínimos e o construtor compatível; os guards
++dos grupos e o parsing operacional ainda não estavam completos. Os 65 casos
++anteriores passaram; todos os 290 resultados negativos pertenciam aos casos novos:
++overrides reconhecidos como desconhecidos, valores inválidos aceites por records
++e diagnósticos/receção de overrides ainda ausentes. Não se alterou um teste antigo
++para fabricar falha. Depois passaram os guards e os casos da carga, por partes.
++
++Evidência preservada: [red completo](../../../experiments/construction/019-overlay/implement-red.log),
++[guards](../../../experiments/construction/019-overlay/implement-records-green-command.json),
++[configuração](../../../experiments/construction/019-overlay/implement-config-green-command.json),
++[último comando/resultados](../../../experiments/construction/019-overlay/implement-config-codec-green-command.json)
++e [resumo extraído dos XML](../../../experiments/construction/019-overlay/implement-results.json).
++Os relatórios XML/txt de cada fase estão nas suas pastas *-surefire. O comando
++final guarda hashes dos quatro ficheiros antes/depois: idênticos durante a execução.
++
++## Correspondência D01–D17
++
++Métodos abaixo pertencem ao ConfigurationLoaderTest existente. As parametrizações
++usam uma tabela independente de 30 chaves, valores literais e accessors esperados;
++não geram o oráculo a partir do parser/defaults de produção.
++
++| Design | Métodos/evidência incremental | Estado e limite |
++|---|---|---|
++| D01 | runtimeDefaultsPreserveFiveRealProfiles | Aprovado nos cinco perfis e nos 30 valores, incluindo grupos inativos |
++| D02 | runtimeOverridesReachExactAccessorForEveryAllowedRole | Aprovado: 93 combinações chave/papel, accessor correto e restantes defaults preservados |
++| D03 | runtimeScalarBoundariesRespectCrossRelations; runtimeAcceptsApprovedAlphaGrammar | Aprovado: 58 fronteiras escalares e sete alpha válidos; ms→nanos/inteiro exatos e erros relacionais em fronteiras impossíveis |
++| D04 | runtimeRejectsInvalidIntegerTokensAndCaps; runtimeAcceptsApprovedAlphaGrammar; runtimeRejectsAlphaGrammarDomainAndUnderflow; runtimeAcceptsWhitespaceAndLeadingZeroIntegers | Aprovado: léxico aprovado, espaços/zeros, overflow/underflow, NaN/infinito e representação proibida |
++| D05 | runtimeRejectsInvalidIntegerTokensAndCaps; runtimeConstructorsRejectInvalidValues | Aprovado: limites reduzíveis em carga/construção direta, sem alterar wire |
++| D06 | runtimeOverridesReachExactAccessorForEveryAllowedRole; runtimeRejectsInapplicableKeysEvenAtDefault | Aprovado: Control para todos, overlay nos três papéis, Source só SERVER; 54 casos de chave inaplicável, inclusive igual ao default |
++| D07 | runtimeRejectsUnknownDuplicatesAndInvalidRoleWithoutFallback; testes existentes rejectsDuplicateDecodedProperties/rejectsUnknownAndRoleInapplicableKeys | Aprovado: typo, duplicada literal/escapada, papel inválido; casos antigos intactos |
++| D08 | runtimeEnforcesFourCrossRelations; runtimeScalarBoundariesRespectCrossRelations; runtimeConstructorsRejectNullsAndInvalidRelations | Aprovado: igualdades permitidas/proibidas, chave correta e guards diretos |
++| D09 | runtimeValidatesOverridesTogetherWithDefaults | Aprovado: quatro pares inválidos com default, restaurados por overrides coerentes |
++| D10 | runtimeAggregatesIndependentLegacyAndRuntimeProblems | Aprovado: problemas independentes de grupos diferentes e erro legado, coleção de problemas imutável |
++| D11 | runtimeDoesNotInventRelationErrorsFromInvalidOperands | Aprovado: sem erro falso em retry.max; outra relação continua a ser diagnosticada |
++| D12 | runtimeConstructorsRejectInvalidValues; runtimeConstructorsRejectNullsAndInvalidRelations | Aprovado: 125 casos de valores inválidos, grupos/Duration nulos, frações e Duration enorme sem overflow do diagnóstico |
++| D13 | runtimePreservesOldConstructorAndCanonicalOverrides | Aprovado: overload 13 argumentos, canónico 14, cópia defensiva e runtime não nulo |
++| D14 | runtimeOverridesReachTransportOptionsWithoutOpeningSockets | Aprovado: queue=7, connections=13, connect=1111 ms, shutdown=2222 ms chegam ao record real; não instancia Transport |
++| D15 | runtimeDeploymentIsAtomicAndOptionsRemainPerNode; runtimePropertiesStayOutOfTopologyAndCatalog | Aprovado: falha conjunta sem resultado parcial, valores por nó e defaults globais intactos; escopo das chaves preservado |
++| D16 | runtimeDefaultsDoNotReplaceRequiredConfiguration; resolvesPathsAgainstConfigurationNotWorkingDirectory | Aprovado: identidade/papel/endpoints/paths obrigatórios; perfis temporários fora do cwd |
++| D17 | 65 testes anteriores de configuração e 66 de codec aprovados; preservação das fixtures por hash | Parcial: regressão completa de transporte/clean verify e manual deste incremento pendentes para Test, além da revisão/integração |
++
++O teste D14 demonstra carga → RuntimeConfiguration → record consumidor existente.
++Não alega OttApplication/bootstrap ligados nem vídeo/GUI/CORE. A ausência de
++sockets é sustentada pelo caminho puro do loader e do construtor de Options;
++os testes selecionados executaram no ambiente restrito sem permissões TCP.
++
++## Linhas substituídas nas fundações
++
++Comparação contra a [baseline anterior a Implement](../../../experiments/construction/019-overlay/implement-baseline.json):
++
++| Ficheiro | Linha original substituída | Justificação |
++|---|---|---|
++| NodeConfiguration.java:19 | Cabeçalho terminava em List<StreamConfiguration> streams) | Acrescentar runtime como componente final; o overload público anterior mantém exatamente os 13 argumentos |
++| ConfigurationLoader.java:114 | Último argumento da construção era streams | Passar também runtime validado ao novo canónico, preservando todos os anteriores |
++| ConfigurationLoaderTest.java | Nenhuma linha original removida | Import de Duration e novos casos/helpers acrescentados; corpos/casos antigos intactos |
++
++Nenhum outro comportamento antigo foi removido. Guards/listas de erros/cópias,
++framing, enums com códigos, bytes v1 e hard caps permanecem. RuntimeConfiguration
++é ficheiro novo; não substitui fundações. As listas Maven geradas em target/
++podem diferir pelo build e são mostradas separadamente, sem lhes atribuir autoria
++de código ou incluí-las em qualquer commit por inferência.
++
++## Checkpoint e pendências
++
++Walkthrough e implementação local prontos para revisão. Não se assinala Implement
++concluído nem se avança para Test antes dessa aprovação. O bolt, história/unidade
++e TASK-032 continuam em progresso; critérios de fecho não são presumidos.
++
++Ainda pendentes: etapa Test, mvn -B -ntp clean verify completo com log novo,
++transporte na regressão atual, teste manual do incremento, revisor humano distinto
++designado (G-REVIEW-032), revisão final e integração na base comum. Sem commit/push,
++fecho, medição ou resultado GUI/CORE inventados. Os 806 testes incrementais não
++substituem essas condições nem reutilizam os 149 testes históricos de IMP-001.
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java b/Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java
+--- /dev/null
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java
+@@ -0,0 +1,118 @@
++package pt.uminho.esr.ott.config;
++
++import java.time.Duration;
++import java.util.Objects;
++
++/** Opções operacionais imutáveis e validadas, sem rede ou estado de execução. */
++public record RuntimeConfiguration(
++        Control control, Overlay overlay, Monitoring monitoring, Routing routing,
++        Subscription subscription, Video video, Source source) {
++
++    private static final Duration MIN_DURATION = Duration.ofMillis(1);
++    private static final Duration MAX_DURATION = Duration.ofMillis(Integer.MAX_VALUE);
++    private static final RuntimeConfiguration DEFAULTS = new RuntimeConfiguration(
++                new Control(Duration.ofMillis(2000), Duration.ofMillis(3000), 64, 256, Duration.ofMillis(3000)),
++                new Overlay(Duration.ofMillis(3000), Duration.ofMillis(500), Duration.ofMillis(5000), 10, 4096),
++                new Monitoring(Duration.ofMillis(1000), Duration.ofMillis(1000), 3, .2),
++                new Routing(Duration.ofMillis(2000), Duration.ofMillis(8000), 4096, Duration.ofMillis(16000), 10,
++                        Duration.ofMillis(3000), 3, 20, 3, Duration.ofMillis(5000)),
++                new Subscription(Duration.ofMillis(6000), Duration.ofMillis(2000)),
++                new Video(256, 8, Duration.ofMillis(250)), new Source(99999));
++
++    public RuntimeConfiguration {
++        Objects.requireNonNull(control, "control");
++        Objects.requireNonNull(overlay, "overlay");
++        Objects.requireNonNull(monitoring, "monitoring");
++        Objects.requireNonNull(routing, "routing");
++        Objects.requireNonNull(subscription, "subscription");
++        Objects.requireNonNull(video, "video");
++        Objects.requireNonNull(source, "source");
++    }
++
++    public static RuntimeConfiguration defaults() { return DEFAULTS; }
++
++    public record Control(Duration connectTimeout, Duration shutdownTimeout, int maxConnections,
++                          int queueCapacity, Duration bootstrapQueryTimeout) {
++        public Control {
++            duration(connectTimeout, "connectTimeout");
++            duration(shutdownTimeout, "shutdownTimeout");
++            range(maxConnections, 1, 64, "maxConnections");
++            range(queueCapacity, 1, 256, "queueCapacity");
++            duration(bootstrapQueryTimeout, "bootstrapQueryTimeout");
++        }
++    }
++    public record Overlay(Duration helloTimeout, Duration retryInitial, Duration retryMax,
++                          int retryJitterPercent, int eventsCapacity) {
++        public Overlay {
++            duration(helloTimeout, "helloTimeout");
++            duration(retryInitial, "retryInitial");
++            duration(retryMax, "retryMax");
++            range(retryJitterPercent, 0, 100, "retryJitterPercent");
++            range(eventsCapacity, 1, 4096, "eventsCapacity");
++            if (retryInitial.compareTo(retryMax) > 0)
++                throw new IllegalArgumentException("retryInitial must not exceed retryMax");
++        }
++    }
++    public record Monitoring(Duration probeInterval, Duration probeTimeout, int probeFailures,
++                             double ewmaAlpha) {
++        public Monitoring {
++            duration(probeInterval, "probeInterval");
++            duration(probeTimeout, "probeTimeout");
++            range(probeFailures, 1, Integer.MAX_VALUE, "probeFailures");
++            if (!Double.isFinite(ewmaAlpha) || ewmaAlpha <= 0 || ewmaAlpha > 1)
++                throw new IllegalArgumentException("ewmaAlpha must be finite and in (0,1]");
++        }
++    }
++    public record Routing(Duration announceInterval, Duration candidateTtl, int cacheCapacity,
++                          Duration cacheTtl, int floodMaxPerSecond, Duration activateTimeout,
++                          int activateAttempts, int switchImprovementPercent, int switchObservations,
++                          Duration switchMinDwell) {
++        public Routing {
++            duration(announceInterval, "announceInterval");
++            duration(candidateTtl, "candidateTtl");
++            range(cacheCapacity, 1, 4096, "cacheCapacity");
++            duration(cacheTtl, "cacheTtl");
++            range(floodMaxPerSecond, 1, 10, "floodMaxPerSecond");
++            duration(activateTimeout, "activateTimeout");
++            range(activateAttempts, 1, Integer.MAX_VALUE, "activateAttempts");
++            range(switchImprovementPercent, 0, 100, "switchImprovementPercent");
++            range(switchObservations, 1, Integer.MAX_VALUE, "switchObservations");
++            duration(switchMinDwell, "switchMinDwell");
++            if (candidateTtl.compareTo(announceInterval) <= 0)
++                throw new IllegalArgumentException("candidateTtl must exceed announceInterval");
++            if (cacheTtl.compareTo(candidateTtl) < 0)
++                throw new IllegalArgumentException("cacheTtl must not be less than candidateTtl");
++        }
++    }
++    public record Subscription(Duration lease, Duration renew) {
++        public Subscription {
++            duration(lease, "lease");
++            duration(renew, "renew");
++            if (renew.compareTo(lease) >= 0)
++                throw new IllegalArgumentException("renew must be less than lease");
++        }
++    }
++    public record Video(int egressCapacity, int reassemblyMaxFrames, Duration reassemblyDeadline) {
++        public Video {
++            range(egressCapacity, 1, 256, "egressCapacity");
++            range(reassemblyMaxFrames, 1, 8, "reassemblyMaxFrames");
++            duration(reassemblyDeadline, "reassemblyDeadline");
++        }
++    }
++    public record Source(int maxFrameBytes) {
++        public Source { range(maxFrameBytes, 1, 99999, "maxFrameBytes"); }
++    }
++
++    private static void range(int value, int min, int max, String name) {
++        if (value < min || value > max)
++            throw new IllegalArgumentException(name + " must be in " + min + ".." + max);
++    }
++
++    private static void duration(Duration value, String name) {
++        Objects.requireNonNull(value, name);
++        // Compare before converting: an arbitrary Duration can overflow toMillis/toNanos.
++        if (value.compareTo(MIN_DURATION) < 0 || value.compareTo(MAX_DURATION) > 0
++                || value.getNano() % 1_000_000 != 0)
++            throw new IllegalArgumentException(name + " must fit positive integer milliseconds");
++    }
++}

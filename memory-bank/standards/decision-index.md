@@ -39,3 +39,14 @@ Fonte normativa: [ADD, secção 13](../../add.md#13-questões-em-aberto-e-change
 
 As CP confirmam decisões existentes; conservam-se as 26 ADR. A aprovação do
 utilizador é documental, sem prova de implementação ou revisão individual de código.
+
+## Detalhe de Construction aprovado — IMP-002
+
+[Q-C-03 — gramática decimal de alpha](../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha)
+regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Design.
+As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
+[revisão de conformidade](../bolts/019-overlay/adr-review.md) aprovada antes de código.
+Implement e [Test aprovados](../bolts/019-overlay/ddd-03-test-report.md): 824 testes
+completos e repetição pessoal por Luis/25 checks confirmados. [Fecho preparado](../bolts/019-overlay/closure-walkthrough.md),
+com revisor distinto designado/revisão final/integração pendentes em G-REVIEW-032.
+Sem ADR nova ou fecho presumido.

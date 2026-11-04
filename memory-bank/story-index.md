@@ -6,7 +6,9 @@ GENERATED indica criação documental, não implementação. Fonte de arquitetur
 Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
 aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
 em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
-as restantes 32 histórias/bolts não foram iniciadas. Intent ainda em construção.
+019-overlay/IMP-002 está in-progress/test, com as cinco etapas aprovadas/concluídas;
+fecho pendente de revisor distinto, revisão final e integração;
+as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
 
@@ -17,7 +19,10 @@ história implemented=true. Versão revista integrada em main: d65f947.
 
 ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
 
-**Tarefa:** IMP-002. **Estado:** planned. **Bolt:** 019-overlay.
+**Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
+Test aprovado: 824 testes completos e execução pessoal por Luis/25 checks/saída 0.
+[Fecho preparado](bolts/019-overlay/closure-walkthrough.md); sem implemented=true/DONE.
+Pendentes: revisor humano distinto designado, revisão final e integração.
 **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
 
 ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED

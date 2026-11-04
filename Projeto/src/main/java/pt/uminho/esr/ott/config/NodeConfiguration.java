@@ -16,7 +16,8 @@ public record NodeConfiguration(
         String advertisedHost, int controlPort, int dataPort,
         Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
         Optional<Path> streamsFile, Optional<Path> mediaBase,
-        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams) {
+        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams,
+        RuntimeConfiguration runtime) {
 
     public NodeConfiguration {
         Objects.requireNonNull(sourceFile);
@@ -29,7 +30,20 @@ public record NodeConfiguration(
         Objects.requireNonNull(streamsFile);
         Objects.requireNonNull(mediaBase);
         Objects.requireNonNull(topology);
+        Objects.requireNonNull(runtime);
         streams = List.copyOf(streams);
+    }
+
+    /** Compatibilidade com o construtor anterior à parametrização operacional. */
+    public NodeConfiguration(
+            Path sourceFile, String nodeId, NodeRole role, String bindHost,
+            String advertisedHost, int controlPort, int dataPort,
+            Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
+            Optional<Path> streamsFile, Optional<Path> mediaBase,
+            Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams) {
+        this(sourceFile, nodeId, role, bindHost, advertisedHost, controlPort, dataPort,
+                bootstrap, topologyFile, streamsFile, mediaBase, topology, streams,
+                RuntimeConfiguration.defaults());
     }
 
     /** Contacto conhecido para obter a vizinhança, sem resolução de DNS na carga. */

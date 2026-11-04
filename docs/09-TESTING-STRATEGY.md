@@ -270,7 +270,13 @@ Responsável: [TASK-031](tasks/PHASE-07/TASK-031.md). Requisitos: RNF-005, RC-00
 Defaults preservam perfis atuais; overrides válidos chegam ao consumidor.
 Chaves desconhecidas/inaplicáveis/duplicadas, NaN/infinito, tipos, intervalos,
 overflow e relações inválidas produzem erro agregado antes de sockets.
-Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: NÃO EXECUTADO.
+Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUTADO E APROVADO EM TEST.
+[Prova atual D01–D17](../memory-bank/bolts/019-overlay/ddd-03-test-report.md): clean
+verify/JDK21 com 824 testes aprovados (740 configuração +66 codec +18 TCP real),
+zero falhas/erros/skips; manual do agente com 25 checks e repetição pessoal por
+Luis em 2026-11-04T10:15:14Z, 25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmada.
+Test aprovado; revisor distinto designado, revisão final/integração pendentes
+em G-REVIEW-032. Não declara DONE da tarefa/bolt.
 
 ### V-ADD — Coerência do documento mestre e dos incrementos
 

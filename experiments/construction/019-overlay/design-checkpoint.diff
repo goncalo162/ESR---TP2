@@ -1,0 +1,608 @@
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:11:18Z"
++updated: "2026-11-03T22:20:11Z"
+ started: "2026-11-03T22:09:01Z"
+ completed: null
+-current_stage: "model"
+-stages_completed: []
++current_stage: "design"
++stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}]
+ requires_bolts: ["001-base-validada"]
+ enables_bolts: ["002-overlay", "020-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
+ 
+-## Etapa 1 — Model preparado para revisão
++## Etapa 2 — Design preparado para revisão
+ 
+ Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
+ próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
+@@ -44,10 +44,14 @@
+ sete grupos, identidade, proprietário dos dados, estados/resultados da carga,
+ invariantes de papel/limites/relações e prova futura V-032.
+ 
+-Bolt in-progress/model; stages_completed vazio enquanto o checkpoint aguarda
+-aprovação. Apenas Model autorizado; Design/ADR/Implement/Test e V-032 ainda
+-não executados. POM, fontes Java, perfis, fixtures e testes intactos.
+-G-REVIEW-032: designar revisor humano distinto antes de DONE; não presumido.
++Model aprovado explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z.
++Model concluído em stages_completed; bolt in-progress/design. [Design técnico](ddd-02-technical-design.md)
++preparado em 2026-11-03T22:20:11Z: assinaturas/records imutáveis, construtor antigo preservado,
++unidades/conversões, erros agregados, D01–D17 de V-032 e consumidor offline via
++Transport.Options dentro do teste autorizado. Apenas Design autorizado nesta
++continuação; aguardar revisão antes de ADR/Implement/Test. V-032, regressão atual
++Java e teste manual deste incremento ainda por executar. POM/fontes/perfis/fixtures/
++testes intactos. G-REVIEW-032 continua pendente antes de DONE.
+ Baseline/diff/conferência em experiments/construction/019-overlay/.
+ 
+ ## Fonte normativa e âmbito
+@@ -63,7 +67,7 @@
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-002 e as ADR do ADD.
++1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+diff --git a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+--- a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+@@ -1,8 +1,10 @@
+ # IMP-002 — Model: parametrização operacional
+ 
+ Bolt 019-overlay; unidade 002-overlay; origem TASK-032. Autorizado pelo utilizador
+-iniciar o próximo bolt e executar somente a primeira etapa. Modelo preparado
+-para revisão; Design/ADR/Implement/Test ainda não executados neste bolt.
++iniciar o próximo bolt e executar somente a primeira etapa. Model aprovado
++explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z. A continuação
++posterior está no [Design para revisão](ddd-02-technical-design.md); ADR/Implement/Test
++não foram iniciados. As descrições de pendências abaixo retratam o checkpoint Model.
+ 
+ Fontes: [ADD 6.1–6.3](../../../add.md#6-modelo-de-dados-e-contratos),
+ [IMP-002](../../../add.md#imp-002), [REQ-024](../../../specs.md#req-024),
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T22:11:18Z"
++updated: "2026-11-03T22:20:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -34,9 +34,9 @@
+ 
+ ## Dependências e critérios de fecho
+ 
+-019-overlay/IMP-002 iniciado em Model por pedido do utilizador. [Modelo para revisão](../../../../bolts/019-overlay/ddd-01-domain-model.md).
+-Somente a primeira etapa foi autorizada; restantes bolts desta unidade continuam
+-planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
++019-overlay/IMP-002: Model aprovado pelo utilizador em 2026-11-03T22:16:54Z;
++[Design preparado para revisão](../../../../bolts/019-overlay/ddd-02-technical-design.md).
++Autorizado apenas Design, sem ADR/Implement/Test; restantes bolts continuam planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
+ ou execução Java nova é declarada por este arranque.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:11:18Z"
++updated: "2026-11-03T22:20:11Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+ requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+@@ -17,8 +17,9 @@
+ 
+ ## Valor e âmbito
+ 
+-Model iniciado no bolt 019-overlay; [modelo preparado para revisão](../../../../../bolts/019-overlay/ddd-01-domain-model.md).
+-Sem implemented=true, critérios funcionais ou testes concluídos nesta primeira etapa.
++Model aprovado no bolt 019-overlay, em 2026-11-03T22:16:54Z;
++[Design preparado para revisão](../../../../../bolts/019-overlay/ddd-02-technical-design.md).
++Sem implemented=true, critérios funcionais ou V-032 concluídos. Apenas Design autorizado.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-03T22:11:18Z"
++updated: "2026-11-03T22:20:11Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -21,3 +21,17 @@
+   Aguardar aprovação do checkpoint Model antes de iniciar Design.
+ 
+ Modelo: [ddd-01-domain-model.md](../../../../bolts/019-overlay/ddd-01-domain-model.md).
++
++- **2026-11-03T22:16:54Z**: Model aprovado explicitamente pelo utilizador. Model concluído;
++  iniciado somente Design. Autorizados assinaturas/tipos imutáveis, unidades e
++  conversões, compatibilidade do construtor, erros agregados/casos V-032 e prova
++  offline de consumo dentro dos quatro ficheiros autorizados. Parar em Design,
++  antes de ADR/Implement/Test. G-REVIEW-032 e execuções Java continuam pendentes.
++- **2026-11-03T22:20:11Z**: Design preparado para revisão: sete records imutáveis com Duration
++  em ms exatos, overload anterior de NodeConfiguration preservado, parsing sem
++  fallback inválido e relações/erros agregados. D01–D17 especificam V-032 e o
++  consumo offline pelo record Transport.Options, sem new Transport/socket/wiring
++  de app fora dos ficheiros autorizados. Nenhuma implementação/teste Java executado.
++  Aguardar revisão de Design antes de ADR/Implement/Test; gate distinto pendente.
++
++Design: [ddd-02-technical-design.md](../../../../bolts/019-overlay/ddd-02-technical-design.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -6,7 +6,7 @@
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+ em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-019-overlay/IMP-002 está in-progress/model, com modelo preparado para revisão;
++019-overlay/IMP-002 está in-progress/design, com Model aprovado e Design para revisão;
+ as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -19,7 +19,7 @@
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
+-Etapa Model: [modelo preparado para revisão](bolts/019-overlay/ddd-01-domain-model.md);
++Etapa Design: [desenho preparado para revisão](bolts/019-overlay/ddd-02-technical-design.md), após Model aprovado;
+ nenhuma implementação ou V-032 executados.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS, apenas Model. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em Design, após aprovação de Model. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Model do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Design do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -26,9 +26,9 @@
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+ Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS apenas
+-na etapa Model por pedido do utilizador. [Modelo preparado para revisão](../memory-bank/bolts/019-overlay/ddd-01-domain-model.md).
++em Design após aprovação de Model pelo utilizador. [Design preparado para revisão](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md).
+ V-032/build do novo incremento ainda não executados; sem código/testes alterados,
+-sem Design iniciado e sem aprovação de revisor distinto presumida. Os 149 testes
++sem ADR/Implement/Test iniciados e sem aprovação de revisor distinto presumida. Os 149 testes
+ referidos abaixo pertencem ao IMP-001, não a esta etapa documental.
+ 
+ [Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+@@ -60,7 +60,7 @@
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model preparado; V-032: NÃO EXECUTADO |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model aprovado; Design preparado; V-032: NÃO EXECUTADO |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -5,7 +5,7 @@
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+ 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
+-em Model, com [modelo para revisão](../memory-bank/bolts/019-overlay/ddd-01-domain-model.md).
++em Design, após Model aprovado, com [desenho para revisão](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md).
+ Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -43,7 +43,7 @@
+ 
+ ## 7. Passos de implementação
+ 
+-- [ ] Modelar as opções, defaults, limites e regras cruzadas do ADD.
++- [x] Modelar as opções, defaults, limites e regras cruzadas do ADD.
+ - [ ] Integrar carga estrita e erros agregados sem estado parcial.
+ - [ ] Testar defaults antigos, overrides válidos e rejeições/casos limite.
+ - [ ] Confirmar que um consumidor recebe os valores validados sem abrir rede.
+@@ -81,8 +81,10 @@
+ 
+ Arranque em 2026-11-03T22:09:01Z, apenas Model do bolt 019-overlay/IMP-002.
+ [Modelo preparado](../../../memory-bank/bolts/019-overlay/ddd-01-domain-model.md)
+-para aprovação; sem código/testes alterados ou V-032 executado. Gate de revisor
+-humano distinto ainda pendente antes de DONE; Design não foi iniciado.
++aprovado pelo utilizador em 2026-11-03T22:16:54Z. [Design para revisão](../../../memory-bank/bolts/019-overlay/ddd-02-technical-design.md),
++com tipos/assinaturas, conversões, compatibilidade, agregação de erros/casos V-032 e
++prova de consumidor sem sockets. Sem código/testes alterados ou V-032 executado;
++parar antes de ADR/Implement/Test. Gate de revisor distinto pendente antes de DONE.
+ 
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -250,10 +250,10 @@
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+     "docs/13-REQUIREMENTS-TRACEABILITY.md": "2370409b88da3146dfeb6d9c7ce15ab82b9385bd34be893321707797797274c5",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "0a786b0cfce7e7db86d872b872591efdfb178950c4bf173657d911b400e28a02",
++    "docs/15-PROJECT-PROGRESS.md": "0ebcc2a7b0ee719948b610a4f222885ce23a7387998569fc3f8d292c07fe51c6",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "9a8e31344924e2dc753f2fa3fe031326da084939b236a17b3ee4930d786d46e7",
++    "docs/18-CONSTRUCTION-BOLTS.md": "99c9bf7d6cb09462ba0ee179df0c134d9503535f2b220db0fcb099e57ac86bc4",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "4797203a3248ca9b93223a806d000d9a3b3ce3ccb6739ceb2b6dee2878fc369c",
++    "docs/tasks/PHASE-02/TASK-032.md": "9bfa61440f4949f35174412e95c398cb5c657b8bce574bfb51a359e17fe39f88",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -303,7 +303,7 @@
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
+   },
+-  "updated": "2026-11-03T22:11:52Z",
++  "updated": "2026-11-03T22:21:00Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -495,6 +495,20 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "9a8e31344924e2dc753f2fa3fe031326da084939b236a17b3ee4930d786d46e7",
+         "docs/tasks/PHASE-02/TASK-032.md": "4797203a3248ca9b93223a806d000d9a3b3ce3ccb6739ceb2b6dee2878fc369c"
+       }
++    },
++    {
++      "updated": "2026-11-03T22:21:00Z",
++      "reason": "Utilizador aprovou Model de IMP-002 e autorizou somente Design; atualizar estado/progresso/índice e primeiro passo documental de TASK-032. Design aguarda revisão; sem Java, novos requisitos ou ADR.",
++      "previous_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "0a786b0cfce7e7db86d872b872591efdfb178950c4bf173657d911b400e28a02",
++        "docs/18-CONSTRUCTION-BOLTS.md": "9a8e31344924e2dc753f2fa3fe031326da084939b236a17b3ee4930d786d46e7",
++        "docs/tasks/PHASE-02/TASK-032.md": "4797203a3248ca9b93223a806d000d9a3b3ce3ccb6739ceb2b6dee2878fc369c"
++      },
++      "updated_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "0ebcc2a7b0ee719948b610a4f222885ce23a7387998569fc3f8d292c07fe51c6",
++        "docs/18-CONSTRUCTION-BOLTS.md": "99c9bf7d6cb09462ba0ee179df0c134d9503535f2b220db0fcb099e57ac86bc4",
++        "docs/tasks/PHASE-02/TASK-032.md": "9bfa61440f4949f35174412e95c398cb5c657b8bce574bfb51a359e17fe39f88"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+--- /dev/null
++++ b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+@@ -0,0 +1,304 @@
++# IMP-002 — Design: parametrização operacional
++
++Model aprovado explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z.
++Autorizado apenas Design e revisão deste desenho antes de ADR/Implement/Test.
++As assinaturas e casos abaixo são propostas documentais; nenhum Java/teste foi
++escrito ou executado. G-REVIEW-032 e as execuções de V-032/regressão/manual pendentes.
++
++Norma: [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
++[IMP-002](../../../add.md#imp-002), [Model aprovado](ddd-01-domain-model.md) e
++[TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md). ADR 007/010/016/024/026
++preservadas; a revisão formal das ADR pertence à próxima etapa.
++
++## 1. Ficheiros e limites
++
++| Ficheiro autorizado | Alteração futura limitada a IMP-002 |
++|---|---|
++| Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java | Novo record com sete records aninhados, defaults e invariantes |
++| Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java | Acrescentar runtime no fim; preservar construtor de 13 argumentos e accessors anteriores |
++| Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java | Reconhecer as 30 chaves no perfil de nó; parsing opcional/por papel e erros agregados |
++| Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java | Acrescentar casos V-032 e prova offline de consumo/compatibilidade sem remover casos atuais |
++
++Transport/Connection, codec, fixtures, perfis, POM e consumidores de app/overlay/
++monitoring/routing/streaming não precisam de alteração. Não criar outro teste
++Java, classe de wiring ou dependência. A composição real continua nos respetivos
++IMP; este incremento disponibiliza dados validados e prova um consumo offline.
++
++## 2. API de valores imutáveis
++
++Assinaturas propostas em pt.uminho.esr.ott.config; corpos omitidos nesta etapa.
++Os sete grupos são public records aninhados em RuntimeConfiguration. Componentes
++Duration têm unidade temporal; percentagens, capacidades e contagens são int;
++alpha é double finito. Defaults/chaves/papéis são exatamente os 30 do Model.
++
++```java
++public record RuntimeConfiguration(
++        Control control, Overlay overlay, Monitoring monitoring,
++        Routing routing, Subscription subscription, Video video, Source source) {
++    public static RuntimeConfiguration defaults();
++
++    public record Control(Duration connectTimeout, Duration shutdownTimeout,
++                          int maxConnections, int queueCapacity,
++                          Duration bootstrapQueryTimeout) { /* construtor validante */ }
++    public record Overlay(Duration helloTimeout, Duration retryInitial,
++                          Duration retryMax, int retryJitterPercent,
++                          int eventsCapacity) { /* construtor validante */ }
++    public record Monitoring(Duration probeInterval, Duration probeTimeout,
++                             int probeFailures, double ewmaAlpha) { /* construtor validante */ }
++    public record Routing(Duration announceInterval, Duration candidateTtl,
++                          int cacheCapacity, Duration cacheTtl, int floodMaxPerSecond,
++                          Duration activateTimeout, int activateAttempts,
++                          int switchImprovementPercent, int switchObservations,
++                          Duration switchMinDwell) { /* construtor validante */ }
++    public record Subscription(Duration lease, Duration renew) { /* construtor validante */ }
++    public record Video(int egressCapacity, int reassemblyMaxFrames,
++                        Duration reassemblyDeadline) { /* construtor validante */ }
++    public record Source(int maxFrameBytes) { /* construtor validante */ }
++}
++```
++
++Cada componente corresponde à chave do seu grupo no Model, pela mesma semântica:
++eventsCapacity é node.events.capacity; bootstrapQueryTimeout é bootstrap.query.timeout.ms;
++maxFrameBytes é source.max.frame.bytes. A ordem de Control acima é explícita e
++difere da ordem do construtor Transport.Options, que recebe queueCapacity primeiro.
++
++defaults() devolve os sete grupos completos; não recebe papel nem faz I/O.
++Pode partilhar um valor estático final porque todo o grafo é imutável. Não expõe
++Properties, arrays, mapas mutáveis, setters ou builders públicos. Duration é
++imutável; não necessita cópia. NodeConfiguration conserva List.copyOf(streams).
++
++Construtores compactos públicos dos grupos verificam intervalos/caps e relações
++internas: retryInitial≤retryMax em Overlay; candidateTtl>announceInterval e
++cacheTtl≥candidateTtl em Routing; renew<lease em Subscription. Monitoring exige
++Double.isFinite(ewmaAlpha), alpha>0 e alpha≤1. Todos os Duration e grupos não nulos;
++null provoca NullPointerException, valor/domínio/relação inválidos provocam
++IllegalArgumentException. O record exterior exige os sete grupos não nulos.
++Assim, criação direta também não publica RuntimeConfiguration numericamente inválido.
++
++A aplicabilidade por papel/presença é política do loader: um objeto de valor não
++guarda quais chaves foram fornecidas. BOOTSTRAP rejeita uma chave de overlay mesmo
++se o valor for igual ao default; SERVER é o único que aceita source.max.frame.bytes.
++Grupos inativos ficam com defaults e não são consumidos. Não se inventa proibição
++por igualdade de valores dentro de um record que não contém proveniência de chaves.
++
++## 3. NodeConfiguration: extensão aditiva e compatibilidade
++
++Novo cabeçalho canónico, com os 13 componentes atuais na mesma ordem e runtime
++acrescentado no fim:
++
++```java
++public record NodeConfiguration(
++        Path sourceFile, String nodeId, NodeRole role, String bindHost,
++        String advertisedHost, int controlPort, int dataPort,
++        Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
++        Optional<Path> streamsFile, Optional<Path> mediaBase,
++        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams,
++        RuntimeConfiguration runtime) { /* validações existentes + runtime não nulo */ }
++```
++
++Preservar este overload público, com o descritor anterior:
++
++```java
++public NodeConfiguration(
++        Path sourceFile, String nodeId, NodeRole role, String bindHost,
++        String advertisedHost, int controlPort, int dataPort,
++        Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
++        Optional<Path> streamsFile, Optional<Path> mediaBase,
++        Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams);
++```
++
++O overload delega no canónico com RuntimeConfiguration.defaults(), sem duplicar
++validações ou inferir identidades/hosts/portas. O loader passa explicitamente o
++runtime validado ao novo construtor de 14 argumentos. Accessors existentes e
++BootstrapContact mantêm nomes/tipos; runtime() é o novo accessor aprovado.
++Não substituir a classe por um builder nem expor um NodeConfiguration parcial.
++
++O novo componente participa em equals/hashCode/toString como num record normal;
++overrides diferentes são configurações diferentes. A introspeção dos componentes
++passa de 13 para 14; não se promete compatibilidade de reflection/layout. O
++construtor de 13 argumentos continua disponível e produz valor equivalente ao
++canónico quando runtime=defaults(). Sem serialização Java de objetos da rede.
++
++## 4. Unidades, gramática e conversões verificadas
++
++Todas as 16 chaves terminadas em .ms representam milissegundos inteiros entre
++1 e Integer.MAX_VALUE. No record são Duration, não segundos, nanos crus ou relógio
++UTC. A gramática inteira segue a existente: [0-9]+ após strip; leading zeros são
++aceites. String ausente usa default; vazia, sinal, fração, unidade, overflow ou
++separador de milhares são erro. Não aceitar silenciosamente propriedade inválida.
++
++Parsing: Integer.parseInt após a verificação lexical, validar intervalo e criar
++Duration.ofMillis((long) valor). Nunca multiplicar como int. Quando um consumidor
++necessitar nanos, usar toNanos() apenas depois dos limites: máximo de
++2_147_483_647_000_000 ns, representável em long. Para int ms, só Math.toIntExact
++após a verificação. Não dividir por 1000/truncar nem converter por double.
++
++Construtores diretos dos grupos também exigem precisão exata de milissegundos:
++comparar primeiro Duration com 1 ms e Integer.MAX_VALUE ms, antes de toMillis/
++toNanos; exigir getNano()%1_000_000==0. Rejeitar frações/submilissegundos, negativos
++e Duration enormes sem overflow do próprio diagnóstico. Os limites tornam a
++conversão posterior segura; não há conversão de unidade implícita no accessor.
++
++[PRESSUPOSTO] Detalhe lexical de alpha, coerente com o decimal do ADD: aceitar
++[0-9]+(\.[0-9]+)? ou \.[0-9]+, depois de strip. Aceitar 1, 1.0, 0.2 e .2;
++rejeitar expoente, hexadecimal, sufixo d/f, vírgula, sinal e unidades. Usar
++Double.parseDouble e verificar finitude e (0,1]; underflow para zero também é
++inválido. Não arredondar, limitar ou substituir por 0.2 um valor inválido.
++Isto detalha a gramática da propriedade, sem mudar o domínio do parâmetro.
++
++bootstrap.query.timeout.ms é prazo completo da consulta após a ligação; não se
++soma/inicia timer nesta carga. As restantes políticas temporais do ADD permanecem
++nos consumidores futuros. Não acrescentar timer, clock, watchdog ou negociação.
++
++## 5. Loader e agregação dos problemas
++
++APIs públicas preservadas:
++
++```java
++public static NodeConfiguration load(Path path, NodeRole expectedRole)
++        throws ConfigurationException;
++public static List<NodeConfiguration> loadDeployment(Collection<Path> paths)
++        throws ConfigurationException;
++```
++
++Helpers privados propostos dentro de ConfigurationLoader, sem outro ficheiro:
++
++```java
++private static RuntimeConfiguration runtime(Properties p, Path file, NodeRole role,
++        Set<String> allowed, List<ConfigurationProblem> errors);
++private static Integer optionalInteger(Properties p, Path file, String key,
++        int defaultValue, int min, int max, List<ConfigurationProblem> errors);
++private static Duration optionalDuration(Properties p, Path file, String key,
++        Duration defaultValue, List<ConfigurationProblem> errors);
++private static Double optionalAlpha(Properties p, Path file, String key,
++        double defaultValue, List<ConfigurationProblem> errors);
++```
++
++Null nos helpers é marcador privado de parsing inválido, nunca fallback nem
++componente de configuração publicada. A ordem de trabalho é:
++
++1. Reutilizar read() estrito e a deteção existente de duplicadas após escapes;
++   não trocar por Properties.load permissivo nem perder o primeiro valor.
++2. Preservar o parsing legado e as suas validações. Definir allowed por papel,
++   acrescentando as cinco chaves Control a todos, 24 overlay a SERVER/RELAY/CLIENT
++   e a chave Source apenas a SERVER. allowed é preenchido mesmo se algum valor
++   falhar. Os grupos não aplicáveis usam defaults; chaves fornecidas desses grupos
++   são rejeitadas por unknownKeys existente, inclusive se iguais aos defaults.
++3. Ler todos os campos aplicáveis, agregando erros independentes. Não lançar a
++   primeira IllegalArgumentException de um grupo para fora da API de carga.
++   Se role for inválido, registar node.role sem adivinhar papel; nenhuma configuração
++   pode ser construída. Não interpretar ausência/invalidade de papel como overlay.
++4. Verificar cada relação apenas quando ambos os operandos têm valor válido
++   (default ou override). Marcar o erro na chave abaixo, sem comparar sentinelas
++   numéricas ou fabricar erros cruzados a partir de um parsing que falhou.
++5. Construir grupos completos apenas após validar os seus campos/relações;
++   o record exterior só existe se todos os grupos forem válidos. Os construtores
++   são segunda defesa; uma falha inesperada não deve ser escondida por catch genérico.
++6. Executar unknownKeys e o critério atual errors.size()!=start do nó; nenhuma
++   configuração é devolvida se houve erro legado/runtime/duplicada/role.
++   loadDeployment conserva a validação conjunta e falha inteira, não devolve
++   subconjunto nem impõe igualdade nova de opções entre nós distintos.
++
++| Relação | Chave do ConfigurationProblem | Mensagem identifica também |
++|---|---|---|
++| retry.initial ≤ retry.max | overlay.retry.max.ms | overlay.retry.initial.ms |
++| candidate.ttl > announce.interval | routing.candidate.ttl.ms | routing.announce.interval.ms |
++| cache.ttl ≥ candidate.ttl | routing.cache.ttl.ms | routing.candidate.ttl.ms |
++| renew < lease | subscription.renew.ms | subscription.lease.ms |
++
++ConfigurationProblem(file,key,message) e ConfigurationException(List<...>)
++permanecem os tipos atuais. Os testes conferem fonte/chaves/motivo, sem depender
++da ordem de Properties ou fixar uma quantidade global de mensagens secundárias
++de deployment. Não alterar a cópia defensiva de problems() nem a dos resultados.
++Erros nulos ou de argumento de programação mantêm a semântica existente; erros
++de propriedades são sempre agregados como ConfigurationException.
++
++As chaves operacionais só são reconhecidas nos perfis de nó: não entram nas
++allowlists de topologia/catálogos. Carga lê configuração UTF-8, não resolve DNS,
++não abre sockets e não lê bytes de vídeo. Nenhuma fila/cache real é alocada por
++receber uma capacidade validada. Falha do parsing não muda o ficheiro de entrada.
++
++## 6. Prova offline: overrides chegam a um consumidor existente
++
++Dentro de ConfigurationLoaderTest, carregar um perfil CLIENT temporário completo
++com overrides sentinela: queue.capacity=7, max.connections=13, connect.timeout=1111
++ms e shutdown.timeout=2222 ms (usar os nomes completos de Control). Conferir
++primeiro os valores no NodeConfiguration.runtime().control(). Depois construir
++**apenas o record Transport.Options existente**, passando esses accessors:
++
++```java
++var control = loaded.runtime().control();
++var consumed = new Transport.Options(
++        control.queueCapacity(), control.maxConnections(),
++        control.connectTimeout(), control.shutdownTimeout());
++assertEquals(7, consumed.queueCapacity());
++assertEquals(13, consumed.maxConnections());
++assertEquals(Duration.ofMillis(1111), consumed.connectTimeout());
++assertEquals(Duration.ofMillis(2222), consumed.shutdownTimeout());
++```
++
++O nome Transport.Options é o tipo público real já existente, cujo construtor
++valida só números/Duration. O teste não faz new Transport, connect, bind, listener,
++sleep ou resolução de endpoints. Não usa Transport.Options.defaults(), pois isso
++esconderia um override perdido. Não cria um novo adapter de produção nem faz
++config depender de transport: o import ocorre só no teste autorizado.
++
++Esta prova cobre a fronteira carga → runtime validado → valor do consumidor
++existente; falha se o loader perder/trocar os quatro overrides. As outras 26
++propriedades são verificadas nos accessors corretos nos casos abaixo. O prazo de
++consulta é conferido no Control; o seu consumo pelo bootstrap é IMP-003.
++Não se alega wiring de OttApplication nem algoritmo de rede: isso é trabalho dos
++consumidores futuros. A ausência de sockets é verificável pelo caminho de chamadas
++do teste/loader e pelo construtor puro do record, sem SecurityManager/mock novo.
++
++## 7. Casos concretos de V-032, ainda por executar
++
++Todos os casos novos ficam em ConfigurationLoaderTest, com helpers privados,
++@TempDir e @ParameterizedTest/@MethodSource já disponíveis no JUnit existente.
++D01–D17 são identificadores locais deste desenho, não novos oráculos globais.
++
++| Caso | Preparação e oráculo |
++|---|---|
++| D01 — defaults reais | loadDeployment dos cinco perfis; comparar todos os 30 accessors com defaults e conservar nós/streams/paths existentes |
++| D02 — 30 overrides | Casos por chave com valor válido diferente do default e papel aplicável; assert no accessor exato, grupos restantes preservados |
++| D03 — fronteiras | Cada intervalo inteiro/duração no mínimo/máximo, com parceiros coerentes quando existir combinação válida; fronteiras impossíveis falham pela relação, não por relaxar o domínio; percentagens 0 e 100 e alpha positivo representável/1 aceites |
++| D04 — léxico/tipos | Vazio/espaço, negativo/sinal, fração de inteiro, unidade, milhares e overflow 2147483648 rejeitados por file/key; alpha vírgula/expoente/hex/NaN/infinito/zero/>1 rejeitados |
++| D05 — limites reduzíveis | Abaixo de 1/acima de 64/256/4096/10/8/99999 conforme a chave, sem alterar os caps do wire |
++| D06 — papéis | BOOTSTRAP aceita Control e rejeita cada uma das outras 25 chaves; RELAY/CLIENT rejeitam Source; SERVER aceita as 30; proibir chave inaplicável mesmo igual ao default |
++| D07 — desconhecidas/duplicadas | Manter testes control.prt/streams.file atuais; novas chaves mal escritas e duplicadas literais/descodificadas geram problemas, sem último valor vencer |
++| D08 — quatro relações | Fronteira válida/inválida de cada relação; igualdade válida em retry/cache e inválida em candidate/announce e renew/lease; erro na chave definida |
++| D09 — defaults+override | Um override quebra relação com o default do outro campo; vários overrides restauram a validade; não validar cada linha isolada |
++| D10 — agregação | Perfil completo com campos runtime inválidos de grupos diferentes e erro legado; observar todas as chaves independentes na mesma ConfigurationException, sem NodeConfiguration parcial |
++| D11 — relação sem sentinela | Parsing inválido num operando não fabrica erro cruzado; outra relação válida/invalidada é avaliada independentemente |
++| D12 — imutabilidade e duração direta | Records sem coleções mutáveis; null, capacidades/alpha/relações inválidos e Duration fracionário/zero/negativo/enorme rejeitados também por construção direta |
++| D13 — construtores compatíveis | Recriar nó válido pelo overload antigo de 13 argumentos; defaults presentes e campos antigos/streams imutáveis preservados; canónico novo mantém overrides e rejeita runtime null |
++| D14 — consumidor offline | Quatro sentinelas chegam ao record Transport.Options conforme secção 6; sem instanciar Transport nem abrir rede |
++| D15 — deployment/escopo | Nó com runtime inválido faz falhar a carga conjunta inteira; opções diferentes por nó válido são preservadas; chaves runtime em topologia/catálogo continuam rejeitadas |
++| D16 — obrigatórias | Omissão de node.id/host/porta/path continua inválida apesar de defaults runtime; diretório temporário fora do cwd não altera semântica |
++| D17 — preservação | Manter todos os testes existentes e hashes das fixtures; depois da implementação executar V-032, regressão atual completa e manual adequado com logs novos |
++
++As tabelas de casos devem ter expected values explícitos, sem reutilizar a lógica
++do parser para gerar o oráculo. Usar valores distintos onde uma troca de campos
++seria mascarada por defaults iguais. Não acrescentar teste artificial de relógio
++ou transporte falso: esta carga não mede tempo e o consumidor offline não abre rede.
++
++Domínio escalar não implica que toda a fronteira forme uma configuração completa:
++candidate.ttl=1 ms não pode exceder announce.interval≥1 ms; announce.interval no
++máximo não admite TTL maior. Do mesmo modo lease=1 ms e renew no máximo são
++incompatíveis com renew<lease e os restantes limites. D03/D08 esperam erro de
++relação nesses casos, sem aumentar caps ou inventar zero como operando válido.
++
++## 8. Sequência posterior e checkpoint
++
++Depois da revisão deste Design, a etapa ADR confirma reutilização das decisões
++existentes ou apresenta divergência material antes de código. Só quando autorizado
++em Implement, introduzir interfaces e casos novos com falhas reais por API/casos
++ausentes; implementar incrementalmente preservando a regressão existente. Não
++fabricar falha em testes antigos. O manual futuro deve carregar overrides válidos,
++conferir o consumidor offline e rejeitar perfil inválido; execução ainda pendente.
++
++Neste checkpoint só há documentos/estados/evidência de validação documental.
++V-032, regressão atual e teste manual do IMP-002 não foram executados. G-REVIEW-032
++continua pendente: designar revisor humano distinto, aceitar a revisão e integrar
++antes de DONE. Aprovar Design não satisfaz esse gate nem fecha o incremento.
++Parar para revisão do desenho, sem iniciar ADR, Implement ou Test.

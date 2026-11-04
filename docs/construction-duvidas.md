@@ -43,3 +43,31 @@
 - Impacto: nenhum no runtime Java, wire, âmbito ou ADR; é adaptação de ferramenta
   ao esquema já existente. Não dispensa revisão final nem integração, exigidas
   pelo utilizador/DoD antes do estado complete.
+
+## Q-C-03 — Gramática decimal de alpha
+
+- Estado: resolvida; aprovação explícita do utilizador registada em
+  2026-11-03T22:25:30Z, juntamente com a aprovação de Design do IMP-002.
+- Âmbito: monitor.ewma.alpha, bolt 019-overlay / TASK-032. O
+  [ADD 6.3](../add.md#63-parâmetros-operacionais-opcionais) exige representação
+  decimal com ponto e valor finito em (0,1]; a gramática exata é o detalhe
+  especificado no [Design, secção 4](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md#4-unidades-gramática-e-conversões-verificadas).
+- Decisão aprovada: depois de strip, exigir correspondência da string inteira
+  com `(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)`. Aceitar, por exemplo, `1`, `1.0`,
+  `0.2` e `.2`; os exemplos continuam sujeitos ao domínio numérico.
+- Rejeitar expoente, hexadecimal, sufixo d/f, vírgula, sinal, unidades, valor
+  vazio e decimal sem dígitos depois do ponto, como `1.`. Após o teste lexical,
+  usar Double.parseDouble, exigir Double.isFinite e 0 < alpha ≤ 1; overflow
+  não finito e underflow para zero são inválidos. Não arredondar/clamp nem
+  aplicar o default 0.2 a um valor presente inválido.
+- Erros de propriedades entram na ConfigurationException agregada com fonte e
+  chave; criação direta do record também mantém finitude e domínio. A ausência
+  da chave usa o default existente. Os casos D03/D04/D10/D12 de V-032 verificam
+  fronteiras, gramática, agregação e construção direta quando forem executados.
+- Impacto: esclarece a representação de uma propriedade nova; preserva valor
+  default, papel, domínio de ADR-016, bytes v1, hard caps e perfis existentes.
+  Sem substituição de ADR Aceite, dependência ou âmbito adicional; não requer
+  ADR nova. A revisão das cinco ADR está em
+  [adr-review](../memory-bank/bolts/019-overlay/adr-review.md).
+- A aprovação abrange Design/gramática e autoriza somente a etapa ADR nesta
+  continuação; não declara implementação, testes, revisão distinta ou integração.

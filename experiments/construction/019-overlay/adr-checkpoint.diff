@@ -1,0 +1,468 @@
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:20:11Z"
++updated: "2026-11-03T22:27:22Z"
+ started: "2026-11-03T22:09:01Z"
+ completed: null
+-current_stage: "design"
+-stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}]
++current_stage: "adr"
++stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}]
+ requires_bolts: ["001-base-validada"]
+ enables_bolts: ["002-overlay", "020-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
+ 
+-## Etapa 2 — Design preparado para revisão
++## Etapa 3 — Revisão ADR preparada
+ 
+ Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
+ próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
+@@ -45,13 +45,17 @@
+ invariantes de papel/limites/relações e prova futura V-032.
+ 
+ Model aprovado explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z.
+-Model concluído em stages_completed; bolt in-progress/design. [Design técnico](ddd-02-technical-design.md)
+-preparado em 2026-11-03T22:20:11Z: assinaturas/records imutáveis, construtor antigo preservado,
+-unidades/conversões, erros agregados, D01–D17 de V-032 e consumidor offline via
+-Transport.Options dentro do teste autorizado. Apenas Design autorizado nesta
+-continuação; aguardar revisão antes de ADR/Implement/Test. V-032, regressão atual
+-Java e teste manual deste incremento ainda por executar. POM/fontes/perfis/fixtures/
+-testes intactos. G-REVIEW-032 continua pendente antes de DONE.
++Model e Design concluídos em stages_completed; Design e gramática de alpha
++aprovados explicitamente pelo utilizador, com registo em 2026-11-03T22:25:30Z.
++[Q-C-03](../../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha)
++regista a gramática decimal aprovada. [Revisão ADR](adr-review.md) preparada em
++2026-11-03T22:27:22Z: conformidade do desenho com ADR-007/010/016/024/026,
++sem divergência material ou necessidade de ADR nova identificada.
++
++Bolt in-progress/adr, aguardando revisão antes de Implement/Test. Construtor
++anterior, testes existentes, bytes v1 e hard caps preservados no desenho e na
++árvore atual. G-REVIEW-032 pendente: revisor distinto designado, V-032/regressão/
++manual executados, revisão final e integração antes de DONE; nada presumido.
+ Baseline/diff/conferência em experiments/construction/019-overlay/.
+ 
+ ## Fonte normativa e âmbito
+@@ -68,7 +72,7 @@
+ ## Etapas e validação
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+-2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-002 e as ADR do ADD.
++2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+diff --git a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+--- a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+@@ -3,8 +3,8 @@
+ Bolt 019-overlay; unidade 002-overlay; origem TASK-032. Autorizado pelo utilizador
+ iniciar o próximo bolt e executar somente a primeira etapa. Model aprovado
+ explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z. A continuação
+-posterior está no [Design para revisão](ddd-02-technical-design.md); ADR/Implement/Test
+-não foram iniciados. As descrições de pendências abaixo retratam o checkpoint Model.
++posterior está no [Design aprovado](ddd-02-technical-design.md) e na
++[revisão ADR preparada](adr-review.md); Implement/Test não foram iniciados. As descrições de pendências abaixo retratam o checkpoint Model.
+ 
+ Fontes: [ADD 6.1–6.3](../../../add.md#6-modelo-de-dados-e-contratos),
+ [IMP-002](../../../add.md#imp-002), [REQ-024](../../../specs.md#req-024),
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T22:20:11Z"
++updated: "2026-11-03T22:27:22Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -35,8 +35,10 @@
+ ## Dependências e critérios de fecho
+ 
+ 019-overlay/IMP-002: Model aprovado pelo utilizador em 2026-11-03T22:16:54Z;
+-[Design preparado para revisão](../../../../bolts/019-overlay/ddd-02-technical-design.md).
+-Autorizado apenas Design, sem ADR/Implement/Test; restantes bolts continuam planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
++Design aprovado, com registo em 2026-11-03T22:25:30Z, incluindo alpha/Q-C-03.
++[Revisão ADR preparada](../../../../bolts/019-overlay/adr-review.md), sem divergência
++material identificada. Autorizado apenas ADR; Implement/Test não iniciados e
++restantes bolts continuam planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
+ ou execução Java nova é declarada por este arranque.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:20:11Z"
++updated: "2026-11-03T22:27:22Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+ requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+@@ -18,8 +18,10 @@
+ ## Valor e âmbito
+ 
+ Model aprovado no bolt 019-overlay, em 2026-11-03T22:16:54Z;
+-[Design preparado para revisão](../../../../../bolts/019-overlay/ddd-02-technical-design.md).
+-Sem implemented=true, critérios funcionais ou V-032 concluídos. Apenas Design autorizado.
++Design aprovado pelo utilizador em 2026-11-03T22:25:30Z;
++[revisão ADR preparada](../../../../../bolts/019-overlay/adr-review.md), com Q-C-03
++aprovada. Sem implemented=true, critérios funcionais ou V-032 concluídos.
++Apenas ADR autorizado; Implement/Test ainda não iniciados.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-03T22:20:11Z"
++updated: "2026-11-03T22:27:22Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -35,3 +35,16 @@
+   Aguardar revisão de Design antes de ADR/Implement/Test; gate distinto pendente.
+ 
+ Design: [ddd-02-technical-design.md](../../../../bolts/019-overlay/ddd-02-technical-design.md).
++
++- **2026-11-03T22:25:30Z**: Design e gramática decimal de alpha da secção 4 aprovados
++  explicitamente pelo utilizador. Design concluído; iniciado apenas ADR.
++  Registar Q-C-03 e confirmar ADR-007/010/016/024/026 antes de código. Parar
++  para revisão antes de Implement/Test. G-REVIEW-032 continua pendente; não há
++  revisor distinto designado nem V-032/regressão/manual deste incremento executados.
++- **2026-11-03T22:27:22Z**: revisão ADR preparada: conformidade de Design com
++  ADR-007/010/016/024/026 e reutilização, sem decisão substituída/ADR nova ou
++  divergência material identificada. Q-C-03 regista a gramática decimal de alpha
++  com aprovação explícita. Construtor/testes/bytes/caps preservados; a análise
++  documental não é prova de implementação. Aguardar revisão antes de Implement/Test.
++
++ADR: [adr-review.md](../../../../bolts/019-overlay/adr-review.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -6,7 +6,7 @@
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+ em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-019-overlay/IMP-002 está in-progress/design, com Model aprovado e Design para revisão;
++019-overlay/IMP-002 está in-progress/adr, com Model/Design aprovados e revisão ADR preparada;
+ as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -19,7 +19,7 @@
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
+-Etapa Design: [desenho preparado para revisão](bolts/019-overlay/ddd-02-technical-design.md), após Model aprovado;
++Etapa ADR: [revisão preparada](bolts/019-overlay/adr-review.md), após Model/Design e alpha/Q-C-03 aprovados;
+ nenhuma implementação ou V-032 executados.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em Design, após aprovação de Model. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em ADR, após aprovação de Design. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Design do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em ADR do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -26,9 +26,10 @@
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+ Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS apenas
+-em Design após aprovação de Model pelo utilizador. [Design preparado para revisão](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md).
++em ADR após aprovação de Design/alpha pelo utilizador. [Revisão ADR preparada](../memory-bank/bolts/019-overlay/adr-review.md),
++sem divergência material; [Q-C-03 aprovada](construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
+ V-032/build do novo incremento ainda não executados; sem código/testes alterados,
+-sem ADR/Implement/Test iniciados e sem aprovação de revisor distinto presumida. Os 149 testes
++sem Implement/Test iniciados e sem aprovação de revisor distinto presumida. Os 149 testes
+ referidos abaixo pertencem ao IMP-001, não a esta etapa documental.
+ 
+ [Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+@@ -60,7 +61,7 @@
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model aprovado; Design preparado; V-032: NÃO EXECUTADO |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model/Design aprovados; revisão ADR preparada; V-032: NÃO EXECUTADO |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -5,7 +5,7 @@
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+ 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
+-em Design, após Model aprovado, com [desenho para revisão](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md).
++em ADR, após Model/Design aprovados, com [revisão para validação](../memory-bank/bolts/019-overlay/adr-review.md).
+ Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -81,10 +81,14 @@
+ 
+ Arranque em 2026-11-03T22:09:01Z, apenas Model do bolt 019-overlay/IMP-002.
+ [Modelo preparado](../../../memory-bank/bolts/019-overlay/ddd-01-domain-model.md)
+-aprovado pelo utilizador em 2026-11-03T22:16:54Z. [Design para revisão](../../../memory-bank/bolts/019-overlay/ddd-02-technical-design.md),
++aprovado pelo utilizador em 2026-11-03T22:16:54Z. [Design aprovado](../../../memory-bank/bolts/019-overlay/ddd-02-technical-design.md),
+ com tipos/assinaturas, conversões, compatibilidade, agregação de erros/casos V-032 e
+ prova de consumidor sem sockets. Sem código/testes alterados ou V-032 executado;
+-parar antes de ADR/Implement/Test. Gate de revisor distinto pendente antes de DONE.
++Design/alpha aprovados em 2026-11-03T22:25:30Z, registados em
++[Q-C-03](../../construction-duvidas.md#q-c-03--gramática-decimal-de-alpha).
++[Revisão ADR preparada](../../../memory-bank/bolts/019-overlay/adr-review.md),
++sem divergências materiais identificadas; parar antes de Implement/Test.
++Gate de revisor distinto, V-032/regressão/manual, revisão/integração pendentes antes de DONE.
+ 
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -250,10 +250,10 @@
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+     "docs/13-REQUIREMENTS-TRACEABILITY.md": "2370409b88da3146dfeb6d9c7ce15ab82b9385bd34be893321707797797274c5",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "0ebcc2a7b0ee719948b610a4f222885ce23a7387998569fc3f8d292c07fe51c6",
++    "docs/15-PROJECT-PROGRESS.md": "5e8118a149c348e3dd2e097514956b7184366397d261fe8180204bc21dc073a8",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "99c9bf7d6cb09462ba0ee179df0c134d9503535f2b220db0fcb099e57ac86bc4",
++    "docs/18-CONSTRUCTION-BOLTS.md": "7526884ae2ca7a88b82a0bc2cd040da45fea4d58b4cf6662042cab978956394c",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "9bfa61440f4949f35174412e95c398cb5c657b8bce574bfb51a359e17fe39f88",
++    "docs/tasks/PHASE-02/TASK-032.md": "3246dca4d87ba3088a9ff31acf8fd92771fbf304a98a56c731d1d32dceced6eb",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -303,7 +303,7 @@
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
+   },
+-  "updated": "2026-11-03T22:21:00Z",
++  "updated": "2026-11-03T22:28:09Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -509,6 +509,20 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "99c9bf7d6cb09462ba0ee179df0c134d9503535f2b220db0fcb099e57ac86bc4",
+         "docs/tasks/PHASE-02/TASK-032.md": "9bfa61440f4949f35174412e95c398cb5c657b8bce574bfb51a359e17fe39f88"
+       }
++    },
++    {
++      "updated": "2026-11-03T22:28:09Z",
++      "reason": "Utilizador aprovou Design/gramática alpha em Q-C-03 e autorizou somente ADR do IMP-002. Registar revisão das cinco ADR aceites e estados derivados; sem alteração de arquitetura/ADD/código e sem Implement/Test.",
++      "previous_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "0ebcc2a7b0ee719948b610a4f222885ce23a7387998569fc3f8d292c07fe51c6",
++        "docs/18-CONSTRUCTION-BOLTS.md": "99c9bf7d6cb09462ba0ee179df0c134d9503535f2b220db0fcb099e57ac86bc4",
++        "docs/tasks/PHASE-02/TASK-032.md": "9bfa61440f4949f35174412e95c398cb5c657b8bce574bfb51a359e17fe39f88"
++      },
++      "updated_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "5e8118a149c348e3dd2e097514956b7184366397d261fe8180204bc21dc073a8",
++        "docs/18-CONSTRUCTION-BOLTS.md": "7526884ae2ca7a88b82a0bc2cd040da45fea4d58b4cf6662042cab978956394c",
++        "docs/tasks/PHASE-02/TASK-032.md": "3246dca4d87ba3088a9ff31acf8fd92771fbf304a98a56c731d1d32dceced6eb"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+--- a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
++++ b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+@@ -1,14 +1,15 @@
+ # IMP-002 — Design: parametrização operacional
+ 
+ Model aprovado explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z.
+-Autorizado apenas Design e revisão deste desenho antes de ADR/Implement/Test.
++Design e gramática de alpha aprovados pelo utilizador, com registo em
++2026-11-03T22:25:30Z. Autorizada apenas a [revisão ADR](adr-review.md), antes de Implement/Test.
+ As assinaturas e casos abaixo são propostas documentais; nenhum Java/teste foi
+ escrito ou executado. G-REVIEW-032 e as execuções de V-032/regressão/manual pendentes.
+ 
+ Norma: [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
+ [IMP-002](../../../add.md#imp-002), [Model aprovado](ddd-01-domain-model.md) e
+ [TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md). ADR 007/010/016/024/026
+-preservadas; a revisão formal das ADR pertence à próxima etapa.
++preservadas; a revisão formal das ADR está preparada para validação, sem código.
+ 
+ ## 1. Ficheiros e limites
+ 
+@@ -139,7 +140,8 @@
+ e Duration enormes sem overflow do próprio diagnóstico. Os limites tornam a
+ conversão posterior segura; não há conversão de unidade implícita no accessor.
+ 
+-[PRESSUPOSTO] Detalhe lexical de alpha, coerente com o decimal do ADD: aceitar
++Detalhe lexical aprovado em [Q-C-03](../../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha),
++coerente com o decimal do ADD: aceitar
+ [0-9]+(\.[0-9]+)? ou \.[0-9]+, depois de strip. Aceitar 1, 1.0, 0.2 e .2;
+ rejeitar expoente, hexadecimal, sufixo d/f, vírgula, sinal e unidades. Usar
+ Double.parseDouble e verificar finitude e (0,1]; underflow para zero também é
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -43,3 +43,31 @@
+ - Impacto: nenhum no runtime Java, wire, âmbito ou ADR; é adaptação de ferramenta
+   ao esquema já existente. Não dispensa revisão final nem integração, exigidas
+   pelo utilizador/DoD antes do estado complete.
++
++## Q-C-03 — Gramática decimal de alpha
++
++- Estado: resolvida; aprovação explícita do utilizador registada em
++  2026-11-03T22:25:30Z, juntamente com a aprovação de Design do IMP-002.
++- Âmbito: monitor.ewma.alpha, bolt 019-overlay / TASK-032. O
++  [ADD 6.3](../add.md#63-parâmetros-operacionais-opcionais) exige representação
++  decimal com ponto e valor finito em (0,1]; a gramática exata é o detalhe
++  especificado no [Design, secção 4](../memory-bank/bolts/019-overlay/ddd-02-technical-design.md#4-unidades-gramática-e-conversões-verificadas).
++- Decisão aprovada: depois de strip, exigir correspondência da string inteira
++  com `(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)`. Aceitar, por exemplo, `1`, `1.0`,
++  `0.2` e `.2`; os exemplos continuam sujeitos ao domínio numérico.
++- Rejeitar expoente, hexadecimal, sufixo d/f, vírgula, sinal, unidades, valor
++  vazio e decimal sem dígitos depois do ponto, como `1.`. Após o teste lexical,
++  usar Double.parseDouble, exigir Double.isFinite e 0 < alpha ≤ 1; overflow
++  não finito e underflow para zero são inválidos. Não arredondar/clamp nem
++  aplicar o default 0.2 a um valor presente inválido.
++- Erros de propriedades entram na ConfigurationException agregada com fonte e
++  chave; criação direta do record também mantém finitude e domínio. A ausência
++  da chave usa o default existente. Os casos D03/D04/D10/D12 de V-032 verificam
++  fronteiras, gramática, agregação e construção direta quando forem executados.
++- Impacto: esclarece a representação de uma propriedade nova; preserva valor
++  default, papel, domínio de ADR-016, bytes v1, hard caps e perfis existentes.
++  Sem substituição de ADR Aceite, dependência ou âmbito adicional; não requer
++  ADR nova. A revisão das cinco ADR está em
++  [adr-review](../memory-bank/bolts/019-overlay/adr-review.md).
++- A aprovação abrange Design/gramática e autoriza somente a etapa ADR nesta
++  continuação; não declara implementação, testes, revisão distinta ou integração.
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -39,3 +39,11 @@
+ 
+ As CP confirmam decisões existentes; conservam-se as 26 ADR. A aprovação do
+ utilizador é documental, sem prova de implementação ou revisão individual de código.
++
++## Detalhe de Construction aprovado — IMP-002
++
++[Q-C-03 — gramática decimal de alpha](../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha)
++regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Design.
++As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
++[revisão de conformidade](../bolts/019-overlay/adr-review.md) preparada antes de código.
++V-032 e G-REVIEW-032 continuam pendentes; não é aprovação de implementação.
+diff --git a/memory-bank/bolts/019-overlay/adr-review.md b/memory-bank/bolts/019-overlay/adr-review.md
+--- /dev/null
++++ b/memory-bank/bolts/019-overlay/adr-review.md
+@@ -0,0 +1,83 @@
++# IMP-002 — Etapa ADR: revisão do Design aprovado
++
++Design e gramática de alpha aprovados explicitamente pelo utilizador, com registo
++em 2026-11-03T22:25:30Z. Autorizado apenas rever ADR-007/010/016/024/026 e registar
++Q-C-03; parar para revisão antes de Implement/Test. Esta análise é documental:
++não comprova implementação nem execução de V-032, regressão ou teste manual.
++
++Fontes: [ADD secção 5](../../../add.md#5-registo-de-decisões),
++[ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
++[IMP-002](../../../add.md#imp-002), [Model](ddd-01-domain-model.md),
++[Design aprovado](ddd-02-technical-design.md) e
++[TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md).
++
++## Resultado
++
++As cinco ADR continuam Aceites e são reutilizadas. Não foi identificada divergência
++material entre o desenho aprovado, as decisões e as APIs inspecionadas. Não é
++necessária ADR nova nem substituição de uma decisão aceite. O detalhe lexical
++novo tem aprovação explícita em [Q-C-03](../../../docs/construction-duvidas.md#q-c-03--gramática-decimal-de-alpha);
++o domínio de alpha continua finito e em (0,1], com default 0.2.
++
++| Decisão | Conformidade do desenho | Prova futura/limite |
++|---|---|---|
++| [ADR-007](../../../add.md#adr-007) — propriedades UTF-8 e binário sem dependências runtime | Mantém o reader UTF-8 estrito e Properties com deteção de duplicadas; só acrescenta chaves no perfil do nó. Não usa JSON externo, serialização da rede ou biblioteca nova | D04/D07/D15/D16; POM/fixtures/codec preservados. Nenhum Java executado nesta etapa |
++| [ADR-010](../../../add.md#adr-010) — carga estrita/imutável | Sete records e Duration imutáveis; construtores guardam domínio/relações; loader agrega file/key/message, rejeita unknown/duplicada/inaplicável e não publica carga parcial | D01/D06–D13/D15/D16. Retorno agregado do loader é distinto de erro de programação em construção direta |
++| [ADR-016](../../../add.md#adr-016) — opções centrais/overrides | Exatamente 30 chaves/sete grupos, defaults/caps/papéis/quatro relações do ADD. Dezasseis durações com milissegundos exatos e conversões limitadas; alpha conforme Q-C-03 | D01–D06/D08–D15. Consumo offline por Transport.Options; wiring real continua nos IMP responsáveis |
++| [ADR-024](../../../add.md#adr-024) — ADD mestre/IMP atómico | Apenas IMP-002/TASK-032 no bolt 019; dependência IMP-001 complete e integrada. Quatro ficheiros autorizados para implementação futura; índices/registos sem reabrir fundações | V-ADD e preservação de hashes agora; V-032/revisão/integração futuras. Nenhum avanço para IMP-003/bolt 002 |
++| [ADR-026](../../../add.md#adr-026) — qualidade com ferramentas existentes | JUnit/Maven/validador existentes, D01–D17 especificados e regressão/manual pendentes; sem CI, linter, JaCoCo, dependência runtime ou limiar percentual novos | Cobrir critérios/casos críticos com resultados reais. Os 149 testes de IMP-001 não contam como execução atual deste incremento |
++
++## Q-C-03 e razão para não criar nova ADR
++
++Q-C-03 regista a gramática aprovada, não uma nova opção arquitetural. A carga
++operacional ainda será implementada; não existe representação anterior de alpha
++aceite pelo loader que esteja a ser removida. A string inteira, após strip, deve
++ser decimal com dígitos e ponto conforme o Design; expoente/hex/sufixos/vírgula/
++sinal/unidades não fazem parte dessa representação. O parsing continua obrigado
++a rejeitar não finitos, zero, valores acima de 1 e underflow para zero, agregando
++o erro da propriedade. Não se usa validação lexical para dispensar a numérica.
++
++O detalhe não altera default, aplicabilidade por papel, limites, mensagem de rede
++ou requisito; concretiza ADR-016/010 com autorização explícita. ADR-033 em diante
++ficam reservadas para eventual decisão nova, não são criadas para renumerar ou
++duplicar este esclarecimento. O ADD e as ADR aceites não foram modificados.
++
++## Salvaguardas a manter antes e durante a implementação autorizada
++
++- **Compatibilidade:** acrescentar runtime no fim do record e manter o overload
++  público anterior de 13 argumentos, delegando nos defaults. Não remover accessors
++  ou nomes Java existentes. A alteração de reflection/equals pelo novo componente
++  já está explícita no Design aprovado; não afeta o protocolo binário v1.
++- **Erros agregados:** parsing inválido não recebe default, não publica grupo/nó
++  parcial nem dispara uma relação com sentinela inválida. A validação dos records
++  é segunda defesa; não substitui a agregação da API de carga. Role inválido não
++  é tratado como overlay; chave inaplicável é rejeitada mesmo igual ao default.
++- **Unidades/caps:** Duration limitado antes de converter, sem truncar fração;
++  inteiros/percentagens/alpha nos domínios aprovados. Fronteira escalar impossível
++  com as relações resulta em erro de relação, sem aumentar caps para fazer passar
++  um caso. Preservar TCP 37..65536, 16 tipos/código 3 rejeitado, UDP 1200/64/1136,
++  2 MiB/frame e restantes limites protegidos do ADD.
++- **Âmbito e consumo:** a prova D14 instancia apenas o record real Transport.Options
++  no ConfigurationLoaderTest autorizado, com sentinelas diferentes dos defaults.
++  Não instancia Transport, abre sockets ou cria adapter de produção. Não afirma
++  wiring de OttApplication/bootstrap nem consumo dos serviços ainda por implementar.
++- **Testes:** manter todos os testes existentes, inclusive chaves inválidas atuais.
++  Depois da autorização, os novos casos falham por APIs/comportamentos ausentes;
++  não fabricar falhas em fundações. V-032, regressão completa com log novo e teste
++  manual adequado continuam obrigatórios, com resultados atuais e limitações.
++
++Estas salvaguardas já decorrem do desenho/ADR; não são novas dependências ou gates.
++Se o código real revelar inviabilidade durante Implement, parar a parte afetada,
++registar evidência/impacto e propor a revisão necessária antes de intervir.
++
++## Checkpoint ADR e condições de fecho
++
++Revisão ADR preparada, ainda não aprovada. Bolt in-progress/adr; Model e Design
++concluídos pelas aprovações reais, ADR ainda fora de stages_completed. Nenhuma
++alteração em Projeto/, teste Java, regressão, manual, commit ou push nesta etapa.
++
++G-REVIEW-032 permanece pendente: designar revisor humano distinto do autor,
++executar V-032/regressão/manual, obter revisão final e integrar antes de DONE.
++A aprovação de Design/alpha não identifica esse revisor nem equivale a revisão
++da implementação. Não fechar bolt/história/unidade nem iniciar outro IMP.
++Apresentar esta reutilização para revisão e parar antes de Implement/Test.

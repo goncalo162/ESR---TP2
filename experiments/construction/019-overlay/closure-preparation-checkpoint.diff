@@ -1,0 +1,654 @@
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T23:04:14Z"
++updated: "2026-11-04T10:20:17Z"
+ started: "2026-11-03T22:09:01Z"
+ completed: null
+ current_stage: "test"
+-stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-03T22:33:00Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-03T22:55:46Z", "artifact": "implementation-walkthrough.md"}]
++stages_completed: [{"name": "model", "completed": "2026-11-03T22:16:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-03T22:25:30Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-03T22:33:00Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-03T22:55:46Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-04T10:19:06Z", "artifact": "ddd-03-test-report.md"}]
+ requires_bolts: ["001-base-validada"]
+ enables_bolts: ["002-overlay", "020-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
+ 
+-## Etapa 5 — Test executado, resultados para revisão
++## Test concluído — fecho preparado para revisão
+ 
+ Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
+ próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
+@@ -69,12 +69,16 @@
+ zero falhas/erros/skips; manual do agente com 25 CHECK_PASS e MANUAL_PASS.
+ D01–D17/V-032 consolidados. Os quatro hashes de código não mudaram desde Implement.
+ 
+-Bolt in-progress/test; Test ainda não aprovado nem concluído em stages_completed.
+-A repetição pessoal do manual pelo utilizador é pendente antes da aprovação.
+-G-REVIEW-032 exige ainda revisor humano distinto designado, revisão final e
+-integração antes de DONE. Não confundir execução do agente com execução humana.
+-Sem fecho, commit/push ou outro IMP. Logs/XML/hashes/diffs e roteiro reproduzível
+-em experiments/construction/019-overlay/; listas Maven geradas separadas.
++Test aprovado explicitamente pelo utilizador em 2026-11-04T10:19:06Z (registo),
++incluindo os 824 testes e a execução pessoal por Luis em 2026-11-04T10:15:14Z,
++25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmada. [Log pessoal preservado](../../../experiments/construction/019-overlay/test-manual-luis.log)
++separado do agente. Test concluído em stages_completed; todas as cinco etapas
++executadas/aprovadas. [Fecho preparado](closure-walkthrough.md) para revisão.
++
++Bolt continua in-progress/test, completed=null: G-REVIEW-032 pendente de revisor
++humano distinto designado, revisão final e integração. Não executar a cascata
++complete enquanto faltar condição. Sem commits/push ou outro IMP. Código e
++evidências de execução anteriores intactos; listas target/ separadas.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -93,15 +97,15 @@
+ 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 4. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+-5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-002 e as ADR do ADD.
++5. [x] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-002 e as ADR do ADD.
+ 
+ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
+-- [ ] Carregamento inválido falha antes de rede e sem configuração parcial.
+-- [ ] Perfis existentes continuam válidos sem propriedades novas.
++- [x] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
++- [x] Carregamento inválido falha antes de rede e sem configuração parcial.
++- [x] Perfis existentes continuam válidos sem propriedades novas.
+ - [ ] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## Evidência e fecho
+diff --git a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+--- a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+@@ -5,7 +5,8 @@
+ explicitamente pelo utilizador, com registo em 2026-11-03T22:16:54Z. A continuação
+ posterior está no [Design aprovado](ddd-02-technical-design.md) e na
+ [revisão ADR aprovada](adr-review.md). Implement autorizado, com
+-[walkthrough aprovado](implementation-walkthrough.md) e [Test para revisão](ddd-03-test-report.md).
++[walkthrough aprovado](implementation-walkthrough.md), [Test aprovado](ddd-03-test-report.md)
++e [fecho preparado](closure-walkthrough.md).
+ As descrições de pendências abaixo retratam o checkpoint Model.
+ 
+ Fontes: [ADD 6.1–6.3](../../../add.md#6-modelo-de-dados-e-contratos),
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T23:04:14Z"
++updated: "2026-11-04T10:23:36Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -37,9 +37,11 @@
+ 019-overlay/IMP-002: Model aprovado pelo utilizador em 2026-11-03T22:16:54Z;
+ Design aprovado, com registo em 2026-11-03T22:25:30Z, incluindo alpha/Q-C-03.
+ Revisão ADR e Implement aprovados; Implement concluído em 2026-11-03T22:55:46Z.
+-[Test executado para revisão](../../../../bolts/019-overlay/ddd-03-test-report.md):
+-824 testes completos aprovados (740+66+18) e manual do agente com 25 checks.
+-Unidade in-progress; Test ainda não aprovado. Repetição pessoal do utilizador,
+-revisor distinto/revisão final/integração pendentes; restantes bolts planned.
++Test aprovado pelo utilizador em 2026-11-04T10:19:06Z (registo), incluindo 824 testes
++completos e a sua execução pessoal como Luis em 2026-11-04T10:15:14Z, 25 checks/
++MANUAL_PASS e saída Java 0. [Fecho preparado para revisão](../../../../bolts/019-overlay/closure-walkthrough.md).
++As cinco etapas de 019-overlay concluídas; bolt/história/unidade em progresso.
++G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração;
++restantes bolts planned. A aprovação de Test não é DONE nem nova implementação.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T23:04:14Z"
++updated: "2026-11-04T10:23:36Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+ requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+@@ -19,10 +19,11 @@
+ 
+ Model aprovado no bolt 019-overlay, em 2026-11-03T22:16:54Z;
+ Design aprovado pelo utilizador em 2026-11-03T22:25:30Z;
+-revisão ADR e Implement aprovados. [Test para revisão](../../../../../bolts/019-overlay/ddd-03-test-report.md):
+-824 testes completos e manual do agente/25 checks. Sem implemented=true ou fecho
+-presumidos. Repetição pessoal do utilizador, aprovação de Test, revisor distinto,
+-revisão final e integração pendentes.
++revisão ADR, Implement e Test aprovados. Test concluído em 2026-11-04T10:19:06Z (registo),
++824 testes e manual pessoal de Luis com 25 checks/saída Java 0 confirmados.
++[Fecho preparado](../../../../../bolts/019-overlay/closure-walkthrough.md), sem
++implemented=true ou DONE. Pendentes: revisor humano distinto designado, revisão
++final e integração. Esta repetição manual não designa o revisor.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+@@ -30,9 +31,9 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
+-- [ ] Carregamento inválido falha antes de rede e sem configuração parcial.
+-- [ ] Perfis existentes continuam válidos sem propriedades novas.
++- [x] Chaves, defaults, papéis e relações correspondem ao ADD secção 6.3.
++- [x] Carregamento inválido falha antes de rede e sem configuração parcial.
++- [x] Perfis existentes continuam válidos sem propriedades novas.
+ - [ ] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## Testes
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-03T23:04:14Z"
++updated: "2026-11-04T10:21:41Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -90,3 +90,18 @@
+ 
+ Test: [relatório](../../../../bolts/019-overlay/ddd-03-test-report.md).
+ Manual: [roteiro e comandos](../../../../../experiments/construction/019-overlay/manual-runtime.md).
++
++- **2026-11-04T10:15:14Z**: execução pessoal por Luis, confirmada pelo utilizador:
++  25 CHECK_PASS, MANUAL_PASS e saída Java 0. Log /tmp/ott-imp002-manual.tak20f.log
++  preservado byte a byte em test-manual-luis.log, separado do agente; original
++  mantido. Saída 0 registada como declaração do utilizador, não extraída do log.
++- **2026-11-04T10:19:06Z**: aprovação explícita de Test e do manual pessoal registada.
++  Test concluído; todas as cinco etapas em stages_completed. Três critérios
++  técnicos assinalados, último critério de revisão/integração ainda aberto.
++- **2026-11-04T10:21:41Z**: fecho preparado para revisão, sem aplicar cascata complete.
++  Bolt/história/unidade/TASK-032 em progresso. G-REVIEW-032: revisor distinto
++  designado, revisão final e integração pendentes. Sem commits/push ou outro IMP;
++  código/JAR/XML/log do agente intactos e listas geradas separadas.
++
++Fecho: [preparação para revisão](../../../../bolts/019-overlay/closure-walkthrough.md).
++Luis: [log pessoal preservado](../../../../../experiments/construction/019-overlay/test-manual-luis.log).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -6,7 +6,8 @@
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+ em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-019-overlay/IMP-002 está in-progress/test, com Model/Design/ADR/Implement aprovados;
++019-overlay/IMP-002 está in-progress/test, com as cinco etapas aprovadas/concluídas;
++fecho pendente de revisor distinto, revisão final e integração;
+ as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -19,9 +20,9 @@
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+ **Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
+-Etapa Test: [relatório para revisão](bolts/019-overlay/ddd-03-test-report.md); 824 testes
+-completos aprovados e manual do agente/25 checks. Repetição pessoal do utilizador,
+-aprovação de Test e gate de revisão/integração pendentes.
++Test aprovado: 824 testes completos e execução pessoal por Luis/25 checks/saída 0.
++[Fecho preparado](bolts/019-overlay/closure-walkthrough.md); sem implemented=true/DONE.
++Pendentes: revisor humano distinto designado, revisão final e integração.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS em Test, após aprovação de Implement. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS, com Test aprovado e fecho pendente de G-REVIEW-032. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Test do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS, com Test aprovado no bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -25,13 +25,13 @@
+ (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+-Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS em Test,
+-após Implement aprovado em 2026-11-03T22:55:46Z. [Resultados para revisão](../memory-bank/bolts/019-overlay/ddd-03-test-report.md):
+-clean verify/JDK21, 824 testes aprovados (740 configuração +66 codec +18 TCP real),
+-zero falhas/erros/skips; manual do agente com 25 CHECK_PASS/MANUAL_PASS. Código
+-igual ao revisto em Implement. D01–D17/V-032 tecnicamente executados; repetição
+-pessoal do utilizador, aprovação de Test, revisor distinto G-REVIEW-032, revisão
+-final e integração pendentes. Sem fecho/commit/push de IMP-002 ou outro IMP iniciado.
++Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS, com cinco
++etapas concluídas e Test aprovado explicitamente em 2026-11-04T10:19:06Z (registo).
++824 testes completos aprovados; execução pessoal por Luis em 2026-11-04T10:15:14Z,
++25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmados. [Fecho preparado para revisão](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
++G-REVIEW-032 pendente de revisor humano distinto designado, revisão final e
++integração. Aprovação Test não implica DONE; sem fecho/commit/push ou outro IMP.
++Código/JAR/XML/execução do agente preservados; log pessoal de Luis separado.
+ 
+ [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+ 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+@@ -62,7 +62,7 @@
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Test para revisão: 824 testes completos e manual agente/25 checks; gates humanos/integração pendentes |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Test aprovado: 824 testes e manual Luis/25 checks; fecho/G-REVIEW-032 pendentes |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -5,7 +5,8 @@
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+ 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
+-em Test, após Implement aprovado, com [resultados para revisão](../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
++com Test aprovado/concluído, com [fecho preparado para revisão](../memory-bank/bolts/019-overlay/closure-walkthrough.md).
++G-REVIEW-032 ainda pendente; 019-overlay permanece in-progress.
+ Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -67,9 +67,9 @@
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Chaves, defaults, papéis e relações correspondem ao ADD, secção 6.3.
+-- [ ] Carregamento inválido falha antes de rede e sem configuração parcial.
+-- [ ] Perfis existentes continuam válidos sem propriedades novas.
++- [x] Chaves, defaults, papéis e relações correspondem ao ADD, secção 6.3.
++- [x] Carregamento inválido falha antes de rede e sem configuração parcial.
++- [x] Perfis existentes continuam válidos sem propriedades novas.
+ - [ ] V-032 e revisão/integração exigidas têm evidência real.
+ 
+ ## 12. Definition of Done
+@@ -89,9 +89,12 @@
+ Revisão ADR e Implement aprovados; [Test para revisão](../../../memory-bank/bolts/019-overlay/ddd-03-test-report.md).
+ Clean verify/JDK21 em 2026-11-03T22:56:28Z: 824 testes aprovados, zero falhas/erros/
+ skips (740 configuração, 66 codec, 18 TCP real). Manual do agente: 25 checks e
+-MANUAL_PASS. Código igual à versão revista de Implement. Repetição pessoal do
+-utilizador antes da aprovação de Test, revisor distinto designado, revisão final
+-e integração continuam pendentes antes de DONE. Nenhum fecho autorizado.
++MANUAL_PASS. Código igual à versão revista de Implement. Luis repetiu pessoalmente em
++2026-11-04T10:15:14Z: 25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada. Test
++aprovado explicitamente, com registo em 2026-11-04T10:19:06Z; etapas concluídas.
++[Fecho preparado para revisão](../../../memory-bank/bolts/019-overlay/closure-walkthrough.md).
++G-REVIEW-032 pendente: revisor humano distinto designado, revisão final e integração.
++Estado permanece IN PROGRESS; não marcar DONE enquanto faltar condição. Sem commits/push.
+ 
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -244,16 +244,16 @@
+     "docs/06-DATA-MODEL.md": "3105f2c82ab84cc1b4c21238f50d5ae2d56306d32217bdb53c4df5d076dbd29d",
+     "docs/07-API-AND-INTERFACES.md": "cc83fe11878509c15a6b11d0a74d141f479b188c97acb56b2aa1d6ec5f70e83a",
+     "docs/08-IMPLEMENTATION-ROADMAP.md": "b8aff31a131a05746fe7908a4406a3b45f23684ea3d4ee4d1c5f560c098696bb",
+-    "docs/09-TESTING-STRATEGY.md": "2c680deb1885ad039a6592799316fa7c7529b8788fa39c46fc9e95c18a7d6dcd",
++    "docs/09-TESTING-STRATEGY.md": "f06ccfb06202a779a2b475908eefd2991dd59cb09d384a4e197800bc45161daa",
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "7a177d2d4440d4ce77adb540c8ff1d4ea7d0a25c8e55f4b67eb636a61a592184",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "374a659b82b0b2ab6b5e8db556c5e5a4095b25f8b0d5e188ba0dcfc1035324b7",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "2bde36de4cf8c7a4c2f8e463e7035dbbff6ee945999273c28138f9f2f3165d2d",
++    "docs/15-PROJECT-PROGRESS.md": "dda6d350be55d7d204b32e84502459533cd9bc85287ea2421494ea2a79fbd1c3",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "a6cb514883eae6819b1c7ca23773693e42386190e5ca9bb6e19154d218b96ba6",
++    "docs/18-CONSTRUCTION-BOLTS.md": "bd7e9a90e03b8fe6dcd198a516ed3dbed8a0dde6d16b1e7f28671306758e720b",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "fb2d574b5b273910dc94992dab22a919337c8f86219906dc348344e2d694c01c",
++    "docs/tasks/PHASE-02/TASK-032.md": "105e4daaa920937a1be0c3383e720e5e1fdfd43ca00c697810aaa9a47cda56c3",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-03T23:04:58Z",
++  "updated": "2026-11-04T10:23:36Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -568,6 +568,24 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "a6cb514883eae6819b1c7ca23773693e42386190e5ca9bb6e19154d218b96ba6",
+         "docs/tasks/PHASE-02/TASK-032.md": "fb2d574b5b273910dc94992dab22a919337c8f86219906dc348344e2d694c01c"
+       }
++    },
++    {
++      "updated": "2026-11-04T10:23:36Z",
++      "reason": "Utilizador aprovou Test e repetição pessoal por Luis (25 checks/saída 0); concluir a etapa e preparar fecho, mantendo G-REVIEW-032/revisor distinto/revisão final/integração pendentes. Sem DONE, código, novos testes, commits/push ou outro IMP.",
++      "previous_hashes": {
++        "docs/09-TESTING-STRATEGY.md": "2c680deb1885ad039a6592799316fa7c7529b8788fa39c46fc9e95c18a7d6dcd",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "7a177d2d4440d4ce77adb540c8ff1d4ea7d0a25c8e55f4b67eb636a61a592184",
++        "docs/15-PROJECT-PROGRESS.md": "2bde36de4cf8c7a4c2f8e463e7035dbbff6ee945999273c28138f9f2f3165d2d",
++        "docs/18-CONSTRUCTION-BOLTS.md": "a6cb514883eae6819b1c7ca23773693e42386190e5ca9bb6e19154d218b96ba6",
++        "docs/tasks/PHASE-02/TASK-032.md": "fb2d574b5b273910dc94992dab22a919337c8f86219906dc348344e2d694c01c"
++      },
++      "updated_hashes": {
++        "docs/09-TESTING-STRATEGY.md": "f06ccfb06202a779a2b475908eefd2991dd59cb09d384a4e197800bc45161daa",
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "374a659b82b0b2ab6b5e8db556c5e5a4095b25f8b0d5e188ba0dcfc1035324b7",
++        "docs/15-PROJECT-PROGRESS.md": "dda6d350be55d7d204b32e84502459533cd9bc85287ea2421494ea2a79fbd1c3",
++        "docs/18-CONSTRUCTION-BOLTS.md": "bd7e9a90e03b8fe6dcd198a516ed3dbed8a0dde6d16b1e7f28671306758e720b",
++        "docs/tasks/PHASE-02/TASK-032.md": "105e4daaa920937a1be0c3383e720e5e1fdfd43ca00c697810aaa9a47cda56c3"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+--- a/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
++++ b/memory-bank/bolts/019-overlay/ddd-02-technical-design.md
+@@ -4,9 +4,9 @@
+ Design e gramática de alpha aprovados pelo utilizador, com registo em
+ 2026-11-03T22:25:30Z. A [revisão ADR](adr-review.md) foi depois aprovada em
+ 2026-11-03T22:33:00Z, autorizando apenas Implement e testes incrementais.
+-[Implementação aprovada](implementation-walkthrough.md); [Test executado para revisão](ddd-03-test-report.md):
+-824 testes completos e manual do agente com 25 checks. Repetição pessoal do
+-utilizador, aprovação de Test e G-REVIEW-032/revisão/integração pendentes.
++[Implementação e Test aprovados](ddd-03-test-report.md): 824 testes completos e
++execução pessoal por Luis/25 checks confirmados. [Fecho preparado](closure-walkthrough.md),
++com revisor distinto designado, revisão final e integração pendentes em G-REVIEW-032.
+ As assinaturas e estados de execução abaixo retratam o Design aprovado.
+ 
+ Norma: [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -46,7 +46,7 @@
+ regista a aprovação explícita do detalhe lexical de monitor.ewma.alpha no Design.
+ As ADR-007/010/016/024/026 são reutilizadas sem substituição ou ADR nova;
+ [revisão de conformidade](../bolts/019-overlay/adr-review.md) aprovada antes de código.
+-Implement aprovado e [Test para revisão](../bolts/019-overlay/ddd-03-test-report.md):
+-824 testes completos e manual do agente/25 checks aprovados tecnicamente.
+-Repetição pessoal do utilizador, aprovação Test e G-REVIEW-032/revisão/integração
+-pendentes. Sem ADR nova ou aprovação de fecho presumida.
++Implement e [Test aprovados](../bolts/019-overlay/ddd-03-test-report.md): 824 testes
++completos e repetição pessoal por Luis/25 checks confirmados. [Fecho preparado](../bolts/019-overlay/closure-walkthrough.md),
++com revisor distinto designado/revisão final/integração pendentes em G-REVIEW-032.
++Sem ADR nova ou fecho presumido.
+diff --git a/memory-bank/bolts/019-overlay/adr-review.md b/memory-bank/bolts/019-overlay/adr-review.md
+--- a/memory-bank/bolts/019-overlay/adr-review.md
++++ b/memory-bank/bolts/019-overlay/adr-review.md
+@@ -3,9 +3,9 @@
+ Design e gramática de alpha aprovados explicitamente pelo utilizador, com registo
+ em 2026-11-03T22:25:30Z. Autorizado apenas rever ADR-007/010/016/024/026 e registar
+ Q-C-03. Revisão ADR aprovada pelo utilizador em 2026-11-03T22:33:00Z;
+-[Implement aprovado](implementation-walkthrough.md) e [Test executado para revisão](ddd-03-test-report.md),
+-com 824 testes completos e manual do agente/25 checks. Esta análise ADR é documental;
+-os resultados atuais/limites estão no relatório Test. Aprovação de Test pendente.
++[Implement e Test aprovados](ddd-03-test-report.md), com 824 testes completos e
++execução pessoal por Luis/25 checks confirmados. Esta análise ADR é documental;
++resultados e [fecho preparado](closure-walkthrough.md) mantêm G-REVIEW-032 pendente.
+ 
+ Fontes: [ADD secção 5](../../../add.md#5-registo-de-decisões),
+ [ADD 6.3](../../../add.md#63-parâmetros-operacionais-opcionais),
+@@ -76,9 +76,9 @@
+ 
+ Revisão ADR aprovada e incluída em stages_completed. Na etapa ADR não houve
+ alterações em Projeto/ ou execução Java; o trabalho posterior autorizado está no
+-walkthrough de Implement e no relatório Test posterior. Bolt in-progress/test,
+-aguardando revisão e repetição pessoal do manual. Nenhum fecho ou commit/push
+-foi autorizado para este incremento.
++walkthrough de Implement e no relatório Test posterior, agora aprovado com
++repetição pessoal confirmada. Bolt in-progress/test, aguardando G-REVIEW-032 e
++revisão do fecho preparado. Nenhum DONE ou commit/push foi autorizado.
+ 
+ G-REVIEW-032 permanece pendente: designar revisor humano distinto do autor,
+ executar V-032/regressão/manual, obter revisão final e integrar antes de DONE.
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -270,12 +270,13 @@
+ Defaults preservam perfis atuais; overrides válidos chegam ao consumidor.
+ Chaves desconhecidas/inaplicáveis/duplicadas, NaN/infinito, tipos, intervalos,
+ overflow e relações inválidas produzem erro agregado antes de sockets.
+-Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUTADO, EM REVISÃO.
++Responsável: [TASK-032](tasks/PHASE-02/TASK-032.md). Estado: EXECUTADO E APROVADO EM TEST.
+ [Prova atual D01–D17](../memory-bank/bolts/019-overlay/ddd-03-test-report.md): clean
+ verify/JDK21 com 824 testes aprovados (740 configuração +66 codec +18 TCP real),
+-zero falhas/erros/skips; manual do agente com 25 checks. Repetição pessoal pelo
+-utilizador antes de aprovar Test, revisor distinto, revisão final/integração
+-pendentes; isto não declara DONE da tarefa/bolt.
++zero falhas/erros/skips; manual do agente com 25 checks e repetição pessoal por
++Luis em 2026-11-04T10:15:14Z, 25 CHECK_PASS/MANUAL_PASS e saída Java 0 confirmada.
++Test aprovado; revisor distinto designado, revisão final/integração pendentes
++em G-REVIEW-032. Não declara DONE da tarefa/bolt.
+ 
+ ### V-ADD — Coerência do documento mestre e dos incrementos
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -65,13 +65,15 @@
+ complete; nenhum requisito global é promovido a DONE.
+ Os estados e evidências legados acima conservam-se como histórico das TASK.
+ 
+-IMP-002/REQ-024: Implement aprovado; [Test executado para revisão](../memory-bank/bolts/019-overlay/ddd-03-test-report.md),
++IMP-002/REQ-024: Test aprovado, incluindo repetição pessoal de Luis; [prova executada](../memory-bank/bolts/019-overlay/ddd-03-test-report.md),
+ com 30 chaves/sete grupos, erros agregados e construtor anterior preservado.
+ Clean verify/JDK21: 824 testes aprovados (740 configuração, 66 codec, 18 TCP real),
+ zero falhas/erros/skips; 45 fixtures intactas e manual do agente com 25 checks.
+-D01–D17/V-032 tecnicamente executados. Repetição pessoal do utilizador/aprovação
+-Test, G-REVIEW-032/revisão final/integração pendentes; nenhum requisito global,
+-TASK/bolt ou unidade promovido a DONE.
++D01–D17/V-032 executados e Test aprovado: Luis repetiu em 2026-11-04T10:15:14Z,
++25 CHECK_PASS/MANUAL_PASS, saída Java 0 confirmada; log pessoal separado do agente.
++[Fecho preparado](../memory-bank/bolts/019-overlay/closure-walkthrough.md), com
++G-REVIEW-032 pendente de revisor distinto designado, revisão final e integração.
++Nenhum requisito global, TASK/bolt ou unidade promovido a DONE.
+ 
+ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ [ADD, secção 12](../add.md). REQ-024 é satisfeito pela nova TASK-032/V-032.
+diff --git a/memory-bank/bolts/019-overlay/implementation-walkthrough.md b/memory-bank/bolts/019-overlay/implementation-walkthrough.md
+--- a/memory-bank/bolts/019-overlay/implementation-walkthrough.md
++++ b/memory-bank/bolts/019-overlay/implementation-walkthrough.md
+@@ -5,8 +5,10 @@
+ com casos V-032/falhas reais e testes incrementais. Bolt in-progress/implement;
+ a implementação foi aprovada pelo utilizador em 2026-11-03T22:55:46Z. O
+ [relatório Test](ddd-03-test-report.md) consolida a execução posterior, com 824
+-testes e manual do agente/25 checks. A aprovação de Test e o fecho continuam
+-pendentes; os resultados/limites abaixo retratam o checkpoint Implement.
++testes e manual do agente/25 checks. Test foi depois aprovado pelo utilizador,
++incluindo a repetição pessoal por Luis/25 checks em 2026-11-04T10:15:14Z.
++[Fecho preparado](closure-walkthrough.md), com G-REVIEW-032 pendente; os resultados/
++limites abaixo retratam o checkpoint Implement.
+ 
+ ## Resultado local e âmbito
+ 
+@@ -131,7 +133,8 @@
+ 
+ As pendências de execução acima eram da apresentação de Implement. Clean verify,
+ TCP e manual do agente foram depois executados em Test; continuam pendentes a
+-aprovação dessa etapa, repetição pessoal do utilizador, revisor humano distinto
+-designado (G-REVIEW-032), revisão final e integração na base comum. Sem commit/push,
++revisor humano distinto designado (G-REVIEW-032), revisão final e integração
++na base comum. Test e a repetição pessoal foram aprovados pelo utilizador; o
++fecho permanece pendente. Sem commit/push,
+ fecho, medição ou resultado GUI/CORE inventados. Os 806 testes incrementais não
+ substituem essas condições nem reutilizam os 149 testes históricos de IMP-001.
+diff --git a/memory-bank/bolts/019-overlay/ddd-03-test-report.md b/memory-bank/bolts/019-overlay/ddd-03-test-report.md
+--- a/memory-bank/bolts/019-overlay/ddd-03-test-report.md
++++ b/memory-bank/bolts/019-overlay/ddd-03-test-report.md
+@@ -1,9 +1,11 @@
+-# IMP-002 — Test: resultados para revisão
++# IMP-002 — Test aprovado; fecho ainda pendente
+ 
+ Implement aprovado explicitamente pelo utilizador, com registo em
+ 2026-11-03T22:55:46Z. Autorizado Test completo e manual reproduzível; parar antes
+-de fecho/commit/push ou outro IMP. Bolt in-progress/test; a etapa ainda aguarda
+-repetição pessoal do manual e aprovação humana. G-REVIEW-032 permanece pendente.
++de fecho/commit/push ou outro IMP. Test aprovado explicitamente pelo utilizador,
++com registo em 2026-11-04T10:19:06Z, incluindo os 824 testes e a execução pessoal
++por Luis em 2026-11-04T10:15:14Z. Test concluído; [fecho preparado](closure-walkthrough.md)
++para revisão, com G-REVIEW-032 pendente. Bolt in-progress/test, completed=null.
+ 
+ ## Resultado atual e versão validada
+ 
+@@ -13,8 +15,10 @@
+ das execuções incrementais. Não é reutilização dos 149 históricos de IMP-001.
+ 
+ O manual executado pelo agente passou com **25 CHECK_PASS e MANUAL_PASS**,
+-operador Codex. A execução pessoal do utilizador ainda não foi comprovada; este
+-relatório não a substitui nem atribui a Luis ou a outro revisor a execução do agente.
++operador Codex. Luis repetiu pessoalmente o manual em 2026-11-04T10:15:14Z:
++25 CHECK_PASS e MANUAL_PASS no [log separado](../../../experiments/construction/019-overlay/test-manual-luis.log),
++saída Java 0 confirmada pelo utilizador. [Proveniência pessoal](../../../experiments/construction/019-overlay/test-manual-luis.json).
++O log do agente foi mantido; esta repetição não designa o revisor distinto.
+ 
+ Base Git: Denji/HEAD 6bef7425a1f9237f9f744f26f3aa7e6067778025, com as alterações
+ locais revistas de IMP-002. Não há commit deste incremento nem integração das
+@@ -78,11 +82,12 @@
+ | D14 | Quatro overrides chegam ao record Transport.Options, sem instanciar Transport | Passou em JUnit e manual |
+ | D15 | Deployment falha inteiro, parâmetros por nó, escopo perfil/topologia/catálogo | Passou |
+ | D16 | Propriedades obrigatórias e paths fora do cwd não mascarados por defaults | Passou |
+-| D17 | 824 casos completos, incluindo TCP real, 45 fixtures intactas e manual do agente | Prova executada; repetição pessoal/revisão/integração pendentes |
++| D17 | 824 casos completos, incluindo TCP real, 45 fixtures intactas e manual do agente | Prova executada e Test aprovado, incluindo repetição pessoal; revisão distinta/integração pendentes |
+ 
+ V-032 tem evidência técnica atual de defaults/overrides/domínios/papéis/relações,
+ agregação/imutabilidade e consumo offline. A prova D17 que faltava em Implement
+-foi executada no ambiente disponível; isso não satisfaz por inferência o gate de
++foi executada no ambiente disponível e aceite em Test, com repetição pessoal;
++isso não satisfaz por inferência o gate de
+ revisor distinto nem a integração exigida para DONE. Não marcar tarefa/bolt
+ concluídos apenas porque o build passou.
+ 
+@@ -103,9 +108,11 @@
+ 
+ Comandos e roteiro para o utilizador:
+ [manual-runtime.md](../../../experiments/construction/019-overlay/manual-runtime.md).
+-O último argumento identifica o operador real; **a repetição pessoal pelo utilizador
+-continua pendente antes de aprovar Test**. O agente não pode declarar essa prova
+-humana por executar o launcher com outro nome. Conservar o log real da repetição.
++O último argumento identifica o operador real. **A repetição pessoal foi realizada
++por Luis e aceite na aprovação de Test**. O [log pessoal](../../../experiments/construction/019-overlay/test-manual-luis.log)
++está preservado byte a byte, com os metadados da execução separados dos do agente.
++O roteiro arquivado conserva as instruções anteriores à repetição; não se pede
++nova execução pessoal para registar esta aprovação.
+ 
+ ## Hashes, preservação e diff
+ 
+@@ -137,7 +144,8 @@
+ do record de opções, não o wiring dos componentes futuros. Quatro UUID de streams
+ configurados não provam quatro conteúdos preparados/reproduzidos.
+ 
+-Resultados de Test preparados, sem aprovação presumida. Mantêm-se pendentes a
+-repetição pessoal do utilizador, revisor humano distinto designado, revisão final
+-e integração antes de DONE. Bolt/história/unidade/TASK-032 em progresso, etapa
+-Test não concluída em stages_completed. Sem fecho, commit, push ou outro IMP.
++Resultados de Test aprovados explicitamente pelo utilizador, com repetição
++pessoal comprovada. Test concluído em stages_completed; bolt/história/unidade/
++TASK-032 continuam em progresso. Pendentes: revisor humano distinto designado,
++revisão final e integração antes de DONE. [Fecho preparado para revisão](closure-walkthrough.md).
++Sem fecho, commit, push ou outro IMP.
+diff --git a/memory-bank/bolts/019-overlay/closure-walkthrough.md b/memory-bank/bolts/019-overlay/closure-walkthrough.md
+--- /dev/null
++++ b/memory-bank/bolts/019-overlay/closure-walkthrough.md
+@@ -0,0 +1,79 @@
++# IMP-002 — Fecho preparado para revisão
++
++Test e os 824 testes aprovados explicitamente pelo utilizador, incluindo a sua
++execução manual como **Luis** em 2026-11-04T10:15:14Z: 25 CHECK_PASS, MANUAL_PASS
++e saída Java 0 confirmada pelo utilizador. Aprovação registada em
++2026-11-04T10:19:06Z. Autorizado concluir Test e preparar o fecho; **não autorizado
++marcar DONE enquanto faltar G-REVIEW-032, fazer commits/push ou iniciar outro IMP**.
++
++## Estado e critérios
++
++As cinco etapas Model/Design/ADR/Implement/Test estão concluídas pelas aprovações
++registadas. O tipo DDD não define uma sexta etapa: current_stage continua test
++enquanto o fecho está pendente, com status=in-progress e completed=null.
++História, unidade e TASK-032 continuam em progresso, sem implemented=true/DONE.
++As três condições técnicas abaixo estão cumpridas; a condição de revisão/integração
++permanece aberta no bolt/história.
++
++| Critério técnico | Evidência aceite |
++|---|---|
++| 30 chaves, sete grupos, defaults/papéis/relações do ADD 6.3 | Model/Design/ADR aprovados; casos V-032 e Q-C-03 aprovados |
++| Carga inválida antes de rede, sem configuração parcial | Casos de agregação/immutabilidade e manual com cinco problemas independentes |
++| Perfis antigos válidos e construtor anterior preservado | Cinco perfis/defaults, overload público de 13 argumentos e testes antigos preservados |
++| V-032 e regressão atual | clean verify/JDK21: 824 testes, zero falhas/erros/skips; 740 configuração +66 codec +18 TCP real |
++| Manual do agente | Codex, 2026-11-03T22:58:31Z, 25 checks; [log](../../../experiments/construction/019-overlay/test-manual.log) |
++| Repetição pessoal do utilizador | Luis, 2026-11-04T10:15:14Z, 25 checks/saída 0; [log separado](../../../experiments/construction/019-overlay/test-manual-luis.log) |
++
++[Relatório Test aprovado](ddd-03-test-report.md) e
++[walkthrough D01–D17](implementation-walkthrough.md). O código mantém exatamente
++os quatro hashes da versão revista/executada; não se repetiram testes Java para
++esta alteração exclusivamente documental. As execuções anteriores não foram
++rebatizadas nem sobrescritas com datas/resultados novos.
++
++## Proveniência da execução por Luis
++
++Origem preservada: /tmp/ott-imp002-manual.tak20f.log, sem alterar/remover o original.
++Cópia: experiments/construction/019-overlay/test-manual-luis.log, 4361 bytes,
++SHA-256 `493522dbbfa85b3f8fe80f357759e4f1dd9b6bb444402d2e6b45d3d967ff55eb`.
++[Metadados](../../../experiments/construction/019-overlay/test-manual-luis.json)
++distinguem os instantes do log da data de preservação/aprovação registada.
++As 25 etiquetas CHECK_PASS coincidem com as do roteiro executado pelo agente.
++A saída Java 0 é a confirmação explícita do utilizador; não se inventa um comando
++ou estado da shell ausente do log. Isto não designa Luis como revisor distinto.
++
++O JAR da validação registada tem SHA-256
++`b13a0bd6c928badfb0fd37cdb44d2e9699f683120b096490b60eed1a4ad43760`.
++O log pessoal não inclui hash de JAR: a identificação do operador/resultados vem
++do próprio log e da aprovação do utilizador, sem atribuir ao log metadados ausentes.
++
++## G-REVIEW-032 — condições ainda pendentes
++
++| Condição para DONE | Estado real |
++|---|---|
++| Revisor humano distinto do autor designado | Pendente; sem nome/designação confirmados |
++| Revisão final da versão implementada | Pendente; aprovação de Test/manual não equivale à revisão distinta final |
++| Integração na base comum | Pendente; alterações IMP-002 locais em Denji, HEAD 6bef742, sem commit deste incremento |
++
++Estas condições vêm do [ADD](../../../add.md#10-riscos-pressupostos-e-dívida-técnica),
++[TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md),
++[DoD](../../../docs/14-DEFINITION-OF-DONE.md) e do pedido explícito do utilizador.
++Não se troca uma aprovação por outra nem se presume integração porque o build
++passou. Manter a história/bolt e os dependentes em estados atuais; não iniciar
++IMP-003/bolt 002 nem concluir unidade/requisitos/fase por inferência.
++
++## Diff, preservação e ponto de retoma
++
++Código de aplicação permanece o revisto: quatro ficheiros, +664/−2, com duas
++substituições justificadas e nenhum teste antigo removido. POM, codec, transporte,
++perfis e fixtures preservados. As duas listas Maven em Projeto/target/ ficam num
++diff separado; não houve reposição artificial de resultados gerados.
++
++Este checkpoint atualiza estados/aprovação/proveniência e prepara o fecho para
++revisão. Os diffs documental/cumulativo e a conferência de hashes ficam em
++experiments/construction/019-overlay/closure-preparation-*. A evidência do agente,
++os XML e os logs anteriores permanecem intactos. Os relatórios/manifestos antigos
++conservam o retrato anterior à aprovação; esta preparação regista o estado atual.
++
++Não executar o mecanismo de fecho enquanto faltar alguma das três condições.
++Sem fecho, commits, push ou outro IMP nesta continuação. Próxima ação: revisão
++humana deste fecho e resolução explícita de G-REVIEW-032.

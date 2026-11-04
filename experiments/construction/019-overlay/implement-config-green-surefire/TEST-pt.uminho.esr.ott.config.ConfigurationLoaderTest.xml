@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="1.276" tests="739" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/luis/ESR/ESR---TP2/Projeto/target/test-classes:/home/luis/ESR/ESR---TP2/Projeto/target/classes:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/luis/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/luis/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/luis/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/luis/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/luis/ESR/ESR---TP2/Projeto/target/surefire/surefirebooter-20261103223927005_3.jar /home/luis/ESR/ESR---TP2/Projeto/target/surefire 2026-11-03T22-39-26_923-jvmRun1 surefire-20261103223927005_1tmp surefire_0-20261103223927005_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="test" value="ConfigurationLoaderTest"/>
+    <property name="surefire.test.class.path" value="/home/luis/ESR/ESR---TP2/Projeto/target/test-classes:/home/luis/ESR/ESR---TP2/Projeto/target/classes:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter/5.13.4/junit-jupiter-5.13.4.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.13.4/junit-jupiter-api-5.13.4.jar:/home/luis/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/luis/.m2/repository/org/junit/platform/junit-platform-commons/1.13.4/junit-platform-commons-1.13.4.jar:/home/luis/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.13.4/junit-jupiter-params-5.13.4.jar:/home/luis/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.13.4/junit-jupiter-engine-5.13.4.jar:/home/luis/.m2/repository/org/junit/platform/junit-platform-engine/1.13.4/junit-platform-engine-1.13.4.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/luis"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-08-18"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/luis/ESR/ESR---TP2/Projeto"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="/home/luis/ESR/ESR---TP2/Projeto/target/surefire/surefirebooter-20261103223927005_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.12.1+1-1-22.04.4-Ubuntu"/>
+    <property name="user.name" value="luis"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-138-generic"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/luis/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.12.1"/>
+    <property name="user.dir" value="/home/luis/ESR/ESR---TP2/Projeto"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.12.1+1-1-22.04.4-Ubuntu"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="enforcesTitleUnicodeLimitsAndUtf8" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.077"/>
+  <testcase name="runtimeDefaultsPreserveFiveRealProfiles" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.03"/>
+  <testcase name="deploymentRejectsUuidOwnedByTwoServers" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.008"/>
+  <testcase name="acceptsPropertyContinuationAndUtf8Titles" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeAggregatesIndependentLegacyAndRuntimeProblems" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.005"/>
+  <testcase name="aggregatesMissingFieldsWithFileAndProperty" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="deploymentRejectsRoleAndEndpointsDifferentFromTopology" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.005"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.007"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeEnforcesFourCrossRelations(String, String)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsAliasMediaAndEscapeOutsideBase" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsAlphaGrammarDomainAndUnderflow(String)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="deploymentRejectsNodeAbsentFromAllowedGraph" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeDefaultsDoNotReplaceRequiredConfiguration" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.006"/>
+  <testcase name="rejectsDuplicateNeighborAndUnknownTopologyKey" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.005"/>
+  <testcase name="rejectsInvalidUtf8AndMalformedUnicodeEscapes" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsSelfUnknownAndAsymmetricNeighbors" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.006"/>
+  <testcase name="acceptsOneCharacterIdAndUnresolvedHostnameWithoutNetwork" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="allowsSameNumericPortForTcpAndUdp" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="rejectsOversizedNodeAndStreamLists" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.025"/>
+  <testcase name="runtimeDeploymentIsAtomicAndOptionsRemainPerNode" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.008"/>
+  <testcase name="deploymentRejectsMissingAndDuplicateProfiles" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.006"/>
+  <testcase name="rejectsInvalidFps(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="rejectsInvalidFps(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsInvalidFps(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsInvalidFps(String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidIds(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidIds(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsInvalidIds(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[21]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[22]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[23]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[24]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[25]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[26]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[27]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[28]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[29]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[30]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[31]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[32]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[33]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[34]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[35]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[36]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[37]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[38]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[39]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[40]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[41]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[42]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[43]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[44]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[45]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[46]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[47]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[48]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[49]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[50]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[51]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[52]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[53]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[54]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[55]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[56]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[57]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[58]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[59]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[60]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[61]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[62]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[63]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[64]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[65]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.006"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[66]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[67]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[68]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[69]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[70]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[71]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[72]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[73]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[74]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[75]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[76]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[77]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[78]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[79]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[80]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[81]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[82]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[83]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[84]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[85]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[86]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[87]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[88]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[89]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[90]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[91]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[92]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[93]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[94]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[95]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[96]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[97]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[98]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[99]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[100]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[101]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[102]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[103]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[104]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[105]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[106]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[107]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[108]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[109]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[110]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[111]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[112]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[113]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[114]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[115]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[116]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[117]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[118]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[119]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[120]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[121]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[122]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[123]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[124]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[125]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[126]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[127]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[128]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[129]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[130]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[131]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[132]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[133]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[134]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[135]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[136]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[137]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[138]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[139]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[140]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[141]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[142]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[143]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[144]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[145]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[146]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[147]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[148]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[149]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[150]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[151]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[152]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[153]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[154]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[155]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[156]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[157]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[158]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[159]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[160]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[161]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[162]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[163]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[164]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[165]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[166]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[167]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[168]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[169]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[170]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[171]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[172]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[173]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[174]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[175]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[176]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[177]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[178]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[179]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[180]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[181]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[182]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[183]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[184]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[185]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[186]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[187]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[188]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[189]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[190]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[191]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[192]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[193]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[194]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[195]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[196]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[197]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[198]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[199]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[200]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[201]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[202]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[203]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[204]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[205]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[206]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[207]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[208]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[209]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[210]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[211]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[212]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[213]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[214]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[215]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[216]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[217]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[218]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[219]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[220]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[221]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[222]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[223]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[224]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[225]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[226]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[227]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[228]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[229]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[230]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[231]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[232]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[233]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[234]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[235]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[236]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[237]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[238]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[239]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[240]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[241]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[242]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[243]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[244]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[245]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[246]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[247]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[248]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[249]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[250]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[251]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[252]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[253]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[254]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[255]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[256]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[257]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[258]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[259]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[260]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[261]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[262]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[263]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[264]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[265]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[266]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[267]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[268]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[269]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[270]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[271]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[272]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[273]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[274]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[275]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[276]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[277]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[278]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[279]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[280]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[281]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[282]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[283]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[284]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[285]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[286]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[287]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[288]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[289]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[290]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[291]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[292]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[293]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[294]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[295]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[296]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[297]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInvalidIntegerTokensAndCaps(RuntimeCase, String)[298]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[21]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[22]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[23]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[24]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[25]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[26]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[27]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[28]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[29]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[30]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[31]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[32]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[33]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[34]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[35]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[36]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[37]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[38]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[39]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[40]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[41]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[42]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[43]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[44]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[45]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[46]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[47]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[48]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[49]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[50]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[51]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[52]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[53]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[54]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[55]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[56]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[57]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[58]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[59]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[60]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[61]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[62]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[63]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[64]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[65]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[66]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[67]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[68]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[69]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[70]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[71]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[72]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[73]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[74]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[75]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[76]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[77]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[78]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[79]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[80]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[81]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[82]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[83]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[84]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[85]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[86]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[87]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[88]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[89]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[90]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[91]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[92]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeOverridesReachExactAccessorForEveryAllowedRole(RuntimeCase, NodeRole)[93]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="collectionsAreImmutable" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsExpectedRoleMismatch" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsDuplicateEndpointsWithinSameTransport" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsBootstrapAsForwardingNode" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidPorts(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidPorts(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsInvalidPorts(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsInvalidPorts(String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidPorts(String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidPorts(String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidRoles(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsInvalidRoles(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsInvalidRoles(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[21]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[22]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[23]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[24]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[25]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[26]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[27]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[28]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[29]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[30]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[31]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[32]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[33]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[34]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[35]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[36]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[37]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[38]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[39]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[40]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[41]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[42]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[43]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[44]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[45]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[46]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[47]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[48]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[49]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[50]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[51]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[52]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[53]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsInapplicableKeysEvenAtDefault(RuntimeCase, NodeRole, String)[54]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsNonCanonicalUuid(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsNonCanonicalUuid(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsNonCanonicalUuid(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsNonBooleanLoop(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsNonBooleanLoop(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsNonBooleanLoop(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[21]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[22]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[23]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[24]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[25]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[26]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[27]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[28]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[29]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[30]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[31]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[32]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[33]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[34]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[35]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[36]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[37]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[38]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[39]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[40]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[41]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[42]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[43]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[44]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[45]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[46]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[47]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[48]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[49]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[50]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[51]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[52]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[53]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[54]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[55]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[56]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[57]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeScalarBoundariesRespectCrossRelations(RuntimeCase, int)[58]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="deploymentRejectsWrongBootstrapContact" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="rejectsMissingFieldsAndUnknownCatalogKeys" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="deploymentDetectsCollisionWithBootstrapPort" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[9]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[10]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[11]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[12]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[13]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[14]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[15]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[16]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[17]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[18]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[19]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[20]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[21]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[22]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[23]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[24]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[25]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[26]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[27]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[28]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[29]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[30]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[31]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[32]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[33]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[34]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[35]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[36]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[37]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[38]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[39]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[40]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[41]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[42]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[43]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[44]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[45]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[46]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[47]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[48]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[49]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[50]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[51]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[52]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[53]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[54]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[55]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[56]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[57]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[58]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[59]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[60]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[61]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[62]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[63]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[64]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.004"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[65]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[66]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[67]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[68]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[69]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[70]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[71]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[72]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[73]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[74]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[75]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[76]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[77]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[78]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[79]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[80]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[81]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[82]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[83]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[84]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[85]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[86]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[87]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[88]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[89]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[90]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[91]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[92]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[93]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[94]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[95]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[96]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[97]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[98]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[99]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[100]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[101]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[102]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[103]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[104]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[105]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[106]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[107]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[108]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[109]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[110]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[111]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[112]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[113]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[114]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[115]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[116]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[117]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[118]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[119]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[120]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[121]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[122]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[123]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[124]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeConstructorsRejectInvalidValues(RuntimeCase, Object)[125]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeValidatesOverridesTogetherWithDefaults" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.003"/>
+  <testcase name="rejectsMalformedNodeLists(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsMalformedNodeLists(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsMalformedNodeLists(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsMalformedNodeLists(String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="permitsWildcardBindAndLiteralIpv6WithoutLookup" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeOverridesReachTransportOptionsWithoutOpeningSockets" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimePreservesOldConstructorAndCanonicalOverrides" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.005"/>
+  <testcase name="runtimePropertiesStayOutOfTopologyAndCatalog" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsUnusableAdvertisedHosts(String)[8]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="resolvesPathsAgainstConfigurationNotWorkingDirectory" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="runtimeDoesNotInventRelationErrorsFromInvalidOperands" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsDuplicateDecodedProperties(String)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsDuplicateDecodedProperties(String)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="loadsFiveRealProfilesAndFourDistinctOwnedStreams" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="missingTopologyFileDoesNotReturnPartialNode" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="missingFileIsAnExplicitConfigurationProblem" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="rejectsServerWithOnlyOneStream" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeConstructorsRejectNullsAndInvalidRelations" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.005"/>
+  <testcase name="rejectsRepeatedUuid" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[1]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[2]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[3]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[4]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[5]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[6]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+  <testcase name="runtimeAcceptsApprovedAlphaGrammar(String, double)[7]" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.001"/>
+  <testcase name="runtimeRejectsUnknownDuplicatesAndInvalidRoleWithoutFallback" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.002"/>
+  <testcase name="rejectsUnknownAndRoleInapplicableKeys" classname="pt.uminho.esr.ott.config.ConfigurationLoaderTest" time="0.0"/>
+</testsuite>

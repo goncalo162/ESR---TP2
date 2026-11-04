@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +29,18 @@ import java.util.UUID;
 public final class ConfigurationLoader {
     private static final Set<String> COMMON_KEYS = Set.of(
             "node.id", "node.role", "bind.host", "advertised.host", "control.port");
+    private static final Set<String> CONTROL_RUNTIME_KEYS = Set.of(
+            "control.connect.timeout.ms", "control.shutdown.timeout.ms", "control.max.connections",
+            "control.queue.capacity", "bootstrap.query.timeout.ms");
+    private static final Set<String> OVERLAY_RUNTIME_KEYS = Set.of(
+            "overlay.hello.timeout.ms", "overlay.retry.initial.ms", "overlay.retry.max.ms",
+            "overlay.retry.jitter.percent", "node.events.capacity", "monitor.probe.interval.ms",
+            "monitor.probe.timeout.ms", "monitor.probe.failures", "monitor.ewma.alpha",
+            "routing.announce.interval.ms", "routing.candidate.ttl.ms", "routing.cache.capacity",
+            "routing.cache.ttl.ms", "routing.flood.max.per.sec", "routing.activate.timeout.ms",
+            "routing.activate.attempts", "routing.switch.improvement.percent", "routing.switch.observations",
+            "routing.switch.min.dwell.ms", "subscription.lease.ms", "subscription.renew.ms",
+            "video.egress.capacity", "video.reassembly.max.frames", "video.reassembly.deadline.ms");
     private static final String UUID_PATTERN =
             "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 
@@ -106,12 +119,152 @@ public final class ConfigurationLoader {
                 }
             }
         }
+        RuntimeConfiguration runtime = runtime(p, file, role, allowed, errors);
         unknownKeys(p, allowed, file, errors);
         if (errors.size() != start) return null;
         return new NodeConfiguration(file, id, role, bind, advertised, control, data,
                 Optional.ofNullable(bootstrap), Optional.ofNullable(topologyFile),
                 Optional.ofNullable(streamsFile), Optional.ofNullable(mediaBase),
-                Optional.ofNullable(topology), streams);
+                Optional.ofNullable(topology), streams, runtime);
+    }
+
+    /** Defaults apply only to absent keys; parsing failures never become effective values. */
+    private static RuntimeConfiguration runtime(Properties p, Path file, NodeRole role,
+                                                 Set<String> allowed, List<ConfigurationProblem> errors) {
+        int start = errors.size();
+        var defaults = RuntimeConfiguration.defaults();
+        allowed.addAll(CONTROL_RUNTIME_KEYS);
+        boolean overlayRole = role != null && role != NodeRole.BOOTSTRAP;
+        if (overlayRole) allowed.addAll(OVERLAY_RUNTIME_KEYS);
+        if (role == NodeRole.SERVER) allowed.add("source.max.frame.bytes");
+
+        var controlDefault = defaults.control();
+        Duration connect = optionalDuration(p, file, "control.connect.timeout.ms", controlDefault.connectTimeout(), errors);
+        Duration shutdown = optionalDuration(p, file, "control.shutdown.timeout.ms", controlDefault.shutdownTimeout(), errors);
+        Integer connections = optionalInteger(p, file, "control.max.connections", controlDefault.maxConnections(), 1, 64, errors);
+        Integer queue = optionalInteger(p, file, "control.queue.capacity", controlDefault.queueCapacity(), 1, 256, errors);
+        Duration query = optionalDuration(p, file, "bootstrap.query.timeout.ms", controlDefault.bootstrapQueryTimeout(), errors);
+        var control = allPresent(connect, shutdown, connections, queue, query)
+                ? new RuntimeConfiguration.Control(connect, shutdown, connections, queue, query) : null;
+
+        var overlay = defaults.overlay();
+        var monitoring = defaults.monitoring();
+        var routing = defaults.routing();
+        var subscription = defaults.subscription();
+        var video = defaults.video();
+        var source = defaults.source();
+        if (overlayRole) {
+            Duration hello = optionalDuration(p, file, "overlay.hello.timeout.ms", overlay.helloTimeout(), errors);
+            Duration initial = optionalDuration(p, file, "overlay.retry.initial.ms", overlay.retryInitial(), errors);
+            Duration maximum = optionalDuration(p, file, "overlay.retry.max.ms", overlay.retryMax(), errors);
+            Integer jitter = optionalInteger(p, file, "overlay.retry.jitter.percent", overlay.retryJitterPercent(), 0, 100, errors);
+            Integer events = optionalInteger(p, file, "node.events.capacity", overlay.eventsCapacity(), 1, 4096, errors);
+            boolean retryValid = runtimeRelation(initial, maximum, false, file, "overlay.retry.max.ms",
+                    "deve ser >= overlay.retry.initial.ms", errors);
+            overlay = allPresent(hello, initial, maximum, jitter, events) && retryValid
+                    ? new RuntimeConfiguration.Overlay(hello, initial, maximum, jitter, events) : null;
+
+            Duration probeInterval = optionalDuration(p, file, "monitor.probe.interval.ms", monitoring.probeInterval(), errors);
+            Duration probeTimeout = optionalDuration(p, file, "monitor.probe.timeout.ms", monitoring.probeTimeout(), errors);
+            Integer failures = optionalInteger(p, file, "monitor.probe.failures", monitoring.probeFailures(), 1, Integer.MAX_VALUE, errors);
+            Double alpha = optionalAlpha(p, file, "monitor.ewma.alpha", monitoring.ewmaAlpha(), errors);
+            monitoring = allPresent(probeInterval, probeTimeout, failures, alpha)
+                    ? new RuntimeConfiguration.Monitoring(probeInterval, probeTimeout, failures, alpha) : null;
+
+            Duration announce = optionalDuration(p, file, "routing.announce.interval.ms", routing.announceInterval(), errors);
+            Duration candidate = optionalDuration(p, file, "routing.candidate.ttl.ms", routing.candidateTtl(), errors);
+            Integer cacheCapacity = optionalInteger(p, file, "routing.cache.capacity", routing.cacheCapacity(), 1, 4096, errors);
+            Duration cacheTtl = optionalDuration(p, file, "routing.cache.ttl.ms", routing.cacheTtl(), errors);
+            Integer flood = optionalInteger(p, file, "routing.flood.max.per.sec", routing.floodMaxPerSecond(), 1, 10, errors);
+            Duration activateTimeout = optionalDuration(p, file, "routing.activate.timeout.ms", routing.activateTimeout(), errors);
+            Integer attempts = optionalInteger(p, file, "routing.activate.attempts", routing.activateAttempts(), 1, Integer.MAX_VALUE, errors);
+            Integer improvement = optionalInteger(p, file, "routing.switch.improvement.percent", routing.switchImprovementPercent(), 0, 100, errors);
+            Integer observations = optionalInteger(p, file, "routing.switch.observations", routing.switchObservations(), 1, Integer.MAX_VALUE, errors);
+            Duration dwell = optionalDuration(p, file, "routing.switch.min.dwell.ms", routing.switchMinDwell(), errors);
+            // Evaluate independently; a failure in one relation must not hide another.
+            boolean candidateValid = runtimeRelation(announce, candidate, true, file, "routing.candidate.ttl.ms",
+                    "deve ser > routing.announce.interval.ms", errors);
+            boolean cacheValid = runtimeRelation(candidate, cacheTtl, false, file, "routing.cache.ttl.ms",
+                    "deve ser >= routing.candidate.ttl.ms", errors);
+            routing = allPresent(announce, candidate, cacheCapacity, cacheTtl, flood, activateTimeout,
+                    attempts, improvement, observations, dwell) && candidateValid && cacheValid
+                    ? new RuntimeConfiguration.Routing(announce, candidate, cacheCapacity, cacheTtl, flood,
+                    activateTimeout, attempts, improvement, observations, dwell) : null;
+
+            Duration lease = optionalDuration(p, file, "subscription.lease.ms", subscription.lease(), errors);
+            Duration renew = optionalDuration(p, file, "subscription.renew.ms", subscription.renew(), errors);
+            boolean leaseValid = runtimeRelation(renew, lease, true, file, "subscription.renew.ms",
+                    "deve ser < subscription.lease.ms", errors);
+            subscription = allPresent(lease, renew) && leaseValid
+                    ? new RuntimeConfiguration.Subscription(lease, renew) : null;
+
+            Integer egress = optionalInteger(p, file, "video.egress.capacity", video.egressCapacity(), 1, 256, errors);
+            Integer frames = optionalInteger(p, file, "video.reassembly.max.frames", video.reassemblyMaxFrames(), 1, 8, errors);
+            Duration deadline = optionalDuration(p, file, "video.reassembly.deadline.ms", video.reassemblyDeadline(), errors);
+            video = allPresent(egress, frames, deadline) ? new RuntimeConfiguration.Video(egress, frames, deadline) : null;
+        }
+        if (role == NodeRole.SERVER) {
+            Integer bytes = optionalInteger(p, file, "source.max.frame.bytes", source.maxFrameBytes(), 1, 99999, errors);
+            source = bytes == null ? null : new RuntimeConfiguration.Source(bytes);
+        }
+        if (errors.size() != start) return null;
+        return new RuntimeConfiguration(control, overlay, monitoring, routing, subscription, video, source);
+    }
+
+    private static Integer optionalInteger(Properties p, Path file, String key, int defaultValue,
+                                            int min, int max, List<ConfigurationProblem> errors) {
+        String raw = p.getProperty(key);
+        if (raw == null) return defaultValue;
+        String value = raw.strip();
+        try {
+            if (!value.matches("[0-9]+")) throw new NumberFormatException();
+            int result = Integer.parseInt(value);
+            if (result < min || result > max) throw new NumberFormatException();
+            return result;
+        } catch (NumberFormatException ex) {
+            error(errors, file, key, "inteiro decimal esperado no intervalo " + min + ".." + max);
+            return null;
+        }
+    }
+
+    private static Duration optionalDuration(Properties p, Path file, String key,
+                                              Duration defaultValue, List<ConfigurationProblem> errors) {
+        Integer millis = optionalInteger(p, file, key, Math.toIntExact(defaultValue.toMillis()),
+                1, Integer.MAX_VALUE, errors);
+        return millis == null ? null : Duration.ofMillis(millis.longValue());
+    }
+
+    private static Double optionalAlpha(Properties p, Path file, String key, double defaultValue,
+                                         List<ConfigurationProblem> errors) {
+        String raw = p.getProperty(key);
+        if (raw == null) return defaultValue;
+        String value = raw.strip();
+        try {
+            // Q-C-03: full decimal token, no exponent/hex/suffix/sign/comma.
+            if (!value.matches("(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)")) throw new NumberFormatException();
+            double result = Double.parseDouble(value);
+            if (!Double.isFinite(result) || result <= 0 || result > 1) throw new NumberFormatException();
+            return result;
+        } catch (NumberFormatException ex) {
+            error(errors, file, key, "decimal com ponto, finito e no intervalo (0,1] esperado");
+            return null;
+        }
+    }
+
+    private static boolean allPresent(Object... values) {
+        for (Object value : values) if (value == null) return false;
+        return true;
+    }
+
+    private static boolean runtimeRelation(Duration left, Duration right, boolean strict, Path file,
+                                            String key, String message, List<ConfigurationProblem> errors) {
+        if (left == null || right == null) return false;
+        int comparison = left.compareTo(right);
+        if (strict ? comparison >= 0 : comparison > 0) {
+            error(errors, file, key, message);
+            return false;
+        }
+        return true;
     }
 
     private static TopologyConfiguration topology(Path file, List<ConfigurationProblem> errors) {

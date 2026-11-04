@@ -1,0 +1,455 @@
+diff --git a/memory-bank/bolts/019-overlay/bolt.md b/memory-bank/bolts/019-overlay/bolt.md
+--- a/memory-bank/bolts/019-overlay/bolt.md
++++ b/memory-bank/bolts/019-overlay/bolt.md
+@@ -3,13 +3,13 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["005-implementar-parametrizacao-operacional"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-03T22:00:19Z"
+-started: null
++updated: "2026-11-03T22:11:18Z"
++started: "2026-11-03T22:09:01Z"
+ completed: null
+-current_stage: null
++current_stage: "model"
+ stages_completed: []
+ requires_bolts: ["001-base-validada"]
+ enables_bolts: ["002-overlay", "020-overlay"]
+@@ -34,6 +34,21 @@
+ architecture_source: "add.md"
+ ---
+ # Bolt 019-overlay — Implementar parametrização operacional
++
++## Etapa 1 — Model preparado para revisão
++
++Iniciado em 2026-11-03T22:09:01Z, por pedido explícito do utilizador para o
++próximo bolt e a primeira etapa. Dependência 001-base-validada complete/integrada;
++base Denji, HEAD 6bef7425a1f9237f9f744f26f3aa7e6067778025, árvore inicial limpa.
++[Modelo concreto](ddd-01-domain-model.md) preparado em 2026-11-03T22:11:18Z: 30 chaves,
++sete grupos, identidade, proprietário dos dados, estados/resultados da carga,
++invariantes de papel/limites/relações e prova futura V-032.
++
++Bolt in-progress/model; stages_completed vazio enquanto o checkpoint aguarda
++aprovação. Apenas Model autorizado; Design/ADR/Implement/Test e V-032 ainda
++não executados. POM, fontes Java, perfis, fixtures e testes intactos.
++G-REVIEW-032: designar revisor humano distinto antes de DONE; não presumido.
++Baseline/diff/conferência em experiments/construction/019-overlay/.
+ 
+ ## Fonte normativa e âmbito
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -1,11 +1,11 @@
+ ---
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-phase: "inception"
++phase: "construction"
+ source_phase: "PHASE-02"
+-status: "ready"
++status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T20:54:11Z"
++updated: "2026-11-03T22:11:18Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -34,4 +34,9 @@
+ 
+ ## Dependências e critérios de fecho
+ 
++019-overlay/IMP-002 iniciado em Model por pedido do utilizador. [Modelo para revisão](../../../../bolts/019-overlay/ddd-01-domain-model.md).
++Somente a primeira etapa foi autorizada; restantes bolts desta unidade continuam
++planned. V-032 e revisão distinta G-REVIEW-032 pendentes; nenhuma implementação
++ou execução Java nova é declarada por este arranque.
++
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md
+@@ -2,9 +2,10 @@
+ id: "005-implementar-parametrizacao-operacional"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
++updated: "2026-11-03T22:11:18Z"
+ source_tasks: ["TASK-032"]
+ implementation_tasks: ["IMP-002"]
+ requirements: ["CON-009", "INT-001", "INT-002", "REQ-021", "REQ-024"]
+@@ -15,6 +16,9 @@
+ # História — Implementar parametrização operacional
+ 
+ ## Valor e âmbito
++
++Model iniciado no bolt 019-overlay; [modelo preparado para revisão](../../../../../bolts/019-overlay/ddd-01-domain-model.md).
++Sem implemented=true, critérios funcionais ou testes concluídos nesta primeira etapa.
+ 
+ Como responsável pelo serviço OTT, quero implementar parametrização operacional, para cumprir os drivers CON-009, INT-001, INT-002, REQ-021, REQ-024 com validação concreta.
+ 
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -6,7 +6,8 @@
+ Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
+ aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
+ em 2026-11-03T21:56:48Z, após integração em main. Uma história complete;
+-as restantes 32 histórias/bolts não foram iniciadas. Intent ainda em construção.
++019-overlay/IMP-002 está in-progress/model, com modelo preparado para revisão;
++as restantes 31 histórias/bolts não foram iniciadas. Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+ 
+@@ -17,7 +18,9 @@
+ 
+ ## 002-overlay/005-implementar-parametrizacao-operacional.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-002. **Estado:** planned. **Bolt:** 019-overlay.
++**Tarefa:** IMP-002. **Estado:** in-progress. **Bolt:** 019-overlay.
++Etapa Model: [modelo preparado para revisão](bolts/019-overlay/ddd-01-domain-model.md);
++nenhuma implementação ou V-032 executados.
+ **Ficheiro:** [005-implementar-parametrizacao-operacional](intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
+ 
+ ## 002-overlay/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md ✅ GENERATED
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–032 continuam TODO. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-006–031 continuam TODO; TASK-032 IN PROGRESS, apenas Model. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador desta sessão:** [Fillmore](team/FILLMORE.md). A próxima implementação legada da tua fila é TASK-006, agora dependente de TASK-032; a revisão atribuída é de Waheed. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Próxima tarefa de código:** [TASK-032](tasks/PHASE-02/TASK-032.md), ainda TODO, após o bolt de verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
++**Tarefa atual:** [TASK-032](tasks/PHASE-02/TASK-032.md), IN PROGRESS em Model do bolt 019-overlay, após fecho da verificação da base. TASK-006 aguarda a parametrização aprovada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -25,7 +25,11 @@
+ (d65f94740ef95ffc67d312f7fbccac7575c86f7a). IMP-001 DONE; bolt/história/unidade
+ 001-base-validada complete, com implemented=true na história. A verificação
+ não reimplementou TASK-001–005 nem promove requisitos globais a DONE.
+-Próximo incremento pelo DAG: IMP-002/019-overlay/TASK-032, ainda não iniciado.
++Incremento atual pelo DAG: IMP-002/019-overlay/TASK-032, IN PROGRESS apenas
++na etapa Model por pedido do utilizador. [Modelo preparado para revisão](../memory-bank/bolts/019-overlay/ddd-01-domain-model.md).
++V-032/build do novo incremento ainda não executados; sem código/testes alterados,
++sem Design iniciado e sem aprovação de revisor distinto presumida. Os 149 testes
++referidos abaixo pertencem ao IMP-001, não a esta etapa documental.
+ 
+ [Resultados atuais](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+ 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+@@ -56,7 +60,7 @@
+ | [TASK-003](tasks/PHASE-01/TASK-003.md) | Carregar e validar configurações de nós, grafo e streams | TASK-001, TASK-002 | DONE | V-003: EXECUTADA; [65 testes, build e controlo negativo](../experiments/task-003-configuration-validation.md) |
+ | [TASK-004](tasks/PHASE-01/TASK-004.md) | Codificar e descodificar mensagens de controlo v1 | TASK-002, TASK-003 | DONE | V-004: EXECUTADA; [66 casos do codec e 131 no build](../experiments/task-004-codec-validation.md) |
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+-| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | TODO | V-032: NÃO EXECUTADO |
++| [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | IN PROGRESS | Model preparado; V-032: NÃO EXECUTADO |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | TODO | V-006: NÃO EXECUTADO |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -4,8 +4,9 @@
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
+ 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
+ iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
+-2026-11-03T21:56:48Z, após revisão e integração em main; os restantes 32 bolts
+-permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
++2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
++em Model, com [modelo para revisão](../memory-bank/bolts/019-overlay/ddd-01-domain-model.md).
++Os restantes 31 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-032.md b/docs/tasks/PHASE-02/TASK-032.md
+--- a/docs/tasks/PHASE-02/TASK-032.md
++++ b/docs/tasks/PHASE-02/TASK-032.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-032
+ - Fase: PHASE-02
+ - Prioridade: P1
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Construction](../../../memory-bank/standards/execution-contract.md), trabalho técnico transversal.
+ - Revisor: [Equipa](../../team/00-COORDINATION.md); designar membro distinto do autor antes de DONE, sem aprovação presumida.
+ - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-005](TASK-005.md).
+@@ -79,5 +79,10 @@
+ 
+ ## 13. Notas de retoma
+ 
++Arranque em 2026-11-03T22:09:01Z, apenas Model do bolt 019-overlay/IMP-002.
++[Modelo preparado](../../../memory-bank/bolts/019-overlay/ddd-01-domain-model.md)
++para aprovação; sem código/testes alterados ou V-032 executado. Gate de revisor
++humano distinto ainda pendente antes de DONE; Design não foi iniciado.
++
+ Esta tarefa passa antes de TASK-006 no DAG, apesar do ID posterior. O ADD contém
+ a ordem normativa; não selecionar trabalho apenas por ordem numérica de TASK.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -250,10 +250,10 @@
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+     "docs/13-REQUIREMENTS-TRACEABILITY.md": "2370409b88da3146dfeb6d9c7ce15ab82b9385bd34be893321707797797274c5",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "04895c72c278120b46735c860659d7139a561c092f24480b66af44012adfd915",
++    "docs/15-PROJECT-PROGRESS.md": "0a786b0cfce7e7db86d872b872591efdfb178950c4bf173657d911b400e28a02",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "a99cfc6316719197e3ceb1b4ac9d0fe064dabf3fbf62341be0207f0192d93745",
++    "docs/18-CONSTRUCTION-BOLTS.md": "9a8e31344924e2dc753f2fa3fe031326da084939b236a17b3ee4930d786d46e7",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+@@ -272,7 +272,7 @@
+     "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+-    "docs/tasks/PHASE-02/TASK-032.md": "bbb03319de4e9ee9146d87d8bbd9b8ae332dd74f37d43344ef4d67da624ea9ec",
++    "docs/tasks/PHASE-02/TASK-032.md": "4797203a3248ca9b93223a806d000d9a3b3ce3ccb6739ceb2b6dee2878fc369c",
+     "docs/tasks/PHASE-03/TASK-010.md": "d7fa5c0b897543fd46ffd9e56312b5e2281860230a562211bbaa33bd806db694",
+     "docs/tasks/PHASE-03/TASK-011.md": "eecaa4b298d2c96f3082a33aef387077261ca46801159717e5e5bea7aa265374",
+     "docs/tasks/PHASE-03/TASK-012.md": "68a80fce2f0df0852022ae45732372743fb782cbb7809c0b2c1fa80769e931e3",
+@@ -303,7 +303,7 @@
+     "specs.md": "7ba7e898dfceaabe73d97ee2bf431a177a435844d90fdcaf73d26708fb0fbb61",
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5"
+   },
+-  "updated": "2026-11-03T21:59:55Z",
++  "updated": "2026-11-03T22:11:52Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -481,6 +481,20 @@
+         "docs/15-PROJECT-PROGRESS.md": "04895c72c278120b46735c860659d7139a561c092f24480b66af44012adfd915",
+         "docs/18-CONSTRUCTION-BOLTS.md": "a99cfc6316719197e3ceb1b4ac9d0fe064dabf3fbf62341be0207f0192d93745"
+       }
++    },
++    {
++      "updated": "2026-11-03T22:11:52Z",
++      "reason": "Utilizador autorizou iniciar 019-overlay/IMP-002 e somente Model; estados de TASK-032/progresso/índice alinhados, modelo ainda por aprovar. Sem alterações de código, requisitos ou ADR.",
++      "previous_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "04895c72c278120b46735c860659d7139a561c092f24480b66af44012adfd915",
++        "docs/18-CONSTRUCTION-BOLTS.md": "a99cfc6316719197e3ceb1b4ac9d0fe064dabf3fbf62341be0207f0192d93745",
++        "docs/tasks/PHASE-02/TASK-032.md": "bbb03319de4e9ee9146d87d8bbd9b8ae332dd74f37d43344ef4d67da624ea9ec"
++      },
++      "updated_hashes": {
++        "docs/15-PROJECT-PROGRESS.md": "0a786b0cfce7e7db86d872b872591efdfb178950c4bf173657d911b400e28a02",
++        "docs/18-CONSTRUCTION-BOLTS.md": "9a8e31344924e2dc753f2fa3fe031326da084939b236a17b3ee4930d786d46e7",
++        "docs/tasks/PHASE-02/TASK-032.md": "4797203a3248ca9b93223a806d000d9a3b3ce3ccb6739ceb2b6dee2878fc369c"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/bolts/019-overlay/ddd-01-domain-model.md b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+--- /dev/null
++++ b/memory-bank/bolts/019-overlay/ddd-01-domain-model.md
+@@ -0,0 +1,173 @@
++# IMP-002 — Model: parametrização operacional
++
++Bolt 019-overlay; unidade 002-overlay; origem TASK-032. Autorizado pelo utilizador
++iniciar o próximo bolt e executar somente a primeira etapa. Modelo preparado
++para revisão; Design/ADR/Implement/Test ainda não executados neste bolt.
++
++Fontes: [ADD 6.1–6.3](../../../add.md#6-modelo-de-dados-e-contratos),
++[IMP-002](../../../add.md#imp-002), [REQ-024](../../../specs.md#req-024),
++[TASK-032](../../../docs/tasks/PHASE-02/TASK-032.md) e
++[história](../../intents/001-ott-streaming/units/002-overlay/stories/005-implementar-parametrizacao-operacional.md).
++ADR aplicáveis: 007, 010, 016, 024 e 026. A revisão formal das ADR é a etapa 3;
++este modelo reutiliza as decisões aceites e não propõe nova ADR.
++
++## Base real e fronteira do incremento
++
++IMP-001/001-base-validada está complete e integrado em main/Denji, HEAD de partida
++6bef7425a1f9237f9f744f26f3aa7e6067778025. A árvore inicial está limpa.
++NodeConfiguration é um record com 13 componentes; ainda não tem runtime().
++ConfigurationLoader.load/loadDeployment validam propriedades, papéis e deployment
++offline, agregam ConfigurationProblem e devolvem dados imutáveis ou lançam
++ConfigurationException. RuntimeConfiguration ainda não existe.
++
++O ponto de extensão autorizado é RuntimeConfiguration, NodeConfiguration,
++ConfigurationLoader e ConfigurationLoaderTest. Não se substitui o loader nem se
++reabre TASK-003/005. A futura extensão deve preservar nomes/APIs existentes;
++o Design deve explicitar como manter a construção anterior de NodeConfiguration
++ao acrescentar o componente runtime. Nenhuma assinatura Java é alterada em Model.
++
++Os testes existentes de chaves inválidas usam control.prt e streams.file num
++CLIENT; continuam inválidos. Aceitar as 30 chaves novas não exige enfraquecer esses
++casos. O único new NodeConfiguration encontrado está no loader. Transport.Options
++já recebe capacidades/timeouts, com defaults 256/64/2000 ms/3000 ms; não é preciso
++abrir um Transport para provar passagem de valores a um consumidor em V-032.
++
++## Entidades, identidade e propriedade
++
++| Elemento | Natureza e identidade | Invariantes |
++|---|---|---|
++| NodeConfiguration | Configuração do nó identificado pelo nodeId existente; sourceFile é proveniência | Identidade, papel, endpoints e paths obrigatórios mantêm a validação atual |
++| RuntimeConfiguration | Objeto de valor composto, pertencente à configuração do nó; sem UUID/identidade própria | Imutável, grupos não nulos, valores tipados e já validados |
++| Control | Conexão, shutdown, limites TCP e consulta bootstrap | Aplicável aos quatro papéis |
++| Overlay | HELLO, retry/jitter e capacidade de eventos | Overrides só SERVER/RELAY/CLIENT |
++| Monitoring | Intervalo/timeout/falhas de sondas e EWMA | Overrides só SERVER/RELAY/CLIENT; alpha finito |
++| Routing | Anúncios, candidatos, cache, flooding, ativação e troca | Overrides só SERVER/RELAY/CLIENT; relações e tetos explícitos |
++| Subscription | Lease máximo e período máximo de renovação | Overrides só SERVER/RELAY/CLIENT; renew estritamente menor que lease |
++| Video | Egress e reassemblagem | Overrides só SERVER/RELAY/CLIENT, conforme o ADD, mesmo que um consumidor futuro não use todos os campos |
++| Source | Limite local do frame de ficheiro | Override só SERVER; não muda o máximo do protocolo UDP |
++| ConfigurationProblem | Diagnóstico existente, com file/key/message | Erros atribuíveis à fonte/chave; coleção de problemas copiada defensivamente |
++
++Os sete grupos são valores de configuração, não serviços, atores ou máquinas de
++estado de rede. É permitido manter defaults dos grupos não aplicáveis no record;
++isso não autoriza um override nem faz o BOOTSTRAP consumir opções de overlay.
++Não há mutação global, geração de instanceId, DNS, sockets, criação de diretórios
++ou leitura de media nesta carga. O resultado pode ser partilhado como valor
++imutável. O estado de rede dos consumidores continua sujeito à ADR-017, sem
++introduzir executor serial, filas ou timers reais na configuração.
++
++## Catálogo completo dos valores
++
++Correspondência de modelo com o ADD 6.3. "Overlay" no papel significa
++SERVER/RELAY/CLIENT; "todos" inclui BOOTSTRAP. Durações da tabela são milissegundos.
++Inteiros positivos sem outro teto usam 1..2147483647. Os tipos Java concretos e
++conversões verificadas serão fixados em Design; não são 30 strings livres.
++
++| Grupo | Chave | Default | Papel | Domínio |
++|---|---|---:|---|---|
++| Control | control.connect.timeout.ms | 2000 | todos | 1..2147483647 ms |
++| Control | control.shutdown.timeout.ms | 3000 | todos | 1..2147483647 ms |
++| Control | control.max.connections | 64 | todos | 1..64 |
++| Control | control.queue.capacity | 256 | todos | 1..256 |
++| Control | bootstrap.query.timeout.ms | 3000 | todos | 1..2147483647 ms |
++| Overlay | overlay.hello.timeout.ms | 3000 | overlay | 1..2147483647 ms |
++| Overlay | overlay.retry.initial.ms | 500 | overlay | 1..2147483647 ms |
++| Overlay | overlay.retry.max.ms | 5000 | overlay | 1..2147483647 ms |
++| Overlay | overlay.retry.jitter.percent | 10 | overlay | inteiro 0..100 |
++| Overlay | node.events.capacity | 4096 | overlay | 1..4096 |
++| Monitoring | monitor.probe.interval.ms | 1000 | overlay | 1..2147483647 ms |
++| Monitoring | monitor.probe.timeout.ms | 1000 | overlay | 1..2147483647 ms |
++| Monitoring | monitor.probe.failures | 3 | overlay | 1..2147483647 |
++| Monitoring | monitor.ewma.alpha | 0.2 | overlay | finito, 0 < alpha ≤ 1 |
++| Routing | routing.announce.interval.ms | 2000 | overlay | 1..2147483647 ms |
++| Routing | routing.candidate.ttl.ms | 8000 | overlay | 1..2147483647 ms |
++| Routing | routing.cache.capacity | 4096 | overlay | 1..4096 |
++| Routing | routing.cache.ttl.ms | 16000 | overlay | 1..2147483647 ms |
++| Routing | routing.flood.max.per.sec | 10 | overlay | 1..10 |
++| Routing | routing.activate.timeout.ms | 3000 | overlay | 1..2147483647 ms |
++| Routing | routing.activate.attempts | 3 | overlay | 1..2147483647 |
++| Routing | routing.switch.improvement.percent | 20 | overlay | inteiro 0..100 |
++| Routing | routing.switch.observations | 3 | overlay | 1..2147483647 |
++| Routing | routing.switch.min.dwell.ms | 5000 | overlay | 1..2147483647 ms |
++| Subscription | subscription.lease.ms | 6000 | overlay | 1..2147483647 ms |
++| Subscription | subscription.renew.ms | 2000 | overlay | 1..2147483647 ms |
++| Video | video.egress.capacity | 256 | overlay | 1..256 |
++| Video | video.reassembly.max.frames | 8 | overlay | 1..8 |
++| Video | video.reassembly.deadline.ms | 250 | overlay | 1..2147483647 ms |
++| Source | source.max.frame.bytes | 99999 | SERVER | 1..99999 |
++
++São 5+5+4+10+2+3+1=30 chaves. A consulta bootstrap fica em Control, pois não
++existe grupo Bootstrap entre os sete definidos pelo ADD. A capacidade de eventos
++fica em Overlay; não se cria um oitavo grupo Node por causa do prefixo da chave.
++Esta é uma organização do modelo, sem mudar nomes de propriedades/contratos.
++
++## Invariantes de validação e compatibilidade
++
++1. Só a ausência de uma chave operacional permite o default. Valor presente
++   inválido/vazio não é ausência. Identidades, hosts/portas e paths existentes
++   continuam obrigatórios; os defaults não os substituem.
++2. Chaves desconhecidas, duplicadas após descodificação Properties e inaplicáveis
++   ao papel são rejeitadas. BOOTSTRAP só admite as cinco chaves operacionais de
++   Control; source.max.frame.bytes só pode ser fornecida por SERVER.
++3. Números usam representação decimal sem unidades/separadores de milhares;
++   alpha usa ponto. Rejeitar NaN/infinito, overflow, tipos incompatíveis e valores
++   fora do domínio. Conversões de duração são verificadas antes do consumo.
++4. overlay.retry.initial.ms ≤ overlay.retry.max.ms.
++5. routing.candidate.ttl.ms > routing.announce.interval.ms.
++6. routing.cache.ttl.ms ≥ routing.candidate.ttl.ms.
++7. subscription.renew.ms < subscription.lease.ms.
++8. Validar o conjunto efetivo de defaults+overrides: um override individualmente
++   válido pode violar uma relação com o default de outra chave. Não acrescentar
++   relações que o ADD não exige, como probe.timeout < probe.interval.
++9. O loader agrega erros pelo mecanismo atual e não publica NodeConfiguration
++   nem deployment parcial. Dados temporários de validação não são estado ativo.
++10. Filas/caches/montagens configuráveis só podem descer dos tetos da tabela;
++    não se alteram 64 nós/deployment, 256 streams/origem, 32 IDs/path, TCP
++    37..65536, UDP 1200/64/1136, 2 MiB/frame de protocolo ou dedup de 512 frames.
++
++O construtor/validador dos valores não pode permitir que um consumidor receba um
++RuntimeConfiguration inválido por uma via alternativa de criação. O Design
++definirá a divisão de validações entre construção e loader, preservando o erro
++agregado na API de carga. Não se decide aqui um novo tipo público de erro.
++
++## Estados e resultados da carga
++
++Fluxo conceptual: entrada → leitura estrita → defaults/tipos/papel → relações e
++deployment → resultado imutável **ou** ConfigurationException agregada. Estes
++nomes são passos de análise, não novos enums/eventos Java.
++
++Uma carga válida termina com um valor local; uma carga inválida termina sem
++publicação parcial. loadDeployment não devolve subconjunto se algum perfil falhar.
++Não há hot reload, negociação de parâmetros entre nós ou protocolo de atualização.
++Sucesso/erro são o retorno/exception existentes; não se cria event bus.
++
++Os consumidores futuros recebem os valores na composição: Control alimenta
++Transport.Options e o prazo de consulta; os outros grupos alimentam os serviços
++nos IMP que os implementam. O modelo preserva as políticas já aprovadas: retry
++com jitter limitado a 1 ms..retry.max, uma sonda pendente por vizinho, renovação
++com lease concedido e melhoria estrita mesmo com 0%. TASK-032 fornece os valores;
++não implementa esses algoritmos, watchdog UDP ou recuperação extraordinária.
++
++## Rastreabilidade para a prova futura V-032
++
++| Obrigação | Casos a preparar em Design/Implement, ainda não executados |
++|---|---|
++| Defaults/compatibilidade | Cinco perfis existentes; sete grupos/defaults corretos sem chaves novas; identidade/endpoints/paths sem defaults adicionais |
++| Overrides e consumidor | Valores válidos por papel e fronteiras; um consumidor offline observa exatamente os valores fornecidos |
++| Domínios e erros agregados | Vazio, zero/negativos/excesso, NaN/infinito, overflow, unknown/duplicada/inaplicável e várias falhas numa carga |
++| Relações | Igualdade permitida em retry/cache e proibida em candidate/announce e renew/lease; combinações de overrides com defaults |
++| Publicação/imutabilidade | Nenhum resultado parcial ou socket; cópias defensivas; rejeição de construção inválida por vias públicas |
++| Preservação | Não apagar/enfraquecer testes existentes; regressão configuração/codec/transporte e novo log quando autorizados |
++
++Model não executa V-032, Maven, GUI/CORE ou o teste manual do novo incremento.
++Os 149 testes de IMP-001 são evidência anterior, não resultado deste bolt.
++O gate G-REVIEW-032 exige revisor humano distinto designado e revisão/integração
++antes de DONE; ainda não há designação ou aprovação dessa revisão.
++
++## Checkpoint e próxima etapa
++
++Modelo concreto preparado para aprovação. Nenhuma lacuna material de fundações
++ou decisão arquitetural inviável identificada nesta leitura. Design deverá fixar
++assinaturas/records, compatibilidade do construtor existente, unidades/conversões,
++origem dos diagnósticos e oráculos detalhados, antes de escrever a implementação.
++Parar aqui: o pedido só autoriza Model. Os critérios funcionais do bolt/história
++continuam pendentes até implementação, provas, revisão e integração reais.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- /dev/null
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -0,0 +1,23 @@
++---
++unit: "002-overlay"
++intent: "001-ott-streaming"
++created: "2026-11-03T22:09:01Z"
++updated: "2026-11-03T22:11:18Z"
++---
++# Registo Construction — 002-overlay
++
++- **2026-11-03T22:09:01Z**: iniciado 019-overlay/IMP-002/TASK-032 em model, por pedido explícito
++  do utilizador para executar o próximo bolt e apenas a primeira etapa. Leitura
++  e estado comunicados antes de escrever. Dependência 001-base-validada complete
++  e integrada; árvore inicial limpa em Denji, HEAD 6bef7425a1f9237f9f744f26f3aa7e6067778025.
++  Baseline preservada em experiments/construction/019-overlay/baseline.json.
++- G-REVIEW-032: designar revisor humano distinto do autor antes de DONE;
++  não se presume designação/aceitação. Nenhum código/teste/build executado.
++- Parar no checkpoint Model antes de Design, ADR, Implement ou Test.
++- **2026-11-03T22:11:18Z**: modelo concreto preparado: 30 chaves/sete grupos do ADD 6.3,
++  quatro relações cruzadas, aplicabilidade por papel, carga sem rede/estado parcial
++  e invariantes de imutabilidade/compatibilidade. Nenhuma decisão nova requerida.
++  V-032/build/regressão/manual não executados; nenhuma fundação/teste alterado.
++  Aguardar aprovação do checkpoint Model antes de iniciar Design.
++
++Modelo: [ddd-01-domain-model.md](../../../../bolts/019-overlay/ddd-01-domain-model.md).

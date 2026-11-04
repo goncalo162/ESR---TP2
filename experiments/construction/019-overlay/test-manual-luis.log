@@ -1,0 +1,94 @@
+MANUAL_START 2026-11-04T10:15:14.127512119Z operator=Luis Java=21.0.12.1
+CHECK_PASS defaults_five_profiles
+CHECK_PASS defaults_four_roles_two_servers
+CHECK_PASS defaults_four_distinct_streams
+CHECK_PASS defaults_30_values_B
+CHECK_PASS defaults_30_values_S1
+CHECK_PASS defaults_30_values_S2
+CHECK_PASS defaults_30_values_R1
+CHECK_PASS defaults_30_values_C1
+DEFAULT bootstrap.query.timeout.ms=3000
+DEFAULT control.connect.timeout.ms=2000
+DEFAULT control.max.connections=64
+DEFAULT control.queue.capacity=256
+DEFAULT control.shutdown.timeout.ms=3000
+DEFAULT monitor.ewma.alpha=0.2
+DEFAULT monitor.probe.failures=3
+DEFAULT monitor.probe.interval.ms=1000
+DEFAULT monitor.probe.timeout.ms=1000
+DEFAULT node.events.capacity=4096
+DEFAULT overlay.hello.timeout.ms=3000
+DEFAULT overlay.retry.initial.ms=500
+DEFAULT overlay.retry.jitter.percent=10
+DEFAULT overlay.retry.max.ms=5000
+DEFAULT routing.activate.attempts=3
+DEFAULT routing.activate.timeout.ms=3000
+DEFAULT routing.announce.interval.ms=2000
+DEFAULT routing.cache.capacity=4096
+DEFAULT routing.cache.ttl.ms=16000
+DEFAULT routing.candidate.ttl.ms=8000
+DEFAULT routing.flood.max.per.sec=10
+DEFAULT routing.switch.improvement.percent=20
+DEFAULT routing.switch.min.dwell.ms=5000
+DEFAULT routing.switch.observations=3
+DEFAULT source.max.frame.bytes=99999
+DEFAULT subscription.lease.ms=6000
+DEFAULT subscription.renew.ms=2000
+DEFAULT video.egress.capacity=256
+DEFAULT video.reassembly.deadline.ms=250
+DEFAULT video.reassembly.max.frames=8
+TEMP_CONFIG_DIR /tmp/ott-imp002-manual-7274252485951196636
+CHECK_PASS overrides_all_30_values
+OVERRIDE bootstrap.query.timeout.ms=1234
+OVERRIDE control.connect.timeout.ms=1111
+OVERRIDE control.max.connections=13
+OVERRIDE control.queue.capacity=7
+OVERRIDE control.shutdown.timeout.ms=2222
+OVERRIDE monitor.ewma.alpha=0.35
+OVERRIDE monitor.probe.failures=5
+OVERRIDE monitor.probe.interval.ms=1500
+OVERRIDE monitor.probe.timeout.ms=1750
+OVERRIDE node.events.capacity=99
+OVERRIDE overlay.hello.timeout.ms=1234
+OVERRIDE overlay.retry.initial.ms=750
+OVERRIDE overlay.retry.jitter.percent=25
+OVERRIDE overlay.retry.max.ms=6000
+OVERRIDE routing.activate.attempts=4
+OVERRIDE routing.activate.timeout.ms=1200
+OVERRIDE routing.announce.interval.ms=1000
+OVERRIDE routing.cache.capacity=123
+OVERRIDE routing.cache.ttl.ms=18000
+OVERRIDE routing.candidate.ttl.ms=9000
+OVERRIDE routing.flood.max.per.sec=7
+OVERRIDE routing.switch.improvement.percent=35
+OVERRIDE routing.switch.min.dwell.ms=6500
+OVERRIDE routing.switch.observations=5
+OVERRIDE source.max.frame.bytes=50000
+OVERRIDE subscription.lease.ms=9000
+OVERRIDE subscription.renew.ms=1500
+OVERRIDE video.egress.capacity=123
+OVERRIDE video.reassembly.deadline.ms=333
+OVERRIDE video.reassembly.max.frames=4
+CHECK_PASS consumer_queue_7
+CHECK_PASS consumer_connections_13
+CHECK_PASS consumer_connect_1111_ms
+CHECK_PASS consumer_shutdown_2222_ms
+CONSUMER Options[queueCapacity=7, maxConnections=13, connectTimeout=PT1.111S, shutdownTimeout=PT2.222S]
+CHECK_PASS legacy_constructor_defaults
+CHECK_PASS legacy_collections_immutable
+CHECK_PASS invalid_no_partial_configuration
+CHECK_PASS invalid_five_independent_keys_aggregated
+CHECK_PASS invalid_diagnostics_have_source
+EXPECTED_PROBLEM /tmp/ott-imp002-manual-7274252485951196636/invalid-client.properties [control.port]: inteiro decimal esperado no intervalo 1..65535
+EXPECTED_PROBLEM /tmp/ott-imp002-manual-7274252485951196636/invalid-client.properties [control.queue.capacity]: inteiro decimal esperado no intervalo 1..256
+EXPECTED_PROBLEM /tmp/ott-imp002-manual-7274252485951196636/invalid-client.properties [monitor.ewma.alpha]: decimal com ponto, finito e no intervalo (0,1] esperado
+EXPECTED_PROBLEM /tmp/ott-imp002-manual-7274252485951196636/invalid-client.properties [routing.candidate.ttl.ms]: deve ser > routing.announce.interval.ms
+EXPECTED_PROBLEM /tmp/ott-imp002-manual-7274252485951196636/invalid-client.properties [video.reassembly.max.frames]: inteiro decimal esperado no intervalo 1..8
+CHECK_PASS invalid_problem_list_immutable
+CHECK_PASS invalid_input_not_modified
+CHECK_PASS defaults_not_mutated_after_overrides_or_failure
+CHECK_PASS approved_alpha_grammar_rejects_exponent
+CHECK_PASS bootstrap_rejects_overlay_override_equal_to_default
+CHECK_PASS original_profiles_preserved
+CHECK_PASS temporary_files_removed
+MANUAL_PASS 2026-11-04T10:15:14.191638105Z checks=25 operator=Luis
