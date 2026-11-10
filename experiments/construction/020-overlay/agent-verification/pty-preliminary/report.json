@@ -1,0 +1,134 @@
+{
+  "status": "FAIL",
+  "operator": "agent",
+  "kind": "supplementary controlled CLI probe",
+  "evidence": "/tmp/ott-imp005-agent-cli-retry-facshhph",
+  "jar_sha256": "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52",
+  "checks": [
+    {
+      "name": "approved_jar_hash",
+      "passed": true
+    },
+    {
+      "name": "six_profile_hashes",
+      "passed": true
+    },
+    {
+      "name": "jdk_21",
+      "passed": true
+    },
+    {
+      "name": "seven_ports_free_before",
+      "passed": true
+    },
+    {
+      "name": "pty_three_nodes_two_active",
+      "passed": true,
+      "pids": [
+        88849,
+        88855,
+        88857
+      ]
+    },
+    {
+      "name": "pty_bootstrap_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_fresh_neighbors_without_bootstrap",
+      "passed": true
+    },
+    {
+      "name": "pty_client_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_leave_and_actual_retries_before_queries",
+      "passed": true
+    },
+    {
+      "name": "pty_ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+      "passed": true,
+      "elapsed_ms": [
+        0.7062579998091678,
+        0.6122550003055949,
+        1.021757999296824,
+        0.9139159992628265,
+        0.8566599999539903,
+        0.6751329992766841,
+        0.962930000241613,
+        0.9393939999426948,
+        1.2195179997434025,
+        0.6176400002004812
+      ]
+    },
+    {
+      "name": "pty_survivor_pids_preserved",
+      "passed": true
+    },
+    {
+      "name": "pty_reconnect_new_client_instance_same_survivors",
+      "passed": true,
+      "previous_ready": "READY node=N2 instance=2c08b1bb-bbf2-425b-b620-d166480faf79",
+      "current_ready": "READY node=N2 instance=7ee815da-990b-46ff-95c9-8706825b5188"
+    },
+    {
+      "name": "pty_server_eof_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_relay_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_restarted_client_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_restarted_bootstrap_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_all_owned_jvms_terminated",
+      "passed": true
+    },
+    {
+      "name": "pty_no_tcp_listener_after",
+      "passed": true,
+      "tcp_states": "State     Recv-Q Send-Q      Local Address:Port        Peer Address:Port Process\nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45912       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48518       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45940       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48516       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56120 [::ffff:127.0.0.1]:58818       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45936       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45926       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48780       \n"
+    }
+  ],
+  "failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 197, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<stdin>\", line 200, in <module>\nBrokenPipeError: [Errno 32] Broken pipe\n",
+  "owned_processes": [
+    {
+      "label": "bootstrap-01",
+      "pid": 88826,
+      "exit": 0
+    },
+    {
+      "label": "server-01",
+      "pid": 88849,
+      "exit": 0
+    },
+    {
+      "label": "relay-01",
+      "pid": 88855,
+      "exit": 0
+    },
+    {
+      "label": "client-01",
+      "pid": 88857,
+      "exit": 0
+    },
+    {
+      "label": "bootstrap-02",
+      "pid": 89086,
+      "exit": 0
+    },
+    {
+      "label": "client-02",
+      "pid": 89111,
+      "exit": 0
+    }
+  ]
+}

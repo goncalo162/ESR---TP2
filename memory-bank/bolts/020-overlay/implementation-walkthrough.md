@@ -3,14 +3,14 @@ stage: implement
 bolt: 020-overlay
 created: "2026-11-10T18:15:17Z"
 ---
-# IMP-005 — Implement preparado para aprovação
+# IMP-005 — Implement aprovado
 
 ## Summary
 
 Composição CLI dos quatro papéis e ciclo de vida do nó implementados nos cinco
 ficheiros autorizados. Saída best effort usa sessões confirmadas e orçamento único;
 I/O e callbacks têm limites e observação explícita da terminação física.
-Implement aguarda aprovação; Test não iniciado.
+Implement aprovado pelo utilizador, com registo em 2026-11-10T22:05:26Z. Consultar o [relatório de Test](test-walkthrough.md).
 
 ## Structure Overview
 
@@ -63,7 +63,7 @@ subprocessos reais dos quatro papéis e TCP local. Não é clean verify nem Test
 - [Resultados/XML](../../../experiments/construction/020-overlay/terminal-fix-test-results.json)
 - [Oráculos L01–L12/M01–M18](implement-oracles.md)
 - [Justificação das substituições no manager](neighbor-manager-adaptations.md)
-- [Roteiro manual humano, não executado](../../../experiments/construction/020-overlay/manual-instructions.md)
+- [Roteiro manual humano](../../../experiments/construction/020-overlay/manual-instructions.md)
 - [Diff acumulado](../../../experiments/construction/020-overlay/implement-vs-operational-base.diff)
 - [Numstat](../../../experiments/construction/020-overlay/implement-vs-operational-base.numstat)
 - [Preservação e hashes](../../../experiments/construction/020-overlay/implement-preservation.json)
@@ -73,13 +73,9 @@ subprocessos reais dos quatro papéis e TCP local. Não é clean verify nem Test
 
 Logs preliminares preservam falhas reais e respetivas correções: cleanup do stdin
 do harness após processo morto e observação de evento explicitamente sincronizada
-no teste do owner. A versão final passa sem editar testes históricos. Não declarar
-metas, GUI/CORE, manual humano, revisão de Waheed ou integração como realizados.
-
-Parar no checkpoint Implement. A aprovação seguinte autorizará Test; ainda faltam
-clean verify/JAR/hash consolidados em Test, manual humano antes da sua aprovação,
-revisão humana final de Waheed e integração. Sem gates externos adicionais.
-Bolt/história/TASK continuam em progresso, sem commits/push ou outro IMP.
+no teste do owner. A versão final passa sem editar testes históricos. As execuções manuais e o
+clean verify estão registados no [relatório de Test](test-walkthrough.md). Test foi aprovado. A revisão
+final de Waheed e a integração da versão revista estão pendentes.
 
 ## Correção terminal — Implement reapresentado
 

@@ -1,0 +1,1479 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index e69de29..9a96d7e 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -0,0 +1,250 @@
++package pt.uminho.esr.ott.app;
++
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.overlay.*;
++import java.io.*;
++import java.nio.channels.*;
++import java.nio.charset.StandardCharsets;
++import java.nio.file.Path;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++import java.util.function.LongSupplier;
++
++/** Validated CLI composition. Blocking console work never runs on the node owner. */
++public final class OttApplication {
++    public static final int MAX_LINE_CHARS = 4096;
++    public static final int MAX_LOG_CHARS = 4096;
++    public record Invocation(boolean help, Optional<NodeRole> role, Optional<Path> config) {
++        public Invocation { Objects.requireNonNull(role); Objects.requireNonNull(config); }
++    }
++    interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
++    interface RunningService extends AutoCloseable {
++        Map<String, Neighbor> neighbors();
++        void requestShutdown(int reason, Duration remainingBudget);
++        boolean awaitTermination(Duration remainingBudget);
++        default Optional<Throwable> failure() { return Optional.empty(); }
++        @Override void close();
++    }
++    private OttApplication() { }
++    public static Invocation parse(String[] arguments) {
++        Objects.requireNonNull(arguments);
++        if (arguments.length == 1 && "--help".equals(arguments[0]))
++            return new Invocation(true, Optional.empty(), Optional.empty());
++        NodeRole role = null; Path config = null;
++        for (int i = 0; i < arguments.length; i++) {
++            String option = arguments[i];
++            if ("--role".equals(option) && role == null && i + 1 < arguments.length) {
++                try { role = NodeRole.valueOf(arguments[++i]); }
++                catch (RuntimeException e) { throw new IllegalArgumentException("Invalid --role", e); }
++            } else if ("--config".equals(option) && config == null && i + 1 < arguments.length) {
++                String value = arguments[++i];
++                if (value == null || value.isBlank() || value.startsWith("--")) throw new IllegalArgumentException("Invalid --config");
++                config = Path.of(value);
++            } else throw new IllegalArgumentException("Unknown, repeated or incomplete option: " + option);
++        }
++        if (role == null || config == null) throw new IllegalArgumentException("--role and --config required");
++        return new Invocation(false, Optional.of(role), Optional.of(config));
++    }
++    public static int run(String[] arguments, InputStream input, PrintStream output, PrintStream error) {
++        return execute(arguments, input, output, error, null, System::nanoTime, () -> {}, () -> {}).exitCode();
++    }
++    static int run(String[] arguments, InputStream input, PrintStream output, PrintStream error,
++                   ServiceFactory services, LongSupplier clock) {
++        return execute(arguments, input, output, error, Objects.requireNonNull(services), clock, () -> {}, () -> {}).exitCode();
++    }
++    /** Own interruptible descriptor channels rather than closing a locked PrintStream wrapper. */
++    public static void main(String[] arguments) throws IOException {
++        var in = new FileInputStream(FileDescriptor.in).getChannel();
++        var out = new FileOutputStream(FileDescriptor.out).getChannel();
++        var err = new FileOutputStream(FileDescriptor.err).getChannel();
++        var result = execute(arguments, Channels.newInputStream(in),
++                new PrintStream(Channels.newOutputStream(out), true, StandardCharsets.UTF_8),
++                new PrintStream(Channels.newOutputStream(err), true, StandardCharsets.UTF_8), null,
++                System::nanoTime, () -> closeChannel(in), () -> { closeChannel(out); closeChannel(err); });
++        System.exit(result.exitCode());
++    }
++    private static void closeChannel(Channel channel) {
++        try { channel.close(); } catch (IOException ignored) { /* Closing is followed by physical joins. */ }
++    }
++    private record InputEvent(String line, boolean eof) { }
++    private record OutputEvent(String text, boolean error) { }
++    record ExecutionResult(int exitCode, boolean inputTerminated, boolean outputTerminated, boolean serviceTerminated) { }
++    static ExecutionResult execute(String[] arguments, InputStream input, PrintStream output, PrintStream error,
++                               ServiceFactory factory, LongSupplier clock, Runnable closeInput, Runnable closeOutput) {
++        final Invocation invocation;
++        final NodeConfiguration config;
++        try {
++            invocation = parse(arguments);
++            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, quit"); return new ExecutionResult(0, true, true, true); }
++            config = ConfigurationLoader.load(invocation.config().orElseThrow(), invocation.role().orElseThrow());
++        } catch (ConfigurationException | IllegalArgumentException e) { error.println(bounded("CONFIG_ERROR " + e.getMessage())); return new ExecutionResult(2, true, true, true); }
++        var console = new Console(input, output, error, config, clock);
++        var hook = new Thread(() -> {
++            console.stop(false);
++            try { console.finished.await(config.runtime().control().shutdownTimeout().toNanos(), TimeUnit.NANOSECONDS); }
++            catch (InterruptedException e) { Thread.currentThread().interrupt(); }
++        }, "ott-shutdown-hook");
++        RunningService service = null;
++        boolean interrupted = false;
++        boolean inputDone = true, outputDone = true, serviceDone = true;
++        try {
++            Runtime.getRuntime().addShutdownHook(hook);
++            console.writer.start();
++            service = factory == null ? open(config, console) : factory.open(config);
++            console.log("STARTED node=" + config.nodeId() + " role=" + config.role() + " pid=" + ProcessHandle.current().pid(), false);
++            console.reader.start();
++            while (!console.stopped.get()) {
++                var failure = service.failure();
++                if (failure.isPresent()) { console.log("FATAL " + failure.orElseThrow(), true); console.stop(true); break; }
++                var command = console.commands.poll(20, TimeUnit.MILLISECONDS);
++                if (command == null) continue;
++                if (command.eof()) { console.stop(false); break; }
++                String line = command.line().strip();
++                if (line.isEmpty()) continue;
++                if (line.equals("quit")) console.stop(false);
++                else if (line.equals("neighbors")) {
++                    var neighbors = service.neighbors();
++                    console.log("NEIGHBORS node=" + config.nodeId() + " role=" + config.role() + " count=" + neighbors.size(), false);
++                    neighbors.values().stream().sorted(Comparator.comparing(Neighbor::nodeId)).forEach(n ->
++                        console.log("NEIGHBOR node=" + n.nodeId() + " state=" + n.state() + " session=" + n.session(), false));
++                } else if (line.equals("catalog") || line.equals("play") || line.startsWith("play "))
++                    console.log("NOT_IMPLEMENTED " + line.split(" ", 2)[0], false);
++                else console.log("COMMAND_ERROR unknown command", true);
++            }
++        } catch (InterruptedException e) { console.stop(true); interrupted = true; /* Restore after bounded cleanup. */ }
++        catch (Exception e) { console.log("FATAL " + bounded(e.getMessage()), true); console.stop(true); }
++        finally {
++            console.stop(false);
++            // Close/cancel the owned input before waiting on the network budget.
++            console.reader.interrupt(); closeInput.run();
++            if (service != null) {
++                try {
++                    service.requestShutdown(console.failed.get() ? 1 : 0, console.left());
++                    serviceDone = service.awaitTermination(console.left());
++                    if (!serviceDone) { console.failed.set(true); service.close(); }
++                    if (service.failure().isPresent()) console.failed.set(true);
++                } catch (RuntimeException e) {
++                    serviceDone = false; console.failed.set(true); console.log("CLEANUP_ERROR " + e.getMessage(), true);
++                    try { service.close(); } catch (RuntimeException ignored) { /* Preserve the first cleanup failure. */ }
++                }
++            }
++            inputDone = join(console.reader, console.left());
++            if (!inputDone) console.failed.set(true);
++            // This record precedes the writer's final drain/join, so it cannot announce a final status.
++            // The returned ExecutionResult / OS exit status is authoritative after all cleanup.
++            console.log("SHUTDOWN node=" + config.nodeId() + " phase=closing-output", false);
++            console.outputStopping.set(true);
++            // Leave time for closing a blocked descriptor and joining its writer.
++            outputDone = join(console.writer, console.left().dividedBy(2));
++            if (!outputDone) {
++                console.failed.set(true); console.writer.interrupt(); closeOutput.run();
++                outputDone = join(console.writer, console.left());
++                if (!outputDone) console.failed.set(true);
++            }
++            try { Runtime.getRuntime().removeShutdownHook(hook); }
++            catch (IllegalStateException ignored) { /* JVM hook is already running. */ }
++            console.finished.countDown();
++        }
++        if (interrupted) Thread.currentThread().interrupt();
++        return new ExecutionResult(console.failed.get() ? 3 : 0, inputDone, outputDone, serviceDone);
++    }
++    private static RunningService open(NodeConfiguration config, Console console) throws IOException {
++        if (config.role() == NodeRole.BOOTSTRAP) {
++            var bootstrap = new BootstrapServer(config);
++            console.log("READY node=" + config.nodeId() + " role=BOOTSTRAP instance=internal-not-exposed", false);
++            return new RunningService() {
++                private boolean closed; private RuntimeException failure;
++                public Map<String, Neighbor> neighbors() { return Map.of(); }
++                public synchronized void requestShutdown(int reason, Duration budget) {
++                    if (closed) return; closed = true;
++                    try { bootstrap.close(); } catch (RuntimeException e) { failure = e; }
++                }
++                public boolean awaitTermination(Duration budget) { if (failure != null) throw failure; return closed; }
++                public void close() { requestShutdown(1, Duration.ZERO); }
++            };
++        }
++        UUID instance = UUID.randomUUID();
++        var node = new OverlayNode(config, instance, event -> console.log("EVENT node=" + config.nodeId()
++                + " instance=" + instance + " " + event, event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR));
++        node.start().whenComplete((v, error) -> {
++            if (error == null) console.log("READY node=" + config.nodeId() + " instance=" + instance, false);
++        });
++        return new RunningService() {
++            public Map<String, Neighbor> neighbors() { return node.diagnostics(); }
++            public void requestShutdown(int reason, Duration budget) { node.requestShutdown(reason, budget); }
++            public boolean awaitTermination(Duration budget) { return node.awaitTermination(budget); }
++            public Optional<Throwable> failure() { return node.failure(); }
++            public void close() { node.close(); }
++        };
++    }
++    private static boolean join(Thread thread, Duration budget) {
++        if (thread.getState() == Thread.State.NEW) return true;
++        if (thread == Thread.currentThread()) return false;
++        try { if (!budget.isZero()) thread.join(budget); return !thread.isAlive(); }
++        catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
++    }
++    private static String bounded(String text) {
++        if (text == null) return "unspecified";
++        String marker = "...[truncated]";
++        return text.length() <= MAX_LOG_CHARS ? text : text.substring(0, MAX_LOG_CHARS - marker.length()) + marker;
++    }
++    private static final class Console {
++        final ArrayBlockingQueue<InputEvent> commands;
++        final ArrayBlockingQueue<OutputEvent> outputs;
++        final AtomicBoolean stopped = new AtomicBoolean(), failed = new AtomicBoolean(), outputStopping = new AtomicBoolean();
++        final CountDownLatch finished = new CountDownLatch(1);
++        final Thread reader, writer;
++        final LongSupplier clock; final long budget;
++        volatile long stopAt;
++        Console(InputStream input, PrintStream output, PrintStream error, NodeConfiguration config,
++                LongSupplier clock) {
++            this.clock = Objects.requireNonNull(clock); budget = config.runtime().control().shutdownTimeout().toNanos();
++            commands = new ArrayBlockingQueue<>(config.runtime().overlay().eventsCapacity());
++            outputs = new ArrayBlockingQueue<>(config.runtime().control().queueCapacity());
++            reader = Thread.ofVirtual().name("ott-cli-input").unstarted(() -> read(input));
++            writer = Thread.ofVirtual().name("ott-cli-output").unstarted(() -> write(output, error));
++        }
++        synchronized void stop(boolean fatal) {
++            if (fatal) failed.set(true);
++            if (stopped.compareAndSet(false, true)) stopAt = clock.getAsLong();
++        }
++        Duration left() { return Duration.ofNanos(Math.max(0, budget - (clock.getAsLong() - stopAt))); }
++        void log(String text, boolean error) {
++            if (!outputs.offer(new OutputEvent(bounded(text), error))) stop(true);
++        }
++        void command(InputEvent event) { if (!stopped.get() && !commands.offer(event)) { log("COMMAND_OVERFLOW", true); stop(true); } }
++        void read(InputStream input) {
++            try {
++                var chars = new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder()
++                    .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT).onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT));
++                var line = new StringBuilder(); boolean overlong = false;
++                while (!stopped.get()) {
++                    int value = chars.read();
++                    if (value < 0) { if (!overlong && !line.isEmpty()) command(new InputEvent(line.toString(), false)); command(new InputEvent("", true)); return; }
++                    if (value == '\n') {
++                        if (!overlong) command(new InputEvent(line.toString(), false));
++                        line.setLength(0); overlong = false;
++                    } else if (!overlong) {
++                        if (line.length() == MAX_LINE_CHARS) { log("COMMAND_ERROR line exceeds 4096 characters", true); line.setLength(0); overlong = true; }
++                        else line.append((char)value);
++                    }
++                }
++            } catch (IOException | RuntimeException e) { if (!stopped.get()) { log("INPUT_ERROR " + e.getMessage(), true); stop(true); } }
++        }
++        void write(PrintStream output, PrintStream error) {
++            try {
++                while (!outputStopping.get() || !outputs.isEmpty()) {
++                    var item = outputs.poll(20, TimeUnit.MILLISECONDS);
++                    if (item == null) continue;
++                    var target = item.error() ? error : output;
++                    target.println(item.text());
++                    if (target.checkError()) { stop(true); return; }
++                }
++            } catch (InterruptedException e) { if (!outputStopping.get()) stop(true); Thread.currentThread().interrupt(); }
++            catch (RuntimeException e) { stop(true); }
++        }
++    }
++}
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+index 61cbf89..4560b75 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+@@ -17,6 +17,97 @@ public final class NeighborManager implements AutoCloseable {
+     public enum Phase { NOT_STARTED, DISCOVERING, READY, FAILED, CLOSED }
+     public enum Reason { REMOTE_REJECTION, CONTEXT, TRANSPORT, TIMEOUT, RESOURCE_LIMIT,
+         SHUTDOWN, LEAVE, CONSUMER_FAILURE, STALE }
++    /** Local diagnostics only; these values are never serialized on the wire. */
++    public enum LeaveOutcome { LOCAL_WRITE_CONFIRMED, WRITE_FAILED, TIMED_OUT, ABORTED }
++    public record LeaveAttempt(Neighbor.Session session, LeaveOutcome outcome) {
++        public LeaveAttempt { Objects.requireNonNull(session); Objects.requireNonNull(outcome); }
++    }
++    public record ShutdownReport(List<LeaveAttempt> attempts, boolean notificationTimedOut) {
++        public ShutdownReport {
++            Objects.requireNonNull(attempts);
++            if (attempts.size() > 63) throw new IllegalArgumentException("Configured degree cap is 63");
++            attempts = List.copyOf(attempts);
++        }
++    }
++    /** Completion confirms only the local notification phase, never a peer ACK or termination. */
++    public synchronized CompletionStage<ShutdownReport> requestShutdown(int reason, Duration remainingBudget) {
++        Objects.requireNonNull(remainingBudget);
++        if (reason < 0 || reason > 1 || remainingBudget.isNegative())
++            throw new IllegalArgumentException("Leave reason 0/1 and nonnegative budget required");
++        final long nanos;
++        try { nanos = remainingBudget.toNanos(); }
++        catch (ArithmeticException e) { throw new IllegalArgumentException("Budget overflow", e); }
++        if (shutdownResult != null) return shutdownView;
++        shutdownResult = new CompletableFuture<>(); shutdownView = shutdownResult.minimalCompletionStage();
++        notificationStarted = now();
++        notificationTotalBudget = Math.min(nanos, plan.config.runtime().control().shutdownTimeout().toNanos());
++        notificationBudget = notificationTotalBudget / 2;
++        draining.set(true);
++        if (!launched || stopping.get() || notificationBudget == 0) {
++            requestClose(); publishShutdown(LeaveOutcome.ABORTED); return shutdownView;
++        }
++        if (!post(() -> beginShutdown(reason), true)) {
++            requestClose();
++            // No notification event was admitted, so there is no owner-owned attempt map to read.
++            shutdownResult.complete(new ShutdownReport(List.of(), false));
++        }
++        return shutdownView;
++    }
++    private void beginShutdown(int reason) {
++        cancel(initialSlot); initialSlot = null;
++        if (discovery != null) retire(discovery);
++        for (var p : peers.values()) {
++            cancel(p.slot); p.slot = null;
++            if (p.attempt != null) retire(p.attempt);
++        }
++        for (var c : List.copyOf(contexts.values())) {
++            cancel(c.deadline); c.deadline = null;
++            if (!c.bootstrap && c.active && c.peer != null && c.peer.context == c
++                    && c.peer.session != null && c.channel.id().equals(c.peer.session.connectionId())
++                    && Objects.equals(c.remoteInstance, c.peer.session.instanceId()))
++                leaveResults.put(c.peer.session, null);
++            else finish(c, Reason.SHUTDOWN, null);
++        }
++        long left = notificationBudget - (now() - notificationStarted);
++        if (left <= 0) { finishShutdown(LeaveOutcome.TIMED_OUT, !leaveResults.isEmpty()); return; }
++        if (leaveResults.isEmpty()) { finishShutdown(LeaveOutcome.ABORTED, false); return; }
++        notificationTicket = deadlines.schedule(() -> post(() -> finishShutdown(LeaveOutcome.TIMED_OUT, true), true), left);
++        for (var session : List.copyOf(leaveResults.keySet())) {
++            if (stopping.get()) break;
++            if (now() - notificationStarted >= notificationBudget) { finishShutdown(LeaveOutcome.TIMED_OUT, true); break; }
++            var peer = current(session);
++            if (peer == null || peer.context == null || !peer.context.active || !peer.context.channel.isOpen()
++                    || !peer.context.channel.id().equals(session.connectionId())
++                    || !Objects.equals(peer.context.remoteInstance, session.instanceId())) {
++                writtenLeave(session, new IllegalStateException("Session retired")); continue;
++            }
++            try {
++                peer.context.channel.sendAndFlush(new ControlMessage(MessageType.NODE_LEAVE, UUID.randomUUID(),
++                        plan.local.nodeId(), instance, new ControlMessage.Leave(reason)))
++                    .whenComplete((v, error) -> post(() -> writtenLeave(session, error), true));
++            } catch (RuntimeException e) { writtenLeave(session, e); }
++        }
++    }
++    private void writtenLeave(Neighbor.Session session, Throwable error) {
++        if (shutdownResult.isDone() || !leaveResults.containsKey(session) || leaveResults.get(session) != null) return;
++        if (now() - notificationStarted >= notificationBudget) { finishShutdown(LeaveOutcome.TIMED_OUT, true); return; }
++        leaveResults.put(session, error == null ? LeaveOutcome.LOCAL_WRITE_CONFIRMED : LeaveOutcome.WRITE_FAILED);
++        if (leaveResults.values().stream().allMatch(Objects::nonNull)) finishShutdown(LeaveOutcome.ABORTED, false);
++    }
++    private void finishShutdown(LeaveOutcome pending, boolean timedOut) {
++        if (shutdownResult == null || shutdownResult.isDone()) return;
++        notificationTimedOut |= timedOut;
++        leaveResults.replaceAll((session, outcome) -> outcome == null ? pending : outcome);
++        if (notificationTicket != null) { notificationTicket.cancel(); notificationTicket = null; }
++        requestClose(); publishShutdown(pending);
++    }
++    private void publishShutdown(LeaveOutcome pending) {
++        if (shutdownResult == null || shutdownResult.isDone()) return;
++        if (notificationTicket != null) { notificationTicket.cancel(); notificationTicket = null; }
++        var attempts = new ArrayList<LeaveAttempt>(leaveResults.size());
++        leaveResults.forEach((session, outcome) -> attempts.add(new LeaveAttempt(session, outcome == null ? pending : outcome)));
++        shutdownResult.complete(new ShutdownReport(attempts, notificationTimedOut));
++    }
+     public interface Observer { void onEvent(Event event); }
+     public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic {}
+     public record NeighborUp(Neighbor.Session session) implements Event {
+@@ -96,6 +187,14 @@ public final class NeighborManager implements AutoCloseable {
+     private volatile Deadlines deadlines;
+     private Registration registration;
+     private final AtomicBoolean stopping = new AtomicBoolean();
++    private final AtomicBoolean draining = new AtomicBoolean();
++    private volatile CompletableFuture<ShutdownReport> shutdownResult;
++    private CompletionStage<ShutdownReport> shutdownView;
++    // Notification state is owned by SerialOwner, except the before-start empty report.
++    private final Map<Neighbor.Session, LeaveOutcome> leaveResults = new LinkedHashMap<>();
++    private long notificationStarted, notificationBudget, notificationTotalBudget;
++    private boolean notificationTimedOut;
++    private Ticket notificationTicket;
+     private final AtomicReference<Throwable> failure = new AtomicReference<>();
+     private final AtomicBoolean terminationObserved = new AtomicBoolean();
+     private final CompletableFuture<Void> started = new CompletableFuture<>(), cleaned = new CompletableFuture<>();
+@@ -160,7 +259,7 @@ public final class NeighborManager implements AutoCloseable {
+         commandSlots = new Semaphore(config.runtime().overlay().eventsCapacity() + 1);
+     }
+     public synchronized CompletionStage<Void> start() {
+-        if (launched || stopping.get()) return startView;
++        if (launched || stopping.get() || draining.get()) return startView;
+         launched = true;
+         try {
+             if (!borrowed) owner = ports.owner(plan.config.runtime().overlay().eventsCapacity());
+@@ -198,22 +297,24 @@ public final class NeighborManager implements AutoCloseable {
+         return peer != null && expected.equals(peer.session) ? peer : null;
+     }
+     private <T> CompletionStage<T> command(T closedValue, java.util.function.Supplier<T> operation) {
+-        if (stopping.get() || !launched) return CompletableFuture.completedStage(closedValue);
++        if (stopping.get() || draining.get() || !launched) return CompletableFuture.completedStage(closedValue);
+         if (!commandSlots.tryAcquire()) {
+             fatal(new RejectedExecutionException("Command capacity"));
+             return CompletableFuture.failedStage(new RejectedExecutionException("Command capacity"));
+         }
+         var result = new CompletableFuture<T>(); commands.add(result);
+         result.whenComplete((v, e) -> { commands.remove(result); commandSlots.release(); });
+-        if (!post(() -> { if (!result.isDone()) result.complete(operation.get()); })) result.complete(closedValue);
++        if (!post(() -> { if (!result.isDone()) result.complete(draining.get() ? closedValue : operation.get()); }, true)) result.complete(closedValue);
+         return result.minimalCompletionStage();
+     }
+     private void postOrClose(Channel channel, Runnable event) { if (!post(event)) channel.close(); }
+-    private boolean post(Runnable event) {
++    private boolean post(Runnable event) { return post(event, false); }
++    private boolean post(Runnable event, boolean lifecycle) {
+         var target = owner;
+-        if (stopping.get() || target == null) return false;
++        if (stopping.get() || target == null || draining.get() && !lifecycle) return false;
+         if (target.offer(() -> {
+             if (stopping.get()) { cleanup(); return; }
++            if (draining.get() && !lifecycle) return;
+             try { event.run(); } catch (RuntimeException e) { fatal(e); }
+         })) return true;
+         fatal(new RejectedExecutionException("Serial event capacity exceeded")); return false;
+@@ -269,7 +370,7 @@ public final class NeighborManager implements AutoCloseable {
+         final long began = now(); final UUID job = UUID.randomUUID();
+         initialSlot = schedule(connectBudget(), () -> failDiscovery(new IllegalStateException("Bind resolution timeout"), Reason.TIMEOUT, null, null));
+         io.resolver().resolve(job, plan.config.bindHost()).whenComplete((address, error) -> post(() -> {
+-            if (phase != Phase.DISCOVERING || stopping.get()) return;
++            if (phase != Phase.DISCOVERING || stopping.get() || draining.get()) return;
+             if (error != null || expired(began, connectBudget())) {
+                 failDiscovery(error == null ? new IllegalStateException("Bind resolution timeout") : error, Reason.TRANSPORT, null, null); return;
+             }
+@@ -290,7 +391,7 @@ public final class NeighborManager implements AutoCloseable {
+         }));
+     }
+     private boolean live(Attempt a) {
+-        return a.live && (a.peer == null ? phase == Phase.DISCOVERING && discovery == a
++        return !draining.get() && a.live && (a.peer == null ? phase == Phase.DISCOVERING && discovery == a
+                 : phase == Phase.READY && a.peer.attempt == a);
+     }
+     private void discover() {
+@@ -600,12 +701,12 @@ public final class NeighborManager implements AutoCloseable {
+                 : previous > max / 2 ? max : Math.min(max, previous * 2);
+     }
+     private void retry(Peer p) {
+-        if (phase != Phase.READY || stopping.get() || !initiates(p) || p.session != null || p.attempt != null) return;
++        if (phase != Phase.READY || stopping.get() || draining.get() || !initiates(p) || p.session != null || p.attempt != null) return;
+         cancel(p.slot); p.base = nextBase(p.base); p.delay = nextDelay(p.base);
+         p.slot = schedule(TimeUnit.MILLISECONDS.toNanos(p.delay), () -> { p.slot = null; dialPeer(p); }); publish();
+     }
+     private void retryDiscovery() {
+-        if (phase != Phase.DISCOVERING || stopping.get()) return;
++        if (phase != Phase.DISCOVERING || stopping.get() || draining.get()) return;
+         discoveryBase = nextBase(discoveryBase); cancel(initialSlot);
+         initialSlot = schedule(TimeUnit.MILLISECONDS.toNanos(nextDelay(discoveryBase)), () -> {
+             initialSlot = null;
+@@ -619,16 +720,16 @@ public final class NeighborManager implements AutoCloseable {
+     }
+     public synchronized void requestClose() {
+         if (!stopping.compareAndSet(false, true)) return;
+-        closeStarted = now();
++        closeStarted = draining.get() ? notificationStarted : now();
+         var services = io; if (services != null) services.requestClose();
+         var timers = deadlines; if (timers != null) timers.requestClose();
+-        if (owner == null) { started.completeExceptionally(new IllegalStateException("Manager closed")); cleaned.complete(null); return; }
++        if (owner == null) { started.completeExceptionally(new IllegalStateException("Manager closed")); cleaned.complete(null); publishShutdown(LeaveOutcome.ABORTED); return; }
+         if (owner.isOwnerThread()) cleanup();
+         else if (!owner.offer(this::cleanup)) owner.fail(new RejectedExecutionException("Stop could not enter owner"));
+     }
+     private void ownerStopped() {
+         stopping.set(true);
+-        if (closeStarted == 0) closeStarted = now();
++        if (closeStarted == 0) closeStarted = draining.get() ? notificationStarted : now();
+         if (io != null) io.requestClose(); if (deadlines != null) deadlines.requestClose(); cleanup();
+     }
+     private void cleanup() {
+@@ -647,7 +748,7 @@ public final class NeighborManager implements AutoCloseable {
+         started.completeExceptionally(new IllegalStateException("Manager closed"));
+         for (var command : commands) command.completeExceptionally(new IllegalStateException("Manager closed"));
+         if (registration != null) registration.remove();
+-        cleaned.complete(null); if (!borrowed) owner.requestClose();
++        cleaned.complete(null); publishShutdown(LeaveOutcome.ABORTED); if (!borrowed) owner.requestClose();
+     }
+     public boolean awaitTermination(Duration timeout) {
+         Objects.requireNonNull(timeout);
+@@ -674,7 +775,8 @@ public final class NeighborManager implements AutoCloseable {
+     private Duration remainingMillis(long budget, long began) { return Duration.ofMillis(TimeUnit.NANOSECONDS.toMillis(remainingNanos(budget, began))); }
+     @Override public void close() {
+         requestClose(); if (owner != null && owner.isOwnerThread()) return;
+-        long left = remainingNanos(plan.config.runtime().control().shutdownTimeout().toNanos(), closeStarted);
++        long total = draining.get() ? notificationTotalBudget : plan.config.runtime().control().shutdownTimeout().toNanos();
++        long left = remainingNanos(total, closeStarted);
+         if (!awaitTermination(Duration.ofNanos(left))) throw new IllegalStateException("Neighbor shutdown deadline: owner, TCP, timers or I/O worker still pending", failure.get());
+     }
+     private static Plan validate(NodeConfiguration config, UUID instance) {
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+index e69de29..dd54443 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -0,0 +1,110 @@
++package pt.uminho.esr.ott.overlay;
++
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import java.time.Duration;
++import java.util.Map;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.UUID;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.AtomicReference;
++
++/** Owns one serial executor and lends it to the embedded neighbor service. */
++public final class OverlayNode implements AutoCloseable {
++    private final NodeConfiguration configuration;
++    private final UUID instance;
++    private final NeighborManager.Observer observer;
++    private final AtomicReference<Throwable> failure = new AtomicReference<>();
++    private final CompletableFuture<Void> started = new CompletableFuture<>();
++    private NeighborManager.SerialOwner owner;
++    private volatile NeighborManager manager;
++    private CompletionStage<NeighborManager.ShutdownReport> shutdown;
++    private boolean closed, launched;
++    private long stopStarted, stopBudget;
++
++    public OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer) {
++        this.configuration = Objects.requireNonNull(configuration);
++        instance = Objects.requireNonNull(instanceId); this.observer = Objects.requireNonNull(observer);
++        // Reuse the existing offline validation before creating even the serial thread.
++        new NeighborManager(configuration, instance, observer);
++    }
++    public synchronized CompletionStage<Void> start() {
++        if (closed || launched) return started.minimalCompletionStage();
++        launched = true;
++        try {
++            owner = NeighborManager.createSerialOwner(configuration.runtime().overlay().eventsCapacity());
++            manager = new NeighborManager(configuration, instance, owner, event -> {
++                if (event instanceof NeighborManager.Diagnostic d && (d.phase() == NeighborManager.Phase.FAILED
++                        || d.phase() == NeighborManager.Phase.CLOSED && (d.reason() == NeighborManager.Reason.RESOURCE_LIMIT
++                        || d.reason() == NeighborManager.Reason.CONSUMER_FAILURE)))
++                    failure.compareAndSet(null, new IllegalStateException("Neighbor service: " + d.reason()));
++                observer.onEvent(event);
++            });
++            manager.start().whenComplete((v, error) -> {
++                if (error != null) {
++                    synchronized (this) { if (!closed) failure.compareAndSet(null, error); }
++                    started.completeExceptionally(error);
++                } else started.complete(null);
++            });
++        } catch (RuntimeException e) {
++            failure.compareAndSet(null, e); started.completeExceptionally(e);
++            if (manager != null) manager.requestClose();
++            if (owner != null) owner.requestClose();
++        }
++        return started.minimalCompletionStage();
++    }
++    public Map<String, Neighbor.Session> snapshot() { var m = manager; return m == null ? Map.of() : m.snapshot(); }
++    public Map<String, Neighbor> diagnostics() { var m = manager; return m == null ? Map.of() : m.diagnostics(); }
++    public Optional<Throwable> failure() { return Optional.ofNullable(failure.get()); }
++    public synchronized CompletionStage<NeighborManager.ShutdownReport> requestShutdown(int reason, Duration remainingBudget) {
++        long nanos = budget(remainingBudget);
++        if (reason < 0 || reason > 1) throw new IllegalArgumentException("Leave reason 0/1 required");
++        if (shutdown != null) return shutdown;
++        closed = true; stopStarted = System.nanoTime();
++        stopBudget = Math.min(nanos, configuration.runtime().control().shutdownTimeout().toNanos());
++        started.completeExceptionally(new IllegalStateException("Node shutting down"));
++        if (manager == null) shutdown = CompletableFuture.completedStage(new NeighborManager.ShutdownReport(java.util.List.of(), false));
++        else shutdown = manager.requestShutdown(reason, Duration.ofNanos(stopBudget));
++        return shutdown;
++    }
++    public boolean awaitTermination(Duration remainingBudget) {
++        long nanos = budget(remainingBudget), began = System.nanoTime();
++        final CompletionStage<NeighborManager.ShutdownReport> stopping;
++        final NeighborManager.SerialOwner serial;
++        synchronized (this) {
++            if (!closed) return false; stopping = shutdown; serial = owner;
++            nanos = Math.min(nanos, left(stopBudget, stopStarted));
++        }
++        if (serial != null && serial.isOwnerThread()) return false;
++        boolean done = true;
++        try { if (stopping != null) stopping.toCompletableFuture().get(left(nanos, began), TimeUnit.NANOSECONDS); }
++        catch (InterruptedException e) { Thread.currentThread().interrupt(); done = false; }
++        catch (ExecutionException | TimeoutException e) { done = false; }
++        var m = manager;
++        if (!done && m != null) m.requestClose();
++        if (m != null) done &= m.awaitTermination(Duration.ofNanos(left(nanos, began)));
++        if (serial != null) {
++            serial.requestClose(); done &= serial.awaitTermination(Duration.ofNanos(left(nanos, began)));
++        }
++        return done;
++    }
++    @Override public void close() {
++        final long nanos;
++        synchronized (this) {
++            if (!closed) {
++                closed = true; stopStarted = System.nanoTime(); stopBudget = configuration.runtime().control().shutdownTimeout().toNanos();
++                started.completeExceptionally(new IllegalStateException("Node closed"));
++            }
++            if (manager != null) manager.requestClose();
++            if (owner != null && owner.isOwnerThread()) { owner.requestClose(); return; }
++            nanos = left(stopBudget, stopStarted);
++        }
++        if (!awaitTermination(Duration.ofNanos(nanos))) throw new IllegalStateException("Node shutdown deadline");
++    }
++    private static long budget(Duration duration) {
++        Objects.requireNonNull(duration);
++        if (duration.isNegative()) throw new IllegalArgumentException("Negative budget");
++        try { return duration.toNanos(); } catch (ArithmeticException e) { throw new IllegalArgumentException("Budget overflow", e); }
++    }
++    private static long left(long nanos, long began) { return Math.max(0, nanos - (System.nanoTime() - began)); }
++}
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+new file mode 100644
+index 0000000..17aa033
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+@@ -0,0 +1,513 @@
++package pt.uminho.esr.ott.app;
++
++import org.junit.jupiter.api.*;
++import org.junit.jupiter.api.io.TempDir;
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.overlay.*;
++import java.io.*;
++import java.nio.charset.StandardCharsets;
++import java.nio.file.*;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.TimeUnit;
++import java.util.concurrent.atomic.*;
++import java.util.stream.Stream;
++import static org.junit.jupiter.api.Assertions.*;
++
++/** Initial CLI/composition oracles; full V-008 remains to be built and executed. */
++@Timeout(15)
++class OttApplicationTest {
++    @TempDir Path temporary;
++    static final class FakeService implements OttApplication.RunningService {
++        final List<Duration> budgets = new ArrayList<>();
++        int stops, closes, snapshots; boolean terminated = true; int reason = -1;
++        public Map<String, Neighbor> neighbors() { snapshots++; return Map.of(); }
++        public void requestShutdown(int reason, Duration budget) { stops++; this.reason = reason; budgets.add(budget); }
++        public boolean awaitTermination(Duration budget) { budgets.add(budget); return terminated; }
++        public void close() { closes++; }
++    }
++    static final class Harness {
++        final AtomicLong clock = new AtomicLong(1000);
++        final AtomicInteger opens = new AtomicInteger();
++        final List<NodeConfiguration> configs = new ArrayList<>();
++        final FakeService service = new FakeService();
++        final ByteArrayOutputStream output = new ByteArrayOutputStream(), error = new ByteArrayOutputStream();
++        boolean failOpen;
++        int run(String input, String... arguments) {
++            return assertDoesNotThrow(() -> OttApplication.run(arguments,
++                new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)),
++                new PrintStream(output, true, StandardCharsets.UTF_8), new PrintStream(error, true, StandardCharsets.UTF_8),
++                config -> { opens.incrementAndGet(); configs.add(config); if (failOpen) throw new IOException("controlled resource failure"); return service; }, clock::get));
++        }
++        String text() { return output.toString(StandardCharsets.UTF_8) + error.toString(StandardCharsets.UTF_8); }
++    }
++    @Test void m01HelpHasNoServiceOrConfigLoad() {
++        var h = new Harness(); assertEquals(0, h.run("", "--help"));
++        assertEquals(0, h.opens.get()); assertTrue(h.text().contains("--role"));
++    }
++    @TestFactory Stream<DynamicTest> m01GrammarRejectsAmbiguousOrIncompleteArguments() {
++        List<String[]> invalid = List.of(new String[0], new String[]{"--help", "--role", "RELAY"},
++            new String[]{"--role", "relay", "--config", "x"}, new String[]{"--role=RELAY", "--config", "x"},
++            new String[]{"--role", "RELAY", "--role", "CLIENT", "--config", "x"},
++            new String[]{"--role", "RELAY", "--config", "x", "--config", "y"},
++            new String[]{"--role", "RELAY", "--config"}, new String[]{"--role", "RELAY"},
++            new String[]{"--config", "x"}, new String[]{"--unknown"},
++            new String[]{"--role", "UNKNOWN", "--config", "x"}, new String[]{"RELAY", "x"});
++        return invalid.stream().map(args -> DynamicTest.dynamicTest(Arrays.toString(args), () -> {
++            assertThrows(IllegalArgumentException.class, () -> OttApplication.parse(args));
++            var h = new Harness(); assertEquals(2, h.run("", args)); assertEquals(0, h.opens.get());
++        }));
++    }
++    @TestFactory Stream<DynamicTest> m02GrammarAcceptsAllRolesInEitherOrder() {
++        return Arrays.stream(NodeRole.values()).map(role -> DynamicTest.dynamicTest(role.name(), () -> {
++            var invocation = assertDoesNotThrow(() -> OttApplication.parse(new String[]{"--role", role.name(), "--config", "node.properties"}));
++            var reversed = assertDoesNotThrow(() -> OttApplication.parse(new String[]{"--config", "node.properties", "--role", role.name()}));
++            assertEquals(invocation, reversed); assertFalse(invocation.help());
++            assertEquals(Optional.of(role), invocation.role()); assertEquals(Optional.of(Path.of("node.properties")), invocation.config());
++        }));
++    }
++    @Test void m01MissingConfigurationCannotOpenAService() {
++        var h = new Harness(); assertEquals(2, h.run("quit\n", "--role", "RELAY", "--config", temporary.resolve("missing.properties").toString()));
++        assertEquals(0, h.opens.get()); assertFalse(h.text().isBlank());
++    }
++    @Test void m01InvalidConfigurationCannotOpenAService() throws IOException {
++        Path file = temporary.resolve("bad.properties"); Files.writeString(file, "node.id=bad\ncontrol.port=999999\n");
++        var h = new Harness(); assertEquals(2, h.run("", "--role", "RELAY", "--config", file.toString())); assertEquals(0, h.opens.get());
++    }
++    @Test void m04NeighborsAndQuitUseValidatedProfileAndCloseOnce() {
++        var h = new Harness(); assertEquals(0, h.run("neighbors\nquit\n", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.opens.get()); assertEquals(NodeRole.RELAY, h.configs.getFirst().role());
++        assertEquals(1, h.service.snapshots); assertEquals(1, h.service.stops); assertEquals(0, h.service.reason);
++        assertTrue(h.service.budgets.stream().allMatch(d -> !d.isNegative() && d.compareTo(h.configs.getFirst().runtime().control().shutdownTimeout()) <= 0));
++    }
++    @Test void m10EofStopsNormallyWithoutAQuitLine() {
++        var h = new Harness(); assertEquals(0, h.run("", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.service.stops); assertEquals(0, h.service.reason);
++    }
++    @Test void m09ResourceFailureReturnsThreeInsteadOfHanging() {
++        var h = new Harness(); h.failOpen = true;
++        assertEquals(3, h.run("", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.opens.get()); assertTrue(h.text().contains("controlled resource failure"));
++    }
++    @Test void m12FailedPhysicalTerminationReturnsThree() {
++        var h = new Harness(); h.service.terminated = false;
++        assertEquals(3, h.run("quit\n", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.service.stops);
++    }
++    @Test void m16FutureCommandsExplainUnavailabilityAndKeepCliUsable() {
++        var h = new Harness(); assertEquals(0, h.run("catalog\nplay example\nneighbors\nquit\n", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.service.snapshots); assertEquals(1, h.service.stops);
++        assertFalse(h.text().isBlank());
++    }
++    @Test void m14OverlongLineIsReportedAndDoesNotBecomeACommand() {
++        var h = new Harness(); assertEquals(0, h.run("x".repeat(4097) + "\nneighbors\nquit\n", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
++        assertEquals(1, h.service.snapshots); assertFalse(h.error.toString(StandardCharsets.UTF_8).isBlank());
++    }
++    @Test void m15NodeCannotReviveAfterCloseBeforeStart() {
++        // Configuration is loaded only by the existing validated loader; no service starts here.
++        var config = assertDoesNotThrow(() -> pt.uminho.esr.ott.config.ConfigurationLoader.load(
++                Path.of("src/main/resources/config/relay.properties"), NodeRole.RELAY));
++        var node = new OverlayNode(config, UUID.randomUUID(), event -> {});
++        assertDoesNotThrow(node::close);
++        var started = assertDoesNotThrow(node::start);
++        assertTrue(started.toCompletableFuture().isCompletedExceptionally());
++        assertTrue(assertDoesNotThrow(() -> node.awaitTermination(Duration.ofSeconds(1))));
++    }
++    record ChildResult(int exit, String output) { }
++    ChildResult child(String input, String... arguments) throws Exception {
++        var command = new ArrayList<String>();
++        command.add(Path.of(System.getProperty("java.home"), "bin", "java").toString()); command.add("-cp");
++        command.add(System.getProperty("surefire.test.class.path", System.getProperty("java.class.path")));
++        command.add(OttApplication.class.getName()); command.addAll(List.of(arguments));
++        Path log = temporary.resolve(UUID.randomUUID() + ".log");
++        Process process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
++        try {
++            try (var stream = process.getOutputStream()) { stream.write(input.getBytes(StandardCharsets.UTF_8)); }
++            assertTrue(process.waitFor(5, TimeUnit.SECONDS), "CLI JVM must terminate within the test deadline");
++            return new ChildResult(process.exitValue(), Files.readString(log));
++        } finally {
++            if (process.isAlive()) { process.destroyForcibly(); assertTrue(process.waitFor(5, TimeUnit.SECONDS), "child cleanup"); }
++        }
++    }
++    @Test void v008RealJvmHelpReturnsZero() throws Exception {
++        var child = child("", "--help"); assertEquals(0, child.exit(), child.output()); assertTrue(child.output().contains("--config"));
++    }
++    @Test void v008RealJvmInvalidConfigurationReturnsTwo() throws Exception {
++        var child = child("", "--role", "RELAY", "--config", temporary.resolve("absent.properties").toString());
++        assertEquals(2, child.exit(), child.output());
++    }
++    static final class LiveChild implements AutoCloseable {
++        final Process process; final Path log; final BufferedWriter input;
++        LiveChild(Path profile, NodeRole role, Path log, boolean pipeOutput) throws IOException {
++            this.log = log;
++            var command = List.of(Path.of(System.getProperty("java.home"), "bin", "java").toString(), "-cp",
++                System.getProperty("surefire.test.class.path", System.getProperty("java.class.path")),
++                OttApplication.class.getName(), "--role", role.name(), "--config", profile.toString());
++            var builder = new ProcessBuilder(command).redirectErrorStream(true);
++            if (!pipeOutput) builder.redirectOutput(log.toFile());
++            process = builder.start(); input = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8));
++        }
++        void send(String line) throws IOException { input.write(line); input.newLine(); input.flush(); }
++        String text() { try { return Files.exists(log) ? Files.readString(log) : ""; } catch (IOException e) { throw new UncheckedIOException(e); } }
++        void await(java.util.function.Predicate<String> predicate) throws Exception {
++            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(6);
++            while (!predicate.test(text())) {
++                assertTrue(process.isAlive(), "child stopped unexpectedly: " + text());
++                assertTrue(System.nanoTime() < deadline, "child log condition deadline: " + text());
++                Thread.sleep(5);
++            }
++        }
++        int exit() throws Exception {
++            assertTrue(process.waitFor(5, TimeUnit.SECONDS), "process deadline: " + text());
++            int result = process.exitValue();
++            Files.writeString(log.resolveSibling(log.getFileName() + ".exit"), Integer.toString(result));
++            return result;
++        }
++        public void close() throws Exception {
++            if (process.isAlive()) process.destroy();
++            if (!process.waitFor(4, TimeUnit.SECONDS)) process.destroyForcibly();
++            assertTrue(process.waitFor(2, TimeUnit.SECONDS), "all child JVMs reaped");
++            try { input.close(); } catch (IOException expected) { /* A dead child may already have closed its stdin pipe. */ }
++        }
++    }
++    static final class LiveDeployment implements AutoCloseable {
++        final Path directory; final int[] ports = new int[7];
++        final List<LiveChild> children = new ArrayList<>();
++        final List<Path> profiles = new ArrayList<>();
++        LiveDeployment() throws Exception {
++            directory = Path.of(System.getProperty("ott.evidence.directory", "target/imp005-evidence"))
++                .toAbsolutePath().resolve("cli-" + UUID.randomUUID()); Files.createDirectories(directory);
++            var reservations = new ArrayList<java.net.ServerSocket>();
++            try {
++                for (int n = 0; n < ports.length; n++) {
++                    var socket = new java.net.ServerSocket(0, 1, java.net.InetAddress.getLoopbackAddress());
++                    reservations.add(socket); ports[n] = socket.getLocalPort();
++                }
++                StringBuilder graph = new StringBuilder("node.ids=N0,N1,N2\n");
++                for (int n = 0; n < 3; n++) graph.append("node.N" + n + ".host=127.0.0.1\nnode.N" + n + ".controlPort=" + ports[n + 1]
++                    + "\nnode.N" + n + ".dataPort=" + ports[n + 4] + "\nnode.N" + n + ".role=" + role(n)
++                    + "\nnode.N" + n + ".neighbors=" + (n == 0 ? "N1,N2" : n == 1 ? "N0,N2" : "N0,N1") + "\n");
++                Files.writeString(directory.resolve("topology.properties"), graph.toString());
++                Path boot = directory.resolve("bootstrap.properties");
++                Files.writeString(boot, "node.id=BOOT\nnode.role=BOOTSTRAP\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="
++                    + ports[0] + "\ntopology.file=topology.properties\ncontrol.shutdown.timeout.ms=1500\n"); profiles.add(boot);
++                for (int n = 0; n < 3; n++) {
++                    Path file = directory.resolve("N" + n + ".properties");
++                    String media = n == 0 ? "streams.file=" + Path.of("src/main/resources/config/streams-s1.properties").toAbsolutePath()
++                        + "\nmedia.base=" + directory + "\n" : "";
++                    Files.writeString(file, "node.id=N" + n + "\nnode.role=" + role(n) + "\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="
++                        + ports[n + 1] + "\ndata.port=" + ports[n + 4] + "\nbootstrap.host=127.0.0.1\nbootstrap.port=" + ports[0]
++                        + "\ncontrol.connect.timeout.ms=300\nbootstrap.query.timeout.ms=500\noverlay.retry.initial.ms=20\noverlay.retry.max.ms=100\noverlay.retry.jitter.percent=0\ncontrol.shutdown.timeout.ms=1500\n" + media);
++                    profiles.add(file);
++                }
++            } finally { for (var socket : reservations) socket.close(); }
++        }
++        static NodeRole role(int n) { return n == 0 ? NodeRole.SERVER : n == 1 ? NodeRole.RELAY : NodeRole.CLIENT; }
++        LiveChild start(int index) throws Exception {
++            var child = new LiveChild(profiles.get(index), index == 0 ? NodeRole.BOOTSTRAP : role(index - 1),
++                directory.resolve("process-" + index + "-" + children.size() + ".log"), false);
++            children.add(child); return child;
++        }
++        public void close() throws Exception {
++            Exception failure = null;
++            for (var child : children) try { child.close(); } catch (Exception e) { failure = e; }
++            if (failure != null) throw failure;
++        }
++    }
++    @Test @Timeout(40) void v008FourRolesConvergeAndPeerLeaveDoesNotRestartSurvivors() throws Exception {
++        try (var d = new LiveDeployment()) {
++            var bootstrap = d.start(0); bootstrap.await(t -> t.contains("READY"));
++            var a = d.start(1); var b = d.start(2); var c = d.start(3);
++            for (var child : List.of(a,b,c)) child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
++            for (var child : List.of(a,b,c)) { child.send("neighbors"); child.await(t -> t.lines().filter(l -> l.contains("state=ACTIVE")).count() >= 2); }
++            bootstrap.send("quit"); assertEquals(0, bootstrap.exit());
++            long aPid = a.process.pid(), bPid = b.process.pid();
++            c.send("quit"); assertEquals(0, c.exit());
++            a.await(t -> t.contains("reason=LEAVE")); b.await(t -> t.contains("reason=LEAVE"));
++            a.send("neighbors"); b.send("neighbors");
++            assertTrue(a.process.isAlive()); assertTrue(b.process.isAlive()); assertEquals(aPid, a.process.pid()); assertEquals(bPid, b.process.pid());
++            var bootAgain = d.start(0); bootAgain.await(t -> t.contains("READY"));
++            var restart = d.start(3); restart.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
++            a.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 3);
++            restart.send("quit"); assertEquals(0, restart.exit());
++            a.send("quit"); b.send("quit"); assertEquals(0, a.exit()); assertEquals(0, b.exit());
++            bootAgain.send("quit"); assertEquals(0, bootAgain.exit());
++            for (int port : d.ports) try (var socket = new java.net.ServerSocket(port, 1, java.net.InetAddress.getLoopbackAddress())) { assertTrue(socket.isBound()); }
++        }
++    }
++    @Test @Timeout(20) void m04NeighborsWorksDuringDiscoveryAndQuitClosesBlockedStdin() throws Exception {
++        try (var d = new LiveDeployment()) {
++            var child = d.start(2); child.await(t -> t.contains("STARTED"));
++            child.send("neighbors"); child.await(t -> t.contains("NEIGHBORS"));
++            child.send("quit"); // Deliberately keep the input pipe open while the reader waits for another line.
++            assertEquals(0, child.exit());
++        }
++    }
++    @Test @Timeout(20) void m10RealSigtermWhileStdinIsBlockedTerminatesWithinBudget() throws Exception {
++        try (var d = new LiveDeployment()) {
++            var child = d.start(2); child.await(t -> t.contains("STARTED"));
++            child.process.destroy(); child.exit(); // Record actual OS status; a signal is not promised to return zero.
++            assertFalse(child.process.isAlive());
++        }
++    }
++    @Test @Timeout(20) void m09RealBindFailureRollsBackAndReturnsThree() throws Exception {
++        try (var d = new LiveDeployment(); var occupied = new java.net.ServerSocket(d.ports[2], 1, java.net.InetAddress.getLoopbackAddress())) {
++            var child = d.start(2); assertEquals(3, child.exit());
++            assertFalse(child.text().contains("READY node=N1"));
++        }
++    }
++    @Test @Timeout(20) void m13ClosedStdoutTerminatesInsteadOfBlockingOwner() throws Exception {
++        try (var d = new LiveDeployment(); var child = new LiveChild(d.profiles.get(2), NodeRole.RELAY, d.directory.resolve("closed-pipe.log"), true)) {
++            child.process.getInputStream().close(); assertEquals(3, child.exit());
++        }
++    }
++
++    @Test void m13InputFailureStopsAndCleansService() {
++        var h = new Harness(); var input = new InputStream() { public int read() throws IOException { throw new IOException("controlled input failure"); } };
++        int result = OttApplication.run(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"}, input,
++            new PrintStream(h.output), new PrintStream(h.error), c -> h.service, h.clock::get);
++        assertEquals(3, result); assertEquals(1, h.service.stops); assertEquals(1, h.service.reason);
++    }
++    @Test void m14FatalLogIsBoundedAndTruncationIsVisible() {
++        var h = new Harness();
++        int result = OttApplication.run(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"}, new ByteArrayInputStream(new byte[0]),
++            new PrintStream(h.output), new PrintStream(h.error), c -> { throw new IOException("x".repeat(10000)); }, h.clock::get);
++        assertEquals(3, result); assertTrue(h.text().contains("[truncated]"));
++        assertTrue(h.text().lines().allMatch(line -> line.length() <= 4096));
++    }
++    @Test @Timeout(20) void m13BlockedStdoutIsClosedAndWriterTerminates() throws Exception {
++        try (var d = new LiveDeployment(); var child = new LiveChild(d.profiles.get(2), NodeRole.RELAY, d.directory.resolve("blocked-pipe.log"), true)) {
++            var feeder = Thread.ofVirtual().start(() -> {
++                try { for (int n = 0; n < 20000; n++) child.send("neighbors"); }
++                catch (IOException expected) { /* Child exits after queue/backpressure failure. */ }
++            });
++            try { assertEquals(3, child.exit()); }
++            finally {
++                if (child.process.isAlive()) child.process.destroyForcibly();
++                feeder.join(Duration.ofSeconds(3)); assertFalse(feeder.isAlive(), "stdin feeder physically terminated");
++            }
++        }
++    }
++    @Test @Timeout(30) void m07AbruptPeerDeathLeavesSurvivorsRunningAndRestartReconnects() throws Exception {
++        try (var d = new LiveDeployment()) {
++            var bootstrap = d.start(0); bootstrap.await(t -> t.contains("READY"));
++            var a = d.start(1); var b = d.start(2); var peer = d.start(3);
++            for (var child : List.of(a,b,peer)) child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
++            peer.process.destroyForcibly(); peer.exit();
++            a.await(t -> t.contains("NeighborDown[") && t.contains("reason=TRANSPORT"));
++            assertTrue(a.process.isAlive()); assertTrue(b.process.isAlive());
++            var restarted = d.start(3); restarted.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
++            a.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 3);
++            for (var child : List.of(a,b,restarted,bootstrap)) child.send("quit");
++            for (var child : List.of(a,b,restarted,bootstrap)) assertEquals(0, child.exit());
++        }
++    }
++    @Test @Timeout(15) void m01InvalidProfileInRealJvmDoesNotBindItsConfiguredPort() throws Exception {
++        try (var d = new LiveDeployment()) {
++            Files.writeString(d.profiles.get(2), "\nunknown.option=1\n", StandardOpenOption.APPEND);
++            var child = d.start(2); assertEquals(2, child.exit());
++            try (var free = new java.net.ServerSocket(d.ports[2], 1, java.net.InetAddress.getLoopbackAddress())) { assertTrue(free.isBound()); }
++        }
++    }
++
++    @Test @Timeout(20) void m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap() throws Exception {
++        try (var d = new LiveDeployment(); var peerServer = new java.net.ServerSocket(d.ports[3], 8, java.net.InetAddress.getLoopbackAddress())) {
++            peerServer.setSoTimeout(4000);
++            var boot = d.start(0); boot.await(t -> t.contains("READY")); var child = d.start(2);
++            UUID remote = UUID.randomUUID();
++            try (var socket = peerServer.accept()) {
++                socket.setSoTimeout(2500);
++                var hello = pt.uminho.esr.ott.protocol.MessageCodec.read(socket.getInputStream()).orElseThrow();
++                assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO, hello.type());
++                pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
++                    pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", remote,
++                    pt.uminho.esr.ott.protocol.ControlMessage.Empty.INSTANCE), socket.getOutputStream()); socket.getOutputStream().flush();
++                child.await(t -> t.contains("NeighborUp[")); boot.send("quit"); assertEquals(0, boot.exit());
++                pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
++                    pt.uminho.esr.ott.protocol.MessageType.ERROR, UUID.randomUUID(), "N2", remote,
++                    new pt.uminho.esr.ott.protocol.ControlMessage.ErrorPayload(pt.uminho.esr.ott.protocol.ErrorCode.TIMEOUT, 7, "controlled-active-error")), socket.getOutputStream()); socket.getOutputStream().flush();
++                child.await(t -> t.contains("controlled-active-error") && t.contains("Received["));
++                assertTrue(child.process.isAlive());
++            }
++            try (var second = peerServer.accept()) {
++                second.setSoTimeout(2500);
++                var hello = pt.uminho.esr.ott.protocol.MessageCodec.read(second.getInputStream()).orElseThrow();
++                UUID newRemote = UUID.randomUUID();
++                pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
++                    pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", newRemote,
++                    pt.uminho.esr.ott.protocol.ControlMessage.Empty.INSTANCE), second.getOutputStream()); second.getOutputStream().flush();
++                child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
++                assertTrue(child.text().contains(newRemote.toString())); child.send("quit");
++                var leave = pt.uminho.esr.ott.protocol.MessageCodec.read(second.getInputStream()).orElseThrow();
++                assertEquals(pt.uminho.esr.ott.protocol.MessageType.NODE_LEAVE, leave.type());
++                assertEquals(new pt.uminho.esr.ott.protocol.ControlMessage.Leave(0), leave.payload());
++                assertEquals(0, child.exit());
++            }
++        }
++    }
++    @Test void m10InterruptCleansBeforeRestoringInterruptStatus() throws Exception {
++        var reading = new java.util.concurrent.CountDownLatch(1);
++        var input = new InputStream() {
++            public int read() throws IOException {
++                reading.countDown();
++                try { new java.util.concurrent.CountDownLatch(1).await(); return -1; }
++                catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IOException(e); }
++            }
++        };
++        var h = new Harness(); var outcome = new AtomicInteger(-1); var restored = new AtomicBoolean();
++        var coordinator = Thread.ofVirtual().start(() -> {
++            outcome.set(OttApplication.run(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"}, input,
++                new PrintStream(h.output), new PrintStream(h.error), c -> h.service, System::nanoTime));
++            restored.set(Thread.currentThread().isInterrupted());
++        });
++        try {
++            assertTrue(reading.await(2, TimeUnit.SECONDS)); coordinator.interrupt(); coordinator.join(Duration.ofSeconds(3));
++            assertFalse(coordinator.isAlive()); assertEquals(3, outcome.get()); assertTrue(restored.get());
++            assertEquals(1, h.service.stops); assertEquals(1, h.service.reason);
++        } finally { coordinator.interrupt(); coordinator.join(Duration.ofSeconds(3)); }
++    }
++    @Test @Timeout(15) void m03NodeUsesOneSerialObserverAndPhysicallyTerminatesBorrowedOwner() throws Exception {
++        try (var d = new LiveDeployment(); var boot = new pt.uminho.esr.ott.bootstrap.BootstrapServer(
++                pt.uminho.esr.ott.config.ConfigurationLoader.load(d.profiles.getFirst(), NodeRole.BOOTSTRAP))) {
++            var threads = java.util.concurrent.ConcurrentHashMap.<Thread>newKeySet();
++            var observed = new java.util.concurrent.CountDownLatch(1);
++            var config = pt.uminho.esr.ott.config.ConfigurationLoader.load(d.profiles.get(2), NodeRole.RELAY);
++            try (var node = new OverlayNode(config, UUID.randomUUID(), event -> { threads.add(Thread.currentThread()); observed.countDown(); })) {
++                node.start().toCompletableFuture().get(3, TimeUnit.SECONDS);
++                assertEquals(2, node.diagnostics().size());
++                assertTrue(observed.await(3, TimeUnit.SECONDS), "observe a real serial event before testing its owner");
++                node.requestShutdown(0, Duration.ofMillis(1500)).toCompletableFuture().get(1, TimeUnit.SECONDS);
++                assertTrue(node.awaitTermination(Duration.ofMillis(1500)));
++                assertEquals(1, threads.size()); assertTrue(threads.stream().noneMatch(Thread::isAlive));
++                assertTrue(node.snapshot().isEmpty());
++            }
++        }
++    }
++
++    public static final class IoTerminationProbe {
++        public static void main(String[] args) throws Exception {
++            var in = new FileInputStream(FileDescriptor.in).getChannel();
++            var out = new FileOutputStream(FileDescriptor.out).getChannel();
++            var result = OttApplication.execute(new String[]{"--role", "RELAY", "--config", args[0]},
++                java.nio.channels.Channels.newInputStream(in),
++                new PrintStream(java.nio.channels.Channels.newOutputStream(out), true, StandardCharsets.UTF_8), System.err,
++                c -> new FakeService(), System::nanoTime,
++                () -> { try { in.close(); } catch (IOException e) { throw new UncheckedIOException(e); } },
++                () -> { try { out.close(); } catch (IOException e) { throw new UncheckedIOException(e); } });
++            Files.writeString(Path.of(args[1]), result.toString());
++            System.exit(result.exitCode());
++        }
++    }
++    @Test @Timeout(20) void m13PhysicalIoJoinsAreProvedBeforeJvmExitWithBlockedOutput() throws Exception {
++        try (var d = new LiveDeployment()) {
++            Path result = d.directory.resolve("physical-joins.txt");
++            var process = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin", "java").toString(), "-cp",
++                System.getProperty("surefire.test.class.path", System.getProperty("java.class.path")),
++                IoTerminationProbe.class.getName(), d.profiles.get(2).toString(), result.toString())
++                .redirectError(d.directory.resolve("physical-joins.err").toFile()).start();
++            var feeder = Thread.ofVirtual().start(() -> {
++                try (var input = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
++                    for (int n = 0; n < 20000; n++) { input.write("neighbors\n"); input.flush(); }
++                } catch (IOException expected) { /* Child stopped after bounded queue saturation. */ }
++            });
++            try {
++                assertTrue(process.waitFor(6, TimeUnit.SECONDS)); assertEquals(3, process.exitValue());
++                String actual = Files.readString(result);
++                assertTrue(actual.contains("inputTerminated=true"), actual);
++                assertTrue(actual.contains("outputTerminated=true"), actual);
++                assertTrue(actual.contains("serviceTerminated=true"), actual);
++            } finally {
++                if (process.isAlive()) process.destroyForcibly();
++                assertTrue(process.waitFor(3, TimeUnit.SECONDS)); feeder.join(Duration.ofSeconds(3)); assertFalse(feeder.isAlive());
++            }
++        }
++    }
++
++    @Test void m12ServiceWaitReceivesOnlyTheRemainingGlobalBudget() {
++        var clock = new AtomicLong(1000); var budgets = new ArrayList<Duration>();
++        var service = new OttApplication.RunningService() {
++            public Map<String, Neighbor> neighbors() { return Map.of(); }
++            public void requestShutdown(int reason, Duration budget) { budgets.add(budget); clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); }
++            public boolean awaitTermination(Duration budget) { budgets.add(budget); clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(500)); return true; }
++            public void close() { fail("No second complete timeout or duplicate close"); }
++        };
++        var output = new ByteArrayOutputStream();
++        var result = OttApplication.execute(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"},
++            new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)), new PrintStream(output), new PrintStream(output),
++            c -> service, clock::get, () -> {}, () -> {});
++        assertEquals(0, result.exitCode()); assertTrue(result.inputTerminated()); assertTrue(result.outputTerminated()); assertTrue(result.serviceTerminated());
++        assertEquals(List.of(Duration.ofMillis(3000), Duration.ofMillis(2000)), budgets);
++    }
++
++    @Test @Timeout(15) void m15ClosingFromSerialCallbackNeverWaitsForItsOwnOwner() throws Exception {
++        try (var d = new LiveDeployment(); var boot = new pt.uminho.esr.ott.bootstrap.BootstrapServer(
++                pt.uminho.esr.ott.config.ConfigurationLoader.load(d.profiles.getFirst(), NodeRole.BOOTSTRAP))) {
++            var reference = new AtomicReference<OverlayNode>(); var once = new AtomicBoolean();
++            var returned = new java.util.concurrent.CountDownLatch(1); var callbackFailure = new AtomicReference<Throwable>();
++            var config = pt.uminho.esr.ott.config.ConfigurationLoader.load(d.profiles.get(2), NodeRole.RELAY);
++            try (var node = new OverlayNode(config, UUID.randomUUID(), event -> {
++                if (once.compareAndSet(false, true)) {
++                    try { reference.get().close(); } catch (Throwable e) { callbackFailure.set(e); }
++                    finally { returned.countDown(); }
++                }
++            })) {
++                reference.set(node); node.start();
++                assertTrue(returned.await(3, TimeUnit.SECONDS)); assertNull(callbackFailure.get());
++                assertTrue(node.awaitTermination(Duration.ofMillis(1500))); assertTrue(node.snapshot().isEmpty());
++                node.start();
++                try (var free = new java.net.ServerSocket(config.controlPort(), 1, java.net.InetAddress.getLoopbackAddress())) { assertTrue(free.isBound()); }
++            }
++        }
++    }
++
++    @Test void m13CleanupWriterFailureCannotPublishPrematureFinalExit() throws Exception {
++        cleanupWriter(false);
++    }
++    @Test void m13CleanupWriterBlockClosesWithinRemainingGlobalBudget() throws Exception {
++        cleanupWriter(true);
++    }
++    private void cleanupWriter(boolean blocked) throws Exception {
++        var clock = new AtomicLong(1000);
++        var closed = new AtomicBoolean(); var afterClose = new AtomicInteger(); var closes = new AtomicInteger();
++        var release = new java.util.concurrent.CountDownLatch(1);
++        var progress = new java.util.concurrent.CopyOnWriteArrayList<String>();
++        var serviceBudgets = new ArrayList<Duration>();
++        var service = new OttApplication.RunningService() {
++            public Map<String, Neighbor> neighbors() { return Map.of(); }
++            public void requestShutdown(int reason, Duration budget) { assertEquals(0, reason); serviceBudgets.add(budget); }
++            public boolean awaitTermination(Duration budget) {
++                serviceBudgets.add(budget); clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); return true;
++            }
++            public void close() { fail("service already physically terminated"); }
++        };
++        var output = new PrintStream(new ByteArrayOutputStream()) {
++            @Override public void println(String line) {
++                if (closed.get()) afterClose.incrementAndGet();
++                progress.add(line);
++                if (line.startsWith("STARTED")) return;
++                // This is the cleanup record, after a successful service shutdown.
++                if (!blocked) { setError(); return; }
++                boolean done = false;
++                while (!done) try { release.await(); done = true; }
++                catch (InterruptedException expected) { /* A blocked writer needs its owned output closed. */ }
++            }
++        };
++        try {
++            var result = OttApplication.execute(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"},
++                new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)), output, output, c -> service, clock::get,
++                () -> {}, () -> {
++                    closes.incrementAndGet(); closed.set(true);
++                    // Account for the half of the remaining 2000 ms spent draining the writer.
++                    clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); release.countDown();
++                });
++            assertEquals(3, result.exitCode()); assertTrue(result.serviceTerminated());
++            assertTrue(result.inputTerminated()); assertTrue(result.outputTerminated());
++            assertEquals(List.of(Duration.ofMillis(3000), Duration.ofMillis(3000)), serviceBudgets);
++            assertEquals(blocked ? 1 : 0, closes.get()); assertEquals(0, afterClose.get());
++            assertEquals(TimeUnit.MILLISECONDS.toNanos(blocked ? 2000 : 1000), clock.get() - 1000);
++            assertTrue(progress.stream().noneMatch(line -> line.contains("exit=") || line.startsWith("STOPPED")), progress.toString());
++            assertTrue(progress.stream().anyMatch(line -> line.contains("phase=closing-output")), progress.toString());
++        } finally { release.countDown(); }
++    }
++
++}
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java
+new file mode 100644
+index 0000000..cb89b96
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java
+@@ -0,0 +1,357 @@
++package pt.uminho.esr.ott.overlay;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.Connection;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import static org.junit.jupiter.api.Assertions.*;
++import static pt.uminho.esr.ott.overlay.NeighborManagerTest.*;
++
++/** Uses the existing deterministic ports without modifying the historical tests. */
++@Timeout(5)
++class NeighborManagerLifecycleTest {
++    private static final Duration BUDGET = Duration.ofSeconds(3);
++    private static NeighborManager.ShutdownReport result(CompletionStage<NeighborManager.ShutdownReport> stage) {
++        return assertDoesNotThrow(() -> stage.toCompletableFuture().get(1, TimeUnit.SECONDS));
++    }
++    private static CompletionStage<NeighborManager.ShutdownReport> shutdown(Fixture f, Duration budget) {
++        return assertDoesNotThrow(() -> f.manager.requestShutdown(0, budget), "lifecycle must accept a valid request");
++    }
++    private static FakeChannel active(Fixture f) {
++        f.ready("B"); var channel = f.outbound(true); f.ok(channel, UUID.randomUUID());
++        assertEquals(1, f.manager.snapshot().size()); return channel;
++    }
++    @Test void reportCopiesAttemptsAndRejectsNullElements() {
++        var attempts = new ArrayList<NeighborManager.LeaveAttempt>();
++        var report = new NeighborManager.ShutdownReport(attempts, false);
++        var remote = UUID.randomUUID();
++        attempts.add(new NeighborManager.LeaveAttempt(new Neighbor.Session("B", remote,
++                UUID.randomUUID(), endpoint("B", remote, 19002)), NeighborManager.LeaveOutcome.ABORTED));
++        assertTrue(report.attempts().isEmpty());
++        assertThrows(UnsupportedOperationException.class, () -> report.attempts().clear());
++        assertThrows(NullPointerException.class, () -> new NeighborManager.ShutdownReport(Arrays.asList((NeighborManager.LeaveAttempt)null), false));
++    }
++    @Test void attemptRejectsNullSessionAndOutcome() {
++        assertThrows(NullPointerException.class, () -> new NeighborManager.LeaveAttempt(null, NeighborManager.LeaveOutcome.ABORTED));
++        var remote = UUID.randomUUID();
++        var session = new Neighbor.Session("B", remote, UUID.randomUUID(), endpoint("B", remote, 19002));
++        assertThrows(NullPointerException.class, () -> new NeighborManager.LeaveAttempt(session, null));
++    }
++    @Test void l01InvalidReasonDoesNotCreateServices() {
++        try (var f = new Fixture("A")) {
++            assertThrows(IllegalArgumentException.class, () -> f.manager.requestShutdown(2, BUDGET));
++            assertEquals(0, f.factories);
++        }
++    }
++    @Test void l01InvalidDurationDoesNotCreateServices() {
++        try (var f = new Fixture("A")) {
++            assertThrows(IllegalArgumentException.class, () -> f.manager.requestShutdown(0, Duration.ofNanos(-1)));
++            assertThrows(NullPointerException.class, () -> f.manager.requestShutdown(0, null));
++            assertThrows(IllegalArgumentException.class, () -> f.manager.requestShutdown(0, Duration.ofSeconds(Long.MAX_VALUE)));
++            assertEquals(0, f.factories);
++        }
++    }
++    @Test void l01BeforeStartClosesWithoutFactoriesAndCannotRevive() {
++        try (var f = new Fixture("A")) {
++            var report = result(shutdown(f, BUDGET));
++            assertTrue(report.attempts().isEmpty()); assertEquals(0, f.factories);
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally());
++        }
++    }
++    @Test void l01ZeroBudgetSkipsLeaveAndCloses() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); int before = c.writes.size();
++            var stage = shutdown(f, Duration.ZERO); f.pump(); result(stage);
++            assertEquals(before, c.writes.size()); assertFalse(c.open);
++            assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l02OnlyConfirmedDirectSessionGetsV1Leave() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); var session = f.manager.snapshot().get("B");
++            var stage = shutdown(f, BUDGET); f.pump(); var report = result(stage);
++            var leave = c.last(); assertEquals(MessageType.NODE_LEAVE, leave.type());
++            assertEquals(1, leave.version()); assertEquals("A", leave.senderId()); assertEquals(f.instance, leave.senderInstance());
++            assertNotEquals(ZERO, leave.requestId()); assertEquals(new ControlMessage.Leave(0), leave.payload());
++            assertEquals(List.of(new NeighborManager.LeaveAttempt(session, NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED)), report.attempts());
++            assertFalse(report.notificationTimedOut()); assertFalse(c.open);
++        }
++    }
++    @Test void l02DiscoveryAndUnconfirmedHelloAreNotNotified() {
++        try (var f = new Fixture("A")) {
++            var bootstrap = f.discovery(); var stage = shutdown(f, BUDGET); f.pump();
++            assertTrue(result(stage).attempts().isEmpty());
++            assertEquals(List.of(MessageType.REGISTER), bootstrap.writes.stream().map(ControlMessage::type).toList());
++            assertFalse(bootstrap.open);
++        }
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false); var stage = shutdown(f, BUDGET); f.pump();
++            assertTrue(result(stage).attempts().isEmpty());
++            assertEquals(List.of(MessageType.HELLO), c.writes.stream().map(ControlMessage::type).toList());
++            assertFalse(c.open);
++        }
++    }
++    @Test void l03ApplicationSendStillRejectsLeaveWithoutClosingHealthySession() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); var session = f.manager.snapshot().get("B");
++            var leave = new ControlMessage(MessageType.NODE_LEAVE, UUID.randomUUID(), "A", f.instance, new ControlMessage.Leave(0));
++            var sent = f.manager.send(session, leave); f.pump();
++            assertEquals(Connection.SendResult.INVALID_MESSAGE, sent.toCompletableFuture().join());
++            assertTrue(c.open); assertEquals(1, c.writes.size());
++        }
++    }
++    @Test void l04CompletionWaitsForLocalFlush() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false;
++            var stage = shutdown(f, BUDGET); f.pump();
++            assertFalse(stage.toCompletableFuture().isDone()); assertTrue(c.open);
++            c.written(); f.pump();
++            assertEquals(NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED, result(stage).attempts().getFirst().outcome());
++            assertFalse(c.open);
++        }
++    }
++    @Test void l05FailedWriteStillClosesWithoutNewDial() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false; int dials = f.io.dials.size();
++            var stage = shutdown(f, BUDGET); f.pump();
++            c.confirmations.getLast().completeExceptionally(new java.io.IOException("controlled write failure")); f.pump();
++            assertEquals(NeighborManager.LeaveOutcome.WRITE_FAILED, result(stage).attempts().getFirst().outcome());
++            assertFalse(c.open); assertEquals(dials, f.io.dials.size());
++        }
++    }
++    @Test void l06HalfBudgetDeadlineWinsAndLateFlushCannotChangeReport() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false;
++            var stage = shutdown(f, BUDGET); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1499)); f.pump(); assertFalse(stage.toCompletableFuture().isDone());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1)); f.pump(); var report = result(stage);
++            assertTrue(report.notificationTimedOut()); assertEquals(NeighborManager.LeaveOutcome.TIMED_OUT, report.attempts().getFirst().outcome());
++            assertFalse(c.open); c.written(); f.pump(); assertEquals(report, result(stage));
++            assertTrue(f.manager.awaitTermination(Duration.ofMillis(1500)));
++        }
++    }
++    @Test void l07RepeatedRequestKeepsFirstReasonAndDeadline() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false;
++            var first = shutdown(f, BUDGET); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1000)); f.pump();
++            var second = assertDoesNotThrow(() -> f.manager.requestShutdown(1, BUDGET));
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump();
++            assertEquals(result(first), result(second));
++            assertEquals(1, c.writes.stream().filter(m -> m.type() == MessageType.NODE_LEAVE).count());
++            assertEquals(new ControlMessage.Leave(0), c.last().payload());
++        }
++    }
++    @Test void l07ImmediateClosePreemptsPendingFlush() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false; var stage = shutdown(f, BUDGET); f.pump();
++            f.manager.requestClose(); f.pump();
++            assertEquals(NeighborManager.LeaveOutcome.ABORTED, result(stage).attempts().getFirst().outcome());
++            assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l08QueuedAndNewApplicationCommandsCannotWriteAfterRequest() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false; var session = f.manager.snapshot().get("B");
++            var app = new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "A", f.instance, new ControlMessage.Probe(7));
++            var queued = f.manager.send(session, app); var shutdown = shutdown(f, BUDGET);
++            var later = f.manager.send(session, app); f.pump();
++            assertEquals(Connection.SendResult.CLOSED, queued.toCompletableFuture().join());
++            assertEquals(Connection.SendResult.CLOSED, later.toCompletableFuture().join());
++            assertTrue(c.writes.stream().noneMatch(m -> m.type() == MessageType.PROBE_PING));
++            c.written(); f.pump(); result(shutdown);
++        }
++    }
++    @Test void l08RetryAndLateDialCannotReviveDuringShutdown() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var stage = shutdown(f, BUDGET); f.pump();
++            var late = new FakeChannel(); f.io.dials.get(1).future().complete(late); f.pump();
++            f.timers.advance(TimeUnit.SECONDS.toNanos(30)); f.pump();
++            result(stage); assertFalse(late.open); assertTrue(late.writes.isEmpty()); assertEquals(2, f.io.dials.size());
++        }
++    }
++    @Test void l10RejectedOwnerCannotLeaveShutdownFuturePending() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); f.owner.reject = true; var stage = shutdown(f, BUDGET); f.pump();
++            result(stage); assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l12BorrowedOwnerRemainsOwnedByComposition() {
++        try (var f = new Fixture(config("A", 19001), true)) {
++            var c = active(f); var stage = shutdown(f, BUDGET); f.pump(); result(stage);
++            assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET)); assertFalse(f.owner.stopped);
++            f.owner.requestClose(); assertTrue(f.owner.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l09StaleSessionCallbacksCannotNotifyOrDeleteReplacement() {
++        try (var f = new Fixture("A")) {
++            var old = active(f); var oldSession = f.manager.snapshot().get("B");
++            var disconnected = f.manager.disconnect(oldSession); f.pump(); assertTrue(disconnected.toCompletableFuture().join());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump();
++            var fresh = f.connect(2, false); f.ok(fresh, UUID.randomUUID());
++            var freshSession = f.manager.snapshot().get("B");
++            f.io.sink.closed(old, Connection.CloseReason.PEER_EOF, f.clock.get());
++            var stage = shutdown(f, BUDGET); f.pump(); var report = result(stage);
++            assertEquals(List.of(freshSession), report.attempts().stream().map(NeighborManager.LeaveAttempt::session).toList());
++            assertNotEquals(oldSession.instanceId(), freshSession.instanceId());
++            assertTrue(old.writes.stream().noneMatch(m -> m.type() == MessageType.NODE_LEAVE));
++            assertEquals(MessageType.NODE_LEAVE, fresh.last().type());
++        }
++    }
++    @Test void l10RejectedTimerStillClosesAndCompletesRequest() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false; f.timers.stopped = true;
++            var stage = shutdown(f, BUDGET); f.pump(); result(stage);
++            assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l11OwnerQueueTimeConsumesTheSameHalfBudget() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false; var stage = shutdown(f, BUDGET);
++            f.clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(499)); f.pump(); assertFalse(stage.toCompletableFuture().isDone());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1)); f.pump();
++            assertTrue(result(stage).notificationTimedOut()); assertFalse(c.open);
++        }
++    }
++    @Test void l12ErrorReasonUsesExistingV1Payload() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); var stage = assertDoesNotThrow(() -> f.manager.requestShutdown(1, BUDGET));
++            f.pump(); result(stage); assertEquals(new ControlMessage.Leave(1), c.last().payload());
++        }
++    }
++
++    @Test void l05ClosedChannelCannotClaimSuccessfulLocalWrite() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.close(); var stage = shutdown(f, BUDGET); f.pump();
++            assertEquals(NeighborManager.LeaveOutcome.WRITE_FAILED, result(stage).attempts().getFirst().outcome());
++            assertEquals(1, c.writes.size());
++        }
++    }
++    @Test void l11MaximumDegreeUsesOneNotificationTimerAndBoundedReport() {
++        try (var f = new Fixture("Z")) {
++            var bootstrap = f.discovery(); var endpoints = new ArrayList<ControlMessage.Endpoint>();
++            for (int n = 0; n < 63; n++) endpoints.add(endpoint(String.format("P%02d", n), ZERO, 20000 + n * 2));
++            f.message(bootstrap, new ControlMessage(MessageType.REGISTER_OK, bootstrap.last().requestId(), "BOOT", UUID.randomUUID(), new ControlMessage.NeighborList(endpoints)));
++            var channels = new ArrayList<FakeChannel>();
++            for (var configured : endpoints) {
++                var c = new FakeChannel(); var remote = UUID.randomUUID();
++                f.io.sink.opened(c, f.clock.get()); f.pump();
++                f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), configured.nodeId(), remote,
++                    new ControlMessage.EndpointPayload(endpoint(configured.nodeId(), remote, configured.controlPort()))));
++                c.flush = false; channels.add(c);
++            }
++            assertEquals(63, f.manager.snapshot().size());
++            var stage = shutdown(f, BUDGET); f.pump();
++            assertEquals(1, f.timers.tasks.size());
++            assertTrue(f.timers.peak <= f.timers.limit); assertFalse(stage.toCompletableFuture().isDone());
++            channels.forEach(FakeChannel::written); f.pump();
++            var report = result(stage); assertEquals(63, report.attempts().size());
++            assertEquals(63, new HashSet<>(report.attempts().stream().map(NeighborManager.LeaveAttempt::session).toList()).size());
++            assertTrue(report.attempts().stream().allMatch(a -> a.outcome() == NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED));
++            assertThrows(UnsupportedOperationException.class, () -> report.attempts().clear());
++            assertTrue(f.timers.tasks.isEmpty()); assertTrue(channels.stream().noneMatch(c -> c.open));
++        }
++    }
++    @Test void l11LargeBudgetIsCappedAtConfiguredTimeoutAndWrapIsSafe() {
++        try (var f = new Fixture("A")) {
++            f.clock.set(Long.MAX_VALUE - TimeUnit.SECONDS.toNanos(1)); var c = active(f); c.flush = false;
++            var stage = shutdown(f, Duration.ofDays(1)); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1500)); f.pump();
++            assertTrue(result(stage).notificationTimedOut()); assertFalse(c.open);
++        }
++    }
++    @Test void l12RealTcpReceivesV1LeaveBeforeConnectionCloses() throws Exception {
++        try (var d = new Deployment()) {
++            var a = d.managers.getFirst(); a.start().toCompletableFuture().get(3, TimeUnit.SECONDS);
++            var config = d.configs.get(1); var remote = UUID.randomUUID();
++            // N1 initiates only toward larger IDs, so replace N0 by an inbound-capable N2 service.
++            var receiver = d.managers.get(2); receiver.start().toCompletableFuture().get(3, TimeUnit.SECONDS);
++            try (var socket = new java.net.Socket("127.0.0.1", d.configs.get(2).controlPort())) {
++                socket.setSoTimeout(2500);
++                var ep = new ControlMessage.Endpoint("N1", remote, "127.0.0.1", config.controlPort(), config.dataPort(), NodeRole.RELAY);
++                MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "N1", remote,
++                    new ControlMessage.EndpointPayload(ep)), socket.getOutputStream()); socket.getOutputStream().flush();
++                assertEquals(MessageType.HELLO_OK, MessageCodec.read(socket.getInputStream()).orElseThrow().type());
++                until(() -> receiver.snapshot().containsKey("N1"));
++                var report = receiver.requestShutdown(1, BUDGET).toCompletableFuture().get(2, TimeUnit.SECONDS);
++                var leave = MessageCodec.read(socket.getInputStream()).orElseThrow();
++                assertEquals(1, leave.version()); assertEquals(MessageType.NODE_LEAVE, leave.type());
++                assertEquals(new ControlMessage.Leave(1), leave.payload()); assertNotEquals(ZERO, leave.senderInstance());
++                assertTrue(MessageCodec.read(socket.getInputStream()).isEmpty());
++                assertTrue(report.attempts().stream().anyMatch(t -> t.session().nodeId().equals("N1") && t.outcome() == NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED));
++                assertTrue(receiver.awaitTermination(BUDGET));
++            }
++        }
++    }
++
++    @Test void l11ReportChecksDegreeBeforeCopyingInput() {
++        var remote = UUID.randomUUID();
++        var attempt = new NeighborManager.LeaveAttempt(new Neighbor.Session("B", remote, UUID.randomUUID(), endpoint("B", remote, 19002)), NeighborManager.LeaveOutcome.ABORTED);
++        assertThrows(IllegalArgumentException.class, () -> new NeighborManager.ShutdownReport(Collections.nCopies(64, attempt), false));
++    }
++    @Test void l10ConsumerFailureDuringCleanupCannotRetainFutureOrChannels() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); f.observerFails = true;
++            var stage = shutdown(f, BUDGET); f.pump(); result(stage);
++            assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++    @Test void l07ConcurrentRequestsEmitOnceAndKeepOneFuture() throws Exception {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false;
++            var requests = new java.util.concurrent.CopyOnWriteArrayList<CompletionStage<NeighborManager.ShutdownReport>>();
++            var threads = new ArrayList<Thread>();
++            for (int n = 0; n < 8; n++) threads.add(Thread.ofVirtual().start(() -> requests.add(f.manager.requestShutdown(0, BUDGET))));
++            for (var thread : threads) { thread.join(Duration.ofSeconds(1)); assertFalse(thread.isAlive()); }
++            assertEquals(8, requests.size()); assertTrue(requests.stream().allMatch(r -> r == requests.getFirst()));
++            f.pump(); c.written(); f.pump();
++            assertEquals(1, c.writes.stream().filter(m -> m.type() == MessageType.NODE_LEAVE).count());
++            assertTrue(requests.stream().allMatch(r -> result(r).equals(result(requests.getFirst()))));
++        }
++    }
++
++    @Test void l05SynchronousOverflowStillClosesAndReportsWriteFailure() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var delegate = new FakeChannel();
++            var channel = new NeighborManager.Channel() {
++                public UUID id() { return delegate.id(); }
++                public boolean isOpen() { return delegate.isOpen(); }
++                public Connection.SendResult send(ControlMessage message) { return delegate.send(message); }
++                public CompletableFuture<Void> sendAndFlush(ControlMessage message) {
++                    if (message.type() == MessageType.NODE_LEAVE) throw new RejectedExecutionException("controlled output overflow");
++                    return delegate.sendAndFlush(message);
++                }
++                public void close() { delegate.close(); }
++            };
++            f.io.sink.opened(channel, f.clock.get()); f.io.dials.get(1).future().complete(channel); f.pump();
++            f.ok(delegate, UUID.randomUUID()); assertEquals(1, f.manager.snapshot().size());
++            var stage = shutdown(f, BUDGET); f.pump();
++            assertEquals(NeighborManager.LeaveOutcome.WRITE_FAILED, result(stage).attempts().getFirst().outcome());
++            assertFalse(delegate.open); assertEquals(2, f.io.dials.size());
++        }
++    }
++    @Test void l10OwnerStopsBetweenAdmittingRequestAndRunningIt() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); var stage = shutdown(f, BUDGET);
++            f.owner.requestClose(); result(stage);
++            assertFalse(c.open); assertTrue(f.manager.awaitTermination(BUDGET));
++        }
++    }
++
++    @Test void l12CloseDoesNotRenewBudgetAfterNotificationTimeout() {
++        try (var f = new Fixture("A")) {
++            var c = active(f); c.flush = false;
++            var stage = shutdown(f, Duration.ofMillis(200)); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(100)); f.pump(); assertTrue(result(stage).notificationTimedOut());
++            f.io.awaitClock = f.clock; f.io.consumeMillis = 60;
++            assertThrows(IllegalStateException.class, f.manager::close);
++            assertEquals(List.of(Duration.ofMillis(100), Duration.ofMillis(40)), f.io.awaitBudgets);
++            f.io.consumeMillis = 0;
++        }
++    }
++
++}

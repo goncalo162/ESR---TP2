@@ -520,3 +520,18 @@ incremento/evidência; target/ e alterações alheias excluídos; sem push.
 Bolt permanece in-progress/current_stage=implement/completed=null; só Plan em
 stages_completed. História não implementada, TASK-008 IN PROGRESS. Revisão final
 Waheed e integração continuam pendentes; sem gates externos adicionais ou DONE.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](../../../../bolts/020-overlay/test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.
+
+## IMP-005 — Test aprovado e fecho preparado
+
+Registo em 2026-11-10T22:22:56Z. O utilizador aprovou Test, incluindo V-008,
+o manual de Luis, a verificação complementar e V-ADD após Q-C-13.
+Waheed tem a revisão final atribuída. A integração e o fecho dependem dessa
+revisão. [Pacote para revisão final](../../../../bolts/020-overlay/closure-walkthrough.md).

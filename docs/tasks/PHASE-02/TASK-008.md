@@ -54,14 +54,14 @@ Ctrl-C duas vezes, papel/config incompatíveis, stdin fechado, porta ocupada e b
 
 V-008: subprocessos locais iniciam por CLI, mostram vizinhos e terminam; configuração inválida não abre porto; interrupção e erro de um peer não deixam processo preso.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado da validação: EXECUTADO; [relatório de Test](../../../memory-bank/bolts/020-overlay/test-walkthrough.md) aprovado. Revisão final de Waheed e integração pendentes. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] BOOTSTRAP, SERVER, RELAY e CLIENT arrancam no papel pedido.
-- [ ] Códigos de erro e logs são coerentes.
-- [ ] O fim de um processo não exige reiniciar os restantes.
-- [ ] Validação V-008 executada e evidência ligada no progresso.
+- [x] BOOTSTRAP, SERVER, RELAY e CLIENT arrancam no papel pedido.
+- [x] Códigos de erro e logs são coerentes.
+- [x] O fim de um processo não exige reiniciar os restantes.
+- [x] Validação V-008 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -118,3 +118,11 @@ Q-C-09–12 preservadas; send() e testes históricos intactos, sem alteração w
 ou dependências. Não há gates externos adicionais. Bolt aberto, história ainda
 não implementada, TASK-008 IN PROGRESS e unidade in-progress. Sem commits/push
 ou outro IMP.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](../../../memory-bank/bolts/020-overlay/test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.

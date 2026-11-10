@@ -383,3 +383,22 @@ clean verify de Test, manual humano, revisão final Waheed e integração penden
 O scope Q-C-09 permanece resolvido; as três concretizações Q-C-10–12 continuam
 atribuídas à aprovação do utilizador, não ao enunciado. Nenhuma ADR foi substituída.
 [Walkthrough e limites](../memory-bank/bolts/020-overlay/implementation-walkthrough.md).
+
+## Q-C-13 — Referência a template inexistente no V-ADD de IMP-005
+
+O V-ADD do checkpoint Test devolveu saída 1 por uma ligação quebrada para
+`adr-template.md` no template DDD de `.specsmd/`. As duas referências já
+constavam da base operacional `90cded6`. O mesmo erro foi reproduzido no
+estado de entrada. O [precedente Q-C-08](#q-c-08--validação-global-inclui-exemplos-de-ferramentas-preexistentes)
+regista uma correção documental de ferramentas com validação no repositório.
+[Relatório inicial](../experiments/construction/020-overlay/test-consolidation-validation.md).
+[Reprodução no estado de entrada](../experiments/construction/020-overlay/test-vadd-entry-repro.log).
+
+O utilizador aceitou a evidência de V-008 e do manual e autorizou a correção
+das duas referências. A instrução aponta para o exemplo da etapa 3 e para o
+formato de ADR da secção 5 do ADD. A ligação quebrada foi retirada do exemplo
+de apresentação. Test permanece em revisão.
+
+Q-C-13 resolvida na execução de 2026-11-10T22:18:21Z. O V-ADD passou no
+repositório com saída 0, zero erros e 45 fixtures verificadas.
+[Novo relatório V-ADD](../experiments/construction/020-overlay/q-c-13-v-add.log).

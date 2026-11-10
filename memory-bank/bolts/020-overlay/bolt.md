@@ -6,11 +6,11 @@ type: "simple-construction-bolt"
 status: "in-progress"
 stories: ["003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-10T18:16:24Z"
+updated: "2026-11-10T22:22:56Z"
 started: "2026-11-10T17:27:22Z"
 completed: null
-current_stage: "implement"
-stages_completed: [{"name": "plan", "completed": "2026-11-10T17:41:41Z", "artifact": "implementation-plan.md"}]
+current_stage: null
+stages_completed: [{"name": "plan", "completed": "2026-11-10T17:41:41Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-10T22:05:26Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-10T22:22:56Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["001-base-validada", "003-overlay", "019-overlay"]
 enables_bolts: ["004-overlay", "022-rotas"]
 requires_units: ["001-base-validada"]
@@ -49,23 +49,23 @@ Ler [IMP-005](../../../add.md#imp-005) e as ADR aí indicadas antes de qualquer 
 ## Etapas e validação
 
 1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-005 e as ADR do ADD.
-2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-005 e as ADR do ADD.
-3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-005 e as ADR do ADD.
+2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-005 e as ADR do ADD.
+3. [x] **test** → `test-walkthrough.md`; validar a etapa contra IMP-005 e as ADR do ADD.
 
 Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
 
 ## Critérios de aceitação
 
-- [ ] BOOTSTRAP, SERVER, RELAY e CLIENT arrancam no papel pedido.
-- [ ] Códigos de erro e logs são coerentes.
-- [ ] O fim de um processo não exige reiniciar os restantes.
-- [ ] Validação V-008 executada e evidência ligada no progresso.
+- [x] BOOTSTRAP, SERVER, RELAY e CLIENT arrancam no papel pedido.
+- [x] Códigos de erro e logs são coerentes.
+- [x] O fim de um processo não exige reiniciar os restantes.
+- [x] Validação V-008 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
 - Testes: V-008, detalhados no ADD; guardar comandos, ambiente, resultados e limites.
 - Outputs e ficheiros: consultar [IMP-005](../../../add.md#imp-005).
-- Prova futura: `experiments/construction/020-overlay/` e relatório local do bolt.
+- Evidência: [relatório de Test](test-walkthrough.md) e `experiments/construction/020-overlay/`.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
 
@@ -175,3 +175,19 @@ incremento/evidência; target/ e alterações alheias excluídos; sem push.
 Bolt permanece in-progress/current_stage=implement/completed=null; só Plan em
 stages_completed. História não implementada, TASK-008 IN PROGRESS. Revisão final
 Waheed e integração continuam pendentes; sem gates externos adicionais ou DONE.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.
+
+## IMP-005 — Test aprovado, revisão final pendente
+
+A aprovação do utilizador foi registada em 2026-11-10T22:22:56Z. As três etapas
+estão concluídas. V-008, o manual de Luis, a verificação complementar e
+V-ADD após Q-C-13 estão aceites. O bolt e a TASK-008 ficam em progresso até à
+revisão final de Waheed e à integração da versão revista.
+[Pacote para revisão final](closure-walkthrough.md).

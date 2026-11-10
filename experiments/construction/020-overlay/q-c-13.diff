@@ -1,0 +1,49 @@
+diff --git a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+index bb35da7..499ad94 100644
+--- a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
++++ b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+@@ -275,7 +275,7 @@ Suggest an ADR when you identify:
+ 6 - **Update decision index**: Add entries to `memory-bank/standards/decision-index.md`
+ 
+ **Artifact**: `adr-{number}-{slug}.md` (zero or more)
+-**Template**: `.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt/adr-template.md`
++**Template**: Use the Example ADR in Stage 3 as a worked example and follow the [ADR format in ADD section 5](../../../../../add.md#5-registo-de-decisões).
+ **Location**: `memory-bank/bolts/{bolt-id}/adr-{number}-{slug}.md`
+ 
+ **ADR Analysis Process**:
+@@ -548,7 +548,7 @@ status: in-progress
+ ## Relevant Prior Decisions
+ 
+ Found {n} ADR(s) that may apply to this bolt:
+-- ADR-001: Use JWT for Authentication → example path: `bolts/001-auth-service/adr-001-jwt-auth.md` ([ADR template](ddd-construction-bolt/adr-template.md))
++- ADR-001: Use JWT for Authentication → example path: `bolts/001-auth-service/adr-001-jwt-auth.md`
+ 
+ These decisions may constrain or guide your approach. Proceed? (y/n)
+ ```
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 1e33a98..923200b 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -383,3 +383,22 @@ clean verify de Test, manual humano, revisão final Waheed e integração penden
+ O scope Q-C-09 permanece resolvido; as três concretizações Q-C-10–12 continuam
+ atribuídas à aprovação do utilizador, não ao enunciado. Nenhuma ADR foi substituída.
+ [Walkthrough e limites](../memory-bank/bolts/020-overlay/implementation-walkthrough.md).
++
++## Q-C-13 — Referência a template inexistente no V-ADD de IMP-005
++
++O V-ADD do checkpoint Test devolveu saída 1 por uma ligação quebrada para
++`adr-template.md` no template DDD de `.specsmd/`. As duas referências já
++constavam da base operacional `90cded6`. O mesmo erro foi reproduzido no
++estado de entrada. O [precedente Q-C-08](#q-c-08--validação-global-inclui-exemplos-de-ferramentas-preexistentes)
++regista uma correção documental de ferramentas com validação no repositório.
++[Relatório inicial](../experiments/construction/020-overlay/test-consolidation-validation.md).
++[Reprodução no estado de entrada](../experiments/construction/020-overlay/test-vadd-entry-repro.log).
++
++O utilizador aceitou a evidência de V-008 e do manual e autorizou a correção
++das duas referências. A instrução aponta para o exemplo da etapa 3 e para o
++formato de ADR da secção 5 do ADD. A ligação quebrada foi retirada do exemplo
++de apresentação. Test permanece em revisão.
++
++Q-C-13 resolvida na execução de 2026-11-10T22:18:21Z. O V-ADD passou no
++repositório com saída 0, zero erros e 45 fixtures verificadas.
++[Novo relatório V-ADD](../experiments/construction/020-overlay/q-c-13-v-add.log).

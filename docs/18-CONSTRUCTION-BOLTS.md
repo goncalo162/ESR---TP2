@@ -115,7 +115,7 @@ identificada no desenho; nenhuma ADR nova criada. Apenas Model/Design em
 stages_completed, current_stage=adr. D01–D22 mantidos e por executar, sem Java.
 Revisão final/integração antes de DONE; parar antes de Implement/Test.
 
-## Estado atual — IMP-004 fechado
+## Fecho anterior — IMP-004
 
 Registo documental em 2026-11-10T17:12:15Z.
 IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
@@ -132,3 +132,11 @@ Sem push ou alegação de integração remota/entrega do projeto.
 [Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
 pendentes são históricas; não descrevem o estado atual. Não se promovem
 requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](../memory-bank/bolts/020-overlay/test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.

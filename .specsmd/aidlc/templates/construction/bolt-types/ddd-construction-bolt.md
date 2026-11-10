@@ -275,7 +275,7 @@ Suggest an ADR when you identify:
 6 - **Update decision index**: Add entries to `memory-bank/standards/decision-index.md`
 
 **Artifact**: `adr-{number}-{slug}.md` (zero or more)
-**Template**: `.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt/adr-template.md`
+**Template**: Use the Example ADR in Stage 3 as a worked example and follow the [ADR format in ADD section 5](../../../../../add.md#5-registo-de-decisões).
 **Location**: `memory-bank/bolts/{bolt-id}/adr-{number}-{slug}.md`
 
 **ADR Analysis Process**:
@@ -548,7 +548,7 @@ status: in-progress
 ## Relevant Prior Decisions
 
 Found {n} ADR(s) that may apply to this bolt:
-- ADR-001: Use JWT for Authentication → example path: `bolts/001-auth-service/adr-001-jwt-auth.md` ([ADR template](ddd-construction-bolt/adr-template.md))
+- ADR-001: Use JWT for Authentication → example path: `bolts/001-auth-service/adr-001-jwt-auth.md`
 
 These decisions may constrain or guide your approach. Proceed? (y/n)
 ```

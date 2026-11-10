@@ -80,3 +80,11 @@ Q-C-09–12 preservadas; send() e testes históricos intactos, sem alteração w
 ou dependências. Não há gates externos adicionais. Bolt aberto, história ainda
 não implementada, TASK-008 IN PROGRESS e unidade in-progress. Sem commits/push
 ou outro IMP.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](../../../../../bolts/020-overlay/test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.

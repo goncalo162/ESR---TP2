@@ -1,0 +1,201 @@
+{
+  "consolidated_at": "2026-11-10T22:05:26Z",
+  "operator": "agent",
+  "final_report": "experiments/construction/020-overlay/agent-verification/final/report.json",
+  "final_report_at": "2026-11-10T21:57:09.714335+00:00",
+  "final_report_completed_at": "2026-11-10T21:57:09.803594+00:00",
+  "final_status": "PASS",
+  "final_check_count": 13,
+  "runs": {
+    "pipe": {
+      "original_report_status": "FAIL",
+      "original_report_sha256": "8c13e4ebbf4193ec89a7982b72758b335b7ead433fb51f7cfae8dc0422e033fe",
+      "raw_directory": "experiments/construction/020-overlay/agent-verification/pipe-preliminary",
+      "required_functional_checks": [
+        "three_nodes_two_active",
+        "bootstrap_quit_exit_zero",
+        "fresh_neighbors_without_bootstrap",
+        "client_quit_exit_zero",
+        "leave_and_actual_retries_before_queries",
+        "ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+        "survivor_pids_preserved",
+        "reconnect_new_client_instance_same_survivors",
+        "server_eof_exit_zero",
+        "relay_quit_exit_zero",
+        "restarted_client_quit_exit_zero",
+        "restarted_bootstrap_quit_exit_zero",
+        "all_owned_jvms_terminated"
+      ],
+      "fresh_neighbors_responses": 10,
+      "response_ms_observed": [
+        3.1006129993329523,
+        2.960959000120056,
+        2.640120000251045,
+        2.7369500003260328,
+        1.9552690000637085,
+        2.1348330001274007,
+        3.3601140003156615,
+        3.659429999970598,
+        3.0986339997980394,
+        2.4325450003743754
+      ],
+      "owned_processes": [
+        {
+          "label": "bootstrap-01",
+          "pid": 81176,
+          "exit": 0
+        },
+        {
+          "label": "server-01",
+          "pid": 81200,
+          "exit": 0
+        },
+        {
+          "label": "relay-01",
+          "pid": 81202,
+          "exit": 0
+        },
+        {
+          "label": "client-01",
+          "pid": 81206,
+          "exit": 0
+        },
+        {
+          "label": "bootstrap-02",
+          "pid": 81351,
+          "exit": 0
+        },
+        {
+          "label": "client-02",
+          "pid": 81376,
+          "exit": 0
+        }
+      ],
+      "client_reconnection": {
+        "name": "pipe_reconnect_new_client_instance_same_survivors",
+        "passed": true,
+        "previous_ready": "READY node=N2 instance=4b768d16-cae6-471c-91fb-90ec82556caf",
+        "current_ready": "READY node=N2 instance=83e5947e-1001-461d-8183-4b2a1f599a42"
+      },
+      "original_failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 187, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n",
+      "tcp_states_after_scenario": null
+    },
+    "pty": {
+      "original_report_status": "FAIL",
+      "original_report_sha256": "cb043f5fe5c89ed897f475d267c2665353af4fe865b23ac1e0c3632d38319d40",
+      "raw_directory": "experiments/construction/020-overlay/agent-verification/pty-preliminary",
+      "required_functional_checks": [
+        "three_nodes_two_active",
+        "bootstrap_quit_exit_zero",
+        "fresh_neighbors_without_bootstrap",
+        "client_quit_exit_zero",
+        "leave_and_actual_retries_before_queries",
+        "ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+        "survivor_pids_preserved",
+        "reconnect_new_client_instance_same_survivors",
+        "server_eof_exit_zero",
+        "relay_quit_exit_zero",
+        "restarted_client_quit_exit_zero",
+        "restarted_bootstrap_quit_exit_zero",
+        "all_owned_jvms_terminated"
+      ],
+      "fresh_neighbors_responses": 10,
+      "response_ms_observed": [
+        0.7062579998091678,
+        0.6122550003055949,
+        1.021757999296824,
+        0.9139159992628265,
+        0.8566599999539903,
+        0.6751329992766841,
+        0.962930000241613,
+        0.9393939999426948,
+        1.2195179997434025,
+        0.6176400002004812
+      ],
+      "owned_processes": [
+        {
+          "label": "bootstrap-01",
+          "pid": 88826,
+          "exit": 0
+        },
+        {
+          "label": "server-01",
+          "pid": 88849,
+          "exit": 0
+        },
+        {
+          "label": "relay-01",
+          "pid": 88855,
+          "exit": 0
+        },
+        {
+          "label": "client-01",
+          "pid": 88857,
+          "exit": 0
+        },
+        {
+          "label": "bootstrap-02",
+          "pid": 89086,
+          "exit": 0
+        },
+        {
+          "label": "client-02",
+          "pid": 89111,
+          "exit": 0
+        }
+      ],
+      "client_reconnection": {
+        "name": "pty_reconnect_new_client_instance_same_survivors",
+        "passed": true,
+        "previous_ready": "READY node=N2 instance=2c08b1bb-bbf2-425b-b620-d166480faf79",
+        "current_ready": "READY node=N2 instance=7ee815da-990b-46ff-95c9-8706825b5188"
+      },
+      "original_failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 197, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<stdin>\", line 200, in <module>\nBrokenPipeError: [Errno 32] Broken pipe\n",
+      "tcp_states_after_scenario": "State     Recv-Q Send-Q      Local Address:Port        Peer Address:Port Process\nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45912       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48518       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45940       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48516       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56120 [::ffff:127.0.0.1]:58818       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45936       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56100 [::ffff:127.0.0.1]:45926       \nTIME-WAIT 0      0      [::ffff:127.0.0.1]:56130 [::ffff:127.0.0.1]:48780       \n"
+    }
+  },
+  "fresh_neighbors_total": 20,
+  "all_12_agent_jvms_exit_zero": true,
+  "final_seven_ports_available": [
+    {
+      "port": 56100,
+      "protocol": "TCP",
+      "available": true
+    },
+    {
+      "port": 56110,
+      "protocol": "TCP",
+      "available": true
+    },
+    {
+      "port": 56111,
+      "protocol": "UDP",
+      "available": true
+    },
+    {
+      "port": 56120,
+      "protocol": "TCP",
+      "available": true
+    },
+    {
+      "port": 56121,
+      "protocol": "UDP",
+      "available": true
+    },
+    {
+      "port": 56130,
+      "protocol": "TCP",
+      "available": true
+    },
+    {
+      "port": 56131,
+      "protocol": "UDP",
+      "available": true
+    }
+  ],
+  "no_owned_processes_remaining": true,
+  "final_check_not_a_new_third_run": true,
+  "jar_sha256": "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52",
+  "human_evidence_verified_separately": 38,
+  "limitation": "Repeated diagnostics can obscure interactive output. Controlled fresh CLI responses are not an unrestricted-load responsiveness guarantee."
+}

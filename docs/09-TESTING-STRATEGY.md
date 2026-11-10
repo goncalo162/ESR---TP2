@@ -131,7 +131,7 @@ revisão final Denji aprovada e integração local 8db7b78 comprovada.
 
 V-008: subprocessos locais iniciam por CLI, mostram vizinhos e terminam; configuração inválida não abre porto; interrupção e erro de um peer não deixam processo preso.
 
-Responsável: [TASK-008](tasks/PHASE-02/TASK-008.md). Requisitos: RF-001, RF-002, RNF-003, RP-008. Estado: NÃO EXECUTADO.
+Responsável: [TASK-008](tasks/PHASE-02/TASK-008.md). Requisitos: RF-001, RF-002, RNF-003, RP-008. Estado: EXECUTADO, Test aprovado. [relatório de Test](../memory-bank/bolts/020-overlay/test-walkthrough.md): clean verify com 981 testes e zero falhas/erros/ignorados; manual de Luis e verificação complementar do agente separados.
 
 ### V-009 — Preparar evidência do primeiro marco intermédio
 

@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. Total atual: quatro histórias/bolts complete; 020-overlay/IMP-005 está in-progress no checkpoint Implement para aprovação; os restantes 28 continuam planned.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. Total atual: quatro histórias/bolts complete; 020-overlay/IMP-005 está in-progress com Test aprovado; os restantes 28 continuam planned.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -51,7 +51,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
 
 ## 002-overlay/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md ✅ GENERATED
 
-**Tarefa:** IMP-005. **Estado:** in-progress (Implement preparado; Plan aprovado). **Bolt:** 020-overlay.
+**Tarefa:** IMP-005. **Estado:** in-progress (Plan, Implement e Test aprovados. Revisão final e integração pendentes). **Bolt:** 020-overlay.
 **Ficheiro:** [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md).
 
 ## 002-overlay/004-preparar-evidencia-do-primeiro-marco-intermedio.md ✅ GENERATED
@@ -269,3 +269,11 @@ Q-C-09–12 preservadas; send() e testes históricos intactos, sem alteração w
 ou dependências. Não há gates externos adicionais. Bolt aberto, história ainda
 não implementada, TASK-008 IN PROGRESS e unidade in-progress. Sem commits/push
 ou outro IMP.
+
+## IMP-005 — Implement aprovado; Test para revisão
+
+Aprovação de Implement registada em 2026-11-10T22:05:26Z. O [relatório de Test](bolts/020-overlay/test-walkthrough.md)
+consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manual
+de Luis e a verificação complementar do agente, com as sondagens preliminares
+preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
+da versão revista continuam pendentes.

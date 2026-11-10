@@ -1,0 +1,173 @@
+{
+  "at": "2026-11-10T21:57:09.714335+00:00",
+  "operator": "agent",
+  "checks": [
+    {
+      "name": "pipe_controlled_scenario",
+      "passed": true,
+      "required_checks": [
+        "three_nodes_two_active",
+        "bootstrap_quit_exit_zero",
+        "fresh_neighbors_without_bootstrap",
+        "client_quit_exit_zero",
+        "leave_and_actual_retries_before_queries",
+        "ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+        "survivor_pids_preserved",
+        "reconnect_new_client_instance_same_survivors",
+        "server_eof_exit_zero",
+        "relay_quit_exit_zero",
+        "restarted_client_quit_exit_zero",
+        "restarted_bootstrap_quit_exit_zero",
+        "all_owned_jvms_terminated"
+      ],
+      "response_ms": [
+        3.1006129993329523,
+        2.960959000120056,
+        2.640120000251045,
+        2.7369500003260328,
+        1.9552690000637085,
+        2.1348330001274007,
+        3.3601140003156615,
+        3.659429999970598,
+        3.0986339997980394,
+        2.4325450003743754
+      ]
+    },
+    {
+      "name": "pipe_all_six_exit_codes_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_no_owned_ott_process_remaining",
+      "passed": true,
+      "live": []
+    },
+    {
+      "name": "pty_controlled_scenario",
+      "passed": true,
+      "required_checks": [
+        "three_nodes_two_active",
+        "bootstrap_quit_exit_zero",
+        "fresh_neighbors_without_bootstrap",
+        "client_quit_exit_zero",
+        "leave_and_actual_retries_before_queries",
+        "ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+        "survivor_pids_preserved",
+        "reconnect_new_client_instance_same_survivors",
+        "server_eof_exit_zero",
+        "relay_quit_exit_zero",
+        "restarted_client_quit_exit_zero",
+        "restarted_bootstrap_quit_exit_zero",
+        "all_owned_jvms_terminated"
+      ],
+      "response_ms": [
+        0.7062579998091678,
+        0.6122550003055949,
+        1.021757999296824,
+        0.9139159992628265,
+        0.8566599999539903,
+        0.6751329992766841,
+        0.962930000241613,
+        0.9393939999426948,
+        1.2195179997434025,
+        0.6176400002004812
+      ]
+    },
+    {
+      "name": "pty_all_six_exit_codes_zero",
+      "passed": true
+    },
+    {
+      "name": "pty_no_owned_ott_process_remaining",
+      "passed": true,
+      "live": []
+    },
+    {
+      "name": "no_tcp_listeners_on_test_ports",
+      "passed": true,
+      "states": "State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess\n"
+    },
+    {
+      "name": "seven_test_ports_available_at_final_check",
+      "passed": true,
+      "ports": [
+        {
+          "port": 56100,
+          "protocol": "TCP",
+          "available": true
+        },
+        {
+          "port": 56110,
+          "protocol": "TCP",
+          "available": true
+        },
+        {
+          "port": 56111,
+          "protocol": "UDP",
+          "available": true
+        },
+        {
+          "port": 56120,
+          "protocol": "TCP",
+          "available": true
+        },
+        {
+          "port": 56121,
+          "protocol": "UDP",
+          "available": true
+        },
+        {
+          "port": 56130,
+          "protocol": "TCP",
+          "available": true
+        },
+        {
+          "port": 56131,
+          "protocol": "UDP",
+          "available": true
+        }
+      ]
+    },
+    {
+      "name": "jar_hash_preserved",
+      "passed": true
+    },
+    {
+      "name": "wip-package-manifest.json_preserved",
+      "passed": true,
+      "count": 748,
+      "mismatches": []
+    },
+    {
+      "name": "wip-personal-evidence.json_preserved",
+      "passed": true,
+      "count": 8,
+      "mismatches": []
+    },
+    {
+      "name": "no_project_changes",
+      "passed": true
+    },
+    {
+      "name": "git_diff_check",
+      "passed": true
+    }
+  ],
+  "prior_reports": [
+    {
+      "path": "/tmp/ott-imp005-agent-cli-retry-vel56184/report.json",
+      "sha256": "8c13e4ebbf4193ec89a7982b72758b335b7ead433fb51f7cfae8dc0422e033fe",
+      "original_status": "FAIL",
+      "original_failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 187, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n"
+    },
+    {
+      "path": "/tmp/ott-imp005-agent-cli-retry-facshhph/report.json",
+      "sha256": "cb043f5fe5c89ed897f475d267c2665353af4fe865b23ac1e0c3632d38319d40",
+      "original_status": "FAIL",
+      "original_failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 197, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<stdin>\", line 200, in <module>\nBrokenPipeError: [Errno 32] Broken pipe\n"
+    }
+  ],
+  "human_evidence_files": 38,
+  "status": "PASS",
+  "completed_at": "2026-11-10T21:57:09.803594+00:00"
+}

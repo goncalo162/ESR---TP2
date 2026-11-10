@@ -790,8 +790,9 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
   ACK, tipo wire, cap ou dependência. Não reabre IMP-004 nem muda o seu fecho/testes.
   Contrato em [07](docs/07-API-AND-INTERFACES.md) e
   [Plan aprovado](memory-bank/bolts/020-overlay/implementation-plan.md);
-  [Implement preparado para aprovação](memory-bank/bolts/020-overlay/implementation-walkthrough.md),
-  após autorização explícita de comportamentos. Q-C-09–12 preservadas; Test e fecho pendentes.
+  [Implement aprovado](memory-bank/bolts/020-overlay/implementation-walkthrough.md);
+  [Test aprovado](memory-bank/bolts/020-overlay/test-walkthrough.md), com V-008,
+  regressão e V-ADD consolidados. Revisão final e integração pendentes.
 - **Dependências:** IMP-001 (001-base-validada), IMP-004 (003-overlay), IMP-002 (019-overlay).
 - **ADR:** ADR-013, ADR-014, ADR-016, ADR-017, ADR-019, ADR-020, ADR-022, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, NFR-003, REQ-001, REQ-002, REQ-023.

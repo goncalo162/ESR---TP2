@@ -1,0 +1,129 @@
+{
+  "status": "FAIL",
+  "operator": "agent",
+  "kind": "supplementary controlled CLI probe",
+  "evidence": "/tmp/ott-imp005-agent-cli-retry-vel56184",
+  "jar_sha256": "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52",
+  "checks": [
+    {
+      "name": "approved_jar_hash",
+      "passed": true
+    },
+    {
+      "name": "six_profile_hashes",
+      "passed": true
+    },
+    {
+      "name": "jdk_21",
+      "passed": true
+    },
+    {
+      "name": "seven_ports_free_before",
+      "passed": true
+    },
+    {
+      "name": "pipe_three_nodes_two_active",
+      "passed": true,
+      "pids": [
+        81200,
+        81202,
+        81206
+      ]
+    },
+    {
+      "name": "pipe_bootstrap_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_fresh_neighbors_without_bootstrap",
+      "passed": true
+    },
+    {
+      "name": "pipe_client_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_leave_and_actual_retries_before_queries",
+      "passed": true
+    },
+    {
+      "name": "pipe_ten_fresh_cli_responses_while_client_and_bootstrap_absent",
+      "passed": true,
+      "elapsed_ms": [
+        3.1006129993329523,
+        2.960959000120056,
+        2.640120000251045,
+        2.7369500003260328,
+        1.9552690000637085,
+        2.1348330001274007,
+        3.3601140003156615,
+        3.659429999970598,
+        3.0986339997980394,
+        2.4325450003743754
+      ]
+    },
+    {
+      "name": "pipe_survivor_pids_preserved",
+      "passed": true
+    },
+    {
+      "name": "pipe_reconnect_new_client_instance_same_survivors",
+      "passed": true,
+      "previous_ready": "READY node=N2 instance=4b768d16-cae6-471c-91fb-90ec82556caf",
+      "current_ready": "READY node=N2 instance=83e5947e-1001-461d-8183-4b2a1f599a42"
+    },
+    {
+      "name": "pipe_server_eof_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_relay_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_restarted_client_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_restarted_bootstrap_quit_exit_zero",
+      "passed": true
+    },
+    {
+      "name": "pipe_all_owned_jvms_terminated",
+      "passed": true
+    }
+  ],
+  "failure": "Traceback (most recent call last):\n  File \"<stdin>\", line 187, in <module>\n  File \"<stdin>\", line 40, in free_ports\nOSError: [Errno 98] Address already in use\n",
+  "owned_processes": [
+    {
+      "label": "bootstrap-01",
+      "pid": 81176,
+      "exit": 0
+    },
+    {
+      "label": "server-01",
+      "pid": 81200,
+      "exit": 0
+    },
+    {
+      "label": "relay-01",
+      "pid": 81202,
+      "exit": 0
+    },
+    {
+      "label": "client-01",
+      "pid": 81206,
+      "exit": 0
+    },
+    {
+      "label": "bootstrap-02",
+      "pid": 81351,
+      "exit": 0
+    },
+    {
+      "label": "client-02",
+      "pid": 81376,
+      "exit": 0
+    }
+  ]
+}

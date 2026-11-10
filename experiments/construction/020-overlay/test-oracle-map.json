@@ -1,0 +1,185 @@
+{
+  "validation": "V-008",
+  "lifecycle_suite": "experiments/construction/020-overlay/test-clean-verify-01-xml/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml",
+  "lifecycle": {
+    "L01": [
+      "l01BeforeStartClosesWithoutFactoriesAndCannotRevive",
+      "l01ZeroBudgetSkipsLeaveAndCloses",
+      "l01InvalidReasonDoesNotCreateServices",
+      "l01InvalidDurationDoesNotCreateServices"
+    ],
+    "L02": [
+      "l02DiscoveryAndUnconfirmedHelloAreNotNotified",
+      "l02OnlyConfirmedDirectSessionGetsV1Leave"
+    ],
+    "L03": [
+      "l03ApplicationSendStillRejectsLeaveWithoutClosingHealthySession"
+    ],
+    "L04": [
+      "l04CompletionWaitsForLocalFlush"
+    ],
+    "L05": [
+      "l05SynchronousOverflowStillClosesAndReportsWriteFailure",
+      "l05ClosedChannelCannotClaimSuccessfulLocalWrite",
+      "l05FailedWriteStillClosesWithoutNewDial"
+    ],
+    "L06": [
+      "l06HalfBudgetDeadlineWinsAndLateFlushCannotChangeReport"
+    ],
+    "L07": [
+      "l07RepeatedRequestKeepsFirstReasonAndDeadline",
+      "l07ImmediateClosePreemptsPendingFlush",
+      "l07ConcurrentRequestsEmitOnceAndKeepOneFuture"
+    ],
+    "L08": [
+      "l08RetryAndLateDialCannotReviveDuringShutdown",
+      "l08QueuedAndNewApplicationCommandsCannotWriteAfterRequest"
+    ],
+    "L09": [
+      "l09StaleSessionCallbacksCannotNotifyOrDeleteReplacement"
+    ],
+    "L10": [
+      "l10OwnerStopsBetweenAdmittingRequestAndRunningIt",
+      "l10ConsumerFailureDuringCleanupCannotRetainFutureOrChannels",
+      "l10RejectedTimerStillClosesAndCompletesRequest",
+      "l10RejectedOwnerCannotLeaveShutdownFuturePending"
+    ],
+    "L11": [
+      "l11ReportChecksDegreeBeforeCopyingInput",
+      "l11MaximumDegreeUsesOneNotificationTimerAndBoundedReport",
+      "l11LargeBudgetIsCappedAtConfiguredTimeoutAndWrapIsSafe",
+      "l11OwnerQueueTimeConsumesTheSameHalfBudget",
+      "reportCopiesAttemptsAndRejectsNullElements",
+      "attemptRejectsNullSessionAndOutcome"
+    ],
+    "L12": [
+      "l12RealTcpReceivesV1LeaveBeforeConnectionCloses",
+      "l12CloseDoesNotRenewBudgetAfterNotificationTimeout",
+      "l12BorrowedOwnerRemainsOwnedByComposition",
+      "l12ErrorReasonUsesExistingV1Payload"
+    ]
+  },
+  "process_suite": "experiments/construction/020-overlay/test-clean-verify-01-xml/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+  "process": {
+    "M01": [
+      "m01InvalidProfileInRealJvmDoesNotBindItsConfiguredPort",
+      "m01InvalidConfigurationCannotOpenAService",
+      "m01MissingConfigurationCannotOpenAService",
+      "m01HelpHasNoServiceOrConfigLoad",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[1]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[2]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[3]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[4]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[5]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[6]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[7]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[8]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[9]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[10]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[11]",
+      "m01GrammarRejectsAmbiguousOrIncompleteArguments()[12]",
+      "v008RealJvmInvalidConfigurationReturnsTwo",
+      "v008RealJvmHelpReturnsZero"
+    ],
+    "M02": [
+      "m02GrammarAcceptsAllRolesInEitherOrder()[1]",
+      "m02GrammarAcceptsAllRolesInEitherOrder()[2]",
+      "m02GrammarAcceptsAllRolesInEitherOrder()[3]",
+      "m02GrammarAcceptsAllRolesInEitherOrder()[4]",
+      "v008FourRolesConvergeAndPeerLeaveDoesNotRestartSurvivors"
+    ],
+    "M03": [
+      "m03NodeUsesOneSerialObserverAndPhysicallyTerminatesBorrowedOwner"
+    ],
+    "M04": [
+      "m04NeighborsWorksDuringDiscoveryAndQuitClosesBlockedStdin",
+      "m04NeighborsAndQuitUseValidatedProfileAndCloseOnce"
+    ],
+    "M05": [
+      "v008FourRolesConvergeAndPeerLeaveDoesNotRestartSurvivors"
+    ],
+    "M06": [
+      "m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap"
+    ],
+    "M07": [
+      "m07AbruptPeerDeathLeavesSurvivorsRunningAndRestartReconnects",
+      "v008FourRolesConvergeAndPeerLeaveDoesNotRestartSurvivors"
+    ],
+    "M08": [
+      "m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap"
+    ],
+    "M09": [
+      "m09ResourceFailureReturnsThreeInsteadOfHanging",
+      "m09RealBindFailureRollsBackAndReturnsThree"
+    ],
+    "M10": [
+      "m10EofStopsNormallyWithoutAQuitLine",
+      "m10InterruptCleansBeforeRestoringInterruptStatus",
+      "m10RealSigtermWhileStdinIsBlockedTerminatesWithinBudget"
+    ],
+    "M11": [
+      "v008FourRolesConvergeAndPeerLeaveDoesNotRestartSurvivors"
+    ],
+    "M12": [
+      "m12ServiceWaitReceivesOnlyTheRemainingGlobalBudget",
+      "m12FailedPhysicalTerminationReturnsThree"
+    ],
+    "M13": [
+      "m13PhysicalIoJoinsAreProvedBeforeJvmExitWithBlockedOutput",
+      "m13CleanupWriterBlockClosesWithinRemainingGlobalBudget",
+      "m13ClosedStdoutTerminatesInsteadOfBlockingOwner",
+      "m13InputFailureStopsAndCleansService",
+      "m13BlockedStdoutIsClosedAndWriterTerminates",
+      "m13CleanupWriterFailureCannotPublishPrematureFinalExit"
+    ],
+    "M14": [
+      "m14OverlongLineIsReportedAndDoesNotBecomeACommand",
+      "m14FatalLogIsBoundedAndTruncationIsVisible",
+      "m13PhysicalIoJoinsAreProvedBeforeJvmExitWithBlockedOutput"
+    ],
+    "M15": [
+      "m15ClosingFromSerialCallbackNeverWaitsForItsOwnOwner",
+      "m15NodeCannotReviveAfterCloseBeforeStart"
+    ],
+    "M16": [
+      "m16FutureCommandsExplainUnavailabilityAndKeepCliUsable"
+    ]
+  },
+  "related_lifecycle": {
+    "M10": [
+      "L07"
+    ],
+    "M11": [
+      "L01",
+      "L02",
+      "L03",
+      "L04",
+      "L05",
+      "L06",
+      "L07",
+      "L08",
+      "L09",
+      "L10",
+      "L11",
+      "L12"
+    ],
+    "M12": [
+      "L12"
+    ]
+  },
+  "supplemental": {
+    "M17": [
+      "experiments/construction/020-overlay/test-clean-verify-summary.json"
+    ],
+    "M18": [
+      "experiments/construction/020-overlay/test-manual-luis.json",
+      "experiments/construction/020-overlay/test-agent-verification.json"
+    ]
+  },
+  "pending": [
+    "Test approval",
+    "Waheed final review",
+    "integration of reviewed version"
+  ],
+  "new_execution_in_consolidation": false
+}
