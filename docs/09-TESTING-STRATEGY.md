@@ -119,7 +119,12 @@ Responsável: [TASK-006](tasks/PHASE-02/TASK-006.md). Requisitos: RF-002, RF-003
 
 V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado; após descoberta, desligar bootstrap e comprovar reconexão direta sem novas consultas.
 
-Responsável: [TASK-007](tasks/PHASE-02/TASK-007.md). Requisitos: RF-002, RF-003, RF-004, RNF-004, RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-007](tasks/PHASE-02/TASK-007.md). Requisitos: RF-002, RF-003, RF-004, RNF-004, RP-006. Estado: EXECUÇÃO AUTOMATIZADA LOCAL EM IMPLEMENT, ACEITAÇÃO TEST PENDENTE.
+[Prova incremental](../memory-bank/bolts/003-overlay/implementation-walkthrough.md):
+47 testes de vizinhança, incluindo TCP real em seis ordens, desconhecido, reinício
+e reconexão sem bootstrap; regressão `mvn -B -ntp test` com 903 testes/zero falhas.
+Implement aguarda aprovação. clean verify/JAR/manual, revisão humana e integração
+continuam pendentes; esta prova não substitui GUI/CORE/CLI.
 
 ### V-008 — Compor o processo overlay e encerrar de forma previsível
 
@@ -293,3 +298,40 @@ O V pai só fecha quando todas as partes e critérios originais estão satisfeit
 3B: V-026-A separa TCP/processo de UDP-only; controlo saudável não garante recuperação
 de vídeo. O resultado negativo fica na avaliação. 4A mantém Maven/JUnit e oráculos
 críticos, sem CI/linter/percentagem global obrigatórios.
+
+## IMP-004 — Test preparado, aceitação pendente
+
+Implement aprovado explicitamente pelo utilizador; [relatório Test](../memory-bank/bolts/003-overlay/ddd-03-test-report.md)
+preparado em 2026-11-10T16:26:35Z. Clean verify atual: 903 testes (47 de vizinhança),
+zero falhas/erros/ignorados. Manual interativo executado pelo agente Codex no
+JAR verificado: 49 CHECK_PASS, MANUAL_PASS/CLEANUP_COMPLETE, saída Java 0.
+XML/JAR/hash/perfis/log e instruções de repetição pessoal preservados em
+experiments/construction/003-overlay/. Código aprovado e ferramentas intactos
+durante Test. V-007/D01–D22 têm consolidação técnica local, com limites explícitos.
+Q-C-08 continua aberta: V-ADD reprovado com três erros, sem alteração de ferramentas
+ou redução do alcance. Test ainda não aprovado; revisão final humana e integração
+pendentes. TASK/bolt/história/unidade permanecem em progresso, sem implemented=true,
+commits/push/fecho ou GUI/CORE presumidos.
+
+## Test para aprovação — Q-C-08 resolvida
+
+Estado registado em 2026-11-10T16:41:30Z. Patch Q-C-08 aplicado exclusivamente
+como autorizado: [diff +5/−3](../experiments/construction/003-overlay/q-c-08-applied.diff), três ficheiros, restante conteúdo
+local preservado. [V-ADD real](../experiments/construction/003-overlay/q-c-08-v-add-applied.log) passou: saída 0, zero erros;
+validador/alcance intactos. Q-C-08 resolvida. As anteriores referências a
+V-ADD reprovado são históricas. Código Java/testes/configurações sem alteração;
+clean verify de 903 testes e JAR/hash/XML preservados. Manual humano Francisco
+cumprido e aprovado, 49 checks/Java 0. [Checkpoint Test atualizado](../memory-bank/bolts/003-overlay/ddd-03-test-report.md).
+Test ainda por aprovar, current_stage=test, completed=null; não há fecho,
+commits/push ou nova integração. Revisão humana final e integração pendentes.
+
+## IMP-004 — Test aprovado; fecho pendente
+
+Test aprovado explicitamente pelo utilizador, registo em 2026-11-10T16:44:29Z.
+903 testes do clean verify aprovados, manual humano de Francisco cumprido
+(49 checks/Java 0) e V-ADD aprovado; Q-C-08 resolvida.
+[Resumo/diff para revisão humana final](../memory-bank/bolts/003-overlay/final-review-summary.md).
+As cinco etapas estão concluídas; bolt in-progress, current_stage=null,
+completed=null. TASK/história/unidade continuam em progresso, sem implemented=true
+ou DONE. Não há gates externos adicionais; faltam revisão humana final e
+integração. Não executar o fecho nem fazer commits/push nesta autorização.

@@ -1,0 +1,33 @@
+import com.sun.source.tree.*;
+import com.sun.source.util.*;
+import javax.tools.*;
+import java.net.URI;
+import java.nio.file.*;
+import java.util.*;
+import java.util.regex.*;
+public class AstMembers {
+    static String tokens(String text) {
+        var m = Pattern.compile("\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'|[A-Za-z0-9_$]+|[^\\s]").matcher(text);
+        var result = new ArrayList<String>();
+        while (m.find()) if (!m.group().equals("{") && !m.group().equals("}")) result.add(m.group());
+        return String.join(" ", result);
+    }
+    static void members(ClassTree c, String path, List<String> out) {
+        String name = path + "." + c.getSimpleName();
+        out.add(name + " CLASS " + c.getModifiers() + " extends " + c.getExtendsClause() + " implements " + c.getImplementsClause());
+        for (var t : c.getMembers()) {
+            if (t instanceof ClassTree nested) members(nested, name, out);
+            else out.add(name + " " + t.getKind() + " " + tokens(t.toString()));
+        }
+    }
+    public static void main(String[] args) throws Exception {
+        String source = Files.readString(Path.of(args[0]));
+        var input = new SimpleJavaFileObject(URI.create("string:///BootstrapServer.java"), JavaFileObject.Kind.SOURCE) {
+            public CharSequence getCharContent(boolean ignored) { return source; }
+        };
+        var task = (JavacTask) ToolProvider.getSystemJavaCompiler().getTask(null, null, null, List.of("-proc:none"), null, List.of(input));
+        var result = new ArrayList<String>();
+        for (var tree : task.parse()) for (var t : tree.getTypeDecls()) if (t instanceof ClassTree c) members(c, "", result);
+        Collections.sort(result); for (var line : result) System.out.println(line);
+    }
+}

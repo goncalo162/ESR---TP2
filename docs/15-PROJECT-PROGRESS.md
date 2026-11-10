@@ -298,3 +298,108 @@ revistos; Q-C-05 e D01–D22 mantidos. 155 ficheiros de Projeto/ preservados.
 Só Model/Design concluídos; parar antes de Implement/Test. V-007/regressão/manual,
 revisão final atribuída a Denji e integração pendentes. Sem Java/build/testes,
 commits/push/fecho ou outro IMP nesta etapa.
+
+## IMP-004 — Implement para checkpoint
+
+ADR explicitamente aprovada; Q-C-07 resolvida com reposição externa autorizada
+de EventLoop/RealDeadlines. [Implement para checkpoint](../memory-bank/bolts/003-overlay/implementation-walkthrough.md)
+preparado em 2026-11-10T16:12:36Z. Regressão incremental: `mvn -B -ntp test`,
+903 testes (740 configuração +66 codec +31 TCP +19 bootstrap +47 vizinhança),
+zero falhas/erros/ignorados. V-007 tem execução automatizada TCP local;
+Q-C-05/Q-C-06 e D01–D22 preservados. Três ficheiros do IMP +1745/−0;
+BootstrapServer externo +482/−142 separado, 151 ficheiros restantes preservados.
+Implement ainda aguarda aprovação; Test/clean verify/JAR/manual não iniciados,
+revisão final atribuída a Denji e integração pendentes. TASK/bolt/história/unidade
+continuam em progresso, sem implemented=true, commits/push ou fecho.
+
+Validação documental global desta continuação: falhou com três erros em exemplos
+preexistentes de `.specsmd/`, sem alteração desses ficheiros. Q-C-08 regista
+a pendência; V-ADD não aprovado. A regressão Java de 903 testes é independente.
+
+## IMP-004 — Test preparado, aceitação pendente
+
+Implement aprovado explicitamente pelo utilizador; [relatório Test](../memory-bank/bolts/003-overlay/ddd-03-test-report.md)
+preparado em 2026-11-10T16:26:35Z. Clean verify atual: 903 testes (47 de vizinhança),
+zero falhas/erros/ignorados. Manual interativo executado pelo agente Codex no
+JAR verificado: 49 CHECK_PASS, MANUAL_PASS/CLEANUP_COMPLETE, saída Java 0.
+XML/JAR/hash/perfis/log e instruções de repetição pessoal preservados em
+experiments/construction/003-overlay/. Código aprovado e ferramentas intactos
+durante Test. V-007/D01–D22 têm consolidação técnica local, com limites explícitos.
+Q-C-08 continua aberta: V-ADD reprovado com três erros, sem alteração de ferramentas
+ou redução do alcance. Test ainda não aprovado; revisão final humana e integração
+pendentes. TASK/bolt/história/unidade permanecem em progresso, sem implemented=true,
+commits/push/fecho ou GUI/CORE presumidos.
+
+## Checkpoint Test mantido aberto — 2026-11-10T16:29:38Z
+
+O utilizador confirmou que conferiu a evidência técnica, mas manteve Test
+por aprovar até executar o manual humano. Não há execução humana registada
+por esta confirmação. Checkpoint aberto, current_stage=test, completed=null;
+Test não entra em stages_completed. Q-C-08 continua por resolver e V-ADD
+continua reprovado. Sem gates externos adicionais; critérios/validações,
+revisão humana final e integração continuam exigidos antes do fecho.
+Não fechar o bolt nem fazer commits/push.
+
+## Manual humano aprovado — Test ainda aberto
+
+Registo de conferência em 2026-11-10T16:38:44Z.
+Manual humano executado e aprovado por Francisco, confirmado pelo utilizador.
+Conferência do log original: 49 CHECK_PASS distintos, zero CHECK_FAIL,
+MANUAL_PASS CHECKS=49 e CLEANUP_COMPLETE; hash do JAR coincide com o clean verify
+e os cinco hashes de configuração coincidem com os ficheiros da execução.
+JAVA_EXIT=0 é confirmação explícita do utilizador; esse marcador não consta
+do log original do driver, que foi preservado sem edição.
+Test continua por aprovar até tratar V-ADD. Q-C-08 continua aberta; correção
+mínima preparada e ensaiada apenas em cópia isolada, não aplicada às ferramentas.
+Sem fecho/commits/push; revisão humana final e integração continuam pendentes.
+
+[Log Francisco](../experiments/construction/003-overlay/manual-Francisco-execucao-01/manual.log) · [Conferência](../experiments/construction/003-overlay/manual-Francisco-evidence.json) · [Proposta Q-C-08](../experiments/construction/003-overlay/q-c-08-proposal.md).
+
+## Test para aprovação — Q-C-08 resolvida
+
+Estado registado em 2026-11-10T16:41:30Z. Patch Q-C-08 aplicado exclusivamente
+como autorizado: [diff +5/−3](../experiments/construction/003-overlay/q-c-08-applied.diff), três ficheiros, restante conteúdo
+local preservado. [V-ADD real](../experiments/construction/003-overlay/q-c-08-v-add-applied.log) passou: saída 0, zero erros;
+validador/alcance intactos. Q-C-08 resolvida. As anteriores referências a
+V-ADD reprovado são históricas. Código Java/testes/configurações sem alteração;
+clean verify de 903 testes e JAR/hash/XML preservados. Manual humano Francisco
+cumprido e aprovado, 49 checks/Java 0. [Checkpoint Test atualizado](../memory-bank/bolts/003-overlay/ddd-03-test-report.md).
+Test ainda por aprovar, current_stage=test, completed=null; não há fecho,
+commits/push ou nova integração. Revisão humana final e integração pendentes.
+
+## IMP-004 — Test aprovado; fecho pendente
+
+Test aprovado explicitamente pelo utilizador, registo em 2026-11-10T16:44:29Z.
+903 testes do clean verify aprovados, manual humano de Francisco cumprido
+(49 checks/Java 0) e V-ADD aprovado; Q-C-08 resolvida.
+[Resumo/diff para revisão humana final](../memory-bank/bolts/003-overlay/final-review-summary.md).
+As cinco etapas estão concluídas; bolt in-progress, current_stage=null,
+completed=null. TASK/história/unidade continuam em progresso, sem implemented=true
+ou DONE. Não há gates externos adicionais; faltam revisão humana final e
+integração. Não executar o fecho nem fazer commits/push nesta autorização.
+
+## Revisão Denji pendente — plano de integração
+
+Registo em 2026-11-10T16:50:53Z.
+Plano de integração preparado para aprovação, sem staging/commits/push.
+Não foi encontrada confirmação registada da revisão humana final atribuída
+a Denji; essa revisão mantém-se pendente. Aprovação de Test e manual Francisco
+não a substituem. Bolt permanece in-progress/completed=null até revisão e integração.
+A lista proposta exclui target/ e alterações locais alheias. Q-C-08 fica
+separada como patch/evidência: integrar os três ficheiros de ferramentas completos
+importaria conteúdo local anterior alheio (dois não tracked e um substituído
+por versão genérica). Essa importação não é proposta nem autorizada.
+
+[Plano/lista exata](../memory-bank/bolts/003-overlay/integration-plan.md).
+
+## Revisão final Denji aprovada — integração por autorizar
+
+O utilizador confirmou explicitamente que Denji realizou e aprovou a revisão
+humana final desta versão, sem alterações pendentes. Confirmação registada em
+2026-11-10T17:00:44Z; data de execução da revisão não fornecida e não inventada.
+Código permanece idêntico ao aprovado em Test; manual humano de Francisco
+já cumprido, sem repetição. Q-C-08 resolvida, Test/V-ADD aprovados.
+Falta integração autorizada/comprovada para poder tratar DONE. Sem staging,
+commits/push, integração ou fecho nesta autorização.
+
+[Registo da confirmação](../experiments/construction/003-overlay/denji-final-review-confirmation.json).

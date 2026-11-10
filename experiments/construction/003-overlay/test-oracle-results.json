@@ -1,0 +1,337 @@
+{
+  "groups": {
+    "D01": [
+      "d01RejectsZeroInstanceBeforeStart",
+      "d01InvalidOwnerAndEndpointFailBeforeFactories"
+    ],
+    "D02": [
+      "d02TransientDiscoveryErrorRetriesWithBackoff",
+      "d02WrongRequestFailsLocallyAndUnrelatedInboundCannotFailDiscovery",
+      "d02CompleteBootstrapReplyRemainsValidWhenSocketHasAlreadyReachedEof",
+      "d02DiscoveryRejectsPermanentErrorIntactWithoutErrorResponse"
+    ],
+    "D03": [
+      "d03DegreeAboveEffectiveConnectionCapFailsWithoutPartialInstall",
+      "d03DegreeCapAndConfiguredCopiesAreCheckedBeforeAnyPartialDial",
+      "d03SnapshotRequiresConfiguredZeroAndSessionOnlyWhenActive",
+      "d03InvalidListHasNoPartialInstallOrPeerDial"
+    ],
+    "D04": [
+      "d10OldCallbacksCannotDeleteReconnectedInstance",
+      "d21RealReconnectWithoutBootstrapUnknownPeerAndRestartNewInstance"
+    ],
+    "D05": [
+      "d05OnlySmallerIdDialsAndSnapshotIsImmutable"
+    ],
+    "D06": [
+      "d06InvalidInboundEndpointDirectionAndIdentityDoNotAuthorize"
+    ],
+    "D07": [
+      "d07InvalidHelloOkEnvelopeAndRequestCannotPublishUp",
+      "d07UnexpectedErrorBeforeLegitimateWindowClosesLocally",
+      "d07UnexpectedAndWrongIdentityHandshakeErrorsNeverGenerateErrorResponse",
+      "d07ErrorRejectsHelloBeforeFlushAndOldFlushCannotAuthorize"
+    ],
+    "D08": [
+      "d08OutboundNeedsBothFlushAndHelloOkThenDrainsApplicationAfterUp",
+      "d08InboundFlushAndErrorRejectionOfHelloOk",
+      "d08RetentionAtLimitDrainsInFifoOnlyAfterFlush"
+    ],
+    "D09": [
+      "d09DuplicateLiveIdPreservesHealthySession"
+    ],
+    "D10": [
+      "d10OldCallbacksCannotDeleteReconnectedInstance"
+    ],
+    "D11": [
+      "d11WrongActiveIdentityIsIsolatedAndLocalSendValidatesIdentityAndSession",
+      "d11ActiveErrorCapturedBeforeEofIsDeliveredBeforeDown",
+      "d11ActiveErrorsPreserveEveryCodeAndRawRelatedType"
+    ],
+    "D12": [
+      "d12DeadlineIncludesQueueAndWrapAndWinsOverLateOk",
+      "d12DnsAndBindBudgetsIncludeQueueDelayBeforeResultsAreProcessed"
+    ],
+    "D13": [
+      "d13BackoffResetsAfterActiveAndNoImmediateRetryOccurs",
+      "d13BackoffSaturatesAndJitterExtremesStayWithinOneAndMax"
+    ],
+    "D14": [
+      "d14ForgedHelloBeforeDialResultCannotBecomeInbound",
+      "d14InboundWaitsForOtherDialBarrierWithoutExtendingHelloDeadline"
+    ],
+    "D15": [
+      "d15RealDnsRetirementKeepsPhysicalReservationUntilLookupActuallyReturns",
+      "d15RetiredNativeDialClosesLateSuccessAndDoesNotDuplicate"
+    ],
+    "D16": [
+      "d16LeaveProducesOneDownAndKeepsConfiguredEdge"
+    ],
+    "D17": [
+      "d17GlobalRetentionLimitPreservesOtherCandidatesAndReleasesCharges",
+      "d17RetentionOverflowClosesOnlyCandidateAndFreesBufferedFrames",
+      "d17CancelledRunningTimerStillOccupiesItsPhysicalPermit"
+    ],
+    "D18": [
+      "d18ObserverFailureHasExplicitCleanupAndCannotLeaveAnActiveSnapshot",
+      "d18SaturatedOwnerCleansUpWithoutAnotherQueueSlot"
+    ],
+    "D19": [
+      "d19StopDuringDnsAndBindCannotRevive",
+      "d19CloseBeforeStartIsIdempotentAndStartCannotRevive",
+      "d19AwaitPassesOnlyRemainingBudgetAndCloseDoesNotRenewDeadline",
+      "d19SuccessfulCloseRemainsIdempotentAfterItsOriginalBudget",
+      "d19ExternalBorrowedOwnerFailureRunsManagerCleanupOnItsStopHook"
+    ],
+    "D20": [
+      "d20BorrowedOwnerSurvivesManagerShutdownAndReceivesRuntimeOptions",
+      "d20SmallerRuntimeCapsReachTransportAndHandshakeRetention"
+    ],
+    "D21": [
+      "d21SixOrdersAndSimultaneousStartConvergeOnRealTcp",
+      "d21RealReconnectWithoutBootstrapUnknownPeerAndRestartNewInstance"
+    ],
+    "D22": [
+      "clean verify: 903 passing tests; JAR SHA-256 and XML preserved",
+      "manual: 49 passing checks; human acceptance/review/integration pending"
+    ]
+  },
+  "neighbor_testcases": [
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d20BorrowedOwnerSurvivesManagerShutdownAndReceivesRuntimeOptions",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d03DegreeAboveEffectiveConnectionCapFailsWithoutPartialInstall",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d19StopDuringDnsAndBindCannotRevive",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d15RealDnsRetirementKeepsPhysicalReservationUntilLookupActuallyReturns",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d15RetiredNativeDialClosesLateSuccessAndDoesNotDuplicate",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d03DegreeCapAndConfiguredCopiesAreCheckedBeforeAnyPartialDial",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d01RejectsZeroInstanceBeforeStart",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d14ForgedHelloBeforeDialResultCannotBecomeInbound",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d07InvalidHelloOkEnvelopeAndRequestCannotPublishUp",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d02TransientDiscoveryErrorRetriesWithBackoff",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d08OutboundNeedsBothFlushAndHelloOkThenDrainsApplicationAfterUp",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d11WrongActiveIdentityIsIsolatedAndLocalSendValidatesIdentityAndSession",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d03SnapshotRequiresConfiguredZeroAndSessionOnlyWhenActive",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d01InvalidOwnerAndEndpointFailBeforeFactories",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d02WrongRequestFailsLocallyAndUnrelatedInboundCannotFailDiscovery",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d08InboundFlushAndErrorRejectionOfHelloOk",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d19CloseBeforeStartIsIdempotentAndStartCannotRevive",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d19AwaitPassesOnlyRemainingBudgetAndCloseDoesNotRenewDeadline",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d20SmallerRuntimeCapsReachTransportAndHandshakeRetention",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d12DeadlineIncludesQueueAndWrapAndWinsOverLateOk",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d13BackoffResetsAfterActiveAndNoImmediateRetryOccurs",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d21SixOrdersAndSimultaneousStartConvergeOnRealTcp",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d03InvalidListHasNoPartialInstallOrPeerDial",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d11ActiveErrorCapturedBeforeEofIsDeliveredBeforeDown",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d19SuccessfulCloseRemainsIdempotentAfterItsOriginalBudget",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d06InvalidInboundEndpointDirectionAndIdentityDoNotAuthorize",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d19ExternalBorrowedOwnerFailureRunsManagerCleanupOnItsStopHook",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d08RetentionAtLimitDrainsInFifoOnlyAfterFlush",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d17GlobalRetentionLimitPreservesOtherCandidatesAndReleasesCharges",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d18ObserverFailureHasExplicitCleanupAndCannotLeaveAnActiveSnapshot",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d17RetentionOverflowClosesOnlyCandidateAndFreesBufferedFrames",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d16LeaveProducesOneDownAndKeepsConfiguredEdge",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d09DuplicateLiveIdPreservesHealthySession",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d14InboundWaitsForOtherDialBarrierWithoutExtendingHelloDeadline",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d13BackoffSaturatesAndJitterExtremesStayWithinOneAndMax",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d02CompleteBootstrapReplyRemainsValidWhenSocketHasAlreadyReachedEof",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d17CancelledRunningTimerStillOccupiesItsPhysicalPermit",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d18SaturatedOwnerCleansUpWithoutAnotherQueueSlot",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d07UnexpectedErrorBeforeLegitimateWindowClosesLocally",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d10OldCallbacksCannotDeleteReconnectedInstance",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d02DiscoveryRejectsPermanentErrorIntactWithoutErrorResponse",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d12DnsAndBindBudgetsIncludeQueueDelayBeforeResultsAreProcessed",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d11ActiveErrorsPreserveEveryCodeAndRawRelatedType",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d21RealReconnectWithoutBootstrapUnknownPeerAndRestartNewInstance",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d07UnexpectedAndWrongIdentityHandshakeErrorsNeverGenerateErrorResponse",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d05OnlySmallerIdDialsAndSnapshotIsImmutable",
+      "pass": true
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.NeighborManagerTest",
+      "name": "d07ErrorRejectsHelloBeforeFlushAndOldFlushCannotAuthorize",
+      "pass": true
+    }
+  ],
+  "scope": "Representative critical cases, deterministic fakes plus real loopback TCP; not exhaustive thread interleavings; no GUI/CORE/CLI/video claim."
+}

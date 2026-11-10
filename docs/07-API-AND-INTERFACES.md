@@ -218,3 +218,32 @@ e valida antes de sockets. Não muda os bytes v1 ou a semântica de send.
 Resposta 3B / ADR-025: deteção automática continua a usar TCP/sondas. Bloqueio
 apenas de UDP com controlo saudável não garante troca de parent/recuperação.
 O teste deve documentar interrupção/counters e essa limitação sem criar watchdog.
+
+## Estado incremental de NeighborManager — IMP-004
+
+Implementação local preparada, ainda sujeita ao checkpoint Implement.
+`NeighborManager(NodeConfiguration, UUID, Observer)` fornece `start()`,
+`snapshot()`, `diagnostics()`, `send(Session, ControlMessage)`, `disconnect(Session)`,
+`requestClose()`, `awaitTermination(Duration)` e `close()`. O construtor com
+`SerialOwner` permite partilhar o dono serial do nó. Eventos tipados incluem
+NeighborUp/NeighborDown/Received/Diagnostic; snapshots contêm Session imutável.
+READY confirma a instalação da lista, sem prometer todos os peers online.
+ERROR ACTIVE é entregue intacto ao consumidor; envio ACCEPTED só enfileira.
+[Implement e limites](../memory-bank/bolts/003-overlay/implementation-walkthrough.md).
+As referências anteriores a HELLO por implementar são históricas; CLI continua
+por implementar. Formatos v1 não foram alterados. Test/manual/revisão final e
+integração permanecem pendentes; não se declara API aprovada ou serviço entregue.
+
+## IMP-004 — Test preparado, aceitação pendente
+
+Implement aprovado explicitamente pelo utilizador; [relatório Test](../memory-bank/bolts/003-overlay/ddd-03-test-report.md)
+preparado em 2026-11-10T16:26:35Z. Clean verify atual: 903 testes (47 de vizinhança),
+zero falhas/erros/ignorados. Manual interativo executado pelo agente Codex no
+JAR verificado: 49 CHECK_PASS, MANUAL_PASS/CLEANUP_COMPLETE, saída Java 0.
+XML/JAR/hash/perfis/log e instruções de repetição pessoal preservados em
+experiments/construction/003-overlay/. Código aprovado e ferramentas intactos
+durante Test. V-007/D01–D22 têm consolidação técnica local, com limites explícitos.
+Q-C-08 continua aberta: V-ADD reprovado com três erros, sem alteração de ferramentas
+ou redução do alcance. Test ainda não aprovado; revisão final humana e integração
+pendentes. TASK/bolt/história/unidade permanecem em progresso, sem implemented=true,
+commits/push/fecho ou GUI/CORE presumidos.

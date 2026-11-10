@@ -1,0 +1,2561 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java b/Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java
+index 334a0d7..1f5fd60 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java
+@@ -33,314 +33,654 @@ import java.util.concurrent.atomic.AtomicReference;
+ import java.util.function.LongSupplier;
+ 
+ /** Initial configured-neighbor lookup only: no membership, leases, liveness or routing. */
+-public final class BootstrapServer implements AutoCloseable {
++public final class BootstrapServer implements AutoCloseable 
++{
++    //* Atributos, Interfaces e Records
++
+     private static final UUID ZERO = new UUID(0, 0);
+     private static final int EVENTS_CAPACITY = 4096;
+-    interface Channel {
++    private static final ThreadLocal<Boolean> CALLBACK = ThreadLocal.withInitial(() -> false);
++    private final AtomicReference<Transport> transport = new AtomicReference<>();
++    private final Core core;
++    private final SerialEvents events;
++    private final Deadlines deadlines;
++    private final Duration shutdownTimeout;
++
++
++    interface Channel 
++    {
+         UUID id();
+         boolean isOpen();
+         CompletableFuture<Void> sendAndFlush(ControlMessage message);
+         void close();
+     }
+-    interface Ticket { void cancel(); }
+-    interface Deadlines {
++
++    interface Ticket 
++    { 
++        void cancel(); 
++    }
++
++    interface Deadlines 
++    {
+         Ticket schedule(Runnable task, long delayNanos);
+         void close();
+         boolean await(Duration timeout) throws InterruptedException;
+     }
+-    interface SerialEvents {
++
++    interface SerialEvents 
++    {
+         void execute(Runnable task);
+         boolean isOwnerThread();
+         void close();
+         boolean await(Duration timeout) throws InterruptedException;
+     }
+-    interface TransportFactory {
++
++    interface TransportFactory 
++    {
+         Transport open(InetSocketAddress bind, Transport.Listener listener, Transport.Options options) throws IOException;
+     }
+-    private record Plan(NodeConfiguration config, Map<String, TopologyConfiguration.Node> nodes,
+-                        Transport.Options options) { }
+-    private record EndpointKey(String host, int port, boolean udp) { }
+-    private record TcpChannel(Connection connection) implements Channel {
++
++
++    private record Plan(NodeConfiguration config, Map<String, TopologyConfiguration.Node> nodes,Transport.Options options) {}
++
++    private record EndpointKey(String host, int port, boolean udp) {}
++
++    private record TcpChannel(Connection connection) implements Channel 
++    {
+         @Override public UUID id() { return connection.id(); }
+         @Override public boolean isOpen() { return connection.isOpen(); }
+         @Override public CompletableFuture<Void> sendAndFlush(ControlMessage message) { return connection.sendAndFlush(message); }
+         @Override public void close() { connection.close(); }
+     }
+-    private static final ThreadLocal<Boolean> CALLBACK = ThreadLocal.withInitial(() -> false);
+-    private final AtomicReference<Transport> transport = new AtomicReference<>();
+-    private final Core core;
+-    private final SerialEvents events;
+-    private final Deadlines deadlines;
+-    private final Duration shutdownTimeout;
+ 
+-    public BootstrapServer(NodeConfiguration configuration) throws IOException {
++
++
++    //* Construtores e Métodos Auxiliares de Inicialização
++
++    public BootstrapServer(NodeConfiguration configuration) throws IOException 
++    {
+         this(validate(configuration), null, System::nanoTime, new RealDeadlines(), new EventLoop(), Transport::new);
+     }
+-    BootstrapServer(NodeConfiguration configuration, InetSocketAddress bind) throws IOException {
++
++    BootstrapServer(NodeConfiguration configuration, InetSocketAddress bind) throws IOException 
++    {
+         this(validate(configuration), bind, System::nanoTime, new RealDeadlines(), new EventLoop(), Transport::new);
+     }
++
+     BootstrapServer(NodeConfiguration configuration, InetSocketAddress bind, LongSupplier clock,
+-                    Deadlines deadlines, SerialEvents events, TransportFactory factory) throws IOException {
++                    Deadlines deadlines, SerialEvents events, TransportFactory factory) throws IOException 
++    {
+         this(validate(configuration), bind, clock, deadlines, events, factory);
+     }
++
++
+     private BootstrapServer(Plan plan, InetSocketAddress bind, LongSupplier clock,
+-                            Deadlines deadlines, SerialEvents events, TransportFactory factory) throws IOException {
+-        Objects.requireNonNull(clock); Objects.requireNonNull(factory);
++                            Deadlines deadlines, SerialEvents events, TransportFactory factory) throws IOException 
++    {
++        Objects.requireNonNull(clock); 
++        Objects.requireNonNull(factory);
+         this.deadlines = Objects.requireNonNull(deadlines);
+         this.events = Objects.requireNonNull(events);
++
+         shutdownTimeout = plan.config.runtime().control().shutdownTimeout();
+         core = new Core(plan, nonzeroInstance(), clock, deadlines, events);
+         core.onStop = () -> { var tcp = transport.get(); if (tcp != null) tcp.requestClose(); };
+-        try {
+-            if (bind == null) bind = new InetSocketAddress(InetAddress.getByName(plan.config.bindHost()), plan.config.controlPort());
+-            if (bind.isUnresolved() || (bind.getPort() != 0 && bind.getPort() != plan.config.controlPort()))
++
++        try{
++            if(bind == null) 
++                bind = new InetSocketAddress(InetAddress.getByName(plan.config.bindHost()), plan.config.controlPort());
++            if(bind.isUnresolved() || (bind.getPort() != 0 && bind.getPort() != plan.config.controlPort()))
+                 throw new IllegalArgumentException("Resolved configured bind required (zero only for tests)");
+-            var listener = new Transport.Listener() {
++
++            var listener = new Transport.Listener() 
++            {
+                 @Override public void connectionOpen(Connection c) { callback(() -> core.open(new TcpChannel(c))); }
+                 @Override public void message(Connection c, ControlMessage m) { callback(() -> core.message(new TcpChannel(c), m)); }
+                 @Override public void connectionClosed(Connection c, Connection.CloseReason reason) { callback(() -> core.closed(new TcpChannel(c))); }
+             };
++
+             var tcp = factory.open(bind, listener, plan.options);
+             transport.set(tcp);
+-            if (core.stopping.get()) {
+-                tcp.requestClose(); throw new IOException("Bootstrap stopped during startup");
++            if(core.stopping.get()) 
++            {
++                tcp.requestClose(); 
++                throw new IOException("Bootstrap stopped during startup");
+             }
+-        } catch (IOException | RuntimeException e) {
++
++        }catch (IOException | RuntimeException e){
+             core.requestStop(); deadlines.close();
+-            try { awaitStopped(shutdownTimeout); }
+-            catch (RuntimeException cleanup) { e.addSuppressed(cleanup); }
++            try 
++            { 
++                awaitStopped(shutdownTimeout); 
++            }catch (RuntimeException cleanup) { 
++                e.addSuppressed(cleanup); 
++            }
++
+             throw e;
+         }
+     }
+-    private static UUID nonzeroInstance() {
++
++
++    private static UUID nonzeroInstance() 
++    {
+         UUID value;
+         do { value = UUID.randomUUID(); } while (ZERO.equals(value));
+         return value;
+     }
+-    private static void callback(Runnable action) {
+-        boolean previous = CALLBACK.get(); CALLBACK.set(true);
+-        try { action.run(); }
+-        finally { if (previous) CALLBACK.set(true); else CALLBACK.remove(); }
++
++
++    private static void callback(Runnable action) 
++    {
++        boolean previous = CALLBACK.get(); 
++        CALLBACK.set(true);
++        try 
++        { 
++            action.run();
++
++        }finally{ 
++            if (previous) 
++                CALLBACK.set(true); 
++            else 
++                CALLBACK.remove(); 
++        }
++    }
++
++
++    public InetSocketAddress localAddress() 
++    {
++        return transport.get().localAddress(); 
+     }
+-    public InetSocketAddress localAddress() { return transport.get().localAddress(); }
+ 
+-    @Override public void close() {
++
++    @Override public void close() 
++    {
+         long started = System.nanoTime();
+         core.requestStop();
+-        var tcp = transport.get(); if (tcp != null) tcp.requestClose();
++
++        var tcp = transport.get(); 
++        if (tcp != null) 
++            tcp.requestClose();
+         deadlines.close();
+-        if (CALLBACK.get() || events.isOwnerThread()) return;
++
++        if (CALLBACK.get() || events.isOwnerThread()) 
++            return;
++
+         awaitStopped(Duration.ofNanos(Math.max(0, shutdownTimeout.toNanos() - (System.nanoTime() - started))));
+-        if (core.failure != null) throw new IllegalStateException("Bootstrap control processing failed", core.failure);
++        if (core.failure != null) 
++            throw new IllegalStateException("Bootstrap control processing failed", core.failure);
+     }
+-    private void awaitStopped(Duration budget) {
++
++
++    private void awaitStopped(Duration budget) 
++    {
+         long started = System.nanoTime();
+-        try {
++        try{
+             var tcp = transport.get();
+-            if (tcp != null && !tcp.awaitTermination(remaining(budget, started)))
++            if(tcp != null && !tcp.awaitTermination(remaining(budget, started)))
+                 throw new IllegalStateException("Bootstrap TCP workers did not terminate");
+-            if (!events.await(remaining(budget, started)) || !deadlines.await(remaining(budget, started)))
++            if(!events.await(remaining(budget, started)) || !deadlines.await(remaining(budget, started)))
+                 throw new IllegalStateException("Bootstrap control workers did not terminate");
+-        } catch (InterruptedException e) {
++
++        }catch (InterruptedException e){
+             Thread.currentThread().interrupt(); throw new IllegalStateException("Bootstrap shutdown interrupted", e);
+         }
+     }
+-    private static Duration remaining(Duration budget, long started) {
++
++
++    private static Duration remaining(Duration budget, long started) 
++    {
+         long millis = TimeUnit.NANOSECONDS.toMillis(budget.toNanos() - (System.nanoTime() - started));
+-        if (millis < 1) throw new IllegalStateException("Bootstrap shutdown deadline exceeded");
++        if(millis < 1) 
++            throw new IllegalStateException("Bootstrap shutdown deadline exceeded");
+         return Duration.ofMillis(millis);
+     }
+ 
+-    static String normalizeHost(String host) { return normalizeHost(host, false); }
+-    private static String normalizeHost(String host, boolean allowWildcard) {
++
++    static String normalizeHost(String host) 
++    { 
++        return normalizeHost(host, false); 
++    }
++
++
++    private static String normalizeHost(String host, boolean allowWildcard) 
++    {
+         try {
+-            if (host == null || host.isEmpty() || host.length() > 253 || !host.chars().allMatch(c -> c > 32 && c < 127))
++            if(host == null || host.isEmpty() || host.length() > 253 || !host.chars().allMatch(c -> c > 32 && c < 127))
+                 throw new IllegalArgumentException();
+             new URI("ott", null, host, -1, null, null, null).parseServerAuthority();
++
+             String result = host.toLowerCase(Locale.ROOT);
+-            if (result.startsWith("[") && result.endsWith("]")) result = result.substring(1, result.length() - 1);
+-            if (result.endsWith(".")) result = result.substring(0, result.length() - 1);
+-            if (result.matches("[0-9.]+") && result.contains(".")) {
++            if(result.startsWith("[") && result.endsWith("]")) 
++                result = result.substring(1, result.length() - 1);
++            if(result.endsWith(".")) 
++                result = result.substring(0, result.length() - 1);
++
++            if(result.matches("[0-9.]+") && result.contains(".")) 
++            {
+                 String[] parts = result.split("\\.", -1);
+-                if (parts.length != 4) throw new IllegalArgumentException();
+-                for (int i = 0; i < parts.length; i++) {
++                if(parts.length != 4) 
++                    throw new IllegalArgumentException();
++
++                for(int i = 0; i < parts.length; i++) 
++                {
+                     int n = Integer.parseInt(parts[i]);
+-                    if (n > 255) throw new IllegalArgumentException();
++                    if(n > 255) 
++                        throw new IllegalArgumentException();
++
+                     parts[i] = Integer.toString(n);
+                 }
+                 result = String.join(".", parts);
+             }
++
+             String address = result.split("%", 2)[0];
+             boolean wildcard = address.equals("0.0.0.0") || (address.contains(":") && address.replace(":", "").matches("0*"));
+-            if (wildcard && !allowWildcard) throw new IllegalArgumentException();
++
++            if(wildcard && !allowWildcard) 
++                throw new IllegalArgumentException();
+             return result;
+-        } catch (URISyntaxException | IllegalArgumentException e) {
++        }catch (URISyntaxException | IllegalArgumentException e){
+             throw new IllegalArgumentException("Invalid configured or advertised host", e);
+         }
+     }
+-    private static void require(boolean condition, String detail) {
+-        if (!condition) throw new IllegalArgumentException(detail);
++
++    private static void require(boolean condition, String detail) 
++    {
++        if(!condition) 
++            throw new IllegalArgumentException(detail);
++    }
++
++    private static void nodeId(String id) 
++    { 
++        require(id != null && id.matches("[A-Za-z0-9_-]{1,32}"), "Invalid node ID"); 
+     }
+-    private static void nodeId(String id) { require(id != null && id.matches("[A-Za-z0-9_-]{1,32}"), "Invalid node ID"); }
+-    private static void port(int port) { require(port >= 1 && port <= 65535, "Invalid endpoint port"); }
+-    private static Plan validate(NodeConfiguration config) {
++
++    private static void port(int port) 
++    { 
++        require(port >= 1 && port <= 65535, "Invalid endpoint port"); 
++    }
++
++    private static Plan validate(NodeConfiguration config) 
++    {
+         require(config != null && config.role() == NodeRole.BOOTSTRAP, "BOOTSTRAP configuration required");
+-        nodeId(config.nodeId()); port(config.controlPort()); normalizeHost(config.bindHost(), true);
++        nodeId(config.nodeId()); 
++        port(config.controlPort()); 
++
++        normalizeHost(config.bindHost(), true);
+         String advertised = normalizeHost(config.advertisedHost());
++
+         require(config.dataPort() == 0 && config.bootstrap().isEmpty() && config.streamsFile().isEmpty()
+                 && config.mediaBase().isEmpty() && config.streams().isEmpty(), "Incompatible bootstrap profile");
++
+         require(config.topology().isPresent() && config.topologyFile().isPresent(), "Topology required");
++
+         var original = config.topology().orElseThrow().nodes();
+         require(!original.isEmpty() && original.size() <= 64 && !original.containsKey(config.nodeId()), "Invalid topology size or bootstrap ID");
++        
+         var nodes = new LinkedHashMap<String, TopologyConfiguration.Node>();
++
+         var endpoints = new HashSet<EndpointKey>(); endpoints.add(new EndpointKey(advertised, config.controlPort(), false));
+-        original.forEach((id, n) -> {
+-            nodeId(id); require(n != null && id.equals(n.nodeId()), "Topology ID mismatch");
++
++        original.forEach((id, n) -> 
++        {
++            nodeId(id); 
++            require(n != null && id.equals(n.nodeId()), "Topology ID mismatch");
+             require(n.role() != null && n.role() != NodeRole.BOOTSTRAP, "Invalid overlay role");
++
+             port(n.controlPort()); port(n.dataPort()); String host = normalizeHost(n.host());
+             require(endpoints.add(new EndpointKey(host, n.controlPort(), false))
+                     && endpoints.add(new EndpointKey(host, n.dataPort(), true)), "Endpoint collision");
++
+             require(!n.neighbors().isEmpty() && n.neighbors().size() <= 63, "Invalid degree");
+-            for (String neighbor : n.neighbors()) nodeId(neighbor);
++
++            for(String neighbor : n.neighbors())
++            {
++                nodeId(neighbor);
++            }
++
+             nodes.put(id, new TopologyConfiguration.Node(id, host, n.controlPort(), n.dataPort(), n.role(), n.neighbors()));
+         });
+-        for (var n : nodes.values()) for (String id : n.neighbors())
+-            require(!id.equals(n.nodeId()) && nodes.containsKey(id) && nodes.get(id).neighbors().contains(n.nodeId()), "Invalid or asymmetric edge");
++
++        for(var n : nodes.values())
++        {
++            for (String id : n.neighbors())
++            {
++                require(!id.equals(n.nodeId()) && nodes.containsKey(id) && nodes.get(id).neighbors()
++                                                                .contains(n.nodeId()), "Invalid or asymmetric edge");
++            }
++        }
++        
+         var c = config.runtime().control();
+         return new Plan(config, Collections.unmodifiableMap(nodes),
+                 new Transport.Options(c.queueCapacity(), c.maxConnections(), c.connectTimeout(), c.shutdownTimeout()));
+     }
+ 
+-    static final class Core {
++    //* Validação e Ciclo de Vida
++
++    static final class Core 
++    {
++        //* Atributos e Subclasses
++
+         private final Plan plan;
+         private final UUID instance;
+         private final LongSupplier clock;
+         private final Deadlines deadlines;
+         private final SerialEvents events;
++
+         final AtomicBoolean stopping = new AtomicBoolean();
+         volatile RuntimeException failure;
+         volatile Runnable onStop = () -> { };
+-        Core(NodeConfiguration config, UUID instance, LongSupplier clock, Deadlines deadlines, SerialEvents events) {
+-            this(validate(config), instance, clock, deadlines, events);
+-        }
+-        private Core(Plan plan, UUID instance, LongSupplier clock, Deadlines deadlines, SerialEvents events) {
+-            this.plan = plan; this.instance = Objects.requireNonNull(instance);
+-            require(!ZERO.equals(instance), "Bootstrap execution instance required");
+-            this.clock = Objects.requireNonNull(clock); this.deadlines = Objects.requireNonNull(deadlines); this.events = Objects.requireNonNull(events);
+-        }
+-        private static final class Context {
++
++        private final Map<UUID, Context> contexts = new LinkedHashMap<>();
++        private boolean cleaned;
++
++
++        /** Estado por ligação: canal, instante de chegada, ticket de prazo e flag de resposta. */
++        private static final class Context 
++        {
+             final Channel channel;
+             final long started;
+             Ticket ticket;
+             boolean responding;
+-            Context(Channel channel, long started) { this.channel = channel; this.started = started; }
++
++            Context(Channel channel, long started) 
++            { 
++                this.channel = channel; 
++                this.started = started; 
++            }
+         }
+-        private final Map<UUID, Context> contexts = new LinkedHashMap<>();
+-        private boolean cleaned;
+-        private long budget() { return plan.config.runtime().control().bootstrapQueryTimeout().toNanos(); }
+-        private boolean expired(Context context) { return clock.getAsLong() - context.started >= budget(); }
+ 
+-        void open(Channel channel) {
++
++        //* Construtores
++
++        Core(NodeConfiguration config, UUID instance, LongSupplier clock, Deadlines deadlines, SerialEvents events) 
++        {
++            this(validate(config), instance, clock, deadlines, events);
++        }
++
++        private Core(Plan plan, UUID instance, LongSupplier clock, Deadlines deadlines, SerialEvents events) 
++        {
++            this.plan = plan;
++            this.instance = Objects.requireNonNull(instance);
++            require(!ZERO.equals(instance), "Bootstrap execution instance required");
++
++            this.clock = Objects.requireNonNull(clock);
++            this.deadlines = Objects.requireNonNull(deadlines);
++            this.events = Objects.requireNonNull(events);
++        }
++
++
++        //* Prazos (Deadlines)
++
++        /** Orçamento temporal máximo que uma ligação pode ficar aberta à espera de REGISTER. */
++        private long budget() 
++        { 
++            return plan.config.runtime().control().bootstrapQueryTimeout().toNanos(); 
++        }
++
++        /** Verifica se o contexto já consumiu todo o seu orçamento temporal. */
++        private boolean expired(Context context) 
++        { 
++            return clock.getAsLong() - context.started >= budget(); 
++        }
++
++
++        //* Processamento de Eventos
++
++        /** Registo de uma nova ligação; agenda o fecho automático se não chegar REGISTER a tempo. */
++        void open(Channel channel) 
++        {
+             long started = clock.getAsLong();
+-            if (!post(() -> {
++
++            if(!post(() -> 
++            {
+                 var context = new Context(channel, started);
+-                if (!channel.isOpen() || expired(context) || contexts.size() >= plan.options.maxConnections()
+-                        || contexts.containsKey(channel.id())) { channel.close(); return; }
++
++                // Rejeita ligações inválidas, fora de prazo, acima do limite ou duplicadas.
++                if(!channel.isOpen() || expired(context) 
++                        || contexts.size() >= plan.options.maxConnections() 
++                        || contexts.containsKey(channel.id())) 
++                { 
++                    channel.close(); 
++                    return; 
++                }
++
+                 contexts.put(channel.id(), context);
++
+                 long remaining = budget() - (clock.getAsLong() - started);
+-                if (remaining <= 0) { finish(context); return; }
+-                context.ticket = deadlines.schedule(() -> post(() -> {
+-                    if (contexts.get(channel.id()) == context && expired(context)) finish(context);
++                if(remaining <= 0) 
++                { 
++                    finish(context); 
++                    return; 
++                }
++
++                // Agenda o prazo: fecha a ligação se expirar sem resposta.
++                context.ticket = deadlines.schedule(() -> post(() -> 
++                {
++                    if(contexts.get(channel.id()) == context && expired(context)) 
++                        finish(context);
+                 }), remaining);
++
+             })) channel.close();
+         }
+ 
+-        void message(Channel channel, ControlMessage message) {
+-            post(() -> {
++        /** Processa uma mensagem recebida; só REGISTER é válido e gera REGISTER_OK com a lista de vizinhos. */
++        void message(Channel channel, ControlMessage message) 
++        {
++            post(() -> 
++            {
+                 var context = contexts.get(channel.id());
+-                if (context == null) return;
+-                if (expired(context) || !channel.isOpen()) { finish(context); return; }
+-                if (context.responding) return;
++                if(context == null) 
++                    return;
++
++                if(expired(context) || !channel.isOpen()) 
++                { 
++                    finish(context); 
++                    return; 
++                }
++
++                // Ignora mensagens adicionais enquanto a resposta anterior ainda não terminou.
++                if(context.responding) 
++                    return;
++
+                 ControlMessage.Payload response;
+                 MessageType type;
+-                if (message.type() != MessageType.REGISTER) {
+-                    response = error(ErrorCode.INVALID_MESSAGE, message, "Only REGISTER is accepted"); type = MessageType.ERROR;
+-                } else if (!(message.payload() instanceof ControlMessage.EndpointPayload payload)
++
++                // Valida o tipo da mensagem.
++                if(message.type() != MessageType.REGISTER) 
++                {
++                    response = error(ErrorCode.INVALID_MESSAGE, message, "Only REGISTER is accepted"); 
++                    type = MessageType.ERROR;
++                }
++                // Valida a coerência da identidade do remetente com o endpoint anunciado.
++                else if(!(message.payload() instanceof ControlMessage.EndpointPayload payload)
+                         || payload.endpoint() == null
+                         || !Objects.equals(message.senderId(), payload.endpoint().nodeId())
+                         || payload.endpoint().instanceId() == null || ZERO.equals(payload.endpoint().instanceId())
+-                        || !Objects.equals(message.senderInstance(), payload.endpoint().instanceId())) {
+-                    response = error(ErrorCode.INVALID_MESSAGE, message, "Inconsistent sender identity"); type = MessageType.ERROR;
+-                } else if (!authorized(message.senderId(), payload.endpoint())) {
+-                    response = error(ErrorCode.UNAUTHORIZED_NEIGHBOR, message, "Node or endpoint is not configured"); type = MessageType.ERROR;
+-                } else {
++                        || !Objects.equals(message.senderInstance(), payload.endpoint().instanceId())) 
++                {
++                    response = error(ErrorCode.INVALID_MESSAGE, message, "Inconsistent sender identity"); 
++                    type = MessageType.ERROR;
++                }
++                // Valida se o nó e o endpoint pertencem à topologia configurada.
++                else if(!authorized(message.senderId(), payload.endpoint())) 
++                {
++                    response = error(ErrorCode.UNAUTHORIZED_NEIGHBOR, message, "Node or endpoint is not configured"); 
++                    type = MessageType.ERROR;
++                }
++                // Pedido válido: devolve a lista de vizinhos configurada para o remetente.
++                else 
++                {
+                     var neighbors = new ArrayList<ControlMessage.Endpoint>();
+-                    for (String id : plan.nodes.get(message.senderId()).neighbors()) {
++
++                    for(String id : plan.nodes.get(message.senderId()).neighbors()) 
++                    {
+                         var node = plan.nodes.get(id);
+                         neighbors.add(new ControlMessage.Endpoint(id, ZERO, node.host(), node.controlPort(), node.dataPort(), node.role()));
+                     }
+-                    response = new ControlMessage.NeighborList(neighbors); type = MessageType.REGISTER_OK;
++
++                    response = new ControlMessage.NeighborList(neighbors); 
++                    type = MessageType.REGISTER_OK;
+                 }
++
++                // Envia a resposta e fecha o contexto quando o envio termina.
+                 context.responding = true;
+                 var reply = new ControlMessage(type, message.requestId(), plan.config.nodeId(), instance, response);
+-                channel.sendAndFlush(reply).whenComplete((ignored, error) -> callback(() -> post(() -> {
+-                    if (contexts.get(channel.id()) == context) finish(context);
++
++                channel.sendAndFlush(reply).whenComplete((ignored, error) -> callback(() -> post(() -> 
++                {
++                    if(contexts.get(channel.id()) == context) 
++                        finish(context);
+                 })));
+             });
+         }
+-        private boolean authorized(String sender, ControlMessage.Endpoint endpoint) {
++
++        /** Fecho de ligação reportado pelo transporte. */
++        void closed(Channel channel) 
++        {
++            post(() -> 
++            { 
++                var context = contexts.get(channel.id()); 
++                if(context != null) 
++                    finish(context); 
++            });
++        }
++
++
++        //* Autorização
++
++        /** Confirma que o remetente e o endpoint anunciado correspondem exatamente à topologia configurada. */
++        private boolean authorized(String sender, ControlMessage.Endpoint endpoint) 
++        {
+             var node = plan.nodes.get(sender);
+-            if (node == null || node.role() != endpoint.role() || node.controlPort() != endpoint.controlPort()
+-                    || node.dataPort() != endpoint.dataPort()) return false;
+-            try { return node.host().equals(normalizeHost(endpoint.host())); }
+-            catch (IllegalArgumentException e) { return false; }
++
++            if(node == null || node.role() != endpoint.role() 
++                    || node.controlPort() != endpoint.controlPort() 
++                    || node.dataPort() != endpoint.dataPort()) 
++                return false;
++
++            try 
++            { 
++                return node.host().equals(normalizeHost(endpoint.host())); 
++            }
++            catch (IllegalArgumentException e) 
++            { 
++                return false; 
++            }
+         }
+-        private static ControlMessage.ErrorPayload error(ErrorCode code, ControlMessage request, String detail) {
++
++
++        //* Respostas de Erro
++
++        /** Constrói a payload de erro que responde a um pedido inválido. */
++        private static ControlMessage.ErrorPayload error(ErrorCode code, ControlMessage request, String detail) 
++        {
+             return new ControlMessage.ErrorPayload(code, request.type().code(), detail);
+         }
+-        void closed(Channel channel) {
+-            post(() -> { var context = contexts.get(channel.id()); if (context != null) finish(context); });
+-        }
+-        private void finish(Context context) {
+-            if (!contexts.remove(context.channel.id(), context)) return;
+-            if (context.ticket != null) context.ticket.cancel();
++
++
++        //* Limpeza e Encerramento
++
++        /** Remove o contexto do mapa, cancela o prazo pendente e fecha o canal. */
++        private void finish(Context context) 
++        {
++            if(!contexts.remove(context.channel.id(), context)) 
++                return;
++
++            if(context.ticket != null) 
++                context.ticket.cancel();
++
+             context.channel.close();
+         }
+-        private boolean post(Runnable event) {
+-            if (stopping.get()) return false;
+-            try {
+-                events.execute(() -> {
+-                    if (stopping.get()) { cleanup(); return; }
+-                    try { event.run(); }
+-                    catch (RuntimeException e) { fail(e); }
+-                    finally { if (stopping.get()) cleanup(); }
++
++        /** Submete um evento no loop serial; devolve false (e fecha o canal) se o servidor já estiver a parar. */
++        private boolean post(Runnable event) 
++        {
++            if(stopping.get()) 
++                return false;
++
++            try 
++            {
++                events.execute(() -> 
++                {
++                    if(stopping.get()) 
++                    { 
++                        cleanup(); 
++                        return; 
++                    }
++
++                    try 
++                    { 
++                        event.run(); 
++                    }
++                    catch (RuntimeException e) 
++                    { 
++                        fail(e); 
++                    }
++                    finally 
++                    { 
++                        if(stopping.get()) 
++                            cleanup(); 
++                    }
+                 });
++
+                 return true;
+-            } catch (RejectedExecutionException e) {
+-                fail(e); return false;
++
++            }catch (RejectedExecutionException e) 
++            {
++                fail(e); 
++                return false;
+             }
+         }
+-        private void fail(RuntimeException cause) {
++
++        /** Registra a falha crítica e inicia o encerramento do serviço. */
++        private void fail(RuntimeException cause) 
++        {
+             failure = cause;
+             System.err.println("Bootstrap control processing failed; stopping bounded service");
+             requestStop();
+         }
+-        void requestStop() {
+-            if (!stopping.compareAndSet(false, true)) return;
++
++        /** Marca o servidor como parando e dispara o onStop; idempotente. */
++        void requestStop() 
++        {
++            if(!stopping.compareAndSet(false, true)) 
++                return;
++
+             onStop.run();
+-            try { events.execute(this::cleanup); }
+-            catch (RejectedExecutionException ignored) {
+-                // A full queue already has a worker/event that observes stopping and cleans up.
+-                // A closed event loop has already executed its cleanup.
++
++            try 
++            { 
++                events.execute(this::cleanup); 
++            }
++            catch (RejectedExecutionException ignored) 
++            {
++                // Fila cheia: já existe um evento que observa stopping e limpa.
++                // Loop fechado: a limpeza já foi executada.
+             }
+         }
+-        private void cleanup() {
+-            if (cleaned) return;
++
++        /** Fecha todos os contextos ativos e encerra os executores; executa uma única vez. */
++        private void cleanup() 
++        {
++            if(cleaned) 
++                return;
++
+             cleaned = true;
+-            for (var context : new ArrayList<>(contexts.values())) finish(context);
+-            deadlines.close(); events.close();
++
++            for(var context : new ArrayList<>(contexts.values())) 
++                finish(context);
++
++            deadlines.close(); 
++            events.close();
++        }
++
++
++        //* Observabilidade (Testes)
++
++        int contextCount() 
++        { 
++            return contexts.size(); 
+         }
+-        int contextCount() { return contexts.size(); }
+     }
+ 
+     private static final class EventLoop implements SerialEvents {
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java
+index e69de29..f86d612 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java
+@@ -0,0 +1,33 @@
++package pt.uminho.esr.ott.overlay;
++
++import pt.uminho.esr.ott.protocol.ControlMessage;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.UUID;
++
++/** Immutable configured edge and its optional, confirmed transport session. */
++public record Neighbor(String nodeId, ControlMessage.Endpoint configured, State state,
++                       Optional<Session> session, long retryDelayMillis) {
++    private static final UUID ZERO = new UUID(0, 0);
++    public enum State { DISCONNECTED, CONNECTING, HANDSHAKING, ACTIVE, CLOSED }
++    public Neighbor {
++        Objects.requireNonNull(nodeId); Objects.requireNonNull(configured);
++        Objects.requireNonNull(state); Objects.requireNonNull(session);
++        NeighborManager.validateEndpoint(configured, true);
++        if (!nodeId.equals(configured.nodeId()) || !ZERO.equals(configured.instanceId())
++                || retryDelayMillis < 0 || (state == State.ACTIVE) != session.isPresent()
++                || session.isPresent() && !nodeId.equals(session.orElseThrow().nodeId()))
++            throw new IllegalArgumentException("Inconsistent neighbor snapshot");
++    }
++    public record Session(String nodeId, UUID instanceId, UUID connectionId,
++                          ControlMessage.Endpoint endpoint) {
++        public Session {
++            Objects.requireNonNull(nodeId); Objects.requireNonNull(instanceId);
++            Objects.requireNonNull(connectionId); Objects.requireNonNull(endpoint);
++            NeighborManager.validateEndpoint(endpoint, false);
++            if (ZERO.equals(instanceId) || !nodeId.equals(endpoint.nodeId())
++                    || !instanceId.equals(endpoint.instanceId()))
++                throw new IllegalArgumentException("Inconsistent confirmed session");
++        }
++    }
++}
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+index e69de29..61cbf89 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+@@ -0,0 +1,953 @@
++package pt.uminho.esr.ott.overlay;
++
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.config.RuntimeConfiguration;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.*;
++import java.net.*;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++import java.util.function.LongSupplier;
++
++/** Initial discovery and persistent, authorized neighbors. All domain changes run on SerialOwner. */
++public final class NeighborManager implements AutoCloseable {
++    private static final UUID ZERO = new UUID(0, 0);
++    public enum Phase { NOT_STARTED, DISCOVERING, READY, FAILED, CLOSED }
++    public enum Reason { REMOTE_REJECTION, CONTEXT, TRANSPORT, TIMEOUT, RESOURCE_LIMIT,
++        SHUTDOWN, LEAVE, CONSUMER_FAILURE, STALE }
++    public interface Observer { void onEvent(Event event); }
++    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic {}
++    public record NeighborUp(Neighbor.Session session) implements Event {
++        public NeighborUp { Objects.requireNonNull(session); }
++    }
++    public record NeighborDown(Neighbor.Session session, Reason reason) implements Event {
++        public NeighborDown { Objects.requireNonNull(session); Objects.requireNonNull(reason); }
++    }
++    public record Received(Neighbor.Session session, ControlMessage message) implements Event {
++        public Received { Objects.requireNonNull(session); Objects.requireNonNull(message); }
++    }
++    public record Diagnostic(Phase phase, Reason reason, Optional<UUID> attemptId,
++            Optional<UUID> connectionId, Optional<Neighbor.Session> session,
++            Optional<ControlMessage> remoteMessage) implements Event {
++        public Diagnostic {
++            Objects.requireNonNull(phase); Objects.requireNonNull(reason); Objects.requireNonNull(attemptId);
++            Objects.requireNonNull(connectionId); Objects.requireNonNull(session); Objects.requireNonNull(remoteMessage);
++        }
++    }
++    public static final class DiscoveryRejected extends IllegalStateException {
++        private final ControlMessage remoteMessage;
++        private final UUID attemptId, connectionId;
++        DiscoveryRejected(ControlMessage message, UUID attempt, UUID connection) {
++            super("Initial discovery rejected by " + message.senderId());
++            remoteMessage = message; attemptId = attempt; connectionId = connection;
++        }
++        public ControlMessage remoteMessage() { return remoteMessage; }
++        public UUID attemptId() { return attemptId; }
++        public UUID connectionId() { return connectionId; }
++    }
++    public interface Registration { void remove(); }
++    public interface SerialOwner extends AutoCloseable {
++        int capacity(); boolean isOwnerThread(); boolean offer(Runnable event);
++        Registration onStop(Runnable cleanup); void fail(Throwable cause); void requestClose();
++        boolean awaitTermination(Duration timeout); @Override void close();
++    }
++    public static SerialOwner createSerialOwner(int capacity) { return new Owner(capacity); }
++    interface Channel {
++        UUID id(); boolean isOpen(); Connection.SendResult send(ControlMessage message);
++        CompletableFuture<Void> sendAndFlush(ControlMessage message); void close();
++    }
++    interface Ticket { void cancel(); }
++    interface Deadlines {
++        void limit(int maxPhysicalTickets); Ticket schedule(Runnable task, long delayNanos);
++        void requestClose(); boolean awaitTermination(Duration timeout);
++    }
++    interface Jitter { long choose(long minInclusive, long maxInclusive); }
++    interface Resolver {
++        CompletableFuture<InetAddress> resolve(UUID jobId, String configuredHost); void retire(UUID jobId);
++    }
++    interface Sink {
++        void opened(Channel channel, long observedAt);
++        void message(Channel channel, ControlMessage message, long observedAt);
++        void closed(Channel channel, Connection.CloseReason reason, long observedAt);
++    }
++    interface Network {
++        CompletableFuture<InetSocketAddress> open(InetSocketAddress bind, Transport.Options options, Sink sink);
++        CompletableFuture<Channel> connect(InetSocketAddress remote); int reservations();
++        void requestClose(); boolean awaitTermination(Duration timeout);
++    }
++    interface IoServices {
++        Resolver resolver(); Network network(); void requestClose(); boolean awaitTermination(Duration timeout);
++    }
++    interface Ports {
++        SerialOwner owner(int capacity); IoServices io(int maxPhysicalJobs); Deadlines deadlines(int maxPhysicalTickets);
++    }
++    private record Plan(NodeConfiguration config, ControlMessage.Endpoint local, Transport.Options options) {}
++    private final Plan plan;
++    private final UUID instance;
++    private final Observer observer;
++    private final LongSupplier clock;
++    private final Jitter jitter;
++    private final Ports ports;
++    private final boolean borrowed;
++    private volatile SerialOwner owner;
++    private volatile IoServices io;
++    private volatile Deadlines deadlines;
++    private Registration registration;
++    private final AtomicBoolean stopping = new AtomicBoolean();
++    private final AtomicReference<Throwable> failure = new AtomicReference<>();
++    private final AtomicBoolean terminationObserved = new AtomicBoolean();
++    private final CompletableFuture<Void> started = new CompletableFuture<>(), cleaned = new CompletableFuture<>();
++    private final CompletionStage<Void> startView = started.minimalCompletionStage();
++    private volatile Map<String, Neighbor.Session> activeView = Map.of();
++    private volatile Map<String, Neighbor> diagnosticView = Map.of();
++    private final Set<CompletableFuture<?>> commands = ConcurrentHashMap.newKeySet();
++    private final Semaphore commandSlots;
++    private volatile boolean launched;
++    private volatile long closeStarted;
++    // The following fields belong exclusively to the serial owner.
++    private Phase phase = Phase.NOT_STARTED;
++    private final Map<String, Peer> peers = new LinkedHashMap<>();
++    private final Map<UUID, Context> contexts = new LinkedHashMap<>();
++    private final Map<UUID, Attempt> nativeDials = new LinkedHashMap<>();
++    private Attempt discovery;
++    private Slot initialSlot;
++    private long discoveryBase;
++    private int retained;
++    private boolean cleanupDone;
++    private enum Direction { UNCLASSIFIED, INBOUND, OUTBOUND }
++    private static final class Peer {
++        final ControlMessage.Endpoint configured;
++        Neighbor.State state = Neighbor.State.DISCONNECTED;
++        Attempt attempt; Context context; Slot slot;
++        Neighbor.Session session; long base, delay;
++        Peer(ControlMessage.Endpoint endpoint) { configured = endpoint; }
++    }
++    private static final class Attempt {
++        final UUID id = UUID.randomUUID(); final Peer peer;
++        UUID job; boolean live = true; Context context;
++        Attempt(Peer peer) { this.peer = peer; }
++    }
++    private static final class Slot { Ticket ticket; boolean live = true; }
++    private record Frame(ControlMessage message, long observedAt) {}
++    private static final class Context {
++        final Channel channel; long openedAt;
++        Direction direction = Direction.UNCLASSIFIED;
++        final Set<UUID> barrier = new HashSet<>();
++        final ArrayDeque<Frame> frames = new ArrayDeque<>();
++        Attempt attempt; Peer peer; Slot deadline;
++        UUID request, remoteInstance; ControlMessage.Endpoint endpoint;
++        boolean bootstrap, sent, written, acknowledged, responding, active;
++        Context(Channel channel, long at) { this.channel = channel; openedAt = at; }
++    }
++    public NeighborManager(NodeConfiguration config, UUID instanceId, Observer observer) {
++        this(config, instanceId, null, observer, System::nanoTime,
++                (min, max) -> ThreadLocalRandom.current().nextLong(min, max + 1), new RealPorts());
++    }
++    public NeighborManager(NodeConfiguration config, UUID instanceId, SerialOwner borrowedOwner, Observer observer) {
++        this(config, instanceId, Objects.requireNonNull(borrowedOwner), observer, System::nanoTime,
++                (min, max) -> ThreadLocalRandom.current().nextLong(min, max + 1), new RealPorts());
++    }
++    NeighborManager(NodeConfiguration config, UUID instanceId, SerialOwner borrowedOwner,
++                    Observer observer, LongSupplier clock, Jitter jitter, Ports ports) {
++        plan = validate(config, instanceId); instance = instanceId;
++        this.observer = Objects.requireNonNull(observer); this.clock = Objects.requireNonNull(clock);
++        this.jitter = Objects.requireNonNull(jitter); this.ports = Objects.requireNonNull(ports);
++        borrowed = borrowedOwner != null; owner = borrowedOwner;
++        if (borrowed && owner.capacity() != config.runtime().overlay().eventsCapacity())
++            throw new IllegalArgumentException("Owner capacity must equal overlay.eventsCapacity");
++        commandSlots = new Semaphore(config.runtime().overlay().eventsCapacity() + 1);
++    }
++    public synchronized CompletionStage<Void> start() {
++        if (launched || stopping.get()) return startView;
++        launched = true;
++        try {
++            if (!borrowed) owner = ports.owner(plan.config.runtime().overlay().eventsCapacity());
++            registration = owner.onStop(this::ownerStopped);
++            io = ports.io(65);
++            deadlines = ports.deadlines(63 + plan.options.maxConnections() + 1);
++            deadlines.limit(plan.options.maxConnections() + 1);
++            post(() -> { phase = Phase.DISCOVERING; bind(); });
++        } catch (RuntimeException e) { fatal(e); }
++        return startView;
++    }
++    public Map<String, Neighbor.Session> snapshot() { return stopping.get() ? Map.of() : activeView; }
++    public Map<String, Neighbor> diagnostics() { return diagnosticView; }
++    public CompletionStage<Connection.SendResult> send(Neighbor.Session expected, ControlMessage message) {
++        Objects.requireNonNull(expected); Objects.requireNonNull(message);
++        return command(Connection.SendResult.CLOSED, () -> {
++            var peer = current(expected);
++            if (peer == null) return Connection.SendResult.CLOSED;
++            if (!envelope(message) || !message.senderId().equals(plan.local.nodeId())
++                    || !message.senderInstance().equals(instance) || !application(message.type())
++                    || message.payload() instanceof ControlMessage.ErrorPayload p && p.relatedType() == 17)
++                return Connection.SendResult.INVALID_MESSAGE;
++            return peer.context.channel.send(message);
++        });
++    }
++    public CompletionStage<Boolean> disconnect(Neighbor.Session expected) {
++        Objects.requireNonNull(expected);
++        return command(false, () -> {
++            var peer = current(expected); if (peer == null) return false;
++            finish(peer.context, Reason.TRANSPORT, null); return true;
++        });
++    }
++    private Peer current(Neighbor.Session expected) {
++        var peer = peers.get(expected.nodeId());
++        return peer != null && expected.equals(peer.session) ? peer : null;
++    }
++    private <T> CompletionStage<T> command(T closedValue, java.util.function.Supplier<T> operation) {
++        if (stopping.get() || !launched) return CompletableFuture.completedStage(closedValue);
++        if (!commandSlots.tryAcquire()) {
++            fatal(new RejectedExecutionException("Command capacity"));
++            return CompletableFuture.failedStage(new RejectedExecutionException("Command capacity"));
++        }
++        var result = new CompletableFuture<T>(); commands.add(result);
++        result.whenComplete((v, e) -> { commands.remove(result); commandSlots.release(); });
++        if (!post(() -> { if (!result.isDone()) result.complete(operation.get()); })) result.complete(closedValue);
++        return result.minimalCompletionStage();
++    }
++    private void postOrClose(Channel channel, Runnable event) { if (!post(event)) channel.close(); }
++    private boolean post(Runnable event) {
++        var target = owner;
++        if (stopping.get() || target == null) return false;
++        if (target.offer(() -> {
++            if (stopping.get()) { cleanup(); return; }
++            try { event.run(); } catch (RuntimeException e) { fatal(e); }
++        })) return true;
++        fatal(new RejectedExecutionException("Serial event capacity exceeded")); return false;
++    }
++    private void fatal(Throwable cause) {
++        failure.compareAndSet(null, cause);
++        started.completeExceptionally(cause);
++        requestClose();
++        var target = owner; if (target != null) target.fail(cause);
++    }
++    private void emit(Event event) {
++        try { observer.onEvent(event); }
++        catch (RuntimeException e) { fatal(new IllegalStateException("Observer failed", e)); }
++    }
++    private void diagnostic(Reason reason, Attempt attempt, Context context, ControlMessage remote) {
++        emit(new Diagnostic(phase, reason, Optional.ofNullable(attempt == null ? null : attempt.id),
++                Optional.ofNullable(context == null ? null : context.channel.id()),
++                Optional.ofNullable(context == null || context.peer == null ? null : context.peer.session),
++                Optional.ofNullable(remote)));
++    }
++    private long now() { return clock.getAsLong(); }
++    private long connectBudget() { return plan.config.runtime().control().connectTimeout().toNanos(); }
++    private long helloBudget() { return plan.config.runtime().overlay().helloTimeout().toNanos(); }
++    private long budget(Context c) { return c.bootstrap ? plan.config.runtime().control().bootstrapQueryTimeout().toNanos() : helloBudget(); }
++    private boolean expired(long began, long duration) { return now() - began >= duration; }
++    private boolean current(Context c) { return contexts.get(c.channel.id()) == c; }
++    private Slot schedule(long nanos, Runnable action) {
++        var slot = new Slot();
++        slot.ticket = deadlines.schedule(() -> post(() -> {
++            if (slot.live) { slot.live = false; action.run(); }
++        }), Math.max(1, nanos));
++        return slot;
++    }
++    private void cancel(Slot slot) { if (slot != null) { slot.live = false; slot.ticket.cancel(); } }
++    private void publish() {
++        var active = new LinkedHashMap<String, Neighbor.Session>();
++        var all = new LinkedHashMap<String, Neighbor>();
++        for (var p : peers.values()) {
++            if (p.session != null) active.put(p.configured.nodeId(), p.session);
++            all.put(p.configured.nodeId(), new Neighbor(p.configured.nodeId(), p.configured,
++                    p.state, Optional.ofNullable(p.session), p.delay));
++        }
++        activeView = Map.copyOf(active); diagnosticView = Map.copyOf(all);
++    }
++    private final Sink sink = new Sink() {
++        public void opened(Channel ch, long at) { postOrClose(ch, () -> openedOnOwner(ch, at)); }
++        public void message(Channel ch, ControlMessage m, long at) { postOrClose(ch, () -> messageOnOwner(ch, m, at)); }
++        public void closed(Channel ch, Connection.CloseReason why, long at) {
++            postOrClose(ch, () -> { var c = contexts.get(ch.id()); if (c != null) finish(c, Reason.TRANSPORT, null); });
++        }
++    };
++    private void bind() {
++        final long began = now(); final UUID job = UUID.randomUUID();
++        initialSlot = schedule(connectBudget(), () -> failDiscovery(new IllegalStateException("Bind resolution timeout"), Reason.TIMEOUT, null, null));
++        io.resolver().resolve(job, plan.config.bindHost()).whenComplete((address, error) -> post(() -> {
++            if (phase != Phase.DISCOVERING || stopping.get()) return;
++            if (error != null || expired(began, connectBudget())) {
++                failDiscovery(error == null ? new IllegalStateException("Bind resolution timeout") : error, Reason.TRANSPORT, null, null); return;
++            }
++            cancel(initialSlot);
++            long bindStart = now();
++            initialSlot = schedule(connectBudget(), () -> failDiscovery(new IllegalStateException("Bind timeout"), Reason.TIMEOUT, null, null));
++            io.network().open(new InetSocketAddress(address, plan.config.controlPort()), plan.options, sink)
++                    .whenComplete((bound, bindError) -> {
++                if (stopping.get()) { io.network().requestClose(); return; }
++                post(() -> {
++                    cancel(initialSlot);
++                    if (bindError != null || expired(bindStart, connectBudget())) {
++                        failDiscovery(bindError == null ? new IllegalStateException("Bind timeout") : bindError, Reason.TRANSPORT, null, null); return;
++                    }
++                    discover();
++                });
++            });
++        }));
++    }
++    private boolean live(Attempt a) {
++        return a.live && (a.peer == null ? phase == Phase.DISCOVERING && discovery == a
++                : phase == Phase.READY && a.peer.attempt == a);
++    }
++    private void discover() {
++        if (phase != Phase.DISCOVERING || discovery != null) return;
++        discovery = new Attempt(null);
++        resolve(discovery, plan.config.bootstrap().orElseThrow().host(), plan.config.bootstrap().orElseThrow().port());
++    }
++    private void dialPeer(Peer p) {
++        if (phase != Phase.READY || p.session != null || p.attempt != null || !initiates(p)) return;
++        // Logically retired native dials remain reserved until their native completion.
++        if (nativeDials.values().stream().anyMatch(a -> a.peer == p)) { retry(p); return; }
++        p.attempt = new Attempt(p); p.state = Neighbor.State.CONNECTING; publish();
++        resolve(p.attempt, p.configured.host(), p.configured.controlPort());
++    }
++    private boolean initiates(Peer peer) { return plan.local.nodeId().compareTo(peer.configured.nodeId()) < 0; }
++    private void phaseSlot(Attempt a, Slot slot) {
++        if (a.peer == null) { cancel(initialSlot); initialSlot = slot; }
++        else { cancel(a.peer.slot); a.peer.slot = slot; }
++    }
++    private void resolve(Attempt a, String host, int port) {
++        long began = now(); a.job = UUID.randomUUID();
++        phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
++        io.resolver().resolve(a.job, host).whenComplete((address, error) -> post(() -> {
++            if (!live(a)) return;
++            io.resolver().retire(a.job); a.job = null;
++            if (error != null || expired(began, connectBudget())) {
++                attemptFailed(a, error == null ? Reason.TIMEOUT : error instanceof RejectedExecutionException
++                        ? Reason.RESOURCE_LIMIT : Reason.TRANSPORT, null); return;
++            }
++            phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
++            if (nativeDials.size() >= plan.options.maxConnections()) { attemptFailed(a, Reason.RESOURCE_LIMIT, null); return; }
++            nativeDials.put(a.id, a);
++            io.network().connect(new InetSocketAddress(address, port)).whenComplete((ch, dialError) -> {
++                long observed = now();
++                if (stopping.get()) { if (ch != null) ch.close(); return; }
++                if (!post(() -> dialResult(a, ch, dialError, observed)) && ch != null) ch.close();
++            });
++        }));
++    }
++    private void dialResult(Attempt a, Channel ch, Throwable error, long observed) {
++        // Associate this handle before excluding the token from any other channel's barrier.
++        if (ch != null) {
++            var c = contexts.get(ch.id());
++            if (c == null && ch.isOpen() && live(a)) c = makeContext(ch, observed);
++            if (c == null || !ch.isOpen() || !live(a)) {
++                if (c != null) finish(c, Reason.STALE, null); else ch.close();
++                if (live(a)) attemptFailed(a, Reason.TRANSPORT, null);
++            } else {
++                c.direction = Direction.OUTBOUND; c.barrier.clear(); c.attempt = a; a.context = c;
++                c.peer = a.peer; c.bootstrap = a.peer == null;
++                if (a.peer != null) { a.peer.context = c; a.peer.state = Neighbor.State.HANDSHAKING; }
++                phaseSlotCancel(a);
++                armContext(c);
++                if (current(c)) {
++                    if (expired(c.openedAt, budget(c))) finish(c, Reason.TIMEOUT, null);
++                    else { beginOutbound(c); drain(c); }
++                }
++            }
++        } else if (live(a)) attemptFailed(a, Reason.TRANSPORT, null);
++        nativeDials.remove(a.id);
++        for (var c : List.copyOf(contexts.values())) {
++            if (c.direction == Direction.UNCLASSIFIED && c.barrier.remove(a.id) && c.barrier.isEmpty()) classifyInbound(c);
++        }
++    }
++    private void phaseSlotCancel(Attempt a) {
++        if (a.peer == null) { cancel(initialSlot); initialSlot = null; }
++        else { cancel(a.peer.slot); a.peer.slot = null; }
++    }
++    private Context makeContext(Channel ch, long at) {
++        if (!ch.isOpen() || contexts.size() >= plan.options.maxConnections()) { ch.close(); return null; }
++        var c = new Context(ch, at); c.barrier.addAll(nativeDials.keySet()); contexts.put(ch.id(), c);
++        armContext(c); return c;
++    }
++    private void openedOnOwner(Channel ch, long at) {
++        var c = contexts.get(ch.id());
++        if (c != null) {
++            // Select the earlier observation using elapsed subtraction, including nanoTime wrap.
++            if (c.openedAt - at > 0) { c.openedAt = at; armContext(c); }
++            return;
++        }
++        c = makeContext(ch, at);
++        if (c != null && c.barrier.isEmpty()) classifyInbound(c);
++    }
++    private void armContext(Context c) {
++        cancel(c.deadline);
++        long left = budget(c) - (now() - c.openedAt);
++        if (left <= 0) { finish(c, Reason.TIMEOUT, null); return; }
++        c.deadline = schedule(left, () -> { if (current(c)) finish(c, Reason.TIMEOUT, null); });
++    }
++    private void classifyInbound(Context c) {
++        if (!current(c)) return;
++        c.direction = Direction.INBOUND;
++        if (phase != Phase.READY) { finish(c, Reason.CONTEXT, null); return; }
++        drain(c);
++    }
++    private void beginOutbound(Context c) {
++        c.request = UUID.randomUUID(); c.sent = true;
++        var type = c.bootstrap ? MessageType.REGISTER : MessageType.HELLO;
++        write(c, new ControlMessage(type, c.request, plan.local.nodeId(), instance,
++                new ControlMessage.EndpointPayload(plan.local)), false);
++    }
++    private void write(Context c, ControlMessage message, boolean closeAfter) {
++        if (c.responding) { finish(c, Reason.RESOURCE_LIMIT, null); return; }
++        c.responding = true;
++        c.channel.sendAndFlush(message).whenComplete((v, error) -> post(() -> {
++            if (!current(c)) return;
++            // A bootstrap deliberately closes after its complete reply. Its reader can
++            // enqueue that reply before Closed while the writer's callback is pending.
++            // Only the reader's ordered Closed event/deadline may discard that reply.
++            if (c.bootstrap && error != null) return;
++            if (error != null || !c.bootstrap && !c.channel.isOpen()) { finish(c, Reason.TRANSPORT, null); return; }
++            if (expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
++            c.responding = false;
++            if (closeAfter) { finish(c, Reason.CONTEXT, null); return; }
++            c.written = true;
++            if (!c.bootstrap) activate(c);
++        }));
++    }
++    private void messageOnOwner(Channel ch, ControlMessage message, long at) {
++        var c = contexts.get(ch.id());
++        if (c == null) {
++            emit(new Diagnostic(phase, Reason.STALE, Optional.empty(), Optional.of(ch.id()), Optional.empty(), Optional.of(message)));
++            return; // No tombstones: a retired connection cannot authorize anything.
++        }
++        // Reader callbacks are ordered. Deliver a captured ACTIVE frame before its
++        // queued Closed event even if the physical socket has already reached EOF.
++        if (!c.bootstrap && !c.active && !ch.isOpen() || !c.active && (expired(c.openedAt, budget(c)) || at - c.openedAt >= budget(c))) {
++            finish(c, Reason.TIMEOUT, null); return;
++        }
++        if (c.direction == Direction.UNCLASSIFIED) { retain(c, message, at); return; }
++        handle(c, message, at);
++    }
++    private boolean envelope(ControlMessage m) {
++        return m != null && m.version() == 1 && m.type() != null && m.requestId() != null
++                && validId(m.senderId()) && m.senderInstance() != null && !ZERO.equals(m.senderInstance()) && m.payload() != null;
++    }
++    private static boolean application(MessageType type) { return type != null && type.code() >= 7 && type.code() <= 17; }
++    private boolean identity(Context c, ControlMessage m) {
++        return c.peer != null && c.peer.configured.nodeId().equals(m.senderId())
++                && (c.remoteInstance == null || c.remoteInstance.equals(m.senderInstance()));
++    }
++    private void handle(Context c, ControlMessage m, long at) {
++        if (!c.active && expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
++        if (!envelope(m)) { contextFailure(c, m); return; }
++        if (c.bootstrap) { discoveryReply(c, m); return; }
++        if (c.active) {
++            if (!identity(c, m)) { contextFailure(c, m); return; }
++            if (m.type() == MessageType.NODE_LEAVE && m.payload() instanceof ControlMessage.Leave) finish(c, Reason.LEAVE, null);
++            else if (application(m.type())) emit(new Received(c.peer.session, m));
++            else contextFailure(c, m);
++            return;
++        }
++        if (c.direction == Direction.INBOUND && c.peer == null) {
++            if (m.type() != MessageType.HELLO) { contextFailure(c, m); return; }
++            hello(c, m); return;
++        }
++        if (!identity(c, m)) { contextFailure(c, m); return; }
++        if (m.type() == MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p) {
++            int related = c.direction == Direction.OUTBOUND ? 5 : 6;
++            if (c.request.equals(m.requestId()) && p.relatedType() == related) {
++                finish(c, Reason.REMOTE_REJECTION, m); return;
++            }
++            if (legitimateWindow(c)) { retain(c, m, at); return; }
++            contextFailure(c, m); return;
++        }
++        if (c.direction == Direction.OUTBOUND && m.type() == MessageType.HELLO_OK
++                && m.payload() == ControlMessage.Empty.INSTANCE && c.request.equals(m.requestId()) && !c.acknowledged) {
++            c.remoteInstance = m.senderInstance(); c.endpoint = withInstance(c.peer.configured, c.remoteInstance);
++            c.acknowledged = true; activate(c); return;
++        }
++        if (application(m.type()) && legitimateWindow(c)) { retain(c, m, at); return; }
++        contextFailure(c, m);
++    }
++    private boolean legitimateWindow(Context c) {
++        return c.peer != null && c.remoteInstance != null && (c.direction == Direction.INBOUND || c.acknowledged);
++    }
++    private void hello(Context c, ControlMessage m) {
++        var p = peers.get(m.senderId());
++        if (p == null || !(m.payload() instanceof ControlMessage.EndpointPayload ep) || ep.endpoint() == null) {
++            reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return;
++        }
++        var e = ep.endpoint();
++        boolean allowed;
++        try { allowed = m.senderId().equals(e.nodeId()) && m.senderInstance().equals(e.instanceId())
++                && sameEndpoint(e, p.configured) && m.senderId().compareTo(plan.local.nodeId()) < 0; }
++        catch (IllegalArgumentException ex) { allowed = false; }
++        if (!allowed) { reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return; }
++        if (p.context != null || p.session != null || p.attempt != null) { reject(c, m, ErrorCode.DUPLICATE_ID); return; }
++        c.peer = p; c.endpoint = withInstance(p.configured, m.senderInstance()); c.remoteInstance = m.senderInstance();
++        c.request = m.requestId(); c.sent = true; p.context = c; p.state = Neighbor.State.HANDSHAKING; publish();
++        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, ControlMessage.Empty.INSTANCE), false);
++    }
++    private void reject(Context c, ControlMessage m, ErrorCode code) {
++        diagnostic(Reason.CONTEXT, c.attempt, c, m);
++        if (!envelope(m) || m.type() == MessageType.ERROR || c.responding) { finish(c, Reason.CONTEXT, null); return; }
++        write(c, new ControlMessage(MessageType.ERROR, m.requestId(), plan.local.nodeId(), instance,
++                new ControlMessage.ErrorPayload(code, m.type().code(), "Neighbor handshake rejected")), true);
++    }
++    private void contextFailure(Context c, ControlMessage m) {
++        if (c.bootstrap) {
++            diagnostic(Reason.CONTEXT, c.attempt, c, m);
++            failDiscovery(new IllegalStateException("Invalid initial discovery context"), Reason.CONTEXT, c, m);
++        } else { diagnostic(Reason.CONTEXT, c.attempt, c, m); finish(c, Reason.CONTEXT, null); }
++    }
++    private void discoveryReply(Context c, ControlMessage m) {
++        if (c.attempt == null || !live(c.attempt) || !c.sent || !c.request.equals(m.requestId())) { contextFailure(c, m); return; }
++        if (m.type() == MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload e && e.relatedType() == 1) {
++            if (e.code() == ErrorCode.TIMEOUT || e.code() == ErrorCode.RESOURCE_LIMIT) finish(c, Reason.REMOTE_REJECTION, m);
++            else failDiscovery(new DiscoveryRejected(m, c.attempt.id, c.channel.id()), Reason.REMOTE_REJECTION, c, m);
++            return;
++        }
++        if (m.type() != MessageType.REGISTER_OK || !(m.payload() instanceof ControlMessage.NeighborList list)) { contextFailure(c, m); return; }
++        final Map<String, Peer> installed;
++        try { installed = validateList(list); }
++        catch (IllegalArgumentException e) { failDiscovery(e, Reason.CONTEXT, c, m); return; }
++        phase = Phase.READY; cancel(initialSlot); initialSlot = null;
++        c.attempt.live = false; discovery = null;
++        removeContext(c); c.channel.close(); peers.putAll(installed);
++        deadlines.limit(peers.size() + plan.options.maxConnections() + 1);
++        publish(); started.complete(null);
++        for (var p : peers.values()) if (initiates(p)) dialPeer(p);
++    }
++    private Map<String, Peer> validateList(ControlMessage.NeighborList list) {
++        if (list.neighbors().size() > 63 || list.neighbors().size() > plan.options.maxConnections())
++            throw new IllegalArgumentException("Configured degree exceeds capacity");
++        var result = new LinkedHashMap<String, Peer>(); var tcp = new HashSet<String>(); var udp = new HashSet<String>();
++        tcp.add(key(plan.local.host(), plan.local.controlPort())); udp.add(key(plan.local.host(), plan.local.dataPort()));
++        var bootstrap = plan.config.bootstrap().orElseThrow(); tcp.add(key(bootstrap.host(), bootstrap.port()));
++        for (var e : list.neighbors()) {
++            validateEndpoint(e, true);
++            if (e.nodeId().equals(plan.local.nodeId()) || result.containsKey(e.nodeId())
++                    || !tcp.add(key(e.host(), e.controlPort())) || !udp.add(key(e.host(), e.dataPort())))
++                throw new IllegalArgumentException("Conflicting configured neighbor");
++            result.put(e.nodeId(), new Peer(withInstance(e, ZERO)));
++        }
++        return result;
++    }
++    private void activate(Context c) {
++        if (!current(c) || c.active || !c.written || c.peer == null || c.remoteInstance == null
++                || c.direction == Direction.OUTBOUND && !c.acknowledged) return;
++        if (!c.channel.isOpen() || expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
++        var p = c.peer;
++        if (p.context != c || p.session != null) { finish(c, Reason.CONTEXT, null); return; }
++        c.active = true; cancel(c.deadline); c.deadline = null;
++        if (c.attempt != null) { c.attempt.live = false; p.attempt = null; }
++        p.session = new Neighbor.Session(p.configured.nodeId(), c.remoteInstance, c.channel.id(), c.endpoint);
++        p.state = Neighbor.State.ACTIVE; p.base = 0; p.delay = 0;
++        publish(); emit(new NeighborUp(p.session)); drain(c);
++    }
++    private void retain(Context c, ControlMessage m, long at) {
++        int b = Math.min(4, plan.options.queueCapacity());
++        int r = Math.min(plan.config.runtime().overlay().eventsCapacity(), plan.options.maxConnections() * b);
++        if (c.frames.size() >= b || retained >= r) { finish(c, Reason.RESOURCE_LIMIT, m); return; }
++        c.frames.addLast(new Frame(m, at)); retained++;
++    }
++    private void drain(Context c) {
++        while (current(c) && !stopping.get() && !c.frames.isEmpty() && c.direction != Direction.UNCLASSIFIED) {
++            // Until ACTIVE, application frames must stay behind the local flush barrier.
++            var next = c.frames.peekFirst();
++            if (!c.active && legitimateWindow(c) && application(next.message.type())
++                    && !(next.message.type() == MessageType.ERROR && next.message.requestId().equals(c.request)
++                    && ((ControlMessage.ErrorPayload) next.message.payload()).relatedType() == (c.direction == Direction.OUTBOUND ? 5 : 6))) return;
++            c.frames.removeFirst(); retained--; handle(c, next.message, next.observedAt);
++        }
++    }
++    private void removeContext(Context c) {
++        if (!contexts.remove(c.channel.id(), c)) return;
++        cancel(c.deadline); c.deadline = null;
++        retained -= c.frames.size(); c.frames.clear();
++    }
++    private void finish(Context c, Reason reason, ControlMessage remote) {
++        if (!current(c)) return;
++        diagnostic(reason, c.attempt, c, remote);
++        removeContext(c); c.channel.close();
++        var p = c.peer;
++        if (p != null && p.context == c) {
++            var old = p.session; p.context = null; p.session = null; p.state = stopping.get() ? Neighbor.State.CLOSED : Neighbor.State.DISCONNECTED;
++            if (c.attempt != null) retire(c.attempt);
++            publish(); if (old != null) emit(new NeighborDown(old, reason));
++            if (!stopping.get()) retry(p);
++        } else if (c.bootstrap && c.attempt != null && live(c.attempt)) {
++            retire(c.attempt); retryDiscovery();
++        }
++    }
++    private void retire(Attempt a) {
++        a.live = false; phaseSlotCancel(a);
++        if (a.job != null) { io.resolver().retire(a.job); a.job = null; }
++        if (a.peer == null) { if (discovery == a) discovery = null; }
++        else if (a.peer.attempt == a) { a.peer.attempt = null; a.peer.state = Neighbor.State.DISCONNECTED; }
++    }
++    private void attemptFailed(Attempt a, Reason reason, ControlMessage remote) {
++        if (!live(a)) return;
++        if (a.context != null && current(a.context)) { finish(a.context, reason, remote); return; }
++        diagnostic(reason, a, null, remote); retire(a);
++        if (a.peer == null) retryDiscovery(); else { publish(); retry(a.peer); }
++    }
++    private long nextDelay(long base) {
++        var o = plan.config.runtime().overlay();
++        long spread = base * o.retryJitterPercent() / 100;
++        long noise = jitter.choose(-spread, spread);
++        if (noise < -spread || noise > spread) throw new IllegalStateException("Jitter outside requested range");
++        return Math.max(1, Math.min(o.retryMax().toMillis(), base + noise));
++    }
++    private long nextBase(long previous) {
++        long max = plan.config.runtime().overlay().retryMax().toMillis();
++        return previous == 0 ? plan.config.runtime().overlay().retryInitial().toMillis()
++                : previous > max / 2 ? max : Math.min(max, previous * 2);
++    }
++    private void retry(Peer p) {
++        if (phase != Phase.READY || stopping.get() || !initiates(p) || p.session != null || p.attempt != null) return;
++        cancel(p.slot); p.base = nextBase(p.base); p.delay = nextDelay(p.base);
++        p.slot = schedule(TimeUnit.MILLISECONDS.toNanos(p.delay), () -> { p.slot = null; dialPeer(p); }); publish();
++    }
++    private void retryDiscovery() {
++        if (phase != Phase.DISCOVERING || stopping.get()) return;
++        discoveryBase = nextBase(discoveryBase); cancel(initialSlot);
++        initialSlot = schedule(TimeUnit.MILLISECONDS.toNanos(nextDelay(discoveryBase)), () -> {
++            initialSlot = null;
++            if (nativeDials.values().stream().anyMatch(a -> a.peer == null)) retryDiscovery(); else discover();
++        });
++    }
++    private void failDiscovery(Throwable error, Reason reason, Context c, ControlMessage remote) {
++        if (phase != Phase.DISCOVERING) return;
++        phase = Phase.FAILED; diagnostic(reason, c == null ? discovery : c.attempt, c, remote);
++        failure.compareAndSet(null, error); started.completeExceptionally(error); requestClose();
++    }
++    public synchronized void requestClose() {
++        if (!stopping.compareAndSet(false, true)) return;
++        closeStarted = now();
++        var services = io; if (services != null) services.requestClose();
++        var timers = deadlines; if (timers != null) timers.requestClose();
++        if (owner == null) { started.completeExceptionally(new IllegalStateException("Manager closed")); cleaned.complete(null); return; }
++        if (owner.isOwnerThread()) cleanup();
++        else if (!owner.offer(this::cleanup)) owner.fail(new RejectedExecutionException("Stop could not enter owner"));
++    }
++    private void ownerStopped() {
++        stopping.set(true);
++        if (closeStarted == 0) closeStarted = now();
++        if (io != null) io.requestClose(); if (deadlines != null) deadlines.requestClose(); cleanup();
++    }
++    private void cleanup() {
++        if (cleanupDone) return; cleanupDone = true;
++        if (phase != Phase.FAILED) phase = Phase.CLOSED;
++        if (phase != Phase.FAILED && failure.get() != null) diagnostic(failure.get() instanceof RejectedExecutionException
++                ? Reason.RESOURCE_LIMIT : Reason.CONSUMER_FAILURE, null, null, null);
++        cancel(initialSlot); initialSlot = null;
++        if (discovery != null) retire(discovery);
++        for (var c : List.copyOf(contexts.values())) finish(c, Reason.SHUTDOWN, null);
++        for (var p : peers.values()) {
++            cancel(p.slot); p.slot = null; if (p.attempt != null) retire(p.attempt);
++            p.state = Neighbor.State.CLOSED; p.session = null;
++        }
++        publish();
++        started.completeExceptionally(new IllegalStateException("Manager closed"));
++        for (var command : commands) command.completeExceptionally(new IllegalStateException("Manager closed"));
++        if (registration != null) registration.remove();
++        cleaned.complete(null); if (!borrowed) owner.requestClose();
++    }
++    public boolean awaitTermination(Duration timeout) {
++        Objects.requireNonNull(timeout);
++        if (timeout.isNegative()) throw new IllegalArgumentException("Negative timeout");
++        if (terminationObserved.get()) return true;
++        if (owner != null && owner.isOwnerThread()) return cleaned.isDone();
++        long began = now(), nanos = timeout.toNanos();
++        try {
++            if (!cleaned.isDone()) cleaned.get(Math.max(0, remainingNanos(nanos, began)), TimeUnit.NANOSECONDS);
++        } catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
++        catch (ExecutionException | TimeoutException e) { return false; }
++        Duration left = remainingMillis(nanos, began);
++        if (io != null && (left.isZero() || !io.network().awaitTermination(left))) return false;
++        left = remainingMillis(nanos, began);
++        if (deadlines != null && (left.isZero() || !deadlines.awaitTermination(left))) return false;
++        left = remainingMillis(nanos, began);
++        if (io != null && (left.isZero() || !io.awaitTermination(left))) return false;
++        left = remainingMillis(nanos, began);
++        boolean done = borrowed || owner == null || !left.isZero() && owner.awaitTermination(left);
++        if (done) terminationObserved.set(true);
++        return done;
++    }
++    private long remainingNanos(long budget, long began) { return Math.max(0, budget - (now() - began)); }
++    private Duration remainingMillis(long budget, long began) { return Duration.ofMillis(TimeUnit.NANOSECONDS.toMillis(remainingNanos(budget, began))); }
++    @Override public void close() {
++        requestClose(); if (owner != null && owner.isOwnerThread()) return;
++        long left = remainingNanos(plan.config.runtime().control().shutdownTimeout().toNanos(), closeStarted);
++        if (!awaitTermination(Duration.ofNanos(left))) throw new IllegalStateException("Neighbor shutdown deadline: owner, TCP, timers or I/O worker still pending", failure.get());
++    }
++    private static Plan validate(NodeConfiguration config, UUID instance) {
++        Objects.requireNonNull(config); Objects.requireNonNull(instance);
++        if (ZERO.equals(instance) || config.role() == NodeRole.BOOTSTRAP || config.bootstrap().isEmpty()
++                || !validId(config.nodeId()) || config.topology().isPresent() || config.topologyFile().isPresent())
++            throw new IllegalArgumentException("Overlay profile and nonzero instance required");
++        normalizeHost(config.bindHost(), true);
++        var local = new ControlMessage.Endpoint(config.nodeId(), instance, normalizeHost(config.advertisedHost(), false),
++                config.controlPort(), config.dataPort(), config.role()); validateEndpoint(local, false);
++        var contact = config.bootstrap().orElseThrow(); normalizeHost(contact.host(), false); port(contact.port());
++        if (config.role() != NodeRole.SERVER && (!config.streams().isEmpty() || config.streamsFile().isPresent() || config.mediaBase().isPresent()))
++            throw new IllegalArgumentException("Media configuration requires SERVER");
++        var r = config.runtime(); var c = r.control();
++        return new Plan(config, local, new Transport.Options(c.queueCapacity(), c.maxConnections(), c.connectTimeout(), c.shutdownTimeout()));
++    }
++    private static boolean validId(String id) { return id != null && id.matches("[A-Za-z0-9_-]{1,32}"); }
++    private static void port(int value) { if (value < 1 || value > 65535) throw new IllegalArgumentException("Invalid port"); }
++    static void validateEndpoint(ControlMessage.Endpoint e, boolean configured) {
++        Objects.requireNonNull(e);
++        if (!validId(e.nodeId()) || e.instanceId() == null || configured != ZERO.equals(e.instanceId())
++                || e.role() == null || e.role() == NodeRole.BOOTSTRAP) throw new IllegalArgumentException("Invalid endpoint identity");
++        normalizeHost(e.host(), false); port(e.controlPort()); port(e.dataPort());
++    }
++    private static String key(String host, int port) { return normalizeHost(host, false) + ":" + port; }
++    private static boolean sameEndpoint(ControlMessage.Endpoint a, ControlMessage.Endpoint b) {
++        return a.nodeId().equals(b.nodeId()) && a.role() == b.role() && a.controlPort() == b.controlPort()
++                && a.dataPort() == b.dataPort() && normalizeHost(a.host(), false).equals(normalizeHost(b.host(), false));
++    }
++    private static ControlMessage.Endpoint withInstance(ControlMessage.Endpoint e, UUID instance) {
++        return new ControlMessage.Endpoint(e.nodeId(), instance, normalizeHost(e.host(), false), e.controlPort(), e.dataPort(), e.role());
++    }
++    private static String normalizeHost(String host, boolean wildcardAllowed) {
++        try {
++            if (host == null || host.isEmpty() || host.length() > 253 || !host.chars().allMatch(c -> c > 32 && c < 127))
++                throw new IllegalArgumentException("Invalid host");
++            new URI("ott", null, host, -1, null, null, null).parseServerAuthority();
++            String result = host.toLowerCase(Locale.ROOT);
++            if (result.startsWith("[") && result.endsWith("]")) result = result.substring(1, result.length() - 1);
++            if (result.endsWith(".")) result = result.substring(0, result.length() - 1);
++            if (result.matches("[0-9.]+") && result.contains(".")) {
++                var parts = result.split("\\.", -1);
++                if (parts.length != 4) throw new IllegalArgumentException("Invalid IPv4");
++                for (int i = 0; i < 4; i++) { int n = Integer.parseInt(parts[i]); if (n > 255) throw new IllegalArgumentException("Invalid IPv4"); parts[i] = Integer.toString(n); }
++                result = String.join(".", parts);
++            }
++            String address = result.split("%", 2)[0];
++            if (!wildcardAllowed && (address.equals("0.0.0.0") || address.contains(":") && address.replace(":", "").matches("0*")))
++                throw new IllegalArgumentException("Wildcard advertised host");
++            return result;
++        } catch (URISyntaxException e) { throw new IllegalArgumentException("Invalid host", e); }
++    }
++
++    private static boolean joinThread(Thread thread, Duration timeout) {
++        if (thread == Thread.currentThread()) return false;
++        try { thread.join(timeout); return !thread.isAlive(); }
++        catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
++    }
++    /** One bounded queue; stop/failure is out of band, so cleanup never needs another slot. */
++    private static final class Owner implements SerialOwner {
++        private final int capacity;
++        private final ArrayBlockingQueue<Runnable> queue;
++        private final AtomicBoolean stopped = new AtomicBoolean();
++        private final AtomicReference<Throwable> failure = new AtomicReference<>();
++        private final Map<Object, Runnable> hooks = new LinkedHashMap<>();
++        private final Thread thread;
++        Owner(int capacity) {
++            if (capacity < 1 || capacity > 4096) throw new IllegalArgumentException("Owner capacity 1..4096");
++            this.capacity = capacity; queue = new ArrayBlockingQueue<>(capacity);
++            thread = Thread.ofVirtual().name("ott-neighbor-events").unstarted(this::loop); thread.start();
++        }
++        private void loop() {
++            try {
++                while (!stopped.get()) {
++                    try { var action = queue.take(); if (!stopped.get()) action.run(); }
++                    catch (InterruptedException e) { if (!stopped.get()) fail(e); }
++                    catch (RuntimeException e) { fail(e); }
++                }
++            } finally {
++                queue.clear(); List<Runnable> cleanups;
++                synchronized (hooks) { cleanups = List.copyOf(hooks.values()); hooks.clear(); }
++                for (var hook : cleanups) try { hook.run(); } catch (RuntimeException e) { failure.compareAndSet(null, e); }
++            }
++        }
++        public int capacity() { return capacity; }
++        public boolean isOwnerThread() { return Thread.currentThread() == thread; }
++        public boolean offer(Runnable action) {
++            Objects.requireNonNull(action);
++            if (stopped.get()) return false;
++            if (queue.offer(action)) return true;
++            fail(new RejectedExecutionException("Owner queue full")); return false;
++        }
++        public Registration onStop(Runnable cleanup) {
++            Objects.requireNonNull(cleanup); var token = new Object();
++            synchronized (hooks) {
++                if (stopped.get() || hooks.size() >= 16) throw new RejectedExecutionException("Owner stopped or cleanup hook capacity");
++                hooks.put(token, cleanup);
++            }
++            return () -> { synchronized (hooks) { hooks.remove(token); } };
++        }
++        public void fail(Throwable cause) { failure.compareAndSet(null, Objects.requireNonNull(cause)); requestClose(); }
++        public void requestClose() { stopped.set(true); if (!isOwnerThread()) thread.interrupt(); }
++        public boolean awaitTermination(Duration timeout) { return joinThread(thread, timeout); }
++        public void close() {
++            requestClose(); if (!isOwnerThread() && !awaitTermination(Duration.ofSeconds(3))) throw new IllegalStateException("Serial owner did not terminate");
++        }
++    }
++    private static final class RealPorts implements Ports {
++        public SerialOwner owner(int capacity) { return createSerialOwner(capacity); }
++        public IoServices io(int maxJobs) { return new RealIo(maxJobs); }
++        public Deadlines deadlines(int maxTickets) { return new RealDeadlines(maxTickets); }
++    }
++    private record TcpChannel(Connection connection) implements Channel {
++        public UUID id() { return connection.id(); }
++        public boolean isOpen() { return connection.isOpen(); }
++        public Connection.SendResult send(ControlMessage message) { return connection.send(message); }
++        public CompletableFuture<Void> sendAndFlush(ControlMessage message) { return connection.sendAndFlush(message); }
++        public void close() { connection.close(); }
++    }
++    /** Physical ticket accounting includes callbacks already running when cancelled. */
++    static final class RealDeadlines implements Deadlines {
++        private final int maximum;
++        private int limit, physical;
++        private boolean stopped;
++        private final Set<TimerJob> jobs = new HashSet<>();
++        private final ScheduledThreadPoolExecutor worker = new ScheduledThreadPoolExecutor(1,
++                Thread.ofVirtual().name("ott-neighbor-deadlines").factory());
++        RealDeadlines(int max) {
++            maximum = max; limit = max;
++            worker.setRemoveOnCancelPolicy(true); worker.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
++        }
++        public synchronized void limit(int value) {
++            if (value < 1 || value > maximum) throw new IllegalArgumentException("Invalid timer limit"); limit = value;
++        }
++        private final class TimerJob implements Runnable, Ticket {
++            final Runnable task; ScheduledFuture<?> future; boolean running, done;
++            TimerJob(Runnable task) { this.task = task; }
++            public void run() {
++                synchronized (RealDeadlines.this) { if (done) return; running = true; }
++                try { task.run(); } finally { synchronized (RealDeadlines.this) { release(); } }
++            }
++            private void release() { if (!done) { done = true; physical--; jobs.remove(this); } }
++            public void cancel() {
++                synchronized (RealDeadlines.this) {
++                    if (done) return;
++                    future.cancel(false);
++                    if (!running) release();
++                }
++            }
++        }
++        public synchronized Ticket schedule(Runnable task, long nanos) {
++            if (stopped || physical >= limit) throw new RejectedExecutionException("Physical timer capacity");
++            var job = new TimerJob(Objects.requireNonNull(task)); physical++; jobs.add(job);
++            try { job.future = worker.schedule(job, Math.max(1, nanos), TimeUnit.NANOSECONDS); }
++            catch (RuntimeException e) { job.release(); throw e; }
++            return job;
++        }
++        public synchronized void requestClose() {
++            stopped = true; for (var job : List.copyOf(jobs)) job.cancel(); worker.shutdownNow();
++        }
++        public boolean awaitTermination(Duration timeout) {
++            try { return worker.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS); }
++            catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
++        }
++    }
++    /** One bounded worker for configured DNS and bind, independent of the serial domain owner. */
++    interface AddressLookup { InetAddress resolve(String host) throws Exception; }
++    static final class RealIo implements IoServices, Resolver, Network {
++        private final int maximum;
++        private final AddressLookup lookup;
++        private final ThreadPoolExecutor worker;
++        private final Map<String, ResolveJob> hosts = new HashMap<>();
++        private final Map<UUID, ResolveJob> jobs = new HashMap<>();
++        private final AtomicReference<Transport> transport = new AtomicReference<>();
++        private boolean stopped; private int physical;
++        RealIo(int maximum) {
++            this(maximum, InetAddress::getByName);
++        }
++        RealIo(int maximum, AddressLookup lookup) {
++            this.maximum = maximum;
++            this.lookup = Objects.requireNonNull(lookup);
++            worker = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(maximum),
++                    Thread.ofVirtual().name("ott-neighbor-io").factory(), new ThreadPoolExecutor.AbortPolicy());
++        }
++        public Resolver resolver() { return this; }
++        public Network network() { return this; }
++        private final class ResolveJob implements Runnable {
++            final UUID id; final String host;
++            final CompletableFuture<InetAddress> result = new CompletableFuture<>();
++            Thread runner; boolean running, retired;
++            ResolveJob(UUID id, String host) { this.id = id; this.host = host; }
++            public void run() {
++                synchronized (RealIo.this) {
++                    if (retired) return; running = true; runner = Thread.currentThread();
++                }
++                InetAddress address = null; Throwable error = null;
++                try { address = lookup.resolve(host); } catch (Exception e) { error = e; }
++                // Complete only after physical resolution returns, never on logical retirement.
++                // Continuations also remain inside this job's physical reservation.
++                try { if (error == null) result.complete(address); else result.completeExceptionally(error); }
++                finally { synchronized (RealIo.this) { physical--; hosts.remove(host, this); jobs.remove(id, this); runner = null; } }
++            }
++        }
++        public CompletableFuture<InetAddress> resolve(UUID id, String host) {
++            host = normalizeHost(host, true);
++            ResolveJob job;
++            synchronized (this) {
++                if (stopped || physical >= maximum || hosts.containsKey(host))
++                    return CompletableFuture.failedFuture(new RejectedExecutionException("DNS job busy or capacity"));
++                job = new ResolveJob(id, host); hosts.put(host, job); jobs.put(id, job); physical++;
++                try { worker.execute(job); }
++                catch (RuntimeException e) { physical--; hosts.remove(host); jobs.remove(id); return CompletableFuture.failedFuture(e); }
++            }
++            return job.result;
++        }
++        public void retire(UUID id) {
++            ResolveJob job; boolean removed = false;
++            synchronized (this) {
++                job = jobs.get(id); if (job == null) return;
++                if (!job.running && worker.remove(job)) {
++                    job.retired = true; jobs.remove(id); hosts.remove(job.host, job); physical--; removed = true;
++                } else if (job.runner != null) job.runner.interrupt();
++            }
++            if (removed) job.result.completeExceptionally(new CancellationException("DNS waiter retired"));
++        }
++        public CompletableFuture<InetSocketAddress> open(InetSocketAddress bind, Transport.Options options, Sink sink) {
++            var result = new CompletableFuture<InetSocketAddress>();
++            synchronized (this) {
++                if (stopped || physical >= maximum) return CompletableFuture.failedFuture(new RejectedExecutionException("Bind job capacity"));
++                physical++;
++                try { worker.execute(() -> {
++                    Transport opened = null; Throwable error = null;
++                    try {
++                        opened = new Transport(bind, new Transport.Listener() {
++                            public void connectionOpen(Connection c) { sink.opened(new TcpChannel(c), System.nanoTime()); }
++                            public void message(Connection c, ControlMessage m) { sink.message(new TcpChannel(c), m, System.nanoTime()); }
++                            public void connectionClosed(Connection c, Connection.CloseReason why) { sink.closed(new TcpChannel(c), why, System.nanoTime()); }
++                        }, options);
++                        transport.set(opened);
++                        synchronized (RealIo.this) { if (stopped) opened.requestClose(); }
++                    } catch (Exception e) { error = e; }
++                    try { if (error == null) result.complete(opened.localAddress()); else result.completeExceptionally(error); }
++                    finally { synchronized (RealIo.this) { physical--; } }
++                }); } catch (RuntimeException e) {
++                    physical--;
++                    // The failed future is published only after leaving this lock.
++                    return CompletableFuture.failedFuture(e);
++                }
++            }
++            return result;
++        }
++        public CompletableFuture<Channel> connect(InetSocketAddress remote) {
++            var tcp = transport.get();
++            if (tcp == null) return CompletableFuture.failedFuture(new IllegalStateException("Network not open"));
++            return tcp.connect(remote).thenApply(TcpChannel::new);
++        }
++        public int reservations() { var tcp = transport.get(); return tcp == null ? 0 : tcp.connectionCount(); }
++        public void requestClose() {
++            List<UUID> pending;
++            synchronized (this) { stopped = true; pending = List.copyOf(jobs.keySet()); }
++            var tcp = transport.get(); if (tcp != null) tcp.requestClose();
++            for (var id : pending) retire(id);
++            // Queued bind must run its rollback; do not silently drop the job/future.
++            worker.shutdown();
++        }
++        public boolean awaitTermination(Duration timeout) {
++            // IoServices and Network share this adapter: verify both within a single supplied budget.
++            long began = System.nanoTime();
++            try { if (!worker.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS)) return false; }
++            catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
++            var tcp = transport.get(); if (tcp == null) return true;
++            long remaining = TimeUnit.NANOSECONDS.toMillis(timeout.toNanos() - (System.nanoTime() - began));
++            return remaining > 0 && tcp.awaitTermination(Duration.ofMillis(remaining));
++        }
++    }
++}
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+index e69de29..d7953b4 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+@@ -0,0 +1,759 @@
++package pt.uminho.esr.ott.overlay;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.protocol.*;
++import java.nio.file.Path;
++import java.util.*;
++import java.net.*;
++import java.time.Duration;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.AtomicLong;
++import pt.uminho.esr.ott.transport.*;
++import static org.junit.jupiter.api.Assertions.*;
++
++@Timeout(20)
++class NeighborManagerTest {
++    static final UUID ZERO = new UUID(0, 0);
++    static ControlMessage.Endpoint endpoint(String id, UUID instance, int port) {
++        return new ControlMessage.Endpoint(id, instance, "127.0.0.1", port, port + 100, NodeRole.RELAY);
++    }
++    static NodeConfiguration config(String id, int port) {
++        return new NodeConfiguration(Path.of("fixture.properties"), id, NodeRole.RELAY,
++                "127.0.0.1", "127.0.0.1", port, port + 100,
++                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", 19000)),
++                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), List.of());
++    }
++    @Test void d01RejectsZeroInstanceBeforeStart() {
++        assertThrows(IllegalArgumentException.class, () -> new NeighborManager(config("A", 19001), ZERO, e -> {}));
++    }
++    @Test void d03SnapshotRequiresConfiguredZeroAndSessionOnlyWhenActive() {
++        var e = endpoint("B", ZERO, 19002);
++        assertThrows(IllegalArgumentException.class, () -> new Neighbor("A", e, Neighbor.State.DISCONNECTED, Optional.empty(), 0));
++        assertThrows(IllegalArgumentException.class, () -> new Neighbor("B", e, Neighbor.State.ACTIVE, Optional.empty(), 0));
++        assertThrows(IllegalArgumentException.class, () -> new Neighbor.Session("B", ZERO, UUID.randomUUID(), e));
++    }
++    @Test void d19CloseBeforeStartIsIdempotentAndStartCannotRevive() {
++        var m = new NeighborManager(config("A", 19001), UUID.randomUUID(), e -> {});
++        m.close(); m.close();
++        assertTrue(m.snapshot().isEmpty());
++        assertTrue(m.start().toCompletableFuture().isCompletedExceptionally());
++    }
++
++    static final class ManualOwner implements NeighborManager.SerialOwner {
++        final ArrayDeque<Runnable> events = new ArrayDeque<>();
++        final List<Runnable> hooks = new ArrayList<>();
++        boolean running, stopped, reject; int capacity = 4096;
++        public int capacity() { return capacity; }
++        public boolean isOwnerThread() { return running; }
++        public boolean offer(Runnable event) {
++            if (stopped || reject || events.size() >= capacity) return false;
++            events.add(event); return true;
++        }
++        public NeighborManager.Registration onStop(Runnable r) { hooks.add(r); return () -> hooks.remove(r); }
++        public void fail(Throwable t) { requestClose(); }
++        public void requestClose() {
++            stopped = true; running = true;
++            try { for (var hook : List.copyOf(hooks)) hook.run(); } finally { running = false; events.clear(); }
++        }
++        public boolean awaitTermination(Duration d) { return stopped && !running; }
++        public void close() { requestClose(); }
++        void pump() {
++            int count = 0;
++            while (!events.isEmpty()) {
++                assertTrue(++count < 1000, "No unbounded immediate retry");
++                running = true; try { events.remove().run(); } finally { running = false; }
++            }
++        }
++    }
++    static final class FakeChannel implements NeighborManager.Channel {
++        final UUID id = UUID.randomUUID(); boolean open = true, flush = true;
++        final List<ControlMessage> writes = new ArrayList<>();
++        final List<CompletableFuture<Void>> confirmations = new ArrayList<>();
++        public UUID id() { return id; }
++        public boolean isOpen() { return open; }
++        public Connection.SendResult send(ControlMessage m) { if (!open) return Connection.SendResult.CLOSED; writes.add(m); return Connection.SendResult.ACCEPTED; }
++        public CompletableFuture<Void> sendAndFlush(ControlMessage m) {
++            writes.add(m); var f = new CompletableFuture<Void>(); confirmations.add(f);
++            if (flush) f.complete(null); return f;
++        }
++        public void close() { open = false; }
++        ControlMessage last() { return writes.getLast(); }
++        void written() { confirmations.getLast().complete(null); }
++    }
++    static final class FakeTimers implements NeighborManager.Deadlines {
++        record Task(long began, long delay, Runnable action) {}
++        final AtomicLong clock; final List<Task> tasks = new ArrayList<>();
++        int limit, peak; boolean stopped;
++        FakeTimers(AtomicLong clock) { this.clock = clock; }
++        public void limit(int n) { limit = n; }
++        public NeighborManager.Ticket schedule(Runnable r, long delay) {
++            if (stopped || tasks.size() >= limit) throw new RejectedExecutionException("Physical timer capacity");
++            var t = new Task(clock.get(), delay, r); tasks.add(t); peak = Math.max(peak, tasks.size());
++            return () -> tasks.remove(t);
++        }
++        void advance(long nanos) {
++            clock.addAndGet(nanos);
++            for (var t : List.copyOf(tasks)) if (clock.get() - t.began >= t.delay) { tasks.remove(t); t.action.run(); }
++        }
++        public void requestClose() { stopped = true; tasks.clear(); }
++        public boolean awaitTermination(Duration d) { return stopped; }
++    }
++    static final class FakeIo implements NeighborManager.IoServices, NeighborManager.Resolver, NeighborManager.Network {
++        record Dial(InetSocketAddress remote, CompletableFuture<NeighborManager.Channel> future) {}
++        final List<Dial> dials = new ArrayList<>();
++        final List<String> resolved = new ArrayList<>();
++        final Map<UUID, CompletableFuture<InetAddress>> jobs = new LinkedHashMap<>();
++        final List<UUID> retired = new ArrayList<>();
++        NeighborManager.Sink sink; Transport.Options options;
++        boolean stopped, holdDns, holdBind, holdTermination; CompletableFuture<InetSocketAddress> binding;
++        AtomicLong awaitClock; long consumeMillis; final List<Duration> awaitBudgets = new ArrayList<>();
++        public NeighborManager.Resolver resolver() { return this; }
++        public NeighborManager.Network network() { return this; }
++        public CompletableFuture<InetAddress> resolve(UUID id, String host) {
++            resolved.add(host); var f = new CompletableFuture<InetAddress>(); jobs.put(id, f);
++            if (!holdDns) f.complete(InetAddress.getLoopbackAddress()); return f;
++        }
++        public void retire(UUID id) { retired.add(id); }
++        public CompletableFuture<InetSocketAddress> open(InetSocketAddress address, Transport.Options options, NeighborManager.Sink sink) {
++            this.options = options; this.sink = sink; binding = new CompletableFuture<>();
++            if (!holdBind) binding.complete(address); return binding;
++        }
++        public CompletableFuture<NeighborManager.Channel> connect(InetSocketAddress address) {
++            var f = new CompletableFuture<NeighborManager.Channel>(); dials.add(new Dial(address, f)); return f;
++        }
++        public int reservations() { return dials.size(); }
++        public void requestClose() { stopped = true; }
++        public boolean awaitTermination(Duration d) {
++            awaitBudgets.add(d);
++            if (awaitClock != null) awaitClock.addAndGet(TimeUnit.MILLISECONDS.toNanos(Math.min(consumeMillis, d.toMillis())));
++            return stopped && !holdTermination && consumeMillis <= d.toMillis();
++        }
++    }
++    static final class Fixture implements AutoCloseable {
++        final AtomicLong clock = new AtomicLong(1000);
++        final ManualOwner owner = new ManualOwner();
++        final FakeIo io = new FakeIo(); final FakeTimers timers = new FakeTimers(clock);
++        final List<NeighborManager.Event> events = new ArrayList<>();
++        final UUID instance = UUID.randomUUID();
++        long jitterMode; boolean observerFails;
++        final NeighborManager manager; int factories;
++        Fixture(String id) { this(config(id, 19001), false); }
++        Fixture(NodeConfiguration config, boolean borrow) {
++            owner.capacity = config.runtime().overlay().eventsCapacity();
++            manager = new NeighborManager(config, instance, borrow ? owner : null, event -> { events.add(event); if (observerFails) throw new IllegalStateException("Controlled consumer failure"); }, clock::get,
++                (min, max) -> jitterMode < 0 ? min : jitterMode > 0 ? max : 0,
++                new NeighborManager.Ports() {
++                    public NeighborManager.SerialOwner owner(int n) { factories++; assertEquals(owner.capacity, n); return owner; }
++                    public NeighborManager.IoServices io(int n) { factories++; assertEquals(65, n); return io; }
++                    public NeighborManager.Deadlines deadlines(int n) { factories++; return timers; }
++                });
++        }
++        void pump() { owner.pump(); }
++        void message(FakeChannel c, ControlMessage m) { io.sink.message(c, m, clock.get()); pump(); }
++        FakeChannel connect(int index, boolean callbacksFirst) {
++            var c = new FakeChannel();
++            if (callbacksFirst) io.sink.opened(c, clock.get());
++            io.dials.get(index).future.complete(c);
++            if (!callbacksFirst) io.sink.opened(c, clock.get());
++            pump(); return c;
++        }
++        FakeChannel discovery() {
++            assertEquals(0, factories); manager.start(); pump(); return connect(0, true);
++        }
++        void ready(String peer) {
++            var boot = discovery();
++            message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(),
++                    new ControlMessage.NeighborList(List.of(endpoint(peer, ZERO, 19002)))));
++            assertTrue(manager.start().toCompletableFuture().isDone()); assertFalse(boot.open);
++        }
++        FakeChannel outbound(boolean flush) {
++            var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); io.dials.get(1).future.complete(c); pump(); return c;
++        }
++        void ok(FakeChannel c, UUID remote) {
++            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, ControlMessage.Empty.INSTANCE));
++        }
++        FakeChannel inbound(String id, UUID remote, boolean flush) {
++            var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); pump();
++            message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), id, remote,
++                    new ControlMessage.EndpointPayload(endpoint(id, remote, 19002)))); return c;
++        }
++        long ups() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborUp).count(); }
++        long downs() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborDown).count(); }
++        List<NeighborManager.Received> received() { return events.stream().filter(e -> e instanceof NeighborManager.Received).map(e -> (NeighborManager.Received)e).toList(); }
++        public void close() { manager.requestClose(); pump(); assertTrue(manager.awaitTermination(Duration.ofSeconds(1))); }
++    }
++    static ControlMessage error(FakeChannel c, String id, UUID instance, ErrorCode code, int related) {
++        return new ControlMessage(MessageType.ERROR, c.last().requestId(), id, instance, new ControlMessage.ErrorPayload(code, related, "remote detail"));
++    }
++    @Test void d02DiscoveryRejectsPermanentErrorIntactWithoutErrorResponse() {
++        try (var f = new Fixture("A")) {
++            var boot = f.discovery(); var error = error(boot, "BOOT", UUID.randomUUID(), ErrorCode.UNAUTHORIZED_NEIGHBOR, 1);
++            f.message(boot, error);
++            var thrown = assertThrows(CompletionException.class, () -> f.manager.start().toCompletableFuture().join());
++            var rejection = assertInstanceOf(NeighborManager.DiscoveryRejected.class, thrown.getCause());
++            assertSame(error, rejection.remoteMessage()); assertEquals(boot.id, rejection.connectionId());
++            assertEquals(1, boot.writes.size()); assertTrue(f.manager.snapshot().isEmpty()); assertEquals(0, f.ups());
++        }
++    }
++    @Test void d02TransientDiscoveryErrorRetriesWithBackoff() {
++        for (var code : List.of(ErrorCode.TIMEOUT, ErrorCode.RESOURCE_LIMIT)) try (var f = new Fixture("A")) {
++            var boot = f.discovery(); f.message(boot, error(boot, "BOOT", UUID.randomUUID(), code, 1));
++            assertFalse(f.manager.start().toCompletableFuture().isDone()); assertEquals(1, f.io.dials.size());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump();
++            assertEquals(2, f.io.dials.size()); assertEquals(0, f.ups()); assertEquals(1, boot.writes.size());
++        }
++    }
++    @Test void d02WrongRequestFailsLocallyAndUnrelatedInboundCannotFailDiscovery() {
++        try (var f = new Fixture("A")) {
++            var boot = f.discovery(); var other = new FakeChannel();
++            f.io.sink.opened(other, f.clock.get()); f.pump();
++            f.message(other, new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "X", UUID.randomUUID(), new ControlMessage.ErrorPayload(ErrorCode.TIMEOUT, 1, "x")));
++            assertFalse(f.manager.start().toCompletableFuture().isDone()); assertFalse(other.open);
++            f.message(boot, new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "BOOT", UUID.randomUUID(), new ControlMessage.ErrorPayload(ErrorCode.TIMEOUT, 1, "wrong request")));
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally()); assertEquals(1, boot.writes.size());
++        }
++    }
++    @Test void d03InvalidListHasNoPartialInstallOrPeerDial() {
++        for (int kind = 0; kind < 4; kind++) try (var f = new Fixture("A")) {
++            var boot = f.discovery();
++            var e = endpoint(kind == 0 ? "A" : "B", kind == 1 ? UUID.randomUUID() : ZERO, 19002);
++            var list = kind == 2 ? List.of(e, e) : kind == 3 ? List.of(e, endpoint("C", ZERO, 19002)) : List.of(e);
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(), new ControlMessage.NeighborList(list)));
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally());
++            assertTrue(f.manager.diagnostics().isEmpty()); assertEquals(1, f.io.dials.size());
++        }
++    }
++    @Test void d05OnlySmallerIdDialsAndSnapshotIsImmutable() {
++        try (var small = new Fixture("A"); var big = new Fixture("Z")) {
++            small.ready("B"); big.ready("B");
++            assertEquals(2, small.io.dials.size()); assertEquals(1, big.io.dials.size());
++            assertThrows(UnsupportedOperationException.class, () -> small.manager.diagnostics().clear());
++            assertEquals(ZERO, small.manager.diagnostics().get("B").configured().instanceId());
++        }
++    }
++    @Test void d08OutboundNeedsBothFlushAndHelloOkThenDrainsApplicationAfterUp() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false); var remote = UUID.randomUUID();
++            f.ok(c, remote); assertEquals(0, f.ups()); assertTrue(f.manager.snapshot().isEmpty());
++            var app = new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "B", remote, new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, 255, "route"));
++            f.message(c, app); assertTrue(f.received().isEmpty()); c.written(); f.pump();
++            assertEquals(1, f.ups()); assertEquals(1, f.received().size()); assertSame(app, f.received().getFirst().message());
++            assertInstanceOf(NeighborManager.NeighborUp.class, f.events.get(f.events.indexOf(f.received().getFirst()) - 1));
++            assertEquals(c.id, f.manager.snapshot().get("B").connectionId());
++        }
++    }
++    @Test void d08InboundFlushAndErrorRejectionOfHelloOk() {
++        try (var f = new Fixture("Z")) {
++            f.ready("B"); var remote = UUID.randomUUID(); var c = f.inbound("B", remote, false);
++            assertEquals(MessageType.HELLO_OK, c.last().type()); assertEquals(0, f.ups());
++            f.message(c, error(c, "B", remote, ErrorCode.DUPLICATE_ID, 6));
++            c.written(); f.pump(); assertEquals(0, f.ups()); assertFalse(c.open); assertEquals(1, c.writes.size());
++        }
++    }
++    @Test void d07ErrorRejectsHelloBeforeFlushAndOldFlushCannotAuthorize() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false);
++            f.message(c, error(c, "B", UUID.randomUUID(), ErrorCode.DUPLICATE_ID, 5));
++            c.written(); f.pump(); assertEquals(0, f.ups()); assertEquals(1, c.writes.size()); assertFalse(c.open);
++            assertEquals(Neighbor.State.DISCONNECTED, f.manager.diagnostics().get("B").state());
++        }
++    }
++    @Test void d07UnexpectedErrorBeforeLegitimateWindowClosesLocally() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true);
++            f.message(c, error(c, "B", UUID.randomUUID(), ErrorCode.NO_ROUTE, 11));
++            assertFalse(c.open); assertEquals(0, f.ups()); assertEquals(1, c.writes.size());
++        }
++    }
++    @Test void d11ActiveErrorsPreserveEveryCodeAndRawRelatedType() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true); var remote = UUID.randomUUID(); f.ok(c, remote);
++            for (var code : ErrorCode.values()) for (int related : List.of(0, 3, 17, 255)) {
++                var m = new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "B", remote, new ControlMessage.ErrorPayload(code, related, "original"));
++                f.message(c, m); assertSame(m, f.received().getLast().message()); assertEquals(c.id, f.received().getLast().session().connectionId());
++            }
++            assertTrue(c.open); assertEquals(0, f.downs()); assertEquals(1, c.writes.size());
++            var session = f.manager.snapshot().get("B");
++            var invalid = new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "A", f.instance, new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, 17, "never error to error"));
++            var result = f.manager.send(session, invalid); f.pump(); assertEquals(Connection.SendResult.INVALID_MESSAGE, result.toCompletableFuture().join());
++        }
++    }
++    @Test void d10OldCallbacksCannotDeleteReconnectedInstance() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var old = f.outbound(true); f.ok(old, UUID.randomUUID());
++            var stale = f.manager.snapshot().get("B"); var lost = f.manager.disconnect(stale); f.pump(); assertTrue(lost.toCompletableFuture().join());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump(); var c = f.connect(2, false); var remote = UUID.randomUUID(); f.ok(c, remote);
++            var fresh = f.manager.snapshot().get("B"); assertEquals(remote, fresh.instanceId());
++            f.io.sink.closed(old, Connection.CloseReason.PEER_EOF, f.clock.get());
++            f.message(old, error(old, "B", stale.instanceId(), ErrorCode.TIMEOUT, 5));
++            var no = f.manager.disconnect(stale); f.pump(); assertFalse(no.toCompletableFuture().join());
++            assertEquals(fresh, f.manager.snapshot().get("B")); assertEquals(2, f.ups()); assertEquals(1, f.downs());
++            assertEquals(3, f.io.dials.size()); // Exactly one bootstrap query.
++        }
++    }
++    @Test void d12DeadlineIncludesQueueAndWrapAndWinsOverLateOk() {
++        for (long begin : List.of(1000L, Long.MAX_VALUE - TimeUnit.MILLISECONDS.toNanos(100))) try (var f = new Fixture("A")) {
++            f.clock.set(begin); f.ready("B"); var c = f.outbound(false);
++            f.clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(3000));
++            f.ok(c, UUID.randomUUID()); c.written(); f.pump(); assertEquals(0, f.ups()); assertFalse(c.open);
++        }
++    }
++    @Test void d14ForgedHelloBeforeDialResultCannotBecomeInbound() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = new FakeChannel(); f.io.sink.opened(c, f.clock.get());
++            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.EndpointPayload(endpoint("B", UUID.randomUUID(), 19002))));
++            assertTrue(c.writes.isEmpty()); assertEquals(0, f.ups());
++            f.io.dials.get(1).future.complete(c); f.pump(); assertFalse(c.open); assertEquals(0, f.ups());
++        }
++    }
++    @Test void d15RetiredNativeDialClosesLateSuccessAndDoesNotDuplicate() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var nativeFuture = f.io.dials.get(1).future;
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(2000)); f.pump();
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump(); assertEquals(2, f.io.dials.size());
++            assertFalse(nativeFuture.isCancelled()); var late = new FakeChannel(); nativeFuture.complete(late); f.pump();
++            assertFalse(late.open); assertEquals(0, f.ups());
++        }
++    }
++    @Test void d16LeaveProducesOneDownAndKeepsConfiguredEdge() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true); var remote = UUID.randomUUID(); f.ok(c, remote);
++            var leave = new ControlMessage(MessageType.NODE_LEAVE, UUID.randomUUID(), "B", remote, new ControlMessage.Leave(0));
++            f.message(c, leave); f.message(c, leave); f.io.sink.closed(c, Connection.CloseReason.PEER_EOF, f.clock.get()); f.pump();
++            assertEquals(1, f.downs()); assertTrue(f.manager.snapshot().isEmpty()); assertTrue(f.manager.diagnostics().containsKey("B"));
++        }
++    }
++    @Test void d17RetentionOverflowClosesOnlyCandidateAndFreesBufferedFrames() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false); var remote = UUID.randomUUID(); f.ok(c, remote);
++            for (int i = 0; i < 5; i++) f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(i)));
++            c.written(); f.pump(); assertFalse(c.open); assertEquals(0, f.ups()); assertTrue(f.received().isEmpty());
++            assertTrue(f.timers.peak <= 3);
++        }
++    }
++    @Test void d18SaturatedOwnerCleansUpWithoutAnotherQueueSlot() {
++        var f = new Fixture("A"); f.ready("B"); f.owner.reject = true;
++        var c = new FakeChannel(); f.io.sink.opened(c, f.clock.get());
++        assertTrue(f.io.stopped); assertTrue(f.timers.stopped); assertFalse(c.open); assertTrue(f.manager.snapshot().isEmpty());
++        assertTrue(f.manager.awaitTermination(Duration.ofSeconds(1)));
++    }
++    @Test void d19StopDuringDnsAndBindCannotRevive() {
++        try (var f = new Fixture("A")) {
++            f.io.holdDns = true; f.manager.start(); f.pump(); f.manager.requestClose(); f.pump();
++            f.io.jobs.values().forEach(job -> job.complete(InetAddress.getLoopbackAddress())); f.pump();
++            assertTrue(f.io.dials.isEmpty()); assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally());
++        }
++        try (var f = new Fixture("A")) {
++            f.io.holdBind = true; f.manager.start(); f.pump(); f.manager.requestClose(); f.pump();
++            f.io.binding.complete(new InetSocketAddress(InetAddress.getLoopbackAddress(), 19001)); f.pump();
++            assertTrue(f.io.stopped); assertTrue(f.io.dials.isEmpty());
++        }
++    }
++    @Test void d20BorrowedOwnerSurvivesManagerShutdownAndReceivesRuntimeOptions() {
++        try (var f = new Fixture(config("A", 19001), true)) {
++            f.ready("B"); assertEquals(256, f.io.options.queueCapacity()); assertEquals(64, f.io.options.maxConnections());
++            f.manager.requestClose(); f.pump(); assertFalse(f.owner.stopped);
++            var ran = new boolean[1]; assertTrue(f.owner.offer(() -> ran[0] = true)); f.pump(); assertTrue(ran[0]);
++        }
++    }
++
++    static RuntimeConfiguration fastRuntime() {
++        var r = RuntimeConfiguration.defaults();
++        return new RuntimeConfiguration(new RuntimeConfiguration.Control(Duration.ofMillis(300), Duration.ofSeconds(3), 64, 256, Duration.ofMillis(500)),
++                new RuntimeConfiguration.Overlay(Duration.ofMillis(500), Duration.ofMillis(20), Duration.ofMillis(100), 0, 4096),
++                r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
++    }
++    static void until(java.util.function.BooleanSupplier condition) throws Exception {
++        long began = System.nanoTime();
++        while (!condition.getAsBoolean()) {
++            if (System.nanoTime() - began > TimeUnit.SECONDS.toNanos(5)) fail("TCP condition did not converge within 5 seconds");
++            Thread.sleep(5);
++        }
++    }
++    static final class Deployment implements AutoCloseable {
++        final NodeConfiguration bootstrapConfig;
++        final List<NodeConfiguration> configs = new ArrayList<>();
++        final List<NeighborManager> managers = new ArrayList<>();
++        pt.uminho.esr.ott.bootstrap.BootstrapServer bootstrap;
++        Deployment() throws Exception {
++            var sockets = new ArrayList<ServerSocket>(); var ports = new ArrayList<Integer>();
++            try {
++                for (int i = 0; i < 7; i++) { var s = new ServerSocket(0, 1, InetAddress.getLoopbackAddress()); sockets.add(s); ports.add(s.getLocalPort()); }
++            } finally { for (var socket : sockets) socket.close(); }
++            var nodes = new LinkedHashMap<String, TopologyConfiguration.Node>();
++            for (int i = 0; i < 3; i++) {
++                String id = "N" + i;
++                nodes.put(id, new TopologyConfiguration.Node(id, "127.0.0.1", ports.get(i + 1), ports.get(i + 4), NodeRole.RELAY,
++                        new LinkedHashSet<>(List.of("N0", "N1", "N2").stream().filter(n -> !n.equals(id)).toList())));
++                configs.add(new NodeConfiguration(Path.of("test-" + id), id, NodeRole.RELAY, "127.0.0.1", "127.0.0.1", ports.get(i + 1), ports.get(i + 4),
++                        Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", ports.getFirst())), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), List.of(), fastRuntime()));
++            }
++            bootstrapConfig = new NodeConfiguration(Path.of("test-bootstrap"), "BOOT", NodeRole.BOOTSTRAP, "127.0.0.1", "127.0.0.1", ports.getFirst(), 0,
++                    Optional.empty(), Optional.of(Path.of("test-topology")), Optional.empty(), Optional.empty(), Optional.of(new TopologyConfiguration(Path.of("test-topology"), nodes)), List.of(), fastRuntime());
++            bootstrap = new pt.uminho.esr.ott.bootstrap.BootstrapServer(bootstrapConfig);
++            for (var config : configs) managers.add(new NeighborManager(config, UUID.randomUUID(), e -> {}));
++        }
++        void start(int[] order, boolean simultaneous) throws Exception {
++            if (simultaneous) {
++                var starts = new ArrayList<CompletableFuture<Void>>();
++                for (int i : order) starts.add(CompletableFuture.runAsync(() -> managers.get(i).start().toCompletableFuture().join()));
++                CompletableFuture.allOf(starts.toArray(CompletableFuture[]::new)).get(5, TimeUnit.SECONDS);
++            } else for (int i : order) managers.get(i).start().toCompletableFuture().get(3, TimeUnit.SECONDS);
++            until(() -> managers.stream().allMatch(m -> m.snapshot().size() == 2));
++            for (var m : managers) assertEquals(2, new HashSet<>(m.snapshot().values().stream().map(Neighbor.Session::connectionId).toList()).size());
++        }
++        public void close() {
++            for (var m : managers) m.requestClose();
++            try { for (var m : managers) assertTrue(m.awaitTermination(Duration.ofSeconds(3)), "All real TCP/owner/I/O/timer resources terminate"); }
++            finally { if (bootstrap != null) bootstrap.close(); }
++        }
++    }
++    @Test void d21SixOrdersAndSimultaneousStartConvergeOnRealTcp() throws Exception {
++        int[][] orders = {{0,1,2}, {0,2,1}, {1,0,2}, {1,2,0}, {2,0,1}, {2,1,0}};
++        for (var order : orders) try (var deployment = new Deployment()) { deployment.start(order, false); }
++        try (var deployment = new Deployment()) { deployment.start(orders[0], true); }
++    }
++    @Test void d21RealReconnectWithoutBootstrapUnknownPeerAndRestartNewInstance() throws Exception {
++        try (var d = new Deployment()) {
++            d.start(new int[]{0,1,2}, false);
++            try (var bad = new Socket("127.0.0.1", d.configs.get(0).controlPort())) {
++                bad.setSoTimeout(2000); var remote = UUID.randomUUID();
++                MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "UNKNOWN", remote,
++                        new ControlMessage.EndpointPayload(endpoint("UNKNOWN", remote, 18002))), bad.getOutputStream());
++                bad.getOutputStream().flush(); var reply = MessageCodec.read(bad.getInputStream()).orElseThrow();
++                assertEquals(MessageType.ERROR, reply.type());
++                assertEquals(ErrorCode.UNAUTHORIZED_NEIGHBOR, ((ControlMessage.ErrorPayload)reply.payload()).code());
++                assertTrue(MessageCodec.read(bad.getInputStream()).isEmpty());
++            }
++            var a = d.managers.getFirst(); var old = a.snapshot().get("N1");
++            d.bootstrap.close(); d.bootstrap = null;
++            assertTrue(a.disconnect(old).toCompletableFuture().get(2, TimeUnit.SECONDS));
++            until(() -> a.snapshot().containsKey("N1") && !a.snapshot().get("N1").connectionId().equals(old.connectionId()));
++            assertEquals(old.instanceId(), a.snapshot().get("N1").instanceId());
++            assertFalse(a.disconnect(old).toCompletableFuture().get(2, TimeUnit.SECONDS));
++            d.managers.get(1).close(); until(() -> !a.snapshot().containsKey("N1"));
++            d.bootstrap = new pt.uminho.esr.ott.bootstrap.BootstrapServer(d.bootstrapConfig);
++            var restartEvents = new java.util.concurrent.CopyOnWriteArrayList<NeighborManager.Event>();
++            var newInstance = UUID.randomUUID(); var restarted = new NeighborManager(d.configs.get(1), newInstance, restartEvents::add);
++            d.managers.set(1, restarted);
++            try { restarted.start().toCompletableFuture().get(3, TimeUnit.SECONDS); }
++            catch (Exception e) { throw new AssertionError("Restart events: " + restartEvents, e); }
++            until(() -> a.snapshot().containsKey("N1") && a.snapshot().get("N1").instanceId().equals(newInstance));
++            assertFalse(a.disconnect(old).toCompletableFuture().get(2, TimeUnit.SECONDS));
++        }
++    }
++
++    @Test void d02CompleteBootstrapReplyRemainsValidWhenSocketHasAlreadyReachedEof() {
++        try (var f = new Fixture("Z")) {
++            var boot = f.discovery();
++            var reply = new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(),
++                    new ControlMessage.NeighborList(List.of(endpoint("B", ZERO, 19002))));
++            boot.close(); // Socket state can lead delivery of the already captured reader events.
++            f.io.sink.message(boot, reply, f.clock.get());
++            f.io.sink.closed(boot, Connection.CloseReason.PEER_EOF, f.clock.get()); f.pump();
++            f.manager.start().toCompletableFuture().join();
++            assertEquals(Set.of("B"), f.manager.diagnostics().keySet()); assertEquals(1, f.io.dials.size());
++        }
++    }
++    @Test void d06InvalidInboundEndpointDirectionAndIdentityDoNotAuthorize() {
++        for (int kind = 0; kind < 6; kind++) try (var f = new Fixture("Z")) {
++            f.ready("B"); var c = new FakeChannel(); var remote = UUID.randomUUID();
++            var ep = switch (kind) {
++                case 0 -> new ControlMessage.Endpoint("B", remote, "other.invalid", 19002, 19102, NodeRole.RELAY);
++                case 1 -> new ControlMessage.Endpoint("B", remote, "127.0.0.1", 19003, 19102, NodeRole.RELAY);
++                case 2 -> new ControlMessage.Endpoint("B", remote, "127.0.0.1", 19002, 19102, NodeRole.CLIENT);
++                case 3 -> endpoint("B", UUID.randomUUID(), 19002);
++                case 4 -> endpoint("UNKNOWN", remote, 19002);
++                default -> endpoint("B", ZERO, 19002);
++            };
++            f.io.sink.opened(c, f.clock.get()); f.pump();
++            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.EndpointPayload(ep)));
++            assertEquals(0, f.ups()); assertFalse(c.open); assertEquals(2, f.io.resolved.size(), "No DNS from remote HELLO");
++        }
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.inbound("B", UUID.randomUUID(), true);
++            assertEquals(0, f.ups()); // Still unclassified while the native outbound dial is pending.
++            f.io.dials.get(1).future.completeExceptionally(new java.io.IOException("Dial failed")); f.pump();
++            assertFalse(c.open); assertEquals(0, f.ups()); // B must not dial smaller A.
++        }
++    }
++    @Test void d09DuplicateLiveIdPreservesHealthySession() {
++        try (var f = new Fixture("Z")) {
++            f.ready("B"); var first = f.inbound("B", UUID.randomUUID(), true);
++            var original = f.manager.snapshot().get("B");
++            var duplicate = f.inbound("B", UUID.randomUUID(), true);
++            assertEquals(ErrorCode.DUPLICATE_ID, ((ControlMessage.ErrorPayload)duplicate.last().payload()).code());
++            assertFalse(duplicate.open); assertTrue(first.open); assertEquals(original, f.manager.snapshot().get("B"));
++            assertEquals(1, f.ups()); assertEquals(0, f.downs());
++        }
++    }
++    @Test void d08RetentionAtLimitDrainsInFifoOnlyAfterFlush() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false); var remote = UUID.randomUUID(); f.ok(c, remote);
++            var originals = new ArrayList<ControlMessage>();
++            for (int i = 0; i < 4; i++) {
++                var m = new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(i));
++                originals.add(m); f.message(c, m);
++            }
++            assertTrue(f.received().isEmpty()); c.written(); f.pump();
++            assertEquals(originals, f.received().stream().map(NeighborManager.Received::message).toList()); assertEquals(1, f.ups());
++        }
++    }
++    @Test void d12DnsAndBindBudgetsIncludeQueueDelayBeforeResultsAreProcessed() {
++        try (var f = new Fixture("A")) {
++            f.io.holdDns = true; f.manager.start(); f.pump();
++            f.io.jobs.values().forEach(job -> job.complete(InetAddress.getLoopbackAddress()));
++            f.clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(2000)); f.pump();
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally()); assertNull(f.io.sink);
++        }
++        try (var f = new Fixture("A")) {
++            f.io.holdBind = true; f.manager.start(); f.pump();
++            f.io.binding.complete(new InetSocketAddress(InetAddress.getLoopbackAddress(), 19001));
++            f.clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(2000)); f.pump();
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally()); assertTrue(f.io.dials.isEmpty());
++        }
++    }
++    @Test void d15RealDnsRetirementKeepsPhysicalReservationUntilLookupActuallyReturns() throws Exception {
++        var entered = new CountDownLatch(1); var release = new CountDownLatch(1);
++        var calls = new java.util.concurrent.atomic.AtomicInteger();
++        var io = new NeighborManager.RealIo(65, host -> {
++            calls.incrementAndGet(); entered.countDown();
++            boolean interrupted = false;
++            while (true) try { release.await(); break; } catch (InterruptedException e) { interrupted = true; }
++            if (interrupted) Thread.currentThread().interrupt();
++            return InetAddress.getLoopbackAddress();
++        });
++        try {
++            var id = UUID.randomUUID(); var pending = io.resolve(id, "blocked.invalid");
++            assertTrue(entered.await(1, TimeUnit.SECONDS)); io.retire(id);
++            assertFalse(pending.isDone(), "Logical cancellation is not physical DNS completion");
++            assertTrue(io.resolve(UUID.randomUUID(), "BLOCKED.INVALID.").isCompletedExceptionally()); assertEquals(1, calls.get());
++            var queued = new ArrayList<CompletableFuture<InetAddress>>();
++            for (int n = 0; n < 64; n++) queued.add(io.resolve(UUID.randomUUID(), "queued" + n + ".invalid"));
++            assertTrue(queued.stream().noneMatch(CompletableFuture::isDone));
++            assertTrue(io.resolve(UUID.randomUUID(), "overflow.invalid").isCompletedExceptionally());
++            io.requestClose(); assertFalse(io.awaitTermination(Duration.ofMillis(10)));
++            release.countDown(); assertTrue(io.awaitTermination(Duration.ofSeconds(2))); assertTrue(pending.isDone());
++        } finally { release.countDown(); io.requestClose(); assertTrue(io.awaitTermination(Duration.ofSeconds(2))); }
++    }
++    @Test void d17CancelledRunningTimerStillOccupiesItsPhysicalPermit() throws Exception {
++        var timers = new NeighborManager.RealDeadlines(2); timers.limit(1);
++        var entered = new CountDownLatch(1); var release = new CountDownLatch(1);
++        try {
++            var ticket = timers.schedule(() -> {
++                entered.countDown();
++                try { release.await(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
++            }, 1);
++            assertTrue(entered.await(1, TimeUnit.SECONDS)); ticket.cancel();
++            assertThrows(RejectedExecutionException.class, () -> timers.schedule(() -> {}, 1));
++            release.countDown();
++        } finally { release.countDown(); timers.requestClose(); assertTrue(timers.awaitTermination(Duration.ofSeconds(2))); }
++    }
++
++    static NodeConfiguration runtimeConfig(RuntimeConfiguration runtime) {
++        var c = config("A", 19001);
++        return new NodeConfiguration(c.sourceFile(), c.nodeId(), c.role(), c.bindHost(), c.advertisedHost(), c.controlPort(), c.dataPort(),
++                c.bootstrap(), c.topologyFile(), c.streamsFile(), c.mediaBase(), c.topology(), c.streams(), runtime);
++    }
++    @Test void d13BackoffSaturatesAndJitterExtremesStayWithinOneAndMax() {
++        var r = RuntimeConfiguration.defaults();
++        for (long mode : List.of(-1L, 0L, 1L)) {
++            var runtime = new RuntimeConfiguration(r.control(),
++                    new RuntimeConfiguration.Overlay(r.overlay().helloTimeout(), Duration.ofMillis(Integer.MAX_VALUE - 1L), Duration.ofMillis(Integer.MAX_VALUE), 100, 4096),
++                    r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
++            try (var f = new Fixture(runtimeConfig(runtime), false)) {
++                f.jitterMode = mode; f.ready("B");
++                f.io.dials.get(1).future.completeExceptionally(new java.io.IOException("offline")); f.pump();
++                long delay = f.manager.diagnostics().get("B").retryDelayMillis();
++                assertEquals(mode < 0 ? 1L : mode > 0 ? Integer.MAX_VALUE : Integer.MAX_VALUE - 1L, delay);
++                f.timers.advance(TimeUnit.MILLISECONDS.toNanos(delay)); f.pump();
++                f.io.dials.get(2).future.completeExceptionally(new java.io.IOException("still offline")); f.pump();
++                assertEquals(mode < 0 ? 1L : Integer.MAX_VALUE, f.manager.diagnostics().get("B").retryDelayMillis());
++            }
++        }
++    }
++    @Test void d13BackoffResetsAfterActiveAndNoImmediateRetryOccurs() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); f.io.dials.get(1).future.completeExceptionally(new java.io.IOException("offline")); f.pump();
++            assertEquals(500, f.manager.diagnostics().get("B").retryDelayMillis());
++            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500)); f.pump(); var c = f.connect(2, false); f.ok(c, UUID.randomUUID());
++            assertEquals(0, f.manager.diagnostics().get("B").retryDelayMillis());
++            f.manager.disconnect(f.manager.snapshot().get("B")); f.pump();
++            assertEquals(500, f.manager.diagnostics().get("B").retryDelayMillis()); assertEquals(3, f.io.dials.size());
++        }
++    }
++    @Test void d14InboundWaitsForOtherDialBarrierWithoutExtendingHelloDeadline() {
++        try (var f = new Fixture(config("M", 19001), false)) {
++            var boot = f.discovery();
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(),
++                    new ControlMessage.NeighborList(List.of(endpoint("A", ZERO, 19002), endpoint("Z", ZERO, 19003)))));
++            var remote = UUID.randomUUID(); var inbound = f.inbound("A", remote, true);
++            assertTrue(inbound.writes.isEmpty()); assertEquals(0, f.ups());
++            f.io.dials.get(1).future.completeExceptionally(new java.io.IOException("No Z")); f.pump();
++            assertEquals(1, f.ups()); assertEquals(remote, f.manager.snapshot().get("A").instanceId());
++        }
++        try (var f = new Fixture(config("M", 19001), false)) {
++            var boot = f.discovery();
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(),
++                    new ControlMessage.NeighborList(List.of(endpoint("A", ZERO, 19002), endpoint("Z", ZERO, 19003)))));
++            var c = f.inbound("A", UUID.randomUUID(), true);
++            f.clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(3000));
++            f.io.dials.get(1).future.completeExceptionally(new java.io.IOException("Late dial failure")); f.pump();
++            assertEquals(0, f.ups()); assertFalse(c.open);
++        }
++    }
++    @Test void d18ObserverFailureHasExplicitCleanupAndCannotLeaveAnActiveSnapshot() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true); f.observerFails = true; f.ok(c, UUID.randomUUID());
++            assertTrue(f.io.stopped); assertTrue(f.manager.snapshot().isEmpty()); assertFalse(c.open);
++            assertTrue(f.events.stream().anyMatch(e -> e instanceof NeighborManager.Diagnostic d && d.reason() == NeighborManager.Reason.CONSUMER_FAILURE));
++        }
++    }
++    @Test void d20SmallerRuntimeCapsReachTransportAndHandshakeRetention() {
++        var r = RuntimeConfiguration.defaults();
++        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(Duration.ofMillis(31), Duration.ofMillis(97), 2, 1, Duration.ofMillis(53)),
++                new RuntimeConfiguration.Overlay(Duration.ofMillis(71), Duration.ofMillis(11), Duration.ofMillis(47), 0, 8),
++                r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
++        try (var f = new Fixture(runtimeConfig(runtime), true)) {
++            f.ready("B"); assertEquals(1, f.io.options.queueCapacity()); assertEquals(2, f.io.options.maxConnections());
++            assertEquals(Duration.ofMillis(31), f.io.options.connectTimeout()); assertEquals(Duration.ofMillis(97), f.io.options.shutdownTimeout());
++            var c = f.outbound(false); var remote = UUID.randomUUID(); f.ok(c, remote);
++            f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(1)));
++            assertTrue(c.open);
++            f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(2)));
++            assertFalse(c.open); assertEquals(0, f.ups()); assertEquals(11, f.manager.diagnostics().get("B").retryDelayMillis());
++        }
++    }
++    @Test void d19SuccessfulCloseRemainsIdempotentAfterItsOriginalBudget() {
++        var f = new Fixture("A"); f.ready("B"); f.manager.requestClose(); f.pump();
++        assertTrue(f.manager.awaitTermination(Duration.ofSeconds(1)));
++        f.clock.addAndGet(TimeUnit.SECONDS.toNanos(10)); assertDoesNotThrow(f.manager::close);
++    }
++
++    @Test void d11ActiveErrorCapturedBeforeEofIsDeliveredBeforeDown() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true); var remote = UUID.randomUUID(); f.ok(c, remote);
++            var m = error(c, "B", remote, ErrorCode.PATH_CHANGED, 11);
++            c.close(); f.io.sink.message(c, m, f.clock.get()); f.io.sink.closed(c, Connection.CloseReason.PEER_EOF, f.clock.get()); f.pump();
++            assertSame(m, f.received().getLast().message()); assertEquals(1, f.downs());
++            int received = f.events.indexOf(f.received().getLast());
++            int down = java.util.stream.IntStream.range(0, f.events.size()).filter(i -> f.events.get(i) instanceof NeighborManager.NeighborDown).findFirst().orElseThrow();
++            assertTrue(received < down);
++        }
++    }
++    @Test void d19AwaitPassesOnlyRemainingBudgetAndCloseDoesNotRenewDeadline() {
++        var f = new Fixture("A");
++        try {
++            f.ready("B"); f.manager.requestClose(); f.pump();
++            f.io.awaitClock = f.clock; f.io.consumeMillis = 40;
++            assertTrue(f.manager.awaitTermination(Duration.ofMillis(100)));
++            assertEquals(List.of(Duration.ofMillis(100), Duration.ofMillis(60)), f.io.awaitBudgets);
++        } finally { f.io.consumeMillis = 0; f.close(); }
++        var stuck = new Fixture("A");
++        try {
++            stuck.ready("B"); stuck.io.holdTermination = true; stuck.manager.requestClose(); stuck.pump();
++            stuck.clock.addAndGet(TimeUnit.SECONDS.toNanos(4));
++            assertThrows(IllegalStateException.class, stuck.manager::close);
++            assertFalse(stuck.manager.awaitTermination(Duration.ofMillis(10)));
++            stuck.io.holdTermination = false;
++            assertTrue(stuck.manager.awaitTermination(Duration.ofMillis(100)));
++        } finally { stuck.io.holdTermination = false; stuck.close(); }
++    }
++    @Test void d03DegreeCapAndConfiguredCopiesAreCheckedBeforeAnyPartialDial() {
++        for (int count : List.of(63, 64)) try (var f = new Fixture("Z")) {
++            var boot = f.discovery(); var source = new ArrayList<ControlMessage.Endpoint>();
++            for (int i = 0; i < count; i++) source.add(endpoint("A" + i, ZERO, 20000 + i));
++            var payload = new ControlMessage.NeighborList(source); source.clear();
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(), payload));
++            if (count == 63) { assertEquals(63, f.manager.diagnostics().size()); assertFalse(f.manager.start().toCompletableFuture().isCompletedExceptionally()); }
++            else { assertTrue(f.manager.diagnostics().isEmpty()); assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally()); }
++            assertEquals(1, f.io.dials.size());
++        }
++    }
++    @Test void d17GlobalRetentionLimitPreservesOtherCandidatesAndReleasesCharges() {
++        var r = RuntimeConfiguration.defaults();
++        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(r.control().connectTimeout(), r.control().shutdownTimeout(), 4, 4, r.control().bootstrapQueryTimeout()),
++                new RuntimeConfiguration.Overlay(r.overlay().helloTimeout(), r.overlay().retryInitial(), r.overlay().retryMax(), 0, 8),
++                r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
++        var base = runtimeConfig(runtime);
++        var config = new NodeConfiguration(base.sourceFile(), "Z", base.role(), base.bindHost(), base.advertisedHost(), base.controlPort(), base.dataPort(), base.bootstrap(),
++                base.topologyFile(), base.streamsFile(), base.mediaBase(), base.topology(), base.streams(), runtime);
++        try (var f = new Fixture(config, true)) {
++            var boot = f.discovery();
++            var desired = List.of(endpoint("A", ZERO, 19002), endpoint("B", ZERO, 19003), endpoint("C", ZERO, 19004));
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(), new ControlMessage.NeighborList(desired)));
++            var candidates = new ArrayList<FakeChannel>();
++            for (int i = 0; i < 3; i++) {
++                var c = new FakeChannel(); c.flush = false; candidates.add(c); var ep = desired.get(i); var remote = UUID.randomUUID();
++                f.io.sink.opened(c, f.clock.get()); f.pump();
++                f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.EndpointPayload(
++                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()))));
++                for (int n = 0; n < 3; n++) f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Probe(n)));
++            }
++            assertFalse(candidates.get(2).open); // Nine frames exceed R=8 while B=4 was not exceeded.
++            candidates.get(0).written(); candidates.get(1).written(); f.pump();
++            assertEquals(2, f.ups()); assertEquals(6, f.received().size()); assertEquals(Set.of("A", "B"), f.manager.snapshot().keySet());
++        }
++    }
++
++    @Test void d03DegreeAboveEffectiveConnectionCapFailsWithoutPartialInstall() {
++        var r = RuntimeConfiguration.defaults();
++        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(r.control().connectTimeout(), r.control().shutdownTimeout(), 2, 4, r.control().bootstrapQueryTimeout()),
++                r.overlay(), r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
++        try (var f = new Fixture(runtimeConfig(runtime), false)) {
++            var boot = f.discovery();
++            f.message(boot, new ControlMessage(MessageType.REGISTER_OK, boot.last().requestId(), "BOOT", UUID.randomUUID(), new ControlMessage.NeighborList(
++                    List.of(endpoint("B", ZERO, 19002), endpoint("C", ZERO, 19003), endpoint("D", ZERO, 19004)))));
++            assertTrue(f.manager.start().toCompletableFuture().isCompletedExceptionally());
++            assertEquals(1, f.io.dials.size()); assertTrue(f.manager.diagnostics().isEmpty());
++        }
++    }
++    @Test void d01InvalidOwnerAndEndpointFailBeforeFactories() {
++        var owner = new ManualOwner(); owner.capacity = 1;
++        assertThrows(IllegalArgumentException.class, () -> new NeighborManager(config("A", 19001), UUID.randomUUID(), owner, e -> {}));
++        assertThrows(IllegalArgumentException.class, () -> new Neighbor.Session("B", UUID.randomUUID(), UUID.randomUUID(),
++                new ControlMessage.Endpoint("B", UUID.randomUUID(), "0.0.0.0", 19002, 19102, NodeRole.RELAY)));
++        assertThrows(IllegalArgumentException.class, () -> new NeighborManager(config("bad id", 19001), UUID.randomUUID(), e -> {}));
++    }
++
++    @Test void d07InvalidHelloOkEnvelopeAndRequestCannotPublishUp() {
++        for (int kind = 0; kind < 4; kind++) try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true);
++            f.message(c, new ControlMessage(MessageType.HELLO_OK, kind == 0 ? UUID.randomUUID() : c.last().requestId(),
++                    kind == 1 ? "WRONG" : "B", kind == 2 ? ZERO : UUID.randomUUID(),
++                    kind == 3 ? new ControlMessage.Probe(1) : ControlMessage.Empty.INSTANCE));
++            assertFalse(c.open); assertEquals(0, f.ups()); assertTrue(f.manager.snapshot().isEmpty());
++        }
++    }
++    @Test void d07UnexpectedAndWrongIdentityHandshakeErrorsNeverGenerateErrorResponse() {
++        for (int kind = 0; kind < 3; kind++) try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(false);
++            f.message(c, new ControlMessage(MessageType.ERROR, kind == 0 ? UUID.randomUUID() : c.last().requestId(),
++                    kind == 1 ? "OTHER" : "B", UUID.randomUUID(), new ControlMessage.ErrorPayload(ErrorCode.TIMEOUT, kind == 2 ? 6 : 5, "not correlated")));
++            assertEquals(1, c.writes.size()); assertFalse(c.open); assertEquals(0, f.ups());
++            c.written(); f.pump(); assertEquals(0, f.ups());
++        }
++    }
++    @Test void d11WrongActiveIdentityIsIsolatedAndLocalSendValidatesIdentityAndSession() {
++        try (var f = new Fixture("A")) {
++            f.ready("B"); var c = f.outbound(true); var remote = UUID.randomUUID(); f.ok(c, remote);
++            var session = f.manager.snapshot().get("B");
++            var wrongLocal = new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "OTHER", f.instance, new ControlMessage.Probe(1));
++            var bad = f.manager.send(session, wrongLocal); f.pump(); assertEquals(Connection.SendResult.INVALID_MESSAGE, bad.toCompletableFuture().join());
++            var local = new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "A", f.instance, new ControlMessage.Probe(2));
++            var sent = f.manager.send(session, local); f.pump(); assertEquals(Connection.SendResult.ACCEPTED, sent.toCompletableFuture().join()); assertSame(local, c.last());
++            f.message(c, new ControlMessage(MessageType.ERROR, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, 11, "wrong instance")));
++            assertTrue(f.received().isEmpty()); assertFalse(c.open); assertEquals(1, f.downs());
++            var stale = f.manager.send(session, local); f.pump(); assertEquals(Connection.SendResult.CLOSED, stale.toCompletableFuture().join());
++        }
++    }
++    @Test void d19ExternalBorrowedOwnerFailureRunsManagerCleanupOnItsStopHook() {
++        try (var f = new Fixture(config("A", 19001), true)) {
++            f.ready("B"); var c = f.outbound(true); f.ok(c, UUID.randomUUID());
++            f.owner.fail(new IllegalStateException("Other node component failed"));
++            assertTrue(f.manager.snapshot().isEmpty()); assertFalse(c.open); assertTrue(f.io.stopped); assertTrue(f.timers.stopped);
++        }
++    }
++}

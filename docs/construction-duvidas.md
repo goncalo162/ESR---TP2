@@ -1,5 +1,40 @@
 # Dúvidas de Construction
 
+## Q-C-07 — Base de Implement do IMP-004 não compila após alteração externa
+
+- Estado: resolvida por autorização explícita do utilizador para alterar o ficheiro
+  e repor as classes, prosseguindo Implement. A suspensão abaixo é histórica.
+- O utilizador aprovou ADR e autorizou Implement de 003-overlay, limitado a
+  Neighbor.java, NeighborManager.java e NeighborManagerTest.java, preservando
+  Q-C-05/Q-C-06 e D01–D22. Pediu identificar separadamente a alteração externa
+  de legibilidade em BootstrapServer.java e confirmar equivalência.
+- Evidência: contra a base aprovada `26aaa4ae6775e9c78e1d7658472ccaca0b376427`,
+  BootstrapServer.java tem +481/−164 linhas. A alteração externa removeu as
+  classes internas EventLoop e RealDeadlines, ainda usadas nas linhas 102/107.
+  Não é possível confirmar equivalência: a base atual não compila.
+- Compilação de diagnóstico com Java 21: `mvn -B -ntp -DskipTests compile`, em
+  Projeto/, falhou com quatro erros cannot find symbol para essas classes.
+  [Log novo](../experiments/construction/003-overlay/implement-entry-compile.log),
+  [diff externo](../experiments/construction/003-overlay/implement-entry-bootstrap-external.diff)
+  e [numstat acumulado de Projeto/](../experiments/construction/003-overlay/implement-entry-project.diff.numstat).
+  Uma confirmação offline também falhou pelos mesmos quatro erros.
+  Não houve execução V-007/regressão/manual nem implementação nos três ficheiros.
+- Impacto: não se consegue executar os oráculos/regressão sobre a base atual;
+  corrigir BootstrapServer está fora dos três ficheiros autorizados. A regra do
+  utilizador exige parar quando o código contradiz o ADD ou exige intervenção
+  fora do âmbito aditivo autorizado.
+- Proposta para aprovação: restaurar exclusivamente EventLoop e RealDeadlines
+  da base aprovada, como correção externa separada, preservando a formatação
+  restante; compilar e voltar a verificar a equivalência antes de Implement.
+  Não exige substituir uma decisão arquitetural nem criar ADR: é reposição de
+  código removido numa alteração externa. Nenhuma correção aplicada nesta inspeção.
+
+- Resolução executada: EventLoop e RealDeadlines repostas da base aprovada;
+  compilação passou. Auditoria javac encontrou 102 declarações normalizadas
+  equivalentes; 19 testes existentes de bootstrap passaram na regressão final
+  de 903 testes. Evidência e limites em
+  [Implement](../memory-bank/bolts/003-overlay/implementation-walkthrough.md#correção-externa--q-c-07).
+
 ## Q-C-01 — Testes primeiro no IMP-001
 
 - Registada: 2026-11-03T21:03:35Z.
@@ -208,3 +243,66 @@ não é uma mensagem legítima dessa sessão: isolar localmente, sem ERROR de re
 - Oráculos D12/D15/D17/D19/D20 concretizam esta decisão; D01–D22 mantidos e ainda
   não executados. Autorizada **apenas ADR** após Design: parar para revisão antes
   de Implement/Test, sem Java/build/testes, commits/push ou outro IMP.
+
+## Q-C-08 — Validação global inclui exemplos de ferramentas preexistentes
+
+- Estado: resolvida em 2026-11-10T16:41:30Z, após aplicação exclusiva do patch
+  aprovado e execução real de V-ADD com saída 0/zero erros.
+  As falhas/propostas abaixo são histórico anterior a esta resolução.
+- A execução real de `python3 scripts/validate-planning.py` nesta continuação
+  devolveu três erros fora dos ficheiros implementados: fence não fechado em
+  `.specsmd/aidlc/skills/inception/bolt-plan.md` e
+  `.specsmd/aidlc/skills/operations/deploy.md`; referência de exemplo inexistente
+  `bolts/001-auth-service/adr-001-jwt-auth.md` em
+  `.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md`.
+- Estes ficheiros estavam presentes antes de Implement; o template já tinha
+  alterações locais. Não foram modificados nesta execução.
+- [Log real](../experiments/construction/003-overlay/implement-planning-validation.log).
+  Não alegar V-ADD aprovado: o resultado global é falha, embora o relatório
+  confirme a DAG e as contagens de arquitetura. A regressão Java é independente.
+- Impacto/proposta: apresentar no checkpoint Implement; corrigir os exemplos
+  de ferramentas separadamente se autorizado, ou definir explicitamente o
+  âmbito aplicável do validador. Nenhuma exceção foi aprovada por inferência.
+  Não altera ADR, wire ou código Java; não impede preparar a revisão autorizada.
+
+### Continuação Test de Q-C-08
+
+O utilizador autorizou apenas Test e determinou manter esta pendência explícita,
+sem corrigir ferramentas ou reduzir alcance por inferência. Validador novamente
+executado em Test: saída 1 e os mesmos três erros.
+[Log](../experiments/construction/003-overlay/test-planning-validation.log).
+Auditoria: 67 ficheiros de ferramentas preservados nesta etapa. O build clean
+verify (903 testes) e o manual do agente (49 checks/Java 0) passaram, mas não
+constituem aprovação de V-ADD ou resolução de Q-C-08.
+
+### Q-C-08 — patch concreto para aprovação
+
+Manual humano de Francisco conferido e aprovado pelo utilizador, com 49 checks
+e Java 0 confirmado por ele; não aprova Test ou V-ADD.
+[Proposta mínima](../experiments/construction/003-overlay/q-c-08-proposal.md):
+três ficheiros, +5/−3 linhas contra o conteúdo local atual, com cópias e hashes
+dos inputs. Ensaio isolado: três erros antes, zero depois, 3688 ligações/âncoras
+em ambos; validador intacto. Patch ainda não aplicado no repositório.
+Q-C-08 permanece por resolver até aprovação/aplicação e execução real de V-ADD.
+Sem fecho, commits ou push; revisão humana final e integração pendentes.
+
+### Q-C-08 — resolução autorizada e executada
+
+O utilizador autorizou exclusivamente `q-c-08-proposed.patch` e nova execução
+de V-ADD. Hashes de entrada conferidos; diff aplicado exatamente igual à proposta:
++5/−3 em três ficheiros de ferramentas, preservando o restante conteúdo local.
+O validador mantém o mesmo SHA-256/alcance. Execução real no repositório:
+`python3 scripts/validate-planning.py`, saída 0 e zero erros.
+[Diff aplicado](../experiments/construction/003-overlay/q-c-08-applied.diff),
+[numstat](../experiments/construction/003-overlay/q-c-08-applied.diff.numstat),
+[log](../experiments/construction/003-overlay/q-c-08-v-add-applied.log) e
+[auditoria](../experiments/construction/003-overlay/q-c-08-applied.json).
+Q-C-08 resolvida; Test continua por aprovar. Manual humano de Francisco cumprido;
+revisão humana final e integração pendentes. Sem fecho, commits ou push.
+
+### Confirmação da resolução de Q-C-08 na aprovação de Test
+
+Em 2026-11-10T16:44:29Z (registo), o utilizador aprovou Test incluindo V-ADD e
+mandou manter Q-C-08 resolvida. Resolução técnica já suportada pelo patch
+aplicado e logs com saída 0/zero erros. Revisão humana final e integração
+continuam pendentes; não há autorização de fecho, commits ou push.

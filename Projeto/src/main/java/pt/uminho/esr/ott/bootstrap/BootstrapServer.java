@@ -682,4 +682,27 @@ public final class BootstrapServer implements AutoCloseable
             return contexts.size(); 
         }
     }
+
+    private static final class EventLoop implements SerialEvents {
+        private volatile Thread owner;
+        private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(EVENTS_CAPACITY), r -> Thread.ofVirtual().name("ott-bootstrap-events").unstarted(() -> {
+                    owner = Thread.currentThread(); r.run();
+                }), new ThreadPoolExecutor.AbortPolicy());
+        @Override public void execute(Runnable task) { executor.execute(task); }
+        @Override public boolean isOwnerThread() { return owner == Thread.currentThread(); }
+        @Override public void close() { executor.shutdownNow(); }
+        @Override public boolean await(Duration timeout) throws InterruptedException { return executor.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS); }
+    }
+    private static final class RealDeadlines implements Deadlines {
+        private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
+                Thread.ofVirtual().name("ott-bootstrap-deadline").factory());
+        RealDeadlines() { executor.setRemoveOnCancelPolicy(true); executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false); }
+        @Override public Ticket schedule(Runnable task, long delayNanos) {
+            var future = executor.schedule(() -> callback(task), delayNanos, TimeUnit.NANOSECONDS);
+            return () -> future.cancel(false);
+        }
+        @Override public void close() { executor.shutdownNow(); }
+        @Override public boolean await(Duration timeout) throws InterruptedException { return executor.awaitTermination(timeout.toNanos(), TimeUnit.NANOSECONDS); }
+    }
 }

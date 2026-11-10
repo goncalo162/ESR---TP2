@@ -121,3 +121,41 @@ terminação física de cancelamento/future concluído. Q-C-05 preservada.
 [Revisão ADR](../bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z: reutilizar ADR existentes,
 sem ADR-033 necessária identificada. ADR-003 permanece substituída. Aguardar
 revisão antes de Implement/Test; nenhuma alteração Java ou prova funcional nova.
+
+## ADR do IMP-004 aprovada — Implement para revisão
+
+ADR explicitamente aprovada; Q-C-07 resolvida com reposição externa autorizada
+de EventLoop/RealDeadlines. [Implement para checkpoint](../bolts/003-overlay/implementation-walkthrough.md)
+preparado em 2026-11-10T16:12:36Z. Regressão incremental: `mvn -B -ntp test`,
+903 testes (740 configuração +66 codec +31 TCP +19 bootstrap +47 vizinhança),
+zero falhas/erros/ignorados. V-007 tem execução automatizada TCP local;
+Q-C-05/Q-C-06 e D01–D22 preservados. Três ficheiros do IMP +1745/−0;
+BootstrapServer externo +482/−142 separado, 151 ficheiros restantes preservados.
+Implement ainda aguarda aprovação; Test/clean verify/JAR/manual não iniciados,
+revisão final atribuída a Denji e integração pendentes. TASK/bolt/história/unidade
+continuam em progresso, sem implemented=true, commits/push ou fecho.
+
+## IMP-004 — Test preparado, aceitação pendente
+
+Implement aprovado explicitamente pelo utilizador; [relatório Test](../bolts/003-overlay/ddd-03-test-report.md)
+preparado em 2026-11-10T16:26:35Z. Clean verify atual: 903 testes (47 de vizinhança),
+zero falhas/erros/ignorados. Manual interativo executado pelo agente Codex no
+JAR verificado: 49 CHECK_PASS, MANUAL_PASS/CLEANUP_COMPLETE, saída Java 0.
+XML/JAR/hash/perfis/log e instruções de repetição pessoal preservados em
+experiments/construction/003-overlay/. Código aprovado e ferramentas intactos
+durante Test. V-007/D01–D22 têm consolidação técnica local, com limites explícitos.
+Q-C-08 continua aberta: V-ADD reprovado com três erros, sem alteração de ferramentas
+ou redução do alcance. Test ainda não aprovado; revisão final humana e integração
+pendentes. TASK/bolt/história/unidade permanecem em progresso, sem implemented=true,
+commits/push/fecho ou GUI/CORE presumidos.
+
+## IMP-004 — Test aprovado; fecho pendente
+
+Test aprovado explicitamente pelo utilizador, registo em 2026-11-10T16:44:29Z.
+903 testes do clean verify aprovados, manual humano de Francisco cumprido
+(49 checks/Java 0) e V-ADD aprovado; Q-C-08 resolvida.
+[Resumo/diff para revisão humana final](../bolts/003-overlay/final-review-summary.md).
+As cinco etapas estão concluídas; bolt in-progress, current_stage=null,
+completed=null. TASK/história/unidade continuam em progresso, sem implemented=true
+ou DONE. Não há gates externos adicionais; faltam revisão humana final e
+integração. Não executar o fecho nem fazer commits/push nesta autorização.

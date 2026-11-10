@@ -177,3 +177,9 @@ Permanecem V-007/D01–D22/regressão/manual, revisão final atribuída a Denji 
 integração em main. Sem gates externos adicionais. Bolt/TASK/história continuam
 in-progress, completed=null; só Model/Design em stages_completed. Parar para
 revisão **antes de Implement/Test**, sem Java, commits/push ou outro IMP.
+
+## Aprovação posterior
+
+Etapa ADR explicitamente aprovada pelo utilizador, com registo no bolt em
+2026-11-10T15:33:12Z. Autorizado Implement; não é aprovação de Implement/Test
+ou revisão final. [Implement para checkpoint](implementation-walkthrough.md).
