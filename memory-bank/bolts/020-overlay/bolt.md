@@ -6,7 +6,7 @@ type: "simple-construction-bolt"
 status: "planned"
 stories: ["003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-10T17:12:15Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["001-base-validada", "003-overlay", "019-overlay"]
 enables_bolts: ["004-overlay", "022-rotas"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 2
   avg_uncertainty: 1
@@ -68,3 +68,9 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 - Prova futura: `experiments/construction/020-overlay/` e relatório local do bolt.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+
+## Prontidão derivada após fecho de IMP-004
+
+003-overlay complete, TASK-007 DONE e integração local 8db7b78 comprovada.
+Atualizado apenas blocks=false: dependências concluídas. Este bolt permanece
+planned, started=null, current_stage=null, stages_completed=[]; nenhum IMP iniciado.

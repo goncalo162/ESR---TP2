@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-02"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-10T17:00:44Z"
+updated: "2026-11-10T17:12:15Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
@@ -28,7 +28,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 - [x] [005-implementar-parametrizacao-operacional](stories/005-implementar-parametrizacao-operacional.md) → [019-overlay](../../../../bolts/019-overlay/bolt.md); IMP-002 (M).
 - [x] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md) → [002-overlay](../../../../bolts/002-overlay/bolt.md); IMP-003 (M).
-- [ ] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
+- [x] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
 - [ ] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
 - [ ] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
 
@@ -175,3 +175,21 @@ Falta integração autorizada/comprovada para poder tratar DONE. Sem staging,
 commits/push, integração ou fecho nesta autorização.
 
 [Registo da confirmação](../../../../../experiments/construction/003-overlay/denji-final-review-confirmation.json).
+
+## Estado atual — IMP-004 fechado
+
+Registo documental em 2026-11-10T17:12:15Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho documental](../../../../bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+pendentes são históricas; não descrevem o estado atual. Não se promovem
+requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.

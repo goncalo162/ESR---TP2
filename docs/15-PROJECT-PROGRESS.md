@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 IN PROGRESS (ADR); TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está em ADR para revisão, após aprovação explícita de Model/Q-C-05 e Design/Q-C-06. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-006](tasks/PHASE-02/TASK-006.md), DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; bolt 002-overlay complete. TASK-032 permanece DONE/integrada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+**Última tarefa concluída:** [TASK-007](tasks/PHASE-02/TASK-007.md), DONE; IMP-004/003-overlay complete, Test/903 testes, manual humano Francisco/49 checks e revisão final Denji aprovados; versão revista integrada localmente em main (`8db7b78`). [Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Próximo bolt por dependências: 020-overlay/IMP-005/TASK-008, planned e não iniciado.
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -58,7 +58,7 @@ com registo em 2026-11-04T14:18:23Z. Versão revista 03345e9e1ab56ec04302676cca6
 Cascata specsmd: bolt/história complete, implemented=true; TASK-006 DONE.
 Unidade mantém in-progress; 003-overlay/IMP-004 continua planned, nenhum outro IMP iniciado.
 
-Incremento atual: IMP-004/003-overlay/TASK-007, IN PROGRESS em Model, iniciado em
+Histórico do início: IMP-004/003-overlay/TASK-007, IN PROGRESS em Model, iniciado em
 2026-11-10T14:01:42Z, base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
 [Modelo concreto](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
 entidades/estados, descoberta inicial, um canal confirmado por par, direção do
@@ -99,7 +99,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
 | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
-| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | IN PROGRESS | Model/Design e Q-C-05/06 aprovados; ADR para revisão, D01–D22 previstos; V-007 NÃO EXECUTADO |
+| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
@@ -403,3 +403,21 @@ Falta integração autorizada/comprovada para poder tratar DONE. Sem staging,
 commits/push, integração ou fecho nesta autorização.
 
 [Registo da confirmação](../experiments/construction/003-overlay/denji-final-review-confirmation.json).
+
+## Estado atual — IMP-004 fechado
+
+Registo documental em 2026-11-10T17:12:15Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+pendentes são históricas; não descrevem o estado atual. Não se promovem
+requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.

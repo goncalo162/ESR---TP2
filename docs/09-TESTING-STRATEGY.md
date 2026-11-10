@@ -119,12 +119,13 @@ Responsável: [TASK-006](tasks/PHASE-02/TASK-006.md). Requisitos: RF-002, RF-003
 
 V-007: três nós iniciados em ordens diferentes convergem para o grafo esperado sem duplicados; novo instanceId após reinício não é apagado por callback antigo; vizinho desconhecido é rejeitado; após descoberta, desligar bootstrap e comprovar reconexão direta sem novas consultas.
 
-Responsável: [TASK-007](tasks/PHASE-02/TASK-007.md). Requisitos: RF-002, RF-003, RF-004, RNF-004, RP-006. Estado: EXECUÇÃO AUTOMATIZADA LOCAL EM IMPLEMENT, ACEITAÇÃO TEST PENDENTE.
+Responsável: [TASK-007](tasks/PHASE-02/TASK-007.md). Requisitos: RF-002, RF-003, RF-004, RNF-004, RP-006. Estado: EXECUTADO E APROVADO EM TEST; TASK-007 DONE.
 [Prova incremental](../memory-bank/bolts/003-overlay/implementation-walkthrough.md):
 47 testes de vizinhança, incluindo TCP real em seis ordens, desconhecido, reinício
 e reconexão sem bootstrap; regressão `mvn -B -ntp test` com 903 testes/zero falhas.
-Implement aguarda aprovação. clean verify/JAR/manual, revisão humana e integração
-continuam pendentes; esta prova não substitui GUI/CORE/CLI.
+Clean verify com 903 testes, manual humano Francisco/49 checks e Test aprovados;
+revisão final Denji aprovada e integração local 8db7b78 comprovada.
+[Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). A prova não substitui GUI/CORE/CLI.
 
 ### V-008 — Compor o processo overlay e encerrar de forma previsível
 

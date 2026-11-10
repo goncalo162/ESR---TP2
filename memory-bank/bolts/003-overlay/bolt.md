@@ -3,15 +3,15 @@ id: "003-overlay"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-10T17:00:44Z"
+updated: "2026-11-10T17:12:15Z"
 started: "2026-11-10T14:01:42Z"
-completed: null
+completed: "2026-11-10T17:10:25Z"
 current_stage: null
-stages_completed: [{"name": "model", "completed": "2026-11-10T14:48:50Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-10T15:13:50Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-10T15:33:12Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-10T16:17:06Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-10T16:44:29Z", "artifact": "ddd-03-test-report.md"}]
-requires_bolts: ["001-base-validada", "002-overlay"]
+stages_completed: [{"name":"model","completed":"2026-11-10T14:48:50Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-10T15:13:50Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-10T15:33:12Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-10T16:17:06Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-10T16:44:29Z","artifact":"ddd-03-test-report.md"}]
+requires_bolts: ["001-base-validada","002-overlay"]
 enables_bolts: ["020-overlay"]
 requires_units: ["001-base-validada"]
 blocks: false
@@ -29,8 +29,8 @@ size: "M"
 validation_ids: ["V-007"]
 test_ids: ["V-007"]
 external_gates: []
-adr_ids: ["ADR-012", "ADR-013", "ADR-018", "ADR-019", "ADR-021", "ADR-024"]
-requirements: ["INT-001", "INT-002", "NFR-004", "REQ-002", "REQ-003", "REQ-004", "REQ-021"]
+adr_ids: ["ADR-012","ADR-013","ADR-018","ADR-019","ADR-021","ADR-024"]
+requirements: ["INT-001","INT-002","NFR-004","REQ-002","REQ-003","REQ-004","REQ-021"]
 architecture_source: "add.md"
 ---
 # Bolt 003-overlay — Estabelecer e reconectar vizinhos
@@ -100,10 +100,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Uma conexão confirmada por vizinho.
-- [ ] Entrada tardia e reconexão funcionam.
-- [ ] Endereço UDP só é aceite após handshake.
-- [ ] Validação V-007 executada e evidência ligada no progresso.
+- [x] Uma conexão confirmada por vizinho.
+- [x] Entrada tardia e reconexão funcionam.
+- [x] Endereço UDP só é aceite após handshake.
+- [x] Validação V-007 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -242,3 +242,19 @@ Falta integração autorizada/comprovada para poder tratar DONE. Sem staging,
 commits/push, integração ou fecho nesta autorização.
 
 [Registo da confirmação](../../../experiments/construction/003-overlay/denji-final-review-confirmation.json).
+
+## Fecho documental concluído
+
+Estado de fecho do bolt registado pelo mecanismo specsmd em 2026-11-10T17:10:25Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho e evidência](closure-walkthrough.md) · [Prova de integração](../../../experiments/construction/003-overlay/integration-commit-proof.json).

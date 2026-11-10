@@ -5,13 +5,13 @@ GENERATED indica criação documental, não implementação. Fonte de arquitetur
 
 Estado Construction atual: IMP-001 com Plan/Implement/Test concluídos e resultados
 aprovados; [checkpoint 5 concluído](bolts/001-base-validada/closure-walkthrough.md)
-em 2026-11-03T21:56:48Z, após integração em main. Três histórias complete:
+em 2026-11-03T21:56:48Z, após integração em main. Três histórias já completas antes de IMP-004:
 019-overlay/IMP-002 fechado em 2026-11-04T10:33:12Z, após as cinco etapas, revisão
 final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-003
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 está em ADR para revisão, após Model/Q-C-05 e Design/Q-C-06 aprovados; as restantes 29 histórias/bolts não foram iniciadas.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. Total atual: quatro histórias/bolts complete; os restantes 29 continuam planned, sem novo IMP iniciado.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -42,7 +42,7 @@ Revisão final atribuída a Waheed confirmada pelo utilizador; versão revista
 
 ## 002-overlay/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md ✅ GENERATED
 
-**Tarefa:** IMP-004. **Estado:** in-progress. **Bolt:** 003-overlay.
+**Tarefa:** IMP-004. **Estado:** complete; implemented=true. **Bolt:** 003-overlay.
 Model iniciado em 2026-11-10T14:01:42Z; [preparado para revisão](bolts/003-overlay/ddd-01-domain-model.md)
 em 2026-11-10T14:11:43Z, dependências integradas em 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
 V-007/M01–M22 planeados, sem código/teste/build novo; parar antes de Design.
@@ -208,3 +208,21 @@ Continuação 003-overlay em 2026-11-10T15:20:09Z: Design/Q-C-06 aprovados expli
 2026-11-10T15:13:50Z; [revisão ADR preparada](bolts/003-overlay/adr-review.md), sem aprovação desta etapa
 ou início de Implement/Test. D01–D22 mantidos; V-007/regressão/manual e revisão
 final/integração pendentes. Nenhum Java, commit ou push novo.
+
+## Estado atual — IMP-004 fechado
+
+Registo documental em 2026-11-10T17:12:15Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho documental](bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+pendentes são históricas; não descrevem o estado atual. Não se promovem
+requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.

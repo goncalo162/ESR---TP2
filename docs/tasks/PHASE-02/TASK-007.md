@@ -5,7 +5,7 @@
 - ID: TASK-007
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-005](../PHASE-02/TASK-005.md), [TASK-006](../PHASE-02/TASK-006.md).
@@ -60,10 +60,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Uma conexão confirmada por vizinho.
-- [ ] Entrada tardia e reconexão funcionam.
-- [ ] Endereço UDP só é aceite após handshake.
-- [ ] Validação V-007 executada e evidência ligada no progresso.
+- [x] Uma conexão confirmada por vizinho.
+- [x] Entrada tardia e reconexão funcionam.
+- [x] Endereço UDP só é aceite após handshake.
+- [x] Validação V-007 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -198,3 +198,19 @@ Falta integração autorizada/comprovada para poder tratar DONE. Sem staging,
 commits/push, integração ou fecho nesta autorização.
 
 [Registo da confirmação](../../../experiments/construction/003-overlay/denji-final-review-confirmation.json).
+
+## Fecho documental concluído
+
+Estado de fecho do bolt registado pelo mecanismo specsmd em 2026-11-10T17:10:25Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho e evidência](../../../memory-bank/bolts/003-overlay/closure-walkthrough.md) · [Prova de integração](../../../experiments/construction/003-overlay/integration-commit-proof.json).

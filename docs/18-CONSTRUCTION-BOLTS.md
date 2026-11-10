@@ -1,5 +1,10 @@
 # Bolts Construction alinhados com o ADD
 
+**Estado atual:** IMP-004/003-overlay complete, história implemented=true e TASK-007 DONE;
+integração local revista 8db7b78. Unidade em progresso; 020-overlay/004-overlay planned.
+[Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Os relatos anteriores
+de etapas na secção seguinte são históricos.
+
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
@@ -109,3 +114,21 @@ Continuação 003-overlay em 2026-11-10T15:20:09Z: Design/Q-C-06 aprovados em 20
 identificada no desenho; nenhuma ADR nova criada. Apenas Model/Design em
 stages_completed, current_stage=adr. D01–D22 mantidos e por executar, sem Java.
 Revisão final/integração antes de DONE; parar antes de Implement/Test.
+
+## Estado atual — IMP-004 fechado
+
+Registo documental em 2026-11-10T17:12:15Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+pendentes são históricas; não descrevem o estado atual. Não se promovem
+requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.

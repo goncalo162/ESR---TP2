@@ -247,3 +247,21 @@ Q-C-08 continua aberta: V-ADD reprovado com três erros, sem alteração de ferr
 ou redução do alcance. Test ainda não aprovado; revisão final humana e integração
 pendentes. TASK/bolt/história/unidade permanecem em progresso, sem implemented=true,
 commits/push/fecho ou GUI/CORE presumidos.
+
+## Estado atual — IMP-004 fechado
+
+Registo documental em 2026-11-10T17:12:15Z.
+IMP-004/003-overlay/TASK-007 fechado documentalmente por autorização explícita
+do utilizador. Integração local comprovada em main: `8db7b78`
+(`8db7b78950e444f3c2917844617be4b9b236ec0f`), com 145 caminhos e hashes conferidos.
+Test aprovado: clean verify/903 testes, manual humano Francisco/49 checks/Java 0
+confirmado pelo utilizador, V-ADD aprovado; revisão final de Denji aprovada sem
+alterações pendentes. Q-C-08 resolvida e limitada a patch/evidência na integração.
+Bolt complete; história complete/implemented=true; TASK-007 DONE. A unidade
+002-overlay mantém in-progress: 020-overlay e 004-overlay continuam planned,
+sem início de outro IMP. Fecho documental sem alteração Java ou repetição do manual.
+Sem push ou alegação de integração remota/entrega do projeto.
+
+[Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+pendentes são históricas; não descrevem o estado atual. Não se promovem
+requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
