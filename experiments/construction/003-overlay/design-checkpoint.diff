@@ -1,0 +1,1015 @@
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -107,3 +107,10 @@
+ sessão ACTIVE, preservando correlação e identidade para consumidores futuros.
+ M02/M07/M11 ampliados; Q-C-05 pendente, sem aprovação de Model ou política nova
+ aceite por inferência. Sem alteração de cobertura executada: V-007 NÃO EXECUTADO.
++
++IMP-004 em Design: Model revisto e Q-C-05 aprovados explicitamente em 2026-11-10T14:48:50Z.
++[Design](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z,
++com D01–D22 ligados a M01–M22/V-007 e políticas ERROR aprovadas preservadas.
++Retenção/DNS/dials/estado serial concretizados; nenhuma prova funcional nova,
++alteração Java ou requisito global promovido. V-007 NÃO EXECUTADO; revisão final
++atribuída a Denji e integração antes de DONE. Parar antes de ADR/Implement/Test.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,8 +1,8 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 IN PROGRESS (Model); TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+-
+-**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está em Model para revisão, por seleção explícita do utilizador. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 IN PROGRESS (Design); TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++
++**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está em Design para revisão, após aprovação explícita de Model/Q-C-05. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+ **Última tarefa concluída:** [TASK-006](tasks/PHASE-02/TASK-006.md), DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; bolt 002-overlay complete. TASK-032 permanece DONE/integrada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+@@ -99,7 +99,7 @@
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+ | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+-| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | IN PROGRESS | Model para revisão, M01–M22 planeados; V-007 NÃO EXECUTADO |
++| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | IN PROGRESS | Model/Q-C-05 aprovados; Design para revisão, D01–D22 previstos; V-007 NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+@@ -275,3 +275,14 @@
+ ampliados. [Q-C-05](construction-duvidas.md#q-c-05--receção-de-error-no-imp-004) pendente de decisão sobre
+ concretizações de retry e resposta inesperada. TASK-007/bolt/história continuam
+ em Model para revisão; nenhum Design/Java/build/V-007/commit/push iniciado.
++
++## Continuação do IMP-004 — Model/Q-C-05 aprovados, Design para revisão
++
++Aprovação explícita registada em 2026-11-10T14:48:50Z, incluindo todas as decisões da tabela
++Q-C-05. [Design preparado](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) em 2026-11-10T15:00:14Z:
++contratos novos nos três ficheiros autorizados, owner serial reutilizável, limites
++concretos de retenção/DNS/dial e D01–D22. As propostas Q-C-05 e a revisão Model
++anteriores estão superadas pela aprovação; Design/ADR/Implement/Test não aprovados.
++155 ficheiros de Projeto/ preservados, sem build/testes/manuais novos ou outro IMP.
++V-007, regressão/manual, revisão final atribuída a Denji e integração pendentes.
++Parar antes de ADR/Implement/Test, sem commits/push ou fecho.
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -97,3 +97,9 @@
+ Ajuste do Model 003-overlay preparado em 2026-11-10T14:24:46Z: ERROR (17) explícito por fase,
+ M02/M07/M11 ampliados e Q-C-05 pendente de decisão. Model ainda não aprovado;
+ Design/ADR/Implement/Test não iniciados, sem código ou provas Java novos.
++
++Continuação 003-overlay em 2026-11-10T15:00:14Z: Model revisto/Q-C-05 aprovados em 2026-11-10T14:48:50Z,
++[Design preparado para revisão](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md).
++Apenas Model em stages_completed; current_stage=design, completed=null. D01–D22
++previstos, V-007 NÃO EXECUTADO; sem Java/teste/build/commit/push ou início de outro IMP.
++Revisão final por Denji e integração continuam exigidas; parar antes de ADR.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -131,8 +131,9 @@
+ ## Q-C-05 — Receção de ERROR no IMP-004
+ 
+ - Registada em 2026-11-10T14:24:46Z, após pedido explícito de ajustes ao Model; IMP-004 /
+-  bolt 003-overlay / TASK-007. **Estado: proposta pendente de decisão explícita**.
+-  Não é aprovação de Model ou autorização de Design/Java.
++  bolt 003-overlay / TASK-007. **Estado: resolvida; propostas da tabela aprovadas**.
++  Aprovação explícita do utilizador registada em 2026-11-10T14:48:50Z, juntamente com o
++  Model revisto. Autorizado apenas Design, sem Java/ADR/Implement/Test.
+ - Lacuna identificada na revisão humana: a secção 8 do Model referia tipos 7–16,
+   sem explicitar ERROR (17). Correção no
+   [Model, secção 8](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md#8-autorização-error-17-e-entrega-ao-consumidor).
+@@ -144,9 +145,10 @@
+   Essas obrigações não são alternativas em votação.
+ - O que falta concretizar nas fontes: reação a ERROR inesperado antes de ACTIVE,
+   rejeição remota de HELLO_OK ainda em confirmação local e classificação de retry
+-  após ERROR remoto. As opções abaixo são **recomendações, ainda não aprovadas**.
++  após ERROR remoto. As concretizações abaixo foram **aprovadas explicitamente**
++  pelo utilizador; não eram regras inferidas das fontes no registo inicial.
+ 
+-| Situação | Proposta para decisão | Razão/limite |
++| Situação | Decisão aprovada | Razão/limite |
+ |---|---|---|
+ | Descoberta: ERROR da tentativa corrente (requestId REGISTER, relatedType=1, geração/connectionId/prazo certos e envelope válido) | Terminar a consulta e guardar a rejeição remota completa; TIMEOUT(10)/RESOURCE_LIMIT(11) permitem nova tentativa com backoff; restantes codes terminam a descoberta em FAILED com evidência para intervenção | Não confundir resposta negativa com NeighborList, não fazer retry imediato e não mascarar erro incompatível como sucesso; codes próprios de routing nesta fase têm diagnóstico de resposta inesperada |
+ | Handshake: ERROR do HELLO pendente (relatedType=5 e identidade do alvo) | Retirar só o candidato, informar a rejeição completa e voltar a DISCONNECTED; menor ID repete com backoff, maior espera por novo HELLO, para qualquer code válido | Um ID desejado continua desejado, incluindo DUPLICATE_ID transitório; sem nova consulta bootstrap, alteração de grafo ou Up/UDP |
+@@ -168,12 +170,13 @@
+ continua octeto bruto e nunca dá origem a ERROR de resposta. Identidade inválida
+ não é uma mensagem legítima dessa sessão: isolar localmente, sem ERROR de resposta.
+ 
+-- Alternativa à recomendação de ERROR não correlacionado antes de ACTIVE: manter
+-  a tentativa até ao deadline, apenas diagnosticando o frame. Não é adotada
+-  automaticamente; evita fecho imediato, mas retém recurso até ao prazo após
+-  uma resposta incompatível. A decisão tem de ficar explícita antes de Design.
++- Alternativa não adotada: manter a tentativa até ao deadline após ERROR não
++  correlacionado antes de ACTIVE. O utilizador escolheu diagnóstico e fecho local
++  do canal, fora da janela legítima de aplicação, sem ERROR de resposta.
+ - Impacto: só políticas de contexto/terminação e entrega de evento nos três
+   ficheiros autorizados. Nenhum byte, código, payload, hard cap, dependência ou
+   âmbito de routing novo. Não altera fundações nem cria ADR aceite por inferência.
+-- Oráculos planeados: M02/M07/M11 ampliados, sem execução. Até decisão, Model
+-  permanece para revisão e Design/ADR/Implement/Test não são iniciados.
++- Oráculos planeados M02/M07/M11 sincronizados com esta decisão, sem execução.
++  Model concluído em 2026-11-10T14:48:50Z; autorizada apenas a preparação de Design, com
++  retenção/DNS/correlação de dial/executor partilhável concretos. Parar antes
++  de ADR/Implement/Test. Revisão final e integração continuam exigidas para DONE.
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 IN PROGRESS em Model para revisão; TASK-008–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 IN PROGRESS em Design para revisão após Model/Q-C-05 aprovados; TASK-008–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+--- a/docs/tasks/PHASE-02/TASK-007.md
++++ b/docs/tasks/PHASE-02/TASK-007.md
+@@ -98,3 +98,15 @@
+ M02/M07/M11 ampliados; [Q-C-05](../../construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)
+ regista retry/rejeição de HELLO_OK/ERROR inesperado como proposta pendente.
+ V-007 não executado; sem Design, alteração Java, commit ou push.
++
++### Model/Q-C-05 aprovados — Design para revisão
++
++Em 2026-11-10T14:48:50Z, o utilizador aprovou Model revisto e todas as propostas da tabela
++Q-C-05, incluindo diagnóstico/fecho local de ERROR inesperado antes de ACTIVE.
++[Desenho](../../../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z:
++assinaturas e records imutáveis, owner serial partilhável, retenção B/R, worker
++DNS/I/O limitado, dials correlacionados antes de classificar direção, budgets e
++D01–D22 previstos. Esta aprovação resolve as pendências Model/Q-C-05 acima.
++Só Design autorizado; parar para revisão antes de ADR/Implement/Test.
++Nenhuma alteração Java nem build/testes/manuais novos; V-007 NÃO EXECUTADO.
++Revisor final Denji e integração exigidos antes de DONE; sem commit/push/fecho.
+--- a/memory-bank/bolts/003-overlay/bolt.md
++++ b/memory-bank/bolts/003-overlay/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-10T14:24:46Z"
++updated: "2026-11-10T15:00:14Z"
+ started: "2026-11-10T14:01:42Z"
+ completed: null
+-current_stage: "model"
+-stages_completed: []
++current_stage: "design"
++stages_completed: [{"name": "model", "completed": "2026-11-10T14:48:50Z", "artifact": "ddd-01-domain-model.md"}]
+ requires_bolts: ["001-base-validada", "002-overlay"]
+ enables_bolts: ["020-overlay"]
+ requires_units: ["001-base-validada"]
+@@ -35,7 +35,7 @@
+ ---
+ # Bolt 003-overlay — Estabelecer e reconectar vizinhos
+ 
+-## Model preparado — checkpoint para revisão
++## Model aprovado — Design para revisão
+ 
+ Iniciado em 2026-11-10T14:01:42Z por seleção explícita do utilizador, apenas Model.
+ Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, árvore inicialmente limpa; dependências complete/integradas.
+@@ -53,7 +53,16 @@
+ descoberta/handshake/ACTIVE separados, erros da sessão entregues intactos ao
+ consumidor, sem ERROR de resposta. M02/M07/M11 ampliados;
+ [Q-C-05](../../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)
+-regista as políticas de retry/erros inesperados ainda pendentes de decisão explícita.
++registou inicialmente as propostas de retry/erros inesperados.
++Model revisto e todas as decisões da tabela Q-C-05 aprovados explicitamente em
++2026-11-10T14:48:50Z. Model concluído em stages_completed; autorizada apenas Design.
++[Desenho concreto](ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z: assinaturas e
++valores imutáveis, owner serial próprio/emprestado, retenção B/R, jobs DNS/I/O
++limitados, correlação por token/connectionId antes de classificar direção,
++barreiras de handshake/ERROR e mapa D01–D22. APIs existentes preservadas.
++Parar para revisão de Design antes de ADR/Implement/Test. Nenhum Java/build/teste,
++commit/push ou outro IMP. V-007/regressão/manual, revisão final por Denji e integração
++continuam pendentes. current_stage=design, completed=null.
+ 
+ ## Fonte normativa e âmbito
+ 
+@@ -68,7 +77,7 @@
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-004 e as ADR do ADD.
++1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-004 e as ADR do ADD.
+ 2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-004 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-004 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-004 e as ADR do ADD.
+--- a/memory-bank/bolts/003-overlay/ddd-01-domain-model.md
++++ b/memory-bank/bolts/003-overlay/ddd-01-domain-model.md
+@@ -2,7 +2,8 @@
+ 
+ Modelo para revisão da etapa 1, preparado em 2026-11-10T14:11:43Z, após seleção explícita
+ de `003-overlay`, apenas Model. Iniciado em 2026-11-10T14:01:42Z; estado no bolt/construction-log.
+-Não é implementação, aprovação de Model ou resultado de V-007.
++Model revisto e Q-C-05 aprovados explicitamente, com registo em 2026-11-10T14:48:50Z.
++Não é implementação ou resultado de V-007; foi autorizado apenas Design.
+ Fonte normativa: [ADD, IMP-004](../../../add.md#imp-004), secções 2/5/6/8/9/10/11/12;
+ [specs](../../../specs.md), [TASK-007](../../../docs/tasks/PHASE-02/TASK-007.md),
+ [contrato v1](../../../docs/07-API-AND-INTERFACES.md) e
+@@ -91,8 +92,8 @@
+ Stop em qualquer fase → CLOSED. Falha transitória antes do sucesso permite
+ nova tentativa serializada, com prazo e backoff; erro permanente de identidade/
+ configuração não provoca um ciclo imediato de consultas inválidas. O mapeamento
+-dos ERROR remotos para retry/FAILED é uma proposta pendente em Q-C-05, não
+-uma classificação já aprovada neste Model.
++dos ERROR remotos para retry/FAILED foi aprovado em Q-C-05: codes 10/11
++permitem retry com backoff; restantes codes levam a FAILED.
+ 
+ Antes de criar executor/timer/socket, validar perfil SERVER/RELAY/CLIENT,
+ identidade local não zero, contacto bootstrap, endpoint/papel e runtime. A carga
+@@ -248,8 +249,8 @@
+ | Fase e operação pendente | ERROR pertence à tentativa corrente quando… | Proprietário/efeito |
+ |---|---|---|
+ | DISCOVERING: REGISTER enviado | Mesma geração e connectionId da consulta, antes do prazo e com requestId do REGISTER; relatedType=1; envelope válido de resposta do contacto bootstrap | Descoberta recebe a rejeição remota completa; nunca instala NeighborList, não publica Up/UDP e termina essa consulta |
+-| HANDSHAKING: iniciador enviou HELLO | Mesma geração/connectionId e requestId do HELLO ainda pendente; relatedType=5; senderId é o alvo esperado e senderInstance não zero, coerente com qualquer identidade já estabelecida no contexto | Handshake recebe a rejeição; não publica ACTIVE; a concretização de retry é Q-C-05 |
+-| HANDSHAKING: recetor enfileirou HELLO_OK | Proposta Q-C-05: mesmo contexto do HELLO já validado, requestId desse HELLO, relatedType=6 e senderId/instanceId desse emissor | Rejeição da resposta local ainda em confirmação; termina só esse candidato, sem terceiro ACK no fio |
++| HANDSHAKING: iniciador enviou HELLO | Mesma geração/connectionId e requestId do HELLO ainda pendente; relatedType=5; senderId é o alvo esperado e senderInstance não zero, coerente com qualquer identidade já estabelecida no contexto | Handshake recebe a rejeição; não publica ACTIVE; retry conforme Q-C-05 aprovada |
++| HANDSHAKING: recetor enfileirou HELLO_OK | Q-C-05 aprovada: mesmo contexto do HELLO já validado, requestId desse HELLO, relatedType=6 e senderId/instanceId desse emissor | Rejeição da resposta local ainda em confirmação; termina só esse candidato, sem terceiro ACK no fio |
+ | ACTIVE: vínculo confirmado | connectionId e senderId/senderInstance correspondem ao vínculo corrente | Entrega ao consumidor responsável, preservando mensagem e sessão; o manager não exige pedido próprio pendente nem restringe os códigos aos do handshake |
+ 
+ Na descoberta, o contacto é host/porta configurados; não existe bootstrap nodeId
+@@ -261,9 +262,10 @@
+ 
+ As verificações exatas para aceitar uma rejeição de HELLO_OK, o destino de ERROR
+ inesperado antes de ACTIVE e a classificação de retry após rejeição remota são
+-concretizações **pendentes de decisão explícita em
++concretizações **aprovadas explicitamente em
+ [Q-C-05](../../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)**.
+-O modelo apresenta a proposta; não a declara uma regra já aprovada nas fontes.
++A fonte destas concretizações é a aprovação do utilizador registada em Q-C-05,
++sem as atribuir retroativamente ao contrato 07.
+ 
+ ### 8.2. ACTIVE: erro de aplicação não é falha automática do vizinho
+ 
+@@ -358,12 +360,12 @@
+ | ID | Oráculo de estado/efeito | Meio previsto |
+ |---|---|---|
+ | M01 | Perfil/instância/configuração inválidos rejeitados antes de criar rede/agenda | Factories espiadas, modelos diretos e loader real |
+-| M02 | REGISTER/REGISTER_OK e ERROR(17) correlacionados por geração/conexão/requestId/relatedType=1; rejeição preserva payload, termina consulta sem lista/Up/UDP e sem ERROR de resposta; erro antigo/tipo-pedido errado e retry/FAILED conforme proposta Q-C-05; EOF parcial/prazo não instalam lista | Discovery controlada e BootstrapServer/TCP real |
++| M02 | REGISTER/REGISTER_OK e ERROR(17) correlacionados por geração/conexão/requestId/relatedType=1; rejeição preserva payload, termina consulta sem lista/Up/UDP e sem ERROR de resposta; erro antigo/tipo-pedido errado e retry/FAILED conforme Q-C-05 aprovada; EOF parcial/prazo não instalam lista | Discovery controlada e BootstrapServer/TCP real |
+ | M03 | Lista imutável; ID próprio/duplicado/instância viva/endpoint inválido/grau acima da capacidade rejeitados sem instalação parcial | Lista/coleções adversas e contadores de dial |
+ | M04 | Depois de READY não há consultas; com bootstrap parado ocorre reconexão; processo novo volta a DISCOVERING | Discovery spy e integração TCP com bootstrap encerrado |
+ | M05 | Só menor ID faz dial; ambas as ordens e arranque simultâneo convergem para um canal por par | Ordem de IDs controlada e três nós TCP |
+ | M06 | HELLO valida grafo local, identidade/instância/endpoint/papel/host lexical/direção; peer inválido não afeta outro | Canal falso e peer TCP adverso |
+-| M07 | HELLO_OK vazio e ERROR(17) correlacionam alvo/conexão/geração/requestId/instância; rejeição de HELLO (relatedType=5), proposta de rejeição de HELLO_OK (6), erros antes do flush, não correlacionados/obsoletos e retry conforme Q-C-05 nunca produzem Up/UDP nem ERROR em resposta | Mensagens/flush/agenda controlados e codec existente |
++| M07 | HELLO_OK vazio e ERROR(17) correlacionam alvo/conexão/geração/requestId/instância; rejeição de HELLO (relatedType=5), rejeição de HELLO_OK (6) aprovada, erros antes do flush, não correlacionados/obsoletos e retry conforme Q-C-05 nunca produzem Up/UDP nem ERROR em resposta | Mensagens/flush/agenda controlados e codec existente |
+ | M08 | Up/UDP só depois das duas condições do handshake, qualquer ordem; frame legítimo da janela de flush não é entregue cedo | Escrita/futures bloqueáveis e relógio falso |
+ | M09 | Um candidato/ACTIVE por ID; duplicado/ID vivo não substitui o vínculo saudável | Interleavings e duas instâncias concorrentes |
+ | M10 | Instância nova é confirmada após falha; Closed/Message/Timeout/Flush antigos não removem nem alteram a nova | Gerações e connectionId/instanceId distintos |
+@@ -382,18 +384,18 @@
+ 
+ ### 10.1. Suboráculos de ERROR — planeados, sem execução
+ 
+-Os casos que concretizam Q-C-05 são condicionados à sua decisão; não são testes
+-aprovados ou já executados. Mantêm-se M01–M22, sem inflacionar contagens JUnit.
++Os casos refletem Q-C-05 aprovada e continuam planeados, sem execução. Aprovar
++um oráculo não é executá-lo. Mantêm-se M01–M22, sem inflacionar contagens JUnit.
+ 
+ | Caso | Estímulo e resultado a observar |
+ |---|---|
+ | M02-a | ERROR com geração/conexão/requestId do REGISTER e relatedType=1: uma rejeição da consulta, payload/emissor preservados, sem lista/Up/UDP; EOF subsequente não produz segunda rejeição |
+-| M02-b | Proposta Q-C-05: codes 10/11 agendam uma nova tentativa inicial com backoff; restantes codes vão a FAILED com rejeição completa observável; nunca retry imediato ou consulta após READY |
+-| M02-c | ERROR com requestId/relatedType errados no canal corrente não é atribuído ao REGISTER; aplicar a proposta de falha local de contexto. Evento de geração/conexão anterior ou após prazo não altera a nova tentativa nem a causa já terminada |
++| M02-b | Q-C-05 aprovada: codes 10/11 agendam uma nova tentativa inicial com backoff; restantes codes vão a FAILED com rejeição completa observável; nunca retry imediato ou consulta após READY |
++| M02-c | ERROR com requestId/relatedType errados no canal corrente não é atribuído ao REGISTER; aplicar a decisão de falha local de contexto. Evento de geração/conexão anterior ou após prazo não altera a nova tentativa nem a causa já terminada |
+ | M02-d | Nos casos anteriores e em ERROR inválido de formato/identidade: zero ERROR de saída; diagnóstico/rejeição observável, sem confundir falha local com resposta remota |
+ | M07-a | ERROR do HELLO pendente: correspondência de geração/conexão/requestId/relatedType=5/identidade; antes ou depois da conclusão de escrita, nenhuma publicação ACTIVE/UDP; retry só do iniciador conforme Q-C-05 |
+-| M07-b | Proposta Q-C-05: ERROR relacionado a HELLO_OK (6) só rejeita a tentativa ainda pendente com a identidade do HELLO validado e reply já enfileirado; flush tardio não a reativa; depois de ACTIVE passa por M11 |
+-| M07-c | ERROR de outra geração/conexão/instância não retira o candidato/vínculo novo; ERROR não correlacionado no canal corrente tem a reação proposta em Q-C-05, sem ERROR de resposta ou alteração de outro peer |
++| M07-b | Q-C-05 aprovada: ERROR relacionado a HELLO_OK (6) só rejeita a tentativa ainda pendente com a identidade do HELLO validado e reply já enfileirado; flush tardio não a reativa; depois de ACTIVE passa por M11 |
++| M07-c | ERROR de outra geração/conexão/instância não retira o candidato/vínculo novo; ERROR não correlacionado no canal corrente tem a reação aprovada em Q-C-05, sem ERROR de resposta ou alteração de outro peer |
+ | M07-d | ERROR de aplicação na janela legítima de flush fica retido dentro dos limites e é entregue intacto após ACTIVE; falha/prazo antes de ACTIVE liberta-o com diagnóstico, sem o entregar numa sessão posterior |
+ | M11-a | Consumidor espiado recebe ERROR do vínculo ACTIVE sem pedido pendente no manager: code, requestId, relatedType, detail, envelope e sessão completa iguais aos recebidos; NO_ROUTE/PATH_CHANGED chegam ao consumidor que possui o pedido, sem lógica de routing neste IMP |
+ | M11-b | Codes de 1..12 e relatedType ativo, 0/3/17/255 preservam a representação válida; não converter para MessageType, não filtrar ou fechar o canal só pelo code e nunca responder ERROR |
+@@ -414,7 +416,8 @@
+ A análise formal de conformidade pertence à etapa ADR após aprovação de Design.
+ A revisão do utilizador identificou a lacuna ERROR (17); o tratamento por fase
+ e os oráculos M02/M07/M11 foram ampliados. Q-C-05 conserva as concretizações
+-não determinadas pelas fontes como proposta pendente, sem aprovação inferida.
++não determinadas pelas fontes com a aprovação explícita posterior, sem
++aprovação inferida. Design está autorizado; a análise ADR formal permanece pendente.
+ 
+ Não foi identificada contradição que exija alterar as fundações nesta inspeção.
+ Riscos a resolver no Design: classificação antes do future de dial, janelas de
+@@ -436,14 +439,19 @@
+ três ficheiros e M01–M22. Nenhum ficheiro de Projeto/ alterado; não há código,
+ build, teste V-007, regressão ou manual novos nesta etapa.
+ 
+-Parar para aprovação de Model antes de Design/ADR/Implement/Test. O bolt fica
+-in-progress/current_stage=model/stages_completed=[], completed=null; história
+-e TASK-007 em progresso, critérios de implementação por cumprir. Sem commits,
+-push, fecho ou início de outro IMP nesta continuação.
++Model aprovado e concluído em 2026-11-10T14:48:50Z; autorizada apenas Design. O bolt
++fica in-progress/current_stage=design, com Model em stages_completed e completed=null;
++história e TASK-007 continuam em progresso, critérios de implementação por cumprir.
++Parar antes de ADR/Implement/Test; sem commits, push, fecho ou outro IMP.
+ 
+ Evidências desta inspeção e da preservação ficam em
+ `experiments/construction/003-overlay/`; a validação documental não executa V-007.
+ 
+ Revisão de Model preparada em 2026-11-10T14:24:46Z, por pedido explícito do utilizador:
+-ERROR (17) distinguido por fase; M02/M07/M11 ampliados; Q-C-05 pendente de decisão.
++ERROR (17) distinguido por fase; M02/M07/M11 ampliados. Q-C-05 posteriormente
++aprovada explicitamente, conforme registo acima.
+ Esta revisão não inicia Design nem altera Java ou os artefactos anteriores de evidência.
++
++Aprovação posterior: o utilizador aceitou expressamente todas as decisões da tabela
++Q-C-05, incluindo fecho local após ERROR inesperado antes de ACTIVE. Permanece
++proibido responder ERROR a ERROR e obrigatório entregar ERROR ACTIVE intacto.
+--- a/memory-bank/bolts/003-overlay/ddd-02-technical-design.md
++++ b/memory-bank/bolts/003-overlay/ddd-02-technical-design.md
+@@ -0,0 +1,539 @@
++# IMP-004 — Design: descoberta e sessões de vizinhança
++
++Desenho preparado em 2026-11-10T15:00:14Z, para revisão da etapa 2, após aprovação explícita do
++[Model](ddd-01-domain-model.md) e de
++[Q-C-05](../../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004).
++O instante de aprovação está em stages_completed do bolt. Apenas Design foi
++autorizado; este documento não é código, análise ADR concluída ou execução V-007.
++Fonte: ADD 5/6/8/9/11, IMP-004, contrato 07 e TASK-007.
++
++## 1. Fronteira e APIs reais
++
++Base Denji/main `26aaa4ae6775e9c78e1d7658472ccaca0b376427`. Preservar os 155
++ficheiros de Projeto/. A implementação futura limita-se a Neighbor.java,
++NeighborManager.java e NeighborManagerTest.java, atualmente vazios. Tipos auxiliares,
++adaptadores, enums e fakes ficam aninhados nesses ficheiros, sem dependência nova.
++
++Transport fornece um listener comum, connect assíncrono com endereço **resolvido**,
++Connection.id/isOpen/send/sendAndFlush/close, requestClose e awaitTermination.
++attach inicia os workers antes de completar o future do dial: Open/Message/Closed
++podem anteceder DialResult. Não existe indicador público inbound/outbound.
++O desenho abaixo resolve essa ausência sem alterar Transport/Connection.
++
++BootstrapServer já implementa o servidor REGISTER. O cliente inicial pertence
++ao manager, conforme TASK-007. A composição CLI/processos fica no IMP-005;
++monitoring/routing/UDP reais não são implementados aqui. MessageType, ErrorCode,
++ControlMessage e codecs permanecem intocados; HELLO_OK conserva payload vazio.
++
++## 2. Valores e assinaturas previstas
++
++Assinaturas abaixo são o contrato a introduzir em Implement, não APIs disponíveis.
++Imports triviais omitidos. Enums de estado são locais, nunca codificados por ordinal.
++
++```java
++// Neighbor.java
++public record Neighbor(String nodeId, ControlMessage.Endpoint configured,
++        State state, Optional<Session> session, long retryDelayMillis) {
++    public enum State { DISCONNECTED, CONNECTING, HANDSHAKING, ACTIVE, CLOSED }
++    public record Session(String nodeId, UUID instanceId, UUID connectionId,
++                          ControlMessage.Endpoint endpoint) { }
++}
++
++// NeighborManager.java
++public final class NeighborManager implements AutoCloseable {
++    public NeighborManager(NodeConfiguration config, UUID instanceId, Observer observer);
++    public NeighborManager(NodeConfiguration config, UUID instanceId,
++                           SerialOwner borrowedOwner, Observer observer);
++    public CompletionStage<Void> start();
++    public Map<String, Neighbor.Session> snapshot();
++    public Map<String, Neighbor> diagnostics();
++    public CompletionStage<Connection.SendResult> send(
++            Neighbor.Session expected, ControlMessage message);
++    public CompletionStage<Boolean> disconnect(Neighbor.Session expected);
++    public void requestClose();
++    public boolean awaitTermination(Duration timeout);
++    @Override public void close();
++
++    public interface Observer { void onEvent(Event event); }
++    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic { }
++    public record NeighborUp(Neighbor.Session session) implements Event { }
++    public record NeighborDown(Neighbor.Session session, Reason reason) implements Event { }
++    public record Received(Neighbor.Session session, ControlMessage message) implements Event { }
++    public record Diagnostic(Phase phase, Reason reason, Optional<UUID> attemptId,
++            Optional<UUID> connectionId, Optional<Neighbor.Session> session,
++            Optional<ControlMessage> remoteMessage) implements Event { }
++    public enum Phase { NOT_STARTED, DISCOVERING, READY, FAILED, CLOSED }
++}
++```
++
++Reason é enum local tipado para rejeição remota, falha de contexto, transporte,
++prazo, saturação e encerramento; não acrescenta códigos ERROR na rede.
++DiscoveryRejected é uma exceção local que conserva ControlMessage original,
++attemptId/connectionId e origem remota; falha local de contexto tem outro tipo/
++motivo, mesmo que retenha a mensagem que a desencadeou. Não fabricar ERROR remoto.
++
++Records validam não nulos/coerência. configured tem instanceId zero; Session tem
++instanceId não zero e Endpoint coerente com nodeId/instanceId. Não mudar configured
++ao aprender a instância. session está presente só em ACTIVE. Mapas/listas são
++cópias imutáveis; snapshots ACTIVE e diagnósticos são publicados por referência
++atómica, sem expor Channel, Connection, futures ou coleções mutáveis.
++
++start é idempotente e devolve o mesmo resultado de descoberta: READY significa
++lista instalada, não todos os vizinhos online. Devolver uma CompletionStage sem
++permissão de cancelar o future nativo de um dial. send executa a validação da
++sessão no dono serial: vínculo retirado devolve CLOSED; envelope local deve ter
++nodeId/instanceId locais e tipo de aplicação permitido. Usa Connection.send e
++mantém ACCEPTED=enfileiramento; não é um novo ACK ou garantia de entrega.
++
++send admite os tipos de aplicação 7–16 e ERROR(17) explicitamente produzido pelo
++consumidor segundo o protocolo; não envia REGISTER/HELLO por essa API nem responde
++automaticamente a mensagens. Um ERROR recebido nunca desencadeia ERROR de resposta,
++também por contrato do consumidor. relatedType bruto de ERROR recebido permanece
++intacto, independentemente do tipo permitido para uma emissão local.
++Para emissão local de ERROR com relatedType=17, devolver INVALID_MESSAGE; é guarda
++de contexto do manager, sem alterar o codec que representa esse octeto recebido.
++
++disconnect é uma operação local de lifecycle para diagnóstico/monitoring: no owner,
++confirma o trio da sessão, retira a autorização e fecha o canal corrente; devolve false para uma sessão
++retirada. Não apaga a aresta nem escolhe novo vizinho. A perda TCP real gera Down
++e reconexão pelo iniciador, com Closed posterior idempotente. Permite ao operador do manual induzir essa perda sem
++expor Connection ou antecipar CLI/sondas; não se apresenta como falha de rede CORE.
++
++Observer é obrigatório, rápido e chamado no dono serial, fora de locks de I/O.
++Recebe Up antes dos Received retidos e Down antes de Up da sessão sucessora.
++Exceção do consumidor é falha operacional local observável. Não criar uma fila
++ilimitada de notificações nem consumidor por omissão que descarte ERROR.
++
++## 3. Executor serial que pode ser partilhado
++
++```java
++public interface Registration { void remove(); }
++public interface SerialOwner extends AutoCloseable {
++    int capacity();
++    boolean isOwnerThread();
++    boolean offer(Runnable event);
++    Registration onStop(Runnable cleanup);
++    void fail(Throwable cause);
++    void requestClose();
++    boolean awaitTermination(Duration timeout);
++    @Override void close();
++}
++public static SerialOwner createSerialOwner(int capacity); // aninhado no manager
++```
++
++O construtor por omissão guarda um Plan validado; não inicia threads/sockets.
++start cria o owner próprio. O segundo construtor recebe o executor do futuro nó,
++com capacity exatamente igual a runtime.overlay.eventsCapacity. O manager não
++cria outro dono e não encerra o owner emprestado numa paragem normal. O chamador
++encerra esse owner depois dos componentes; um fail por saturação é fatal ao nó.
++
++Implementação própria: um worker, ArrayBlockingQueue de N eventos, flag terminal
++fora da fila e hooks limitados a 16 registos por owner; este manager regista um.
++O futuro nó pode usar o mesmo owner para monitoring/routing sem threads a alterar
++vizinhos diretamente. onStop só regista lifecycle; os hooks executam no worker,
++fora do lock de registo. Registration é retirada depois do cleanup do componente.
++O limite de hooks é local à ferramenta de execução, não um cap de protocolo.
++
++offer nunca espera; se falhar, fail grava a primeira causa terminal e acorda/
++interrompe o worker. O finally do loop executa os cleanups no próprio owner, sem
++inserir Stop na fila cheia. O ponto de captura solicita também fecho dos recursos
++I/O por handles thread-safe; não modifica os mapas de domínio fora do owner.
++Os eventos enfileirados deixam de poder criar trabalho após a flag de paragem.
++
++Callback de transporte, conclusão de future ou timer só captura dados e oferece
++evento. Nenhum DNS, join, get de future incompleto ou put bloqueante no owner.
++Se um Observer bloquear e impedir o finally, o fecho de I/O é solicitado por fora
++e o shutdown termina em erro explícito de prazo, sem alegar worker terminado.
++
++## 4. Núcleo, portas e relógio
++
++O construtor de testes package-private recebe Ports/clock/jitter, todos tipos
++aninhados. As três classes autorizadas continuam suficientes.
++
++```java
++interface Channel {
++    UUID id(); boolean isOpen();
++    Connection.SendResult send(ControlMessage message);
++    CompletableFuture<Void> sendAndFlush(ControlMessage message);
++    void close();
++}
++interface Ticket { void cancel(); }
++interface Deadlines {
++    void limit(int maxPhysicalTickets);
++    Ticket schedule(Runnable task, long delayNanos);
++    void requestClose(); boolean awaitTermination(Duration timeout);
++}
++interface Jitter { long choose(long minInclusive, long maxInclusive); }
++interface Resolver {
++    CompletableFuture<InetAddress> resolve(UUID jobId, String configuredHost);
++    void retire(UUID jobId);
++}
++interface Sink {
++    void opened(Channel channel, long observedAt);
++    void message(Channel channel, ControlMessage message, long observedAt);
++    void closed(Channel channel, Connection.CloseReason reason, long observedAt);
++}
++interface Network {
++    CompletableFuture<InetSocketAddress> open(InetSocketAddress resolvedBind,
++                                            Transport.Options options, Sink sink);
++    CompletableFuture<Channel> connect(InetSocketAddress resolvedRemote);
++    int reservations();
++    void requestClose(); boolean awaitTermination(Duration timeout);
++}
++interface IoServices {
++    Resolver resolver(); Network network();
++    void requestClose(); boolean awaitTermination(Duration timeout);
++}
++interface Ports {
++    SerialOwner owner(int eventsCapacity);
++    IoServices io(int maxPhysicalJobs);
++    Deadlines deadlines(int maxPhysicalTickets);
++}
++NeighborManager(NodeConfiguration config, UUID instanceId, SerialOwner borrowedOwner,
++                Observer observer, LongSupplier clock, Jitter jitter, Ports ports);
++```
++
++LongSupplier nanoClock serve deadlines; clock/Jitter/Deadlines/Network/Resolver/
++SerialOwner/Observer são controláveis em NeighborManagerTest. Fakes não tentam
++construir/subclassificar Connection final nem aceder aos hooks privados de outro
++pacote. O wrapper real adapta Channel a Connection pública. Fake await consome
++o relógio controlado e regista o budget restante; TCP real confirma a fronteira.
++
++Core possui Phase, immutable desired, Peer por ID, Context por connectionId,
++NativeDial por token ainda não concluído, tickets por chave e contadores de
++retenção. AttemptId UUID local nunca vai no fio. Todos os eventos verificam
++geração/contexto/estado antes de afetar Peer; sessão confirmada compara também
++instanceId. Não manter tombstones/cache de conexões retiradas sem limite.
++
++Ports cria os serviços só após validação/start; IoServices partilha o mesmo worker
++entre Resolver e Network.open/bind. resolve/open/connect devolvem resultados
++nativos apenas ao terminarem esses trabalhos, sem expor o seu cancelamento na API
++pública. retire remove job ainda em fila ou pede interrupção do que corre, mas o
++future de um resolver em execução só termina quando o job realmente termina.
++Sink preserva a ordem do leitor e captura observedAt antes da oferta ao owner.
++IoServices.await verifica o worker local; Network.await verifica separadamente
++Transport. O teste pode envolver Network/Sink sem alterar o transporte existente.
++
++## 5. Configuração e arranque
++
++Validar perfil overlay, contacto bootstrap, nodeId/instanceId não zero, hosts/
++portas/papel e runtime antes de criar recursos. A normalização lexical de host
++fica em helper interno equivalente à do loader/bootstrap, sem chamar o método
++package-private do outro pacote e sem DNS do valor recebido. String.compareTo
++sobre os IDs ASCII válidos define iniciador, sem locale/ordem numérica de sufixo.
++
++Plan contém Endpoint local imutável e Transport.Options obtido de Control:
++queueCapacity, maxConnections, connectTimeout, shutdownTimeout. Durações têm
++milissegundos inteiros 1..Integer.MAX_VALUE; validar antes de toNanos/toMillis.
++Não criar propriedade nem elevar hard cap. Listas recebidas validam grau ≤63 e
++grau ≤C, own ID/duplicados/instâncias zero/papéis/colisões antes da instalação.
++
++start inicia DISCOVERING e, no worker de I/O limitado, resolve bind configurado
++e abre o Transport. Resolução/bind não bloqueiam o owner. Um bind tardio após Stop
++é fechado ao obter o handle, antes de o publicar como pronto. O handle de I/O
++é registado para fecho de emergência; esse registo não é estado de Neighbor.
++Depois resolve/contacta bootstrap, envia REGISTER com requestId novo e espera
++REGISTER_OK ou ERROR correlacionado. Consulta válida instala a lista uma vez,
++fecha o canal inicial e torna READY. Entrada HELLO antes de READY não é autorizada.
++
++Q-C-05 aprovada: ERROR corrente de REGISTER com code 10/11 termina a tentativa e
++agenda retry inicial; restantes codes levam a FAILED com rejeição integral.
++Erro de contexto no canal corrente também fecha localmente e vai a FAILED.
++Erros de transporte/prazo anteriores ao sucesso têm retry com backoff. FAILED
++solicita cleanup de arranque; não criar loops automáticos de erro permanente.
++Emitir Diagnostic(FAILED, causa original) e completar start excecionalmente antes
++de limpar recursos; cleanup não mascara essa causa com o EOF que ele próprio
++provoca. Stop explícito posterior pode concluir CLOSED, preservando o diagnóstico.
++Depois de READY não há novos contactos bootstrap, incluindo retries de peers.
++
++## 6. DNS e trabalho físico limitado
++
++Um único worker de I/O por manager executa jobs de resolução e o bind inicial,
++com fila ArrayBlockingQueue de capacidade 65: no máximo D+2 hosts configurados
++(D≤63, mais bind e bootstrap). Sem threads novas por mensagem ou retry.
++O registo global limita também jobs físicos totais (em fila + a correr) a 65,
++incluindo o job de bind; reservar antes de submeter, sem exceder esse total.
++Resolver usa InetAddress.getByName apenas sobre esses hosts; não recebe host
++do frame HELLO. Um resultado é um endereço para a porta configurada, não uma
++prova de identidade. A comparação de endpoint continua lexical e independente.
++
++Há no máximo um job físico não concluído por host normalizado. Vários destinos
++no mesmo host podem esperar pelo mesmo resultado; waiters são tokens correntes,
++limitados aos D peers e uma operação de descoberta. Sem cache histórica infinita:
++retirar job após conclusão e entrega ao owner; uma tentativa posterior pode
++resolver de novo, conservando os limites. Não persistir IP ou lista após processo.
++
++Cada espera de resolução/bind tem budget de control.connectTimeout, capturado
++antes de enfileirar o job; inclui a fila. Este é [PRESSUPOSTO] de execução para
++um trabalho sem propriedade própria, não alteração do timeout TCP no transporte.
++Depois de resolver, o dial TCP conserva o seu connectTimeout. Os budgets são
++fases explícitas; não se apresenta o seu somatório como uma meta do enunciado.
++
++Timeout/cancelamento retira o waiter lógico. Job ainda em fila pode ser removido
++antes de executar; job a correr conserva a reserva até terminar fisicamente.
++Não submeter outro para o mesmo host enquanto estiver bloqueado. Retry entretanto
++elegível adia/reaproveita o job corrente dentro do seu próprio prazo; não aumenta
++o número de workers/jobs. Resultado tardio carrega jobId e attemptId e não revive
++uma tentativa retirada. Fila cheia é falha explícita de recurso, sem fallback
++para executor comum, thread extra ou execução DNS no owner.
++
++cancel/shutdownNow não prova que getByName terminou: uma resolução do sistema
++pode ignorar interrupção. Await verifica a terminação real do worker. Se não
++terminar no budget global, close lança erro com o recurso pendente identificado;
++não afirmar shutdown bem-sucedido, thread removida ou cancelamento físico pelo
++isDone de um future. Os testes incluem resolver bloqueável que só termina quando
++libertado. Esta limitação de erro explícito já está no Model aprovado/ADR-020.
++
++## 7. Correlação do dial sem alterar Transport
++
++Antes de executar connect, o owner regista NativeDial(token, target, finalidade,
++geração) no conjunto de dials **fisicamente não concluídos**. Os callbacks usam
++connectionId e handle; a conclusão do future produz DialResult(token, channel/erro).
++Não inferir direção por IP, porta efémera ou pelo facto de Open ter chegado primeiro.
++
++Se DialResult chega primeiro, cria/associa Context OUTBOUND ao token/alvo. Open
++posterior usa o mesmo ID sem reiniciar o relógio. Se Open/Message chegam primeiro,
++Context começa UNCLASSIFIED e guarda a barreira dos tokens nativos ainda não
++concluídos existentes quando o owner processa esse Open. O conjunto pode ser um
++sobraconjunto conservador, mas inclui qualquer dial que possa ser dono do canal.
++São os únicos dials que
++podem ser donos do canal; dials iniciados depois desse Open não entram na barreira.
++
++Um Context UNCLASSIFIED só pode tornar-se INBOUND quando a barreira ficar vazia
++e nenhum DialResult o tiver associado. HELLO/HELLO_OK/ERROR que chegarem antes
++ficam na retenção limitada da secção 8. Um peer malicioso não consegue confirmar
++um HELLO inbound num socket que um DialResult ainda pode identificar como outbound.
++Direção e alvo são validados antes de Up, mesmo que HELLO pareça plausível.
++
++Ao concluir um dial, processar primeiro a associação/fecho do seu channel, depois
++retirar o token das barreiras dos restantes Contexts e reavaliá-los. Uma conclusão
++de erro sem channel retira só o seu token. Context fechado, channel.isOpen=false,
++tentativa retirada ou prazo vencido não podem originar Up. Open tardio de um
++channel já fechado não o recria como saudável. Fecho anterior a DialResult não
++exige guardar um tombstone: isOpen e geração da tentativa cercam a conclusão.
++
++Para preservar esta prova, o manager **não cancela o CompletableFuture nativo
++de Transport.connect durante uma retirada individual**: cancelá-lo poderia perder
++o handle de uma attach concorrente, mantendo Open sem correlação. Retirar o token
++logicamente, manter a sua conclusão registada e fechar qualquer channel tardio.
++O socket conserva o timeout TCP; não iniciar outro dial desse peer até o anterior
++terminar nativamente. Isto não altera o contrato público de Transport.cancel.
++Em shutdown, Transport.requestClose fecha imediatamente todos os sockets/dials,
++sem depender dessa espera lógica, e depois await verifica os workers reais.
++
++Assim, mesmo um token lógico retirado continua na barreira até DialResult nativo,
++limitado pelas reservas C. Não usar Future.isCancelled como prova de que um socket
++nunca existiu. Saturação ao publicar DialResult pede fecho imediato do handle e
++paragem explícita do owner, evitando um recurso órfão fora da fila.
++
++O custo dessa barreira é latência: um inbound pode esperar por outros dials em
++curso. O deadline de HELLO nunca é renovado por essa espera; se expirar, fechar
++localmente e permitir retry. O desenho troca essa latência limitada por uma
++classificação correta com a API atual. D14 tem de provar esse caso, não o esconder.
++
++## 8. Retenção e memória: limites concretos
++
++Definir C=control.maxConnections, Q=control.queueCapacity e N=eventsCapacity.
++Para Context provisório ou handshake confirmado no fio ainda à espera de evento
++local, usar **B=min(4,Q) frames por canal** e **R=min(N,C×B) frames no total**.
++São limites internos derivados, sem novas propriedades/caps wire. Defaults:
++C=64, Q=256, N=4096 → B=4/R=256. Contar antes de inserir; retirar a cobrança ao
++processar/libertar cada frame. Context removido drena a sua cobrança uma vez.
++
++Retenção mantém ControlMessage imutável e ordem de chegada por conexão; não faz
++nova serialização/cópia de payload nem acumula bytes de socket fora do codec.
++Cada frame respeita o corpo TCP ≤65536; R limita quantidade, não é uma medição de
++heap. A fila de eventos N e as filas nativas de saída Q são recursos separados.
++Limites muito pequenos podem provocar rejeição explícita sob concorrência;
++não há promessa de convergência durante saturação deliberada.
++
++Overflow de retenção fecha apenas o Context ofensor, emite diagnóstico local
++RESOURCE_LIMIT e retira candidato/sessão se lhe pertencer; não apaga outro peer.
++Não enviar ERROR de resposta a um ERROR que causou o overflow. Se um envio de
++handshake/erro já está pendente, fechar localmente em vez de admitir outra resposta
++para contornar o limite de uma confirmação por Context. A fila serial cheia é
++um erro global do dono, tratado pela secção 3, sem publicação adicional nessa fila.
++
++| Recurso | Limite efetivo |
++|---|---|
++| Lista desejada / peers | D≤63, instalação rejeitada se D>C |
++| Reservas Transport | C≤64, incluindo dials e workers ainda a terminar |
++| Contexts de canais | ≤C, incluindo anónimos e canais em fecho ainda registados |
++| Dials nativos não concluídos | ≤C, no máximo um por peer; descoberta ≤1 |
++| Tokens de barreira | ≤C por Context; ≤C²≤4096 referências no total |
++| Retenção | ≤B≤4 por Context; ≤R≤256 frames no total |
++| Eventos | N≤4096; nenhuma fila paralela ilimitada de notificações |
++| Agenda | ≤D tickets de fase/retry, ≤C deadlines de Context, ≤1 fase inicial |
++| I/O local / DNS | 1 worker, fila 65, jobs por host ≤D+2≤65; waiters ≤D+1 |
++| Confirmações de escrita | ≤1 operação handshake/erro corrente por Context |
++
++Uma reserva TCP só é libertada pelo transporte após os dois workers terminarem.
++Não decrementar artificialmente C ao retirar uma tentativa de domínio. Context
++retirado não precisa de história ilimitada; fechos tardios são comparados pela
++sessão/geração, não usados para limpar o Neighbor corrente por nodeId apenas.
++
++## 9. Handshake, unicidade e ERROR aprovado
++
++Só o menor ID agenda dial de peer. Após correlacionar o outbound, enviar HELLO
++com Endpoint local e requestId novo; guardar helloWritten=false/helloOk=false.
++HELLO_OK válido marca helloOk e fixa peerInstance não zero; Written válido marca
++helloWritten. Só ambas as condições e channel ainda aberto permitem ACTIVE.
++
++Inbound classificado exige HELLO, senderId/Endpoint.nodeId e senderInstance/
++Endpoint.instanceId coerentes, allowlist/endpoints/papel/direção corretos.
++Reservar candidato por ID antes de enfileirar HELLO_OK; ACTIVE só após Written
++da resposta. Não substituir candidato/vínculo saudável por UUID mais recente ou
++primeiro socket. Duplicado recebe DUPLICATE_ID se for seguro/possível dentro do
++prazo; o vínculo existente permanece. Rejeição não aprende novo endpoint.
++
++Depois de validar a identidade e iniciar a barreira de confirmação, frames de
++aplicação 7–16 e ERROR(17) da janela legítima aguardam em B/R. Up publica Session/
++snapshot e só depois drena Received em FIFO. Falha/prazo limpa retidos com
++diagnóstico, sem entrega à instância seguinte. Antes de uma janela legítima,
++mensagem incompatível falha o contexto; ERROR nunca gera outro ERROR.
++
++Q-C-05 aprovada é aplicada por operação, não apenas por code:
++
++| Estado/operação | Condição e ação |
++|---|---|
++| REGISTER pendente | ERROR com token/connectionId/requestId/prazo corretos e relatedType=1: rejeição remota integral; 10/11 retry, restantes FAILED |
++| HELLO enviado pendente | ERROR do alvo/instância esperados, mesmo pedido/contexto e relatedType=5: retirar só candidato; retry pelo menor ID |
++| HELLO_OK enfileirado ainda pendente | ERROR do HELLO validado, mesmo requestId/contexto, relatedType=6: rejeitar candidato; Written tardio não reativa |
++| ERROR inesperado antes de ACTIVE, fora da janela legítima | Diagnóstico de contexto e close local só desse canal; descoberta FAILED ou peer DISCONNECTED; nunca responder ERROR |
++| ACTIVE | Received(Session, mensagem original), sem filtro de code/relatedType/requestId próprio; consumidor futuro correlaciona, sem Down só pelo payload |
++| Evento antigo/retirado/fora do prazo | Diagnóstico/contador limitado; não mudar sessão nova ou causa terminal anterior |
++
++Preservar inclusive relatedType bruto 0/3/17/255 quando válido no formato. O
++manager não traduz requestId para pedidos de filhos: essa tarefa é de routing.
++Uma falha local não é convertida em ErrorPayload remoto. NODE_LEAVE corrente
++retira a sessão e mantém a aresta desejada; nunca é dirigido ao bootstrap.
++
++## 10. Prazos, retry e cancelamento
++
++Capturar clock no callback antes da fila. Context usa o instante mais antigo
++conhecido de Open ou BindResult; outro evento não reinicia o prazo. Sem comparar
++nanoTime por Math.min: calcular tempo decorrido/subtração modular, válido para
++budgets <2^63 ns, incluindo wrap. Evento depois de expirado não confirma sessão.
++O ticket provisório usa helloTimeout; ao identificar bootstrap, aplicar
++bootstrapQueryTimeout desde a abertura observada, sem apagar o tempo em fila.
++
++Há um ticket de fase/retry por peer: DNS, dial lógico ou espera de retry, nunca
++vários tickets sobrepostos desse Peer. Context de Open tem o seu deadline HELLO,
++mesmo antes de BindResult. Consulta/arranque usa um ticket global de fase.
++ScheduledThreadPoolExecutor com um worker e remove-on-cancel; registo de tickets
++limitado a D+C+1 e geração por chave. Callback do timer só oferece um evento.
++Ticket cancelado que já começou pode publicar evento velho, cercado pela geração;
++não manter uma lista histórica de todas as futures agendadas.
++
++O adaptador reserva uma permissão física antes de schedule e só a liberta depois
++de retirar um job que não começou ou do finally do callback em execução. Um
++future cancelado/isDone não basta para libertar essa permissão. O máximo físico
++provisionado é 63+C+1; chamar limit(C+1) antes de qualquer agendamento e elevar
++para limit(D+C+1) ao instalar a lista. A admissão testa o contador físico contra
++esse limite ativo, incluindo callbacks retirados que ainda terminam; não basta
++contar as chaves lógicas atuais. Se uma substituição não couber porque
++um callback cancelado ainda termina, rejeitar a operação com diagnóstico de
++recurso e cleanup da parte afetada; não submeter além do limite nem esquecer o
++prazo. D17 inclui esse interleaving e comprova limite físico, não só tamanho do mapa.
++
++Função exata de retry, em milissegundos long, sem overflow:
++
++```text
++base := retryInitial na primeira falha; nas seguintes min(retryMax, 2*base)
++         (testar base > retryMax/2 antes de multiplicar)
++spread := floor(base * retryJitterPercent / 100)
++j := Jitter.choose(-spread, +spread), inteiro uniforme no adaptador real
++delay := max(1, min(retryMax, base+j))
++```
++
++base≤Integer.MAX_VALUE, percent≤100; operações intermédias usam long. Jitter fake
++fora do intervalo é erro explícito, não um valor ocultamente corrigido. Reset de
++base após ACTIVE. Quando retry vence, se ainda há dial nativo/resolução física
++incompatível, adiar com novo backoff; não duplicar trabalho do mesmo peer/host.
++Stop cancela elegibilidade/tickets. Nenhum retry pode voltar ao bootstrap em READY.
++
++## 11. Shutdown e ownership
++
++requestClose é não bloqueante: primeira flag vence, rejeita novos comandos,
++solicita Transport.requestClose e fecho da agenda/I/O worker; oferece Stop ou usa
++o fail/hook fora da fila se não houver espaço. Estado de Peer e snapshots só
++mudam no owner; snapshot() retorna vazio quando a flag de fecho já está ativa,
++evitando apresentar autorização operacional antiga enquanto o owner termina.
++
++O cleanup no owner retira candidatos, cobra/liberta retidos, emite Down uma vez,
++fecha todos os Channels, cancela waiters/tickets e completa comandos pendentes
++com causa local. Conclusões tardias fecham os handles obtidos, sem publicar Up.
++Handles físicos de I/O estão registados separadamente para rollback/fecho, mesmo
++se bind ou resolução completarem depois da paragem lógica.
++
++close num callback/owner só solicita paragem. close externo mede **um** budget
++global shutdownTimeout, desde o primeiro pedido de fecho: await de cleanup,
++Transport, agenda, I/O e owner próprio recebe sempre o tempo restante, fora de
++locks. Arredondar restante para baixo para APIs que exigem ms; <1 ms é prazo
++esgotado, não nova espera de 1 ms por recurso. Repetir close não renova o budget;
++se tudo já terminou, devolve normalmente. awaitTermination(timeout) permite
++observação posterior explícita, sem mudar o resultado de timeout anterior.
++
++Owner emprestado fica ativo para o chamador; aguardar só cleanup deste manager
++e os recursos que ele criou. Teste de partilha encerra o owner no fim da fixture.
++Worker DNS/Observer bloqueado após o prazo implica erro explícito de shutdown;
++libertar depois e verificar terminação não reescreve o resultado anterior.
++
++## 12. D01–D22: prova do desenho contra o Model
++
++Todos os testes e resultados funcionais estão por executar. Os IDs abaixo
++orientam os casos futuros em NeighborManagerTest, sem alegar contagem JUnit.
++
++| Design/Model | Casos concretos a introduzir em Implement |
++|---|---|
++| D01/M01 | Construtores inválidos falham antes das factories; observer/owner/config/runtime coerentes, sem rede |
++| D02/M02 | REGISTER_OK/ERROR/EOF por conexão/geração/requestId; codes 10/11 versus FAILED; rejeição integral observável, zero ERROR de resposta |
++| D03/M03 | Cópias defensivas, grau 63/C, próprios/duplicados/colisões/papéis; zero instalação/dial parcial |
++| D04/M04 | Contador de consultas fica constante em READY; bootstrap parado e reconexão; processo novo necessita descoberta |
++| D05/M05 | Seis ordens de arranque de três nós e arranque simultâneo; só menor ID disca, uma sessão por par |
++| D06/M06 | HELLO com host lexical/papel/porta/ID/instância/direção errados; peer saudável preservado, sem DNS do payload |
++| D07/M07 | Negativas HELLO/HELLO_OK e ERROR inesperado/antigo, incluindo os suboráculos aprovados de Q-C-05; nenhum Up indevido |
++| D08/M08 | Flush bloqueado/HELLO_OK antes de Written; Up antes de drain; buffers em B/R-1, B/R e B/R+1; falha liberta cobrança |
++| D09/M09 | Dois candidatos/ID vivo/UUID distinta; preservar sessão saudável, sem escolher direção por primeiro socket |
++| D10/M10 | Instância nova após fecho; callbacks antigos de Close/Message/ERROR/Written/timeout não a removem |
++| D11/M11 | Received íntegro com ERROR ACTIVE e relatedType bruto; consumidor fake correlaciona NO_ROUTE/PATH_CHANGED; sem pedido próprio do manager, sem Down/ERROR de resposta |
++| D12/M12 | Queue delay, prazo exato, wrap de nanoTime e mensagem duplicada não renovam; budgets de cada fase explícitos |
++| D13/M13 | Base/jitter 0/100, overflow evitado, clamp 1..max, reset após ACTIVE; um ticket por peer e seed registada |
++| D14/M14 | Todas as intercalações com DialResult permitidas, preservando Open→Message→Closed do leitor; barreira de outros dials; HELLO forjado antes de Bind não confirma inbound; prazo inclui a espera |
++| D15/M15 | Retirada lógica antes da conclusão nativa, sucesso tardio fechado; DNS a ignorar interrupção mantém reserva, sem duplicar job/worker |
++| D16/M16 | NODE_LEAVE corrente/duplicado/antigo, Down único, desejo conservado e reconexão pelo iniciador |
++| D17/M17 | C/D/tickets/barreiras/B/R/jobs/waiters nos limites e overflow; reservas só acabam fisicamente; sem mapas de IDs arbitrários |
++| D18/M18 | owner.offer=false, consumidor que lança erro e agenda/I/O cheios: falha observável, cleanup sem slot adicional |
++| D19/M19 | Stop em bind/DNS/bootstrap/dial/handshake/ACTIVE; budget restante em awaits, timeout real de worker preso, porta reutilizável e close idempotente |
++| D20/M20 | Overrides capturados em Transport.Options/hello/retry/eventos; dois componentes fake no mesmo SerialOwner, manager não o encerra ao sair; nenhuma mutação fora do owner |
++| D21/M21 | TCP real/BootstrapServer público, três nós, peer desconhecido e nova instanceId; capturar e fechar Connection de teste via wrapper do Listener para simular falha com managers vivos e bootstrap parado |
++| D22/M22 | clean verify/JDK21 atual, XML/log/JAR/hash; manual embutível com comandos e operador real, revisão humana e integração antes de DONE |
++
++Não é necessário expor Connection ao utilizador para D21: factory package-private
++de testes envolve Transport.Listener e conserva handles apenas na fixture.
++Os testes TCP usam perfis completos e portas previamente reservadas/libertadas;
++falha de bind é resultado real, sem ignorar o teste ou alterar a validação de porta.
++Manual posterior terá de usar uma forma pública/reproduzível de provocar a falha
++sem afirmar prova CORE/JVMs completas: após descoberta e ACTIVE nos três managers,
++parar BootstrapServer, guardar Session corrente e chamar disconnect dessa sessão.
++Observar Down, novo connectionId/mesmas instâncias, Up e ausência de consulta ao
++bootstrap encerrado. Reutilizar a Session antiga em disconnect não fecha a nova.
++Reinício com nova instanceId é uma prova distinta: repor bootstrap para a nova
++descoberta, como exige CP-02. Preparar/executar o roteiro em Test, sobre API final.
++
++## 13. Verificação documental e checkpoint
++
++Este desenho não exige mudar os contratos públicos existentes: adaptadores/
++interfaces novas residem nos três ficheiros autorizados. Reter um dial nativo
++até correlação tem custo e testes explícitos; não se introduz um indicador de
++direção no wire ou se altera a semântica de cancelamento de Transport.
++
++Model/Q-C-05 estão aprovados. Design permanece para revisão. A revisão formal
++de ADR-012/013/018/019/021/024 e das decisões transversais é a etapa seguinte,
++ainda não autorizada. Se os oráculos revelarem que uma decisão aceite é inviável
++ou que é necessário alterar fundações, aplicar ADD 11 antes de intervir.
++
++Nenhuma execução de build/V-007/regressão/manual, nova dependência, Java, commit,
++push ou outro IMP. O resultado histórico de 856 testes não foi reexecutado aqui.
++Revisor final atribuído Denji e integração em main continuam exigidos antes de
++DONE; sem gates externos adicionais nem revisão humana presumida.
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -281,3 +281,18 @@
+   em resposta a ERROR. M02/M07/M11 ampliados. Q-C-05 registada como proposta
+   pendente para políticas não fixadas nas fontes. Sem aprovação de Model,
+   avanço para Design, alteração Java, teste/build, commit ou push.
++
++- **2026-11-10T14:48:50Z**: Model revisto e propostas da tabela Q-C-05 aprovados explicitamente
++  pelo utilizador. Etapa Model concluída; autorizado apenas Design, com limites
++  concretos de retenção/DNS, correlação de dial e executor serial partilhável.
++  Parar antes de ADR/Implement/Test, sem Java, testes, commits ou push.
++
++- **2026-11-10T15:00:14Z**: Design do IMP-004 preparado para revisão: assinaturas/valores
++  imutáveis, B/R de retenção, worker/jobs DNS/I/O limitados, NativeDial/barreira
++  de Contexts não classificados, budgets e owner serial próprio/emprestado.
++  D01–D22 previstos; Q-C-05 e Model/oráculos sincronizados como aprovados.
++  Contratos de Transport/Connection mantidos e 155 ficheiros de Projeto/
++  preservados. Sem execução Java/testes/manuais novos, commits/push ou fecho.
++  Parar para revisão antes de ADR/Implement/Test.
++
++Design IMP-004: [artefacto para revisão](../../../../bolts/003-overlay/ddd-02-technical-design.md).
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md
+@@ -56,3 +56,12 @@
+ de ERROR em resposta a ERROR. Políticas não fixadas pelas fontes em
+ [Q-C-05](../../../../../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004), pendentes.
+ Manter Model para revisão; nenhum Java/Design, teste, commit ou push novo.
++
++## Model aprovado — Design para revisão
++
++Model revisto e propostas da tabela Q-C-05 aprovados explicitamente em 2026-11-10T14:48:50Z.
++[Design](../../../../../bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z:
++assinaturas/tipos, retenção limitada, DNS/correlação de dials, dono serial partilhável,
++ERROR por fase e D01–D22. Esta continuação supera as pendências históricas acima.
++Nenhum Java/teste/build novo; parar antes de ADR/Implement/Test. Revisor final
++atribuído Denji e integração antes de DONE; sem commits/push/fecho.
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-10T14:25:39Z"
++updated: "2026-11-10T15:00:14Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -79,3 +79,13 @@
+ handshake e ACTIVE, com M02/M07/M11 ampliados. Q-C-05 pendente de decisão sobre
+ retry e ERROR inesperado antes de ACTIVE. Model ainda não aprovado; sem Design,
+ Java, execução V-007/regressão/manual, commits ou push.
++
++## Estado atual — IMP-004 em Design
++
++Model/Q-C-05 aprovados em 2026-11-10T14:48:50Z; apenas Design autorizado.
++[Desenho para revisão](../../../../bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z:
++owner serial partilhável, B=min(4,Q)/R=min(N,C×B), worker DNS/I/O e barreira dos dials
++nativos ainda não concluídos. D01–D22 previstos. As pendências Model/Q-C-05 dos
++retratos anteriores estão resolvidas por esta aprovação; Design ainda não aprovado.
++Unidade in-progress, 003-overlay em Design; V-007/regressão/manual, revisão final
++atribuída a Denji e integração pendentes. Nenhum Java/build/teste/commit/push novo.
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -248,16 +248,16 @@
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "18af6816d516cf15f3e4c50e6d8bacbe411dbf8114f5d70d454b2e1fed5e51f8",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "010d9893b52167878f33319769e13771bf4e118948a32d87c0de1f3a08f18c94",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "3d653f48dac52ae22220c5fd7c1685cadfceb1637b4fed11bcbce01b54ae1619",
++    "docs/15-PROJECT-PROGRESS.md": "b3baa9216791554865c4055828ae2d6387e73732c6a675c73de3629edbb8fd79",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "9cc73c6de42c003920a0d276da59430e51e3031cc6a6d7d4e56a7b725f49cb6e",
++    "docs/18-CONSTRUCTION-BOLTS.md": "60536b9b557b84b5677337bb7554a270b641eec25a680170fba09ae1b061cb1d",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+-    "docs/phases/PHASE-02-OVERLAY.md": "282e1307f83b1d389326e49ac5619d2bded221331973e903bc7ee9ad40cb7e86",
++    "docs/phases/PHASE-02-OVERLAY.md": "6f3ab4f1756d3afa59f9b41b37b177d63c647bc6fe22fa7381c7b1333ac37ffa",
+     "docs/phases/PHASE-03-ROUTING.md": "52b54397a001bbae7afcdb83690fbf04c768d95e4b9d214ab0557f3334e21c09",
+     "docs/phases/PHASE-04-FLOW-MANAGEMENT.md": "27b7d97c9b1161636a0e446caf75d4e89461bae5b3ddc891d7ca657bafef05fb",
+     "docs/phases/PHASE-05-STREAMING.md": "bd5ff93148be22f59fb8705d1567f9656c19bf6f38e616bb28651b814f27cdca",
+@@ -269,7 +269,7 @@
+     "docs/tasks/PHASE-01/TASK-004.md": "1f60d41d53c5b79cd18d9c0ed766915d8972bea36df6496828a7d5e6df7e36fe",
+     "docs/tasks/PHASE-02/TASK-005.md": "358bd2e423749f1debb5b359c58c1065f51e52d3b631ecc867c927214636832d",
+     "docs/tasks/PHASE-02/TASK-006.md": "c762710cf64e75d42a0060481e762344e7fb9a95fdf35e6241d6e0081c2e7a6a",
+-    "docs/tasks/PHASE-02/TASK-007.md": "46487f1677fa36fa83069021bca86d3bb1a63c3cce946646de732ee3f20ebb9b",
++    "docs/tasks/PHASE-02/TASK-007.md": "899ea0be94b46fd0177b2bc4dd39390c5ff83b3dabcf5d17e7f671d7983d43e7",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+     "docs/tasks/PHASE-02/TASK-032.md": "e8b80b98301be37eaf92d412be065b913e3d5010bf22be9fbbc535eec60ca615",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-10T14:24:46Z",
++  "updated": "2026-11-10T15:00:14Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -800,6 +800,24 @@
+         "docs/18-CONSTRUCTION-BOLTS.md": "9cc73c6de42c003920a0d276da59430e51e3031cc6a6d7d4e56a7b725f49cb6e",
+         "docs/tasks/PHASE-02/TASK-007.md": "46487f1677fa36fa83069021bca86d3bb1a63c3cce946646de732ee3f20ebb9b"
+       }
++    },
++    {
++      "updated": "2026-11-10T15:00:14Z",
++      "reason": "IMP-004: Model revisto e Q-C-05 aprovados explicitamente; avancar apenas para Design. Sincronizar estados e planos D01-D22, retencao/DNS/correlacao de dial/owner serial partilhavel. Sem alteracao Java ou execucao V-007/build/regressao/manual; parar antes de ADR/Implement/Test.",
++      "previous_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "18af6816d516cf15f3e4c50e6d8bacbe411dbf8114f5d70d454b2e1fed5e51f8",
++        "docs/15-PROJECT-PROGRESS.md": "3d653f48dac52ae22220c5fd7c1685cadfceb1637b4fed11bcbce01b54ae1619",
++        "docs/18-CONSTRUCTION-BOLTS.md": "9cc73c6de42c003920a0d276da59430e51e3031cc6a6d7d4e56a7b725f49cb6e",
++        "docs/tasks/PHASE-02/TASK-007.md": "46487f1677fa36fa83069021bca86d3bb1a63c3cce946646de732ee3f20ebb9b",
++        "docs/phases/PHASE-02-OVERLAY.md": "282e1307f83b1d389326e49ac5619d2bded221331973e903bc7ee9ad40cb7e86"
++      },
++      "updated_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "010d9893b52167878f33319769e13771bf4e118948a32d87c0de1f3a08f18c94",
++        "docs/15-PROJECT-PROGRESS.md": "b3baa9216791554865c4055828ae2d6387e73732c6a675c73de3629edbb8fd79",
++        "docs/18-CONSTRUCTION-BOLTS.md": "60536b9b557b84b5677337bb7554a270b641eec25a680170fba09ae1b061cb1d",
++        "docs/tasks/PHASE-02/TASK-007.md": "899ea0be94b46fd0177b2bc4dd39390c5ff83b3dabcf5d17e7f671d7983d43e7",
++        "docs/phases/PHASE-02-OVERLAY.md": "6f3ab4f1756d3afa59f9b41b37b177d63c647bc6fe22fa7381c7b1333ac37ffa"
++      }
+     }
+   ]
+ }
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -105,3 +105,9 @@
+ resposta. As concretizações não determinadas pelas fontes estão em
+ [Q-C-05](../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004), **pendentes**, sem nova ADR aceite.
+ M02/M07/M11 ampliados; nenhuma aprovação de Model, Design ou Java inferida.
++
++Model revisto/Q-C-05 aprovados explicitamente em 2026-11-10T14:48:50Z; apenas Design
++autorizado. [Design para revisão](../bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z,
++com limites e assinaturas concretos, sem alterar os bytes v1 ou as APIs existentes.
++Não é revisão ADR concluída; nenhuma ADR nova aceite ou implementação inferida.
++Q-C-05 resolvida, V-007 e restantes verificações funcionais pendentes.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 está em Model para revisão; as restantes 29 histórias/bolts não foram iniciadas.
++003-overlay/IMP-004 está em Design para revisão, após Model/Q-C-05 aprovados; as restantes 29 histórias/bolts não foram iniciadas.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -198,3 +198,8 @@
+ ERROR (17) por fase e M02/M07/M11 ampliados. [Q-C-05](../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)
+ pendente de decisão explícita; Model não aprovado e Design não iniciado.
+ Nenhum ficheiro de Projeto/ alterado.
++
++Continuação de 003-overlay em 2026-11-10T15:00:14Z: Model e Q-C-05 aprovados explicitamente em
++2026-11-10T14:48:50Z. [Design preparado para revisão](bolts/003-overlay/ddd-02-technical-design.md),
++sem aprovação de Design ou avanço a ADR/Implement/Test. Nenhuma execução Java nova;
++V-007 e revisão final/integração pendentes.

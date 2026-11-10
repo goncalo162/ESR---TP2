@@ -95,3 +95,28 @@ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
 CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
 O índice derivado inclui as partes IMP e não transforma a cobertura documental
 em implementação DONE.
+
+IMP-004/REQ-002–004/021/NFR-004: [Model para revisão](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md),
+preparado em 2026-11-10T14:11:43Z, após seleção explícita e dependências integradas em
+26aaa4ae6775e9c78e1d7658472ccaca0b376427. Estados, identidades, handshake, retry e oráculos M01–M22 definidos;
+V-007 NÃO EXECUTADO, 155 ficheiros de Projeto/ preservados. TASK-007/bolt/história
+em progresso, sem critério de implementação ou requisito global promovido.
+Revisor final atribuído Denji e integração exigidos antes de DONE; parar antes de Design.
+
+Revisão Model do IMP-004 em 2026-11-10T14:24:46Z: erro 17 explicitado na descoberta/handshake/
+sessão ACTIVE, preservando correlação e identidade para consumidores futuros.
+M02/M07/M11 ampliados; Q-C-05 pendente, sem aprovação de Model ou política nova
+aceite por inferência. Sem alteração de cobertura executada: V-007 NÃO EXECUTADO.
+
+IMP-004 em Design: Model revisto e Q-C-05 aprovados explicitamente em 2026-11-10T14:48:50Z.
+[Design](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z,
+com D01–D22 ligados a M01–M22/V-007 e políticas ERROR aprovadas preservadas.
+Retenção/DNS/dials/estado serial concretizados; nenhuma prova funcional nova,
+alteração Java ou requisito global promovido. V-007 NÃO EXECUTADO; revisão final
+atribuída a Denji e integração antes de DONE. Parar antes de ADR/Implement/Test.
+
+IMP-004 em ADR: Design/Q-C-06 aprovados em 2026-11-10T15:13:50Z, Q-C-05 mantida.
+[Revisão ADR](../memory-bank/bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z: compatibilidade
+no desenho com as ADR aceites e APIs/bytes atuais, sem comportamento implementado
+por esta revisão. D01–D22 preservados; V-007 NÃO EXECUTADO. TASK/bolt/história
+em progresso, revisão final Denji/integração pendentes; parar antes de Implement/Test.

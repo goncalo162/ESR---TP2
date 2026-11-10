@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-as restantes 30 histórias/bolts não foram iniciadas.
+003-overlay/IMP-004 está em ADR para revisão, após Model/Q-C-05 e Design/Q-C-06 aprovados; as restantes 29 histórias/bolts não foram iniciadas.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -42,7 +42,11 @@ Revisão final atribuída a Waheed confirmada pelo utilizador; versão revista
 
 ## 002-overlay/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md ✅ GENERATED
 
-**Tarefa:** IMP-004. **Estado:** planned. **Bolt:** 003-overlay.
+**Tarefa:** IMP-004. **Estado:** in-progress. **Bolt:** 003-overlay.
+Model iniciado em 2026-11-10T14:01:42Z; [preparado para revisão](bolts/003-overlay/ddd-01-domain-model.md)
+em 2026-11-10T14:11:43Z, dependências integradas em 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
+V-007/M01–M22 planeados, sem código/teste/build novo; parar antes de Design.
+Revisão final atribuída a Denji e integração continuam exigidas antes de DONE.
 **Ficheiro:** [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md).
 
 ## 002-overlay/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md ✅ GENERATED
@@ -189,3 +193,18 @@ Revisão final atribuída a Waheed confirmada pelo utilizador; versão revista
 
 **Tarefa:** IMP-033. **Estado:** planned. **Bolt:** 033-entrega.
 **Ficheiro:** [004-registar-a-submissao-humana](intents/001-ott-streaming/units/007-entrega/stories/004-registar-a-submissao-humana.md).
+
+Ajuste do Model de 003-overlay em 2026-11-10T14:24:46Z, por pedido do utilizador:
+ERROR (17) por fase e M02/M07/M11 ampliados. [Q-C-05](../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)
+pendente de decisão explícita; Model não aprovado e Design não iniciado.
+Nenhum ficheiro de Projeto/ alterado.
+
+Continuação de 003-overlay em 2026-11-10T15:00:14Z: Model e Q-C-05 aprovados explicitamente em
+2026-11-10T14:48:50Z. [Design preparado para revisão](bolts/003-overlay/ddd-02-technical-design.md),
+sem aprovação de Design ou avanço a ADR/Implement/Test. Nenhuma execução Java nova;
+V-007 e revisão final/integração pendentes.
+
+Continuação 003-overlay em 2026-11-10T15:20:09Z: Design/Q-C-06 aprovados explicitamente em
+2026-11-10T15:13:50Z; [revisão ADR preparada](bolts/003-overlay/adr-review.md), sem aprovação desta etapa
+ou início de Implement/Test. D01–D22 mantidos; V-007/regressão/manual e revisão
+final/integração pendentes. Nenhum Java, commit ou push novo.

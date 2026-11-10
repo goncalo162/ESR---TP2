@@ -127,3 +127,84 @@
   Mecanismo specsmd executado em 2026-11-04T14:18:23Z: bolt/história complete, TASK-006 DONE;
   unidade in-progress. Esta confirmação supera as pendências dos checkpoints
   anteriores. Sem decisão arquitetural nova ou início de outro IMP.
+
+## Q-C-05 — Receção de ERROR no IMP-004
+
+- Registada em 2026-11-10T14:24:46Z, após pedido explícito de ajustes ao Model; IMP-004 /
+  bolt 003-overlay / TASK-007. **Estado: resolvida; propostas da tabela aprovadas**.
+  Aprovação explícita do utilizador registada em 2026-11-10T14:48:50Z, juntamente com o
+  Model revisto. Autorizado apenas Design, sem Java/ADR/Implement/Test.
+- Lacuna identificada na revisão humana: a secção 8 do Model referia tipos 7–16,
+  sem explicitar ERROR (17). Correção no
+  [Model, secção 8](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md#8-autorização-error-17-e-entrega-ao-consumidor).
+- Regras já determinadas: [contrato 07, secção 4](07-API-AND-INTERFACES.md#4-mensagens-de-controlo-v1)
+  fixa ERROR por requestId, relatedType como octeto bruto e uso pelo routing;
+  ADD 6.2/ADR-012/018/020/021 exigem identidade/contexto, falhas locais e recursos
+  limitados. O utilizador instruiu expressamente não responder ERROR a ERROR
+  e não descartar erros legítimos necessários aos consumidores futuros.
+  Essas obrigações não são alternativas em votação.
+- O que falta concretizar nas fontes: reação a ERROR inesperado antes de ACTIVE,
+  rejeição remota de HELLO_OK ainda em confirmação local e classificação de retry
+  após ERROR remoto. As concretizações abaixo foram **aprovadas explicitamente**
+  pelo utilizador; não eram regras inferidas das fontes no registo inicial.
+
+| Situação | Decisão aprovada | Razão/limite |
+|---|---|---|
+| Descoberta: ERROR da tentativa corrente (requestId REGISTER, relatedType=1, geração/connectionId/prazo certos e envelope válido) | Terminar a consulta e guardar a rejeição remota completa; TIMEOUT(10)/RESOURCE_LIMIT(11) permitem nova tentativa com backoff; restantes codes terminam a descoberta em FAILED com evidência para intervenção | Não confundir resposta negativa com NeighborList, não fazer retry imediato e não mascarar erro incompatível como sucesso; codes próprios de routing nesta fase têm diagnóstico de resposta inesperada |
+| Handshake: ERROR do HELLO pendente (relatedType=5 e identidade do alvo) | Retirar só o candidato, informar a rejeição completa e voltar a DISCONNECTED; menor ID repete com backoff, maior espera por novo HELLO, para qualquer code válido | Um ID desejado continua desejado, incluindo DUPLICATE_ID transitório; sem nova consulta bootstrap, alteração de grafo ou Up/UDP |
+| Recetor de HELLO: ERROR sobre HELLO_OK já enfileirado, ainda HANDSHAKING | Tratar como rejeição dessa tentativa apenas com o requestId do HELLO recebido, relatedType=6 e emissor/instância do HELLO validado | HELLO_OK tem payload vazio; não criar terceiro ACK nem espera adicional. Depois de ACTIVE, ERROR é entregue como mensagem da sessão, não reabre handshake concluído |
+| ERROR não correlacionado num canal corrente de descoberta/handshake, fora de uma janela legítima de aplicação | Diagnóstico local com mensagem/sessão/fase e motivo; fechar só o canal ofensor, classificando falha local de contexto, sem atribuir o payload remoto ao pedido corrente | Descoberta com resposta inesperada vai a FAILED; handshake retoma DISCONNECTED/backoff. Nunca emitir ERROR de resposta ou afetar outro vínculo |
+| ERROR antigo, de geração/connectionId retirados ou após prazo já terminado | Observar/contabilizar localmente sem reaplicar o efeito à tentativa nova ou mudar a causa terminal anterior | Sem history/cache de tamanho ilimitado e sem descartar erro legítimo de uma sessão corrente |
+
+Na janela legítima de confirmação/flush, um ERROR de aplicação que não pertença
+à operação de handshake fica sujeito à retenção limitada e barreira ACTIVE da
+secção 6, tal como os restantes frames de aplicação. Não o consumir como rejeição
+de HELLO nem o encaminhar antes da confirmação. Se a confirmação falhar, libertar
+com diagnóstico, sem o transportar para outra sessão.
+
+Em ACTIVE, encaminhar o ControlMessage/ErrorPayload e a sessão imutável
+(nodeId, instanceId, connectionId) intactos ao consumidor. O manager não exige
+pedido próprio pendente, não filtra code/relatedType e não fecha um canal saudável
+apenas por NO_ROUTE/PATH_CHANGED/etc. O consumidor futuro correlaciona ou produz
+diagnóstico local; não se implementa routing neste IMP. relatedType=3/17/desconhecido
+continua octeto bruto e nunca dá origem a ERROR de resposta. Identidade inválida
+não é uma mensagem legítima dessa sessão: isolar localmente, sem ERROR de resposta.
+
+- Alternativa não adotada: manter a tentativa até ao deadline após ERROR não
+  correlacionado antes de ACTIVE. O utilizador escolheu diagnóstico e fecho local
+  do canal, fora da janela legítima de aplicação, sem ERROR de resposta.
+- Impacto: só políticas de contexto/terminação e entrega de evento nos três
+  ficheiros autorizados. Nenhum byte, código, payload, hard cap, dependência ou
+  âmbito de routing novo. Não altera fundações nem cria ADR aceite por inferência.
+- Oráculos planeados M02/M07/M11 sincronizados com esta decisão, sem execução.
+  Model concluído em 2026-11-10T14:48:50Z; autorizada apenas a preparação de Design, com
+  retenção/DNS/correlação de dial/executor partilhável concretos. Parar antes
+  de ADR/Implement/Test. Revisão final e integração continuam exigidas para DONE.
+
+## Q-C-06 — Prazo próprio de resolução e bind no IMP-004
+
+- Estado: resolvida; concretização e Design aprovados explicitamente pelo
+  utilizador, com registo em 2026-11-10T15:13:50Z. Âmbito: IMP-004 / 003-overlay / TASK-007.
+- Origem: o [Design, secção 6](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md#6-dns-e-trabalho-físico-limitado)
+  propôs usar control.connectTimeout nas operações locais sem propriedade própria.
+  Esta regra não era uma imposição do enunciado nem um novo campo wire.
+- Decisão aprovada: cada operação de resolução ou bind tem prazo próprio igual
+  ao control.connectTimeout efetivo. Capturar o início monotónico **antes da
+  entrada na fila**; espera na fila e processamento do resultado não renovam o
+  prazo. Uma conclusão que já chega fora do prazo não reativa a tentativa.
+- Esse prazo é separado do timeout do dial TCP. Depois da resolução válida,
+  Transport.connect continua com o seu próprio connectTimeout nas Options;
+  não retirar tempo de DNS a esse timeout nem mudar a API do transporte.
+- Aplicar o prazo ao waiter/tentativa lógica; não usar cancelamento, isCancelled
+  ou future concluído como prova de terminação física. Job/reserva em execução
+  permanece contabilizado até terminar fisicamente. Resultado/handle tardio é
+  cercado pela geração e fechado/retirado quando necessário.
+- Shutdown usa o budget global independente de control.shutdownTimeout e awaits
+  dos recursos reais. Se o worker DNS não terminar no prazo, reportar timeout
+  explícito com recurso pendente, sem alegar encerramento bem-sucedido.
+- Preservados Q-C-05, defaults/chaves/papéis, bytes v1, hard caps e APIs existentes.
+  Não se introduz propriedade, dependência ou ADR nova; reutilizar ADR-014/016/
+  017/020/024 e confirmar formalmente na etapa ADR.
+- Oráculos D12/D15/D17/D19/D20 concretizam esta decisão; D01–D22 mantidos e ainda
+  não executados. Autorizada **apenas ADR** após Design: parar para revisão antes
+  de Implement/Test, sem Java/build/testes, commits/push ou outro IMP.

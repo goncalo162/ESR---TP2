@@ -257,3 +257,58 @@ Manual IMP-003: [roteiro pessoal](../../../../../experiments/construction/002-ov
 - **2026-11-04T14:21:49Z**: V-ADD identificou o campo derivado blocks de 003-overlay ainda true.
   Sincronizado para false após o fecho de todas as dependências; status=planned,
   started=null, sem iniciar IMP-004. Repetida a validação documental.
+
+- **2026-11-10T14:01:42Z**: 003-overlay/IMP-004 iniciado por seleção explícita do utilizador,
+  apenas etapa Model. Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, árvore inicialmente limpa;
+  dependências 001-base-validada e 002-overlay complete/integradas em main.
+  Parar para revisão antes de Design/ADR/Implement/Test.
+
+- **2026-11-10T14:11:43Z**: 003-overlay Model preparado para revisão: entidades/identidades,
+  lista inicial, estados, barreiras de handshake, unicidade/reinício, retry,
+  proprietário serial e limites; M01–M22 para V-007 planeados. Três ficheiros
+  autorizados existem vazios; 155 hashes de Projeto/ preservados.
+  Corrigida apenas a célula histórica de TASK-006 na tabela de PHASE-02, que
+  ainda dizia IN PROGRESS apesar do fecho confirmado e do resumo já em DONE.
+  Não existe contradição de código/ADD identificada nesta inspeção; pontos de
+  integração/interleavings a detalhar em Design. Model ainda não aprovado.
+  Parar antes de Design/ADR/Implement/Test, sem build/testes/commit/push/fecho.
+
+Model IMP-004: [artefacto para revisão](../../../../bolts/003-overlay/ddd-01-domain-model.md).
+
+- **2026-11-10T14:24:46Z**: ajuste pedido ao Model do IMP-004 por omissão de ERROR (17) na
+  secção de autorização/entrega. Separadas descoberta/handshake/ACTIVE; mensagem
+  e sessão preservadas para consumidores futuros; proibição explícita de ERROR
+  em resposta a ERROR. M02/M07/M11 ampliados. Q-C-05 registada como proposta
+  pendente para políticas não fixadas nas fontes. Sem aprovação de Model,
+  avanço para Design, alteração Java, teste/build, commit ou push.
+
+- **2026-11-10T14:48:50Z**: Model revisto e propostas da tabela Q-C-05 aprovados explicitamente
+  pelo utilizador. Etapa Model concluída; autorizado apenas Design, com limites
+  concretos de retenção/DNS, correlação de dial e executor serial partilhável.
+  Parar antes de ADR/Implement/Test, sem Java, testes, commits ou push.
+
+- **2026-11-10T15:00:14Z**: Design do IMP-004 preparado para revisão: assinaturas/valores
+  imutáveis, B/R de retenção, worker/jobs DNS/I/O limitados, NativeDial/barreira
+  de Contexts não classificados, budgets e owner serial próprio/emprestado.
+  D01–D22 previstos; Q-C-05 e Model/oráculos sincronizados como aprovados.
+  Contratos de Transport/Connection mantidos e 155 ficheiros de Projeto/
+  preservados. Sem execução Java/testes/manuais novos, commits/push ou fecho.
+  Parar para revisão antes de ADR/Implement/Test.
+
+Design IMP-004: [artefacto para revisão](../../../../bolts/003-overlay/ddd-02-technical-design.md).
+
+- **2026-11-10T15:13:50Z**: Design aprovado explicitamente, incluindo budget de resolução/bind
+  igual a control.connectTimeout, antes da fila e separado do dial TCP.
+  Autorizada apenas ADR; registar Q-C-06 e confirmar ownership/limites físicos/
+  retenção/barreira de dials, preservando Q-C-05. Parar antes de Implement/Test.
+
+- **2026-11-10T15:20:09Z**: revisão ADR do IMP-004 preparada para validação. Reutilização das
+  ADR do ADD; owner próprio/emprestado, limites físicos, retenção B/R e barreira
+  de dials analisados, Q-C-05 preservada e Q-C-06 aprovada registada. Sem decisão
+  aceite inviável/ADR nova necessária identificada nesta análise estática.
+  Explicitado isolamento: canal desconhecido durante DISCOVERING não é o canal
+  da consulta legítima e não a termina por uma falha própria. D01–D22 mantidos.
+  155 ficheiros de Projeto/ preservados; sem Java/build/testes/commit/push ou fecho.
+  Parar para revisão antes de Implement/Test.
+
+ADR IMP-004: [revisão para validação](../../../../bolts/003-overlay/adr-review.md).

@@ -89,3 +89,35 @@ versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main a
 Cascata specsmd executada em 2026-11-04T14:18:23Z: bolt/história complete, implemented=true,
 TASK-006 DONE, unidade in-progress. Sem nova decisão arquitetural, código ou ADR.
 [Prova e fecho](../bolts/002-overlay/closure-walkthrough.md).
+
+## Model para revisão — IMP-004
+
+[Modelo](../bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z, após seleção
+explícita de 003-overlay/Model, iniciado em 2026-11-10T14:01:42Z. Reutilização prevista de
+ADR-012/013/018/019/021/024 e contratos transversais, sem revisão ADR antecipada,
+decisão arquitetural nova ou alteração dos bytes v1. ADR-003 continua substituída.
+Preservados os 155 ficheiros de Projeto/; V-007/M01–M22 planeados, sem execução.
+Aguardar aprovação de Model antes de Design/ADR/Implement/Test; revisão final
+atribuída a Denji e integração exigidas antes de DONE.
+
+Revisão do Model do IMP-004, preparada em 2026-11-10T14:24:46Z: lacuna ERROR (17) corrigida,
+com correlação por fase, entrega integral ao consumidor ACTIVE e sem ERROR de
+resposta. As concretizações não determinadas pelas fontes estão em
+[Q-C-05](../../docs/construction-duvidas.md#q-c-05--receção-de-error-no-imp-004), **pendentes**, sem nova ADR aceite.
+M02/M07/M11 ampliados; nenhuma aprovação de Model, Design ou Java inferida.
+
+Model revisto/Q-C-05 aprovados explicitamente em 2026-11-10T14:48:50Z; apenas Design
+autorizado. [Design para revisão](../bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z,
+com limites e assinaturas concretos, sem alterar os bytes v1 ou as APIs existentes.
+Não é revisão ADR concluída; nenhuma ADR nova aceite ou implementação inferida.
+Q-C-05 resolvida, V-007 e restantes verificações funcionais pendentes.
+
+## Q-C-06 aprovada — revisão ADR do IMP-004
+
+[Q-C-06](../../docs/construction-duvidas.md#q-c-06--prazo-próprio-de-resolução-e-bind-no-imp-004) resolvida por aprovação explícita
+em 2026-11-10T15:13:50Z, juntamente com Design. Prazo resolução/bind igual a
+control.connectTimeout, antes da fila e separado do dial TCP; sem inferir
+terminação física de cancelamento/future concluído. Q-C-05 preservada.
+[Revisão ADR](../bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z: reutilizar ADR existentes,
+sem ADR-033 necessária identificada. ADR-003 permanece substituída. Aguardar
+revisão antes de Implement/Test; nenhuma alteração Java ou prova funcional nova.

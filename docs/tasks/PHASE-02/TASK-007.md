@@ -5,7 +5,7 @@
 - ID: TASK-007
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-005](../PHASE-02/TASK-005.md), [TASK-006](../PHASE-02/TASK-006.md).
@@ -74,3 +74,50 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Construction — Model para revisão
+
+Iniciado em 2026-11-10T14:01:42Z por seleção explícita do utilizador, apenas Model.
+Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, igual a main/referências locais de origin no arranque;
+dependências IMP-001/003 complete/integradas. IMP-002 já disponibiliza runtime.
+[Modelo](../../../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
+lista desejada/identidades, estado serial, handshake v1/UDP confirmado,
+unicidade/reinício, retry com prazo e M01–M22 para V-007. Três ficheiros autorizados
+existem vazios; os 155 ficheiros de Projeto/ mantêm os hashes da base.
+Model para aprovação, sem código/build/testes novos, V-007 NÃO EXECUTADO.
+Parar antes de Design/ADR/Implement/Test, sem commits/push/fecho. Revisor final
+atribuído Denji, revisão e integração exigidas antes de DONE.
+
+### Ajuste pedido ao Model — ERROR (17)
+
+Preparado em 2026-11-10T14:24:46Z, sem aprovação de Model. A
+[secção 8 revista](../../../memory-bank/bolts/003-overlay/ddd-01-domain-model.md#8-autorização-error-17-e-entrega-ao-consumidor)
+define correlação de ERROR por descoberta/handshake e entrega integral de ERROR
+ACTIVE ao consumidor responsável com a identidade da sessão. Não responder ERROR
+a ERROR, não consumir silenciosamente erros de protocolos futuros.
+M02/M07/M11 ampliados; [Q-C-05](../../construction-duvidas.md#q-c-05--receção-de-error-no-imp-004)
+regista retry/rejeição de HELLO_OK/ERROR inesperado como proposta pendente.
+V-007 não executado; sem Design, alteração Java, commit ou push.
+
+### Model/Q-C-05 aprovados — Design para revisão
+
+Em 2026-11-10T14:48:50Z, o utilizador aprovou Model revisto e todas as propostas da tabela
+Q-C-05, incluindo diagnóstico/fecho local de ERROR inesperado antes de ACTIVE.
+[Desenho](../../../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z:
+assinaturas e records imutáveis, owner serial partilhável, retenção B/R, worker
+DNS/I/O limitado, dials correlacionados antes de classificar direção, budgets e
+D01–D22 previstos. Esta aprovação resolve as pendências Model/Q-C-05 acima.
+Só Design autorizado; parar para revisão antes de ADR/Implement/Test.
+Nenhuma alteração Java nem build/testes/manuais novos; V-007 NÃO EXECUTADO.
+Revisor final Denji e integração exigidos antes de DONE; sem commit/push/fecho.
+
+### Design/Q-C-06 aprovados — revisão ADR preparada
+
+Aprovação explícita em 2026-11-10T15:13:50Z; orçamento próprio de resolução/bind definido
+em [Q-C-06](../../construction-duvidas.md#q-c-06--prazo-próprio-de-resolução-e-bind-no-imp-004), sem alterar timeout/API do dial TCP.
+[Revisão ADR](../../../memory-bank/bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z:
+owner próprio/emprestado, B/R, limites físicos e correlação dos dials conformes
+no desenho; Q-C-05 preservada, sem decisão aceite inviável ou ADR nova necessária
+identificada. D01–D22 intactos, V-007 NÃO EXECUTADO; 155 hashes preservados.
+Parar para revisão antes de Implement/Test. Sem Java/build/testes/commit/push
+ou fecho. Revisão final atribuída a Denji e integração continuam pendentes.

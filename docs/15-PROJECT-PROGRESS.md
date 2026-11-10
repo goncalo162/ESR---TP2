@@ -1,8 +1,8 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 IN PROGRESS (ADR); TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
-**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. A próxima tarefa por implementar é TASK-007. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está em ADR para revisão, após aprovação explícita de Model/Q-C-05 e Design/Q-C-06. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
 **Última tarefa concluída:** [TASK-006](tasks/PHASE-02/TASK-006.md), DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; bolt 002-overlay complete. TASK-032 permanece DONE/integrada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
 
@@ -58,6 +58,16 @@ com registo em 2026-11-04T14:18:23Z. Versão revista 03345e9e1ab56ec04302676cca6
 Cascata specsmd: bolt/história complete, implemented=true; TASK-006 DONE.
 Unidade mantém in-progress; 003-overlay/IMP-004 continua planned, nenhum outro IMP iniciado.
 
+Incremento atual: IMP-004/003-overlay/TASK-007, IN PROGRESS em Model, iniciado em
+2026-11-10T14:01:42Z, base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
+[Modelo concreto](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
+entidades/estados, descoberta inicial, um canal confirmado por par, direção do
+iniciador, identidade UDP após handshake, reconexão direta e M01–M22 planeados.
+155 hashes de Projeto/ preservados; três ficheiros autorizados vazios. Não há
+execução V-007/build/regressão/manual nova. Model ainda não aprovado; parar antes
+de Design/ADR/Implement/Test. Revisor final atribuído Denji; revisão e integração
+antes de DONE. Nenhum outro IMP iniciado nesta continuação, sem commits/push.
+
 [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
 e 22 checks manuais. Execução por Luis: [log original preservado](../experiments/construction/001-base-validada/manual-smoke-luis.log),
@@ -89,7 +99,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
 | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
-| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
+| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | IN PROGRESS | Model/Design e Q-C-05/06 aprovados; ADR para revisão, D01–D22 previstos; V-007 NÃO EXECUTADO |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
@@ -256,3 +266,35 @@ nenhum IMP/bolt iniciado. Primeiro: 001-base-validada; primeiro código novo:
 TASK-020/025/026/031 têm partes e só fecham após todas elas. Deteção automática
 continua TCP; UDP-only é limitação documentada. Sem ferramentas de qualidade novas.
 Código Java, fixtures e XML preservados; build Java/GUI/CORE não executados aqui.
+
+## Ajuste de Model do IMP-004 — ERROR (17)
+
+Preparado em 2026-11-10T14:24:46Z, por pedido explícito de revisão: tratamento de ERROR na
+[descoberta/handshake/ACTIVE](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md#8-autorização-error-17-e-entrega-ao-consumidor),
+com requestId/relatedType/sessão preservados e sem ERROR de resposta. M02/M07/M11
+ampliados. [Q-C-05](construction-duvidas.md#q-c-05--receção-de-error-no-imp-004) pendente de decisão sobre
+concretizações de retry e resposta inesperada. TASK-007/bolt/história continuam
+em Model para revisão; nenhum Design/Java/build/V-007/commit/push iniciado.
+
+## Continuação do IMP-004 — Model/Q-C-05 aprovados, Design para revisão
+
+Aprovação explícita registada em 2026-11-10T14:48:50Z, incluindo todas as decisões da tabela
+Q-C-05. [Design preparado](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md) em 2026-11-10T15:00:14Z:
+contratos novos nos três ficheiros autorizados, owner serial reutilizável, limites
+concretos de retenção/DNS/dial e D01–D22. As propostas Q-C-05 e a revisão Model
+anteriores estão superadas pela aprovação; Design/ADR/Implement/Test não aprovados.
+155 ficheiros de Projeto/ preservados, sem build/testes/manuais novos ou outro IMP.
+V-007, regressão/manual, revisão final atribuída a Denji e integração pendentes.
+Parar antes de ADR/Implement/Test, sem commits/push ou fecho.
+
+## Continuação do IMP-004 — Design/Q-C-06 aprovados, ADR para revisão
+
+Aprovação explícita registada em 2026-11-10T15:13:50Z: prazo próprio resolução/bind igual
+a control.connectTimeout, antes da fila e separado do dial TCP. Q-C-06 resolvida.
+[Revisão ADR](../memory-bank/bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z:
+compatível no desenho, sem decisão aceite inviável/nova ADR necessária identificada.
+Owner próprio/emprestado, reservas físicas, B/R, dials e shutdown explícito
+revistos; Q-C-05 e D01–D22 mantidos. 155 ficheiros de Projeto/ preservados.
+Só Model/Design concluídos; parar antes de Implement/Test. V-007/regressão/manual,
+revisão final atribuída a Denji e integração pendentes. Sem Java/build/testes,
+commits/push/fecho ou outro IMP nesta etapa.

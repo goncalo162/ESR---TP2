@@ -1,0 +1,710 @@
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index af02d77..1bc7a23 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -95,3 +95,10 @@ Aliases REQ/NFR/CON/INT em [specs](../specs.md); a matriz completa está no
+ CON-008 formaliza a limitação UDP aprovada; CON-009 mantém a qualidade existente.
+ O índice derivado inclui as partes IMP e não transforma a cobertura documental
+ em implementação DONE.
++
++IMP-004/REQ-002–004/021/NFR-004: [Model para revisão](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md),
++preparado em 2026-11-10T14:11:43Z, após seleção explícita e dependências integradas em
++26aaa4ae6775e9c78e1d7658472ccaca0b376427. Estados, identidades, handshake, retry e oráculos M01–M22 definidos;
++V-007 NÃO EXECUTADO, 155 ficheiros de Projeto/ preservados. TASK-007/bolt/história
++em progresso, sem critério de implementação ou requisito global promovido.
++Revisor final atribuído Denji e integração exigidos antes de DONE; parar antes de Design.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 847dbd6..10538d5 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,8 +1,8 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-007–031 continuam TODO; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 IN PROGRESS (Model); TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+-**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. A próxima tarefa por implementar é TASK-007. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
++**Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está em Model para revisão, por seleção explícita do utilizador. Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+ **Última tarefa concluída:** [TASK-006](tasks/PHASE-02/TASK-006.md), DONE, com cinco etapas concluídas, Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; bolt 002-overlay complete. TASK-032 permanece DONE/integrada. TASK-005 DONE com [18 testes TCP e 149 testes no build completo](../experiments/task-005-transport-validation.md). PHASE-01 está DONE: configuração e codec testados com [131 casos aprovados](../experiments/task-004-codec-validation.md). Material para relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+ 
+@@ -58,6 +58,16 @@ com registo em 2026-11-04T14:18:23Z. Versão revista 03345e9e1ab56ec04302676cca6
+ Cascata specsmd: bolt/história complete, implemented=true; TASK-006 DONE.
+ Unidade mantém in-progress; 003-overlay/IMP-004 continua planned, nenhum outro IMP iniciado.
+ 
++Incremento atual: IMP-004/003-overlay/TASK-007, IN PROGRESS em Model, iniciado em
++2026-11-10T14:01:42Z, base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
++[Modelo concreto](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
++entidades/estados, descoberta inicial, um canal confirmado por par, direção do
++iniciador, identidade UDP após handshake, reconexão direta e M01–M22 planeados.
++155 hashes de Projeto/ preservados; três ficheiros autorizados vazios. Não há
++execução V-007/build/regressão/manual nova. Model ainda não aprovado; parar antes
++de Design/ADR/Implement/Test. Revisor final atribuído Denji; revisão e integração
++antes de DONE. Nenhum outro IMP iniciado nesta continuação, sem commits/push.
++
+ [Resultados de IMP-001](../memory-bank/bolts/001-base-validada/test-walkthrough.md):
+ 149 testes aprovados (65+66+18), 45 fixtures, 16 tipos ativos, V-ADD sem erros
+ e 22 checks manuais. Execução por Luis: [log original preservado](../experiments/construction/001-base-validada/manual-smoke-luis.log),
+@@ -89,7 +99,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-005](tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | DONE | [V-005: 18 testes TCP, 149 no build](../experiments/task-005-transport-validation.md) |
+ | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+-| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | TODO | V-007: NÃO EXECUTADO |
++| [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | IN PROGRESS | Model para revisão, M01–M22 planeados; V-007 NÃO EXECUTADO |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index c919c42..03f3a95 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -21,7 +21,11 @@ MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho concluído](../memory-bank/bolts/002-
+ em 2026-11-04T14:18:23Z: revisão final atribuída a Waheed confirmada pelo utilizador,
+ registada em 2026-11-04T14:18:23Z; versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
+ 002-overlay/história complete, implemented=true, TASK-006 DONE. Unidade continua in-progress.
+-Os restantes 30 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
++003-overlay/IMP-004 iniciado em 2026-11-10T14:01:42Z, apenas Model por seleção explícita.
++[Modelo para revisão](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
++155 hashes preservados e M01–M22/V-007 planeados. Nenhuma execução Java nova;
++parar antes de Design/ADR/Implement/Test. Revisão final atribuída a Denji e
++integração exigidas antes de DONE. Os restantes 29 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+ 
+ ## Ordem de execução
+ 
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+index ae3a933..b61bbee 100644
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 IN PROGRESS em Model para revisão; TASK-008–009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -22,8 +22,8 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
+ |---|---|---|---|---|
+ | [TASK-005](../tasks/PHASE-02/TASK-005.md) | Estabelecer transporte TCP full-duplex com recursos limitados | TASK-004 | V-005 | DONE |
+ | [TASK-032](../tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | V-032 | DONE |
+-| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 | IN PROGRESS |
+-| [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | TODO |
++| [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 | DONE |
++| [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | IN PROGRESS |
+ | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | TODO |
+ | [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | TODO |
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-007.md b/docs/tasks/PHASE-02/TASK-007.md
+index f0792c3..6491074 100644
+--- a/docs/tasks/PHASE-02/TASK-007.md
++++ b/docs/tasks/PHASE-02/TASK-007.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-007
+ - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Waheed](../../team/WAHEED.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-005](../PHASE-02/TASK-005.md), [TASK-006](../PHASE-02/TASK-006.md).
+@@ -74,3 +74,16 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## Construction — Model para revisão
++
++Iniciado em 2026-11-10T14:01:42Z por seleção explícita do utilizador, apenas Model.
++Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, igual a main/referências locais de origin no arranque;
++dependências IMP-001/003 complete/integradas. IMP-002 já disponibiliza runtime.
++[Modelo](../../../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
++lista desejada/identidades, estado serial, handshake v1/UDP confirmado,
++unicidade/reinício, retry com prazo e M01–M22 para V-007. Três ficheiros autorizados
++existem vazios; os 155 ficheiros de Projeto/ mantêm os hashes da base.
++Model para aprovação, sem código/build/testes novos, V-007 NÃO EXECUTADO.
++Parar antes de Design/ADR/Implement/Test, sem commits/push/fecho. Revisor final
++atribuído Denji, revisão e integração exigidas antes de DONE.
+diff --git a/memory-bank/bolts/003-overlay/bolt.md b/memory-bank/bolts/003-overlay/bolt.md
+index 7cfb052..224a5d2 100644
+--- a/memory-bank/bolts/003-overlay/bolt.md
++++ b/memory-bank/bolts/003-overlay/bolt.md
+@@ -3,13 +3,13 @@ id: "003-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T14:21:49Z"
+-started: null
++updated: "2026-11-10T14:11:43Z"
++started: "2026-11-10T14:01:42Z"
+ completed: null
+-current_stage: null
++current_stage: "model"
+ stages_completed: []
+ requires_bolts: ["001-base-validada", "002-overlay"]
+ enables_bolts: ["020-overlay"]
+@@ -35,6 +35,19 @@ architecture_source: "add.md"
+ ---
+ # Bolt 003-overlay — Estabelecer e reconectar vizinhos
+ 
++## Model preparado — checkpoint para revisão
++
++Iniciado em 2026-11-10T14:01:42Z por seleção explícita do utilizador, apenas Model.
++Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, árvore inicialmente limpa; dependências complete/integradas.
++[Modelo concreto](ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z: identidade/sessão,
++lista inicial, estados, handshake v1, unicidade/reinício e reconexão sem bootstrap,
++proprietário serial, prazos/limites e oráculos M01–M22 para V-007.
++Três ficheiros autorizados atualmente vazios; nenhum dos 155 ficheiros de Projeto/
++foi alterado. V-007, regressão, manual e revisão final atribuída a Denji pendentes.
++Parar para aprovação de Model antes de Design/ADR/Implement/Test. Não há nova
++execução Java, aprovação de etapa, commit/push ou fecho nesta continuação.
++current_stage=model, stages_completed=[], completed=null.
++
+ ## Fonte normativa e âmbito
+ 
+ Ler [IMP-004](../../../add.md#imp-004) e as ADR aí indicadas antes de qualquer etapa. Este bolt executa **uma** tarefa atómica; o ADD define o que construir, como e porquê. Fonte legada: [TASK-007](../../../docs/tasks/PHASE-02/TASK-007.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index 546691e..095c7f9 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -257,3 +257,20 @@ Manual IMP-003: [roteiro pessoal](../../../../../experiments/construction/002-ov
+ - **2026-11-04T14:21:49Z**: V-ADD identificou o campo derivado blocks de 003-overlay ainda true.
+   Sincronizado para false após o fecho de todas as dependências; status=planned,
+   started=null, sem iniciar IMP-004. Repetida a validação documental.
++
++- **2026-11-10T14:01:42Z**: 003-overlay/IMP-004 iniciado por seleção explícita do utilizador,
++  apenas etapa Model. Base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427, árvore inicialmente limpa;
++  dependências 001-base-validada e 002-overlay complete/integradas em main.
++  Parar para revisão antes de Design/ADR/Implement/Test.
++
++- **2026-11-10T14:11:43Z**: 003-overlay Model preparado para revisão: entidades/identidades,
++  lista inicial, estados, barreiras de handshake, unicidade/reinício, retry,
++  proprietário serial e limites; M01–M22 para V-007 planeados. Três ficheiros
++  autorizados existem vazios; 155 hashes de Projeto/ preservados.
++  Corrigida apenas a célula histórica de TASK-006 na tabela de PHASE-02, que
++  ainda dizia IN PROGRESS apesar do fecho confirmado e do resumo já em DONE.
++  Não existe contradição de código/ADD identificada nesta inspeção; pontos de
++  integração/interleavings a detalhar em Design. Model ainda não aprovado.
++  Parar antes de Design/ADR/Implement/Test, sem build/testes/commit/push/fecho.
++
++Model IMP-004: [artefacto para revisão](../../../../bolts/003-overlay/ddd-01-domain-model.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md
+index b0c1e48..d8a6df1 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md
+@@ -2,7 +2,7 @@
+ id: "002-gerir-handshake-unicidade-e-reconexao-de-vizinhos"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-007"]
+@@ -14,6 +14,16 @@ size: "M"
+ ---
+ # História — Estabelecer e reconectar vizinhos
+ 
++## Model preparado para revisão
++
++Iniciado em 2026-11-10T14:01:42Z; [modelo concreto](../../../../../bolts/003-overlay/ddd-01-domain-model.md)
++preparado em 2026-11-10T14:11:43Z, base Denji 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
++Dependências complete/integradas; três ficheiros autorizados vazios e 155 hashes
++preservados. Estados/sessões/handshake/reconexão e M01–M22 para V-007 planeados,
++sem implementação ou execução Java. Model ainda não aprovado; parar antes de
++Design/ADR/Implement/Test. Revisão final atribuída a Denji e integração antes
++de DONE, sem implemented=true, commits/push ou outro IMP.
++
+ ## Valor e âmbito
+ 
+ Como responsável pelo serviço OTT, quero estabelecer e reconectar vizinhos, para cumprir os drivers INT-001, INT-002, NFR-004, REQ-002, REQ-003, REQ-004, REQ-021 com validação concreta.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+index cc77208..be4f6b7 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-04T14:20:34Z"
++updated: "2026-11-10T14:11:43Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -63,3 +63,14 @@ Bolt/história complete, implemented=true, TASK-006 DONE; unidade mantém in-pro
+ A dependência 001-base-validada permanece concluída/integrada.
+ 
+ Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
++
++## Estado atual — IMP-004 em Model
++
++003-overlay iniciado em 2026-11-10T14:01:42Z, apenas Model por seleção explícita.
++[Modelo para revisão](../../../../bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
++três ficheiros autorizados vazios, lista desejada/sessões/handshake/retries e M01–M22.
++155 ficheiros de Projeto/ preservados; V-007, regressão/manual e revisão final
++atribuída a Denji pendentes. A unidade mantém in-progress: dois bolts complete,
++um em Model e dois planned. A descrição acima conserva os checkpoints anteriores;
++o estado atual supera a referência histórica a três bolts planned.
++Aguardar aprovação antes de Design/ADR/Implement/Test; sem commits/push/fecho.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+index 09b5c7f..d629e48 100644
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -248,16 +248,16 @@
+     "docs/10-SECURITY.md": "2343404aa92cf4fd4003d45f00b5ff5e40dd28db0c66f695094343fb8b305de4",
+     "docs/11-SETUP-AND-ENVIRONMENT.md": "3f1bd052e18492446b08ec26086f66c48f05cbf32061c5cb999ef46c2634cea8",
+     "docs/12-RISKS-AND-DECISIONS.md": "2ecbd16724ce42fccdeb147d89f6cf61f2609e0e34d0b014747284f043d6dbbe",
+-    "docs/13-REQUIREMENTS-TRACEABILITY.md": "2b212d67e2e1eb572067deb3b54547ccc6685276a6ad8b30f479c72d9f071ff1",
++    "docs/13-REQUIREMENTS-TRACEABILITY.md": "23a19a416fc3996143180c1d569cddf98dcf4d02d5a56f6e3ebba151f64a2aad",
+     "docs/14-DEFINITION-OF-DONE.md": "34b1c05b2086e4a839da9610c1355c57f0eb27da59557f47f11caceadc3a3860",
+-    "docs/15-PROJECT-PROGRESS.md": "ab2c4a2fb1ccf8747e193941626adc37701a102bf3d8b503b5339c3157bd3ed8",
++    "docs/15-PROJECT-PROGRESS.md": "035f5edd8dd12a8b7dd4afb135898d9839fb889b7ffeb1d3469b0d876f436d7e",
+     "docs/16-PLAN-VALIDATION.md": "c92e2cbcb154a3a6d4ab1645f57c7abcc030aebe35976b0d3b75968d2f257dd0",
+     "docs/17-INCEPTION-AUDIT.md": "07b888ed27d6f989fda6ee0d529496ac47c7daa6c0d667383678031c3bb9fb3f",
+-    "docs/18-CONSTRUCTION-BOLTS.md": "f0f36bac89cdc74c6b4ca50bfe2097fb985cbe3274805642830fab8f52941ed1",
++    "docs/18-CONSTRUCTION-BOLTS.md": "3b407ca86ff84a9bffe33c69338c60f6dbac74626c33cb734764b126a27d8c90",
+     "docs/19-ADD-RECONCILIATION.md": "57d5b41c02145e5fb1dcbb8725fa59eaaa8e62e868403e6b37b58efe31ea0a30",
+     "docs/AI-IMPLEMENTATION-GUIDE.md": "464ce154f5396aa90ac2a6f1780c69e0030c0c9452a1c543550e355350fc70e7",
+     "docs/phases/PHASE-01-FOUNDATION.md": "5b362669cddf91a3bf3ede8d01f3fb9b1ecd131732f25c462eba3942d44882ae",
+-    "docs/phases/PHASE-02-OVERLAY.md": "954df508232bfbc36ae7b17f9788cb612234e811bb0d044cd7e4dfe25fa5aa1e",
++    "docs/phases/PHASE-02-OVERLAY.md": "282e1307f83b1d389326e49ac5619d2bded221331973e903bc7ee9ad40cb7e86",
+     "docs/phases/PHASE-03-ROUTING.md": "52b54397a001bbae7afcdb83690fbf04c768d95e4b9d214ab0557f3334e21c09",
+     "docs/phases/PHASE-04-FLOW-MANAGEMENT.md": "27b7d97c9b1161636a0e446caf75d4e89461bae5b3ddc891d7ca657bafef05fb",
+     "docs/phases/PHASE-05-STREAMING.md": "bd5ff93148be22f59fb8705d1567f9656c19bf6f38e616bb28651b814f27cdca",
+@@ -269,7 +269,7 @@
+     "docs/tasks/PHASE-01/TASK-004.md": "1f60d41d53c5b79cd18d9c0ed766915d8972bea36df6496828a7d5e6df7e36fe",
+     "docs/tasks/PHASE-02/TASK-005.md": "358bd2e423749f1debb5b359c58c1065f51e52d3b631ecc867c927214636832d",
+     "docs/tasks/PHASE-02/TASK-006.md": "c762710cf64e75d42a0060481e762344e7fb9a95fdf35e6241d6e0081c2e7a6a",
+-    "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
++    "docs/tasks/PHASE-02/TASK-007.md": "3f978a53fd7d852b928a5325e3cb8c82f1631983bf22cfe8f9629dd5f611e94d",
+     "docs/tasks/PHASE-02/TASK-008.md": "46aecfe8f5757b5d9d1024b9727fd12904263410bfd78efc317f38df81cd35b8",
+     "docs/tasks/PHASE-02/TASK-009.md": "560769163da216dbf6c4c3136841cca82f9b6390e6c11e5058952b6cd963d471",
+     "docs/tasks/PHASE-02/TASK-032.md": "e8b80b98301be37eaf92d412be065b913e3d5010bf22be9fbbc535eec60ca615",
+@@ -304,7 +304,7 @@
+     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
+     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+   },
+-  "updated": "2026-11-04T14:20:34Z",
++  "updated": "2026-11-10T14:11:43Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "task_to_bolts": {
+@@ -766,6 +766,24 @@
+         "docs/tasks/PHASE-02/TASK-006.md": "c762710cf64e75d42a0060481e762344e7fb9a95fdf35e6241d6e0081c2e7a6a",
+         "docs/phases/PHASE-02-OVERLAY.md": "954df508232bfbc36ae7b17f9788cb612234e811bb0d044cd7e4dfe25fa5aa1e"
+       }
++    },
++    {
++      "updated": "2026-11-10T14:11:43Z",
++      "reason": "IMP-004/003-overlay explicitamente selecionado: apenas Model para revisao, dependencias fechadas/integradas, sem alteracao Java. Sincronizar TASK-007/progresso/rastreabilidade e corrigir celula antiga da TASK-006 na tabela PHASE-02 para o DONE ja comprovado. V-007/M01-M22 planeados, sem build/regressao/manual novos; parar antes de Design.",
++      "previous_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "2b212d67e2e1eb572067deb3b54547ccc6685276a6ad8b30f479c72d9f071ff1",
++        "docs/15-PROJECT-PROGRESS.md": "ab2c4a2fb1ccf8747e193941626adc37701a102bf3d8b503b5339c3157bd3ed8",
++        "docs/18-CONSTRUCTION-BOLTS.md": "f0f36bac89cdc74c6b4ca50bfe2097fb985cbe3274805642830fab8f52941ed1",
++        "docs/tasks/PHASE-02/TASK-007.md": "1e66d24d46198243aa372c81cab15a1a591df7b7aee8551990a0167be59ab220",
++        "docs/phases/PHASE-02-OVERLAY.md": "954df508232bfbc36ae7b17f9788cb612234e811bb0d044cd7e4dfe25fa5aa1e"
++      },
++      "updated_hashes": {
++        "docs/13-REQUIREMENTS-TRACEABILITY.md": "23a19a416fc3996143180c1d569cddf98dcf4d02d5a56f6e3ebba151f64a2aad",
++        "docs/15-PROJECT-PROGRESS.md": "035f5edd8dd12a8b7dd4afb135898d9839fb889b7ffeb1d3469b0d876f436d7e",
++        "docs/18-CONSTRUCTION-BOLTS.md": "3b407ca86ff84a9bffe33c69338c60f6dbac74626c33cb734764b126a27d8c90",
++        "docs/tasks/PHASE-02/TASK-007.md": "3f978a53fd7d852b928a5325e3cb8c82f1631983bf22cfe8f9629dd5f611e94d",
++        "docs/phases/PHASE-02-OVERLAY.md": "282e1307f83b1d389326e49ac5619d2bded221331973e903bc7ee9ad40cb7e86"
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+index b11e0bd..f2c3e8a 100644
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -89,3 +89,13 @@ versão revista 03345e9e1ab56ec04302676cca6fce32d168223d já integrada em main a
+ Cascata specsmd executada em 2026-11-04T14:18:23Z: bolt/história complete, implemented=true,
+ TASK-006 DONE, unidade in-progress. Sem nova decisão arquitetural, código ou ADR.
+ [Prova e fecho](../bolts/002-overlay/closure-walkthrough.md).
++
++## Model para revisão — IMP-004
++
++[Modelo](../bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z, após seleção
++explícita de 003-overlay/Model, iniciado em 2026-11-10T14:01:42Z. Reutilização prevista de
++ADR-012/013/018/019/021/024 e contratos transversais, sem revisão ADR antecipada,
++decisão arquitetural nova ou alteração dos bytes v1. ADR-003 continua substituída.
++Preservados os 155 ficheiros de Projeto/; V-007/M01–M22 planeados, sem execução.
++Aguardar aprovação de Model antes de Design/ADR/Implement/Test; revisão final
++atribuída a Denji e integração exigidas antes de DONE.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index ee4729b..db7dd58 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-as restantes 30 histórias/bolts não foram iniciadas.
++003-overlay/IMP-004 está em Model para revisão; as restantes 29 histórias/bolts não foram iniciadas.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -42,7 +42,11 @@ Revisão final atribuída a Waheed confirmada pelo utilizador; versão revista
+ 
+ ## 002-overlay/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-004. **Estado:** planned. **Bolt:** 003-overlay.
++**Tarefa:** IMP-004. **Estado:** in-progress. **Bolt:** 003-overlay.
++Model iniciado em 2026-11-10T14:01:42Z; [preparado para revisão](bolts/003-overlay/ddd-01-domain-model.md)
++em 2026-11-10T14:11:43Z, dependências integradas em 26aaa4ae6775e9c78e1d7658472ccaca0b376427.
++V-007/M01–M22 planeados, sem código/teste/build novo; parar antes de Design.
++Revisão final atribuída a Denji e integração continuam exigidas antes de DONE.
+ **Ficheiro:** [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](intents/001-ott-streaming/units/002-overlay/stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md).
+ 
+ ## 002-overlay/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md ✅ GENERATED
+diff --git a/memory-bank/bolts/003-overlay/ddd-01-domain-model.md b/memory-bank/bolts/003-overlay/ddd-01-domain-model.md
+new file mode 100644
+index 0000000..f7b9451
+--- /dev/null
++++ b/memory-bank/bolts/003-overlay/ddd-01-domain-model.md
+@@ -0,0 +1,340 @@
++# IMP-004 — Model: vizinhança confirmada e reconexão direta
++
++Modelo para revisão da etapa 1, preparado em 2026-11-10T14:11:43Z, após seleção explícita
++de `003-overlay`, apenas Model. Iniciado em 2026-11-10T14:01:42Z; estado no bolt/construction-log.
++Não é implementação, aprovação de Model ou resultado de V-007.
++Fonte normativa: [ADD, IMP-004](../../../add.md#imp-004), secções 2/5/6/8/9/10/11/12;
++[specs](../../../specs.md), [TASK-007](../../../docs/tasks/PHASE-02/TASK-007.md),
++[contrato v1](../../../docs/07-API-AND-INTERFACES.md) e
++[DoD](../../../docs/14-DEFINITION-OF-DONE.md).
++
++## 1. Base, dependências e fronteira
++
++Base de trabalho Denji `26aaa4ae6775e9c78e1d7658472ccaca0b376427`, igual a main
++e às referências locais de origin no arranque, árvore inicialmente limpa.
++001-base-validada/IMP-001 e 002-overlay/IMP-003 estão complete e integrados;
++019-overlay/IMP-002 também está concluído, disponibilizando RuntimeConfiguration.
++O último clean verify aprovado é o do IMP-003: 856 testes em 2026-11-04;
++esse resultado é histórico neste Model, sem nova execução Java.
++
++Inspeção real: os três ficheiros autorizados existem com **zero bytes**:
++
++| Caminho relativo a Projeto/src | Trabalho futuro deste IMP |
++|---|---|
++| main/java/pt/uminho/esr/ott/overlay/Neighbor.java | Valores/estados/sessão confirmada e snapshots imutáveis |
++| main/java/pt/uminho/esr/ott/overlay/NeighborManager.java | Descoberta cliente, admissão, handshake, unicidade, retry e eventos |
++| test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java | Dobras controladas, casos de estado e TCP real de V-007 |
++
++Transport/Connection, BootstrapServer, NodeConfiguration/RuntimeConfiguration,
++NodeRole e ControlMessage/MessageCodec já têm APIs implementadas. O próprio
++manager consegue encapsular os adaptadores/seams como tipos internos, sem exigir
++ficheiros novos ou alteração dessas fundações. Assinaturas exatas ficam para Design.
++
++Dentro: obter a lista inicial, fechar a consulta, manter vizinhos permitidos,
++confirmar um canal por par, publicar eventos imutáveis e reconectar diretamente.
++O passo de consulta inicial consta expressamente da TASK-007; não se reimplementa
++BootstrapServer nem se antecipa a composição de OttApplication/OverlayNode.
++
++Fora: CLI/processos finais (IMP-005), sondas/RTT (IMP-007), rotas/subscrições/vídeo,
++socket UDP, criação de novas arestas/IDs, recarga de grafo, membership central,
++autenticação criptográfica e extras de recuperação fora do grafo.
++
++## 2. Entidades e identidades
++
++| Conceito | Identidade e dados | Invariante/proprietário |
++|---|---|---|
++| Execução local | nodeId estável; instanceId UUID não zero, fornecido pela composição | Uma instância constante por arranque, não gerada pelo loader ou por reconexão |
++| Lista desejada | nodeId → endpoint/papel configurados, instância zero | Cópia imutável da primeira resposta inicial válida; inclui offline; não é tabela de disponibilidade |
++| Neighbor | nodeId desejado, estado, tentativa corrente, vínculo confirmado opcional | No máximo uma sessão confirmada por ID; objeto/snapshot externo imutável |
++| Vínculo confirmado | nodeId + peerInstanceId + connectionId; endpoint TCP/UDP permitido | Peer instance não zero; válido só enquanto esse canal estiver ACTIVE |
++| Tentativa | token local de geração, alvo, fase, requestId e prazo | Não reutiliza identidade de tentativa; sucesso tardio não pode instalar canal abandonado |
++| Canal provisório | connectionId, handle, instante Open e papel ainda por correlacionar | Não é Neighbor confirmado; quantidade limitada pelas reservas TCP |
++| Retry | ID do vizinho, geração, backoff e ticket cancelável | Uma tentativa ou retry elegível por vizinho; só o iniciador permitido faz dial |
++| Evento público | sessão completa, motivo/tipo e mensagem quando aplicável | Snapshot/valor imutável; consumidor não recebe autorização de UDP antes de ACTIVE |
++
++Não usar IP remoto, porta TCP efémera, título de stream ou UUID ordenado como
++identidade do nó. O IP pode ser partilhado e as interfaces podem diferir.
++UUID de instância distingue execuções, sem relação temporal entre UUIDs.
++[PRESSUPOSTO] A ordem de nodeId é lexical, sensível a maiúsculas, sobre os IDs
++ASCII já aceites (`[A-Za-z0-9_-]{1,32}`); não é ordem numérica de sufixos nem locale.
++Design deve tornar essa comparação única e testável em ambos os extremos.
++
++## 3. Dono do estado e entradas/saídas
++
++O estado mutável pertence ao **executor serial do nó** (ADR-017). Chamadas de
++controlo, callbacks de Transport, futuras conclusões de dial/flush/resolução e
++timers tornam-se eventos para esse mesmo dono. Nenhuma dessas threads altera
++Neighbor, lista desejada ou retry diretamente. Fila limitada por eventsCapacity;
++callbacks apenas oferecem eventos, sem esperar por ACK, DNS ou espaço na fila.
++
++Um núcleo de transições sem I/O permite injetar relógio monotónico, agenda,
++canais/dials/resolução e coletor de eventos. O adaptador real usa as APIs públicas
++atuais. A composição futura fornece/reutiliza esse executor; não haverá dois
++executores independentes a possuir o estado do mesmo nó.
++
++Entradas conceptuais: Start/Stop; BootstrapConnected/Reply/Closed/Timeout;
++Resolved/ResolveFailed; DialSucceeded/DialFailed/Cancelled; Open/Message/Closed;
++WriteCompleted/WriteFailed; HelloDeadline/RetryDue. Todos os eventos assíncronos
++transportam geração e, depois de conhecida, connectionId; eventos da sessão
++confirmada incluem também instanceId. Mensagem fora do vínculo corrente não
++pode alterar nem ser entregue como mensagem do vizinho novo.
++
++Saídas: iniciar/cancelar dial ou timer, enviar mensagem, solicitar close,
++publicar NeighborUp/NeighborDown/ConfirmedMessage e snapshot. Nomes conceptuais,
++sem impor API Java antes de Design. Consumidores observam remoção da sessão
++antiga antes da entrada da nova e não bloqueiam o executor; subscrições antigas
++terão de ser renegociadas nos incrementos de routing, não restauradas aqui.
++
++## 4. Descoberta inicial e lista permitida
++
++Fases locais: NOT_STARTED → DISCOVERING → READY; erro fatal → FAILED;
++Stop em qualquer fase → CLOSED. Falha transitória antes do sucesso permite
++nova tentativa serializada, com prazo e backoff; erro permanente de identidade/
++configuração não provoca um ciclo imediato de consultas inválidas.
++
++Antes de criar executor/timer/socket, validar perfil SERVER/RELAY/CLIENT,
++identidade local não zero, contacto bootstrap, endpoint/papel e runtime. A carga
++de configuração continua offline. Descoberta valida dados recebidos depois da
++rede, antes de os instalar ou usar em dials; não se promete validar uma resposta
++remota antes de a receber.
++
++REGISTER usa Endpoint local e requestId novo; senderId/instance correspondem ao
++Endpoint. REGISTER_OK só é aceite na tentativa/conexão/prazo/requestId esperados,
++com formato v1 e NeighborList íntegra. A resposta não é um anúncio de presença.
++Rejeitar IDs próprios/repetidos, mais de 63 vizinhos, BOOTSTRAP como vizinho,
++instâncias não zero e endpoints inválidos/conflituosos, sem instalação parcial.
++O grafo é simétrico no bootstrap; um nó com apenas a sua lista não inventa
++conhecimento do grafo global ou valida disponibilidade dos peers.
++
++Se o grau exceder control.maxConnections, declarar incompatibilidade de capacidade
++local antes de iniciar os dials de vizinhança. Não eliminar vizinhos para fingir
++convergência e não aumentar o cap. A reserva do canal bootstrap e sockets ainda
++em terminação também conta para o limite de transporte; indisponibilidade
++temporária de uma reserva não autoriza ultrapassá-lo.
++
++Até READY, um HELLO não dispõe ainda de allowlist confirmada: não publicar
++vizinhança/UDP nem reter canais indefinidamente à espera da descoberta; o
++iniciador pode repetir depois, com backoff. Após validar a lista, conservar uma
++cópia, fechar a consulta e iniciar apenas os dials devidos. EOF antes de resposta completa é falha; não é lista vazia.
++Não esperar por informação adicional nem prazo renovado após uma resposta válida.
++Não exigir um bootstrap nodeId inventado: o perfil tem host/porta conhecidos,
++não uma chave criptográfica/identidade de bootstrap autenticada.
++
++Em READY, **nenhuma falha de peer volta a consultar bootstrap**. Desligar o bootstrap
++não impede reconexão de processos que conservam a lista. Um processo reiniciado
++perde-a e volta à descoberta inicial com nova instanceId; não afirmar arranque
++de um processo novo com bootstrap indisponível. CP-02/03 preservadas.
++
++## 5. Estados de Neighbor
++
++```mermaid
++stateDiagram-v2
++  [*] --> DISCONNECTED: lista inicial válida
++  DISCONNECTED --> CONNECTING: retry elegível e local é menor ID
++  CONNECTING --> HANDSHAKING: dial corrente estabelecido
++  DISCONNECTED --> HANDSHAKING: HELLO admitido do menor ID remoto
++  HANDSHAKING --> ACTIVE: handshake válido e confirmação local de escrita
++  CONNECTING --> DISCONNECTED: falha / cancelamento / prazo
++  HANDSHAKING --> DISCONNECTED: erro / fecho / prazo
++  ACTIVE --> DISCONNECTED: fecho / falha / NODE_LEAVE corrente
++  DISCONNECTED --> CLOSED: shutdown local
++  CONNECTING --> CLOSED: shutdown local
++  HANDSHAKING --> CLOSED: shutdown local
++  ACTIVE --> CLOSED: shutdown local
++```
++
++CONNECTING inclui a resolução/abertura de uma tentativa, fora do executor serial.
++Um nó maior permanece DISCONNECTED à espera; não inicia um dial por impaciência.
++Conexões desconhecidas são contextos provisórios, sem criar entradas desejadas.
++CLOSED é terminal por shutdown do manager; saída remota deixa o vizinho desejado
++DISCONNECTED, permitindo regresso. Para cada transição, publicar estado coerente
++antes de notificar consumidores; emitir Down no máximo uma vez por vínculo ACTIVE.
++
++## 6. Iniciador e handshake v1
++
++Só o **menor nodeId** inicia o canal persistente (ADR-019), em todos os arranques e
++retries. O maior recebe HELLO e responde HELLO_OK. Socket aberto, ACCEPTED e fila
++vazia não confirmam vizinhança. Não introduzir HELLO mútuo ou um terceiro ACK.
++
++Na receção de HELLO, verificar v1/type/payload, senderId=Endpoint.nodeId,
++senderInstance=Endpoint.instanceId não zero, pertença à lista desejada, iniciador
++permitido, papel e endpoint TCP/UDP iguais aos configurados. Comparar hosts pela
++normalização lexical já documentada: caixa/ponto final e IPv4 decimal, sem DNS
++do valor recebido ou equivalência inferida do IP remoto. Papel BOOTSTRAP e ID
++local são inválidos. O endereço recebido não pode reconfigurar a lista inicial.
++
++HELLO_OK mantém **payload vazio** (`Empty.INSTANCE`), preserva requestId e identifica
++o emissor no envelope. O iniciador correlaciona-o com alvo, conexão e pedido
++correntes, senderId esperado e senderInstance não zero. O endpoint UDP desse lado
++vem da lista configurada associada à tentativa, só se torna utilizável após
++esta confirmação; não se inventa um Endpoint dentro de HELLO_OK.
++
++O iniciador só publica ACTIVE após HELLO escrito/flush concluído e HELLO_OK
++válido. O recetor só publica ACTIVE após HELLO válido e escrita/flush de HELLO_OK
++concluídos. São barreiras locais, não prova de ACK remoto para todos os frames.
++As duas condições podem chegar ao executor em ordens diferentes; o contexto
++retém ambas, sem renovar o deadline e sem evento Up prematuro/duplicado.
++
++Mensagens de aplicação recebidas numa janela legítima entre confirmação no fio
++e processamento do evento de flush precisam de retenção **limitada** ou ordenação
++equivalente no adaptador. Design deve provar essa janela; não entregar antes de
++ACTIVE nem tratar tráfego corretamente confirmado como uma nova instância.
++Excesso de retenção é falha explícita/local, nunca fila ilimitada.
++
++## 7. Duplicados, reinício e eventos obsoletos
++
++Reservar no máximo um candidato de handshake por vizinho e uma sessão ACTIVE.
++Direção válida é determinada pela regra de iniciador, não pela chegada do primeiro
++socket. Candidato adicional/ID já vivo não substitui um vínculo saudável: rejeitar
++o excedente com DUPLICATE_ID quando seguro (docs/10), preservando o existente.
++Uma nova UUID não é prova de que a execução antiga morreu.
++
++Depois de falha/fecho observável do vínculo antigo, uma nova tentativa pode
++confirmar o mesmo nodeId com instanceId diferente. Um close tardio do canal antigo
++tem outra connectionId e não elimina a sessão nova, mesmo que tenha o mesmo
++nodeId. O mesmo vale para mensagens, timeout, flush e retry obsoletos. Se uma nova
++tentativa chegar antes de se observar a falha da anterior, os retries posteriores
++permitem o regresso após essa falha, sem arbitragem central de IDs vivos.
++
++Transport pode chamar `connectionOpen` **antes** de concluir o future devolvido
++por `connect`. Não classificar esse canal como inbound só por ainda não existir
++DialSucceeded, nem associá-lo por IP/porta efémera. Contexto provisório por
++connectionId e token de tentativa deve permitir correlacionar Open/Message/Closed
++com o resultado tardio. Um sucesso de dial cancelado/retirado fecha o handle
++obtido, sem criar Neighbor ou deixar socket órfão. Design detalha os interleavings.
++
++## 8. Autorização e eventos após ACTIVE
++
++Frames 7–16 só atravessam o manager após handshake e com o senderId/instanceId
++do vínculo que transporta a mensagem. O manager entrega um evento correlacionado
++ao consumidor futuro; não implementa métricas, rotas ou subscrições.
++REGISTER/REGISTER_OK não são operações de um canal persistente de peer.
++HELLO repetido/HELLO_OK inesperado e identidade incompatível são erros de contexto.
++
++NODE_LEAVE refere-se apenas ao vínculo direto corrente, nunca ao bootstrap.
++Pode antecipar o Down e o fecho; não remove a aresta desejada. Envio local de
++despedida é, quando usado, melhor esforço dentro do prazo de shutdown, sem
++introduzir espera ilimitada ou novo requisito de entrega da mensagem.
++
++Usar ErrorCode existente: INVALID_MESSAGE, UNAUTHORIZED_NEIGHBOR, DUPLICATE_ID,
++TIMEOUT/RESOURCE_LIMIT quando aplicável. ERROR só com envelope/contexto seguros,
++requestId e relatedType correlacionados, detalhe curto; erro de formato inseguro
++fecha sem resposta. Falha de um peer não fecha peers saudáveis. O codec continua
++responsável por bytes/limites e não faz autorização de estado.
++
++## 9. Prazos, backoff e recursos
++
++Relógio monotónico para elegibilidade/prazos; UTC apenas nos logs. Eventos de
++abertura capturam o instante antes da fila serial. helloTimeout limita a tentativa
++de handshake completa, incluindo espera na fila e confirmação local de escrita;
++frames adicionais/duplicados não prolongam o prazo. connectTimeout pertence ao
++dial TCP; bootstrapQueryTimeout limita a consulta após ligação, como no IMP-003.
++Design detalha prazos de resolução e cancelamento sem DNS no executor serial.
++
++Enquanto o manager está ativo, um vizinho permitido offline continua desejado.
++Só o iniciador agenda novo dial, com retryInitial/retryMax/retryJitterPercent
++efetivos. Crescimento exponencial saturado antes de overflow, jitter controlável
++e resultado final **1 ms ≤ atraso ≤ retryMax**. Nenhum ciclo imediato, retry
++paralelo pelo mesmo alvo ou inferência de ausência definitiva após uma recusa.
++Após ACTIVE, reinicia-se a sequência de falhas. Timer/dial antigos não podem
++alterar a geração seguinte. Design fixa a função de jitter e prova fronteiras.
++
++| Recurso | Limite/modelo de contabilização |
++|---|---|
++| Nós/lista desejada | ≤64 nós no deployment; ≤63 vizinhos, sem own ID |
++| Reservas TCP C | control.maxConnections ≤64; inclui bootstrap, dials e workers em terminação |
++| Contextos de canal | ≤C; anónimos/provisórios também contam; sem mapa de IDs arbitrários |
++| Candidatos/dials | ≤1 por vizinho desejado, subordinados a C; bootstrap ≤1 tentativa |
++| Timers | ≤1 retry por vizinho D; ≤1 deadline por contexto C; consulta inicial ≤1; total ≤D+C+1 |
++| Fila do dono serial | eventsCapacity, default/hard cap 4096; offer sem espera |
++| Saída TCP | queueCapacity ≤256 + frame em escrita; contrato existente |
++| Confirmações/retidos | No máximo uma operação handshake/erro por contexto; retenção pós-handshake limitada por contexto e globalmente em Design |
++| Resolução de nomes | Trabalho limitado a alvos configurados e tentativas vigentes; não lançar resolver por mensagem recebida |
++
++Saturação da fila de controlo é erro operacional observado: parar a parte afetada
++com cleanup que não precisa de mais um slot na fila cheia. Não perder Closed/Stop
++silenciosamente nem deixar timers/retries vivos. O cap do transporte também pode
++limitar admissão antes de o manager ver o peer; uma rejeição não aumenta o cap.
++DNS deve resolver apenas destinos configurados, fora do dono serial, com resultados
++tardios cercados pela geração. Design não pode prometer que cancelar um future
++interrompe uma resolução do sistema que ignora interrupções; deve explicar o
++limite dos workers e reportar timeout de shutdown caso não terminem.
++
++Shutdown retira a elegibilidade para novas tentativas, cancela agenda/dials,
++fecha contextos e publica snapshots sem autorização UDP antiga. Usa requestClose
++e aguarda terminação fora de callbacks/executor, dentro de um budget global de
++control.shutdownTimeout. Sucesso exige recursos terminados; timeout é erro explícito.
++Callback/timer/future tardio não revive o manager CLOSED. Não consumir o prazo
++com um join completo por recurso.
++
++## 10. Provas previstas — M01–M22 / V-007
++
++Todas as provas abaixo estão **planeadas, não executadas**. Design relaciona-as
++com assinaturas/tipos e nomes de casos; Implement introduz testes novos/red real
++antes dos comportamentos, preservando as fundações. Dobras e testes ficam nos
++três ficheiros autorizados, sem modificar os testes antigos.
++
++| ID | Oráculo de estado/efeito | Meio previsto |
++|---|---|---|
++| M01 | Perfil/instância/configuração inválidos rejeitados antes de criar rede/agenda | Factories espiadas, modelos diretos e loader real |
++| M02 | REGISTER e resposta correlacionados, EOF parcial/erro/prazo não instalam lista; uma resposta válida fecha consulta | Discovery controlada e BootstrapServer/TCP real |
++| M03 | Lista imutável; ID próprio/duplicado/instância viva/endpoint inválido/grau acima da capacidade rejeitados sem instalação parcial | Lista/coleções adversas e contadores de dial |
++| M04 | Depois de READY não há consultas; com bootstrap parado ocorre reconexão; processo novo volta a DISCOVERING | Discovery spy e integração TCP com bootstrap encerrado |
++| M05 | Só menor ID faz dial; ambas as ordens e arranque simultâneo convergem para um canal por par | Ordem de IDs controlada e três nós TCP |
++| M06 | HELLO valida grafo local, identidade/instância/endpoint/papel/host lexical/direção; peer inválido não afeta outro | Canal falso e peer TCP adverso |
++| M07 | HELLO_OK vazio correlaciona alvo/conexão/requestId/instância; resposta errada não confirma | Mensagens controladas e codec existente |
++| M08 | Up/UDP só depois das duas condições do handshake, qualquer ordem; frame legítimo da janela de flush não é entregue cedo | Escrita/futures bloqueáveis e relógio falso |
++| M09 | Um candidato/ACTIVE por ID; duplicado/ID vivo não substitui o vínculo saudável | Interleavings e duas instâncias concorrentes |
++| M10 | Instância nova é confirmada após falha; Closed/Message/Timeout/Flush antigos não removem nem alteram a nova | Gerações e connectionId/instanceId distintos |
++| M11 | Tipos de aplicação só passam em ACTIVE com identidade corrente; bootstrap/HELLO inesperados rejeitados | Coletor de eventos e mensagens válidas de tipos distintos |
++| M12 | Prazo inclui fila/flush e não renova por mensagens; deadline vencido ganha de resposta tardia | Relógio monotónico falso, incluindo fronteira/wrap |
++| M13 | Backoff exponencial saturado, jitter 0/100 e overrides mantêm 1..max; um retry por alvo, reset após ACTIVE | Agenda e fonte de jitter controladas, sem sleeps |
++| M14 | Open/Message/Closed antes do future de dial não confundem direção nem criam vínculos órfãos | Adaptador com conclusões reordenadas e TCP real |
++| M15 | Cancelar tentativa/resolução e concluir depois fecha o canal tardio, sem Up ou novo timer | Futures/resolver controlados e reservas observadas |
++| M16 | NODE_LEAVE corrente produz um Down e mantém aresta desejada; evento antigo/peer inválido não afeta outra sessão | Mensagens/fechos repetidos e snapshot |
++| M17 | Contextos/dials/timers/retidos respeitam C/D/limites; peer desconhecido/timeout/overflow liberta recursos | Transportes/agenda espiados e saturação TCP |
++| M18 | Fila serial cheia falha explicitamente; cleanup/Stop não dependem de publicar na fila saturada | Executor controlado com capacidade reduzida |
++| M19 | Shutdown antes/durante descoberta/dial/handshake/ACTIVE; nenhum callback revive o serviço; porta reutilizável e prazo global | Agenda falsa, canal bloqueável e TCP real |
++| M20 | Runtime efetivo chega a Transport.Options/hello/retry/events; defaults e menores caps preservam semântica e bytes | Captura de opções e oráculos offline |
++| M21 | V-007 completo: três nós em ordens diferentes, desconhecido rejeitado, reinício com instanceId nova e reconexão sem bootstrap | TCP real com serviço embutível e perfis temporários |
++| M22 | Regressão atual/JDK21 e manual reproduzível com operador/JAR/hash/log próprios; review/integração antes de DONE | Test futuro; execução e revisão humana ainda pendentes |
++
++M21/M22 não demonstram automaticamente CLI, GUI, CORE ou vídeo. O manual deste
++incremento usa a base embutível disponível; processos finais e CORE têm provas
++próprias posteriores. O humano repete o manual antes da aprovação de Test, como
++nos incrementos anteriores. Não reaproveitar o total de 856 como nova execução.
++
++## 11. ADR e condições de revisão
++
++Aplicação prevista de ADR-012/013/018/019/021/024, com os contratos transversais
++014/015/016/017/020/026 preservados. ADR-003 permanece Substituída por ADR-013.
++Não se cria ADR nova, dependência, tipo wire ou política de vizinhança neste Model.
++A análise formal de conformidade pertence à etapa ADR após aprovação de Design.
++
++Não foi identificada contradição que exija alterar as fundações nesta inspeção.
++Riscos a resolver no Design: classificação antes do future de dial, janelas de
++flush, limites concretos da retenção, DNS cancelável/resultado tardio, executor
++partilhado com o futuro nó e cleanup quando a fila está saturada. Se a solução
++exigir alterar ficheiros fora dos três autorizados ou uma decisão aceite se tornar
++inviável, registar evidência em construction-duvidas e aplicar ADD secção 11 antes
++de intervir. Não transformar uma limitação real em hipótese de teste aprovada.
++
++Sem gates externos adicionais. Permanecem obrigatórios V-007, regressão atual,
++manual, aceitação final do revisor atribuído **Denji** e integração em main antes
++de DONE. A atribuição legada de responsável é Waheed; autoria do agente e
++confirmações humanas serão registadas com a proveniência real.
++
++## 12. Checkpoint Model
++
++Entregue para revisão: entidades/identidades, proprietário serial, estados,
++barreiras de handshake, unicidade/reinício, falhas/prazos/limites, fronteira dos
++três ficheiros e M01–M22. Nenhum ficheiro de Projeto/ alterado; não há código,
++build, teste V-007, regressão ou manual novos nesta etapa.
++
++Parar para aprovação de Model antes de Design/ADR/Implement/Test. O bolt fica
++in-progress/current_stage=model/stages_completed=[], completed=null; história
++e TASK-007 em progresso, critérios de implementação por cumprir. Sem commits,
++push, fecho ou início de outro IMP nesta continuação.
++
++Evidências desta inspeção e da preservação ficam em
++`experiments/construction/003-overlay/`; a validação documental não executa V-007.

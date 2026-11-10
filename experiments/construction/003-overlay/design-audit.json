@@ -1,0 +1,60 @@
+{
+  "prepared_at": "2026-11-10T15:00:14Z",
+  "Model_approved_at": "2026-11-10T14:48:50Z",
+  "Q-C-05": "approved; all table proposals accepted explicitly",
+  "stage": "design",
+  "Design_approval": "pending",
+  "authorized_scope": "Design only; stop before ADR/Implement/Test",
+  "retention": {
+    "per_channel": "B=min(4,Q)",
+    "global": "R=min(N,C*B)",
+    "defaults": {
+      "B": 4,
+      "R": 256
+    }
+  },
+  "DNS_IO": {
+    "workers": 1,
+    "queue_capacity": 65,
+    "max_physical_jobs": 65,
+    "max_per_host": 1,
+    "resolution_budget": "control.connectTimeout per phase",
+    "system_resolver_termination": "must be observed; interrupt/cancel is not proof; timeout explicit"
+  },
+  "dial_correlation": "UNCLASSIFIED Contexts barrier of native dials until results correlate by connectionId/token; no address inference; individual native future not canceled",
+  "serial_owner": "owned or borrowed, capacity N, nonblocking offer, terminal flag/hooks outside queue, state only on owner",
+  "application_files_changed": false,
+  "planned_proofs": [
+    "D01",
+    "D02",
+    "D03",
+    "D04",
+    "D05",
+    "D06",
+    "D07",
+    "D08",
+    "D09",
+    "D10",
+    "D11",
+    "D12",
+    "D13",
+    "D14",
+    "D15",
+    "D16",
+    "D17",
+    "D18",
+    "D19",
+    "D20",
+    "D21",
+    "D22"
+  ],
+  "V-007": "not executed",
+  "Java_build_regression_manual": "not executed",
+  "new_ADR": "none; formal ADR stage not started",
+  "finalized_at": "2026-11-10T15:07:08Z",
+  "design_sha256": "6a8cf25050fe0feffb3288b432beb7ff27715a11ba3acb287b6a2c138541477b",
+  "model_sha256": "2d67550437f4576074a7d50dd5b371e938817bcd060b0804258f00a617b1169d",
+  "Q-C-05_sha256": "0339df18933eadd7f534c213a4cfcd0d2e9ea81f83b1224e0d3439a26a9b8217",
+  "physical_timer_limit": "C+1 before discovery; D+C+1 after list; physical running/canceled jobs counted",
+  "planned_public_disconnect": "session-guarded local channel close; graph unchanged; manual simulation identified explicitly"
+}

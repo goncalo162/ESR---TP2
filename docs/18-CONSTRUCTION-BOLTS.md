@@ -21,7 +21,11 @@ MANUAL_PASS/JAVA_EXIT=0, mesmo JAR. [Fecho concluído](../memory-bank/bolts/002-
 em 2026-11-04T14:18:23Z: revisão final atribuída a Waheed confirmada pelo utilizador,
 registada em 2026-11-04T14:18:23Z; versão revista 03345e9e1ab56ec04302676cca6fce32d168223d integrada em main.
 002-overlay/história complete, implemented=true, TASK-006 DONE. Unidade continua in-progress.
-Os restantes 30 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
+003-overlay/IMP-004 iniciado em 2026-11-10T14:01:42Z, apenas Model por seleção explícita.
+[Modelo para revisão](../memory-bank/bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
+155 hashes preservados e M01–M22/V-007 planeados. Nenhuma execução Java nova;
+parar antes de Design/ADR/Implement/Test. Revisão final atribuída a Denji e
+integração exigidas antes de DONE. Os restantes 29 bolts permanecem planned. [Fecho e prova](../memory-bank/bolts/001-base-validada/closure-walkthrough.md).
 
 ## Ordem de execução
 
@@ -89,3 +93,19 @@ estado antigo após execução legítima. Testes Java, GUI e CORE são provas se
 - [Especificação](../specs.md).
 - [Índice de histórias](../memory-bank/story-index.md).
 - [Validação](../experiments/inception-planning-validation.md).
+
+Ajuste do Model 003-overlay preparado em 2026-11-10T14:24:46Z: ERROR (17) explícito por fase,
+M02/M07/M11 ampliados e Q-C-05 pendente de decisão. Model ainda não aprovado;
+Design/ADR/Implement/Test não iniciados, sem código ou provas Java novos.
+
+Continuação 003-overlay em 2026-11-10T15:00:14Z: Model revisto/Q-C-05 aprovados em 2026-11-10T14:48:50Z,
+[Design preparado para revisão](../memory-bank/bolts/003-overlay/ddd-02-technical-design.md).
+Apenas Model em stages_completed; current_stage=design, completed=null. D01–D22
+previstos, V-007 NÃO EXECUTADO; sem Java/teste/build/commit/push ou início de outro IMP.
+Revisão final por Denji e integração continuam exigidas; parar antes de ADR.
+
+Continuação 003-overlay em 2026-11-10T15:20:09Z: Design/Q-C-06 aprovados em 2026-11-10T15:13:50Z;
+[revisão ADR para validação](../memory-bank/bolts/003-overlay/adr-review.md). Sem divergência material
+identificada no desenho; nenhuma ADR nova criada. Apenas Model/Design em
+stages_completed, current_stage=adr. D01–D22 mantidos e por executar, sem Java.
+Revisão final/integração antes de DONE; parar antes de Implement/Test.

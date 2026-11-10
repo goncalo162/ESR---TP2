@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-02"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-04T14:20:34Z"
+updated: "2026-11-10T15:20:09Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
@@ -63,3 +63,38 @@ Bolt/história complete, implemented=true, TASK-006 DONE; unidade mantém in-pro
 A dependência 001-base-validada permanece concluída/integrada.
 
 Concluir 001-base-validada; aplicar também requires_bolts de cada incremento. Histórias e validações devem ter evidência real; TASK pai composta só fecha após todas as partes, revisão e integração. Não presumir GUI, CORE ou submissão.
+
+## Estado atual — IMP-004 em Model
+
+003-overlay iniciado em 2026-11-10T14:01:42Z, apenas Model por seleção explícita.
+[Modelo para revisão](../../../../bolts/003-overlay/ddd-01-domain-model.md) preparado em 2026-11-10T14:11:43Z:
+três ficheiros autorizados vazios, lista desejada/sessões/handshake/retries e M01–M22.
+155 ficheiros de Projeto/ preservados; V-007, regressão/manual e revisão final
+atribuída a Denji pendentes. A unidade mantém in-progress: dois bolts complete,
+um em Model e dois planned. A descrição acima conserva os checkpoints anteriores;
+o estado atual supera a referência histórica a três bolts planned.
+Aguardar aprovação antes de Design/ADR/Implement/Test; sem commits/push/fecho.
+
+Revisão Model do IMP-004 em 2026-11-10T14:24:46Z: ERROR (17) agora explícito na descoberta,
+handshake e ACTIVE, com M02/M07/M11 ampliados. Q-C-05 pendente de decisão sobre
+retry e ERROR inesperado antes de ACTIVE. Model ainda não aprovado; sem Design,
+Java, execução V-007/regressão/manual, commits ou push.
+
+## Estado atual — IMP-004 em Design
+
+Model/Q-C-05 aprovados em 2026-11-10T14:48:50Z; apenas Design autorizado.
+[Desenho para revisão](../../../../bolts/003-overlay/ddd-02-technical-design.md) preparado em 2026-11-10T15:00:14Z:
+owner serial partilhável, B=min(4,Q)/R=min(N,C×B), worker DNS/I/O e barreira dos dials
+nativos ainda não concluídos. D01–D22 previstos. As pendências Model/Q-C-05 dos
+retratos anteriores estão resolvidas por esta aprovação; Design ainda não aprovado.
+Unidade in-progress, 003-overlay em Design; V-007/regressão/manual, revisão final
+atribuída a Denji e integração pendentes. Nenhum Java/build/teste/commit/push novo.
+
+## Estado atual — IMP-004 em ADR
+
+Design/Q-C-06 aprovados em 2026-11-10T15:13:50Z; apenas ADR autorizada.
+[Revisão para validação](../../../../bolts/003-overlay/adr-review.md) preparada em 2026-11-10T15:20:09Z:
+conformidade do owner próprio/emprestado, limites físicos, B/R e barreira de dials,
+sem contrariar Q-C-05 ou APIs/bytes existentes. Unidade mantém in-progress;
+003-overlay em ADR, Model/Design concluídos. Nenhum Java/build/teste ou outro IMP
+iniciado. Revisão final por Denji/integração pendentes; parar antes de Implement/Test.
