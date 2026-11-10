@@ -1,0 +1,495 @@
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 955f82c..469986c 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-009–031 continuam TODO; TASK-008 IN PROGRESS apenas em Model; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-007](tasks/PHASE-02/TASK-007.md), DONE; IMP-004/003-overlay complete, Test/903 testes, manual humano Francisco/49 checks e revisão final Denji aprovados; versão revista integrada localmente em main (`8db7b78`). [Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Próximo bolt por dependências: 020-overlay/IMP-005/TASK-008, planned e não iniciado.
++**Última tarefa concluída:** [TASK-007](tasks/PHASE-02/TASK-007.md), DONE; IMP-004/003-overlay complete, Test/903 testes, manual humano Francisco/49 checks e revisão final Denji aprovados; versão revista integrada localmente em main (`8db7b78`). [Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Bolt atual: 020-overlay/IMP-005/TASK-008, IN PROGRESS apenas em Model (preparação de Plan); checkpoint aberto e Q-C-09 pendente.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -100,7 +100,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
+-| [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
++| [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | IN PROGRESS | Model preparado, Plan aberto; Q-C-09 pendente; V-008 NÃO EXECUTADO |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+@@ -421,3 +421,14 @@ Sem push ou alegação de integração remota/entrega do projeto.
+ [Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+ pendentes são históricas; não descrevem o estado atual. Não se promovem
+ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](../memory-bank/bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 8827179..3860af3 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -306,3 +306,27 @@ Em 2026-11-10T16:44:29Z (registo), o utilizador aprovou Test incluindo V-ADD e
+ mandou manter Q-C-08 resolvida. Resolução técnica já suportada pelo patch
+ aplicado e logs com saída 0/zero erros. Revisão humana final e integração
+ continuam pendentes; não há autorização de fecho, commits ou push.
++
++## Q-C-09 — NODE_LEAVE na composição do IMP-005
++
++- Estado: por resolver, checkpoint Model de IMP-005/020-overlay. Não alterar Java.
++- TASK-008, secção 5, exige notificar NODE_LEAVE aos vizinhos diretos quando
++  possível, antes de fechar. ADD 8 limita o incremento a OttApplication,
++  OverlayNode e OttApplicationTest.
++- Evidência da base 2ea748e: NeighborManager.send(), linhas 177–185, rejeita tipo
++  que não seja application; application(), linha 430, aceita apenas 7..17.
++  NODE_LEAVE é 4. requestClose/close/disconnect não têm emissão de Leave; snapshots
++  não expõem canais. O comportamento é igual no checkout atual.
++- Impacto: não é legítimo prometer essa operação nos três ficheiros de composição
++  sem uma porta pública adequada. Best effort não é autorização para eliminar
++  silenciosamente uma operação prevista, criar outro socket ou contornar sessão.
++- Proposta para decisão, não aplicada: fornecer uma operação lifecycle aditiva no
++  manager, sob extensão de âmbito explicitamente aprovada, ou planear um incremento
++  separado que a disponibilize. Preservar send de aplicação, identidade/sessão,
++  bytes v1, caps e todos os testes de IMP-004. A confirmação local de escrita,
++  o tempo restante e a rejeição de novos comandos devem ser definidos antes de código.
++- Não foi provada uma ADR aceite inviável; não se cria ADR-033 por inferência.
++  Se a solução exigir mudar política/decisão aceite, aplicar ADD 11 e obter a
++  aprovação correspondente. Parar a parte afetada; nenhuma opção autorizada aqui.
++- [Modelo](../memory-bank/bolts/020-overlay/ddd-01-domain-model.md). Sem nova
++  execução Java/Maven/V-008 ou alteração das fundações.
+diff --git a/docs/tasks/PHASE-02/TASK-008.md b/docs/tasks/PHASE-02/TASK-008.md
+index 03304f2..492d4bb 100644
+--- a/docs/tasks/PHASE-02/TASK-008.md
++++ b/docs/tasks/PHASE-02/TASK-008.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-008
+ - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Denji](../../team/DENJI.md).
+ - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-006](../PHASE-02/TASK-006.md), [TASK-007](../PHASE-02/TASK-007.md).
+@@ -72,3 +72,14 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](../../../memory-bank/bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/memory-bank/bolts/020-overlay/bolt.md b/memory-bank/bolts/020-overlay/bolt.md
+index 1f6ca58..b8619da 100644
+--- a/memory-bank/bolts/020-overlay/bolt.md
++++ b/memory-bank/bolts/020-overlay/bolt.md
+@@ -3,13 +3,13 @@ id: "020-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-10T17:12:15Z"
+-started: null
++updated: "2026-11-10T17:27:22Z"
++started: "2026-11-10T17:27:22Z"
+ completed: null
+-current_stage: null
++current_stage: "plan"
+ stages_completed: []
+ requires_bolts: ["001-base-validada", "003-overlay", "019-overlay"]
+ enables_bolts: ["004-overlay", "022-rotas"]
+@@ -74,3 +74,24 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ 003-overlay complete, TASK-007 DONE e integração local 8db7b78 comprovada.
+ Atualizado apenas blocks=false: dependências concluídas. Este bolt permanece
+ planned, started=null, current_stage=null, stages_completed=[]; nenhum IMP iniciado.
++
++## Início autorizado — apenas Model, preparação de Plan
++
++Iniciado em 2026-11-10T17:27:22Z por instrução explícita do utilizador. Base pedida
++`2ea748efd61ba5bdea355d2b5a02de6f6bd9a8c5`; checkout limpo em `90cded6b8d321cfcbe369dd4f8dbed9a01ddf430`.
++Fontes de Projeto/ e ADD iguais à base pedida; diferenças posteriores preservadas.
++O tipo continua Simple: Model é artefacto preliminar dentro de Plan, sem completar
++Plan nem alterar a sequência plan/implement/test. current_stage=plan,
++stages_completed=[], completed=null. Parar no checkpoint Model.
++Sem implementação, testes Java, commits/push ou início de outro IMP.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index 2c2ccce..0d7cdc7 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -431,3 +431,21 @@ Sem push ou alegação de integração remota/entrega do projeto.
+ [Fecho documental](../../../../bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+ pendentes são históricas; não descrevem o estado atual. Não se promovem
+ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
++
++## IMP-005 — início apenas de Model
++
++2026-11-10T17:27:22Z: 020-overlay iniciado por pedido explícito, dependências complete
++e presentes na base 2ea748e. Model dentro da preparação de Plan/Simple; sem
++conclusão de Plan, implementação, testes Java, commits ou push. Checkout 90cded6
++preservado; código/ADD iguais à base pedida. Parar no checkpoint Model.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](../../../../bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md
+index d97cb59..4247a84 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md
+@@ -2,7 +2,7 @@
+ id: "003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-008"]
+@@ -37,3 +37,14 @@ A tarefa normativa é [IMP-005](../../../../../../add.md#imp-005); o bolt só or
+ - Bolts anteriores: 001-base-validada, 003-overlay, 019-overlay.
+ - Responsável de origem: Denji; revisor: Waheed.
+ - Gates: nenhum específico adicional.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](../../../../../bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+index 8f1433c..a8c8519 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-10T17:12:15Z"
++updated: "2026-11-10T17:31:12Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+@@ -193,3 +193,14 @@ Sem push ou alegação de integração remota/entrega do projeto.
+ [Fecho documental](../../../../bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+ pendentes são históricas; não descrevem o estado atual. Não se promovem
+ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](../../../../bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index defed42..ab11036 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. Total atual: quatro histórias/bolts complete; os restantes 29 continuam planned, sem novo IMP iniciado.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. Total atual: quatro histórias/bolts complete; 020-overlay/IMP-005 está in-progress apenas no checkpoint Model (preparação de Plan); os restantes 28 continuam planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -51,7 +51,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
+ 
+ ## 002-overlay/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-005. **Estado:** planned. **Bolt:** 020-overlay.
++**Tarefa:** IMP-005. **Estado:** in-progress (Model dentro de Plan). **Bolt:** 020-overlay.
+ **Ficheiro:** [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md).
+ 
+ ## 002-overlay/004-preparar-evidencia-do-primeiro-marco-intermedio.md ✅ GENERATED
+@@ -226,3 +226,14 @@ Sem push ou alegação de integração remota/entrega do projeto.
+ [Fecho documental](bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
+ pendentes são históricas; não descrevem o estado atual. Não se promovem
+ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
++
++## IMP-005 — checkpoint Model, sem implementação
++
++[Modelo preparado](bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
++001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
++2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
++continua Simple; apenas preparação Model de Plan, current_stage=plan,
++stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
++na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
++Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
++Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+--- /dev/null
++++ b/memory-bank/bolts/020-overlay/ddd-01-domain-model.md
+@@ -0,0 +1,225 @@
++# IMP-005 — Model: processo, composição por papel e ciclo de vida
++
++Modelo preparado para o checkpoint pedido pelo utilizador, **sem implementação**.
++O bolt é Simple: este artefacto é preparação limitada da etapa Plan, que não fica
++concluída nem aprovada por existir o modelo. Não se mudou o tipo, a sequência
++Plan/Implement/Test ou a arquitetura. Só Model foi autorizado nesta continuação.
++
++## 1. Base, fontes e dependências
++
++Base normativa pedida: `2ea748efd61ba5bdea355d2b5a02de6f6bd9a8c5`.
++Checkout real: `90cded6b8d321cfcbe369dd4f8dbed9a01ddf430`, ramo `main`, inicialmente
++limpo. A base é ancestral de HEAD. As diferenças posteriores são ferramentas,
++saídas antigas de build e evidência do fecho anterior; foram preservadas. ADD,
++specs, este bolt e os 155 ficheiros de Projeto/ fora de target são iguais à base.
++Não se fez checkout/reset nem se atribui HEAD à base pedida.
++
++Fontes: enunciado ESR-TP2-26-27.pdf, em especial pp. 2–3 (processos manuais e
++entrada/saída); ADD 2/5/6/8–12, IMP-005; specs REQ-001/002/023 e NFR-003;
++intent/unidade/história; TASK-008; contrato 07, secções 3–7; estratégia 09/V-008;
++DoD 14, progresso 15 e contratos públicos já disponíveis em Projeto/.
++O texto do PDF foi extraído localmente, sem consulta externa.
++
++Dependências fechadas e integradas na base:
++
++| Incremento / bolt | Estado | Reutilização |
++|---|---|---|
++| IMP-001 / 001-base-validada | complete | configuração, codec e transporte de base |
++| IMP-002 / 019-overlay | complete | RuntimeConfiguration validada, defaults e overrides |
++| IMP-004 / 003-overlay | complete | NeighborManager, Session e SerialOwner; TASK-007 DONE |
++
++TASK-003/006/007 exigidas pela TASK-008 estão DONE. A descoberta inicial de
++IMP-003 é herdada por IMP-004; não se reimplementa bootstrap. O último build
++aprovado foi o de IMP-004, com 903 testes: **histórico, sem nova execução aqui**.
++
++## 2. Fronteira do incremento
++
++Únicos ficheiros de código previstos pelo ADD 8:
++
++- `Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java` — CLI e composição;
++- `Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java` — ciclo do nó;
++- `Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java` — V-008.
++
++Os dois ficheiros main existem vazios na base. O terceiro ainda não existe.
++A referência legada a LifecycleTest/StreamingClient na TASK-008 não autoriza
++mudar essa lista: prevalece o ADD. Tipos auxiliares podem ser internos aos três
++ficheiros quando a implementação for autorizada, sem nova dependência.
++
++Dentro: selecionar BOOTSTRAP/SERVER/RELAY/CLIENT; argumentos e configuração antes
++de rede; identidade volátil; composição dos serviços existentes; comando neighbors,
++quit/EOF; logs e códigos de saída; shutdown com prazo; subprocessos reais de V-008.
++SERVER/CLIENT são papéis overlay nesta fase, sem fingir emissão/reprodução.
++
++Fora: vídeo/UDP, GUI, catálogo dinâmico, métricas/sondas/rotas/subscrições,
++CLI futura completa, HTTP, sockets paralelos ao manager, novas arestas, membership,
++novas propriedades/caps, CI/linter/cobertura percentual. catalog/play explicam
++explicitamente indisponibilidade nesta fase; não produzem dados fictícios.
++
++## 3. Entidades e invariantes
++
++| Conceito | Identidade/dados | Invariante |
++|---|---|---|
++| Invocação | argumentos originais, papel e caminho de configuração | sem serviços enquanto argumentos/perfil não forem válidos |
++| Plano local validado | NodeConfiguration/RuntimeConfiguration imutáveis | defaults e caps herdados, sem DNS no loader ou configuração parcial |
++| Execução do processo | nodeId, papel, PID e identidade de execução quando disponível | identidade de processo não é connectionId nem pode ser confundida com UUID wire de outro componente |
++| Nó overlay composto | configuração, uma instanceId não zero, owner e NeighborManager | uma instância por arranque; um único dono serial do estado do nó |
++| Serviço bootstrap | BootstrapServer existente e o seu lifecycle | só consulta inicial; sem membros, leases, renovações, sondas ou NODE_LEAVE |
++| Vista de vizinhos | cópia de Session/diagnóstico publicado pelo manager | leitura não altera peers, não autoriza UDP antes de ACTIVE e não expõe Connection |
++| Pedido de paragem | primeira razão, origem e início monotónico do budget | idempotente; pedidos repetidos não renovam prazo nem repetem cleanup |
++| Resultado terminal | código local 0/2/3 e razão preservada | causa fatal não é substituída por EOF/erro induzido pelo próprio shutdown |
++
++A CLI não gera identidade no loader. SERVER/RELAY/CLIENT recebem uma instanceId
++única na composição, reutilizada em logs e envelopes do manager. BootstrapServer
++já gera a sua identidade interna; o wrapper não deve inventar outro UUID e
++apresentá-lo como senderInstance desse serviço. A exposição/log dessa identidade
++é uma fronteira a esclarecer em Plan, sem alterar BootstrapServer neste Model.
++
++## 4. Estados e eventos do processo
++
++Estados conceptuais, não enums Java introduzidos nesta etapa:
++
++`NEW → VALIDATING → STARTING → RUNNING → STOPPING → TERMINATED`.
++Validação inválida termina sem recursos; falha de arranque passa por rollback
++antes de terminar. READY do manager significa lista inicial instalada, não todos
++os vizinhos online. RUNNING não exige grau desejado já alcançado. Bootstrap pode
++estar ainda indisponível: não confundir retry de descoberta com configuração
++inválida, sucesso fictício ou morte de todos os processos.
++
++Eventos: configuração válida/inválida; arranque concluído/falhado; NeighborUp,
++NeighborDown, Received e Diagnostic; linha/comando local; EOF; sinal/hook;
++paragem pedida/concluída; budget esgotado. Entradas assíncronas conservam geração
++e sessão quando aplicável. Estado de rede só muda no owner; callbacks capturam
++e oferecem eventos sem DNS, leitura de stdin, logging bloqueante ou espera por espaço.
++
++Saídas: criar serviços permitidos, publicar diagnóstico/snapshot, apresentar
++vizinhos, solicitar paragem, cancelar elegibilidade de tentativas, aguardar fora
++do owner com tempo restante e devolver resultado terminal. Sem consumidores que
++descartem ERROR válido silenciosamente; a composição tem de o tornar observável
++sem implementar agora routing.
++
++## 5. CLI e política por papel
++
++| Entrada/papel | Comportamento a construir e provar |
++|---|---|
++| Ajuda | terminar com 0, sem carregar perfil ou abrir socket |
++| --role/--config | obrigatórios para execução, coerentes com perfil; opções desconhecidas/repetidas/incompletas rejeitadas |
++| BOOTSTRAP | validar perfil/topologia e iniciar só BootstrapServer |
++| SERVER/RELAY/CLIENT | validar perfil completo e criar OverlayNode/manager com owner partilhável |
++| neighbors | apresentar desired/estado/sessões confirmadas ou descoberta pendente; não exigir bootstrap disponível depois de READY |
++| quit ou EOF | pedir paragem normal uma vez e aguardar recursos com prazo |
++| catalog/play | explicar que a função não está implementada nesta fase, sem criar stream/rota/reprodução |
++| comando não reconhecido | erro local de utilização, sem frame de rede nem fechar peer saudável |
++
++[PRESSUPOSTO] O Model não fixa aliases, abreviaturas ou sintaxe `--opção=valor`
++que o contrato não exige. Gramática exata e apresentação ficam para Plan, com
++casos negativos; não se cria parser permissivo por inferência. Help combinado
++com argumentos inválidos também precisa de regra explícita antes dos testes.
++
++BOOTSTRAP não é um nó de encaminhamento. neighbors nele pode explicar ausência
++de sessões overlay; não deve fabricar uma lista de membros vivos. A utilização
++de SERVER/CLIENT não abre media/UDP/Swing neste incremento.
++
++## 6. Ownership, recursos e observabilidade
++
++OverlayNode deve usar o SerialOwner emprestado ao NeighborManager: a API própria
++é útil ao serviço embutível, mas criar um segundo owner para o mesmo nó violaria
++ADR-017. Configuração/runtime efectivos chegam aos construtores existentes.
++BootstrapServer conserva o seu proprietário interno; não se instancia um manager
++para esse papel. Não se usa um executor comum ilimitado para CLI, logs ou callbacks.
++
++Input, comandos e logs têm de ser limitados antes de acumular; saturação é
++observável e termina a parte afetada. Os limites concretos derivados, gestão de
++stdin e I/O de saída ficam para Plan. Um leitor daemon ou um future cancelado
++não provam terminação física: V-008 tem de verificar subprocesso e recursos.
++
++Logs distinguem processo/papel/instância conhecida, requestId/connectionId/sessão,
++fase, motivo e código de saída. Não expõem paths privados/stack traces na rede.
++Uma falha de peer gera indisponibilidade/retry local, sem ser tratada como falha
++fatal de todo o nó; uma Diagnostic de saturação/falha fatal de serviço não pode
++ser ignorada porque start já teve sucesso. A classificação da causa e a
++observação de falhas do bootstrap precisam de portas reais, não de campos privados.
++
++## 7. Paragem e códigos de saída
++
++0: ajuda ou fim normal de quit/EOF com recursos terminados. 2: argumentos/perfil
++inválidos antes de sockets. 3: falha local fatal de bind/recurso/cleanup. Não
++prometer 0 para SIGINT/SIGTERM: o SO/JVM determina o status de sinal; o teste
++regista o resultado real e verifica que o hook não fica pendente.
++
++Uma primeira paragem fecha a admissão de comandos, retira novos retries e usa
++control.shutdownTimeout como budget global do processo. O tempo gasto a notificar
++vizinhos/fechar manager/terminar owner não se soma em budgets completos por recurso.
++Hook e quit partilham a mesma decisão terminal; repetir Ctrl-C não reinicia o prazo.
++Nunca aguardar no owner/callback nem confundir requestClose com terminação física.
++
++TASK-008 exige NODE_LEAVE para vizinhos diretos quando possível, nunca para
++bootstrap. Não deve ser convertido em garantia de entrega nem novo ACK. A
++capacidade de envio é uma lacuna real descrita abaixo; não se modela como existente.
++stdin EOF, pipe de logs bloqueado, bootstrap ausente e owner falhado são casos
++separados de shutdown. Rollback cobre recursos parcialmente criados.
++
++## 8. Q-C-09 — fronteira real de NODE_LEAVE
++
++Inspeção da base: NeighborManager.send() aceita apenas mensagens de aplicação
++7..17; NODE_LEAVE tem código 4 e devolve INVALID_MESSAGE. snapshot não expõe canal;
++disconnect/requestClose fecham sem transmitir Leave. Criar outro Transport para
++essa notificação, usar reflexão ou representar Leave como ERROR violaria o
++modelo de sessão/wire. Não se alarga send() por configuração.
++
++Assim, **não está demonstrado ser possível cumprir a notificação normal da
++TASK-008 só nos três ficheiros de IMP-005**. O carácter best effort não permite
++apagar silenciosamente a operação por faltar uma porta pública na composição.
++[Q-C-09](../../../docs/construction-duvidas.md#q-c-09--node_leave-na-composição-do-imp-005)
++regista evidência e opções para decisão: extensão aditiva de lifecycle no manager
++com âmbito explicitamente aprovado, ou incremento separado que forneça essa
++capacidade. Nenhuma foi adotada; não se reabre IMP-004 nem se cria ADR-033 por
++inferência. Não foi provada inviabilidade de uma ADR aceite: é uma lacuna de
++contrato/âmbito que deve ser resolvida antes de Plan/Implement da parte afetada.
++
++## 9. Oráculos M01–M18 / V-008 — planeados, não executados
++
++| ID | Resultado exigido no futuro | Meio |
++|---|---|---|
++| M01 | argumentos/perfil inválidos e ajuda não criam serviços/sockets | factories espiadas + subprocesso/porta de controlo |
++| M02 | cada um dos quatro papéis arranca com identidade/papel coerentes | perfis reais e quatro subprocessos por casos |
++| M03 | só bootstrap consulta grafo; overlay compõe um owner e manager | factories/owner controlados; logs por papel |
++| M04 | READY não significa peers online; neighbors responde durante descoberta | bootstrap/peers controlados, stdin/stdout reais |
++| M05 | três nós por CLI convergem; neighbors mostra sessões sem duplicados | processos JVM distintos, TCP local real |
++| M06 | bootstrap desligado após descoberta não impede comandos/reconexão | subprocessos e callbacks/IDs observados |
++| M07 | um peer sair não exige reiniciar os restantes | fim normal/abrupto e reconexão entre sobreviventes |
++| M08 | ERROR/Diagnostic são observáveis; erro de peer não mata nó saudável | observer/saída espiados + TCP real |
++| M09 | bind/recurso fatal produz 3 e rollback sem porta/worker pendente | serviço falso e porta ocupada real |
++| M10 | quit/EOF/hook concorrentes fazem um cleanup e não renovam budget | clock/fakes e subprocesso com sinal real |
++| M11 | NODE_LEAVE só para sessões diretas correntes, antes do fecho quando possível | pendente Q-C-09; transporte/flush controlados |
++| M12 | tempo global inclui notificação, serviços e owner; prazo dá erro explícito | relógio falso, recursos bloqueáveis e awaits com tempo restante |
++| M13 | stdin/stdout lento/fechado e consumidor que falha não deixam processo preso | pipes reais e I/O controlado, sem alegar thread morta por daemon |
++| M14 | queues/linhas/logs limitados e saturação observável | fronteiras com fakes, sem filas ilimitadas |
++| M15 | owner emprestado termina no fim; nenhum callback ressuscita nó fechado | owner/futures controlados, gerações e snapshots |
++| M16 | catalog/play/command inválido não fingem streaming nem enviam frames novos | entrada/saída e contadores de rede |
++| M17 | regressão preserva codec/framing, configuração, manager e fundações | testes existentes + clean verify futuro, sem os enfraquecer |
++| M18 | roteiro CLI reproduzível, revisão Waheed e integração antes de DONE | Test futuro com JAR/hash/logs e operador identificado |
++
++Os fakes não substituem M02/M05/M07/M10 com subprocessos reais. A regressão de
++903 testes anterior não é execução de V-008. CORE, GUI e metas só contam depois
++de execuções próprias, fora deste Model.
++
++## 10. ADR, gates e checkpoint
++
++Aplicam-se ADR-013/014/016/017/019/020/022/024; transversais 001/010/012/015/018/
++021/026 preservadas. ADR-003 continua substituída. Sem nova dependência, propriedade,
++tipo wire, política ou hard cap. Sem gates externos adicionais; permanecem V-008,
++regressão, manual/revisão humana final atribuída a **Waheed** e integração antes
++de DONE. A atribuição histórica de execução da TASK é Denji; autoria do agente
++não substitui nem presume o revisor.
++
++[PRESSUPOSTO] O pedido «Model» é tratado como preparação de Plan do bolt Simple:
++`current_stage=plan`, `stages_completed=[]`, sem fechar Plan. Este documento não
++é um desenho técnico nem uma autorização para construir. Se o utilizador quiser
++converter o fluxo para DDD, isso requer uma alteração explícita posterior do
++plano, não uma mudança silenciosa deste artefacto.
++
++Parar no checkpoint Model. Validar entidades/estados/fronteiras e resolver a
++questão material Q-C-09 antes de decidir a próxima parte do planeamento.
++Nenhum Java, teste, build, socket de serviço, commit ou push foi executado/criado
++para este Model. A validação documental e hashes são evidência de preservação,
++não V-008 ou aprovação do modelo.

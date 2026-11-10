@@ -306,3 +306,80 @@ Em 2026-11-10T16:44:29Z (registo), o utilizador aprovou Test incluindo V-ADD e
 mandou manter Q-C-08 resolvida. Resolução técnica já suportada pelo patch
 aplicado e logs com saída 0/zero erros. Revisão humana final e integração
 continuam pendentes; não há autorização de fecho, commits ou push.
+
+## Q-C-09 — NODE_LEAVE na composição do IMP-005
+
+- Estado atual: decisão de âmbito resolvida por autorização explícita do utilizador;
+  extensão ainda não implementada nem validada. Model aceite; checkpoint Plan por aprovar.
+  O registo abaixo conserva a evidência e proposta originais. Não alterar Java nesta etapa.
+- TASK-008, secção 5, exige notificar NODE_LEAVE aos vizinhos diretos quando
+  possível, antes de fechar. ADD 8 limita o incremento a OttApplication,
+  OverlayNode e OttApplicationTest.
+- Evidência da base 2ea748e: NeighborManager.send(), linhas 177–185, rejeita tipo
+  que não seja application; application(), linha 430, aceita apenas 7..17.
+  NODE_LEAVE é 4. requestClose/close/disconnect não têm emissão de Leave; snapshots
+  não expõem canais. O comportamento é igual no checkout atual.
+- Impacto: não é legítimo prometer essa operação nos três ficheiros de composição
+  sem uma porta pública adequada. Best effort não é autorização para eliminar
+  silenciosamente uma operação prevista, criar outro socket ou contornar sessão.
+- Proposta para decisão, não aplicada: fornecer uma operação lifecycle aditiva no
+  manager, sob extensão de âmbito explicitamente aprovada, ou planear um incremento
+  separado que a disponibilize. Preservar send de aplicação, identidade/sessão,
+  bytes v1, caps e todos os testes de IMP-004. A confirmação local de escrita,
+  o tempo restante e a rejeição de novos comandos devem ser definidos antes de código.
+- Não foi provada uma ADR aceite inviável; não se cria ADR-033 por inferência.
+  Se a solução exigir mudar política/decisão aceite, aplicar ADD 11 e obter a
+  aprovação correspondente. Parar a parte afetada; nenhuma opção autorizada aqui.
+- [Modelo](../memory-bank/bolts/020-overlay/ddd-01-domain-model.md). Sem nova
+  execução Java/Maven/V-008 ou alteração das fundações.
+
+### Decisão autorizada de Q-C-09 — Model aceite, Plan preparado
+
+Registada em 2026-11-10T17:38:56Z. O utilizador aprovou a extensão mínima aditiva de lifecycle
+em NeighborManager e testes próprios, preservando send() de aplicação e o fecho
+histórico de IMP-004. A alternativa de incremento separado não foi adotada.
+ADD/IMP-005 e contrato 07 passam a documentar essa exceção. Decisão de âmbito
+resolvida; a capacidade permanece por implementar e provar com L01–L12/V-008.
+Base operacional 90cded6; 2ea748e é referência histórica.
+[Plan](../memory-bank/bolts/020-overlay/implementation-plan.md) define operação,
+sessões diretas, confirmação local, bloqueio de trabalho/retries, orçamento e
+fecho incondicional. Sem alteração Java, nova ADR por inferência, commits ou push.
+
+## Q-C-10 — Reserva do budget de cleanup aprovada
+
+Estado: decisão aprovada explicitamente pelo utilizador, registada em 2026-11-10T17:41:41Z.
+A fase best effort de NODE_LEAVE usa no máximo metade do budget global restante
+à entrada do primeiro pedido; a outra metade fica reservada para cleanup.
+Pedidos repetidos não renovam o prazo; não há timeout completo por vizinho/recurso.
+Concretização de Plan, não exigência textual do enunciado nem novo hard cap wire.
+Prova futura L04/L06/L07/L11 e M10/M12; sem execução inferida pela aprovação.
+
+## Q-C-11 — Gramática CLI aprovada
+
+Estado: decisão aprovada explicitamente pelo utilizador, registada em 2026-11-10T17:41:41Z.
+`--help` apenas sozinho; execução com `--role BOOTSTRAP|SERVER|RELAY|CLIENT` e
+`--config <ficheiro>`, ordem livre e cada opção exatamente uma vez. Papéis
+maiúsculos; sem aliases, equals ou posicionais. Ajuda combinada, duplicação,
+opção desconhecida ou valor ausente: erro 2 antes de abrir sockets.
+Escolha de interface do Plan, não transcrição do enunciado. M01/M02/M16 futuros.
+
+## Q-C-12 — Limites locais de I/O aprovados
+
+Estado: decisão aprovada explicitamente pelo utilizador, registada em 2026-11-10T17:41:41Z.
+Linha CLI até 4096 caracteres antes de acumular mais; fila de comandos até
+runtime.overlay.eventsCapacity, fila de saída até runtime.control.queueCapacity;
+registo até 4096 caracteres com truncagem indicada. Excesso de linha tem erro
+explícito e consumo limitado; saturação/falha de consumidor é observável e
+solicita paragem sem bloquear o owner. São buffers locais, sem novas propriedades,
+política wire ou alteração dos hard caps existentes; decisão do utilizador,
+não atribuída ao enunciado. M13/M14 futuros, com terminação física a demonstrar.
+
+### Evidência de Implement para Q-C-09–12
+
+Registada em 2026-11-10T18:16:24Z, ainda sujeita à aprovação de Implement. As decisões aprovadas
+foram implementadas nos cinco ficheiros, sem alterar send()/wire/caps ou reabrir
+IMP-004. L01–L12/M01–M17 têm prova técnica na regressão atual de 979 testes; M18,
+clean verify de Test, manual humano, revisão final Waheed e integração pendentes.
+O scope Q-C-09 permanece resolvido; as três concretizações Q-C-10–12 continuam
+atribuídas à aprovação do utilizador, não ao enunciado. Nenhuma ADR foi substituída.
+[Walkthrough e limites](../memory-bank/bolts/020-overlay/implementation-walkthrough.md).

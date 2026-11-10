@@ -265,3 +265,73 @@ Sem push ou alegação de integração remota/entrega do projeto.
 [Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
 pendentes são históricas; não descrevem o estado atual. Não se promovem
 requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
+
+## IMP-005 — extensão lifecycle planeada (Q-C-09)
+
+Model aceite e exceção de âmbito autorizada explicitamente pelo utilizador;
+Plan ainda por aprovar. Contrato futuro, sem Java alterado:
+`NeighborManager.requestShutdown(int reason, Duration remainingBudget)` devolve
+`CompletionStage<ShutdownReport>`; reason v1 0/1. Relatório imutável com tentativas
+por Session e resultado LOCAL_WRITE_CONFIRMED/WRITE_FAILED/TIMED_OUT/ABORTED,
+mais notificationTimedOut. Sucesso confirma apenas write+flush local, nunca ACK.
+
+O primeiro pedido fecha admissão de comandos/retries; no owner captura apenas
+sessões diretas ACTIVE correntes, revalidando connectionId e instanceId. Nunca
+envia para bootstrap/handshakes/sessões obsoletas nem cria outro transporte.
+Notificação paralela limitada ao budget restante global, com reserva para cleanup;
+falha/timeout obrigam a fechar. Repetições não renovam prazo nem repetem envios.
+requestClose imediato preempta drenagem; awaitTermination físico continua separado,
+fora do owner. send de aplicação mantém filtro 7–17 e semântica existente.
+
+Exceção autorizada: NeighborManager.java e novo NeighborManagerLifecycleTest.java
+somam-se aos três ficheiros de IMP-005. Não reabre nem altera o fecho histórico de
+IMP-004; testes D01–D22 preservados. Sem nova ADR/política/bytes/caps/dependências.
+[Plan completo](../memory-bank/bolts/020-overlay/implementation-plan.md), incluindo
+assinaturas, validações, orçamento, I/O e L01–L12/M01–M18. A operação não existe
+ainda na implementação; Q-C-09 resolve a decisão de âmbito, não comprova execução.
+
+## IMP-005 — interfaces introduzidas, comportamento pendente
+
+Plan aprovado explicitamente, incluindo Q-C-10/11/12. A assinatura requestShutdown
+com ShutdownReport/LeaveAttempt/LeaveOutcome já foi acrescentada; a operação
+lança UnsupportedOperationException até à autorização de implementar comportamento.
+OttApplication e OverlayNode têm igualmente contratos/stubs sem serviços ativos.
+Não confundir compilação das interfaces com API funcional ou validação V-008.
+send() e todos os restantes comportamentos históricos de NeighborManager foram
+preservados. O checkpoint interfaces/testes vermelhos precede a implementação.
+
+## IMP-005 — comportamento de Implement preparado
+
+Registo em 2026-11-10T18:16:24Z, sujeito ao checkpoint Implement. A autorização posterior às
+interfaces permitiu implementar o Plan nos cinco ficheiros. As descrições anteriores
+de stubs/contrato futuro são históricas; requestShutdown já implementa Q-C-09/10,
+com relatório limitado a 63 sessões e escrita local best effort. requestClose
+continua imediato e preempta drenagem; close depois de um aviso não renova o budget.
+send() de aplicação é idêntico à base. Sem alteração de bytes, caps ou transportes.
+
+OttApplication parse/run/main concretizam Q-C-11/12. O main possui canais dos
+descritores da consola, fecha-os diretamente e verifica joins físicos; run com
+streams emprestados não assume ownership desses streams. A vista ExecutionResult
+é interna para observar joins nos testes, sem comando público adicional.
+OverlayNode cria um owner, empresta-o ao manager e aguarda a sua terminação fora
+do owner; close em callback só solicita paragem. failure() expõe falha local
+observada como Optional. Bootstrap conserva o seu lifecycle existente,
+sem membership ou exposição de UUID wire fictício.
+
+Regressão de Implement: 979 testes, zero falhas/erros/ignorados, incluindo TCP e
+subprocessos reais. Não é clean verify/Test aprovado nem manual humano.
+[Walkthrough](../memory-bank/bolts/020-overlay/implementation-walkthrough.md) e
+[oráculos](../memory-bank/bolts/020-overlay/implement-oracles.md). Sem fecho,
+commits/push ou integração presumida.
+
+## IMP-005 — coerência do resultado terminal
+
+Correção registada em 2026-11-10T18:39:44Z, sujeita à aprovação de Implement. A mensagem
+SHUTDOWN node=... phase=closing-output assinala apenas progresso de cleanup,
+sem declarar STOPPED ou exit. O código final é o devolvido por ExecutionResult/run
+e usado pelo main como status do processo, depois de conhecer o resultado do
+writer. Não se exige um log final depois de fechar stdout/stderr. Falha ou
+timeout do writer pode determinar 3, conservando o budget global restante.
+Dois testes de regressão dirigidos cobrem falha e bloqueio precisamente nessa
+fase, após serviço terminado com sucesso; regressão atual de 981 testes passou.
+Test/clean verify/manual humano/revisão final Waheed/integração continuam pendentes.

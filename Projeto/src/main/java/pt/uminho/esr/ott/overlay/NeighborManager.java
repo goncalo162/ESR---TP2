@@ -17,6 +17,97 @@ public final class NeighborManager implements AutoCloseable {
     public enum Phase { NOT_STARTED, DISCOVERING, READY, FAILED, CLOSED }
     public enum Reason { REMOTE_REJECTION, CONTEXT, TRANSPORT, TIMEOUT, RESOURCE_LIMIT,
         SHUTDOWN, LEAVE, CONSUMER_FAILURE, STALE }
+    /** Local diagnostics only; these values are never serialized on the wire. */
+    public enum LeaveOutcome { LOCAL_WRITE_CONFIRMED, WRITE_FAILED, TIMED_OUT, ABORTED }
+    public record LeaveAttempt(Neighbor.Session session, LeaveOutcome outcome) {
+        public LeaveAttempt { Objects.requireNonNull(session); Objects.requireNonNull(outcome); }
+    }
+    public record ShutdownReport(List<LeaveAttempt> attempts, boolean notificationTimedOut) {
+        public ShutdownReport {
+            Objects.requireNonNull(attempts);
+            if (attempts.size() > 63) throw new IllegalArgumentException("Configured degree cap is 63");
+            attempts = List.copyOf(attempts);
+        }
+    }
+    /** Completion confirms only the local notification phase, never a peer ACK or termination. */
+    public synchronized CompletionStage<ShutdownReport> requestShutdown(int reason, Duration remainingBudget) {
+        Objects.requireNonNull(remainingBudget);
+        if (reason < 0 || reason > 1 || remainingBudget.isNegative())
+            throw new IllegalArgumentException("Leave reason 0/1 and nonnegative budget required");
+        final long nanos;
+        try { nanos = remainingBudget.toNanos(); }
+        catch (ArithmeticException e) { throw new IllegalArgumentException("Budget overflow", e); }
+        if (shutdownResult != null) return shutdownView;
+        shutdownResult = new CompletableFuture<>(); shutdownView = shutdownResult.minimalCompletionStage();
+        notificationStarted = now();
+        notificationTotalBudget = Math.min(nanos, plan.config.runtime().control().shutdownTimeout().toNanos());
+        notificationBudget = notificationTotalBudget / 2;
+        draining.set(true);
+        if (!launched || stopping.get() || notificationBudget == 0) {
+            requestClose(); publishShutdown(LeaveOutcome.ABORTED); return shutdownView;
+        }
+        if (!post(() -> beginShutdown(reason), true)) {
+            requestClose();
+            // No notification event was admitted, so there is no owner-owned attempt map to read.
+            shutdownResult.complete(new ShutdownReport(List.of(), false));
+        }
+        return shutdownView;
+    }
+    private void beginShutdown(int reason) {
+        cancel(initialSlot); initialSlot = null;
+        if (discovery != null) retire(discovery);
+        for (var p : peers.values()) {
+            cancel(p.slot); p.slot = null;
+            if (p.attempt != null) retire(p.attempt);
+        }
+        for (var c : List.copyOf(contexts.values())) {
+            cancel(c.deadline); c.deadline = null;
+            if (!c.bootstrap && c.active && c.peer != null && c.peer.context == c
+                    && c.peer.session != null && c.channel.id().equals(c.peer.session.connectionId())
+                    && Objects.equals(c.remoteInstance, c.peer.session.instanceId()))
+                leaveResults.put(c.peer.session, null);
+            else finish(c, Reason.SHUTDOWN, null);
+        }
+        long left = notificationBudget - (now() - notificationStarted);
+        if (left <= 0) { finishShutdown(LeaveOutcome.TIMED_OUT, !leaveResults.isEmpty()); return; }
+        if (leaveResults.isEmpty()) { finishShutdown(LeaveOutcome.ABORTED, false); return; }
+        notificationTicket = deadlines.schedule(() -> post(() -> finishShutdown(LeaveOutcome.TIMED_OUT, true), true), left);
+        for (var session : List.copyOf(leaveResults.keySet())) {
+            if (stopping.get()) break;
+            if (now() - notificationStarted >= notificationBudget) { finishShutdown(LeaveOutcome.TIMED_OUT, true); break; }
+            var peer = current(session);
+            if (peer == null || peer.context == null || !peer.context.active || !peer.context.channel.isOpen()
+                    || !peer.context.channel.id().equals(session.connectionId())
+                    || !Objects.equals(peer.context.remoteInstance, session.instanceId())) {
+                writtenLeave(session, new IllegalStateException("Session retired")); continue;
+            }
+            try {
+                peer.context.channel.sendAndFlush(new ControlMessage(MessageType.NODE_LEAVE, UUID.randomUUID(),
+                        plan.local.nodeId(), instance, new ControlMessage.Leave(reason)))
+                    .whenComplete((v, error) -> post(() -> writtenLeave(session, error), true));
+            } catch (RuntimeException e) { writtenLeave(session, e); }
+        }
+    }
+    private void writtenLeave(Neighbor.Session session, Throwable error) {
+        if (shutdownResult.isDone() || !leaveResults.containsKey(session) || leaveResults.get(session) != null) return;
+        if (now() - notificationStarted >= notificationBudget) { finishShutdown(LeaveOutcome.TIMED_OUT, true); return; }
+        leaveResults.put(session, error == null ? LeaveOutcome.LOCAL_WRITE_CONFIRMED : LeaveOutcome.WRITE_FAILED);
+        if (leaveResults.values().stream().allMatch(Objects::nonNull)) finishShutdown(LeaveOutcome.ABORTED, false);
+    }
+    private void finishShutdown(LeaveOutcome pending, boolean timedOut) {
+        if (shutdownResult == null || shutdownResult.isDone()) return;
+        notificationTimedOut |= timedOut;
+        leaveResults.replaceAll((session, outcome) -> outcome == null ? pending : outcome);
+        if (notificationTicket != null) { notificationTicket.cancel(); notificationTicket = null; }
+        requestClose(); publishShutdown(pending);
+    }
+    private void publishShutdown(LeaveOutcome pending) {
+        if (shutdownResult == null || shutdownResult.isDone()) return;
+        if (notificationTicket != null) { notificationTicket.cancel(); notificationTicket = null; }
+        var attempts = new ArrayList<LeaveAttempt>(leaveResults.size());
+        leaveResults.forEach((session, outcome) -> attempts.add(new LeaveAttempt(session, outcome == null ? pending : outcome)));
+        shutdownResult.complete(new ShutdownReport(attempts, notificationTimedOut));
+    }
     public interface Observer { void onEvent(Event event); }
     public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic {}
     public record NeighborUp(Neighbor.Session session) implements Event {
@@ -96,6 +187,14 @@ public final class NeighborManager implements AutoCloseable {
     private volatile Deadlines deadlines;
     private Registration registration;
     private final AtomicBoolean stopping = new AtomicBoolean();
+    private final AtomicBoolean draining = new AtomicBoolean();
+    private volatile CompletableFuture<ShutdownReport> shutdownResult;
+    private CompletionStage<ShutdownReport> shutdownView;
+    // Notification state is owned by SerialOwner, except the before-start empty report.
+    private final Map<Neighbor.Session, LeaveOutcome> leaveResults = new LinkedHashMap<>();
+    private long notificationStarted, notificationBudget, notificationTotalBudget;
+    private boolean notificationTimedOut;
+    private Ticket notificationTicket;
     private final AtomicReference<Throwable> failure = new AtomicReference<>();
     private final AtomicBoolean terminationObserved = new AtomicBoolean();
     private final CompletableFuture<Void> started = new CompletableFuture<>(), cleaned = new CompletableFuture<>();
@@ -160,7 +259,7 @@ public final class NeighborManager implements AutoCloseable {
         commandSlots = new Semaphore(config.runtime().overlay().eventsCapacity() + 1);
     }
     public synchronized CompletionStage<Void> start() {
-        if (launched || stopping.get()) return startView;
+        if (launched || stopping.get() || draining.get()) return startView;
         launched = true;
         try {
             if (!borrowed) owner = ports.owner(plan.config.runtime().overlay().eventsCapacity());
@@ -198,22 +297,24 @@ public final class NeighborManager implements AutoCloseable {
         return peer != null && expected.equals(peer.session) ? peer : null;
     }
     private <T> CompletionStage<T> command(T closedValue, java.util.function.Supplier<T> operation) {
-        if (stopping.get() || !launched) return CompletableFuture.completedStage(closedValue);
+        if (stopping.get() || draining.get() || !launched) return CompletableFuture.completedStage(closedValue);
         if (!commandSlots.tryAcquire()) {
             fatal(new RejectedExecutionException("Command capacity"));
             return CompletableFuture.failedStage(new RejectedExecutionException("Command capacity"));
         }
         var result = new CompletableFuture<T>(); commands.add(result);
         result.whenComplete((v, e) -> { commands.remove(result); commandSlots.release(); });
-        if (!post(() -> { if (!result.isDone()) result.complete(operation.get()); })) result.complete(closedValue);
+        if (!post(() -> { if (!result.isDone()) result.complete(draining.get() ? closedValue : operation.get()); }, true)) result.complete(closedValue);
         return result.minimalCompletionStage();
     }
     private void postOrClose(Channel channel, Runnable event) { if (!post(event)) channel.close(); }
-    private boolean post(Runnable event) {
+    private boolean post(Runnable event) { return post(event, false); }
+    private boolean post(Runnable event, boolean lifecycle) {
         var target = owner;
-        if (stopping.get() || target == null) return false;
+        if (stopping.get() || target == null || draining.get() && !lifecycle) return false;
         if (target.offer(() -> {
             if (stopping.get()) { cleanup(); return; }
+            if (draining.get() && !lifecycle) return;
             try { event.run(); } catch (RuntimeException e) { fatal(e); }
         })) return true;
         fatal(new RejectedExecutionException("Serial event capacity exceeded")); return false;
@@ -269,7 +370,7 @@ public final class NeighborManager implements AutoCloseable {
         final long began = now(); final UUID job = UUID.randomUUID();
         initialSlot = schedule(connectBudget(), () -> failDiscovery(new IllegalStateException("Bind resolution timeout"), Reason.TIMEOUT, null, null));
         io.resolver().resolve(job, plan.config.bindHost()).whenComplete((address, error) -> post(() -> {
-            if (phase != Phase.DISCOVERING || stopping.get()) return;
+            if (phase != Phase.DISCOVERING || stopping.get() || draining.get()) return;
             if (error != null || expired(began, connectBudget())) {
                 failDiscovery(error == null ? new IllegalStateException("Bind resolution timeout") : error, Reason.TRANSPORT, null, null); return;
             }
@@ -290,7 +391,7 @@ public final class NeighborManager implements AutoCloseable {
         }));
     }
     private boolean live(Attempt a) {
-        return a.live && (a.peer == null ? phase == Phase.DISCOVERING && discovery == a
+        return !draining.get() && a.live && (a.peer == null ? phase == Phase.DISCOVERING && discovery == a
                 : phase == Phase.READY && a.peer.attempt == a);
     }
     private void discover() {
@@ -600,12 +701,12 @@ public final class NeighborManager implements AutoCloseable {
                 : previous > max / 2 ? max : Math.min(max, previous * 2);
     }
     private void retry(Peer p) {
-        if (phase != Phase.READY || stopping.get() || !initiates(p) || p.session != null || p.attempt != null) return;
+        if (phase != Phase.READY || stopping.get() || draining.get() || !initiates(p) || p.session != null || p.attempt != null) return;
         cancel(p.slot); p.base = nextBase(p.base); p.delay = nextDelay(p.base);
         p.slot = schedule(TimeUnit.MILLISECONDS.toNanos(p.delay), () -> { p.slot = null; dialPeer(p); }); publish();
     }
     private void retryDiscovery() {
-        if (phase != Phase.DISCOVERING || stopping.get()) return;
+        if (phase != Phase.DISCOVERING || stopping.get() || draining.get()) return;
         discoveryBase = nextBase(discoveryBase); cancel(initialSlot);
         initialSlot = schedule(TimeUnit.MILLISECONDS.toNanos(nextDelay(discoveryBase)), () -> {
             initialSlot = null;
@@ -619,16 +720,16 @@ public final class NeighborManager implements AutoCloseable {
     }
     public synchronized void requestClose() {
         if (!stopping.compareAndSet(false, true)) return;
-        closeStarted = now();
+        closeStarted = draining.get() ? notificationStarted : now();
         var services = io; if (services != null) services.requestClose();
         var timers = deadlines; if (timers != null) timers.requestClose();
-        if (owner == null) { started.completeExceptionally(new IllegalStateException("Manager closed")); cleaned.complete(null); return; }
+        if (owner == null) { started.completeExceptionally(new IllegalStateException("Manager closed")); cleaned.complete(null); publishShutdown(LeaveOutcome.ABORTED); return; }
         if (owner.isOwnerThread()) cleanup();
         else if (!owner.offer(this::cleanup)) owner.fail(new RejectedExecutionException("Stop could not enter owner"));
     }
     private void ownerStopped() {
         stopping.set(true);
-        if (closeStarted == 0) closeStarted = now();
+        if (closeStarted == 0) closeStarted = draining.get() ? notificationStarted : now();
         if (io != null) io.requestClose(); if (deadlines != null) deadlines.requestClose(); cleanup();
     }
     private void cleanup() {
@@ -647,7 +748,7 @@ public final class NeighborManager implements AutoCloseable {
         started.completeExceptionally(new IllegalStateException("Manager closed"));
         for (var command : commands) command.completeExceptionally(new IllegalStateException("Manager closed"));
         if (registration != null) registration.remove();
-        cleaned.complete(null); if (!borrowed) owner.requestClose();
+        cleaned.complete(null); publishShutdown(LeaveOutcome.ABORTED); if (!borrowed) owner.requestClose();
     }
     public boolean awaitTermination(Duration timeout) {
         Objects.requireNonNull(timeout);
@@ -674,7 +775,8 @@ public final class NeighborManager implements AutoCloseable {
     private Duration remainingMillis(long budget, long began) { return Duration.ofMillis(TimeUnit.NANOSECONDS.toMillis(remainingNanos(budget, began))); }
     @Override public void close() {
         requestClose(); if (owner != null && owner.isOwnerThread()) return;
-        long left = remainingNanos(plan.config.runtime().control().shutdownTimeout().toNanos(), closeStarted);
+        long total = draining.get() ? notificationTotalBudget : plan.config.runtime().control().shutdownTimeout().toNanos();
+        long left = remainingNanos(total, closeStarted);
         if (!awaitTermination(Duration.ofNanos(left))) throw new IllegalStateException("Neighbor shutdown deadline: owner, TCP, timers or I/O worker still pending", failure.get());
     }
     private static Plan validate(NodeConfiguration config, UUID instance) {

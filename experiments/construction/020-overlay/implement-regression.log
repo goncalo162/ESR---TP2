@@ -1,0 +1,80 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 35 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 95 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.transport.TransportTest
+[INFO] Tests run: 31, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.791 s -- in pt.uminho.esr.ott.transport.TransportTest
+[INFO] Running pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+Bootstrap control processing failed; stopping bounded service
+[INFO] Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.264 s -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[INFO] Running pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] Tests run: 42, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 10.54 s <<< FAILURE! -- in pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] pt.uminho.esr.ott.app.OttApplicationTest.m03NodeUsesOneSerialObserverAndPhysicallyTerminatesBorrowedOwner -- Time elapsed: 0.062 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at pt.uminho.esr.ott.app.OttApplicationTest.m03NodeUsesOneSerialObserverAndPhysicallyTerminatesBorrowedOwner(OttApplicationTest.java:379)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Tests run: 740, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.103 s -- in pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Tests run: 66, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.105 s -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.492 s -- in pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.120 s -- in pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   OttApplicationTest.m03NodeUsesOneSerialObserverAndPhysicallyTerminatesBorrowedOwner:379 expected: <1> but was: <0>
+[INFO] 
+[ERROR] Tests run: 974, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  19.820 s
+[INFO] Finished at: 2026-11-10T18:05:46Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

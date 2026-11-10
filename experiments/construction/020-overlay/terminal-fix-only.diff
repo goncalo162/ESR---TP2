@@ -1,0 +1,70 @@
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -133,7 +133,9 @@
+             }
+             inputDone = join(console.reader, console.left());
+             if (!inputDone) console.failed.set(true);
+-            console.log("STOPPED node=" + config.nodeId() + " exit=" + (console.failed.get() ? 3 : 0), false);
++            // This record precedes the writer's final drain/join, so it cannot announce a final status.
++            // The returned ExecutionResult / OS exit status is authoritative after all cleanup.
++            console.log("SHUTDOWN node=" + config.nodeId() + " phase=closing-output", false);
+             console.outputStopping.set(true);
+             // Leave time for closing a blocked descriptor and joining its writer.
+             outputDone = join(console.writer, console.left().dividedBy(2));
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+@@ -460,4 +460,54 @@
+         }
+     }
+ 
++    @Test void m13CleanupWriterFailureCannotPublishPrematureFinalExit() throws Exception {
++        cleanupWriter(false);
++    }
++    @Test void m13CleanupWriterBlockClosesWithinRemainingGlobalBudget() throws Exception {
++        cleanupWriter(true);
++    }
++    private void cleanupWriter(boolean blocked) throws Exception {
++        var clock = new AtomicLong(1000);
++        var closed = new AtomicBoolean(); var afterClose = new AtomicInteger(); var closes = new AtomicInteger();
++        var release = new java.util.concurrent.CountDownLatch(1);
++        var progress = new java.util.concurrent.CopyOnWriteArrayList<String>();
++        var serviceBudgets = new ArrayList<Duration>();
++        var service = new OttApplication.RunningService() {
++            public Map<String, Neighbor> neighbors() { return Map.of(); }
++            public void requestShutdown(int reason, Duration budget) { assertEquals(0, reason); serviceBudgets.add(budget); }
++            public boolean awaitTermination(Duration budget) {
++                serviceBudgets.add(budget); clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); return true;
++            }
++            public void close() { fail("service already physically terminated"); }
++        };
++        var output = new PrintStream(new ByteArrayOutputStream()) {
++            @Override public void println(String line) {
++                if (closed.get()) afterClose.incrementAndGet();
++                progress.add(line);
++                if (line.startsWith("STARTED")) return;
++                // This is the cleanup record, after a successful service shutdown.
++                if (!blocked) { setError(); return; }
++                boolean done = false;
++                while (!done) try { release.await(); done = true; }
++                catch (InterruptedException expected) { /* A blocked writer needs its owned output closed. */ }
++            }
++        };
++        try {
++            var result = OttApplication.execute(new String[]{"--role", "RELAY", "--config", "src/main/resources/config/relay.properties"},
++                new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)), output, output, c -> service, clock::get,
++                () -> {}, () -> {
++                    closes.incrementAndGet(); closed.set(true);
++                    // Account for the half of the remaining 2000 ms spent draining the writer.
++                    clock.addAndGet(TimeUnit.MILLISECONDS.toNanos(1000)); release.countDown();
++                });
++            assertEquals(3, result.exitCode()); assertTrue(result.serviceTerminated());
++            assertTrue(result.inputTerminated()); assertTrue(result.outputTerminated());
++            assertEquals(List.of(Duration.ofMillis(3000), Duration.ofMillis(3000)), serviceBudgets);
++            assertEquals(blocked ? 1 : 0, closes.get()); assertEquals(0, afterClose.get());
++            assertEquals(TimeUnit.MILLISECONDS.toNanos(blocked ? 2000 : 1000), clock.get() - 1000);
++            assertTrue(progress.stream().noneMatch(line -> line.contains("exit=") || line.startsWith("STOPPED")), progress.toString());
++            assertTrue(progress.stream().anyMatch(line -> line.contains("phase=closing-output")), progress.toString());
++        } finally { release.countDown(); }
++    }
++
+ }

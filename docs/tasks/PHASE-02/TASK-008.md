@@ -5,7 +5,7 @@
 - ID: TASK-008
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-006](../PHASE-02/TASK-006.md), [TASK-007](../PHASE-02/TASK-007.md).
@@ -72,3 +72,49 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## IMP-005 — checkpoint Model, sem implementação
+
+[Modelo preparado](../../../memory-bank/bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
+001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
+2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
+continua Simple; apenas preparação Model de Plan, current_stage=plan,
+stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
+na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
+Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
+Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+
+## IMP-005 — Model aceite e Plan para aprovação
+
+Registado em 2026-11-10T17:38:56Z por decisão explícita do utilizador. Model aceite como preparação
+de Plan Simple; Q-C-09 resolvida quanto ao âmbito: extensão mínima de lifecycle
+em NeighborManager e teste próprio, sem mudar send() de aplicação ou reabrir IMP-004.
+Base operacional 90cded6; referência histórica 2ea748e. Plan preparado e ainda
+por aprovar; current_stage=plan, stages_completed=[], sem Implement/Test iniciados.
+V-008 com subprocessos reais, regressão, manual humano antes de aprovar Test,
+revisão final de Waheed e integração continuam exigidos; sem gates externos adicionais.
+Sem Java, staging, commits/push, DONE ou início de outro IMP.
+
+## IMP-005 — Plan aprovado; Implement limitado ao checkpoint interfaces/testes
+
+Registo em 2026-11-10T17:46:21Z. Plan aprovado explicitamente pelo utilizador, incluindo
+Q-C-10 (budget), Q-C-11 (gramática) e Q-C-12 (buffers locais). current_stage=implement;
+apenas Plan consta em stages_completed. Interfaces/tipos e testes inicialmente
+vermelhos preparados; comportamentos novos continuam pendentes. Test não iniciado.
+V-008 completo/L01–L12/M01–M18, regressão completa atual, manual humano antes de
+aprovar Test, revisão final Waheed e integração continuam exigidos, sem gates
+externos adicionais. Bolt aberto, história não implementada, TASK-008 IN PROGRESS.
+Sem commits/push, DONE ou início de outro IMP.
+
+## IMP-005 — Implement preparado para aprovação
+
+Registo em 2026-11-10T18:16:24Z. O utilizador aprovou interfaces/testes vermelhos e autorizou
+comportamentos nos cinco ficheiros do Plan. Implement preparado, ainda por aprovar;
+current_stage=implement, só Plan em stages_completed. Regressão atual Maven test:
+979 testes, zero falhas/erros/ignorados, com 44 CLI e 32 lifecycle novos, TCP e
+subprocessos reais. Test não iniciado; clean verify e manual humano antes da sua
+aprovação continuam pendentes, tal como revisão final Waheed e integração.
+Q-C-09–12 preservadas; send() e testes históricos intactos, sem alteração wire/caps
+ou dependências. Não há gates externos adicionais. Bolt aberto, história ainda
+não implementada, TASK-008 IN PROGRESS e unidade in-progress. Sem commits/push
+ou outro IMP.

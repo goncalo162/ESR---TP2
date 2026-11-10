@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-008–031 continuam TODO; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-009–031 continuam TODO; TASK-008 IN PROGRESS em Implement (checkpoint preparado); TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-007](tasks/PHASE-02/TASK-007.md), DONE; IMP-004/003-overlay complete, Test/903 testes, manual humano Francisco/49 checks e revisão final Denji aprovados; versão revista integrada localmente em main (`8db7b78`). [Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Próximo bolt por dependências: 020-overlay/IMP-005/TASK-008, planned e não iniciado.
+**Última tarefa concluída:** [TASK-007](tasks/PHASE-02/TASK-007.md), DONE; IMP-004/003-overlay complete, Test/903 testes, manual humano Francisco/49 checks e revisão final Denji aprovados; versão revista integrada localmente em main (`8db7b78`). [Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Bolt atual: 020-overlay/IMP-005/TASK-008, IN PROGRESS em Implement preparado para aprovação; regressão atual 981/zero falhas, V-008 técnico com subprocessos reais. Test ainda não iniciado.
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -100,7 +100,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-032](tasks/PHASE-02/TASK-032.md) | Parametrização operacional validada | TASK-003, TASK-005 | DONE | V-032: 824 testes e manual Luis/25 checks; revisão final por Luis e versão revista integrada em main |
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
-| [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | TODO | V-008: NÃO EXECUTADO |
+| [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | IN PROGRESS | Implement preparado; Q-C-09–12 preservadas; Maven test 981/zero falhas e V-008 técnico; Test/manual/revisão/integração pendentes |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
@@ -421,3 +421,72 @@ Sem push ou alegação de integração remota/entrega do projeto.
 [Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
 pendentes são históricas; não descrevem o estado atual. Não se promovem
 requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
+
+## IMP-005 — checkpoint Model, sem implementação
+
+[Modelo preparado](../memory-bank/bolts/020-overlay/ddd-01-domain-model.md) em 2026-11-10T17:31:12Z. Dependências
+001-base-validada/003-overlay/019-overlay complete, presentes na base pedida
+2ea748e. Checkout 90cded6 preservado; Projeto/ e ADD iguais à base. O tipo
+continua Simple; apenas preparação Model de Plan, current_stage=plan,
+stages_completed=[], completed=null. Q-C-09 regista a lacuna NODE_LEAVE
+na API pública, sem alargar os três ficheiros do ADD ou alterar fundações.
+Plan não concluído; parar no checkpoint Model. V-008/regressão/manual/revisão
+Waheed/integração pendentes. Sem Java/build/testes, commits/push ou outro IMP.
+
+## IMP-005 — Model aceite e Plan para aprovação
+
+Registado em 2026-11-10T17:38:56Z por decisão explícita do utilizador. Model aceite como preparação
+de Plan Simple; Q-C-09 resolvida quanto ao âmbito: extensão mínima de lifecycle
+em NeighborManager e teste próprio, sem mudar send() de aplicação ou reabrir IMP-004.
+Base operacional 90cded6; referência histórica 2ea748e. Plan preparado e ainda
+por aprovar; current_stage=plan, stages_completed=[], sem Implement/Test iniciados.
+V-008 com subprocessos reais, regressão, manual humano antes de aprovar Test,
+revisão final de Waheed e integração continuam exigidos; sem gates externos adicionais.
+Sem Java, staging, commits/push, DONE ou início de outro IMP.
+
+## IMP-005 — Plan aprovado; Implement limitado ao checkpoint interfaces/testes
+
+Registo em 2026-11-10T17:46:21Z. Plan aprovado explicitamente pelo utilizador, incluindo
+Q-C-10 (budget), Q-C-11 (gramática) e Q-C-12 (buffers locais). current_stage=implement;
+apenas Plan consta em stages_completed. Interfaces/tipos e testes inicialmente
+vermelhos preparados; comportamentos novos continuam pendentes. Test não iniciado.
+V-008 completo/L01–L12/M01–M18, regressão completa atual, manual humano antes de
+aprovar Test, revisão final Waheed e integração continuam exigidos, sem gates
+externos adicionais. Bolt aberto, história não implementada, TASK-008 IN PROGRESS.
+Sem commits/push, DONE ou início de outro IMP.
+
+## IMP-005 — Implement preparado para aprovação
+
+Registo em 2026-11-10T18:16:24Z. O utilizador aprovou interfaces/testes vermelhos e autorizou
+comportamentos nos cinco ficheiros do Plan. Implement preparado, ainda por aprovar;
+current_stage=implement, só Plan em stages_completed. Regressão atual Maven test:
+979 testes, zero falhas/erros/ignorados, com 44 CLI e 32 lifecycle novos, TCP e
+subprocessos reais. Test não iniciado; clean verify e manual humano antes da sua
+aprovação continuam pendentes, tal como revisão final Waheed e integração.
+Q-C-09–12 preservadas; send() e testes históricos intactos, sem alteração wire/caps
+ou dependências. Não há gates externos adicionais. Bolt aberto, história ainda
+não implementada, TASK-008 IN PROGRESS e unidade in-progress. Sem commits/push
+ou outro IMP.
+
+## IMP-005 — correção terminal no checkpoint Implement
+
+Registo em 2026-11-10T18:39:44Z. Retirado anúncio prematuro STOPPED/exit: última mensagem
+passa a progresso SHUTDOWN/closing-output, sem código final. Resultado terminal
+só após conhecer o fecho do writer. Dois testes novos reproduzidos primeiro
+vermelhos e depois verdes; regressão Maven test atual: 981 testes, zero falhas,
+erros ou ignorados. Budget global, send(), manager, wire/caps e testes históricos
+preservados. Implement reapresentado, por aprovar; Test não iniciado. Sem staging,
+commits/push ou DONE. clean verify, manual humano, revisão Waheed e integração
+continuam pendentes, sem gates externos adicionais.
+
+## Validação interrompida — WIP e ponto de retoma
+
+Registo em 2026-11-10T19:05:26Z, por pedido explícito do utilizador. Pausa da validação;
+manual humano parcial, não aprovado, e Test por aprovar. Quatro logs pessoais
+iniciais/ficheiros de saída preservados, sem inferir roteiro concluído.
+clean verify já executado: 981/zero falhas/erros/ignorados. Ponto de retoma em
+experiments/construction/020-overlay/RESUME.md. Guardar WIP local só deste
+incremento/evidência; target/ e alterações alheias excluídos; sem push.
+Bolt permanece in-progress/current_stage=implement/completed=null; só Plan em
+stages_completed. História não implementada, TASK-008 IN PROGRESS. Revisão final
+Waheed e integração continuam pendentes; sem gates externos adicionais ou DONE.

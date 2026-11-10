@@ -1,0 +1,84 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 35 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 95 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] Tests run: 41, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 10.22 s <<< FAILURE! -- in pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] pt.uminho.esr.ott.app.OttApplicationTest.m13BlockedStdoutIsClosedAndWriterTerminates -- Time elapsed: 0.704 s <<< ERROR!
+java.io.IOException: Stream closed
+	at java.base/java.lang.ProcessBuilder$NullOutputStream.write(ProcessBuilder.java:447)
+	at java.base/java.io.OutputStream.write(OutputStream.java:167)
+	at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:125)
+	at java.base/java.io.BufferedOutputStream.implFlush(BufferedOutputStream.java:252)
+	at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:246)
+	at java.base/sun.nio.cs.StreamEncoder.implClose(StreamEncoder.java:434)
+	at java.base/sun.nio.cs.StreamEncoder.lockedClose(StreamEncoder.java:237)
+	at java.base/sun.nio.cs.StreamEncoder.close(StreamEncoder.java:222)
+	at java.base/java.io.OutputStreamWriter.close(OutputStreamWriter.java:266)
+	at java.base/java.io.BufferedWriter.implClose(BufferedWriter.java:398)
+	at java.base/java.io.BufferedWriter.close(BufferedWriter.java:380)
+	at pt.uminho.esr.ott.app.OttApplicationTest$LiveChild.close(OttApplicationTest.java:170)
+	at pt.uminho.esr.ott.app.OttApplicationTest.m13BlockedStdoutIsClosedAndWriterTerminates(OttApplicationTest.java:289)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	Suppressed: java.io.IOException: Stream closed
+		at java.base/java.lang.ProcessBuilder$NullOutputStream.write(ProcessBuilder.java:447)
+		at java.base/java.io.OutputStream.write(OutputStream.java:167)
+		at java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:125)
+		at java.base/java.io.BufferedOutputStream.implFlush(BufferedOutputStream.java:252)
+		at java.base/java.io.BufferedOutputStream.flush(BufferedOutputStream.java:246)
+		at java.base/java.io.FilterOutputStream.close(FilterOutputStream.java:184)
+		at java.base/sun.nio.cs.StreamEncoder.implClose(StreamEncoder.java:417)
+		... 10 more
+
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.241 s -- in pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   OttApplicationTest.m13BlockedStdoutIsClosedAndWriterTerminates:289 ? IO Stream closed
+[INFO] 
+[ERROR] Tests run: 67, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  15.916 s
+[INFO] Finished at: 2026-11-10T18:00:45Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: 
+[ERROR] 
+[ERROR] See /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
