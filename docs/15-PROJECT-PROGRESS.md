@@ -1,6 +1,6 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE após validação da equipa. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
@@ -81,7 +81,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | Fase | Tarefas | Estado | Dependência / gate |
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
-| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 e TASK-032 | IN PROGRESS | PHASE-01 DONE |
+| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009 e TASK-032 | DONE. [Dossier de fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
@@ -548,3 +548,12 @@ foi dada como concluída por indicação do utilizador. A versão revista
 `cc478d1` foi integrada em main. Bolt e história completos,
 TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
 [Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
+
+## PHASE-02 — Fecho após validação da equipa
+
+Em 2026-11-10T23:39:09Z foi registada a confirmação do utilizador sobre a validação
+da equipa. PHASE-02 DONE, com as seis tarefas integradas em `223ea6f`.
+O ensaio de V-009 e a regressão arquivada de V-008 sustentam o fecho.
+G-ASSESSMENTS mantém a data e o conteúdo da avaliação pendentes.
+PHASE-03 está TODO, com Model de 005-rotas como ponto de retoma.
+[Dossier de fecho](phases/PHASE-02-CLOSURE-REVIEW.md).

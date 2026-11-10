@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
 
 ## 2. Contexto
 
-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O fecho da fase segue a revisão de coordenação prevista na secção 12.
+Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: DONE. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O utilizador confirmou a validação da equipa e autorizou o fecho, registado em 2026-11-10T23:39:09Z sobre a base integrada `223ea6f`. [Dossier de fecho](PHASE-02-CLOSURE-REVIEW.md).
 
 ## 3. Pré-requisitos
 
@@ -49,13 +49,13 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
-- [ ] Pelo menos três nós iniciam fora de ordem, trocam HELLO e reconectam sem canais duplicados.
-- [ ] Bootstrap só fornece localização dos vizinhos a partir da configuração; não mantém disponibilidade ou registos com renovação.
-- [ ] Nós já descobertos reconectam diretamente com bootstrap parado, sem consultas periódicas ou avisos de saída para ele.
-- [ ] O resultado «Três ou mais nós trocam HELLO, entram e saem e reconectam; bootstrap não intermedeia tráfego.» é demonstrável no ambiente da fase.
-- [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
-- [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
+- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+- [x] Pelo menos três nós iniciam fora de ordem, trocam HELLO e reconectam sem canais duplicados.
+- [x] Bootstrap só fornece localização dos vizinhos a partir da configuração; não mantém disponibilidade ou registos com renovação.
+- [x] Nós já descobertos reconectam diretamente com bootstrap parado, sem consultas periódicas ou avisos de saída para ele.
+- [x] O resultado «Três ou mais nós trocam HELLO, entram e saem e reconectam; bootstrap não intermedeia tráfego.» é demonstrável no ambiente da fase.
+- [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+- [x] Não há regressão nos componentes anteriores afetados pelas alterações.
 
 ## 12. Definition of Done
 

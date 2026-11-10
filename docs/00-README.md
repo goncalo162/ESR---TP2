@@ -4,7 +4,7 @@
 
 Este conjunto de documentos especifica um protótipo OTT que distribui vídeo em tempo real através de uma rede overlay com multicast aplicacional. A entrega final deve demonstrar pelo menos dois servidores, cada um com dois vídeos distintos, clientes simultâneos, caminhos alternativos e adaptação às condições de rede.
 
-**Estado atual: PHASE-01 concluída; PHASE-02 IN PROGRESS.** TASK-001–005 DONE; TASK-006–032 TODO. Configuração, codec e transporte TCP implementados, com [149 testes aprovados](../experiments/task-005-transport-validation.md). Descoberta bootstrap, gestão de vizinhos e vídeo continuam por implementar. Material para o relatório: [fase 1](PHASE-01-REPORT-NOTES.md) e [fase 2/TASK-005](PHASE-02-REPORT-NOTES.md).
+**Estado atual: PHASE-01 e PHASE-02 concluídas.** A overlay de controlo funciona localmente com descoberta inicial, handshake, reconexão TCP e saída de nós. A PHASE-03 está planeada para métricas e rotas. [Fecho da fase 2](phases/PHASE-02-CLOSURE-REVIEW.md) · [Roteiro do marco](../experiments/milestone-1/README.md).
 
 Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
 
