@@ -1,0 +1,207 @@
+{
+  "at": "2026-11-10T22:49:23.163243+00:00",
+  "phase": "Implement",
+  "overlay_run_executed": false,
+  "checks": {
+    "readme_bash_1": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_2": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_3": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_4": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_5": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_6": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "readme_bash_7": {
+      "command": [
+        "bash",
+        "-n"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "bench_cli": {
+      "command": [
+        "python3",
+        "-B",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/bench.py",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "usage: bench.py [-h] {init,probe,ports,node,mark,observe,pair,cut} ...\n\npositional arguments:\n  {init,probe,ports,node,mark,observe,pair,cut}\n\noptions:\n  -h, --help            show this help message and exit\n",
+      "stderr": ""
+    },
+    "profiles": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "profiles",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/profiles"
+      ],
+      "exit": 0,
+      "stdout": "PROFILE node=BOOT role=BOOTSTRAP TCP=56100\nPROFILE node=N0 role=SERVER TCP=56110\nPROFILE node=N1 role=RELAY TCP=56120\nPROFILE node=N2 role=CLIENT TCP=56130\n",
+      "stderr": ""
+    },
+    "register": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-register.bin"
+      ],
+      "exit": 0,
+      "stdout": "1 REGISTER requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=EndpointPayload[endpoint=Endpoint[nodeId=S1, instanceId=10213243-5465-7687-98a9-bacbdcedfe0f, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]\n",
+      "stderr": ""
+    },
+    "register-ok": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-register-ok.bin"
+      ],
+      "exit": 0,
+      "stdout": "1 REGISTER_OK requestId=00112233-4455-6677-8899-aabbccddeeff sender=B instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=NeighborList[neighbors=[Endpoint[nodeId=S1, instanceId=00000000-0000-0000-0000-000000000000, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]]\n",
+      "stderr": ""
+    },
+    "hello": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-hello.bin"
+      ],
+      "exit": 0,
+      "stdout": "1 HELLO requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=EndpointPayload[endpoint=Endpoint[nodeId=S1, instanceId=10213243-5465-7687-98a9-bacbdcedfe0f, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]\n",
+      "stderr": ""
+    },
+    "hello-ok-min": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-hello-ok-min.bin"
+      ],
+      "exit": 0,
+      "stdout": "1 HELLO_OK requestId=00112233-4455-6677-8899-aabbccddeeff sender=C instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=INSTANCE\n",
+      "stderr": ""
+    },
+    "node-leave": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-node-leave.bin"
+      ],
+      "exit": 0,
+      "stdout": "1 NODE_LEAVE requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=Leave[reason=0]\n",
+      "stderr": ""
+    },
+    "truncated": {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
+        "frames",
+        "/tmp/ott-imp006-offline-btzbe_rq/truncated.bin"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Exception in thread \"main\" java.io.EOFException\n\tat java.base/java.io.DataInputStream.readFully(DataInputStream.java:210)\n\tat java.base/java.io.DataInputStream.readFully(DataInputStream.java:179)\n\tat pt.uminho.esr.ott.protocol.MessageCodec.read(MessageCodec.java:79)\n\tat Inspect.main(Inspect.java:22)\n"
+    },
+    "temporary_manifest": {
+      "manifest": {
+        "started_at": "2026-11-10T22:49:23.162077+00:00",
+        "operator": "Codex, verificação offline",
+        "java": "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
+        "java_version": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-22.04.4-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-22.04.4-Ubuntu, mixed mode, sharing)",
+        "jar": "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
+        "jar_sha256": "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52",
+        "profiles_sha256": {
+          "N0.properties": "3ef471a3f80355271f0a24252f1970b7cbb9f9a38007c7d38c977bb117ab4864",
+          "N1.properties": "9f8c2985a3265fc38779ce2b3e831617851fb0c86dcde3a78d5d9e2776af3889",
+          "N2.properties": "7e73bfbed9da1d1b9535d7c7668afaa442d787de3d1de43f81bb526b881df0b6",
+          "bootstrap.properties": "d5f9c7b003b512f5043405066c2d3df18cc7cd1d6567942d3c769f5034a11c18",
+          "streams-s1.properties": "0850103529cae7cb7285612f1f9a1b6cd2b13ed2aaffc2a88d60e8d0d99c4445",
+          "topology.properties": "26719d5b185d9b7eadca95160d5be8c6b0c1a854cfc21c2675b1d9018219947e"
+        },
+        "kernel": "6.8.0-138-generic",
+        "machine": "x86_64",
+        "tcp_ports": [
+          56100,
+          56110,
+          56120,
+          56130
+        ],
+        "udp_ports": [
+          56111,
+          56121,
+          56131
+        ]
+      },
+      "verified": true
+    },
+    "timeline_record": {
+      "verified": true
+    }
+  }
+}

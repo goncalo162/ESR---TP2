@@ -137,7 +137,7 @@ Responsável: [TASK-008](tasks/PHASE-02/TASK-008.md). Requisitos: RF-001, RF-002
 
 V-009: outro elemento consegue repetir a demonstração e identificar consulta inicial, handshake, saída e reconexão nos logs; os nós já descobertos reconectam com bootstrap parado, sem tráfego periódico para ele.
 
-Responsável: [TASK-009](tasks/PHASE-02/TASK-009.md). Requisitos: RNF-005, RC-007. Estado: NÃO EXECUTADO.
+Responsável: [TASK-009](tasks/PHASE-02/TASK-009.md). Requisitos: RNF-005, RC-007. Ensaio técnico executado com sucesso e aceite em Test. Repetição independente dispensada em Q-C-15. [Registo de Test](../memory-bank/bolts/004-overlay/test-walkthrough.md).
 
 ### V-010 — Medir RTT e publicar falhas de vizinhança
 

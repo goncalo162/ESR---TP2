@@ -1,6 +1,6 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-009–031 continuam TODO; TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 IN PROGRESS com Test aprovado. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
@@ -101,7 +101,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
-| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
+| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | IN PROGRESS | Test aprovado com ensaio técnico de V-009 e dispensa da repetição em Q-C-15. Integração pendente. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
@@ -515,3 +515,27 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
 por confirmação do utilizador. A versão revista `8c30b04` foi integrada
 por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
 [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
+
+## IMP-006 — Plan para revisão
+
+Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
+na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
+por outro elemento. V-009 continua por executar e a informação docente
+sobre a primeira avaliação está pendente. [Plan do IMP-006](../memory-bank/bolts/004-overlay/implementation-plan.md).
+
+## IMP-006 — Plan aprovado, Implement para revisão
+
+Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
+O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
+permissões da bancada ainda por confirmar para a captura e o corte TCP.
+O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
+A data e o conteúdo da avaliação aguardam informação docente.
+[Implement do IMP-006](../memory-bank/bolts/004-overlay/implementation-walkthrough.md).
+
+## IMP-006 — Implement aprovado, Test em execução
+
+Registo de 2026-11-10T23:09:30Z. O utilizador aprovou Implement incluindo a guarda
+do processo de captura. A sondagem inicial do agente falhou. A sondagem
+de Luis na bancada Linux local passou para captura e corte.
+Test aguarda a evidência de V-009 e a repetição por outro elemento.
+[Registo de Test](../memory-bank/bolts/004-overlay/test-walkthrough.md).

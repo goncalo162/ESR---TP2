@@ -1,0 +1,1539 @@
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 2c248b1..b6022bb 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,6 +1,6 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-009–031 continuam TODO; TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 IN PROGRESS em Implement para revisão. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -101,7 +101,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
+-| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
++| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | IN PROGRESS | Roteiro Implement preparado. V-009 por executar, com permissões da bancada pendentes em Q-C-14 |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+@@ -515,3 +515,19 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
+ por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+ por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+ [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../memory-bank/bolts/004-overlay/implementation-plan.md).
++
++## IMP-006 — Plan aprovado, Implement para revisão
++
++Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
++O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
++permissões da bancada ainda por confirmar para a captura e o corte TCP.
++O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
++A data e o conteúdo da avaliação aguardam informação docente.
++[Implement do IMP-006](../memory-bank/bolts/004-overlay/implementation-walkthrough.md).
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index 043ac97..998279c 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -1,6 +1,6 @@
+ # Bolts Construction alinhados com o ADD
+ 
+-**Estado atual:** IMP-005/020-overlay complete e TASK-008 DONE após revisão final confirmada pelo utilizador e integração de `8c30b04` em main. A unidade está em progresso e 004-overlay está planeado. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
++**Estado atual:** IMP-005/020-overlay complete e TASK-008 DONE após revisão final confirmada pelo utilizador e integração de `8c30b04` em main. A unidade está em progresso e o Implement de 004-overlay aguarda revisão. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 923200b..9bac244 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -402,3 +402,20 @@ de apresentação. Test permanece em revisão.
+ Q-C-13 resolvida na execução de 2026-11-10T22:18:21Z. O V-ADD passou no
+ repositório com saída 0, zero erros e 45 fixtures verificadas.
+ [Novo relatório V-ADD](../experiments/construction/020-overlay/q-c-13-v-add.log).
++
++## Q-C-14 — Permissões da bancada Linux para V-009
++
++O Plan do IMP-006 foi aprovado com a abordagem de captura no loopback e
++corte seletivo de uma sessão TCP. No diagnóstico de 2026-11-10, `tcpdump`
++não conseguiu abrir `lo` com a conta atual. Fora do sandbox, `sudo -n`
++pediu autenticação. A sondagem de `ss -K` selecionou um único socket
++descartável do próprio diagnóstico. O kernel recusou `SOCK_DESTROY`,
++apesar do código de saída 0, e o socket continuou a transmitir dados.
++[Diagnóstico no anfitrião](../experiments/milestone-1/preflight/permissions-host.json) ·
++[Diagnóstico no sandbox](../experiments/milestone-1/preflight/permissions-sandbox.json).
++
++Estado pendente. Para executar o roteiro aprovado é necessário um operador
++ou bancada Linux com permissão de captura em `lo` e de corte do socket
++selecionado. Uma mudança de abordagem fica sujeita a revisão desta dúvida.
++O diagnóstico não abriu sessões da overlay. V-009 aguarda o ensaio e a
++repetição por outro elemento.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+index cfe9d21..7c5147a 100644
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 IN PROGRESS em Implement para revisão, com V-009 por executar. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -25,7 +25,7 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
+ | [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 | DONE |
+ | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | DONE |
+ | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | DONE |
+-| [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | TODO |
++| [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | IN PROGRESS |
+ 
+ ## 6. Ordem de execução
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-009.md b/docs/tasks/PHASE-02/TASK-009.md
+index d0e3603..ebcb406 100644
+--- a/docs/tasks/PHASE-02/TASK-009.md
++++ b/docs/tasks/PHASE-02/TASK-009.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-009
+ - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Denji](../../team/DENJI.md).
+ - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-008](../PHASE-02/TASK-008.md).
+@@ -74,3 +74,19 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../memory-bank/bolts/004-overlay/implementation-plan.md).
++
++## IMP-006 — Plan aprovado, Implement para revisão
++
++Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
++O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
++permissões da bancada ainda por confirmar para a captura e o corte TCP.
++O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
++A data e o conteúdo da avaliação aguardam informação docente.
++[Implement do IMP-006](../../../memory-bank/bolts/004-overlay/implementation-walkthrough.md).
+diff --git a/memory-bank/bolts/004-overlay/bolt.md b/memory-bank/bolts/004-overlay/bolt.md
+index d718084..2c8b529 100644
+--- a/memory-bank/bolts/004-overlay/bolt.md
++++ b/memory-bank/bolts/004-overlay/bolt.md
+@@ -3,14 +3,14 @@ id: "004-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["004-preparar-evidencia-do-primeiro-marco-intermedio"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-10T22:50:50Z"
++started: "2026-11-10T22:38:06Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "implement"
++stages_completed: [{"name": "plan", "completed": "2026-11-10T22:50:50Z", "artifact": "implementation-plan.md"}]
+ requires_bolts: ["001-base-validada", "020-overlay"]
+ enables_bolts: ["005-rotas", "006-rotas", "021-rotas", "022-rotas"]
+ requires_units: ["001-base-validada"]
+@@ -48,7 +48,7 @@ Ler [IMP-006](../../../add.md#imp-006) e as ADR aí indicadas antes de qualquer
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **plan** → `implementation-plan.md`; validar a etapa contra IMP-006 e as ADR do ADD.
++1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-006 e as ADR do ADD.
+ 2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-006 e as ADR do ADD.
+ 3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-006 e as ADR do ADD.
+ 
+@@ -68,3 +68,19 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Prova futura: `experiments/construction/004-overlay/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](implementation-plan.md).
++
++## IMP-006 — Plan aprovado, Implement para revisão
++
++Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
++O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
++permissões da bancada ainda por confirmar para a captura e o corte TCP.
++O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
++A data e o conteúdo da avaliação aguardam informação docente.
++[Implement do IMP-006](implementation-walkthrough.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index a3afd45..c13f0ba 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -542,3 +542,19 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
+ por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+ por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+ [Registo de fecho](../../../../bolts/020-overlay/closure-walkthrough.md).
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../bolts/004-overlay/implementation-plan.md).
++
++## IMP-006 — Plan aprovado, Implement para revisão
++
++Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
++O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
++permissões da bancada ainda por confirmar para a captura e o corte TCP.
++O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
++A data e o conteúdo da avaliação aguardam informação docente.
++[Implement do IMP-006](../../../../bolts/004-overlay/implementation-walkthrough.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
+index 0649e49..a356fea 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
+@@ -2,7 +2,7 @@
+ id: "004-preparar-evidencia-do-primeiro-marco-intermedio"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-009"]
+@@ -37,3 +37,19 @@ A tarefa normativa é [IMP-006](../../../../../../add.md#imp-006); o bolt só or
+ - Bolts anteriores: 001-base-validada, 020-overlay.
+ - Responsável de origem: Denji; revisor: Fillmore.
+ - Gates: G-ASSESSMENTS.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../../bolts/004-overlay/implementation-plan.md).
++
++## IMP-006 — Plan aprovado, Implement para revisão
++
++Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
++O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
++permissões da bancada ainda por confirmar para a captura e o corte TCP.
++O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
++A data e o conteúdo da avaliação aguardam informação docente.
++[Implement do IMP-006](../../../../../bolts/004-overlay/implementation-walkthrough.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index f6d30a2..7eaba59 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. Total atual: cinco histórias/bolts complete e 28 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. Total atual: cinco histórias/bolts complete, 004-overlay em Implement e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -56,7 +56,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
+ 
+ ## 002-overlay/004-preparar-evidencia-do-primeiro-marco-intermedio.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-006. **Estado:** planned. **Bolt:** 004-overlay.
++**Tarefa:** IMP-006. **Estado:** in-progress, Implement para revisão. **Bolt:** 004-overlay.
+ **Ficheiro:** [004-preparar-evidencia-do-primeiro-marco-intermedio](intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md).
+ 
+ ## 003-rotas/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md ✅ GENERATED
+diff --git a/experiments/milestone-1/Inspect.java b/experiments/milestone-1/Inspect.java
+new file mode 100644
+index 0000000..b70e1f1
+--- /dev/null
++++ b/experiments/milestone-1/Inspect.java
+@@ -0,0 +1,37 @@
++import java.nio.file.Files;
++import java.nio.file.Path;
++import java.util.List;
++import pt.uminho.esr.ott.config.ConfigurationLoader;
++import pt.uminho.esr.ott.protocol.MessageCodec;
++
++class Inspect {
++    public static void main(String[] args) throws Exception {
++        if (args.length != 2) throw new IllegalArgumentException("profiles <directory> | frames <raw TCP direction>");
++        Path input = Path.of(args[1]);
++        switch (args[0]) {
++            case "profiles" -> {
++                var profiles = List.of("bootstrap.properties", "N0.properties", "N1.properties", "N2.properties");
++                for (var config : ConfigurationLoader.loadDeployment(profiles.stream().map(input::resolve).toList())) {
++                    System.out.printf("PROFILE node=%s role=%s TCP=%d%n", config.nodeId(), config.role(), config.controlPort());
++                }
++            }
++            case "frames" -> {
++                if (Files.size(input) > 1_048_576) throw new IllegalArgumentException("TCP export exceeds 1 MiB");
++                try (var stream = Files.newInputStream(input)) {
++                    for (int index = 1; ; index++) {
++                        var frame = MessageCodec.read(stream);
++                        if (frame.isEmpty()) {
++                            if (index == 1) throw new IllegalArgumentException("Empty TCP direction");
++                            break;
++                        }
++                        var message = frame.orElseThrow();
++                        System.out.printf("%d %s requestId=%s sender=%s instanceId=%s payload=%s%n",
++                                index, message.type(), message.requestId(), message.senderId(),
++                                message.senderInstance(), message.payload());
++                    }
++                }
++            }
++            default -> throw new IllegalArgumentException("Unknown mode " + args[0]);
++        }
++    }
++}
+diff --git a/experiments/milestone-1/README.md b/experiments/milestone-1/README.md
+new file mode 100644
+index 0000000..34dc5bc
+--- /dev/null
++++ b/experiments/milestone-1/README.md
+@@ -0,0 +1,197 @@
++# Primeiro marco da overlay — IMP-006 / V-009
++
++O roteiro usa quatro JVMs locais do IMP-005. BOOT fornece o grafo triangular
++de N0 (SERVER), N1 (RELAY) e N2 (CLIENT). A sequência evidencia descoberta,
++handshake, reconexão direta e saída voluntária. As portas TCP são 56100,
++56110, 56120 e 56130. Os perfis reservam ainda as portas UDP 56111, 56121 e 56131.
++
++**Estado da primeira avaliação (G-ASSESSMENTS)** — data e conteúdo pendentes
++de informação docente. O roteiro refere-se à primeira demonstração técnica.
++[ADD](../../add.md#imp-006) · [TASK-009](../../docs/tasks/PHASE-02/TASK-009.md).
++
++## Preparar a execução
++
++Usar Linux, Bash, Python 3, JDK 21, `ss`, `tcpdump` e um leitor que permita
++exportar fluxos TCP reconstituídos (por exemplo Wireshark). É preciso acesso a
++captura no loopback e ao corte de sockets da própria experiência. As ferramentas
++são usadas na bancada. A aplicação corre com a conta normal.
++
++Da raiz do repositório, identificar o operador e o binário Java 21 da bancada.
++
++```bash
++export M="$PWD/experiments/milestone-1"
++export JAR="$PWD/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar"
++export JAVA=/usr/lib/jvm/java-21-openjdk-amd64/bin/java
++export RUN="$(python3 "$M/bench.py" init --operator 'NOME DO OPERADOR' --java "$JAVA")"
++"$JAVA" --class-path "$JAR" "$M/Inspect.java" profiles "$RUN/profiles" | tee "$RUN/profiles.log"
++python3 "$M/bench.py" ports "$RUN" before
++```
++
++Confirmar quatro linhas `PROFILE`, saída 0 do validador e as sete portas livres.
++Em Bash, verificar `${PIPESTATUS[0]}` imediatamente após o comando com `tee`.
++O manifesto grava a versão de Java, os hashes do JAR e dos seis perfis e o nome
++do operador. Usar a mesma pasta e o mesmo checkout nos terminais seguintes.
++
++Na bancada autorizada, autenticar o próprio operador antes da sondagem.
++`probe` usa um par TCP temporário criado pelo helper. Confirma a captura de
++um pacote real e verifica que o socket selecionado desaparece após o corte.
++O código 0 de `ss -K`, isoladamente, é insuficiente.
++
++```bash
++sudo -v
++python3 "$M/bench.py" probe "$RUN"
++```
++
++Avançar se `permission-probe.json` contiver `"passed": true`. Se falhar,
++conservar a pasta e registar a pendência. Se uma credencial expirar noutro
++terminal, autenticar de novo nesse terminal antes de prosseguir.
++[Q-C-14](../../docs/construction-duvidas.md#q-c-14--permissões-da-bancada-linux-para-v-009).
++
++## Captura e arranque
++
++No terminal de captura, executar a partir da mesma raiz e definir as variáveis
++`M`, `JAR`, `JAVA` e `RUN` usadas no primeiro terminal. Usar um diretório
++de execução novo para cada ensaio. Confirmar `listening on lo` em
++`capture.log` antes de arrancar BOOT. O limite de 300 segundos e 20 000 pacotes
++delimita a sessão de captura. Se qualquer limite for atingido durante o cenário,
++registar o resultado parcial. A secção de leitura da captura explica as
++verificações de completude.
++
++```bash
++test ! -e "$RUN/control.pcap" && test ! -e "$RUN/capture.log" && (
++  trap ':' INT
++  date -u '+CAPTURE_START %Y-%m-%dT%H:%M:%SZ'
++  filter='ip and tcp and src host 127.0.0.1 and dst host 127.0.0.1 and (port 56100 or port 56110 or port 56120 or port 56130)'
++  printf 'FILTER %s\n' "$filter"
++  sudo -n timeout --signal=INT 300 tcpdump -Z "$(id -un)" -i lo -p -s 0 -U -c 20000 -w "$RUN/control.pcap" "$filter"
++  result=$?
++  printf 'CAPTURE_EXIT %s\n' "$result"
++  date -u '+CAPTURE_END %Y-%m-%dT%H:%M:%SZ'
++  exit "$result"
++) > "$RUN/capture.log" 2>&1
++```
++
++Arrancar cada JVM num terminal próprio. O helper grava PID, comando, logs
++e saída real da JVM. Os comandos interativos são `neighbors` e `quit`.
++
++1. Arrancar BOOTSTRAP com `python3 "$M/bench.py" node "$RUN" BOOTSTRAP`.
++   Aguardar READY.
++2. Arrancar CLIENT e RELAY com `python3 "$M/bench.py" node "$RUN" CLIENT` e
++   `python3 "$M/bench.py" node "$RUN" RELAY`, respetivamente. Aguardar READY
++   em ambos enquanto SERVER está ausente. No terminal do operador,
++   `python3 "$M/bench.py" mark "$RUN" client-relay-ready-server-absent`
++   fixa esse ponto.
++3. Arrancar SERVER com `python3 "$M/bench.py" node "$RUN" SERVER`.
++   Aguardar a convergência. Escrever `neighbors` nas três consolas e confirmar
++   dois vizinhos ACTIVE por nó. Guardar os instanceIds e connectionIds das
++   três arestas a partir de `NeighborUp` e dos snapshots. Marcar
++   `converged` com o comando `mark`.
++
++## Janela de observação e reconexão
++
++Com o bootstrap ainda ativo e a overlay convergida, executar no terminal
++do operador `python3 "$M/bench.py" observe "$RUN"`. São **30 segundos**
++medidos entre marcas UTC e monotónicas. Esta duração é um critério de bancada:
++contém dois períodos de 15 segundos, o intervalo de referência escolhido
++para detetar atividade periódica frequente mesmo com fase desconhecida. Não
++é um prazo do protocolo. A cobertura continua após a janela, durante a paragem
++do bootstrap, a quebra da ligação e a reconexão. O backoff dos vizinhos orienta
++a espera pela reconexão. A janela de observação do bootstrap é independente.
++
++Após a janela, usar `quit` na consola BOOTSTRAP e aguardar `java_exit: 0`.
++Marcar `bootstrap-off`. Verificar que a captura continua ativa.
++
++```bash
++python3 "$M/bench.py" mark "$RUN" bootstrap-off
++ss -4Hltn 'sport = :56100'
++python3 "$M/bench.py" pair "$RUN" | tee "$RUN/pair-inspection.json"
++```
++
++Confirmar que o comando de listener não apresenta linhas. O comando `pair`
++identifica a sessão SERVER → RELAY. Confere o PID e a hora de início no
++`/proc` de ambas as JVMs e as duas direções do mesmo 4-tuple IPv4. Guardar
++a saída e confirmar que corresponde às sessões ACTIVE observadas.
++Copiar a **porta de origem efémera** do campo `source_port`.
++Antes de executar `ss -K`, o helper valida novamente a seleção e confirma
++que BOOT continua sem listener. Abortar se a seleção mudar, for ambígua,
++ou se a captura tiver parado.
++
++```bash
++read -r SOURCE_PORT
++python3 "$M/bench.py" cut "$RUN" "$SOURCE_PORT"
++```
++
++O corte só é considerado bem-sucedido se a ferramenta reportar o socket,
++o resultado não incluir erro e o 4-tuple antigo desaparecer. Guardar
++`cut-before.json` e `cut-result.json`. Aguardar `NeighborDown` com motivo
++`TRANSPORT` e depois `NeighborUp` nos dois processos. Pedir `neighbors`
++e marcar `reconnected`. Confirmar que os PIDs e instanceIds são os mesmos,
++os connectionIds da aresta afetada mudaram e as outras duas arestas conservam
++as sessões. A captura permite correlacionar o novo HELLO/HELLO_OK e verificar
++a porta 56100 no intervalo com BOOT desligado.
++
++## Saída, limpeza e leitura da captura
++
++1. Ainda com BOOT desligado, marcar `client-quit` e escrever `quit` na
++   consola CLIENT. Confirmar `java_exit: 0` e `NeighborDown` com motivo
++   `LEAVE` nos sobreviventes. Pedir `neighbors` em SERVER e RELAY para
++   confirmar a aresta reconstituída.
++2. Escrever `quit` nas consolas dos dois sobreviventes. Conferir os quatro
++   ficheiros de saída, a ausência dos PIDs registados e as portas com
++   `python3 "$M/bench.py" ports "$RUN" after`. Se o bind ainda não estiver
++   disponível, guardar o estado TCP e uma sondagem posterior
++   `ports "$RUN" after-retry`. Distinguir TIME_WAIT de um listener vivo.
++   Marcar `scenario-ended` e terminar a captura com Ctrl-C. Em caso de
++   falha, terminar apenas os processos desta execução e guardar os resultados
++   que existirem.
++3. Confirmar em `capture.log` que a captura começou antes de BOOT e terminou
++   depois da última marca. Conferir o motivo de fim e a contagem de pacotes
++   perdidos. Validar leitura até ao fim do PCAP. No relatório anotar o intervalo
++   efetivo e perdas. Uma falha de captura ou uma janela incompleta fica
++   assinalada como evidência insuficiente.
++4. Guardar a cronologia de pacotes e a seleção da porta de BOOT.
++   Os ACK, FIN e RST das ligações iniciais pertencem ao transporte. Usar o
++   4-tuple e as marcas para os distinguir de novos SYN e frames de aplicação.
++
++```bash
++TZ=UTC tcpdump -tttt -nn -r "$RUN/control.pcap" > "$RUN/tcp-timeline.log" 2> "$RUN/tcp-read.log"
++TZ=UTC tcpdump -tttt -nn -r "$RUN/control.pcap" 'tcp port 56100' > "$RUN/bootstrap-packets.log"
++```
++
++No leitor de PCAP, selecionar cada conexão de interesse pelo 4-tuple e pelo
++instante, seguir o fluxo TCP e exportar **cada direção com dados** em formato
++binário Raw. Em Wireshark, usar Follow TCP Stream, selecionar uma direção e
++guardar com Show data as Raw. Separar a conexão inicial da nova conexão.
++Identificar os ficheiros pelo ID do fluxo e direção. Descodificar cada export
++com o codec do JAR. Um exemplo com o identificador que o leitor atribuiu:
++
++```bash
++"$JAVA" --class-path "$JAR" "$M/Inspect.java" frames "$RUN/stream-0-request.bin" > "$RUN/stream-0-request.frames.log"
++```
++
++Incluir os requestIds de cada REGISTER/REGISTER_OK e dos HELLO/HELLO_OK
++selecionados, o endpoint devolvido do SERVER offline e os NODE_LEAVE reason 0
++do CLIENT. Confrontar os frames com os eventos e IDs nos logs Java. No resumo
++do operador, indicar para cada passo os ficheiros, instantes e resultado.
++Indicar se foram observadas novas conexões ou mensagens para BOOT nas janelas
++capturadas. Uma janela de 30 segundos só sustenta conclusões sobre o intervalo
++observado, complementadas pelo contrato de descoberta e pelo teste de reconexão.
++
++Um CLIENT reiniciado tem uma instância nova e precisa da consulta inicial.
++Se esse cenário adicional for mostrado, usar outra execução, com BOOT
++disponível para a nova consulta. A prova do passo de reconexão usa os dois
++processos existentes.
++
++## Limites e passagem a Test
++
++A demonstração cobre papéis e CLI (RF-001), saída e continuidade (RF-002),
++ligações TCP (RF-003) e descoberta inicial (RF-004). A topologia usa loopback.
++Encaminhamento de fluxos, streaming, reprodução, GUI, cenários CORE e métricas
++de desempenho pertencem a outras provas. Durante a indisponibilidade de um
++vizinho, os diagnósticos podem dificultar a leitura da consola.
++
++A evidência inicial neste diretório consiste nas sondagens de permissões.
++Um ensaio técnico precisa da bancada e das permissões indicadas acima.
++Para aprovar Test, outro elemento executa o roteiro e entrega o identificador
++da execução, os logs, a captura e o resumo de V-009. A versão final é revista
++por Fillmore e integrada antes de DONE.
+diff --git a/experiments/milestone-1/bench.py b/experiments/milestone-1/bench.py
+new file mode 100644
+index 0000000..32a1011
+--- /dev/null
++++ b/experiments/milestone-1/bench.py
+@@ -0,0 +1,337 @@
++#!/usr/bin/env python3
++"""Record V-009 actions on the dedicated IPv4 loopback bench."""
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import signal
++import socket
++import subprocess
++import sys
++import tempfile
++import time
++
++HERE = Path(__file__).resolve().parent
++JAR = HERE.parent / "construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar"
++JAR_SHA256 = "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52"
++PROFILES = {"BOOTSTRAP": "bootstrap.properties", "SERVER": "N0.properties",
++            "RELAY": "N1.properties", "CLIENT": "N2.properties"}
++NODE_PORTS = {"SERVER": 56110, "RELAY": 56120, "CLIENT": 56130}
++TCP_PORTS = (56100, *NODE_PORTS.values())
++UDP_PORTS = (56111, 56121, 56131)
++LOOPBACK = "127.0.0.1"
++MAIN = "pt.uminho.esr.ott.app.OttApplication"
++
++
++def utc():
++    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
++
++
++def save(path, value):
++    with path.open("x") as stream:
++        json.dump(value, stream, ensure_ascii=False, indent=2)
++        stream.write("\n")
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def profile_hashes(directory):
++    return {p.name: sha(p) for p in sorted(directory.glob("*.properties"))}
++
++
++def check_java(java):
++    result = subprocess.run([java, "-version"], capture_output=True, text=True, check=True, timeout=5)
++    if not re.search(r'version "21(?:[."]|$)', result.stderr):
++        raise ValueError("Use JDK 21 with --java")
++    return result.stderr.strip()
++
++
++def init(operator, java):
++    version = check_java(java)
++    if sha(JAR) != JAR_SHA256:
++        raise ValueError("Unexpected reference JAR hash")
++    (HERE / "runs").mkdir(exist_ok=True)
++    run = Path(tempfile.mkdtemp(prefix=datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-"),
++                                dir=HERE / "runs"))
++    shutil.copytree(HERE / "profiles", run / "profiles")
++    save(run / "manifest.json", {
++        "started_at": utc(), "operator": operator, "java": java, "java_version": version,
++        "jar": str(JAR), "jar_sha256": JAR_SHA256, "profiles_sha256": profile_hashes(run / "profiles"),
++        "kernel": os.uname().release, "machine": os.uname().machine,
++        "tcp_ports": TCP_PORTS, "udp_ports": UDP_PORTS,
++    })
++    print(run)
++
++
++def load(run):
++    manifest = json.loads((run / "manifest.json").read_text())
++    if sha(JAR) != JAR_SHA256 or manifest["jar_sha256"] != JAR_SHA256:
++        raise ValueError("Unexpected reference JAR hash")
++    if profile_hashes(run / "profiles") != manifest["profiles_sha256"]:
++        raise ValueError("Run profiles changed after init")
++    return manifest
++
++
++def node(run, role):
++    manifest = load(run)
++    profile = run / "profiles" / PROFILES[role]
++    cmd = [manifest["java"], "-Djava.net.preferIPv4Stack=true", "-cp", str(JAR), MAIN,
++           "--role", role, "--config", str(profile)]
++    with (run / f"{role}.log").open("xb") as log:
++        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
++        try:
++            save(run / f"{role}.start.json", {"at": utc(), "pid": process.pid, "command": cmd,
++                                             "proc_start": proc_start(process.pid)})
++            for line in process.stdout:
++                log.write(line)
++                log.flush()
++                sys.stdout.buffer.write(line)
++                sys.stdout.buffer.flush()
++            return process.wait(timeout=5)
++        finally:
++            if process.poll() is None:
++                process.terminate()
++                try:
++                    process.wait(timeout=5)
++                except subprocess.TimeoutExpired:
++                    process.kill()
++                    process.wait(timeout=5)
++            process.stdout.close()
++            save(run / f"{role}.exit.json", {"at": utc(), "pid": process.pid,
++                                            "java_exit": process.returncode})
++
++
++def proc_start(pid):
++    return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
++
++
++def owned_pid(run, role):
++    record = json.loads((run / f"{role}.start.json").read_text())
++    pid = int(record["pid"])
++    command = Path(f"/proc/{pid}/cmdline").read_bytes().rstrip(b"\0").split(b"\0")
++    if proc_start(pid) != record["proc_start"] or command != [os.fsencode(x) for x in record["command"]]:
++        raise ValueError(f"PID {pid} does not match this run's {role}")
++    return pid
++
++
++def port_check(run, label):
++    results = []
++    for kind, ports in ((socket.SOCK_STREAM, TCP_PORTS), (socket.SOCK_DGRAM, UDP_PORTS)):
++        for port in ports:
++            with socket.socket(socket.AF_INET, kind) as probe:
++                if kind == socket.SOCK_STREAM:
++                    # Test listener reuse. TIME-WAIT is not a live listener.
++                    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
++                try:
++                    probe.bind((LOOPBACK, port))
++                    if kind == socket.SOCK_STREAM:
++                        probe.listen(1)
++                    results.append({"port": port, "kind": kind.name, "available": True})
++                except OSError as error:
++                    results.append({"port": port, "kind": kind.name,
++                                    "available": False, "error": str(error)})
++    record = {"at": utc(), "ports": results}
++    save(run / f"ports-{label}.json", record)
++    print(json.dumps(record))
++    return 0 if all(p["available"] for p in results) else 1
++
++
++def mark(run, label):
++    entry = {"at": utc(), "monotonic_ns": time.monotonic_ns(), "label": label}
++    with (run / "timeline.jsonl").open("a") as stream:
++        stream.write(json.dumps(entry, ensure_ascii=False) + "\n")
++    print(json.dumps(entry, ensure_ascii=False))
++
++
++def observe(run):
++    mark(run, "bootstrap-quiet-start")
++    start = time.monotonic()
++    time.sleep(30)
++    mark(run, "bootstrap-quiet-end")
++    print(f"Observed {time.monotonic() - start:.3f} s")
++
++
++def ss_query(args):
++    result = subprocess.run(["ss", "-4Htnp", *args], capture_output=True, text=True,
++                            check=True, timeout=5)
++    if result.stderr:
++        raise ValueError(result.stderr.strip())
++    return result.stdout.splitlines()
++
++
++def tuple_selector(src, dst):
++    return ["state", "established", "(", "src", LOOPBACK, "and", "sport", "=", f":{src}",
++            "and", "dst", LOOPBACK, "and", "dport", "=", f":{dst}", ")"]
++
++
++def destroy_command(selector):
++    return ["sudo", "-n", "ss", "-4HKtn", *selector]
++
++
++def row_owners(row):
++    return {int(pid) for pid in re.findall(r"\bpid=(\d+),", row)}
++
++
++def permission_probe(run):
++    path = run / "permission-probe.json"
++    if path.exists():
++        raise ValueError("Use a new run for another permission probe")
++    report = {"at": utc(), "capture": False, "destroy": False}
++    try:
++        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
++            listener.bind((LOOPBACK, 0))
++            listener.listen(1)
++            dst = listener.getsockname()[1]
++            with socket.create_connection((LOOPBACK, dst), timeout=2) as client:
++                server, _ = listener.accept()
++                with server:
++                    src = client.getsockname()[1]
++                    capture = ["sudo", "-n", "timeout", "--signal=INT", "3", "tcpdump",
++                               "-Z", subprocess.check_output(["id", "-un"], text=True).strip(),
++                               "-i", "lo", "-p", "-s", "0", "-U", "-c", "1", "-w",
++                               str(run / "probe.pcap"),
++                               f"ip and tcp and src host {LOOPBACK} and src port {src} "
++                               f"and dst host {LOOPBACK} and dst port {dst}"]
++                    with subprocess.Popen(capture, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                                          text=True) as probe:
++                        try:
++                            # Repeated traffic gives tcpdump time to attach. Each byte stays in this test pair.
++                            for _ in range(10):
++                                if probe.poll() is not None:
++                                    break
++                                client.sendall(b"x")
++                                time.sleep(0.1)
++                            stdout, stderr = probe.communicate(timeout=5)
++                        except BaseException:
++                            probe.send_signal(signal.SIGINT)
++                            probe.communicate(timeout=5)
++                            raise
++                        report["capture_result"] = {"command": capture, "exit": probe.returncode,
++                                                    "stdout": stdout, "stderr": stderr}
++                        report["capture"] = (probe.returncode == 0 and
++                                             (run / "probe.pcap").stat().st_size > 24)
++                    selector = tuple_selector(src, dst)
++                    rows = ss_query(selector)
++                    if len(rows) != 1 or row_owners(rows[0]) != {os.getpid()}:
++                        raise ValueError("Disposable socket selection is not unique and owned")
++                    command = destroy_command(selector)
++                    result = subprocess.run(command, capture_output=True, text=True, timeout=5)
++                    after = ss_query(selector)
++                    report["destroy_result"] = {"command": command, "before": rows, "after": after,
++                                                "exit": result.returncode, "stdout": result.stdout,
++                                                "stderr": result.stderr}
++                    report["destroy"] = (result.returncode == 0 and not result.stderr
++                                         and bool(result.stdout.strip()) and not after)
++    except (OSError, ValueError, subprocess.SubprocessError) as error:
++        report["error"] = str(error)
++    report["passed"] = report["capture"] and report["destroy"] and "error" not in report
++    save(path, report)
++    print(json.dumps(report, ensure_ascii=False))
++    return 0 if report["passed"] else 1
++
++
++def select_pair(run):
++    # Higher node ID listens. The SERVER endpoint is the outgoing ephemeral port.
++    server_pid = owned_pid(run, "SERVER")
++    relay_pid = owned_pid(run, "RELAY")
++    relay_port = NODE_PORTS["RELAY"]
++    candidates = ss_query(["state", "established", "(", "dst", LOOPBACK,
++                           "and", "dport", "=", f":{relay_port}", ")"])
++    rows = [row for row in candidates if row_owners(row) == {server_pid}]
++    if len(rows) != 1:
++        raise ValueError("Expected one established SERVER socket to RELAY")
++    match = re.fullmatch(r"\d+\s+\d+\s+127\.0\.0\.1:(\d+)\s+127\.0\.0\.1:"
++                         + str(relay_port) + r"\s+.*", rows[0])
++    if not match:
++        raise ValueError("Unexpected socket listing for SERVER")
++    src = int(match[1])
++    reverse = ss_query(tuple_selector(relay_port, src))
++    if len(reverse) != 1 or row_owners(reverse[0]) != {relay_pid}:
++        raise ValueError("Reverse socket does not belong to the expected RELAY")
++    return {"server_pid": server_pid, "relay_pid": relay_pid, "source_port": src,
++            "destination_port": relay_port, "server_row": rows[0], "relay_row": reverse[0]}
++
++
++def cut(run, expected_source_port):
++    load(run)
++    if not json.loads((run / "permission-probe.json").read_text())["passed"]:
++        raise ValueError("The permission probe has not passed")
++    capture_log = (run / "capture.log").read_text()
++    if ("listening on lo" not in capture_log or "CAPTURE_END " in capture_log
++            or (run / "control.pcap").stat().st_size <= 24):
++        raise ValueError("Start a valid capture and verify it is still running")
++    boot = json.loads((run / "BOOTSTRAP.exit.json").read_text())
++    if boot["java_exit"] != 0:
++        raise ValueError("Expected BOOTSTRAP quit with Java exit 0")
++    listener = subprocess.run(["ss", "-4Hltn", "sport", "=", ":56100"],
++                              capture_output=True, text=True, check=True, timeout=5)
++    if listener.stdout.strip() or listener.stderr:
++        raise ValueError("Bootstrap port has a listener or the listener check failed")
++    pair = select_pair(run)
++    if pair["source_port"] != expected_source_port:
++        raise ValueError("Selected tuple changed since inspection")
++    selector = tuple_selector(expected_source_port, pair["destination_port"])
++    cmd = destroy_command(selector)
++    save(run / "cut-before.json", {"at": utc(), "pair": pair, "command": cmd})
++    result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
++    after = ss_query(selector)
++    record = {"at": utc(), "exit": result.returncode, "stdout": result.stdout,
++              "stderr": result.stderr, "old_tuple_rows": after}
++    save(run / "cut-result.json", record)
++    print(json.dumps(record, ensure_ascii=False))
++    return 0 if result.returncode == 0 and not result.stderr and result.stdout.strip() and not after else 1
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    commands = parser.add_subparsers(dest="command", required=True)
++    setup = commands.add_parser("init")
++    setup.add_argument("--operator", required=True)
++    setup.add_argument("--java", required=True)
++    for name in ("probe", "ports", "node", "mark", "observe", "pair", "cut"):
++        sub = commands.add_parser(name)
++        sub.add_argument("run", type=Path)
++        if name == "ports":
++            sub.add_argument("label", choices=("before", "after", "after-retry"))
++        elif name == "node":
++            sub.add_argument("role", choices=PROFILES)
++        elif name == "mark":
++            sub.add_argument("label")
++        elif name == "cut":
++            sub.add_argument("source_port", type=int)
++    args = parser.parse_args()
++    if args.command == "init":
++        init(args.operator, str(Path(args.java).resolve(strict=True)))
++        return 0
++    run = args.run.resolve(strict=True)
++    if run.parent != HERE / "runs":
++        raise ValueError("Use a run directory created by init")
++    load(run)
++    if args.command == "probe":
++        return permission_probe(run)
++    if args.command == "ports":
++        return port_check(run, args.label)
++    if args.command == "node":
++        return node(run, args.role)
++    if args.command == "mark":
++        mark(run, args.label)
++    if args.command == "observe":
++        observe(run)
++    if args.command == "pair":
++        print(json.dumps(select_pair(run), indent=2))
++    if args.command == "cut":
++        return cut(run, args.source_port)
++    return 0
++
++
++if __name__ == "__main__":
++    try:
++        sys.exit(main())
++    except (ValueError, OSError, subprocess.SubprocessError) as error:
++        sys.exit(str(error))
+diff --git a/experiments/milestone-1/preflight/offline-checks.json b/experiments/milestone-1/preflight/offline-checks.json
+new file mode 100644
+index 0000000..96b09e4
+--- /dev/null
++++ b/experiments/milestone-1/preflight/offline-checks.json
+@@ -0,0 +1,207 @@
++{
++  "at": "2026-11-10T22:49:23.163243+00:00",
++  "phase": "Implement",
++  "overlay_run_executed": false,
++  "checks": {
++    "readme_bash_1": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_2": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_3": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_4": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_5": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_6": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "readme_bash_7": {
++      "command": [
++        "bash",
++        "-n"
++      ],
++      "exit": 0,
++      "stdout": "",
++      "stderr": ""
++    },
++    "bench_cli": {
++      "command": [
++        "python3",
++        "-B",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/bench.py",
++        "--help"
++      ],
++      "exit": 0,
++      "stdout": "usage: bench.py [-h] {init,probe,ports,node,mark,observe,pair,cut} ...\n\npositional arguments:\n  {init,probe,ports,node,mark,observe,pair,cut}\n\noptions:\n  -h, --help            show this help message and exit\n",
++      "stderr": ""
++    },
++    "profiles": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "profiles",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/profiles"
++      ],
++      "exit": 0,
++      "stdout": "PROFILE node=BOOT role=BOOTSTRAP TCP=56100\nPROFILE node=N0 role=SERVER TCP=56110\nPROFILE node=N1 role=RELAY TCP=56120\nPROFILE node=N2 role=CLIENT TCP=56130\n",
++      "stderr": ""
++    },
++    "register": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-register.bin"
++      ],
++      "exit": 0,
++      "stdout": "1 REGISTER requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=EndpointPayload[endpoint=Endpoint[nodeId=S1, instanceId=10213243-5465-7687-98a9-bacbdcedfe0f, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]\n",
++      "stderr": ""
++    },
++    "register-ok": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-register-ok.bin"
++      ],
++      "exit": 0,
++      "stdout": "1 REGISTER_OK requestId=00112233-4455-6677-8899-aabbccddeeff sender=B instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=NeighborList[neighbors=[Endpoint[nodeId=S1, instanceId=00000000-0000-0000-0000-000000000000, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]]\n",
++      "stderr": ""
++    },
++    "hello": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-hello.bin"
++      ],
++      "exit": 0,
++      "stdout": "1 HELLO requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=EndpointPayload[endpoint=Endpoint[nodeId=S1, instanceId=10213243-5465-7687-98a9-bacbdcedfe0f, host=10.0.0.1, controlPort=5000, dataPort=5001, role=SERVER]]\n",
++      "stderr": ""
++    },
++    "hello-ok-min": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-hello-ok-min.bin"
++      ],
++      "exit": 0,
++      "stdout": "1 HELLO_OK requestId=00112233-4455-6677-8899-aabbccddeeff sender=C instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=INSTANCE\n",
++      "stderr": ""
++    },
++    "node-leave": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/home/luis/ESR/ESR---TP2/Projeto/src/test/resources/protocol/tcp-node-leave.bin"
++      ],
++      "exit": 0,
++      "stdout": "1 NODE_LEAVE requestId=00112233-4455-6677-8899-aabbccddeeff sender=S1 instanceId=10213243-5465-7687-98a9-bacbdcedfe0f payload=Leave[reason=0]\n",
++      "stderr": ""
++    },
++    "truncated": {
++      "command": [
++        "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "--class-path",
++        "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "/home/luis/ESR/ESR---TP2/experiments/milestone-1/Inspect.java",
++        "frames",
++        "/tmp/ott-imp006-offline-btzbe_rq/truncated.bin"
++      ],
++      "exit": 1,
++      "stdout": "",
++      "stderr": "Exception in thread \"main\" java.io.EOFException\n\tat java.base/java.io.DataInputStream.readFully(DataInputStream.java:210)\n\tat java.base/java.io.DataInputStream.readFully(DataInputStream.java:179)\n\tat pt.uminho.esr.ott.protocol.MessageCodec.read(MessageCodec.java:79)\n\tat Inspect.main(Inspect.java:22)\n"
++    },
++    "temporary_manifest": {
++      "manifest": {
++        "started_at": "2026-11-10T22:49:23.162077+00:00",
++        "operator": "Codex, verificação offline",
++        "java": "/usr/lib/jvm/java-21-openjdk-amd64/bin/java",
++        "java_version": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1-1-22.04.4-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1-1-22.04.4-Ubuntu, mixed mode, sharing)",
++        "jar": "/home/luis/ESR/ESR---TP2/experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar",
++        "jar_sha256": "303facafc148b96bd2cc0d98ea6afc7a773a50cb2b49d1d5c6c6c4c481de5b52",
++        "profiles_sha256": {
++          "N0.properties": "3ef471a3f80355271f0a24252f1970b7cbb9f9a38007c7d38c977bb117ab4864",
++          "N1.properties": "9f8c2985a3265fc38779ce2b3e831617851fb0c86dcde3a78d5d9e2776af3889",
++          "N2.properties": "7e73bfbed9da1d1b9535d7c7668afaa442d787de3d1de43f81bb526b881df0b6",
++          "bootstrap.properties": "d5f9c7b003b512f5043405066c2d3df18cc7cd1d6567942d3c769f5034a11c18",
++          "streams-s1.properties": "0850103529cae7cb7285612f1f9a1b6cd2b13ed2aaffc2a88d60e8d0d99c4445",
++          "topology.properties": "26719d5b185d9b7eadca95160d5be8c6b0c1a854cfc21c2675b1d9018219947e"
++        },
++        "kernel": "6.8.0-138-generic",
++        "machine": "x86_64",
++        "tcp_ports": [
++          56100,
++          56110,
++          56120,
++          56130
++        ],
++        "udp_ports": [
++          56111,
++          56121,
++          56131
++        ]
++      },
++      "verified": true
++    },
++    "timeline_record": {
++      "verified": true
++    }
++  }
++}
+diff --git a/experiments/milestone-1/preflight/permissions-host.json b/experiments/milestone-1/preflight/permissions-host.json
+new file mode 100644
+index 0000000..ba2336f
+--- /dev/null
++++ b/experiments/milestone-1/preflight/permissions-host.json
+@@ -0,0 +1,108 @@
++{
++  "at": "2026-11-10T22:43:44.146575+00:00",
++  "pid": 146311,
++  "uid": 1000,
++  "checks": {
++    "capture_without_sudo": {
++      "command": [
++        "timeout",
++        "--signal=INT",
++        "1",
++        "tcpdump",
++        "-Z",
++        "luis",
++        "-i",
++        "lo",
++        "-p",
++        "-s",
++        "0",
++        "-c",
++        "1",
++        "-w",
++        "/tmp/ott-imp006-permission-44u9ri4l/probe.pcap",
++        "tcp and port 56100"
++      ],
++      "exit": 1,
++      "stdout": "",
++      "stderr": "tcpdump: lo: You don't have permission to capture on that device\n(socket: Operation not permitted)\n"
++    },
++    "capture_with_sudo_noninteractive": {
++      "command": [
++        "sudo",
++        "-n",
++        "timeout",
++        "--signal=INT",
++        "1",
++        "tcpdump",
++        "-Z",
++        "luis",
++        "-i",
++        "lo",
++        "-p",
++        "-s",
++        "0",
++        "-c",
++        "1",
++        "-w",
++        "/tmp/ott-imp006-permission-44u9ri4l/probe.pcap",
++        "tcp and port 56100"
++      ],
++      "exit": 1,
++      "stdout": "",
++      "stderr": "sudo: é necessária uma senha\n"
++    },
++    "select_disposable_socket": {
++      "command": [
++        "ss",
++        "-4Htnp",
++        "state",
++        "established",
++        "(",
++        "src",
++        "127.0.0.1",
++        "and",
++        "sport",
++        "=",
++        ":51808",
++        "and",
++        "dst",
++        "127.0.0.1",
++        "and",
++        "dport",
++        "=",
++        ":43331",
++        ")"
++      ],
++      "exit": 0,
++      "stdout": "0      0      127.0.0.1:51808 127.0.0.1:43331 users:((\"python3\",pid=146311,fd=4))\n",
++      "stderr": ""
++    },
++    "cut_disposable_socket": {
++      "command": [
++        "ss",
++        "-4Ktn",
++        "state",
++        "established",
++        "(",
++        "src",
++        "127.0.0.1",
++        "and",
++        "sport",
++        "=",
++        ":51808",
++        "and",
++        "dst",
++        "127.0.0.1",
++        "and",
++        "dport",
++        "=",
++        ":43331",
++        ")"
++      ],
++      "exit": 0,
++      "stdout": "Recv-Q Send-Q Local Address:Port Peer Address:PortProcess\n",
++      "stderr": "SOCK_DESTROY answers: Operation not permitted\n"
++    }
++  },
++  "socket_still_usable": true
++}
+diff --git a/experiments/milestone-1/preflight/permissions-sandbox.json b/experiments/milestone-1/preflight/permissions-sandbox.json
+new file mode 100644
+index 0000000..c749bbe
+--- /dev/null
++++ b/experiments/milestone-1/preflight/permissions-sandbox.json
+@@ -0,0 +1,56 @@
++{
++  "at": "2026-11-10T22:43:05.151914+00:00",
++  "pid": 2,
++  "uid": 1000,
++  "checks": {
++    "capture_without_sudo": {
++      "command": [
++        "timeout",
++        "--signal=INT",
++        "1",
++        "tcpdump",
++        "-Z",
++        "luis",
++        "-i",
++        "lo",
++        "-p",
++        "-s",
++        "0",
++        "-c",
++        "1",
++        "-w",
++        "/tmp/ott-imp006-permission-z71g24ij/probe.pcap",
++        "tcp and port 56100"
++      ],
++      "exit": 1,
++      "stdout": "",
++      "stderr": "tcpdump: lo: You don't have permission to capture on that device\n(socket: Operation not permitted)\n"
++    },
++    "capture_with_sudo_noninteractive": {
++      "command": [
++        "sudo",
++        "-n",
++        "timeout",
++        "--signal=INT",
++        "1",
++        "tcpdump",
++        "-Z",
++        "luis",
++        "-i",
++        "lo",
++        "-p",
++        "-s",
++        "0",
++        "-c",
++        "1",
++        "-w",
++        "/tmp/ott-imp006-permission-z71g24ij/probe.pcap",
++        "tcp and port 56100"
++      ],
++      "exit": 1,
++      "stdout": "",
++      "stderr": "sudo: /etc/sudo.conf is owned by uid 65534, should be 0\nsudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.\nsudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.\n"
++    }
++  },
++  "environment_error": "[Errno 1] Operation not permitted"
++}
+diff --git a/experiments/milestone-1/profiles/N0.properties b/experiments/milestone-1/profiles/N0.properties
+new file mode 100644
+index 0000000..79c5cc6
+--- /dev/null
++++ b/experiments/milestone-1/profiles/N0.properties
+@@ -0,0 +1,16 @@
++node.id=N0
++node.role=SERVER
++bind.host=127.0.0.1
++advertised.host=127.0.0.1
++control.port=56110
++control.shutdown.timeout.ms=1500
++data.port=56111
++bootstrap.host=127.0.0.1
++bootstrap.port=56100
++control.connect.timeout.ms=300
++bootstrap.query.timeout.ms=500
++overlay.retry.initial.ms=20
++overlay.retry.max.ms=100
++overlay.retry.jitter.percent=0
++streams.file=streams-s1.properties
++media.base=.
+diff --git a/experiments/milestone-1/profiles/N1.properties b/experiments/milestone-1/profiles/N1.properties
+new file mode 100644
+index 0000000..ec66a54
+--- /dev/null
++++ b/experiments/milestone-1/profiles/N1.properties
+@@ -0,0 +1,14 @@
++node.id=N1
++node.role=RELAY
++bind.host=127.0.0.1
++advertised.host=127.0.0.1
++control.port=56120
++control.shutdown.timeout.ms=1500
++data.port=56121
++bootstrap.host=127.0.0.1
++bootstrap.port=56100
++control.connect.timeout.ms=300
++bootstrap.query.timeout.ms=500
++overlay.retry.initial.ms=20
++overlay.retry.max.ms=100
++overlay.retry.jitter.percent=0
+diff --git a/experiments/milestone-1/profiles/N2.properties b/experiments/milestone-1/profiles/N2.properties
+new file mode 100644
+index 0000000..ceb0b1e
+--- /dev/null
++++ b/experiments/milestone-1/profiles/N2.properties
+@@ -0,0 +1,14 @@
++node.id=N2
++node.role=CLIENT
++bind.host=127.0.0.1
++advertised.host=127.0.0.1
++control.port=56130
++control.shutdown.timeout.ms=1500
++data.port=56131
++bootstrap.host=127.0.0.1
++bootstrap.port=56100
++control.connect.timeout.ms=300
++bootstrap.query.timeout.ms=500
++overlay.retry.initial.ms=20
++overlay.retry.max.ms=100
++overlay.retry.jitter.percent=0
+diff --git a/experiments/milestone-1/profiles/bootstrap.properties b/experiments/milestone-1/profiles/bootstrap.properties
+new file mode 100644
+index 0000000..9fffcff
+--- /dev/null
++++ b/experiments/milestone-1/profiles/bootstrap.properties
+@@ -0,0 +1,7 @@
++node.id=BOOT
++node.role=BOOTSTRAP
++bind.host=127.0.0.1
++advertised.host=127.0.0.1
++control.port=56100
++control.shutdown.timeout.ms=1500
++topology.file=topology.properties
+diff --git a/experiments/milestone-1/profiles/streams-s1.properties b/experiments/milestone-1/profiles/streams-s1.properties
+new file mode 100644
+index 0000000..da7765c
+--- /dev/null
++++ b/experiments/milestone-1/profiles/streams-s1.properties
+@@ -0,0 +1,12 @@
++# Metadados propostos; ficheiros de vídeo por preparar na TASK-020.
++stream.ids=00000000-0000-4000-8000-000000000001,00000000-0000-4000-8000-000000000002
++
++stream.00000000-0000-4000-8000-000000000001.title=A — movie.Mjpeg
++stream.00000000-0000-4000-8000-000000000001.file=a.Mjpeg
++stream.00000000-0000-4000-8000-000000000001.fps=10
++stream.00000000-0000-4000-8000-000000000001.loop=true
++
++stream.00000000-0000-4000-8000-000000000002.title=B — Big Buck Bunny
++stream.00000000-0000-4000-8000-000000000002.file=b.Mjpeg
++stream.00000000-0000-4000-8000-000000000002.fps=10
++stream.00000000-0000-4000-8000-000000000002.loop=true
+diff --git a/experiments/milestone-1/profiles/topology.properties b/experiments/milestone-1/profiles/topology.properties
+new file mode 100644
+index 0000000..d4f7002
+--- /dev/null
++++ b/experiments/milestone-1/profiles/topology.properties
+@@ -0,0 +1,16 @@
++node.ids=N0,N1,N2
++node.N0.host=127.0.0.1
++node.N0.controlPort=56110
++node.N0.dataPort=56111
++node.N0.role=SERVER
++node.N0.neighbors=N1,N2
++node.N1.host=127.0.0.1
++node.N1.controlPort=56120
++node.N1.dataPort=56121
++node.N1.role=RELAY
++node.N1.neighbors=N0,N2
++node.N2.host=127.0.0.1
++node.N2.controlPort=56130
++node.N2.dataPort=56131
++node.N2.role=CLIENT
++node.N2.neighbors=N0,N1
+diff --git a/memory-bank/bolts/004-overlay/implementation-plan.md b/memory-bank/bolts/004-overlay/implementation-plan.md
+new file mode 100644
+index 0000000..53e14c6
+--- /dev/null
++++ b/memory-bank/bolts/004-overlay/implementation-plan.md
+@@ -0,0 +1,108 @@
++---
++stage: plan
++bolt: 004-overlay
++created: "2026-11-10T22:38:06Z"
++---
++# IMP-006 — Plan do primeiro marco intermédio
++
++O IMP-006 / TASK-009 prepara uma demonstração curta da descoberta, do handshake,
++da saída e da reconexão entre nós da overlay. Outro elemento deve conseguir
++repetir o roteiro, localizar os eventos nos logs e verificar os critérios V-009.
++O incremento incide sobre `experiments/milestone-1/`. As alterações de controlo
++da etapa pertencem ao memory-bank e aos índices de progresso.
++[ADD §8, IMP-006](../../../add.md#imp-006) ·
++[TASK-009](../../../docs/tasks/PHASE-02/TASK-009.md) ·
++[Estratégia de testes](../../../docs/09-TESTING-STRATEGY.md#v-009--preparar-evidência-do-primeiro-marco-intermédio).
++
++## Base e decisões aplicáveis
++
++- IMP-001 / 001-base-validada e IMP-005 / 020-overlay estão fechados. A base
++  comum verificada é `89d02014b919290db8c619748973d12ebee246a6`. A CLI da TASK-008
++  e o seu clean verify de 981 testes fornecem a base operacional.
++  [Fecho IMP-001](../001-base-validada/closure-walkthrough.md) ·
++  [Fecho IMP-005](../020-overlay/closure-walkthrough.md).
++- A demonstração pode partir do JAR validado do IMP-005 com Java 21. O operador
++  confirma o SHA-256 e os perfis antes da execução. O JAR local gerado em
++  `Projeto/target/` não é a referência.
++  [JAR de referência](../../../experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar) ·
++  [hash](../../../experiments/construction/020-overlay/verified-jar.sha256).
++- ADR-008 exige evidência incremental com oráculo próprio. Loopback comprova
++  este marco de controlo e a validação dos cenários CORE pertence aos incrementos
++  previstos. ADR-013 reserva o bootstrap à descoberta inicial. ADR-023 pede
++  reprodução com configurações e evidência identificadas. ADR-024 mantém o ADD
++  como autoridade e limita o incremento a V-009.
++  [Registo de decisões do ADD](../../../add.md#5-registo-de-decisões).
++
++## Entregáveis previstos para Implement e Test
++
++- `experiments/milestone-1/README.md` com pré-requisitos, comandos por terminal,
++  topologia, sequência esperada, verificação de cada resultado, limitações e
++  procedimento de limpeza.
++- `experiments/milestone-1/profiles/` com perfis relativos e grafo triangular
++  para BOOT e três nós overlay. Reutilizar os perfis do IMP-005 como referência.
++  Validar a implantação e as portas antes de iniciar os processos. As portas e
++  tempos efetivos ficam registados por execução.
++  [Perfis do IMP-005](../../../experiments/construction/020-overlay/manual-profiles/).
++- `experiments/milestone-1/runs/<identificador>/` com manifesto datado, ambiente,
++  versão e hashes, comandos reais, cronologia UTC, logs por processo, estados de
++  saída, captura de controlo, resumo de frames e resultados. Usar um diretório
++  novo por execução e conservar os resultados parciais. Os logs e capturas de
++  revisão são evidência desta execução, com identificação do operador.
++- Acompanhamento em dois passos. Implement entrega o roteiro e pode fazer um
++  ensaio técnico. Test recolhe e confronta a repetição efetiva por outro
++  elemento. O resumo indica que execução sustenta cada condição de V-009.
++
++## Roteiro previsto e oráculos de V-009
++
++| Passo | Ação | Evidência esperada |
++|---|---|---|
++| 1 | Começar captura de controlo, arrancar BOOT e depois CLIENT e RELAY. Aguardar a descoberta desses dois nós antes de arrancar o SERVER. | Consultas REGISTER/REGISTER_OK correlacionadas e conexões de consulta fechadas. O endpoint do SERVER consta das respostas enquanto o processo está ausente. |
++| 2 | Iniciar o SERVER e pedir `neighbors` nos três nós após a convergência. | A consulta inicial do SERVER fica registada. HELLO/HELLO_OK em ligações diretas. Cada nó mostra dois vizinhos ACTIVE sem duplicados. Guardar PIDs, instanceIds e connectionIds de referência. |
++| 3 | Observar a overlay estável ainda com BOOT em execução e depois encerrar BOOT com `quit`. | Registar o intervalo observado, o fim da JVM BOOT e a ausência de listener. Após as consultas iniciais e durante a observação, verificar que os nós estabilizados não iniciam outras consultas, renovações, sondas ou avisos ao bootstrap. |
++| 4 | Com BOOT parado, fechar apenas o socket estabelecido entre SERVER e RELAY, mantendo ambos os processos em execução. | `NeighborDown` por transporte seguido de novo HELLO/HELLO_OK e `NeighborUp` nos mesmos processos. Confirmar os mesmos PIDs e instanceIds, novos connectionIds e as demais arestas preservadas. Durante a reconexão, a captura continua a abranger a porta de BOOT para detetar tentativas. |
++| 5 | Ainda com BOOT parado, encerrar o CLIENT com `quit`. | Capturar NODE_LEAVE nos canais diretos e eventos `NeighborDown` com motivo LEAVE nos sobreviventes. Confirmar a saída normal do CLIENT. SERVER e RELAY continuam em execução com a ligação reconstituída. |
++| 6 | Se for demonstrado um novo CLIENT, voltar a iniciar BOOT antes da nova descoberta. Encerrar os processos do ensaio e fechar a captura. | A nova JVM tem novo instanceId e efetua a própria consulta. A verificação final regista os códigos de saída, os processos do ensaio terminados e o estado das portas. |
++
++O passo 4 usa, como abordagem planeada, Linux com `ss -K` limitado a uma sessão
++TCP própria do ensaio. Pré-verificar a disponibilidade e permissão. Identificar
++um único socket estabelecido pela família, endereços e portas de origem e
++destino, e confirmar a pertença ao PID observado. Abortar o corte se a seleção
++for ambígua. A ferramenta de bancada não exige mudanças nos componentes da
++aplicação. Se a bancada não permitir este corte, a reconexão entre processos
++já descobertos fica por demonstrar e a alternativa deve ser revista.
++
++A captura prevista usa `tcpdump` no loopback, limitada às portas TCP do ensaio
++e a uma janela com fim definido. Registar os limites e eventuais perdas da
++captura. Analisar por conexão e direção com reconstituição TCP para identificar
++os tipos, emissores e requestIds. Usar os bytes de controlo v1 e o codec existente
++como referência. Distinguir ACK/FIN de transporte de frames da aplicação.
++A ausência de consultas periódicas é avaliada na janela capturada, incluindo
++um intervalo estável antes do encerramento de BOOT. A aprovação do Plan exige
++uma justificação independente do backoff dos vizinhos. Definir a janela,
++registar os limites e restringir a conclusão ao intervalo capturado. Uma
++captura interrompida ou incompleta fica registada como tal.
++
++Antes de marcar V-009 como executado, confrontar a repetição com RF-001–004:
++CLI e papéis para RF-001, saída e continuidade para RF-002, adjacências TCP
++para RF-003, consulta inicial e reconexão sem bootstrap para RF-004. O roteiro
++distingue estas observações de encaminhamento, streaming, GUI, medidas de
++desempenho e validação dos cenários CORE.
++
++## Gate e checkpoint
++
++A situação da primeira avaliação permanece **pendente de informação docente**
++sobre data e conteúdo. O enunciado enumera as duas avaliações intermédias e
++o ADD permite registar a pendência em G-ASSESSMENTS. Atualizar o roteiro quando
++houver informação confirmada.
++[Enunciado](../../../ESR-TP2-26-27.pdf) ·
++[Gates do ADD](../../../add.md#gates-e-momento-de-resolução).
++
++- [ ] Roteiro repetível e logs datados disponíveis.
++- [ ] Limitações da versão intermédia explicitadas.
++- [ ] Situação da avaliação registada sem datas inventadas.
++- [ ] Validação V-009 executada e evidência ligada no progresso.
++
++Plan aprovado pelo utilizador, com registo em 2026-11-10T22:50:50Z. Os comandos do cenário e a intervenção de bancada ainda
++não foram executados. Para fechar a TASK-009, o resultado de V-009 fica ligado
++ao progresso, Fillmore revê a versão final e a versão revista é integrada.
++[Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).
+diff --git a/memory-bank/bolts/004-overlay/implementation-walkthrough.md b/memory-bank/bolts/004-overlay/implementation-walkthrough.md
+new file mode 100644
+index 0000000..d09c302
+--- /dev/null
++++ b/memory-bank/bolts/004-overlay/implementation-walkthrough.md
+@@ -0,0 +1,61 @@
++---
++stage: implement
++bolt: 004-overlay
++created: "2026-11-10T22:50:50Z"
++---
++# IMP-006 — Implement para revisão
++
++O Plan foi aprovado pelo utilizador. O roteiro, os perfis e os auxiliares
++da demonstração estão preparados. Q-C-14 mantém pendente a execução do
++cenário nesta bancada, onde a captura e o corte seletivo exigem permissões
++adicionais. [Roteiro do primeiro marco](../../../experiments/milestone-1/README.md).
++
++## Ficheiros preparados
++
++- [x] `experiments/milestone-1/README.md` — preparação, sequência, observações,
++  correlação da captura com os logs e limpeza.
++- [x] `experiments/milestone-1/profiles/` — configuração dos quatro papéis,
++  grafo e catálogo usados pelo JAR de referência.
++- [x] `experiments/milestone-1/bench.py` — manifesto, logs de JVM, marcas UTC
++  e monotónicas, preflight e corte de um 4-tuple confirmado como sessão própria.
++- [x] `experiments/milestone-1/Inspect.java` — valida perfis e descodifica
++  exportações binárias por direção com o codec do JAR aprovado.
++- [x] `experiments/milestone-1/preflight/` — resultados reais do diagnóstico
++  de permissões e das verificações offline.
++
++## Decisões e limites
++
++A janela de observação com BOOT ativo é de 30 segundos. A duração foi
++escolhida para observar dois períodos de referência de 15 segundos e detetar
++consultas frequentes mesmo com fase desconhecida. É um parâmetro do ensaio,
++independente dos retries dos vizinhos. A captura abrange a paragem de BOOT e
++a reconexão. A conclusão sobre tráfego aplica-se às janelas efetivamente
++capturadas e requer uma captura completa. A janela substitui a justificação
++anterior baseada no backoff.
++
++O corte só avança após uma sondagem positiva com um socket descartável, uma
++captura iniciada e a identificação do 4-tuple nos dois sentidos. O helper
++confirma os PIDs, os instantes de início das JVMs e o socket selecionado.
++Um erro de `ss -K` ou um socket antigo ainda presente impede tratar o corte
++como bem-sucedido. O roteiro mantém a abordagem aprovada. As ferramentas
++Linux e o leitor de captura são pré-requisitos da bancada.
++
++## Evidência real e estado
++
++O JDK 21 validou os quatro perfis. O leitor descodificou as fixtures
++REGISTER, REGISTER_OK, HELLO, HELLO_OK e NODE_LEAVE e rejeitou um frame
++truncado. Foram verificados também o manifesto, as marcas de cronologia e
++a sintaxe dos exemplos Bash.
++[Resultados offline](../../../experiments/milestone-1/preflight/offline-checks.json).
++
++No anfitrião, a captura sem privilégios foi recusada e `sudo -n` pediu
++autenticação. A seleção de um socket TCP descartável próprio foi inequívoca.
++O kernel recusou o corte e o socket continuou a transmitir, apesar de
++`ss -K` devolver saída 0. [Diagnóstico](../../../experiments/milestone-1/preflight/permissions-host.json) ·
++[Q-C-14](../../../docs/construction-duvidas.md#q-c-14--permissões-da-bancada-linux-para-v-009).
++
++A execução técnica da overlay, a captura do cenário e V-009 estão pendentes.
++Test requer a repetição por outro elemento com logs e captura identificados.
++G-ASSESSMENTS permanece pendente de data e conteúdo oficiais. Para fechar
++a TASK-009 é preciso ligar V-009 ao progresso, registar a revisão final
++de Fillmore e integrar a versão revista.

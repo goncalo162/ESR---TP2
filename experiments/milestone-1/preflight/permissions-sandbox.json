@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-10T22:43:05.151914+00:00",
+  "pid": 2,
+  "uid": 1000,
+  "checks": {
+    "capture_without_sudo": {
+      "command": [
+        "timeout",
+        "--signal=INT",
+        "1",
+        "tcpdump",
+        "-Z",
+        "luis",
+        "-i",
+        "lo",
+        "-p",
+        "-s",
+        "0",
+        "-c",
+        "1",
+        "-w",
+        "/tmp/ott-imp006-permission-z71g24ij/probe.pcap",
+        "tcp and port 56100"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "tcpdump: lo: You don't have permission to capture on that device\n(socket: Operation not permitted)\n"
+    },
+    "capture_with_sudo_noninteractive": {
+      "command": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=INT",
+        "1",
+        "tcpdump",
+        "-Z",
+        "luis",
+        "-i",
+        "lo",
+        "-p",
+        "-s",
+        "0",
+        "-c",
+        "1",
+        "-w",
+        "/tmp/ott-imp006-permission-z71g24ij/probe.pcap",
+        "tcp and port 56100"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "sudo: /etc/sudo.conf is owned by uid 65534, should be 0\nsudo: The \"no new privileges\" flag is set, which prevents sudo from running as root.\nsudo: If sudo is running in a container, you may need to adjust the container configuration to disable the flag.\n"
+    }
+  },
+  "environment_error": "[Errno 1] Operation not permitted"
+}

@@ -1,0 +1,298 @@
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 2c248b1..73c6dce 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,6 +1,6 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-009–031 continuam TODO; TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 IN PROGRESS em Plan para revisão. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -101,7 +101,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
+ | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
+-| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | TODO | V-009: NÃO EXECUTADO |
++| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | IN PROGRESS | Plan para revisão. V-009 por executar |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+@@ -515,3 +515,10 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
+ por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+ por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+ [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../memory-bank/bolts/004-overlay/implementation-plan.md).
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index 043ac97..0517050 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -1,6 +1,6 @@
+ # Bolts Construction alinhados com o ADD
+ 
+-**Estado atual:** IMP-005/020-overlay complete e TASK-008 DONE após revisão final confirmada pelo utilizador e integração de `8c30b04` em main. A unidade está em progresso e 004-overlay está planeado. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
++**Estado atual:** IMP-005/020-overlay complete e TASK-008 DONE após revisão final confirmada pelo utilizador e integração de `8c30b04` em main. A unidade está em progresso e o Plan de 004-overlay aguarda revisão. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+index cfe9d21..578f9e3 100644
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 TODO. Overlay completa e demonstração intermédia ainda pendentes.
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 IN PROGRESS em Plan para revisão. Overlay completa e demonstração intermédia ainda pendentes.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -25,7 +25,7 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
+ | [TASK-006](../tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | V-006 | DONE |
+ | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | DONE |
+ | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | DONE |
+-| [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | TODO |
++| [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | IN PROGRESS |
+ 
+ ## 6. Ordem de execução
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-009.md b/docs/tasks/PHASE-02/TASK-009.md
+index d0e3603..434d568 100644
+--- a/docs/tasks/PHASE-02/TASK-009.md
++++ b/docs/tasks/PHASE-02/TASK-009.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-009
+ - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Denji](../../team/DENJI.md).
+ - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-008](../PHASE-02/TASK-008.md).
+@@ -74,3 +74,10 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../memory-bank/bolts/004-overlay/implementation-plan.md).
+diff --git a/memory-bank/bolts/004-overlay/bolt.md b/memory-bank/bolts/004-overlay/bolt.md
+index d718084..2987755 100644
+--- a/memory-bank/bolts/004-overlay/bolt.md
++++ b/memory-bank/bolts/004-overlay/bolt.md
+@@ -3,13 +3,13 @@ id: "004-overlay"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["004-preparar-evidencia-do-primeiro-marco-intermedio"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-10T22:38:06Z"
++started: "2026-11-10T22:38:06Z"
+ completed: null
+-current_stage: null
++current_stage: "plan"
+ stages_completed: []
+ requires_bolts: ["001-base-validada", "020-overlay"]
+ enables_bolts: ["005-rotas", "006-rotas", "021-rotas", "022-rotas"]
+@@ -68,3 +68,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Prova futura: `experiments/construction/004-overlay/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](implementation-plan.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+index a3afd45..5d8499d 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -542,3 +542,10 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
+ por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+ por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+ [Registo de fecho](../../../../bolts/020-overlay/closure-walkthrough.md).
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../bolts/004-overlay/implementation-plan.md).
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
+index 0649e49..6ef8b16 100644
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md
+@@ -2,7 +2,7 @@
+ id: "004-preparar-evidencia-do-primeiro-marco-intermedio"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-009"]
+@@ -37,3 +37,10 @@ A tarefa normativa é [IMP-006](../../../../../../add.md#imp-006); o bolt só or
+ - Bolts anteriores: 001-base-validada, 020-overlay.
+ - Responsável de origem: Denji; revisor: Fillmore.
+ - Gates: G-ASSESSMENTS.
++
++## IMP-006 — Plan para revisão
++
++Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
++na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
++por outro elemento. V-009 continua por executar e a informação docente
++sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../../bolts/004-overlay/implementation-plan.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index f6d30a2..062f0b2 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. Total atual: cinco histórias/bolts complete e 28 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. Total atual: cinco histórias/bolts complete, 004-overlay em Plan e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -56,7 +56,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
+ 
+ ## 002-overlay/004-preparar-evidencia-do-primeiro-marco-intermedio.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-006. **Estado:** planned. **Bolt:** 004-overlay.
++**Tarefa:** IMP-006. **Estado:** in-progress, Plan para revisão. **Bolt:** 004-overlay.
+ **Ficheiro:** [004-preparar-evidencia-do-primeiro-marco-intermedio](intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md).
+ 
+ ## 003-rotas/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md ✅ GENERATED
+diff --git a/memory-bank/bolts/004-overlay/implementation-plan.md b/memory-bank/bolts/004-overlay/implementation-plan.md
+new file mode 100644
+index 0000000..8a5d4f3
+--- /dev/null
++++ b/memory-bank/bolts/004-overlay/implementation-plan.md
+@@ -0,0 +1,108 @@
++---
++stage: plan
++bolt: 004-overlay
++created: "2026-11-10T22:38:06Z"
++---
++# IMP-006 — Plan do primeiro marco intermédio
++
++O IMP-006 / TASK-009 prepara uma demonstração curta da descoberta, do handshake,
++da saída e da reconexão entre nós da overlay. Outro elemento deve conseguir
++repetir o roteiro, localizar os eventos nos logs e verificar os critérios V-009.
++O incremento incide sobre `experiments/milestone-1/`. As alterações de controlo
++da etapa pertencem ao memory-bank e aos índices de progresso.
++[ADD §8, IMP-006](../../../add.md#imp-006) ·
++[TASK-009](../../../docs/tasks/PHASE-02/TASK-009.md) ·
++[Estratégia de testes](../../../docs/09-TESTING-STRATEGY.md#v-009--preparar-evidência-do-primeiro-marco-intermédio).
++
++## Base e decisões aplicáveis
++
++- IMP-001 / 001-base-validada e IMP-005 / 020-overlay estão fechados. A base
++  comum verificada é `89d02014b919290db8c619748973d12ebee246a6`. A CLI da TASK-008
++  e o seu clean verify de 981 testes fornecem a base operacional.
++  [Fecho IMP-001](../001-base-validada/closure-walkthrough.md) ·
++  [Fecho IMP-005](../020-overlay/closure-walkthrough.md).
++- A demonstração pode partir do JAR validado do IMP-005 com Java 21. O operador
++  confirma o SHA-256 e os perfis antes da execução. O JAR local gerado em
++  `Projeto/target/` não é a referência.
++  [JAR de referência](../../../experiments/construction/020-overlay/verified-jar/ott-streaming-1.0-SNAPSHOT.jar) ·
++  [hash](../../../experiments/construction/020-overlay/verified-jar.sha256).
++- ADR-008 exige evidência incremental com oráculo próprio. Loopback comprova
++  este marco de controlo e a validação dos cenários CORE pertence aos incrementos
++  previstos. ADR-013 reserva o bootstrap à descoberta inicial. ADR-023 pede
++  reprodução com configurações e evidência identificadas. ADR-024 mantém o ADD
++  como autoridade e limita o incremento a V-009.
++  [Registo de decisões do ADD](../../../add.md#5-registo-de-decisões).
++
++## Entregáveis previstos para Implement e Test
++
++- `experiments/milestone-1/README.md` com pré-requisitos, comandos por terminal,
++  topologia, sequência esperada, verificação de cada resultado, limitações e
++  procedimento de limpeza.
++- `experiments/milestone-1/profiles/` com perfis relativos e grafo triangular
++  para BOOT e três nós overlay. Reutilizar os perfis do IMP-005 como referência.
++  Validar a implantação e as portas antes de iniciar os processos. As portas e
++  tempos efetivos ficam registados por execução.
++  [Perfis do IMP-005](../../../experiments/construction/020-overlay/manual-profiles/).
++- `experiments/milestone-1/runs/<identificador>/` com manifesto datado, ambiente,
++  versão e hashes, comandos reais, cronologia UTC, logs por processo, estados de
++  saída, captura de controlo, resumo de frames e resultados. Usar um diretório
++  novo por execução e conservar os resultados parciais. Os logs e capturas de
++  revisão são evidência desta execução, com identificação do operador.
++- Acompanhamento em dois passos. Implement entrega o roteiro e pode fazer um
++  ensaio técnico. Test recolhe e confronta a repetição efetiva por outro
++  elemento. O resumo indica que execução sustenta cada condição de V-009.
++
++## Roteiro previsto e oráculos de V-009
++
++| Passo | Ação | Evidência esperada |
++|---|---|---|
++| 1 | Começar captura de controlo, arrancar BOOT e depois CLIENT e RELAY. Aguardar a descoberta desses dois nós antes de arrancar o SERVER. | Consultas REGISTER/REGISTER_OK correlacionadas e conexões de consulta fechadas. O endpoint do SERVER consta das respostas enquanto o processo está ausente. |
++| 2 | Iniciar o SERVER e pedir `neighbors` nos três nós após a convergência. | A consulta inicial do SERVER fica registada. HELLO/HELLO_OK em ligações diretas. Cada nó mostra dois vizinhos ACTIVE sem duplicados. Guardar PIDs, instanceIds e connectionIds de referência. |
++| 3 | Observar a overlay estável ainda com BOOT em execução e depois encerrar BOOT com `quit`. | Registar o intervalo observado, o fim da JVM BOOT e a ausência de listener. Após as consultas iniciais e durante a observação, verificar que os nós estabilizados não iniciam outras consultas, renovações, sondas ou avisos ao bootstrap. |
++| 4 | Com BOOT parado, fechar apenas o socket estabelecido entre SERVER e RELAY, mantendo ambos os processos em execução. | `NeighborDown` por transporte seguido de novo HELLO/HELLO_OK e `NeighborUp` nos mesmos processos. Confirmar os mesmos PIDs e instanceIds, novos connectionIds e as demais arestas preservadas. Durante a reconexão, a captura continua a abranger a porta de BOOT para detetar tentativas. |
++| 5 | Ainda com BOOT parado, encerrar o CLIENT com `quit`. | Capturar NODE_LEAVE nos canais diretos e eventos `NeighborDown` com motivo LEAVE nos sobreviventes. Confirmar a saída normal do CLIENT. SERVER e RELAY continuam em execução com a ligação reconstituída. |
++| 6 | Se for demonstrado um novo CLIENT, voltar a iniciar BOOT antes da nova descoberta. Encerrar os processos do ensaio e fechar a captura. | A nova JVM tem novo instanceId e efetua a própria consulta. A verificação final regista os códigos de saída, os processos do ensaio terminados e o estado das portas. |
++
++O passo 4 usa, como abordagem planeada, Linux com `ss -K` limitado a uma sessão
++TCP própria do ensaio. Pré-verificar a disponibilidade e permissão. Identificar
++um único socket estabelecido pela família, endereços e portas de origem e
++destino, e confirmar a pertença ao PID observado. Abortar o corte se a seleção
++for ambígua. A ferramenta de bancada não exige mudanças nos componentes da
++aplicação. Se a bancada não permitir este corte, a reconexão entre processos
++já descobertos fica por demonstrar e a alternativa deve ser revista.
++
++A captura prevista usa `tcpdump` no loopback, limitada às portas TCP do ensaio
++e a uma janela com fim definido. Registar os limites e eventuais perdas da
++captura. Analisar por conexão e direção com reconstituição TCP para identificar
++os tipos, emissores e requestIds. Usar os bytes de controlo v1 e o codec existente
++como referência. Distinguir ACK/FIN de transporte de frames da aplicação.
++A ausência de consultas periódicas é avaliada na janela capturada, incluindo
++um intervalo estável antes do encerramento de BOOT. Definir e anotar a duração
++a partir de dois ciclos do backoff máximo efetivo do perfil, incluindo jitter
++se estiver configurado. Uma captura interrompida ou
++incompleta fica registada como tal.
++
++Antes de marcar V-009 como executado, confrontar a repetição com RF-001–004:
++CLI e papéis para RF-001, saída e continuidade para RF-002, adjacências TCP
++para RF-003, consulta inicial e reconexão sem bootstrap para RF-004. O roteiro
++distingue estas observações de encaminhamento, streaming, GUI, medidas de
++desempenho e validação dos cenários CORE.
++
++## Gate e checkpoint
++
++A situação da primeira avaliação permanece **pendente de informação docente**
++sobre data e conteúdo. O enunciado enumera as duas avaliações intermédias e
++o ADD permite registar a pendência em G-ASSESSMENTS. Atualizar o roteiro quando
++houver informação confirmada.
++[Enunciado](../../../ESR-TP2-26-27.pdf) ·
++[Gates do ADD](../../../add.md#gates-e-momento-de-resolução).
++
++- [ ] Roteiro repetível e logs datados disponíveis.
++- [ ] Limitações da versão intermédia explicitadas.
++- [ ] Situação da avaliação registada sem datas inventadas.
++- [ ] Validação V-009 executada e evidência ligada no progresso.
++
++Plan para aprovação. Os comandos do cenário e a intervenção de bancada ainda
++não foram executados. Para fechar a TASK-009, o resultado de V-009 fica ligado
++ao progresso, Fillmore revê a versão final e a versão revista é integrada.
++[Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).

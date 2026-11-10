@@ -1,0 +1,64 @@
+{
+  "at": "2026-11-10T23:09:09.777851+00:00",
+  "capture": true,
+  "destroy": true,
+  "capture_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "timeout",
+      "--signal=INT",
+      "3",
+      "tcpdump",
+      "-Z",
+      "luis",
+      "-i",
+      "lo",
+      "-p",
+      "-s",
+      "0",
+      "-U",
+      "-c",
+      "1",
+      "-w",
+      "/home/luis/ESR/ESR---TP2/experiments/milestone-1/runs/20261110T230909Z-iaa88lnv/probe.pcap",
+      "ip and tcp and src host 127.0.0.1 and src port 32866 and dst host 127.0.0.1 and dst port 43151"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "tcpdump: listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes\n1 packet captured\n18 packets received by filter\n0 packets dropped by kernel\n"
+  },
+  "destroy_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "ss",
+      "-4HKtn",
+      "state",
+      "established",
+      "(",
+      "src",
+      "127.0.0.1",
+      "and",
+      "sport",
+      "=",
+      ":32866",
+      "and",
+      "dst",
+      "127.0.0.1",
+      "and",
+      "dport",
+      "=",
+      ":43151",
+      ")"
+    ],
+    "before": [
+      "0      0      127.0.0.1:32866 127.0.0.1:43151 users:((\"python3\",pid=174998,fd=4))"
+    ],
+    "after": [],
+    "exit": 0,
+    "stdout": "0      0      127.0.0.1:32866 127.0.0.1:43151\n",
+    "stderr": ""
+  },
+  "passed": true
+}

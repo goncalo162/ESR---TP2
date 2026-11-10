@@ -542,3 +542,27 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
 por confirmação do utilizador. A versão revista `8c30b04` foi integrada
 por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
 [Registo de fecho](../../../../bolts/020-overlay/closure-walkthrough.md).
+
+## IMP-006 — Plan para revisão
+
+Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
+na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
+por outro elemento. V-009 continua por executar e a informação docente
+sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../bolts/004-overlay/implementation-plan.md).
+
+## IMP-006 — Plan aprovado, Implement para revisão
+
+Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
+O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
+permissões da bancada ainda por confirmar para a captura e o corte TCP.
+O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
+A data e o conteúdo da avaliação aguardam informação docente.
+[Implement do IMP-006](../../../../bolts/004-overlay/implementation-walkthrough.md).
+
+## IMP-006 — Implement aprovado, Test em execução
+
+Registo de 2026-11-10T23:09:30Z. O utilizador aprovou Implement incluindo a guarda
+do processo de captura. A sondagem inicial do agente falhou. A sondagem
+de Luis na bancada Linux local passou para captura e corte.
+Test aguarda a evidência de V-009 e a repetição por outro elemento.
+[Registo de Test](../../../../bolts/004-overlay/test-walkthrough.md).

@@ -402,3 +402,41 @@ de apresentação. Test permanece em revisão.
 Q-C-13 resolvida na execução de 2026-11-10T22:18:21Z. O V-ADD passou no
 repositório com saída 0, zero erros e 45 fixtures verificadas.
 [Novo relatório V-ADD](../experiments/construction/020-overlay/q-c-13-v-add.log).
+
+## Q-C-14 — Permissões da bancada Linux para V-009
+
+O Plan do IMP-006 foi aprovado com a abordagem de captura no loopback e
+corte seletivo de uma sessão TCP. No diagnóstico de 2026-11-10, `tcpdump`
+não conseguiu abrir `lo` com a conta atual. Fora do sandbox, `sudo -n`
+pediu autenticação. A sondagem de `ss -K` selecionou um único socket
+descartável do próprio diagnóstico. O kernel recusou `SOCK_DESTROY`,
+apesar do código de saída 0, e o socket continuou a transmitir dados.
+[Diagnóstico no anfitrião](../experiments/milestone-1/preflight/permissions-host.json) ·
+[Diagnóstico no sandbox](../experiments/milestone-1/preflight/permissions-sandbox.json).
+
+Estado pendente. Para executar o roteiro aprovado é necessário um operador
+ou bancada Linux com permissão de captura em `lo` e de corte do socket
+selecionado. Uma mudança de abordagem fica sujeita a revisão desta dúvida.
+O diagnóstico não abriu sessões da overlay. V-009 aguarda o ensaio e a
+repetição por outro elemento.
+
+### Q-C-14 — Permissões confirmadas na bancada local
+
+Registo de 2026-11-10T23:09:30Z. A sondagem de Luis no anfitrião local, com a sua
+sessão autenticada, registou `passed: true`. O PCAP contém um pacote do
+par descartável e o seletor exato devolveu uma linha antes do corte e
+zero depois. Q-C-14 fica resolvida para essa sessão autorizada.
+A tentativa anterior do agente conserva o resultado de falha.
+[Sondagem de Luis](../experiments/milestone-1/runs/20261110T230622Z-pax81tgv/permission-probe.json) ·
+[PCAP da sondagem](../experiments/milestone-1/runs/20261110T230622Z-pax81tgv/probe.pcap) ·
+[Sondagem do agente](../experiments/milestone-1/runs/20261110T230236Z-1oy34xz9/permission-probe.json).
+
+## Q-C-15 — Evidência aceite no fecho de V-009
+
+Registo de 2026-11-10T23:25:25Z. O utilizador aceitou o ensaio técnico validado
+de V-009 como evidência única de execução e dispensou a repetição por
+outro elemento para este fecho. O roteiro continua disponível e a ausência
+de repetição independente é uma limitação registada. A tentativa incompleta
+e as sondagens mantêm a sua classificação. A revisão final atribuída a
+Fillmore foi dada como concluída por indicação do utilizador.
+[Registo de Test](../memory-bank/bolts/004-overlay/test-walkthrough.md).

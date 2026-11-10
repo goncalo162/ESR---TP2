@@ -1,0 +1,108 @@
+{
+  "at": "2026-11-10T22:43:44.146575+00:00",
+  "pid": 146311,
+  "uid": 1000,
+  "checks": {
+    "capture_without_sudo": {
+      "command": [
+        "timeout",
+        "--signal=INT",
+        "1",
+        "tcpdump",
+        "-Z",
+        "luis",
+        "-i",
+        "lo",
+        "-p",
+        "-s",
+        "0",
+        "-c",
+        "1",
+        "-w",
+        "/tmp/ott-imp006-permission-44u9ri4l/probe.pcap",
+        "tcp and port 56100"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "tcpdump: lo: You don't have permission to capture on that device\n(socket: Operation not permitted)\n"
+    },
+    "capture_with_sudo_noninteractive": {
+      "command": [
+        "sudo",
+        "-n",
+        "timeout",
+        "--signal=INT",
+        "1",
+        "tcpdump",
+        "-Z",
+        "luis",
+        "-i",
+        "lo",
+        "-p",
+        "-s",
+        "0",
+        "-c",
+        "1",
+        "-w",
+        "/tmp/ott-imp006-permission-44u9ri4l/probe.pcap",
+        "tcp and port 56100"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "sudo: é necessária uma senha\n"
+    },
+    "select_disposable_socket": {
+      "command": [
+        "ss",
+        "-4Htnp",
+        "state",
+        "established",
+        "(",
+        "src",
+        "127.0.0.1",
+        "and",
+        "sport",
+        "=",
+        ":51808",
+        "and",
+        "dst",
+        "127.0.0.1",
+        "and",
+        "dport",
+        "=",
+        ":43331",
+        ")"
+      ],
+      "exit": 0,
+      "stdout": "0      0      127.0.0.1:51808 127.0.0.1:43331 users:((\"python3\",pid=146311,fd=4))\n",
+      "stderr": ""
+    },
+    "cut_disposable_socket": {
+      "command": [
+        "ss",
+        "-4Ktn",
+        "state",
+        "established",
+        "(",
+        "src",
+        "127.0.0.1",
+        "and",
+        "sport",
+        "=",
+        ":51808",
+        "and",
+        "dst",
+        "127.0.0.1",
+        "and",
+        "dport",
+        "=",
+        ":43331",
+        ")"
+      ],
+      "exit": 0,
+      "stdout": "Recv-Q Send-Q Local Address:Port Peer Address:PortProcess\n",
+      "stderr": "SOCK_DESTROY answers: Operation not permitted\n"
+    }
+  },
+  "socket_still_usable": true
+}

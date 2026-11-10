@@ -5,7 +5,7 @@
 - ID: TASK-009
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-008](../PHASE-02/TASK-008.md).
@@ -74,3 +74,27 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## IMP-006 — Plan para revisão
+
+Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
+na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
+por outro elemento. V-009 continua por executar e a informação docente
+sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../memory-bank/bolts/004-overlay/implementation-plan.md).
+
+## IMP-006 — Plan aprovado, Implement para revisão
+
+Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
+O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
+permissões da bancada ainda por confirmar para a captura e o corte TCP.
+O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
+A data e o conteúdo da avaliação aguardam informação docente.
+[Implement do IMP-006](../../../memory-bank/bolts/004-overlay/implementation-walkthrough.md).
+
+## IMP-006 — Implement aprovado, Test em execução
+
+Registo de 2026-11-10T23:09:30Z. O utilizador aprovou Implement incluindo a guarda
+do processo de captura. A sondagem inicial do agente falhou. A sondagem
+de Luis na bancada Linux local passou para captura e corte.
+Test aguarda a evidência de V-009 e a repetição por outro elemento.
+[Registo de Test](../../../memory-bank/bolts/004-overlay/test-walkthrough.md).

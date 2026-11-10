@@ -1,0 +1,66 @@
+{
+  "at": "2026-11-10T23:02:56.858968+00:00",
+  "capture": false,
+  "destroy": false,
+  "capture_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "timeout",
+      "--signal=INT",
+      "3",
+      "tcpdump",
+      "-Z",
+      "luis",
+      "-i",
+      "lo",
+      "-p",
+      "-s",
+      "0",
+      "-U",
+      "-c",
+      "1",
+      "-w",
+      "/home/luis/ESR/ESR---TP2/experiments/milestone-1/runs/20261110T230236Z-1oy34xz9/probe.pcap",
+      "ip and tcp and src host 127.0.0.1 and src port 33944 and dst host 127.0.0.1 and dst port 34953"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "sudo: é necessária uma senha\n"
+  },
+  "destroy_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "ss",
+      "-4HKtn",
+      "state",
+      "established",
+      "(",
+      "src",
+      "127.0.0.1",
+      "and",
+      "sport",
+      "=",
+      ":33944",
+      "and",
+      "dst",
+      "127.0.0.1",
+      "and",
+      "dport",
+      "=",
+      ":34953",
+      ")"
+    ],
+    "before": [
+      "0      0      127.0.0.1:33944 127.0.0.1:34953 users:((\"python3\",pid=167811,fd=4))"
+    ],
+    "after": [
+      "0      0      127.0.0.1:33944 127.0.0.1:34953 users:((\"python3\",pid=167811,fd=4))"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "sudo: é necessária uma senha\n"
+  },
+  "passed": false
+}

@@ -1,0 +1,64 @@
+{
+  "at": "2026-11-10T23:11:37.797912+00:00",
+  "capture": true,
+  "destroy": true,
+  "capture_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "timeout",
+      "--signal=INT",
+      "3",
+      "tcpdump",
+      "-Z",
+      "luis",
+      "-i",
+      "lo",
+      "-p",
+      "-s",
+      "0",
+      "-U",
+      "-c",
+      "1",
+      "-w",
+      "/home/luis/ESR/ESR---TP2/experiments/milestone-1/runs/20261110T231137Z-9917llvm/probe.pcap",
+      "ip and tcp and src host 127.0.0.1 and src port 44470 and dst host 127.0.0.1 and dst port 45791"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "tcpdump: listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes\n1 packet captured\n18 packets received by filter\n0 packets dropped by kernel\n"
+  },
+  "destroy_result": {
+    "command": [
+      "sudo",
+      "-n",
+      "ss",
+      "-4HKtn",
+      "state",
+      "established",
+      "(",
+      "src",
+      "127.0.0.1",
+      "and",
+      "sport",
+      "=",
+      ":44470",
+      "and",
+      "dst",
+      "127.0.0.1",
+      "and",
+      "dport",
+      "=",
+      ":45791",
+      ")"
+    ],
+    "before": [
+      "0      0      127.0.0.1:44470 127.0.0.1:45791 users:((\"python3\",pid=178222,fd=4))"
+    ],
+    "after": [],
+    "exit": 0,
+    "stdout": "0      0      127.0.0.1:44470 127.0.0.1:45791\n",
+    "stderr": ""
+  },
+  "passed": true
+}

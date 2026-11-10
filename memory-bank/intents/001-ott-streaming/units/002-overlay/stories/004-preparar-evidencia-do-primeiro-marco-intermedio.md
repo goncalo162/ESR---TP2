@@ -2,7 +2,7 @@
 id: "004-preparar-evidencia-do-primeiro-marco-intermedio"
 unit: "002-overlay"
 intent: "001-ott-streaming"
-status: "planned"
+status: "in-progress"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-009"]
@@ -37,3 +37,19 @@ A tarefa normativa é [IMP-006](../../../../../../add.md#imp-006); o bolt só or
 - Bolts anteriores: 001-base-validada, 020-overlay.
 - Responsável de origem: Denji; revisor: Fillmore.
 - Gates: G-ASSESSMENTS.
+
+## IMP-006 — Plan para revisão
+
+Registo de 2026-11-10T22:38:06Z. As dependências estão concluídas e integradas
+na base `89d0201`. O Plan define o roteiro do marco, a captura e a repetição
+por outro elemento. V-009 continua por executar e a informação docente
+sobre a primeira avaliação está pendente. [Plan do IMP-006](../../../../../bolts/004-overlay/implementation-plan.md).
+
+## IMP-006 — Plan aprovado, Implement para revisão
+
+Registo de 2026-11-10T22:50:50Z. O utilizador aprovou Plan e autorizou Implement.
+O roteiro, os perfis e os auxiliares estão preparados. Q-C-14 regista as
+permissões da bancada ainda por confirmar para a captura e o corte TCP.
+O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
+A data e o conteúdo da avaliação aguardam informação docente.
+[Implement do IMP-006](../../../../../bolts/004-overlay/implementation-walkthrough.md).

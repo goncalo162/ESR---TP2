@@ -1,0 +1,295 @@
+--- a/experiments/milestone-1/bench.py
++++ b/experiments/milestone-1/bench.py
+@@ -6,7 +6,9 @@
+ import json
+ import os
+ from pathlib import Path
++import pwd
+ import re
++import select
+ import shutil
+ import signal
+ import socket
+@@ -25,6 +27,8 @@
+ UDP_PORTS = (56111, 56121, 56131)
+ LOOPBACK = "127.0.0.1"
+ MAIN = "pt.uminho.esr.ott.app.OttApplication"
++BOOT_ID = Path("/proc/sys/kernel/random/boot_id")
++CAPTURE_STATES = {"R", "S"}
+ 
+ 
+ def utc():
+@@ -107,14 +111,22 @@
+                                             "java_exit": process.returncode})
+ 
+ 
++def proc_fields(pid):
++    return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
++
++
+ def proc_start(pid):
+-    return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
++    return proc_fields(pid)[19]
++
++
++def proc_command(pid):
++    return Path(f"/proc/{pid}/cmdline").read_bytes().rstrip(b"\0").split(b"\0")
+ 
+ 
+ def owned_pid(run, role):
+     record = json.loads((run / f"{role}.start.json").read_text())
+     pid = int(record["pid"])
+-    command = Path(f"/proc/{pid}/cmdline").read_bytes().rstrip(b"\0").split(b"\0")
++    command = proc_command(pid)
+     if proc_start(pid) != record["proc_start"] or command != [os.fsencode(x) for x in record["command"]]:
+         raise ValueError(f"PID {pid} does not match this run's {role}")
+     return pid
+@@ -176,6 +188,116 @@
+ 
+ def row_owners(row):
+     return {int(pid) for pid in re.findall(r"\bpid=(\d+),", row)}
++
++
++def capture_command(run):
++    binary = shutil.which("tcpdump")
++    if binary is None:
++        raise ValueError("tcpdump was not found")
++    ports = " or ".join(f"port {port}" for port in TCP_PORTS)
++    capture_filter = f"ip and tcp and src host {LOOPBACK} and dst host {LOOPBACK} and ({ports})"
++    return [str(Path(binary).resolve()), "-Z", pwd.getpwuid(os.getuid()).pw_name,
++            "-i", "lo", "-p", "-s", "0", "-U", "-c", "20000", "-w", str(run / "control.pcap"),
++            capture_filter]
++
++
++def matching_capture_pids(command):
++    expected = [os.fsencode(argument) for argument in command]
++    pids = []
++    for directory in Path("/proc").iterdir():
++        if directory.name.isdecimal():
++            pid = int(directory.name)
++            try:
++                if proc_command(pid) == expected:
++                    pids.append(pid)
++            except (FileNotFoundError, ProcessLookupError, PermissionError):
++                # An exited or unreadable PID cannot establish a capture identity.
++                continue
++    return pids
++
++
++def is_descendant(pid, launcher_pid):
++    while pid > 1 and pid != launcher_pid:
++        pid = int(proc_fields(pid)[1])
++    return pid == launcher_pid
++
++
++def require_permission_probe(run):
++    if json.loads((run / "permission-probe.json").read_text()).get("passed") is not True:
++        raise ValueError("The permission probe has not passed")
++
++
++def capture(run):
++    require_permission_probe(run)
++    if not hasattr(os, "pidfd_open"):
++        raise ValueError("Use Python 3.9+ on Linux with pidfd support")
++    os.close(os.pidfd_open(os.getpid()))
++    if (run / "control.pcap").exists() or (run / "capture-start.json").exists():
++        raise ValueError("Use a new run for another capture")
++    command = capture_command(run)
++    launch = ["sudo", "-n", "timeout", "--signal=INT", "--kill-after=5", "300", *command]
++    log_path = run / "capture.log"
++    with log_path.open("x", buffering=1) as log:
++        log.write(f"CAPTURE_START {utc()}\nCOMMAND {json.dumps(launch)}\n")
++        process = subprocess.Popen(launch, stdout=log, stderr=subprocess.STDOUT)
++        try:
++            deadline = time.monotonic() + 8
++            while process.poll() is None and time.monotonic() < deadline:
++                pids = matching_capture_pids(command)
++                if len(pids) > 1:
++                    raise ValueError("More than one tcpdump matches this run")
++                if pids and "listening on lo" in log_path.read_text(errors="replace"):
++                    pid = pids[0]
++                    if not is_descendant(pid, process.pid):
++                        raise ValueError("tcpdump is outside this capture launcher")
++                    fields = proc_fields(pid)
++                    if fields[0] in CAPTURE_STATES:
++                        save(run / "capture-start.json", {"at": utc(), "pid": pid,
++                             "proc_start": fields[19], "state": fields[0],
++                             "boot_id": BOOT_ID.read_text().strip(), "command": command})
++                        print(f"Capture ready: tcpdump PID {pid}. Press Ctrl-C to stop.", flush=True)
++                        return process.wait()
++                time.sleep(0.1)
++            raise ValueError(f"tcpdump did not become ready. See {log_path}")
++        except KeyboardInterrupt:
++            return 130
++        finally:
++            try:
++                if process.poll() is None:
++                    process.send_signal(signal.SIGINT)
++                    process.wait(timeout=10)
++            finally:
++                log.write(f"CAPTURE_EXIT {process.returncode}\nCAPTURE_END {utc()}\n")
++
++
++def active_capture(run):
++    try:
++        if not hasattr(os, "pidfd_open"):
++            raise ValueError("Python or the platform has no pidfd support")
++        record = json.loads((run / "capture-start.json").read_text())
++        command = capture_command(run)
++        pid = record["pid"]
++        if (type(pid) is not int or pid <= 1 or record["command"] != command
++                or record["boot_id"] != BOOT_ID.read_text().strip()):
++            raise ValueError("Capture identity does not match this run")
++        if matching_capture_pids(command) != [pid]:
++            raise ValueError("Expected exactly one matching tcpdump with the recorded PID")
++        fd = os.pidfd_open(pid)
++        try:
++            poller = select.poll()
++            poller.register(fd, select.POLLIN)
++            actual_command = proc_command(pid)
++            fields = proc_fields(pid)
++            state = fields[0]
++            if (fields[19] != record["proc_start"] or state not in CAPTURE_STATES
++                    or actual_command != [os.fsencode(argument) for argument in command]
++                    or poller.poll(0)):
++                raise ValueError("The recorded tcpdump has changed identity or is not active")
++            return {"at": utc(), "pid": pid, "proc_start": fields[19], "state": state}
++        finally:
++            os.close(fd)
++    except (OSError, KeyError, TypeError, ValueError) as error:
++        raise ValueError(f"Cut aborted: capture identity or state could not be verified ({error})") from error
+ 
+ 
+ def permission_probe(run):
+@@ -260,12 +382,12 @@
+ 
+ def cut(run, expected_source_port):
+     load(run)
+-    if not json.loads((run / "permission-probe.json").read_text())["passed"]:
+-        raise ValueError("The permission probe has not passed")
++    require_permission_probe(run)
+     capture_log = (run / "capture.log").read_text()
+     if ("listening on lo" not in capture_log or "CAPTURE_END " in capture_log
+             or (run / "control.pcap").stat().st_size <= 24):
+         raise ValueError("Start a valid capture and verify it is still running")
++    active_capture(run)
+     boot = json.loads((run / "BOOTSTRAP.exit.json").read_text())
+     if boot["java_exit"] != 0:
+         raise ValueError("Expected BOOTSTRAP quit with Java exit 0")
+@@ -279,11 +401,23 @@
+     selector = tuple_selector(expected_source_port, pair["destination_port"])
+     cmd = destroy_command(selector)
+     save(run / "cut-before.json", {"at": utc(), "pair": pair, "command": cmd})
+-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+-    after = ss_query(selector)
+-    record = {"at": utc(), "exit": result.returncode, "stdout": result.stdout,
+-              "stderr": result.stderr, "old_tuple_rows": after}
+-    save(run / "cut-result.json", record)
++    try:
++        capture_at_cut = active_capture(run)
++    except ValueError as error:
++        save(run / "cut-aborted.json", {"at": utc(), "reason": str(error)})
++        raise
++    record = {"capture_at_cut": capture_at_cut}
++    try:
++        result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
++        record.update(exit=result.returncode, stdout=result.stdout, stderr=result.stderr)
++        after = ss_query(selector)
++        record["old_tuple_rows"] = after
++    except (OSError, ValueError, subprocess.SubprocessError) as error:
++        record["error"] = str(error)
++        raise
++    finally:
++        record["at"] = utc()
++        save(run / "cut-result.json", record)
+     print(json.dumps(record, ensure_ascii=False))
+     return 0 if result.returncode == 0 and not result.stderr and result.stdout.strip() and not after else 1
+ 
+@@ -294,7 +428,7 @@
+     setup = commands.add_parser("init")
+     setup.add_argument("--operator", required=True)
+     setup.add_argument("--java", required=True)
+-    for name in ("probe", "ports", "node", "mark", "observe", "pair", "cut"):
++    for name in ("probe", "capture", "ports", "node", "mark", "observe", "pair", "cut"):
+         sub = commands.add_parser(name)
+         sub.add_argument("run", type=Path)
+         if name == "ports":
+@@ -315,6 +449,8 @@
+     load(run)
+     if args.command == "probe":
+         return permission_probe(run)
++    if args.command == "capture":
++        return capture(run)
+     if args.command == "ports":
+         return port_check(run, args.label)
+     if args.command == "node":
+--- a/experiments/milestone-1/README.md
++++ b/experiments/milestone-1/README.md
+@@ -11,7 +11,8 @@
+ 
+ ## Preparar a execução
+ 
+-Usar Linux, Bash, Python 3, JDK 21, `ss`, `tcpdump` e um leitor que permita
++Usar Linux com suporte a pidfd, Bash, Python 3.9 ou posterior, JDK 21, `ss`,
++`tcpdump` e um leitor que permita
+ exportar fluxos TCP reconstituídos (por exemplo Wireshark). É preciso acesso a
+ captura no loopback e ao corte de sockets da própria experiência. As ferramentas
+ são usadas na bancada. A aplicação corre com a conta normal.
+@@ -49,26 +50,15 @@
+ 
+ ## Captura e arranque
+ 
+-No terminal de captura, executar a partir da mesma raiz e definir as variáveis
+-`M`, `JAR`, `JAVA` e `RUN` usadas no primeiro terminal. Usar um diretório
+-de execução novo para cada ensaio. Confirmar `listening on lo` em
+-`capture.log` antes de arrancar BOOT. O limite de 300 segundos e 20 000 pacotes
+-delimita a sessão de captura. Se qualquer limite for atingido durante o cenário,
+-registar o resultado parcial. A secção de leitura da captura explica as
+-verificações de completude.
++No terminal de captura, usar a mesma raiz e os valores de `M` e `RUN` do
++primeiro terminal. Usar um diretório novo para cada ensaio. Aguardar
++`Capture ready` antes de arrancar BOOT. O helper grava `capture.log`,
++`control.pcap` e `capture-start.json` com a identidade do processo
++`tcpdump`. A captura tem um limite de 300 segundos e 20 000 pacotes.
++Se qualquer limite for atingido durante o cenário, registar o resultado parcial.
+ 
+ ```bash
+-test ! -e "$RUN/control.pcap" && test ! -e "$RUN/capture.log" && (
+-  trap ':' INT
+-  date -u '+CAPTURE_START %Y-%m-%dT%H:%M:%SZ'
+-  filter='ip and tcp and src host 127.0.0.1 and dst host 127.0.0.1 and (port 56100 or port 56110 or port 56120 or port 56130)'
+-  printf 'FILTER %s\n' "$filter"
+-  sudo -n timeout --signal=INT 300 tcpdump -Z "$(id -un)" -i lo -p -s 0 -U -c 20000 -w "$RUN/control.pcap" "$filter"
+-  result=$?
+-  printf 'CAPTURE_EXIT %s\n' "$result"
+-  date -u '+CAPTURE_END %Y-%m-%dT%H:%M:%SZ'
+-  exit "$result"
+-) > "$RUN/capture.log" 2>&1
++python3 "$M/bench.py" capture "$RUN"
+ ```
+ 
+ Arrancar cada JVM num terminal próprio. O helper grava PID, comando, logs
+@@ -113,8 +103,11 @@
+ a saída e confirmar que corresponde às sessões ACTIVE observadas.
+ Copiar a **porta de origem efémera** do campo `source_port`.
+ Antes de executar `ss -K`, o helper valida novamente a seleção e confirma
+-que BOOT continua sem listener. Abortar se a seleção mudar, for ambígua,
+-ou se a captura tiver parado.
++que BOOT continua sem listener. A última verificação lê o PID, a identidade
++do arranque, o comando e o estado do `tcpdump` registado. A verificação exige
++um único processo correspondente, em execução ou pronto a executar (R),
++ou em espera interruptível (S).
++Uma captura terminada, suspensa, desaparecida ou ambígua impede o corte.
+ 
+ ```bash
+ read -r SOURCE_PORT
+@@ -123,7 +116,8 @@
+ 
+ O corte só é considerado bem-sucedido se a ferramenta reportar o socket,
+ o resultado não incluir erro e o 4-tuple antigo desaparecer. Guardar
+-`cut-before.json` e `cut-result.json`. Aguardar `NeighborDown` com motivo
++`cut-before.json` e `cut-result.json`. Este último inclui o estado de captura
++observado imediatamente antes do corte. Aguardar `NeighborDown` com motivo
+ `TRANSPORT` e depois `NeighborUp` nos dois processos. Pedir `neighbors`
+ e marcar `reconnected`. Confirmar que os PIDs e instanceIds são os mesmos,
+ os connectionIds da aresta afetada mudaram e as outras duas arestas conservam
