@@ -1,9 +1,6 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** IMP-004/003-overlay complete, história implemented=true e TASK-007 DONE;
-integração local revista 8db7b78. Unidade em progresso; 020-overlay/004-overlay planned.
-[Fecho](../memory-bank/bolts/003-overlay/closure-walkthrough.md). Os relatos anteriores
-de etapas na secção seguinte são históricos.
+**Estado atual:** IMP-005/020-overlay complete e TASK-008 DONE após revisão final confirmada pelo utilizador e integração de `8c30b04` em main. A unidade está em progresso e 004-overlay está planeado. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;

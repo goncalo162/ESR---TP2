@@ -535,3 +535,10 @@ Registo em 2026-11-10T22:22:56Z. O utilizador aprovou Test, incluindo V-008,
 o manual de Luis, a verificação complementar e V-ADD após Q-C-13.
 Waheed tem a revisão final atribuída. A integração e o fecho dependem dessa
 revisão. [Pacote para revisão final](../../../../bolts/020-overlay/closure-walkthrough.md).
+
+## IMP-005 — Fecho concluído
+
+Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como concluída
+por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+[Registo de fecho](../../../../bolts/020-overlay/closure-walkthrough.md).

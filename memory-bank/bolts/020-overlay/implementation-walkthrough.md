@@ -75,7 +75,7 @@ Logs preliminares preservam falhas reais e respetivas correções: cleanup do st
 do harness após processo morto e observação de evento explicitamente sincronizada
 no teste do owner. A versão final passa sem editar testes históricos. As execuções manuais e o
 clean verify estão registados no [relatório de Test](test-walkthrough.md). Test foi aprovado. A revisão
-final de Waheed e a integração da versão revista estão pendentes.
+final atribuída a Waheed e a integração estão registadas no [fecho](closure-walkthrough.md).
 
 ## Correção terminal — Implement reapresentado
 

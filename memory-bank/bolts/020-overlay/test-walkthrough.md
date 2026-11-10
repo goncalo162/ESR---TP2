@@ -9,8 +9,7 @@ O utilizador aprovou Test do IMP-005/020-overlay em 2026-11-10T22:22:56Z,
 com V-008, os 981 testes registados, o manual de Luis, a verificação
 complementar do agente e a resolução de Q-C-13. Confirmou uma nova execução
 de V-ADD no repositório com saída 0, zero erros e 45 fixtures verificadas.
-O bolt permanece in-progress até à revisão final de Waheed e à integração
-da versão revista.
+A revisão final atribuída a Waheed e a integração estão registadas no [fecho](closure-walkthrough.md).
 
 ## V-008 e regressão
 
@@ -112,5 +111,4 @@ removeu as referências ao template inexistente. O
 passou no repositório com saída 0, zero erros e 45 fixtures verificadas.
 A [versão anterior deste relatório](../../../experiments/construction/020-overlay/test-walkthrough-before-approval.md)
 foi arquivada com o hash registado no manifesto do checkpoint.
-O [pacote para revisão final](closure-walkthrough.md) identifica as condições
-de fecho ainda pendentes.
+O [registo de fecho](closure-walkthrough.md) identifica a versão revista e a prova de integração.

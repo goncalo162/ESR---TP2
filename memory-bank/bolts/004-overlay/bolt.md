@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["001-base-validada", "020-overlay"]
 enables_bolts: ["005-rotas", "006-rotas", "021-rotas", "022-rotas"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 2
   avg_uncertainty: 2

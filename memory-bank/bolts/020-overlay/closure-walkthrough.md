@@ -1,10 +1,10 @@
-# IMP-005 / TASK-008 — Preparação do fecho
+# IMP-005 / 020-overlay / TASK-008 — Fecho
 
 Test aprovado pelo utilizador, com registo em 2026-11-10T22:22:56Z. Denji é o
 responsável pela implementação e Waheed é o revisor final atribuído.
-A revisão incide sobre a versão publicada em Denji com este documento.
-A TASK-008 e o bolt permanecem em progresso. O WIP `b425ad3` é a base
-da publicação de revisão.
+O utilizador confirmou que a revisão atribuída a Waheed podia ser dada como
+concluída. A confirmação foi registada em 2026-11-10T22:30:30Z para a versão
+`8c30b044cbf95ca6b37bf72fa0265ceab327639f`, publicada em Denji.
 
 ## Evidência para a revisão
 
@@ -19,9 +19,17 @@ da publicação de revisão.
   saída 0, zero erros e 45 fixtures numa repetição no repositório.
   [V-ADD aprovado](../../../experiments/construction/020-overlay/q-c-13-v-add.log).
 
-## Condições de fecho
+## Integração e estados
 
-1. Waheed aceita a versão final e a revisão fica registada com o hash revisto.
-2. A versão revista é integrada na base comum e a integração fica comprovada.
-3. Bolt, história, TASK-008, índices e progresso são atualizados com a evidência
-   da revisão e da integração, segundo a [Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).
+O ramo main local avançou de `b425ad32882f36a72674a2e136888304ccd4cc5c` para
+`8c30b044cbf95ca6b37bf72fa0265ceab327639f` por fast-forward.
+[Prova de integração](../../../experiments/construction/020-overlay/closure-integration.json).
+
+O bolt e a história estão complete e a TASK-008 está DONE desde 2026-11-10T22:30:30Z.
+A unidade 002-overlay continua em progresso. As dependências de 004-overlay
+estão cumpridas e o bolt continua planeado.
+[Definition of Done](../../../docs/14-DEFINITION-OF-DONE.md).
+
+O [V-ADD do fecho](../../../experiments/construction/020-overlay/closure-v-add.log)
+verifica a documentação e as fixtures. A evidência dos 981 testes permanece
+a da etapa Test.

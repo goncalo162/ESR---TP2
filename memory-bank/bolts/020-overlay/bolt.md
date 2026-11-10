@@ -3,12 +3,12 @@ id: "020-overlay"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-10T22:22:56Z"
+updated: "2026-11-10T22:30:30Z"
 started: "2026-11-10T17:27:22Z"
-completed: null
+completed: "2026-11-10T22:30:30Z"
 current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-10T17:41:41Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-10T22:05:26Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-10T22:22:56Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["001-base-validada", "003-overlay", "019-overlay"]
@@ -41,7 +41,7 @@ Ler [IMP-005](../../../add.md#imp-005) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](../../intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md).
+- [x] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](../../intents/001-ott-streaming/units/002-overlay/stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md).
 - Dependências: [001-base-validada](../001-base-validada/bolt.md), [003-overlay](../003-overlay/bolt.md), [019-overlay](../019-overlay/bolt.md).
 - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
 - Gates: nenhum adicional.
@@ -191,3 +191,10 @@ estão concluídas. V-008, o manual de Luis, a verificação complementar e
 V-ADD após Q-C-13 estão aceites. O bolt e a TASK-008 ficam em progresso até à
 revisão final de Waheed e à integração da versão revista.
 [Pacote para revisão final](closure-walkthrough.md).
+
+## IMP-005 — Fecho concluído
+
+Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como concluída
+por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+[Registo de fecho](closure-walkthrough.md).

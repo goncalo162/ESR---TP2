@@ -5,7 +5,7 @@
 - ID: TASK-008
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-006](../PHASE-02/TASK-006.md), [TASK-007](../PHASE-02/TASK-007.md).
@@ -54,7 +54,7 @@ Ctrl-C duas vezes, papel/config incompatíveis, stdin fechado, porta ocupada e b
 
 V-008: subprocessos locais iniciam por CLI, mostram vizinhos e terminam; configuração inválida não abre porto; interrupção e erro de um peer não deixam processo preso.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado da validação: EXECUTADO; [relatório de Test](../../../memory-bank/bolts/020-overlay/test-walkthrough.md) aprovado. Revisão final de Waheed e integração pendentes. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado da validação: EXECUTADO; [relatório de Test](../../../memory-bank/bolts/020-overlay/test-walkthrough.md) aprovado. Revisão final atribuída a Waheed confirmada pelo utilizador e integração verificada. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
@@ -126,3 +126,10 @@ consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manua
 de Luis e a verificação complementar do agente, com as sondagens preliminares
 preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
 da versão revista continuam pendentes.
+
+## IMP-005 — Fecho concluído
+
+Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como concluída
+por confirmação do utilizador. A versão revista `8c30b04` foi integrada
+por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
+[Registo de fecho](../../../memory-bank/bolts/020-overlay/closure-walkthrough.md).
