@@ -3,12 +3,12 @@ id: "004-overlay"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["004-preparar-evidencia-do-primeiro-marco-intermedio"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-10T23:25:25Z"
+updated: "2026-11-10T23:27:50Z"
 started: "2026-11-10T22:38:06Z"
-completed: null
+completed: "2026-11-10T23:27:50Z"
 current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-10T22:50:50Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-10T23:09:30Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-10T23:25:25Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["001-base-validada", "020-overlay"]
@@ -41,7 +41,7 @@ Ler [IMP-006](../../../add.md#imp-006) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [004-preparar-evidencia-do-primeiro-marco-intermedio](../../intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md).
+- [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](../../intents/001-ott-streaming/units/002-overlay/stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md).
 - Dependências: [001-base-validada](../001-base-validada/bolt.md), [020-overlay](../020-overlay/bolt.md).
 - Unidade: [002-overlay](../../intents/001-ott-streaming/units/002-overlay/unit-brief.md).
 - Gates: G-ASSESSMENTS.
@@ -56,10 +56,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 
 ## Critérios de aceitação
 
-- [ ] Roteiro repetível e logs datados disponíveis.
-- [ ] Limitações da versão intermédia explicitadas.
-- [ ] Situação da avaliação registada sem datas inventadas.
-- [ ] Validação V-009 executada e evidência ligada no progresso.
+- [x] Roteiro repetível e logs datados disponíveis.
+- [x] Limitações da versão intermédia explicitadas.
+- [x] Situação da avaliação registada sem datas inventadas.
+- [x] Validação V-009 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -92,3 +92,12 @@ do processo de captura. A sondagem inicial do agente falhou. A sondagem
 de Luis na bancada Linux local passou para captura e corte.
 Test aguarda a evidência de V-009 e a repetição por outro elemento.
 [Registo de Test](test-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](closure-walkthrough.md).

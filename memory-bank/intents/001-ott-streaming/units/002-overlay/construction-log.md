@@ -566,3 +566,12 @@ do processo de captura. A sondagem inicial do agente falhou. A sondagem
 de Luis na bancada Linux local passou para captura e corte.
 Test aguarda a evidência de V-009 e a repetição por outro elemento.
 [Registo de Test](../../../../bolts/004-overlay/test-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](../../../../bolts/004-overlay/closure-walkthrough.md).

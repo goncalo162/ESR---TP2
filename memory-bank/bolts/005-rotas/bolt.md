@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["004-overlay"]
 enables_bolts: ["021-rotas"]
 requires_units: ["002-overlay"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

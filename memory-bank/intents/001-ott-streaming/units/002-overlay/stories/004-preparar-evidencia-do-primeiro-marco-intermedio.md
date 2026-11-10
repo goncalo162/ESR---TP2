@@ -2,7 +2,7 @@
 id: "004-preparar-evidencia-do-primeiro-marco-intermedio"
 unit: "002-overlay"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-009"]
@@ -11,6 +11,7 @@ requirements: ["CON-007", "INT-001", "INT-002", "NFR-005"]
 adr_ids: ["ADR-008", "ADR-013", "ADR-023", "ADR-024"]
 bolt: "004-overlay"
 size: "S"
+implemented: true
 ---
 # História — Demonstrar o primeiro marco
 
@@ -22,10 +23,10 @@ A tarefa normativa é [IMP-006](../../../../../../add.md#imp-006); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Roteiro repetível e logs datados disponíveis.
-- [ ] Limitações da versão intermédia explicitadas.
-- [ ] Situação da avaliação registada sem datas inventadas.
-- [ ] Validação V-009 executada e evidência ligada no progresso.
+- [x] Roteiro repetível e logs datados disponíveis.
+- [x] Limitações da versão intermédia explicitadas.
+- [x] Situação da avaliação registada sem datas inventadas.
+- [x] Validação V-009 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -53,3 +54,12 @@ permissões da bancada ainda por confirmar para a captura e o corte TCP.
 O ensaio da overlay e a repetição de V-009 por outro elemento estão pendentes.
 A data e o conteúdo da avaliação aguardam informação docente.
 [Implement do IMP-006](../../../../../bolts/004-overlay/implementation-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](../../../../../bolts/004-overlay/closure-walkthrough.md).

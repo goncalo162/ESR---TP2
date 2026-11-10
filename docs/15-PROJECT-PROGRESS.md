@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 IN PROGRESS com Test aprovado. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 IN PROGRESS. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-008](tasks/PHASE-02/TASK-008.md), DONE. O IMP-005/020-overlay foi fechado com V-008, 981 testes, V-ADD e revisão final confirmada pelo utilizador. Versão revista `8c30b04` integrada em main. [Registo de fecho](../memory-bank/bolts/020-overlay/closure-walkthrough.md).
+**Última tarefa concluída:** [TASK-009](tasks/PHASE-02/TASK-009.md), DONE. IMP-006/004-overlay completo com o ensaio técnico de V-009 e a dispensa de repetição em Q-C-15. Revisão final confirmada pelo utilizador e versão revista `cc478d1` integrada em main. [Fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -101,7 +101,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-006](tasks/PHASE-02/TASK-006.md) | Fornecer localização inicial dos vizinhos configurados | TASK-003, TASK-005, TASK-032 | DONE | V-006: 856 testes; manuais Codex/Luis, 34 checks/saída 0 cada; revisão final confirmada pelo utilizador, versão revista integrada em main e bolt complete |
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
-| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | IN PROGRESS | Test aprovado com ensaio técnico de V-009 e dispensa da repetição em Q-C-15. Integração pendente. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
+| [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
@@ -539,3 +539,12 @@ do processo de captura. A sondagem inicial do agente falhou. A sondagem
 de Luis na bancada Linux local passou para captura e corte.
 Test aguarda a evidência de V-009 e a repetição por outro elemento.
 [Registo de Test](../memory-bank/bolts/004-overlay/test-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).

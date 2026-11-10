@@ -5,7 +5,7 @@
 - ID: TASK-009
 - Fase: [PHASE-02 — Overlay, bootstrap e ciclo de vida](../../phases/PHASE-02-OVERLAY.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-008](../PHASE-02/TASK-008.md).
@@ -39,9 +39,9 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Escrever roteiro com sequência de arranque e resultado esperado.
-- [ ] Executar e recolher logs reais na futura construção.
-- [ ] Relacionar RF-001–004 com evidências e limitações.
+- [x] Escrever roteiro com sequência de arranque e resultado esperado.
+- [x] Executar e recolher logs reais na futura construção.
+- [x] Relacionar RF-001–004 com evidências e limitações.
 - [ ] Registar data/feedback docente quando fornecidos.
 
 ## 8. Regras e restrições
@@ -56,14 +56,14 @@ Avaliação pode exigir outro conteúdo ou ocorrer antes desta fase. Ajustar mar
 
 V-009: outro elemento consegue repetir a demonstração e identificar consulta inicial, handshake, saída e reconexão nos logs; os nós já descobertos reconectam com bootstrap parado, sem tráfego periódico para ele.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Validação técnica executada e aceite em Q-C-15. A evidência e a integração constam do [registo de fecho](../../../memory-bank/bolts/004-overlay/closure-walkthrough.md). Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Roteiro repetível e logs datados disponíveis.
-- [ ] Limitações da versão intermédia explicitadas.
-- [ ] Situação da avaliação registada sem datas inventadas.
-- [ ] Validação V-009 executada e evidência ligada no progresso.
+- [x] Roteiro repetível e logs datados disponíveis.
+- [x] Limitações da versão intermédia explicitadas.
+- [x] Situação da avaliação registada sem datas inventadas.
+- [x] Validação V-009 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -98,3 +98,12 @@ do processo de captura. A sondagem inicial do agente falhou. A sondagem
 de Luis na bancada Linux local passou para captura e corte.
 Test aguarda a evidência de V-009 e a repetição por outro elemento.
 [Registo de Test](../../../memory-bank/bolts/004-overlay/test-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](../../../memory-bank/bolts/004-overlay/closure-walkthrough.md).

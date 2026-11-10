@@ -3,9 +3,10 @@ unit: "002-overlay"
 intent: "001-ott-streaming"
 phase: "construction"
 source_phase: "PHASE-02"
-status: "in-progress"
+status: "complete"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-10T22:30:30Z"
+updated: "2026-11-10T23:27:50Z"
+completed: "2026-11-10T23:27:50Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
@@ -30,7 +31,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [x] [001-fornecer-localizacao-inicial-dos-vizinhos-configurados](stories/001-fornecer-localizacao-inicial-dos-vizinhos-configurados.md) → [002-overlay](../../../../bolts/002-overlay/bolt.md); IMP-003 (M).
 - [x] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
 - [x] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
-- [ ] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
+- [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
 
 ## Dependências e critérios de fecho
 
@@ -251,3 +252,12 @@ Registo de 2026-11-10T22:30:30Z. Revisão final atribuída a Waheed dada como co
 por confirmação do utilizador. A versão revista `8c30b04` foi integrada
 por fast-forward em main. Bolt e história concluídos, TASK-008 DONE.
 [Registo de fecho](../../../../bolts/020-overlay/closure-walkthrough.md).
+
+## IMP-006 — Fecho concluído
+
+Registo de 2026-11-10T23:27:50Z. Test foi aceite com o ensaio técnico de V-009
+e a repetição foi dispensada em Q-C-15. A revisão atribuída a Fillmore
+foi dada como concluída por indicação do utilizador. A versão revista
+`cc478d1` foi integrada em main. Bolt e história completos,
+TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
+[Registo de fecho](../../../../bolts/004-overlay/closure-walkthrough.md).

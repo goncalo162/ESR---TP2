@@ -62,3 +62,5 @@ dispensada por decisão do utilizador e não consta como executada.
 [Manifesto da evidência](../../../experiments/construction/004-overlay/test-evidence.json).
 G-ASSESSMENTS mantém a data e o conteúdo da avaliação pendentes de
 informação docente.
+
+[Fecho com revisão e integração](closure-walkthrough.md).
