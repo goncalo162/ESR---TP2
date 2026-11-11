@@ -2,9 +2,20 @@
 
 > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
 
-A API de configuração foi implementada na TASK-003 e o codec do formato de controlo v1 na TASK-004. O transporte TCP foi implementado na TASK-005; bootstrap de consulta e confirmação de escrita foram implementados localmente no IMP-003, com Test aprovado, revisão final confirmada pelo utilizador e versão revista integrada em main; TASK-006 DONE. HELLO/CLI e restantes serviços de rede continuam por implementar. O enunciado obriga ao comportamento, mas não especifica nomes de mensagens, formato binário, portas, REST ou bibliotecas. Não há API HTTP nem serviço externo inventado.
+**Contrato aprovado em ADR-034: controlo TCP uniforme v2. Implement em revisão.**
+Aplica-se a bootstrap, handshake, mensagens normais e descoberta, com um único
+contrato/codec operacional, sem runtime v1/fallback. Mesmo programa/versão de
+JAR em todos os processos. [ADR-034 Aceite](../add.md#adr-034) e
+[Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+foram aprovados; o código foi migrado e tem testes incrementais registados no
+walkthrough. O JAR histórico/execuções anteriores não são validação v2; clean
+verify e manual da etapa Test continuam pendentes.
 
-Correção explícita do utilizador / ADR-013: bootstrap é exclusivamente descoberta inicial de vizinhos configurados, sem registo vivo, leases, renovações, monitorização ou avisos de saída. O contrato v1 foi corrigido antes da implementação de qualquer transporte: REGISTER_OK contém apenas a lista de vizinhos, e o código 3 está retirado/reservado. Os bytes antigos de REGISTER_OK não são compatíveis nem aceites; não existe fallback para a renovação antiga.
+[Contrato e fixtures v1 arquivados](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada).
+Bootstrap mantém só consulta do grafo imutável inicial, sem membership,
+renovação, leases de registo ou notificações de saída; muda apenas o contrato
+TCP para v2. UDP OTT1/version 1 de vídeo permanece inalterado. Não há HTTP,
+dependências runtime novas ou serviço externo.
 
 ## 1. CLI e configuração
 
@@ -86,21 +97,29 @@ Ajustar prazos em conjunto: candidato válido por mais de um período de anúnci
 
 Cada mensagem: uint32 big-endian length, seguido de exatamente length bytes; length inclui envelope e payload, exclui o próprio prefixo. Validar 37 <= length <= 65536 antes de alocar. Ler prefixo/corpo com leitura completa; TCP pode fragmentar ou juntar escritas. Um único escritor por conexão preserva frames.
 
-Envelope, por ordem: version u8 (=1), type u8, requestId UUID (16 bytes), senderId string, senderInstance UUID (16 bytes). Comprimento mínimo com ID de um byte: 1+1+16+2+1+16=37 bytes. Não tratar IDs de um byte como malformados.
+Envelope, por ordem: version u8 (=2), type u8, requestId UUID (16 bytes), senderId string, senderInstance UUID (16 bytes). Comprimento mínimo com ID de um byte: 1+1+16+2+1+16=37 bytes. Não tratar IDs de um byte como malformados.
 
 Primitivas: u8/u16/u32 sem sinal na rede e lidos em tipos Java suficientes; i64 não negativo para sequências/custos/tempos de media; UUID em dois longs big-endian, bits preservados; bool u8 0/1. String = u16 de comprimento de bytes + UTF-8 estrito sem NUL; nodeId até 32 bytes ASCII, title até 512 bytes e 128 pontos de código Unicode, mensagens de erro até 256 bytes. Lista = u16 count + elementos; node list até 64, path até 32. Não usar writeUTF/readUTF como se fossem UTF-8 comum. Bytes extra no fim do payload são erro de versão/formato. Todas as listas abaixo usam essa contagem.
 
 StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJPEG), fps u16 (1–60), serverEpoch UUID. Endpoint: nodeId string, instanceId UUID (obrigatoriamente zero em REGISTER_OK, não zero em REGISTER/HELLO), host string ASCII de 1–253 bytes, controlPort u16 e dataPort u16 (ambos 1–65535), role u8 (1 SERVER, 2 RELAY, 3 CLIENT). O bootstrap fornece endpoints configurados, nunca a instância viva de um vizinho; esta é conhecida no HELLO direto. senderId, serverId e nodeId obedecem a [A-Za-z0-9_-]{1,32}; título tem 1–128 pontos de código Unicode e até 512 bytes UTF-8. A identidade no envelope é sempre a do emissor imediato, inclusive quando reencaminha anúncio de outra origem. Um elemento não válido rejeita a mensagem inteira.
 
-### API do codec implementada na TASK-004
+### API alvo do codec único v2 (migração proposta)
 
 MessageCodec.encode(ControlMessage) devolve os bytes de exatamente um frame; decode(byte[]) exige exatamente um frame e rejeita bytes adicionais. write(message, OutputStream) valida/serializa antes de escrever no destino; read(InputStream) lê um frame completo e devolve Optional.empty apenas perante EOF limpo antes do prefixo. EOF a meio do prefixo/corpo é EOFException; campos incompletos num corpo já recebido são ProtocolException INVALID_MESSAGE. Comprimento superior ao máximo, incluindo u32 com bit de sinal, é rejeitado antes da alocação do corpo. Strings e listas também verificam máximos antes de alocar.
 
-ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem 16 tipos ativos e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
+ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem 18 tipos ativos (1,2,4..19) e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
 
 O chamador gere flush/close e o único escritor por conexão. O codec não abre sockets. UUID são opacos e preservam todos os bits; a exceção de Endpoint.instanceId desconhecido aplica-se apenas a REGISTER_OK. u32 aceita 0..4294967295 e é exposto como long. Listas vazias, TTL zero ou percursos repetidos podem ter representação sintática; os handlers têm de verificar a validade operacional, origem/prefixo, ciclos, frescura e leases antes de agir. Host no Endpoint tem validação de domínio ASCII/comprimento; o handshake terá de o comparar com a configuração autorizada.
 
-[Implementação e validação original do codec](../experiments/task-004-codec-validation.md); [correção e revalidação do bootstrap](../experiments/bootstrap-discovery-correction.md). As 29 fixtures TCP incluem agora 17 casos aceites e 12 rejeitados, incluindo o código 3 retirado. As 16 fixtures UDP permanecem dados de referência; o codec de dados é da TASK-019.
+[Implementação/validação original v1](../experiments/task-004-codec-validation.md)
+e [correção histórica do bootstrap](../experiments/bootstrap-discovery-correction.md)
+são proveniência, não execução v2. O arquivo conserva 29 fixtures TCP v1 e
+16 UDP; [50 novos vetores TCP v2 independentes](../experiments/construction/034-overlay-extra/protocol-v2-proposal/README.md)
+estão propostos e auditados offline, sem produção Java. A futura migração de
+recursos/testes conserva 16 UDP e troca os vetores TCP operacionais por v2.
+Versão !=2 é UNSUPPORTED_VERSION, sem decoder v1. readFrame partilha o mesmo
+parser e devolve Decoded(ControlMessage) ou RejectedExtraContent tipado; read
+estrito preserva assinatura/erros sem oferecer outra versão. Ver secção extra.
 
 ### API de transporte implementada na TASK-005
 
@@ -130,8 +149,8 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 2 | REGISTER_OK | apenas lista Endpoint dos vizinhos configurados, todos com instanceId zero; sem lease ou disponibilidade |
 | 3 | Retirado/reservado | rejeitar como INVALID_MESSAGE; não implementar renovação de registo |
 | 4 | NODE_LEAVE | reason u8 (0 normal, 1 erro); notifica exclusivamente vizinhos diretos, nunca bootstrap |
-| 5 | HELLO | Endpoint local; permite validar conexão, identidade e UDP publicitado |
-| 6 | HELLO_OK | sem campos; confirma handshake |
+| 5 | HELLO | Endpoint local + supportedMask u32 + requiredMask u32, ambos 1; identidade/endpoint/grafo/instância/iniciador validados |
+| 6 | HELLO_OK | selectedMask u32=1; confirma o contrato obrigatório após as barreiras de handshake/flush |
 | 7 | PROBE_PING | probeId i64 |
 | 8 | PROBE_PONG | probeId i64, eco da sonda; RTT calculado com relógio local |
 | 9 | STREAM_ANNOUNCE | StreamInfo, announceSeq i64, costMicros i64, path lista nodeId; path termina no sender |
@@ -143,10 +162,12 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 15 | ROUTE_TRACE | streamId UUID, serverEpoch UUID, traceId UUID, ttl u8, visited lista nodeId; encaminhado a montante conforme upstream selecionado |
 | 16 | TRACE_RESULT | streamId UUID, traceId UUID, visited lista nodeId; resposta pelo caminho inverso do pedido |
 | 17 | ERROR | code u16, relatedType u8, detail string; correlacionado por requestId |
+| 18 | DISCOVERY_QUERY | helloRequestId UUID, recipientId string, recipientInstance UUID; só sessão ACTIVE_DISCOVERY |
+| 19 | DISCOVERY_SNAPSHOT | campos da QUERY + generation u64 positiva + count u16 (0..63) e endpoints diretos; cap extra 32768 |
 
-Bootstrap usa uma conexão TCP curta por consulta inicial: REGISTER → REGISTER_OK ou ERROR, seguido de fecho após envio completo. O requerente usa os endpoints configurados devolvidos para falar diretamente com os vizinhos. Falhas antes de obter resposta permitem retry limitado por tentativa; depois do sucesso não existem renovação, consultas periódicas, heartbeats ou NODE_LEAVE para bootstrap. Consultas repetidas não alteram a configuração; IDs duplicados/instâncias e saídas são geridos entre vizinhos. O handler de bootstrap só aceita REGISTER e responde da configuração, mesmo que os vizinhos estejam offline. O codec comum pode representar outras mensagens; isso não autoriza o handler de bootstrap a processá-las como operações suas.
+Bootstrap usa uma conexão TCP curta **v2** por consulta inicial: REGISTER → REGISTER_OK ou ERROR, seguido de fecho após envio completo. O requerente usa os endpoints configurados devolvidos para falar diretamente com os vizinhos. Falhas antes de obter resposta permitem retry limitado por tentativa; depois do sucesso não existem renovação, consultas periódicas, heartbeats ou NODE_LEAVE para bootstrap. Consultas repetidas não alteram a configuração; IDs duplicados/instâncias e saídas são geridos entre vizinhos. O handler de bootstrap só aceita REGISTER e responde da configuração, mesmo que os vizinhos estejam offline. O codec comum pode representar outras mensagens; isso não autoriza o handler de bootstrap a processá-las como operações suas.
 
-O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede mensagens 7–16, com 3 retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1, 2 e 4–17; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
+O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede as mensagens de aplicação e descoberta; 3 continua retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1, 2 e 4–19, sempre version=2; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
 
 STREAM_ANNOUNCE de uma fonte tem path=[serverId], custo=0 e sequência estritamente crescente por stream/epoch. Cada relay publica o seu path e custo acumulado; o recetor acrescenta-se antes de guardar/reenviar. Epoch muda a cada arranque do SERVER e coincide com sessionId dos datagramas. Ao ver nova época confirmada por anúncios de caminhos válidos, retirar a antiga até expirar o horizonte; não aceitar regresso a uma época retirada por anúncio atrasado.
 
@@ -335,3 +356,154 @@ timeout do writer pode determinar 3, conservando o budget global restante.
 Dois testes de regressão dirigidos cobrem falha e bloqueio precisamente nessa
 fase, após serviço terminado com sucesso; regressão atual de 981 testes passou.
 Test/clean verify/manual humano/revisão final Waheed/integração continuam pendentes.
+
+## EXTRA-01 — Contrato OTD1 proposto
+
+> Histórico: transporte suspenso pelo utilizador. Proposta atual em
+> [contrato v2 no controlo](#extra-01-control-v2); não implementar OTD1 separado.
+
+**Estado: Design/Q-C-17 aprovados; contrato em revisão ADR, G-EXTRA-ADR pendente.**
+Aprovação de Design registada em 2026-11-11T13:38:55Z. ADR-033 continua Proposta;
+[revisão ADR](../memory-bank/bolts/034-overlay-extra/adr-review.md) e aprovação
+formal dos contratos afetados ainda necessárias antes de Implement.
+[Design IMP-034](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+contém a sequência binária completa e os oráculos D01–D12.
+[Q-C-17](construction-duvidas.md#q-c-17--design-da-descoberta-extra-proposta).
+
+| Serviço | Endereço e mensagens |
+|---|---|
+| Controlo base | TCP/controlPort, 16 tipos v1 existentes, código 3 rejeitado, framing 37..65536. |
+| Dados | UDP/dataPort, OTT1 inalterado (64 bytes de cabeçalho, total <=1200). |
+| Descoberta extra | TCP/dataPort, listener separado, apenas OTD1 v1. Desativado por default. |
+
+Uma ligação de descoberta realiza QUERY=1 → SNAPSHOT=2 → flush completo → EOF.
+Não é uma nova ligação overlay, não tem ERROR e não transporta routing/vídeo.
+Framing big-endian u32 bodyLength, corpo 76..32768, magic ASCII OTD1, version=1,
+kind explícito, queryId UUID, helloRequestId UUID e identidades/instâncias dos
+extremos. SNAPSHOT acrescenta generation u64 positiva, count u16 até 63 e
+endpoints dos vizinhos diretos ACTIVE. Cada endpoint contém nodeId, UUID
+observado, host lexical, controlPort, dataPort e role com código explícito.
+Não enviar cache aprendida como adjacência. Não acrescentar campos ao HELLO,
+REGISTER_OK ou datagrama UDP, nem escolher codec por bytes numa sessão base.
+
+QUERY exige sessão ACTIVE atual; SNAPSHOT exige também consulta/canal correntes.
+O token do HELLO é comum aos dois extremos; connectionId é comparado apenas
+localmente. Sem sessão/correlação, ou com versão/tipo/comprimento inválidos,
+fechar o canal extra sem resposta. O extra não autentica criptograficamente
+anunciantes ou candidatos e não autoriza por IP remoto. Não há fallback ao
+bootstrap nem à porta de controlo se o extra do vizinho estiver indisponível.
+Se dataPort=controlPort no endpoint remoto, ou o TCP alvo coincide com algum
+controlo/bootstrap conhecido, não abrir a consulta. O perfil base mantém-se
+válido; só o extra desse vizinho fica indisponível.
+
+Proposta fixa: TTL local 60 s desde a QUERY, cache 128 IDs/quatro fontes, geração
+crescente por sessão e filtragem de self/IDs configurados/conflitos. Fontes
+retiradas conservam claims até expirar; callbacks antigos não os renovam.
+Conflitos de endpoint/papel e colisões entre IDs tornam candidatos indisponíveis.
+Elegibilidade de refresh 5 s, teto global 4 queries/s, entrada 1/s por sessão,
+30 s de pausa após falha; todos os detalhes e limites físicos estão no Design.
+
+extra.discovery.enabled opt-in só nos três papéis overlay; conservar os dois
+construtores anteriores de NodeConfiguration. Recursos TCP comuns com C<=64,
+no máximo quatro canais/dials extra (2+2), fila de um frame mais o frame em escrita.
+Estado no owner serial partilhado; resolver/bind fora dele, limitados e observados
+até terminação física. Flush não é ACK e cancelamento não prova terminação.
+Shutdown usa o prazo global restante, sem joins no owner nem callbacks sob locks.
+
+OverlayNode terá consulta assíncrona limitada da cache; não é uma tabela de
+rotas, um comando CLI novo ou prova de reparação. IMP-035 precisa de contrato
+próprio para intenção/admissão de arestas aprendidas, com aprovação do gate.
+V-033 cobre aprendizagem; V-034 cobre reparação. Nenhum deles foi executado.
+
+### Alcance da revisão ADR do contrato OTD1
+
+As consultas OTD1 podem ser iniciadas por qualquer extremo de uma sessão
+base ACTIVE; não criam outra sessão vizinha de controlo nem mudam a regra
+do menor nodeId dessa sessão. RESOURCE_LIMIT/EXTRA_UNAVAILABLE são razões
+locais da descoberta, não novas mensagens/códigos v1 enviados pela extensão.
+A configuração mantém a lista base das ADR-010/016, com a única chave extra
+explicitamente definida na ADR-033. DNS/bind usam o serviço físico comum
+existente (um worker, até 65 jobs totais; até dois da descoberta dentro desse
+limite). As demais capacidades e escolhas aprovadas do Design mantêm-se.
+[Conferência dos contratos e recursos](../memory-bank/bolts/034-overlay-extra/adr-review.md).
+
+<a id="extra-01-control-v2"></a>
+## EXTRA-01 — Contrato v2 único no controlo (proposto)
+
+G-EXTRA-ADR satisfeito para IMP-034; [Design completo](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+e [revisão ADR-034](../memory-bank/bolts/034-overlay-extra/adr-034-review.md)
+estão aprovados. OTD1 e a mistura TCP v1/v2 são históricos, arquivados.
+Implement pronto para revisão, sem autorização inferida para Test/fecho.
+
+Todo o TCP é v2: bootstrap REGISTER/REGISTER_OK/ERROR, handshake, mensagens
+normais e descoberta. Um enum MessageType, 18 tipos explícitos (1,2,4..19),
+código 3 rejeitado. Um ControlMessage, um MessageCodec, um parser de framing/
+strings/UUIDs/endpoints/buffer; mesmas APIs encode/decode/read/write agora v2.
+Não criar ControlFrame, CodecPolicy, FrameListener, decoder legado ou fallback.
+DiscoveryMessage só representa payloads; eventual DiscoveryCodec é helper
+interno de payload, sem framing/codec operacional autónomo.
+
+Version!=2 é UNSUPPORTED_VERSION, sem interpretar o payload v1. Toda resposta
+emitida, incluindo ERROR, é v2; responder apenas quando envelope/contexto são
+seguros e correlacionados, nunca ERROR a ERROR. Bootstrap mantém grafo imutável,
+instâncias zero em REGISTER_OK e resposta completa antes de EOF, sem operações
+de descoberta extra. A migração não altera a política do bootstrap (ADR-013/015).
+
+Framing u32/body 37..65536, UTF-8 estrito e hard caps preservados. HELLO contém
+Endpoint + supportedMask/requiredMask u32, ambos 1, bits reservados zero;
+HELLO_OK selectedMask u32=1. Corpo HELLO 72..386 e ACK 41..72. Todos os nós
+overlay exigem esta capacidade, versão/identidade/endpoint/grafo/instância/
+requestId/iniciador/flush válidos antes de NeighborUp. Não há modo base.
+
+QUERY/SNAPSHOT usam o envelope único v2 e payload helloRequestId UUID,
+recipientId string e recipientInstance UUID. SNAPSHOT acrescenta generation
+positiva 1..Long.MAX_VALUE, count 0..63 e endpoints diretos; sem hearsay/TTL
+remoto. QUERY 72..134, SNAPSHOT até 19674, cap adicional extra <=32768.
+
+## Rejeição local e recuperação de conteúdo no contrato v2
+
+Inputs inválidos de versão/identidade/endpoint/capacidade rejeitam apenas a
+tentativa/handle. Sem NeighborUp, FAILED global, node.failure(), FATAL, fim da
+CLI ou fecho de sessões saudáveis. Estado por peer configurado limitado (<=63),
+enum/motivos/escalares, sem payload/histórico ilimitado; uma tentativa e um retry
+por peer, menor ID iniciador, backoff/jitter/deadlines e reservas físicas C<=64
+existentes. Ausência temporária/EOF/timeout não prova incompatibilidade;
+conservar último motivo confirmado separado do resultado atual. Apenas handshake
+válido v2 restaura ACTIVE_DISCOVERY. D11a mantém A ACTIVE/CLI/descoberta úteis
+enquanto B é rejeitado. READY local não prova todas as arestas confirmadas.
+
+FIFO única Q+inFlight/writer comum; descoberta só entra atomicamente com duas
+posições livres e nenhum extra enfileirado. Margem M=1, quota E(Q)=min(1,max(0,Q-1)),
+no máximo um extra enfileirado e um em escrita por ligação e quatro tickets
+globais até terminação física. A transição take→inFlight continua cobrada.
+BACKPRESSURED não fecha controlo nem cria fila de retry. Mensagens normais v2
+conservam a política de overflow. Margem não promete bursts/latência arbitrários.
+
+readFrame, no mesmo parser operacional, devolve FrameRead.Decoded(ControlMessage)
+ou RejectedExtraContent(ExtraEnvelope, ContentRejection). O resultado inválido
+retém só envelope/correlação legíveis e enum de motivo, sem corpo/lista parcial.
+Transport.Listener recebe ControlMessage; callback adicional publica rejeição
+no owner, que compara runToken/connectionId/instanceId/queryId/token e identidade
+antes de a classificar recuperável. Não há parser alternativo por versão.
+
+Um anúncio completo/delimitado de sessão atual pode ser rejeitado atomicamente
+por geração/IDs/role/endpoint/UTF-8 de candidato/count/bytes excedentes inválidos,
+sem alterar cache/watermark/TTL. Mensagem normal v2 seguinte é entregue no mesmo
+TCP. Comprimento inválido, truncamento, versão/tipo/código 3 ou identidade
+ilegível/incompatível continuam terminais no handle afetado. Callback antigo não
+fecha sessão nova. Nunca capturar EOF/framing como mero erro de conteúdo.
+
+## Configuração, cache e shutdown preservados
+
+Todo SERVER/RELAY/CLIENT, em cada loader/construtor/perfil, exige descoberta/Q>=2
+antes de sockets/owner/workers. Ausência da antiga chave já exige, true é só
+declaração redundante, false/vazio/inválido são erros agregados. BOOTSTRAP recusa
+a chave como inaplicável e mantém Q=1 válido quando suportado, tal como transporte
+genérico; ambos usam TCP v2, sem constituir modo base. Não criar API alternativa.
+
+Cache 128 IDs x quatro fontes, TTL monotónico local 60 s desde QUERY admitida,
+geração por sessão, proveniência e retenção após morte do anunciante preservados.
+Owner serial partilhado, callbacks curtos, filas/timers físicos limitados e
+shutdown global com prazo, sem liberar recursos pela mera conclusão de future.
+UDP OTT1/version 1 de vídeo mantém bytes/caps e as 16 fixtures. IMP-034 aprende;
+IMP-035 repara após falhas, com checkpoint próprio; routing/vídeo continuam depois.

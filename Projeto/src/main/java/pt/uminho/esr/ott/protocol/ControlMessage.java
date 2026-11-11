@@ -10,12 +10,12 @@ public record ControlMessage(int version, MessageType type, UUID requestId,
                              String senderId, UUID senderInstance, Payload payload) {
     public ControlMessage(MessageType type, UUID requestId, String senderId,
                           UUID senderInstance, Payload payload) {
-        this(1, type, requestId, senderId, senderInstance, payload);
+        this(2, type, requestId, senderId, senderInstance, payload);
     }
 
     public sealed interface Payload permits EndpointPayload, NeighborList, Empty,
             Leave, Probe, Announcement, Withdrawal, Activation, ActivationAck,
-            Deactivation, Trace, TraceResult, ErrorPayload { }
+            Deactivation, Trace, TraceResult, ErrorPayload, Hello, HelloOk, DiscoveryMessage { }
 
     public record Endpoint(String nodeId, UUID instanceId, String host, int controlPort,
                            int dataPort, NodeRole role) { }
@@ -23,6 +23,9 @@ public record ControlMessage(int version, MessageType type, UUID requestId,
     /** Metadados no fio; não é o catálogo dinâmico da TASK-012. */
     public record StreamInfo(UUID streamId, String serverId, String title, int codec,
                              int fps, UUID serverEpoch) { }
+
+    public record Hello(Endpoint endpoint, long supportedMask, long requiredMask) implements Payload { }
+    public record HelloOk(long selectedMask) implements Payload { }
 
     public record EndpointPayload(Endpoint endpoint) implements Payload { }
 

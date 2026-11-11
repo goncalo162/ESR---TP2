@@ -288,6 +288,47 @@ def main():
         require(len(data) == item["bytes"] and hashlib.sha256(data).hexdigest() == item["sha256"],
                 f"{item['id']}: size/hash mismatch")
         require(bytes.fromhex((fixtures_dir / item["hex"]).read_text()) == data, f"{item['id']}: hex mismatch")
+    # ADR-034 / Q-C-19: only TCP v2 is retained; UDP OTT1 remains unchanged.
+    # The original planning snapshot/hashes remain immutable in manifest['files'].
+    protocol = next((extra.get("protocol_validation") for extra in manifest.get("extras", [])
+                     if extra.get("id") == "EXTRA-01"), None)
+    if protocol:
+        udp_baseline_path = ROOT / protocol["udp_baseline_manifest"]
+        require(hashlib.sha256(udp_baseline_path.read_bytes()).hexdigest()
+                == protocol["udp_baseline_sha256"], "Preserved UDP baseline changed")
+        historic_udp = json.loads(udp_baseline_path.read_text())["fixtures"]
+        reference_path = ROOT / protocol["approved_v2_reference_manifest"]
+        require(hashlib.sha256(reference_path.read_bytes()).hexdigest() == protocol["approved_v2_reference_sha256"],
+                "Approved independent TCP v2 manifest changed")
+        reference = json.loads(reference_path.read_text())["fixtures"]
+        tcp = {row["id"]: row for row in fixtures if row["id"].startswith("tcp-")}
+        udp = {row["id"]: row for row in fixtures if row["id"].startswith("udp-")}
+        old_udp = {row["id"]: row for row in historic_udp}
+        require(len(tcp) == len(reference) == protocol["operational_tcp_fixtures"] == 50,
+                "Operational TCP v2 fixture count mismatch")
+        require(len(udp) == protocol["preserved_udp_fixtures"] == 16 and udp == old_udp,
+                "UDP OTT1 fixtures/expectations changed")
+        active_types = set()
+        for row in reference:
+            reference_data = (reference_path.parent / "fixtures" / row["binary"]).read_bytes()
+            require(hashlib.sha256(reference_data).hexdigest() == row["sha256"],
+                    f"Independent reference bytes changed: {row['id']}")
+            require(bytes.fromhex((reference_path.parent / "fixtures" / row["hex"]).read_text()) == reference_data,
+                    f"Independent reference hex mismatch: {row['id']}")
+            operational = tcp.get(row["id"])
+            require(operational is not None, f"Missing v2 operational fixture: {row['id']}")
+            if operational is None:
+                continue
+            require(operational["sha256"] == row["sha256"] and operational["expected"] == row["expected"],
+                    f"Operational v2 differs from independent oracle: {row['id']}")
+            require((fixtures_dir / operational["binary"]).read_bytes() == reference_data,
+                    f"Operational v2 byte mismatch: {row['id']}")
+            if row["expected"]["outcome"] == "accept":
+                require(reference_data[4] == 2 and reference_data[5] == row["expected"]["fields"]["type"],
+                        f"Accepted TCP fixture is not the declared v2 type: {row['id']}")
+                active_types.add(reference_data[5])
+        require(active_types == {1, 2, *range(4, 20)}, "Independent v2 vectors must cover all 18 active types; code 3 retired")
+        checks.append("Protocolo operacional: 50 fixtures TCP v2 independentes (18 tipos), 16 UDP OTT1 intactas face à base; arquivos TCP v1 retirados por decisão explícita Q-C-19.")
     xml_files = list((ROOT / "CORE/topologies").glob("*.xml"))
     for p in xml_files:
         ET.parse(p)

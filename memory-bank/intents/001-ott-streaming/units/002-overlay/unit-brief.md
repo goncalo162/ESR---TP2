@@ -3,13 +3,13 @@ unit: "002-overlay"
 intent: "001-ott-streaming"
 phase: "construction"
 source_phase: "PHASE-02"
-status: "complete"
+status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-10T23:27:50Z"
-completed: "2026-11-10T23:27:50Z"
+updated: "2026-11-11T14:33:20Z"
+completed: null
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
-owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024"]
+owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024", "REQ-025"]
 requires_units: ["001-base-validada"]
 ---
 # Unidade — 002-overlay
@@ -32,6 +32,9 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [x] [002-gerir-handshake-unicidade-e-reconexao-de-vizinhos](stories/002-gerir-handshake-unicidade-e-reconexao-de-vizinhos.md) → [003-overlay](../../../../bolts/003-overlay/bolt.md); IMP-004 (M).
 - [x] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
 - [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
+
+- [ ] [006-reconstruir-vizinhancas-apos-falhas](stories/006-reconstruir-vizinhancas-apos-falhas.md) → [034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md); IMP-034 (extra A, aprendizagem).
+- [ ] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
 
 ## Dependências e critérios de fecho
 
@@ -261,3 +264,65 @@ foi dada como concluída por indicação do utilizador. A versão revista
 `cc478d1` foi integrada em main. Bolt e história completos,
 TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
 [Registo de fecho](../../../../bolts/004-overlay/closure-walkthrough.md).
+
+## Extensão EXTRA-01
+
+A base desta unidade foi fechada em 17c1ca2. A retoma acrescenta
+[034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md), em Model,
+para [REQ-025](../../../../../specs.md#req-025).
+A unidade fica in-progress até ao fecho do extra.
+
+## EXTRA-01 — Plano atual por aprendizagem
+
+Registo de 2026-11-11T12:26:03Z. A opção de catálogo inicial foi substituída por
+[034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md), divulgação
+e cache, seguido de [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md),
+reparação com candidatos aprendidos. A unidade permanece in-progress.
+
+IMP-034: Model/Design e Q-C-17 aprovados; [revisão ADR para aprovação](../../../../bolts/034-overlay-extra/adr-review.md).
+ADR-033/contratos pendentes; V-033, regressão, manual, revisão final e integração por executar.
+
+## Histórico — revisão de transporte
+
+[Design revisto](../../../../bolts/034-overlay-extra/ddd-02-technical-design.md) e ADR-034 propostos para TCP persistente de controlo,
+codec/framing e fila comuns. OTD1 separado interrompido, com código/evidência
+preservados. Cache/TTL/proveniência/callbacks mantêm-se. G-EXTRA-ADR reaberto;
+não retomar Java, Test ou fecho antes de nova aprovação.
+
+## Histórico — Design de TCP uniforme v2
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## Estado atual — Implement do IMP-034 para revisão
+
+Registo de 2026-11-11T19:06:59Z. Design/ADR-034/29 caminhos aprovados;
+ADR-034 Aceite e G-EXTRA-ADR satisfeito para IMP-034. TCP exclusivamente v2
+no bootstrap e vizinhos, descoberta obrigatória no mesmo canal/codec/fila;
+aprendizagem e retenção limitadas implementadas. 1062 testes incrementais passam
+com JDK 21, TCP local e CLI reais. [Walkthrough e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+Test não iniciado: clean verify, manual, revisão final e integração pendentes.
+Unidade e história in-progress; sem DONE/commits/push. IMP-035 não iniciado.
+
+## Estado atual — Implement revisto após D07e
+
+Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
+e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
+incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
+anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+continuam pendentes; sem DONE, commits/push ou início de IMP-035.
+
+## Estado atual — IMP-034 em Test para repetição humana
+
+Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
+com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
+MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
+Repetição pessoal de Luis, aprovação de Test, revisão final e integração
+pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.

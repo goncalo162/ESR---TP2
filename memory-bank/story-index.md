@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete e 27 planned.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em Test para repetição humana (TCP v2) e 28 planned.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -277,3 +277,15 @@ consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manua
 de Luis e a verificação complementar do agente, com as sondagens preliminares
 preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
 da versão revista continuam pendentes.
+
+## 002-overlay/006-reconstruir-vizinhancas-apos-falhas.md ✅ GENERATED
+
+**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement aprovado; Test com 1065 testes/53 checks do agente, repetição humana e aprovação pendentes.
+**Bolt:** 034-overlay-extra. **Ficheiro:** [006-reconstruir-vizinhancas-apos-falhas](intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md).
+IMP-034 aprende candidatos por divulgação dos vizinhos diretos. IMP-035 repara a overlay antes de 005-rotas. Vídeo na integração posterior.
+
+## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+
+**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** planned.
+**Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+Usa a cache aprendida de IMP-034 para reparar a overlay.

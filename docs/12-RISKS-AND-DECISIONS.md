@@ -142,3 +142,83 @@ O [ADD](../add.md) mantém ADR-001–015 e acrescenta ADR-016–026. Este fichei
 1A: specs consolidado; 2A: configuração operacional em TASK-032;
 3B: limitação de recuperação UDP-only; 4A: sem ferramentas/limiar percentual novos.
 Nova decisão ou substituição é registada no ADD e no seu índice.
+
+## EXTRA-01 — Decisão de descoberta em revisão
+
+O utilizador escolheu divulgação de vizinhos diretos com cache limitada.
+A indisponibilidade de candidatos aprendidos antes de uma falha pode
+impedir a reparação. A retenção após morte do anunciante, a expiração,
+a confiança e os limites precisam de provas próprias.
+[ADR-033 proposta](../add.md#adr-033), IMP-034/035.
+
+### EXTRA-01 — riscos concretizados no Design proposto
+
+OTD1 requer disponibilidade da TCP/dataPort, além da UDP já prevista; colisão
+ou firewall podem impedir o extra. O token do HELLO não substitui criptografia.
+Anunciante autorizado pode mentir, conflitos ficam indisponíveis e TTL/caps
+podem deixar a cache vazia. O orçamento TCP comum preserva o hard cap, podendo
+recusar descoberta quando ocupado pelo controlo. Limites e tratamento estão
+no [Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md).
+Q-C-17 foi aprovada em Design; ADR-033/contratos permanecem em revisão ADR,
+com G-EXTRA-ADR pendente antes de Implement.
+
+### ADR-034 — consequência da partilha proposta
+
+A descoberta no controlo elimina sockets e localização separados, mas partilha
+fila, latência e falha do canal. Erro de framing/truncamento/identidade pode fechar a sessão vizinha;
+backpressure extra é recusado sem fechar, preservando overflow das APIs v1.
+Um legado pode fechar a tentativa v2: no extra obrigatório isso é falha de
+negociação explícita, sem fallback. Compatibilidade base permanece apenas nos
+perfis/APIs base; não satisfaz o requisito da execução normal.
+[ADR-034 Proposta](../add.md#adr-034); G-EXTRA-ADR reaberto, sem risco aceite por inferência.
+
+### ADR-034 — margem de fila e conteúdo recuperável
+
+A proposta limita descoberta a um frame enfileirado por ligação e exige duas
+posições livres para inserir, deixando uma para tráfego normal. Q=1 é válido
+no modo base e recusado offline com extra ativo. Isso preserva o cap;
+não garante bursts ou latência. Framing/truncamento/identidade mantêm falha
+terminal; conteúdo inválido de frame extra completa atual é rejeitado sem fecho.
+O resultado tipado só é considerado recuperável após conferir sessão no owner.
+[Design/ADR-034 para revisão](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md).
+
+### ADR-034 — indisponibilidade explícita sem degradação
+
+Na execução normal não há fallback de capacidade. false ou Q=1 no overlay
+impedem arranque antes de I/O; ausência de chave já exige a funcionalidade.
+Peer autorizado com input incompatível tem só a tentativa rejeitada e diagnóstico por peer, sem falha global/fecho da CLI ou de sessões saudáveis;
+falha transitória só mantém retry v2 e não conta como extra pronto. Isso exige
+bancada com a mesma versão do JAR em todos os nós. Q=1 genérico/bootstrap
+mantém testes próprios, sem criar um modo base de nó. Proposta de fallback
+anterior foi rejeitada pelo utilizador; ADR-034 continua por aprovar.
+
+### ADR-034 — requisito intrínseco, sem exceção de nó base
+
+Todos os nós/API/perfis overlay exigem descoberta e Q>=2, independentemente de
+chave. false deixa de representar um modo e é recusado; ausência não desliga.
+Compatibilidade de formatos v1/generic transport e bootstrap não equivale a
+aceitar peer legado numa sessão da aplicação. Isso exige migrar testes de
+admissão/configuração com justificação, mantendo a cobertura das invariantes.
+ADR-034 ainda por aprovar; código congelado, sem execução nova.
+
+### ADR-034 — único JAR e isolamento (revisão atual)
+
+Registo de 2026-11-11T17:22:59Z. Mesma versão do JAR em todos os nós: não existe requisito
+de versões antigas, operação mista ou fallback. As verificações do handshake
+continuam necessárias mesmo nesse cenário. Inputs negativos não podem provocar
+FAILED global/saída da CLI; diagnóstico local e estado por peer limitados,
+retry do mesmo contrato com backoff existente e recursos físicos contados.
+Conectividade parcial é explícita, sem alegar todas as arestas prontas; pares
+saudáveis e descoberta continuam úteis. D02/D11a cobrem esse isolamento, por
+implementar/executar após aprovação de Design/ADR-034. Cache e TTL conservados.
+
+### ADR-034 — migração uniforme v2 e arquivo histórico
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.

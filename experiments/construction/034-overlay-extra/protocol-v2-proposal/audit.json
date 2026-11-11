@@ -1,0 +1,561 @@
+{
+  "recorded_at": "2026-11-11T17:41:04Z",
+  "command": "python3 experiments/construction/034-overlay-extra/protocol-v2-proposal/audit-reference-fixtures.py",
+  "scope": "independent Python structural/semantic inspection of proposed reference fixtures; not Java codec/tests/transport execution",
+  "fixtures": 50,
+  "active_types_covered": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "passed": true,
+  "conditional_content_recovery": "requires owner validation of current session; this offline audit cannot establish session authorization",
+  "results": [
+    {
+      "id": "tcp-register",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 1,
+        "bodyLength": 73,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "endpointId": "S1",
+        "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-register-ok",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 2,
+        "bodyLength": 74,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "B",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "neighborIds": [
+          "S1"
+        ],
+        "neighborInstances": [
+          "00000000-0000-0000-0000-000000000000"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-node-leave",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 4,
+        "bodyLength": 39,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "reason": 0
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-node-leave-min",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 4,
+        "bodyLength": 38,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "reason": 0
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-hello",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 5,
+        "bodyLength": 81,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "endpointId": "S1",
+        "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "supported": 1,
+        "required": 1
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-hello-ok",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 6,
+        "bodyLength": 41,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "selected": 1
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-probe-ping",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 7,
+        "bodyLength": 46,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "probeId": 42
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-probe-pong",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 8,
+        "bodyLength": 46,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "probeId": 42
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-stream-announce",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 9,
+        "bodyLength": 102,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "title": "A",
+        "announceSeq": 1,
+        "costMicros": 0,
+        "path": [
+          "S1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-stream-announce-utf8",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 9,
+        "bodyLength": 105,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "title": "🎬",
+        "announceSeq": 1,
+        "costMicros": 0,
+        "path": [
+          "S1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-stream-withdraw",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 10,
+        "bodyLength": 78,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "streamId": "00000000-0000-4000-8000-000000000001",
+        "announceSeq": 1
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-activate",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 11,
+        "bodyLength": 108,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "revision": 1,
+        "leaseMs": 6000,
+        "expectedPath": [
+          "S1",
+          "C1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-activate-ack",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 12,
+        "bodyLength": 98,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "revision": 1,
+        "grantedLeaseMs": 6000
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-deactivate",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 13,
+        "bodyLength": 94,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "revision": 1
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-subscription-renew",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 14,
+        "bodyLength": 108,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "revision": 1,
+        "leaseMs": 6000,
+        "expectedPath": [
+          "S1",
+          "C1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-route-trace",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 15,
+        "bodyLength": 93,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "C1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "ttl": 32,
+        "visited": [
+          "C1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-trace-result",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 16,
+        "bodyLength": 80,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "visited": [
+          "C1",
+          "S1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-error-no-route",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 17,
+        "bodyLength": 51,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "code": 6,
+        "relatedType": 11,
+        "detail": "no route"
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-error-discovery",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 17,
+        "bodyLength": 60,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "code": 1,
+        "relatedType": 19,
+        "detail": "snapshot rejected"
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-discovery-query",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 18,
+        "bodyLength": 73,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "helloRequestId": "11223344-5566-4788-99aa-bbccddeeff00",
+        "recipientId": "C",
+        "recipientInstance": "20314253-6475-8697-a8b9-cadbecfd0e1f"
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-discovery-snapshot-empty",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 19,
+        "bodyLength": 83,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "helloRequestId": "11223344-5566-4788-99aa-bbccddeeff00",
+        "recipientId": "C",
+        "recipientInstance": "20314253-6475-8697-a8b9-cadbecfd0e1f",
+        "generation": 1,
+        "candidateIds": []
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-discovery-snapshot",
+      "outcome": "accept",
+      "fields": {
+        "version": 2,
+        "type": 19,
+        "bodyLength": 118,
+        "requestId": "00112233-4455-6677-8899-aabbccddeeff",
+        "senderId": "S1",
+        "senderInstance": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "helloRequestId": "11223344-5566-4788-99aa-bbccddeeff00",
+        "recipientId": "C",
+        "recipientInstance": "20314253-6475-8697-a8b9-cadbecfd0e1f",
+        "generation": 2,
+        "candidateIds": [
+          "R1"
+        ]
+      },
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-short-prefix",
+      "outcome": "reject",
+      "error": "EOFException",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-length-small",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-length-large",
+      "outcome": "reject",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-length-unsigned",
+      "outcome": "reject",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-truncated-body",
+      "outcome": "reject",
+      "error": "EOFException",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-version-0",
+      "outcome": "reject",
+      "error": "UNSUPPORTED_VERSION",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-version-1",
+      "outcome": "reject",
+      "error": "UNSUPPORTED_VERSION",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-version-3",
+      "outcome": "reject",
+      "error": "UNSUPPORTED_VERSION",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-version-255",
+      "outcome": "reject",
+      "error": "UNSUPPORTED_VERSION",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-retired-type",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-type",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-identity-utf8",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-trailing-byte",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-negative-probe",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-role",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-path-count",
+      "outcome": "reject",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-capability-not-required",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-capability-missing",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-capability-reserved",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-invalid-selection",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-generation-zero",
+      "outcome": "reject-content",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-duplicate",
+      "outcome": "reject-content",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-invalid-role",
+      "outcome": "reject-content",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-invalid-count",
+      "outcome": "reject-content",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-trailing",
+      "outcome": "reject-content",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-truncated-endpoint",
+      "outcome": "reject",
+      "error": "INVALID_MESSAGE",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-snapshot-field-length",
+      "outcome": "reject",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    },
+    {
+      "id": "tcp-discovery-over-cap",
+      "outcome": "reject",
+      "error": "RESOURCE_LIMIT",
+      "integrity": "passed"
+    }
+  ]
+}

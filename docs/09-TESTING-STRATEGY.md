@@ -336,3 +336,90 @@ As cinco etapas estão concluídas; bolt in-progress, current_stage=null,
 completed=null. TASK/história/unidade continuam em progresso, sem implemented=true
 ou DONE. Não há gates externos adicionais; faltam revisão humana final e
 integração. Não executar o fecho nem fazer commits/push nesta autorização.
+
+### V-033 — EXTRA-01 A, aprender candidatos
+
+V-033: dois nós vizinhos trocam listas limitadas dos seus vizinhos diretos; C aprende R1 através de R2 ou R3 antes das falhas. Relógio falso comprova retenção após morte do anunciante, TTL local, expiração, informação antiga e caps. A extensão é negociada ou isolada e preserva fixtures, códigos e comportamento v1.
+
+Estado: NÃO EXECUTADO. [Model](../memory-bank/bolts/034-overlay-extra/ddd-01-domain-model.md).
+
+### V-034 — EXTRA-01 B, reparar ligações
+
+V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+
+Estado: NÃO EXECUTADO. [Bolt](../memory-bank/bolts/035-overlay-extra/bolt.md).
+A prova de vídeo por S–C ou S–R1–C segue a integração com routing/streaming.
+
+### V-033 — Design e evidência ainda pendente
+
+[Mapa D01–D12](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md#10-mapa-d01d12--v-033)
+define clock/transporte/escrita controlados e isolamento TCP real, sem alterar
+os testes base. Prevê aprendizagem recíproca, TTL local, caps, conflitos,
+callbacks antigos, EOF após flush e shutdown físico. O manual deste incremento
+observa aprendizagem/expiração com bootstrap parado; não cria arestas nem
+alega vídeo. V-033/regressão nova/manual NÃO EXECUTADOS nesta etapa documental.
+
+### V-033 — transporte revisto, provas novas pendentes
+
+O [mapa D01–D12 revisto](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md#8-oráculos-d01d12--v-033-revistos)
+passa a exigir handshake v2 do contrato único, inputs negativos, fila comum, backpressure,
+tickets reais e preservação literal do v1. Resultados OTD1 são históricos,
+incluindo as falhas; não provam o novo contrato. Não foram executados testes
+Java nesta revisão. Manual no TCP de controlo será preparado depois de aprovação.
+
+### V-033 — margem e rejeição de conteúdo (proposta)
+
+D07a–D07e no [Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md#8-oráculos-d01d12--v-033-revistos)
+exigem anúncio completo inválido seguido de frame v1 válida na mesma ligação,
+cache/watermark/TTL intactos, identidade errada e truncamento terminais, e rejeição
+antiga sem efeito na sessão nova. D08a–D08f exigem Q=1 só genérico/bootstrap, Q=2/3/256 com
+margem, quota atómica, transição do writer, FIFO e tickets até decisão real.
+Todos por executar após aprovação; não mudar testes/fixtures v1 nesta revisão.
+
+### V-033 — extra requerido e configuração antes de I/O
+
+> Histórico: as exceções opcionais/base e eventual falha global foram
+> substituídas pelas clarificações posteriores de obrigatoriedade e isolamento.
+
+D01a–d exigem Q=1 nas APIs/perfis base, Q=1 recusado com flag ativo, Q=2/256
+válidos e preflight do projeto com todos os overlay true; zero recursos abertos
+em configuração inválida e erros agregados. D02a–d/D11 cobrem required=1, seleção
+sem bit/v1 incompatível, falhas explícitas e ausência de HELLO v1 de fallback.
+Timeout/EOF ambíguo não prova legado; retries ficam v2 com backoff. Eventos
+antigos/anónimos não podem falhar a sessão/nó novo. Os subcasos Q=1 degradado
+anteriores foram retirados, não executados. D07 de conteúdo e margem D08 mantêm-se.
+[Design atual](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md).
+
+### V-033 — migração explícita do contrato opcional
+
+A nova decisão não preserva nós overlay base/disabled, nem mesmo em testes ou
+APIs embutidas. [Plano de migração](../memory-bank/bolts/034-overlay-extra/test-contract-migration.md)
+identifica métodos/famílias: conservar v1/UDP/fixtures/transporte genérico;
+esperar erro Q=1/false no overlay e migrar peers positivos HELLO v1 para v2.
+Não excluir os casos, relaxar identidade/FIFO/flush/shutdown ou alterar os bytes
+v1 para obter verde. D01/D02/D08/D11 do Design removem a opcionalidade; testes
+só serão escritos/executados depois da aprovação. Contagens antigas são históricas.
+
+### V-033 — cenário único e isolamento de inputs negativos
+
+Registo de 2026-11-11T17:22:59Z. Apenas um programa/versão de JAR em todos os nós; descoberta
+obrigatória. Matriz de versões antigas/optional não faz parte da operação.
+Substituir a expressão anterior novo/legado por negativos de versão, identidade,
+endpoint e capacidade, mantendo formatos v1 usados e o plano de migração.
+D02b–d verificam rejeição local, estado limitado/retry/backoff existentes e
+distinção de ausência temporária. D11a mantém A ACTIVE enquanto B é rejeitado:
+zero Up(B)/Down(A), sem FAILED/failure()/FATAL, neighbors/help e aprendizagem
+QUERY/SNAPSHOT úteis; TCP/CLI reais e relógio controlado. Depois B pode entrar
+apenas pelo mesmo contrato válido. Tudo pendente de implementação/execução.
+[Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md#8-oráculos-d01d12--v-033-revistos).
+
+### V-033 — migração de todo o controlo para v2
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.

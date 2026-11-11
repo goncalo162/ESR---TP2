@@ -12,7 +12,7 @@ completed: "2026-11-10T23:27:50Z"
 current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-10T22:50:50Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-10T23:09:30Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-10T23:25:25Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["001-base-validada", "020-overlay"]
-enables_bolts: ["005-rotas", "006-rotas", "021-rotas", "022-rotas"]
+enables_bolts: ["005-rotas", "006-rotas", "021-rotas", "022-rotas", "034-overlay-extra"]
 requires_units: ["001-base-validada"]
 blocks: false
 complexity:

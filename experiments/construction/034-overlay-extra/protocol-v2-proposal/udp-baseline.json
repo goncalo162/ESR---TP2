@@ -1,0 +1,250 @@
+{
+  "source_revision": "17c1ca27673930bfbf82078522059a243d96ccdb",
+  "source_path": "Projeto/src/test/resources/protocol/manifest.json",
+  "fixtures": [
+    {
+      "id": "udp-min",
+      "binary": "udp-min.bin",
+      "hex": "udp-min.hex",
+      "bytes": 65,
+      "sha256": "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 0,
+          "mediaTimeUs": 0,
+          "frameLength": 1,
+          "fragmentIndex": 0,
+          "fragmentCount": 1,
+          "payloadBytes": 1
+        }
+      }
+    },
+    {
+      "id": "udp-small",
+      "binary": "udp-small.bin",
+      "hex": "udp-small.hex",
+      "bytes": 67,
+      "sha256": "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 7,
+          "mediaTimeUs": 10000,
+          "frameLength": 3,
+          "fragmentIndex": 0,
+          "fragmentCount": 1,
+          "payloadBytes": 3
+        }
+      }
+    },
+    {
+      "id": "udp-split-first",
+      "binary": "udp-split-first.bin",
+      "hex": "udp-split-first.hex",
+      "bytes": 1200,
+      "sha256": "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 8,
+          "mediaTimeUs": 40000,
+          "frameLength": 1137,
+          "fragmentIndex": 0,
+          "fragmentCount": 2,
+          "payloadBytes": 1136
+        }
+      }
+    },
+    {
+      "id": "udp-split-last",
+      "binary": "udp-split-last.bin",
+      "hex": "udp-split-last.hex",
+      "bytes": 65,
+      "sha256": "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1",
+      "expected": {
+        "outcome": "accept",
+        "stage": "udp-codec",
+        "fields": {
+          "magic": "OTT1",
+          "version": 1,
+          "flags": 0,
+          "headerLength": 64,
+          "streamId": "00000000-0000-4000-8000-000000000001",
+          "sessionId": "deadbeef-0000-4000-8000-000000000001",
+          "frameSeq": 8,
+          "mediaTimeUs": 40000,
+          "frameLength": 1137,
+          "fragmentIndex": 1,
+          "fragmentCount": 2,
+          "payloadBytes": 1
+        }
+      }
+    },
+    {
+      "id": "udp-invalid-short-header",
+      "binary": "udp-invalid-short-header.bin",
+      "hex": "udp-invalid-short-header.hex",
+      "bytes": 63,
+      "sha256": "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "datagrama com menos de 64 bytes de cabeçalho"
+      }
+    },
+    {
+      "id": "udp-invalid-no-payload",
+      "binary": "udp-invalid-no-payload.bin",
+      "hex": "udp-invalid-no-payload.hex",
+      "bytes": 64,
+      "sha256": "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "cabeçalho sem payload, apesar de frameLength=3"
+      }
+    },
+    {
+      "id": "udp-invalid-magic",
+      "binary": "udp-invalid-magic.bin",
+      "hex": "udp-invalid-magic.hex",
+      "bytes": 67,
+      "sha256": "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "magic diferente de OTT1"
+      }
+    },
+    {
+      "id": "udp-invalid-version",
+      "binary": "udp-invalid-version.bin",
+      "hex": "udp-invalid-version.hex",
+      "bytes": 67,
+      "sha256": "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "version=2 não suportada"
+      }
+    },
+    {
+      "id": "udp-invalid-flags",
+      "binary": "udp-invalid-flags.bin",
+      "hex": "udp-invalid-flags.hex",
+      "bytes": 67,
+      "sha256": "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "flags reservadas diferentes de zero"
+      }
+    },
+    {
+      "id": "udp-invalid-header-length",
+      "binary": "udp-invalid-header-length.bin",
+      "hex": "udp-invalid-header-length.hex",
+      "bytes": 67,
+      "sha256": "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "headerLength=63, diferente de 64"
+      }
+    },
+    {
+      "id": "udp-invalid-index",
+      "binary": "udp-invalid-index.bin",
+      "hex": "udp-invalid-index.hex",
+      "bytes": 67,
+      "sha256": "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "index=1 não é inferior a count=1"
+      }
+    },
+    {
+      "id": "udp-invalid-count",
+      "binary": "udp-invalid-count.bin",
+      "hex": "udp-invalid-count.hex",
+      "bytes": 67,
+      "sha256": "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "count=2 não corresponde a ceil(3/1136)=1"
+      }
+    },
+    {
+      "id": "udp-invalid-zero-frame",
+      "binary": "udp-invalid-zero-frame.bin",
+      "hex": "udp-invalid-zero-frame.hex",
+      "bytes": 67,
+      "sha256": "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameLength=0, fora do intervalo 1..2097152"
+      }
+    },
+    {
+      "id": "udp-invalid-large-frame",
+      "binary": "udp-invalid-large-frame.bin",
+      "hex": "udp-invalid-large-frame.hex",
+      "bytes": 67,
+      "sha256": "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameLength=2097153, superior a 2 MiB"
+      }
+    },
+    {
+      "id": "udp-invalid-negative-seq",
+      "binary": "udp-invalid-negative-seq.bin",
+      "hex": "udp-invalid-negative-seq.hex",
+      "bytes": 67,
+      "sha256": "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "frameSeq i64=-1, fora do domínio não negativo"
+      }
+    },
+    {
+      "id": "udp-invalid-datagram-size",
+      "binary": "udp-invalid-datagram-size.bin",
+      "hex": "udp-invalid-datagram-size.hex",
+      "bytes": 1201,
+      "sha256": "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0",
+      "expected": {
+        "outcome": "reject",
+        "stage": "udp-codec",
+        "reason": "1201 bytes, superior ao máximo de aplicação 1200"
+      }
+    }
+  ]
+}

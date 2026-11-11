@@ -1,0 +1,22 @@
+# Validação do ADD e planeamento Construction
+
+Execução: 2026-11-11T19:19:46Z. Base: 85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936.
+Comando: python3 scripts/validate-planning.py --report experiments/construction/034-overlay-extra/d07e-correlation-v-add.log
+
+## Resultado
+
+- Requisitos/constraints/intents: 41; 35 aliases e critérios legados preservados.
+- ADD: 13 secções; 28 ADR com driver/alternativa; matriz 41/41 sem órfãos.
+- Unidades: 7; histórias/IMP/bolts: 35/35/35; TASK pai: 34.
+- DAG sem ciclos; dependências de todas as partes e gates de fase preservados; nenhum IMP L.
+- Protocolo operacional: 50 fixtures TCP v2 independentes (18 tipos), 16 UDP OTT1 intactas; arquivo histórico: 45 fixtures e contrato v1 verificados.
+- Fixtures verificadas: 66; XML CORE analisáveis: 3 (sem execução).
+- Referências locais/âncoras verificadas: 4259.
+- Erros encontrados: 0.
+
+## Alcance
+
+Validação estrutural/documental e de bytes de referência. Não executa Maven,
+testes Java, rede entre processos, GUI, CORE ou submissão. Os 149 testes
+continuam a ser evidência histórica, não resultado desta execução.
+A validação não substitui a aprovação humana dos artefactos/tarefas; não executa bolts.

@@ -1,0 +1,104 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=NeighborDiscoveryTest", "test"]
+STARTED=2026-11-11T17:56:55.435693+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 38 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 195 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 12 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[ERROR] Tests run: 4, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 0.085 s <<< FAILURE! -- in pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[ERROR] pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_falseIsRejectedInsteadOfDisablingDiscovery -- Time elapsed: 0.051 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected pt.uminho.esr.ott.config.ConfigurationException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:73)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3128)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_falseIsRejectedInsteadOfDisablingDiscovery(NeighborDiscoveryTest.java:20)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_Q1AndFalseAreAggregatedBeforeResources -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected pt.uminho.esr.ott.config.ConfigurationException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:73)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3128)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_Q1AndFalseAreAggregatedBeforeResources(NeighborDiscoveryTest.java:24)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_overlayQ2NeedsNoSeparatePortOrEightConnections -- Time elapsed: 0.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+Unexpected exception thrown: pt.uminho.esr.ott.config.ConfigurationException: /tmp/junit-7570742918060457548/client.properties [data.port]: descoberta TCP exige portas distintas
+/tmp/junit-7570742918060457548/client.properties [control.max.connections]: descoberta exige pelo menos 8 reservas comuns
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.D01_overlayQ2NeedsNoSeparatePortOrEightConnections(NeighborDiscoveryTest.java:31)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: pt.uminho.esr.ott.config.ConfigurationException: /tmp/junit-7570742918060457548/client.properties [data.port]: descoberta TCP exige portas distintas
+/tmp/junit-7570742918060457548/client.properties [control.max.connections]: descoberta exige pelo menos 8 reservas comuns
+	at pt.uminho.esr.ott.config.ConfigurationLoader.failIfAny(ConfigurationLoader.java:575)
+	at pt.uminho.esr.ott.config.ConfigurationLoader.load(ConfigurationLoader.java:54)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.lambda$D01_overlayQ2NeedsNoSeparatePortOrEightConnections$7(NeighborDiscoveryTest.java:31)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   NeighborDiscoveryTest.D01_Q1AndFalseAreAggregatedBeforeResources:24 Expected pt.uminho.esr.ott.config.ConfigurationException to be thrown, but nothing was thrown.
+[ERROR]   NeighborDiscoveryTest.D01_falseIsRejectedInsteadOfDisablingDiscovery:20 Expected pt.uminho.esr.ott.config.ConfigurationException to be thrown, but nothing was thrown.
+[ERROR]   NeighborDiscoveryTest.D01_overlayQ2NeedsNoSeparatePortOrEightConnections:31 Unexpected exception thrown: pt.uminho.esr.ott.config.ConfigurationException: /tmp/junit-7570742918060457548/client.properties [data.port]: descoberta TCP exige portas distintas
+/tmp/junit-7570742918060457548/client.properties [control.max.connections]: descoberta exige pelo menos 8 reservas comuns
+[INFO] 
+[ERROR] Tests run: 4, Failures: 3, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.560 s
+[INFO] Finished at: 2026-11-11T17:56:59Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

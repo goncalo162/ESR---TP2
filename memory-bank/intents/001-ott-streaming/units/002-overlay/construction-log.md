@@ -575,3 +575,127 @@ foi dada como concluída por indicação do utilizador. A versão revista
 `cc478d1` foi integrada em main. Bolt e história completos,
 TASK-009 DONE. A data e o conteúdo da avaliação aguardam informação docente.
 [Registo de fecho](../../../../bolts/004-overlay/closure-walkthrough.md).
+
+## EXTRA-01 — Model preparado
+
+2026-11-11T12:11:34Z: pedido do utilizador para reconstrução da overlay antes de 005-rotas.
+Catálogo inicial e fronteira overlay/vídeo confirmados. Novo
+[034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md) e ADR-033 proposta.
+A base da fase 2 conserva o seu fecho histórico. Nenhuma execução V-033 nesta etapa.
+
+## EXTRA-01 — Opção de descoberta revista
+
+2026-11-11T12:26:03Z: o utilizador escolheu divulgação dos vizinhos diretos e
+conservação limitada de candidatos. A escolha anterior do catálogo inicial
+fica como histórico. O trabalho foi decomposto em dois M antes de 005-rotas:
+IMP-034 aprende, IMP-035 repara. Model de IMP-034 para revisão.
+
+- **2026-11-11T12:49:29Z**: aprovação explícita de Model de IMP-034 / 034-overlay-extra,
+  registada na entrada de Design em 2026-11-11T12:41:00Z. Preparado apenas
+  [Design](../../../../bolts/034-overlay-extra/ddd-02-technical-design.md), com
+  OTD1 isolado em TCP/dataPort, confiança pelo vínculo HELLO, geração, TTL 60 s,
+  cache 128×4, conflitos, recursos comuns e D01–D12 controlados.
+  Q-C-17/ADR-033 e contratos continuam propostos; G-EXTRA-ADR pendente.
+  Sem código, V-033/regressão/manual novos ou aceitação de revisão final.
+  Parar em Design antes de ADR/Implement/Test; não iniciar IMP-035/005.
+
+- **2026-11-11T13:44:19Z**: aprovação explícita de Design e Q-C-17 do IMP-034 registada na
+  entrada de ADR em 2026-11-11T13:38:55Z. Preparada apenas a
+  [revisão ADR](../../../../bolts/034-overlay-extra/adr-review.md): compatibilidade
+  OTD1/v1, token HELLO sem autenticação criptográfica, retenção/TTL, quotas e
+  orçamento físico comum. ADR-033 explicita a única chave adicional face a
+  ADR-010/016; ADR aceites preservadas, sem ADR nova. G-EXTRA-ADR pendente de
+  aprovação formal da ADR e contratos antes de Implement. Sem execução Java,
+  manual, commits/push ou início de outro IMP. Revisão humana final e integração
+  continuam pendentes para o fecho.
+
+- **2026-11-11T14:26:58Z**: utilizador interrompeu variante OTD1 e pediu novo Design/ADR
+  no TCP de controlo. Código, 87 evidências e documentos anteriores arquivados;
+  163 ficheiros atuais de Projeto/ congelados. Compilação anterior já terminou;
+  não foram lançados novos builds/testes Java. Design ativo revisto e ADR-034
+  Proposta, com gate reaberto e âmbito de protocolo/testes atualizado. Model
+  permanece aprovado; aprovações de transporte anteriores ficam no histórico.
+  Não continuar Implement antes de aprovação; sem commits, push ou outro IMP.
+
+- **2026-11-11T14:51:37Z**: ajuste documental pedido de fila/falhas da ADR-034. Uma posição
+  de margem, quota extra enfileirada de um, Q=1 em modo base e quatro tickets
+  globais. Conteúdo inválido completo/corrente tem rejeição tipada sem fecho;
+  framing/truncamento/identidade continuam terminais. D07a–e/D08a–f adicionados.
+  Gate continua pendente e Implement interrompido; sem Java ou execução de testes.
+
+- **2026-11-11T15:15:24Z**: decisão explícita do utilizador contra degradação automática.
+  Revisão documental exige extra em todos os overlay normais, Q>=2 antes de
+  I/O e required=1, preservando Q=1/base. Incompatibilidade confirmada e falha
+  transitória têm estados/erros explícitos, sem fallback. D01/D02/D08/D11
+  ajustados; conteúdo recuperável/margem mantidos. Implement continua interrompido,
+  ADR-034 Proposta e gate pendente; nenhum código, teste Java ou outro IMP.
+
+- **2026-11-11T15:35:59Z**: alteração de requisito confirmada: nenhuma ativação opcional ou
+  ACTIVE_BASE em nó overlay. Todos os loaders/construtores/perfis derivam o
+  requisito do papel e validam Q>=2 antes de I/O. true legado só redundante,
+  false erro, ausência obrigatório. Plano de migração dos testes identifica
+  pressupostos alterados sem reescrever formatos v1/UDP ou relaxar invariantes.
+  ADR-034 Proposta, Implement suspenso; IMP-035 não iniciado.
+
+- **2026-11-11T17:22:59Z**: revisão documental de IMP-034 concluída para apresentação: programa
+  único/mesma versão do JAR, descoberta obrigatória e negativos estritos do
+  handshake. Retirada propagação de rejeição remota para FAILED/failure()/CLI;
+  isolamento por peer conforme ADR-020, estado/retry/backoff limitados.
+  D02b–d/D11a preservam A ACTIVE/CLI/descoberta enquanto B é rejeitado.
+  ADR-034 Proposta e gate pendente; Java/evidências congelados, sem commits/push.
+  IMP-034 aprende; IMP-035 permanece planeado para reparação.
+
+- **2026-11-11T17:47:08Z**: decisão do utilizador de migrar todo o TCP para v2, incluindo
+  bootstrap. Design/ADR-034/âmbito (29 caminhos) e plano de testes revistos;
+  arquivo de v1 e 50 vetores v2 independentes preparados/auditados offline.
+  Framing/caps/identidade/FIFO/flush/isolamento/shutdown e cache mantidos;
+  UDP OTT1 inalterado. Código congelado e gate pendente de aprovação, sem
+  testes Java/commits/push. IMP-034 aprende; IMP-035 repara posteriormente.
+
+## Aprovação e retoma de Implement — TCP v2
+
+Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
+O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
+caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
+ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
+opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
+G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
+Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
+com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
+proveniência preservados. Testes incrementais com logs reais autorizados.
+Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
+manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
+próprio; sem commits/push ou início de outro IMP.
+
+## IMP-034 — Implement pronto para revisão
+
+Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
+Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
+normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
+v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
+Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
+JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
+com novo oráculo controlado; falhas/sondagens anteriores mantidas.
+66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
+v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
+XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
+Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+verify/regressão atual, manual reproduzido, revisão final e integração continuam
+necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+
+## IMP-034 — revisão de Implement após D07e
+
+Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
+e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
+incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
+anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+continuam pendentes; sem DONE, commits/push ou início de IMP-035.
+
+## Estado atual — IMP-034 em Test para repetição humana
+
+Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
+com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
+MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
+Repetição pessoal de Luis, aprovação de Test, revisão final e integração
+pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.

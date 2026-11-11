@@ -22,9 +22,20 @@ class MessageCodecTest {
     private static final UUID EPOCH=UUID.fromString("deadbeef-0000-4000-8000-000000000001");
     private static final UUID SUB=UUID.fromString("fedcba98-7654-4321-8765-0123456789ab");
     private static final UUID TRACE=UUID.fromString("11223344-5566-4788-99aa-bbccddeeff00");
+    private static final UUID OTHER=UUID.fromString("20314253-6475-8697-a8b9-cadbecfd0e1f");
     private static final UUID NIL=new UUID(0,0);
     private static final Endpoint ENDPOINT=new Endpoint("S1",INST,"10.0.0.1",5000,5001,NodeRole.SERVER);
     private static final Endpoint CONFIGURED_ENDPOINT=new Endpoint("S1",NIL,"10.0.0.1",5000,5001,NodeRole.SERVER);
+
+    @Test void D01e_uniformV2VersionIsRequired() { assertEquals(2, MessageCodec.VERSION); }
+    @Test void D01e_bootstrapV2GoldenIsAccepted() throws Exception {
+        byte[] bytes=java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/v2/tcp-register.bin"));
+        assertEquals(2,MessageCodec.decode(bytes).version());
+    }
+    @Test void D01e_v1IsRejectedRatherThanFallingBack() throws Exception {
+        byte[] bytes=fixture("register");bytes[4]=1;
+        assertEquals(ErrorCode.UNSUPPORTED_VERSION,assertThrows(ProtocolException.class,()->MessageCodec.decode(bytes)).errorCode());
+    }
 
     // Valores interpretados do contrato, independentes do encoder e decoder.
     static Stream<Arguments> goldenVectors() {
@@ -32,8 +43,8 @@ class MessageCodecTest {
             Arguments.of("register",msg(MessageType.REGISTER,"S1",new EndpointPayload(ENDPOINT))),
             Arguments.of("register-ok",msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(CONFIGURED_ENDPOINT)))),
             Arguments.of("node-leave",msg(MessageType.NODE_LEAVE,"S1",new Leave(0))),
-            Arguments.of("hello",msg(MessageType.HELLO,"S1",new EndpointPayload(ENDPOINT))),
-            Arguments.of("hello-ok-min",msg(MessageType.HELLO_OK,"C",Empty.INSTANCE)),
+            Arguments.of("hello",msg(MessageType.HELLO,"S1",new Hello(ENDPOINT,1,1))),
+            Arguments.of("hello-ok-min",msg(MessageType.HELLO_OK,"C",new HelloOk(1))),
             Arguments.of("probe-ping",msg(MessageType.PROBE_PING,"S1",new Probe(42))),
             Arguments.of("probe-pong",msg(MessageType.PROBE_PONG,"S1",new Probe(42))),
             Arguments.of("stream-announce",announcement("A")),
@@ -45,7 +56,13 @@ class MessageCodecTest {
             Arguments.of("route-trace",msg(MessageType.ROUTE_TRACE,"C1",new Trace(STREAM,EPOCH,TRACE,32,List.of("C1")))),
             Arguments.of("trace-result",msg(MessageType.TRACE_RESULT,"S1",new TraceResult(STREAM,TRACE,List.of("C1","S1")))),
             Arguments.of("error-no-route",msg(MessageType.ERROR,"S1",new ErrorPayload(ErrorCode.NO_ROUTE,11,"no route"))),
-            Arguments.of("stream-announce-utf8",announcement("🎬")));
+            Arguments.of("stream-announce-utf8",announcement("🎬")),
+            Arguments.of("node-leave-min",msg(MessageType.NODE_LEAVE,"C",new Leave(0))),
+            Arguments.of("error-discovery",msg(MessageType.ERROR,"S1",new ErrorPayload(ErrorCode.INVALID_MESSAGE,19,"snapshot rejected"))),
+            Arguments.of("discovery-query",msg(MessageType.DISCOVERY_QUERY,"S1",new DiscoveryMessage.Query(TRACE,"C",OTHER))),
+            Arguments.of("discovery-snapshot-empty",msg(MessageType.DISCOVERY_SNAPSHOT,"S1",new DiscoveryMessage.Snapshot(TRACE,"C",OTHER,1,List.of()))),
+            Arguments.of("discovery-snapshot",msg(MessageType.DISCOVERY_SNAPSHOT,"S1",new DiscoveryMessage.Snapshot(TRACE,"C",OTHER,2,
+                List.of(new Endpoint("R1",OTHER,"10.0.0.2",5002,5003,NodeRole.RELAY))))));
     }
 
     @ParameterizedTest(name="golden {0}") @MethodSource("goldenVectors")
@@ -125,7 +142,7 @@ class MessageCodecTest {
             long wire=((b[98]&255L)<<24)|((b[99]&255L)<<16)|((b[100]&255L)<<8)|(b[101]&255L);
             assertEquals(lease,wire);
         }
-        var bits=new ControlMessage(MessageType.HELLO_OK,new UUID(Long.MIN_VALUE,-1),"C",NIL,Empty.INSTANCE);
+        var bits=new ControlMessage(MessageType.HELLO_OK,new UUID(Long.MIN_VALUE,-1),"C",new UUID(-1,Long.MIN_VALUE),new HelloOk(1));
         assertEquals(bits,MessageCodec.decode(MessageCodec.encode(bits)));
         var probe=msg(MessageType.PROBE_PONG,"S1",new Probe(Long.MAX_VALUE));
         assertEquals(probe,MessageCodec.decode(MessageCodec.encode(probe)));
@@ -146,9 +163,9 @@ class MessageCodecTest {
     }
 
     @Test void validatesIdsAndMaximumNeighborCount() throws Exception {
-        assertEquals(41,MessageCodec.encode(msg(MessageType.HELLO_OK,"C",Empty.INSTANCE)).length);
+        assertEquals(45,MessageCodec.encode(msg(MessageType.HELLO_OK,"C",new HelloOk(1))).length);
         for(String id:List.of("","á","bad/id","a".repeat(33)))
-            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO_OK,id,Empty.INSTANCE)));
+            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO_OK,id,new HelloOk(1))));
         List<Endpoint> neighbors=IntStream.range(0,64).mapToObj(i->new Endpoint("N"+i,NIL,"10.0.0.1",5000,5001,NodeRole.RELAY)).toList();
         var m=msg(MessageType.REGISTER_OK,"B",new NeighborList(neighbors));assertEquals(m,MessageCodec.decode(MessageCodec.encode(m)));
         var excess=new ArrayList<>(neighbors);excess.add(ENDPOINT);
@@ -170,24 +187,24 @@ class MessageCodecTest {
         var unknown=new Endpoint("N",NIL,"10.0.0.2",65535,65535,NodeRole.CLIENT);
         var response=msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(unknown)));
         assertEquals(response,MessageCodec.decode(MessageCodec.encode(response)));
-        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"N",new EndpointPayload(unknown))));
+        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"N",new Hello(unknown,1,1))));
         byte[] zero=fixture("hello");Arrays.fill(zero,46,62,(byte)0);assertThrows(ProtocolException.class,()->MessageCodec.decode(zero));
         for(NodeRole role:List.of(NodeRole.SERVER,NodeRole.RELAY,NodeRole.CLIENT)){
             int code=switch(role){case SERVER->1;case RELAY->2;case CLIENT->3;default->throw new AssertionError();};
-            var m=msg(MessageType.HELLO,"S1",new EndpointPayload(new Endpoint("S1",INST,"10.0.0.1",5000,5001,role)));
+            var m=msg(MessageType.HELLO,"S1",new Hello(new Endpoint("S1",INST,"10.0.0.1",5000,5001,role),1,1));
             byte[] b=MessageCodec.encode(m);assertEquals(code,b[76]);assertEquals(m,MessageCodec.decode(b));
         }
         for(Endpoint invalid:List.of(new Endpoint("S1",INST,"h",0,5001,NodeRole.SERVER),
                 new Endpoint("S1",INST,"h",5000,65536,NodeRole.SERVER),new Endpoint("S1",INST,"bad host",5000,5001,NodeRole.SERVER),
                 new Endpoint("S1",INST,"h",5000,5001,NodeRole.BOOTSTRAP)))
-            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"S1",new EndpointPayload(invalid))));
+            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"S1",new Hello(invalid,1,1))));
     }
 
     @Test void invalidModelsDoNotEmitPartialFrames(){
         var output=new ByteArrayOutputStream();
         assertThrows(ProtocolException.class,()->MessageCodec.write(msg(MessageType.PROBE_PING,"S1",Empty.INSTANCE),output));
         assertEquals(0,output.size());assertThrows(ProtocolException.class,()->MessageCodec.encode(null));
-        assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(2,MessageType.HELLO_OK,REQ,"C",INST,Empty.INSTANCE)));
+        assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(1,MessageType.HELLO_OK,REQ,"C",INST,new HelloOk(1))));
         assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(MessageType.HELLO_OK,null,"C",INST,Empty.INSTANCE)));
     }
 
@@ -197,7 +214,7 @@ class MessageCodecTest {
             @Override public void close(){closed=true;}
             @Override public void flush(){flushed=true;}
         }
-        var output=new Output();MessageCodec.write(msg(MessageType.HELLO_OK,"C",Empty.INSTANCE),output);
+        var output=new Output();MessageCodec.write(msg(MessageType.HELLO_OK,"C",new HelloOk(1)),output);
         assertFalse(output.closed);assertFalse(output.flushed);
         class Input extends ByteArrayInputStream {
             boolean closed;
@@ -224,9 +241,9 @@ class MessageCodecTest {
     }
 
     @Test void allMessageNumbersHaveIndependentVectors(){
-        assertEquals(IntStream.rangeClosed(1,17).filter(code->code!=3).boxed().toList(),
-                goldenVectors().limit(16).map(a->((ControlMessage)a.get()[1]).type().code()).toList());
-        assertEquals(16,MessageType.values().length);
+        assertEquals(IntStream.rangeClosed(1,19).filter(code->code!=3).boxed().toList(),
+                goldenVectors().map(a->((ControlMessage)a.get()[1]).type().code()).distinct().sorted().toList());
+        assertEquals(18,MessageType.values().length);
     }
 
     @Test void bootstrapReplyContainsOnlyConfiguredNeighbors() throws Exception {
@@ -261,7 +278,7 @@ class MessageCodecTest {
                 responses++;
             }else{
                 var endpoint=new Endpoint(node.nodeId(),instance,node.advertisedHost(),node.controlPort(),node.dataPort(),node.role());
-                var message=new ControlMessage(MessageType.HELLO,REQ,node.nodeId(),instance,new EndpointPayload(endpoint));
+                var message=new ControlMessage(MessageType.HELLO,REQ,node.nodeId(),instance,new Hello(endpoint,1,1));
                 assertEquals(message,MessageCodec.decode(MessageCodec.encode(message)));hellos++;
             }
             for(var stream:node.streams()){
@@ -281,7 +298,8 @@ class MessageCodecTest {
     private static ControlMessage announcement(String title){return msg(MessageType.STREAM_ANNOUNCE,"S1",new Announcement(new StreamInfo(STREAM,"S1",title,1,10,EPOCH),1,0,List.of("S1")));}
     private static Activation activation(){return new Activation(STREAM,EPOCH,SUB,1,6000,List.of("S1","C1"));}
     private static byte[] fixture(String name) throws IOException {
-        try(InputStream input=MessageCodecTest.class.getResourceAsStream("/protocol/tcp-"+name+".bin")){
+        name=switch(name){case "hello-ok-min"->"hello-ok";case "invalid-version"->"invalid-version-1";case "invalid-utf8"->"invalid-identity-utf8";default->name;};
+        try(InputStream input=MessageCodecTest.class.getResourceAsStream("/protocol/v2/tcp-"+name+".bin")){
             assertNotNull(input,"Fixture em falta: "+name);return input.readAllBytes();
         }
     }

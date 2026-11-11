@@ -4,7 +4,7 @@
 
 Este conjunto de documentos especifica um protótipo OTT que distribui vídeo em tempo real através de uma rede overlay com multicast aplicacional. A entrega final deve demonstrar pelo menos dois servidores, cada um com dois vídeos distintos, clientes simultâneos, caminhos alternativos e adaptação às condições de rede.
 
-**Estado atual: PHASE-01 e PHASE-02 concluídas.** A overlay de controlo funciona localmente com descoberta inicial, handshake, reconexão TCP e saída de nós. A PHASE-03 está planeada para métricas e rotas. [Fecho da fase 2](phases/PHASE-02-CLOSURE-REVIEW.md) · [Roteiro do marco](../experiments/milestone-1/README.md).
+**Estado atual: PHASE-01 e base da PHASE-02 concluídas, com EXTRA-01 em Model antes da fase 3.** A overlay de controlo funciona localmente com descoberta inicial, handshake, reconexão TCP e saída de nós. A PHASE-03 está planeada para métricas e rotas. [Fecho da fase 2](phases/PHASE-02-CLOSURE-REVIEW.md) · [Roteiro do marco](../experiments/milestone-1/README.md).
 
 Correção atual / ADR-013: bootstrap só devolve a localização dos vizinhos configurados na consulta inicial; sem registo vivo, leases, renovações ou monitorização. O contrato e o codec foram ajustados antes de iniciar rede; [revalidação com 131 testes](../experiments/bootstrap-discovery-correction.md). A lista inicial permite depois manter/reconectar vizinhos sem bootstrap.
 
@@ -64,3 +64,5 @@ PHASE-01 → PHASE-02 → PHASE-03 → PHASE-04 → PHASE-05 → PHASE-06 → PH
 **Primeira tarefa, concluída:** [TASK-001 — Validar a base Java e configurar testes](tasks/PHASE-01/TASK-001.md). **TASK-002 concluída:** contratos/fixtures e recursos revistos. **TASK-003 concluída:** configuração implementada/testada. **TASK-004 e PHASE-01 concluídas:** codec e integração local testados. **TASK-005 concluída:** transporte TCP testado. **Próximo código novo:** [TASK-032](tasks/PHASE-02/TASK-032.md), após verificar a base; TASK-006 depende dela. Executar as tarefas seguintes apenas no âmbito solicitado pelo utilizador.
 
 Ao concluir uma tarefa, atualizar simultaneamente o seu estado, o progresso, a rastreabilidade dos requisitos satisfeitos e as evidências. Não converter TODO em DONE por existirem ficheiros vazios, documentação ou artefactos antigos em target/.
+
+Extensão pedida após a base da fase 2: [EXTRA-01](../memory-bank/bolts/034-overlay-extra/bolt.md), descoberta por divulgação de vizinhos diretos, cache limitada e reconstrução dinâmica. O extra precede 005-rotas.

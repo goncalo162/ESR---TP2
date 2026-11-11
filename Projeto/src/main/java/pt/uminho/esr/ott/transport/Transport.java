@@ -1,6 +1,8 @@
 package pt.uminho.esr.ott.transport;
 
 import pt.uminho.esr.ott.protocol.ControlMessage;
+import pt.uminho.esr.ott.protocol.MessageCodec;
+import pt.uminho.esr.ott.protocol.ProtocolException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -19,6 +21,12 @@ public final class Transport implements AutoCloseable {
         void connectionOpen(Connection connection);
         void message(Connection connection, ControlMessage message);
         void connectionClosed(Connection connection, Connection.CloseReason reason);
+        /** Recovery requires an authorized current session; unhandled rejection is terminal. */
+        default void rejectedExtraContent(Connection connection, MessageCodec.RejectedExtraContent rejection) {
+            connection.close(Connection.CloseReason.PROTOCOL_ERROR);
+        }
+        default void protocolError(Connection connection, ProtocolException error) { }
+
     }
 
     public record Options(int queueCapacity, int maxConnections, Duration connectTimeout,
@@ -49,6 +57,15 @@ public final class Transport implements AutoCloseable {
     private final Map<Socket, Connection> sockets = new HashMap<>();
     private final Set<Thread> workers = new HashSet<>();
     private boolean closed;
+    private final java.util.concurrent.atomic.AtomicInteger extraWrites=new java.util.concurrent.atomic.AtomicInteger();
+    boolean acquireExtraWrite() {
+        int used;
+        do { used=extraWrites.get(); if(used>=4)return false; } while(!extraWrites.compareAndSet(used,used+1));
+        return true;
+    }
+    void releaseExtraWrite() { if(extraWrites.decrementAndGet()<0)throw new IllegalStateException("Extra ledger underflow"); }
+    public int extraWritesInProgress() { return extraWrites.get(); }
+
 
     public Transport(InetSocketAddress bind, Listener listener) throws IOException {
         this(bind, listener, Options.defaults());

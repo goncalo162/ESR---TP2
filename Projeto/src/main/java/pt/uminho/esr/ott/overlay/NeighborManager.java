@@ -3,6 +3,7 @@ package pt.uminho.esr.ott.overlay;
 import pt.uminho.esr.ott.config.NodeConfiguration;
 import pt.uminho.esr.ott.config.RuntimeConfiguration;
 import pt.uminho.esr.ott.protocol.*;
+import pt.uminho.esr.ott.protocol.ProtocolException;
 import pt.uminho.esr.ott.transport.*;
 import java.net.*;
 import java.time.Duration;
@@ -16,7 +17,14 @@ public final class NeighborManager implements AutoCloseable {
     private static final UUID ZERO = new UUID(0, 0);
     public enum Phase { NOT_STARTED, DISCOVERING, READY, FAILED, CLOSED }
     public enum Reason { REMOTE_REJECTION, CONTEXT, TRANSPORT, TIMEOUT, RESOURCE_LIMIT,
-        SHUTDOWN, LEAVE, CONSUMER_FAILURE, STALE }
+        SHUTDOWN, LEAVE, CONSUMER_FAILURE, STALE, REQUIRED_DISCOVERY_MISSING, UNSUPPORTED_VERSION,
+        INVALID_HANDSHAKE, DISCOVERY_BACKPRESSURE, DISCOVERY_TIMEOUT, DISCOVERY_STALE,
+        DISCOVERY_INVALID_CONTENT, DISCOVERY_RATE_LIMIT, DISCOVERY_REMOTE_ERROR,
+        DISCOVERY_WRITE_FAILED, DISCOVERY_GENERATION_EXHAUSTED, DISCOVERY_CACHE_REJECTION }
+    public enum CapabilityState { NEGOTIATING_REQUIRED, ACTIVE_DISCOVERY, TEMPORARILY_UNAVAILABLE, INCOMPATIBLE, INVALID_ATTEMPT }
+    public record PeerStatus(CapabilityState state, Reason currentReason, Optional<Reason> lastConfirmedRejection,
+            int observedVersion,long supportedMask,long requiredMask,long selectedMask,long retryDelayMillis) { }
+    public Map<String,PeerStatus> discoveryStatus(){return peerStatusView;}
     /** Local diagnostics only; these values are never serialized on the wire. */
     public enum LeaveOutcome { LOCAL_WRITE_CONFIRMED, WRITE_FAILED, TIMED_OUT, ABORTED }
     public record LeaveAttempt(Neighbor.Session session, LeaveOutcome outcome) {
@@ -54,6 +62,7 @@ public final class NeighborManager implements AutoCloseable {
         return shutdownView;
     }
     private void beginShutdown(int reason) {
+        if(learner!=null)learner.close();
         cancel(initialSlot); initialSlot = null;
         if (discovery != null) retire(discovery);
         for (var p : peers.values()) {
@@ -148,10 +157,12 @@ public final class NeighborManager implements AutoCloseable {
     interface Channel {
         UUID id(); boolean isOpen(); Connection.SendResult send(ControlMessage message);
         CompletableFuture<Void> sendAndFlush(ControlMessage message); void close();
+        Connection.ExtensionEnqueue trySendExtension(ControlMessage message);
     }
     interface Ticket { void cancel(); }
     interface Deadlines {
         void limit(int maxPhysicalTickets); Ticket schedule(Runnable task, long delayNanos);
+        Ticket periodic(Runnable task,long intervalNanos);
         void requestClose(); boolean awaitTermination(Duration timeout);
     }
     interface Jitter { long choose(long minInclusive, long maxInclusive); }
@@ -162,6 +173,8 @@ public final class NeighborManager implements AutoCloseable {
         void opened(Channel channel, long observedAt);
         void message(Channel channel, ControlMessage message, long observedAt);
         void closed(Channel channel, Connection.CloseReason reason, long observedAt);
+        void rejected(Channel channel,MessageCodec.RejectedExtraContent rejection,long observedAt);
+        void protocolError(Channel channel,ProtocolException error,long observedAt);
     }
     interface Network {
         CompletableFuture<InetSocketAddress> open(InetSocketAddress bind, Transport.Options options, Sink sink);
@@ -201,6 +214,9 @@ public final class NeighborManager implements AutoCloseable {
     private final CompletionStage<Void> startView = started.minimalCompletionStage();
     private volatile Map<String, Neighbor.Session> activeView = Map.of();
     private volatile Map<String, Neighbor> diagnosticView = Map.of();
+    private volatile Map<String,PeerStatus> peerStatusView=Map.of();
+    private NeighborDiscovery learner;
+    private final Semaphore cacheCommands=new Semaphore(4);
     private final Set<CompletableFuture<?>> commands = ConcurrentHashMap.newKeySet();
     private final Semaphore commandSlots;
     private volatile boolean launched;
@@ -221,6 +237,9 @@ public final class NeighborManager implements AutoCloseable {
         Neighbor.State state = Neighbor.State.DISCONNECTED;
         Attempt attempt; Context context; Slot slot;
         Neighbor.Session session; long base, delay;
+        CapabilityState capability=CapabilityState.NEGOTIATING_REQUIRED;
+        Reason currentReason=Reason.STALE,lastConfirmed;
+        int observedVersion;long supported,required,selected;
         Peer(ControlMessage.Endpoint endpoint) { configured = endpoint; }
     }
     private static final class Attempt {
@@ -273,13 +292,18 @@ public final class NeighborManager implements AutoCloseable {
     }
     public Map<String, Neighbor.Session> snapshot() { return stopping.get() ? Map.of() : activeView; }
     public Map<String, Neighbor> diagnostics() { return diagnosticView; }
+    public CompletionStage<List<CandidateCache.CandidateView>> candidates() {
+        if(!cacheCommands.tryAcquire())return CompletableFuture.failedStage(new RejectedExecutionException("Four cache commands maximum"));
+        var result=command(List.<CandidateCache.CandidateView>of(),()->learner==null?List.<CandidateCache.CandidateView>of():learner.snapshot());
+        result.whenComplete((v,e)->cacheCommands.release());return result;
+    }
     public CompletionStage<Connection.SendResult> send(Neighbor.Session expected, ControlMessage message) {
         Objects.requireNonNull(expected); Objects.requireNonNull(message);
         return command(Connection.SendResult.CLOSED, () -> {
             var peer = current(expected);
             if (peer == null) return Connection.SendResult.CLOSED;
             if (!envelope(message) || !message.senderId().equals(plan.local.nodeId())
-                    || !message.senderInstance().equals(instance) || !application(message.type())
+                    || !message.senderInstance().equals(instance) || !application(message.type()) || extra(message.type())
                     || message.payload() instanceof ControlMessage.ErrorPayload p && p.relatedType() == 17)
                 return Connection.SendResult.INVALID_MESSAGE;
             return peer.context.channel.send(message);
@@ -308,6 +332,11 @@ public final class NeighborManager implements AutoCloseable {
         return result.minimalCompletionStage();
     }
     private void postOrClose(Channel channel, Runnable event) { if (!post(event)) channel.close(); }
+    private void postFrameOrClose(Channel channel,Runnable event) {
+        // Stop application admissions during the notification phase, but leave
+        // healthy sockets alive until NODE_LEAVE has actually written/flushed.
+        if(!post(event) && !draining.get())channel.close();
+    }
     private boolean post(Runnable event) { return post(event, false); }
     private boolean post(Runnable event, boolean lifecycle) {
         var target = owner;
@@ -357,11 +386,46 @@ public final class NeighborManager implements AutoCloseable {
             all.put(p.configured.nodeId(), new Neighbor(p.configured.nodeId(), p.configured,
                     p.state, Optional.ofNullable(p.session), p.delay));
         }
+        var status=new LinkedHashMap<String,PeerStatus>();
+        for(var p:peers.values())status.put(p.configured.nodeId(),new PeerStatus(p.capability,p.currentReason,
+                Optional.ofNullable(p.lastConfirmed),p.observedVersion,p.supported,p.required,p.selected,p.delay));
+        peerStatusView=Map.copyOf(status);
         activeView = Map.copyOf(active); diagnosticView = Map.copyOf(all);
     }
     private final Sink sink = new Sink() {
         public void opened(Channel ch, long at) { postOrClose(ch, () -> openedOnOwner(ch, at)); }
-        public void message(Channel ch, ControlMessage m, long at) { postOrClose(ch, () -> messageOnOwner(ch, m, at)); }
+        public void message(Channel ch, ControlMessage m, long at) { postFrameOrClose(ch, () -> messageOnOwner(ch, m, at)); }
+        public void rejected(Channel ch,MessageCodec.RejectedExtraContent rejection,long at) {
+            postFrameOrClose(ch,()->{
+                var c=contexts.get(ch.id());
+                if(c==null)return;
+                if(!c.active || learner==null || c.peer==null || c.peer.context!=c
+                        || !learner.rejected(c.peer.session,rejection))finish(c,Reason.CONTEXT,null);
+            });
+        }
+        public void protocolError(Channel ch,ProtocolException error,long at) {
+            postOrClose(ch,()->{
+                var c=contexts.get(ch.id());if(c==null)return;
+                var remote=error.getCause() instanceof MessageCodec.HandshakeFailure h?h.message():null;
+                if(remote!=null) {
+                    if(remote.type()==MessageType.HELLO && c.direction==Direction.INBOUND && c.peer==null) {
+                        // Reuse normal endpoint/identity authorization; no unknown peer status can be created.
+                        hello(c,remote);return;
+                    }
+                    if(c.peer!=null && identity(c,remote) && Objects.equals(c.request,remote.requestId())) {
+                        incompatible(c.peer,remote,Reason.REQUIRED_DISCOVERY_MISSING);
+                        finish(c,Reason.REQUIRED_DISCOVERY_MISSING,remote);return;
+                    }
+                }
+                Reason reason=error.errorCode()==ErrorCode.UNSUPPORTED_VERSION?Reason.UNSUPPORTED_VERSION:Reason.INVALID_HANDSHAKE;
+                if(c.peer!=null&&c.peer.context==c) {
+                    c.peer.capability=reason==Reason.UNSUPPORTED_VERSION?CapabilityState.INCOMPATIBLE:CapabilityState.INVALID_ATTEMPT;
+                    if(error.getCause() instanceof MessageCodec.VersionFailure version)c.peer.observedVersion=version.observed();
+                    c.peer.currentReason=reason;c.peer.lastConfirmed=reason;publish();
+                }
+                finish(c,reason,null);
+            });
+        }
         public void closed(Channel ch, Connection.CloseReason why, long at) {
             postOrClose(ch, () -> { var c = contexts.get(ch.id()); if (c != null) finish(c, Reason.TRANSPORT, null); });
         }
@@ -491,7 +555,7 @@ public final class NeighborManager implements AutoCloseable {
         c.request = UUID.randomUUID(); c.sent = true;
         var type = c.bootstrap ? MessageType.REGISTER : MessageType.HELLO;
         write(c, new ControlMessage(type, c.request, plan.local.nodeId(), instance,
-                new ControlMessage.EndpointPayload(plan.local)), false);
+                c.bootstrap?new ControlMessage.EndpointPayload(plan.local):new ControlMessage.Hello(plan.local,1,1)), false);
     }
     private void write(Context c, ControlMessage message, boolean closeAfter) {
         if (c.responding) { finish(c, Reason.RESOURCE_LIMIT, null); return; }
@@ -525,10 +589,11 @@ public final class NeighborManager implements AutoCloseable {
         handle(c, message, at);
     }
     private boolean envelope(ControlMessage m) {
-        return m != null && m.version() == 1 && m.type() != null && m.requestId() != null
+        return m != null && m.version() == MessageCodec.VERSION && m.type() != null && m.requestId() != null
                 && validId(m.senderId()) && m.senderInstance() != null && !ZERO.equals(m.senderInstance()) && m.payload() != null;
     }
-    private static boolean application(MessageType type) { return type != null && type.code() >= 7 && type.code() <= 17; }
+    private static boolean application(MessageType type) { return type != null && type.code() >= 7 && type.code() <= 19; }
+    private static boolean extra(MessageType type){return type==MessageType.DISCOVERY_QUERY||type==MessageType.DISCOVERY_SNAPSHOT;}
     private boolean identity(Context c, ControlMessage m) {
         return c.peer != null && c.peer.configured.nodeId().equals(m.senderId())
                 && (c.remoteInstance == null || c.remoteInstance.equals(m.senderInstance()));
@@ -540,7 +605,13 @@ public final class NeighborManager implements AutoCloseable {
         if (c.active) {
             if (!identity(c, m)) { contextFailure(c, m); return; }
             if (m.type() == MessageType.NODE_LEAVE && m.payload() instanceof ControlMessage.Leave) finish(c, Reason.LEAVE, null);
-            else if (application(m.type())) emit(new Received(c.peer.session, m));
+            else if(extra(m.type())) {
+                if(learner==null||!learner.receive(c.peer.session,m,at))contextFailure(c,m);
+            }
+            else if (application(m.type())) {
+                if(m.type()==MessageType.ERROR && learner!=null)learner.error(c.peer.session,m);
+                emit(new Received(c.peer.session, m));
+            }
             else contextFailure(c, m);
             return;
         }
@@ -558,7 +629,9 @@ public final class NeighborManager implements AutoCloseable {
             contextFailure(c, m); return;
         }
         if (c.direction == Direction.OUTBOUND && m.type() == MessageType.HELLO_OK
-                && m.payload() == ControlMessage.Empty.INSTANCE && c.request.equals(m.requestId()) && !c.acknowledged) {
+                && m.payload() instanceof ControlMessage.HelloOk ack && c.request.equals(m.requestId()) && !c.acknowledged) {
+            if(ack.selectedMask()!=1){incompatible(c.peer,m,Reason.REQUIRED_DISCOVERY_MISSING);finish(c,Reason.REQUIRED_DISCOVERY_MISSING,m);return;}
+            c.peer.observedVersion=2;c.peer.selected=1;
             c.remoteInstance = m.senderInstance(); c.endpoint = withInstance(c.peer.configured, c.remoteInstance);
             c.acknowledged = true; activate(c); return;
         }
@@ -569,8 +642,9 @@ public final class NeighborManager implements AutoCloseable {
         return c.peer != null && c.remoteInstance != null && (c.direction == Direction.INBOUND || c.acknowledged);
     }
     private void hello(Context c, ControlMessage m) {
+        if(ZERO.equals(m.requestId())){reject(c,m,ErrorCode.INVALID_MESSAGE);return;}
         var p = peers.get(m.senderId());
-        if (p == null || !(m.payload() instanceof ControlMessage.EndpointPayload ep) || ep.endpoint() == null) {
+        if (p == null || !(m.payload() instanceof ControlMessage.Hello ep) || ep.endpoint() == null) {
             reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return;
         }
         var e = ep.endpoint();
@@ -580,9 +654,19 @@ public final class NeighborManager implements AutoCloseable {
         catch (IllegalArgumentException ex) { allowed = false; }
         if (!allowed) { reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return; }
         if (p.context != null || p.session != null || p.attempt != null) { reject(c, m, ErrorCode.DUPLICATE_ID); return; }
+        if(ep.supportedMask()!=1||ep.requiredMask()!=1) {
+            incompatible(p,m,Reason.REQUIRED_DISCOVERY_MISSING);reject(c,m,ErrorCode.INVALID_MESSAGE);return;
+        }
+        p.observedVersion=2;p.supported=1;p.required=1;
         c.peer = p; c.endpoint = withInstance(p.configured, m.senderInstance()); c.remoteInstance = m.senderInstance();
         c.request = m.requestId(); c.sent = true; p.context = c; p.state = Neighbor.State.HANDSHAKING; publish();
-        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, ControlMessage.Empty.INSTANCE), false);
+        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, new ControlMessage.HelloOk(1)), false);
+    }
+    private void incompatible(Peer p,ControlMessage m,Reason reason) {
+        if(p.session!=null)return;
+        p.capability=CapabilityState.INCOMPATIBLE;p.currentReason=reason;p.lastConfirmed=reason;p.observedVersion=m.version();
+        if(m.payload() instanceof ControlMessage.Hello h){p.supported=h.supportedMask();p.required=h.requiredMask();}
+        if(m.payload() instanceof ControlMessage.HelloOk h)p.selected=h.selectedMask();publish();
     }
     private void reject(Context c, ControlMessage m, ErrorCode code) {
         diagnostic(Reason.CONTEXT, c.attempt, c, m);
@@ -611,6 +695,19 @@ public final class NeighborManager implements AutoCloseable {
         c.attempt.live = false; discovery = null;
         removeContext(c); c.channel.close(); peers.putAll(installed);
         deadlines.limit(peers.size() + plan.options.maxConnections() + 1);
+        learner=new NeighborDiscovery(plan.config,instance,peers.entrySet().stream().collect(
+                java.util.stream.Collectors.toMap(Map.Entry::getKey,e->e.getValue().configured)),clock,new NeighborDiscovery.Host() {
+            public boolean post(Runnable task){return NeighborManager.this.post(task);}
+            public Map<String,Neighbor.Session> active(){return activeView;}
+            public Connection.ExtensionEnqueue enqueue(Neighbor.Session session,ControlMessage message) {
+                var p=current(session);
+                return p==null?Connection.refused(Connection.ExtensionStatus.CLOSED):p.context.channel.trySendExtension(message);
+            }
+            public void diagnostic(NeighborDiscovery.Issue issue) {
+                NeighborManager.this.diagnostic(Reason.valueOf("DISCOVERY_"+issue.name()),null,null,null);
+            }
+        });
+        learner.start(deadlines);
         publish(); started.complete(null);
         for (var p : peers.values()) if (initiates(p)) dialPeer(p);
     }
@@ -639,6 +736,8 @@ public final class NeighborManager implements AutoCloseable {
         if (c.attempt != null) { c.attempt.live = false; p.attempt = null; }
         p.session = new Neighbor.Session(p.configured.nodeId(), c.remoteInstance, c.channel.id(), c.endpoint);
         p.state = Neighbor.State.ACTIVE; p.base = 0; p.delay = 0;
+        p.capability=CapabilityState.ACTIVE_DISCOVERY;p.currentReason=Reason.STALE;p.lastConfirmed=null;
+        learner.up(p.session,c.request);
         publish(); emit(new NeighborUp(p.session)); drain(c);
     }
     private void retain(Context c, ControlMessage m, long at) {
@@ -668,7 +767,12 @@ public final class NeighborManager implements AutoCloseable {
         removeContext(c); c.channel.close();
         var p = c.peer;
         if (p != null && p.context == c) {
-            var old = p.session; p.context = null; p.session = null; p.state = stopping.get() ? Neighbor.State.CLOSED : Neighbor.State.DISCONNECTED;
+            var old = p.session;
+            if(old!=null&&learner!=null)learner.down(old);
+            if(reason!=Reason.REQUIRED_DISCOVERY_MISSING&&reason!=Reason.UNSUPPORTED_VERSION&&reason!=Reason.INVALID_HANDSHAKE) {
+                p.capability=CapabilityState.TEMPORARILY_UNAVAILABLE;p.currentReason=reason;
+            }
+            p.context = null; p.session = null; p.state = stopping.get() ? Neighbor.State.CLOSED : Neighbor.State.DISCONNECTED;
             if (c.attempt != null) retire(c.attempt);
             publish(); if (old != null) emit(new NeighborDown(old, reason));
             if (!stopping.get()) retry(p);
@@ -685,6 +789,7 @@ public final class NeighborManager implements AutoCloseable {
     private void attemptFailed(Attempt a, Reason reason, ControlMessage remote) {
         if (!live(a)) return;
         if (a.context != null && current(a.context)) { finish(a.context, reason, remote); return; }
+        if(a.peer!=null){a.peer.capability=CapabilityState.TEMPORARILY_UNAVAILABLE;a.peer.currentReason=reason;}
         diagnostic(reason, a, null, remote); retire(a);
         if (a.peer == null) retryDiscovery(); else { publish(); retry(a.peer); }
     }
@@ -737,6 +842,7 @@ public final class NeighborManager implements AutoCloseable {
         if (phase != Phase.FAILED) phase = Phase.CLOSED;
         if (phase != Phase.FAILED && failure.get() != null) diagnostic(failure.get() instanceof RejectedExecutionException
                 ? Reason.RESOURCE_LIMIT : Reason.CONSUMER_FAILURE, null, null, null);
+        if(learner!=null)learner.close();
         cancel(initialSlot); initialSlot = null;
         if (discovery != null) retire(discovery);
         for (var c : List.copyOf(contexts.values())) finish(c, Reason.SHUTDOWN, null);
@@ -894,6 +1000,7 @@ public final class NeighborManager implements AutoCloseable {
         public boolean isOpen() { return connection.isOpen(); }
         public Connection.SendResult send(ControlMessage message) { return connection.send(message); }
         public CompletableFuture<Void> sendAndFlush(ControlMessage message) { return connection.sendAndFlush(message); }
+        public Connection.ExtensionEnqueue trySendExtension(ControlMessage message){return connection.trySendExtension(message);}
         public void close() { connection.close(); }
     }
     /** Physical ticket accounting includes callbacks already running when cancelled. */
@@ -912,11 +1019,13 @@ public final class NeighborManager implements AutoCloseable {
             if (value < 1 || value > maximum) throw new IllegalArgumentException("Invalid timer limit"); limit = value;
         }
         private final class TimerJob implements Runnable, Ticket {
-            final Runnable task; ScheduledFuture<?> future; boolean running, done;
+            final Runnable task; ScheduledFuture<?> future; boolean running, done,periodic;
             TimerJob(Runnable task) { this.task = task; }
             public void run() {
                 synchronized (RealDeadlines.this) { if (done) return; running = true; }
-                try { task.run(); } finally { synchronized (RealDeadlines.this) { release(); } }
+                try { task.run(); } finally { synchronized (RealDeadlines.this) {
+                    running=false;if(!periodic||future.isCancelled()||stopped)release();
+                } }
             }
             private void release() { if (!done) { done = true; physical--; jobs.remove(this); } }
             public void cancel() {
@@ -933,6 +1042,12 @@ public final class NeighborManager implements AutoCloseable {
             try { job.future = worker.schedule(job, Math.max(1, nanos), TimeUnit.NANOSECONDS); }
             catch (RuntimeException e) { job.release(); throw e; }
             return job;
+        }
+        public synchronized Ticket periodic(Runnable task,long nanos) {
+            if(stopped||physical>=limit)throw new RejectedExecutionException("Physical timer capacity");
+            var job=new TimerJob(Objects.requireNonNull(task));job.periodic=true;physical++;jobs.add(job);
+            try{job.future=worker.scheduleWithFixedDelay(job,Math.max(1,nanos),Math.max(1,nanos),TimeUnit.NANOSECONDS);}
+            catch(RuntimeException error){job.release();throw error;}return job;
         }
         public synchronized void requestClose() {
             stopped = true; for (var job : List.copyOf(jobs)) job.cancel(); worker.shutdownNow();
@@ -1013,6 +1128,8 @@ public final class NeighborManager implements AutoCloseable {
                         opened = new Transport(bind, new Transport.Listener() {
                             public void connectionOpen(Connection c) { sink.opened(new TcpChannel(c), System.nanoTime()); }
                             public void message(Connection c, ControlMessage m) { sink.message(new TcpChannel(c), m, System.nanoTime()); }
+                            public void rejectedExtraContent(Connection c,MessageCodec.RejectedExtraContent rejection){sink.rejected(new TcpChannel(c),rejection,System.nanoTime());}
+                            public void protocolError(Connection c,ProtocolException error){sink.protocolError(new TcpChannel(c),error,System.nanoTime());}
                             public void connectionClosed(Connection c, Connection.CloseReason why) { sink.closed(new TcpChannel(c), why, System.nanoTime()); }
                         }, options);
                         transport.set(opened);

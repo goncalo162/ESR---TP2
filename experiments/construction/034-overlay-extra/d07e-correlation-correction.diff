@@ -1,0 +1,142 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
+@@ -81,13 +81,17 @@
+     private void retire(Peer p) {cache.retire(p.source);p.query=null;for(var r:responses)if(r.peer==p)r.logical=false;}
+     private boolean current(Peer p){return !closed && peers.get(p.session.nodeId())==p;}
+     private Peer peer(Neighbor.Session session) {var p=peers.get(session.nodeId());return p!=null&&p.session.equals(session)?p:null;}
+-    private boolean identity(Peer p,UUID hello,String recipient,UUID recipientInstance) {
+-        return p!=null && p.hello.equals(hello) && localId.equals(recipient) && instance.equals(recipientInstance);
++    private boolean identity(Peer p,String sender,UUID senderInstance,String recipient,UUID recipientInstance) {
++        return p!=null && p.session.nodeId().equals(sender) && p.session.instanceId().equals(senderInstance)
++                && localId.equals(recipient) && instance.equals(recipientInstance);
+     }
+     boolean receive(Neighbor.Session session,ControlMessage message,long observedAt) {
+         var p=peer(session);
+         if(!(message.payload() instanceof DiscoveryMessage data)
+-                || !identity(p,data.helloRequestId(),data.recipientId(),data.recipientInstance()))return false;
++                || !identity(p,message.senderId(),message.senderInstance(),data.recipientId(),data.recipientInstance()))return false;
++        // A prior HELLO token is stale correlation, not an incompatible identity.
++        // Consume it without touching the current query or either direction's budget.
++        if(!p.hello.equals(data.helloRequestId())){diagnostic(Issue.STALE);return true;}
+         if(message.type()==MessageType.DISCOVERY_QUERY && data instanceof DiscoveryMessage.Query)respond(p,message,observedAt);
+         else if(message.type()==MessageType.DISCOVERY_SNAPSHOT && data instanceof DiscoveryMessage.Snapshot snapshot)learn(p,message,snapshot);
+         else return false;
+@@ -95,8 +99,8 @@
+     }
+     boolean rejected(Neighbor.Session session,MessageCodec.RejectedExtraContent rejection) {
+         var p=peer(session);var e=rejection.envelope();
+-        if(!identity(p,e.helloRequestId(),e.recipientId(),e.recipientInstance())
+-                || !session.nodeId().equals(e.senderId()) || !session.instanceId().equals(e.senderInstance()))return false;
++        if(!identity(p,e.senderId(),e.senderInstance(),e.recipientId(),e.recipientInstance()))return false;
++        if(!p.hello.equals(e.helloRequestId())){diagnostic(Issue.STALE);return true;}
+         diagnostic(Issue.INVALID_CONTENT);
+         if(e.type()==MessageType.DISCOVERY_SNAPSHOT && p.query!=null && p.query.id.equals(e.queryId()))fail(p,Issue.INVALID_CONTENT);
+         else if(e.type()==MessageType.DISCOVERY_QUERY)p.incomingEligibleAt=clock.getAsLong()+COOLDOWN;
+@@ -113,8 +117,8 @@
+     private void learn(Peer p,ControlMessage message,DiscoveryMessage.Snapshot snapshot) {
+         long now=clock.getAsLong();var query=p.query;
+         if(query==null || !query.id.equals(message.requestId())){diagnostic(Issue.STALE);return;}
++        if(snapshot.generation()<=p.watermark){diagnostic(Issue.STALE);return;}
+         if(now-query.started>=QUERY_BUDGET){fail(p,Issue.TIMEOUT);return;}
+-        if(snapshot.generation()<=p.watermark){fail(p,Issue.STALE);return;}
+         try{DiscoveryCodec.validateSnapshot(message.senderId(),snapshot.directNeighbors());}
+         catch(java.io.IOException|IllegalArgumentException error){fail(p,Issue.INVALID_CONTENT);return;}
+         cache.accept(p.source,snapshot.generation(),snapshot.directNeighbors(),query.started,now);
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+@@ -812,6 +812,93 @@
+             f.io.sink.closed(rejected,Connection.CloseReason.PROTOCOL_ERROR,f.clock.get());f.pump();assertEquals(1,f.manager.snapshot().size());assertEquals(0,f.downs());
+         }
+     }
++    private static List<CandidateCache.CandidateView> learnedCandidates(Fixture f) {
++        var result=f.manager.candidates();f.pump();return result.toCompletableFuture().join();
++    }
++    private static ControlMessage discoveryReply(Fixture f,UUID remote,
++            ControlMessage query,UUID hello,long generation,ControlMessage.Endpoint candidate) {
++        return new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),"B",remote,
++            new DiscoveryMessage.Snapshot(hello,"A",f.instance,generation,List.of(candidate)));
++    }
++    private static void assertDiscoverySessionUnchanged(Fixture f,FakeChannel channel,Neighbor.Session expected) {
++        assertTrue(channel.open,"A stale discovery frame must not close the current connection");
++        assertEquals(expected,f.manager.snapshot().get("B"));assertEquals(expected.connectionId(),channel.id());
++        assertEquals(1,f.ups());assertEquals(0,f.downs());assertEquals(2,f.io.dials.size());
++    }
++    @Test void D07eOldHelloTokenOnCurrentConnectionPreservesQueryAndClaims() {
++        for(String kind:List.of("snapshot","query","rejected-snapshot","rejected-query"))try(var f=new Fixture("A")) {
++            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
++            var session=f.manager.snapshot().get("B");f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            var first=channel.extraWrites.getLast();var hello=((DiscoveryMessage.Query)first.payload()).helloRequestId();
++            var candidate=endpoint("S",UUID.randomUUID(),18000);
++            f.message(channel,discoveryReply(f,remote,first,hello,4,candidate));
++            var before=learnedCandidates(f);assertEquals(1,before.size());
++            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();var current=channel.extraWrites.getLast();long queryStarted=f.clock.get();
++            assertNotEquals(first.requestId(),current.requestId());int writes=channel.extraWrites.size();
++            var oldHello=UUID.randomUUID();assertNotEquals(hello,oldHello);
++            if(kind.startsWith("rejected-")) {
++                var type=kind.equals("rejected-query")?MessageType.DISCOVERY_QUERY:MessageType.DISCOVERY_SNAPSHOT;
++                var envelope=new MessageCodec.ExtraEnvelope(2,type,current.requestId(),"B",remote,oldHello,"A",f.instance);
++                f.io.sink.rejected(channel,new MessageCodec.RejectedExtraContent(envelope,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
++            } else if(kind.equals("query")) {
++                f.message(channel,new ControlMessage(MessageType.DISCOVERY_QUERY,current.requestId(),"B",remote,
++                    new DiscoveryMessage.Query(oldHello,"A",f.instance)));
++            } else f.message(channel,discoveryReply(f,remote,current,oldHello,Long.MAX_VALUE,endpoint("OTHER",UUID.randomUUID(),18100)));
++            assertDiscoverySessionUnchanged(f,channel,session);assertEquals(before,learnedCandidates(f),kind);
++            assertEquals(writes,channel.extraWrites.size(),"Stale QUERY must not elicit a response");
++            // An old inbound QUERY/rejection must not consume the current session's response budget.
++            if(kind.endsWith("query")) {
++                f.message(channel,new ControlMessage(MessageType.DISCOVERY_QUERY,UUID.randomUUID(),"B",remote,
++                    new DiscoveryMessage.Query(hello,"A",f.instance)));
++                assertEquals(writes+1,channel.extraWrites.size());assertEquals(MessageType.DISCOVERY_SNAPSHOT,channel.extraWrites.getLast().type());
++            }
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            f.message(channel,discoveryReply(f,remote,current,hello,5,candidate));
++            var after=learnedCandidates(f);assertEquals(1,after.size());var proof=after.getFirst().sources().getFirst();
++            assertEquals(5,proof.generation());assertEquals(queryStarted,proof.queryStartedNanos());
++            assertEquals(CandidateCache.TTL_NANOS,proof.ttlNanos());assertEquals(session.connectionId(),proof.source().connectionId());
++            assertEquals(hello,proof.source().helloRequestId());assertTrue(proof.queryStartedNanos()>before.getFirst().sources().getFirst().queryStartedNanos());
++            assertDiscoverySessionUnchanged(f,channel,session);
++            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();assertEquals(MessageType.DISCOVERY_QUERY,channel.extraWrites.getLast().type());
++            assertNotEquals(current.requestId(),channel.extraWrites.getLast().requestId(),"No cooldown may delay the next refresh");
++        }
++    }
++    @Test void D07eOldGenerationPreservesCurrentQueryUntilValidResponse() {
++        for(long stale:List.of(1L,4L))try(var f=new Fixture("A")) {
++            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
++            var session=f.manager.snapshot().get("B");f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            var first=channel.extraWrites.getLast();var hello=((DiscoveryMessage.Query)first.payload()).helloRequestId();
++            var candidate=endpoint("S",UUID.randomUUID(),18000);
++            f.message(channel,discoveryReply(f,remote,first,hello,4,candidate));var before=learnedCandidates(f);
++            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();var current=channel.extraWrites.getLast();long queryStarted=f.clock.get();
++            assertNotEquals(first.requestId(),current.requestId());int writes=channel.extraWrites.size();
++            f.message(channel,discoveryReply(f,remote,current,hello,stale,endpoint("OTHER",UUID.randomUUID(),18100)));
++            assertEquals(before,learnedCandidates(f));assertDiscoverySessionUnchanged(f,channel,session);
++            assertEquals(writes,channel.extraWrites.size());
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            f.message(channel,discoveryReply(f,remote,current,hello,5,candidate));
++            var after=learnedCandidates(f);assertEquals(1,after.size());var proof=after.getFirst().sources().getFirst();
++            assertEquals(5,proof.generation());assertEquals(queryStarted,proof.queryStartedNanos());
++            assertEquals(CandidateCache.TTL_NANOS,proof.ttlNanos());assertEquals(session.connectionId(),proof.source().connectionId());
++            assertTrue(proof.queryStartedNanos()>before.getFirst().sources().getFirst().queryStartedNanos());
++            assertDiscoverySessionUnchanged(f,channel,session);
++            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();assertNotEquals(current.requestId(),channel.extraWrites.getLast().requestId());
++        }
++    }
++    @Test void D07eOldTokenDoesNotMaskIncompatibleSenderOrRecipient() {
++        for(boolean rejected:List.of(false,true))for(int field=0;field<4;field++)try(var f=new Fixture("A")) {
++            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var query=channel.extraWrites.getLast();
++            var oldHello=UUID.randomUUID();String sender=field==0?"OTHER":"B",recipient=field==2?"OTHER":"A";
++            var senderInstance=field==1?UUID.randomUUID():remote;var recipientInstance=field==3?UUID.randomUUID():f.instance;
++            if(rejected) {
++                var envelope=new MessageCodec.ExtraEnvelope(2,MessageType.DISCOVERY_SNAPSHOT,query.requestId(),sender,senderInstance,oldHello,recipient,recipientInstance);
++                f.io.sink.rejected(channel,new MessageCodec.RejectedExtraContent(envelope,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
++            } else f.message(channel,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),sender,senderInstance,
++                new DiscoveryMessage.Snapshot(oldHello,recipient,recipientInstance,1,List.of())));
++            assertFalse(channel.open);assertEquals(1,f.downs());assertTrue(f.manager.snapshot().isEmpty());assertTrue(learnedCandidates(f).isEmpty());
++        }
++    }
+     @Test void D10CacheQueryAdmissionIsFourAndDoesNotFailNodeWhenFull() throws Exception {
+         try(var f=new Fixture("A")) {
+             f.ready("B");var queries=new ArrayList<CompletionStage<List<CandidateCache.CandidateView>>>();

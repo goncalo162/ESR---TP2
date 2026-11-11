@@ -4,6 +4,8 @@ import pt.uminho.esr.ott.protocol.ControlMessage;
 import pt.uminho.esr.ott.protocol.ErrorCode;
 import pt.uminho.esr.ott.protocol.MessageCodec;
 import pt.uminho.esr.ott.protocol.ProtocolException;
+import pt.uminho.esr.ott.protocol.MessageType;
+import java.util.concurrent.CompletionStage;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,6 +24,14 @@ public final class Connection implements AutoCloseable {
     public enum CloseReason { LOCAL_CLOSE, SHUTDOWN, PEER_EOF, TRUNCATED_FRAME,
         PROTOCOL_ERROR, IO_ERROR, OUTPUT_OVERFLOW, CALLBACK_ERROR }
 
+    public enum ExtensionStatus { ACCEPTED, BACKPRESSURED, CLOSED, INVALID_MESSAGE }
+    /** No mutable/cancellable view of the internal physical write confirmation. */
+    public record ExtensionEnqueue(ExtensionStatus status, CompletionStage<Void> written) {
+        public ExtensionEnqueue { java.util.Objects.requireNonNull(status);java.util.Objects.requireNonNull(written); }
+    }
+    public static ExtensionEnqueue refused(ExtensionStatus status) {
+        return new ExtensionEnqueue(status,CompletableFuture.completedStage(null));
+    }
     interface WriteDriver {
         default void dequeued() throws IOException { }
         void write(byte[] frame) throws IOException;
@@ -39,10 +49,15 @@ public final class Connection implements AutoCloseable {
         final byte[] frame;
         final CompletableFuture<Void> confirmation;
         // Decisions are protected by the Connection monitor; publication is outside it.
+        final boolean extra;
+        boolean extraQueued, released;
         boolean decided;
         IOException failure;
         PendingWrite(byte[] frame, CompletableFuture<Void> confirmation) {
-            this.frame = frame; this.confirmation = confirmation;
+            this(frame,confirmation,false);
+        }
+        PendingWrite(byte[] frame,CompletableFuture<Void> confirmation,boolean extra) {
+            this.frame=frame;this.confirmation=confirmation;this.extra=extra;extraQueued=extra;
         }
         void publish() {
             if (confirmation == null) return;
@@ -59,6 +74,7 @@ public final class Connection implements AutoCloseable {
     // Includes a frame between take() and inFlight publication. Bound: queue capacity + one.
     private final Set<PendingWrite> confirmations = new LinkedHashSet<>();
     private PendingWrite inFlight;
+    private int queuedExtra;
     private final WriteDriverFactory writerFactory;
     private final AtomicInteger remainingWorkers = new AtomicInteger(2);
     private final InetSocketAddress remote;
@@ -91,6 +107,8 @@ public final class Connection implements AutoCloseable {
 
     /** ACCEPTED means queued, never delivery or application ACK. No network write on caller. */
     public SendResult send(ControlMessage message) {
+        if(message!=null && (message.type()==MessageType.DISCOVERY_QUERY || message.type()==MessageType.DISCOVERY_SNAPSHOT))
+            return SendResult.INVALID_MESSAGE;
         if (!isOpen()) return SendResult.CLOSED;
         final byte[] frame;
         try { frame = MessageCodec.encode(message); }
@@ -106,6 +124,8 @@ public final class Connection implements AutoCloseable {
 
     /** Success is local write AND flush, never a peer ACK. Continuations must not block. */
     public CompletableFuture<Void> sendAndFlush(ControlMessage message) {
+        if(message!=null && (message.type()==MessageType.DISCOVERY_QUERY || message.type()==MessageType.DISCOVERY_SNAPSHOT))
+            return CompletableFuture.failedFuture(new ProtocolException(ErrorCode.INVALID_MESSAGE,"Use bounded extension admission"));
         if (!isOpen()) return CompletableFuture.failedFuture(closedError());
         final byte[] frame;
         try { frame = MessageCodec.encode(message); }
@@ -129,17 +149,45 @@ public final class Connection implements AutoCloseable {
         return CompletableFuture.failedFuture(closedError());
     }
 
+    /** Nonclosing admission, common FIFO; acquire the node's physical quota before encoding. */
+    public ExtensionEnqueue trySendExtension(ControlMessage message) {
+        if(message==null || (message.type()!=MessageType.DISCOVERY_QUERY && message.type()!=MessageType.DISCOVERY_SNAPSHOT))
+            return refused(ExtensionStatus.INVALID_MESSAGE);
+        if(!isOpen()) return refused(ExtensionStatus.CLOSED);
+        if(!owner.acquireExtraWrite())return refused(ExtensionStatus.BACKPRESSURED);
+        boolean admitted=false;
+        try {
+            byte[] frame;
+            try { frame=MessageCodec.encode(message); }
+            catch(IOException|IllegalArgumentException|NullPointerException error) { return refused(ExtensionStatus.INVALID_MESSAGE); }
+            var confirmation=new CompletableFuture<Void>();var entry=new PendingWrite(frame,confirmation,true);
+            synchronized(this) {
+                if(!isOpen()) return refused(ExtensionStatus.CLOSED);
+                if(output.remainingCapacity()<2 || queuedExtra!=0)return refused(ExtensionStatus.BACKPRESSURED);
+                if(!output.offer(entry))throw new IllegalStateException("FIFO admission changed under producer monitor");
+                queuedExtra++;confirmations.add(entry);admitted=true;
+            }
+            return new ExtensionEnqueue(ExtensionStatus.ACCEPTED,confirmation.minimalCompletionStage());
+        } finally { if(!admitted)owner.releaseExtraWrite(); }
+    }
+    private void releaseExtra(PendingWrite entry) {
+        if(entry.extra && !entry.released) { entry.released=true;owner.releaseExtraWrite(); }
+    }
+
     private void readLoop() {
         try {
             listener.connectionOpen(this);
             var input = socket.getInputStream();
             while (isOpen()) {
-                var message = MessageCodec.read(input);
-                if (message.isEmpty()) { close(CloseReason.PEER_EOF); break; }
-                listener.message(this, message.orElseThrow());
+                var message = MessageCodec.readFrame(input);
+                if(message.isEmpty()) { close(CloseReason.PEER_EOF);break; }
+                if(message.get() instanceof MessageCodec.Decoded decoded) listener.message(this,decoded.message());
+                else listener.rejectedExtraContent(this,(MessageCodec.RejectedExtraContent)message.get());
             }
         } catch (EOFException e) { close(CloseReason.TRUNCATED_FRAME); }
-        catch (ProtocolException e) { close(CloseReason.PROTOCOL_ERROR); }
+        catch (ProtocolException e) {
+            try { listener.protocolError(this,e); } finally { close(CloseReason.PROTOCOL_ERROR); }
+        }
         catch (IOException e) { close(CloseReason.IO_ERROR); }
         catch (RuntimeException e) { close(CloseReason.CALLBACK_ERROR); }
         finally {
@@ -159,6 +207,7 @@ public final class Connection implements AutoCloseable {
                 synchronized (this) {
                     if (!isOpen()) break;
                     inFlight = entry;
+                    if(entry.extraQueued){entry.extraQueued=false;queuedExtra--;}
                 }
                 destination.write(entry.frame);
                 destination.flush();
@@ -168,6 +217,7 @@ public final class Connection implements AutoCloseable {
                         if (!isOpen()) entry.failure = closedError();
                     }
                     confirmations.remove(entry);
+                    releaseExtra(entry);
                     inFlight = null;
                 }
                 entry.publish();
@@ -180,7 +230,8 @@ public final class Connection implements AutoCloseable {
             synchronized (this) {
                 pending = new ArrayList<>(confirmations);
                 confirmations.clear();
-                inFlight = null;
+                for(var entry:pending)releaseExtra(entry);
+                queuedExtra=0;inFlight = null;
             }
             // Close has decided failure. User continuations run only here, outside both locks.
             try { for (var entry : pending) entry.publish(); }

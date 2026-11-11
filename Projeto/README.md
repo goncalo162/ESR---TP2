@@ -1,61 +1,58 @@
-# ESR - Serviço Over the Top (OTT) para Entrega de Multimédia
+# ESR — Serviço OTT de entrega de multimédia
 
-Trabalho Prático Nº 2 da unidade curricular de Engenharia de Serviços em Rede (ESR) - Mestrado em Engenharia Informática, Universidade do Minho (2026/2027).
+TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/2027.
 
-## Estado atual
+## Estado
 
-TASK-001–005 concluídas; PHASE-02 IN PROGRESS. Configuração, codec e transporte TCP implementados, com dials assíncronos, filas limitadas, eventos e shutdown. Build com 149 testes aprovados (65 configuração, 66 codec, 18 transporte). Sockets loopback reais na mesma JVM; ainda sem overlay entre processos/streaming. Bootstrap previsto só para descoberta inicial, conforme ADR-013.
+A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 passou Test e revisão técnica, com integração local em preparação: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
 
-## Documentação
+IMP-034 aprende/retém candidatos; criar ligações novas após falhas pertence ao IMP-035, ainda não iniciado. Routing, streaming e demonstração de continuidade de vídeo permanecem nos seus incrementos. O clean verify atual passou 1065 testes e o manual do agente passou 53 checks. Luis repetiu pessoalmente o manual: 53 checks e saída 0. Test aceite e revisão técnica concluída; integração local em preparação.
 
-- [Enunciado](../docs/ENUNCIADO.md)
-- [Plano e índice](../docs/00-README.md)
-- [Arquitetura](../docs/04-ARCHITECTURE.md)
-- [Protocolos e APIs](../docs/07-API-AND-INTERFACES.md)
-- [Progresso e TASK-006](../docs/15-PROJECT-PROGRESS.md)
-- [Ambiente e testes](../docs/11-SETUP-AND-ENVIRONMENT.md)
-- [V-005](../experiments/task-005-transport-validation.md)
+## Compilar e testar
 
----
-
-## 🚀 Como Compilar e Executar
-
-### Pré-requisitos
-- Java 21+
-- Apache Maven 3.8+
-- Docker e Docker Compose (para ambiente CORE emulado)
-
-### Compilação
-```bash
-mvn clean package
-```
-
-### Testes
-
-A partir de Projeto/:
+Usar JDK 21 e Maven. Exemplo numa bancada Linux com esse JDK instalado:
 
 ```sh
-mvn clean verify
-mvn -Dtest=TransportTest test
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+mvn -B -ntp clean verify
+sha256sum target/ott-streaming-1.0-SNAPSHOT.jar
 ```
 
-Os testes TCP precisam de permissão para sockets locais; relatórios em target/surefire-reports/.
+Os testes TCP/CLI precisam de permissão para sockets locais e criação de JVM. Resultados em target/surefire-reports/. Usar o mesmo JAR/hash em todos os processos; não reutilizar um JAR histórico para validar os fontes v2. O total de testes deve vir da execução atual, sem tomar 149/981 como metas.
 
-### Execução futura dos componentes
+Testes selecionados do incremento:
 
-Comandos planeados: OttApplication ainda não tem main funcional. A composição pertence à TASK-008; execução de vídeo depende da integração posterior. TASK-005 não implementou bootstrap, handshake ou streaming.
+```sh
+mvn -B -ntp -Dtest=MessageCodecTest,DiscoveryCodecTest,NeighborDiscoveryTest,CandidateCacheTest test
+mvn -B -ntp -Dtest=TransportTest,BootstrapServerTest,NeighborManagerTest,NeighborManagerLifecycleTest,OttApplicationTest test
+```
 
-```bash
-# Iniciar Bootstrap Server
+## Arrancar a overlay e verificar a CLI
+
+A partir de Projeto/, executar cada comando num terminal próprio, com JDK 21. Os cinco perfis correspondem ao grafo configurado; SERVER aqui ainda não implica vídeo implementado.
+
+```sh
 java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role BOOTSTRAP --config src/main/resources/config/bootstrap.properties
-
-# Iniciar Servidor de Conteúdos 1
 java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role SERVER --config src/main/resources/config/server-1.properties
-
-# Iniciar Nó de Encaminhamento (Relay)
+java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role SERVER --config src/main/resources/config/server-2.properties
 java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config src/main/resources/config/relay.properties
-
-# Iniciar Cliente de Streaming
 java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config src/main/resources/config/client.properties
 ```
 
+Introduzir neighbors em cada nó e conferir as adjacências ACTIVE previstas; READY local por si só não prova todas as ligações. Depois de as estabelecer, quit no bootstrap não deve parar os nós: repetir neighbors e confirmar os sobreviventes. quit/EOF encerram o processo com prazo. A ajuda é uma invocação separada com --help; os comandos interativos implementados são neighbors e quit.
+
+A cache de candidatos está disponível pela API assíncrona OverlayNode.candidates()/NeighborManager.candidates() e pelos testes; não existe comando CLI novo para reparar a overlay. A descoberta só usa sessões ACTIVE atuais. Os cenários S–R1/R2–C e S–R1–R2/R3–C são testados para aprendizagem/retenção, sem criar S–C/R1–C neste IMP.
+
+Não é necessária chave de ativação. extra.discovery.enabled=true é apenas declaração redundante; false/vazio/inválido e Q=1 no overlay são erros agregados antes de recursos. Todo overlay exige control.queue.capacity>=2. Q=1 mantém-se na infraestrutura genérica/bootstrap que o suporte. O preflight conjunto rejeita capacidade de ligações inferior ao grau conhecido. Bootstrap só consulta o grafo inicial, sem membership ou consultas periódicas após sucesso.
+
+## Contrato e evidência
+
+- [Protocolo local](docs/protocolos.md) e [interfaces completas](../docs/07-API-AND-INTERFACES.md).
+- [Design e revisão do incremento](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md).
+- [Walkthrough e resultados reais](../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
+- [Fixtures operacionais](src/test/resources/protocol/README.md): 50 TCP v2 independentes e 16 UDP OTT1 preservadas.
+- [Limpeza autorizada TCP v1](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada): retirada dos arquivos antigos, sem decoder legado.
+- [Progresso](../docs/15-PROJECT-PROGRESS.md) e [roteiro do incremento](../experiments/overlay-discovery/README.md).
+
+UDP de vídeo conserva OTT1/version 1, cabeçalho 64, total <=1200 e payload <=1136. Testes locais não são demonstração CORE, GUI, FPS ou vídeo real.

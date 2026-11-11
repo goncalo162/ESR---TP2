@@ -1,9 +1,9 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** IMP-006/004-overlay complete e TASK-009 DONE após Test, revisão confirmada e integração de `cc478d1` em main. A unidade 002-overlay está completa. [Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
+**Estado atual:** IMP-006/004-overlay complete e TASK-009 DONE após Test, revisão confirmada e integração de `cc478d1` em main. A base da unidade 002-overlay está completa e a extensão EXTRA-01 retomou Design para rever transporte; Implement OTD1 interrompido. [Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
-Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 33 tarefas IMP/histórias/bolts;
+Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
 18 IDs antigos mantidos e 15 acrescentados. Na preparação nenhum bolt estava
 iniciado. Estado Construction atual: IMP-001/001-base-validada complete em
 2026-11-03T21:56:48Z, após revisão e integração em main; 019-overlay/IMP-002
@@ -39,7 +39,9 @@ integração exigidas antes de DONE. Os restantes 29 bolts permanecem planned. [
 | IMP-004 | [003-overlay](../memory-bank/bolts/003-overlay/bolt.md) | TASK-007 | M | 001-base-validada, 002-overlay |
 | IMP-005 | [020-overlay](../memory-bank/bolts/020-overlay/bolt.md) | TASK-008 | M | 001-base-validada, 003-overlay, 019-overlay |
 | IMP-006 | [004-overlay](../memory-bank/bolts/004-overlay/bolt.md) | TASK-009 | S | 001-base-validada, 020-overlay |
-| IMP-007 | [005-rotas](../memory-bank/bolts/005-rotas/bolt.md) | TASK-010 | M | 004-overlay |
+| IMP-034 (extra A) | [034-overlay-extra](../memory-bank/bolts/034-overlay-extra/bolt.md) | TASK-033 | M | 004-overlay |
+| IMP-035 (extra B) | [035-overlay-extra](../memory-bank/bolts/035-overlay-extra/bolt.md) | TASK-034 | M | 034-overlay-extra |
+| IMP-007 | [005-rotas](../memory-bank/bolts/005-rotas/bolt.md) | TASK-010 | M | 004-overlay, 035-overlay-extra |
 | IMP-008 | [021-rotas](../memory-bank/bolts/021-rotas/bolt.md) | TASK-011 | M | 004-overlay, 005-rotas |
 | IMP-009 | [006-rotas](../memory-bank/bolts/006-rotas/bolt.md) | TASK-012 | M | 004-overlay, 021-rotas |
 | IMP-010 | [022-rotas](../memory-bank/bolts/022-rotas/bolt.md) | TASK-013 | S | 004-overlay, 006-rotas, 020-overlay |
@@ -137,3 +139,58 @@ consolida V-008, clean verify (981 testes, zero falhas/erros/ignorados), o manua
 de Luis e a verificação complementar do agente, com as sondagens preliminares
 preservadas. Test aguarda aprovação. A revisão final de Waheed e a integração
 da versão revista continuam pendentes.
+
+## Ordem revista — extra antes de 005-rotas
+
+004-overlay → 034-overlay-extra → 035-overlay-extra → 005-rotas. O último está bloqueado até
+o extra estar concluído e integrado. [Model](../memory-bank/bolts/034-overlay-extra/ddd-01-domain-model.md).
+
+## Revisão atual do IMP-034 — migração TCP v2
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## Aprovação e retoma de Implement — TCP v2
+
+Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
+O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
+caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
+ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
+opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
+G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
+Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
+com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
+proveniência preservados. Testes incrementais com logs reais autorizados.
+Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
+manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
+próprio; sem commits/push ou início de outro IMP.
+
+## IMP-034 — Implement pronto para revisão
+
+Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
+Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
+normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
+v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
+Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
+JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
+com novo oráculo controlado; falhas/sondagens anteriores mantidas.
+66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
+v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
+XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
+Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+verify/regressão atual, manual reproduzido, revisão final e integração continuam
+necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+
+## Estado atual — IMP-034 em Test para repetição humana
+
+Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
+com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
+MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
+Repetição pessoal de Luis, aprovação de Test, revisão final e integração
+pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.

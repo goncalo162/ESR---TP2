@@ -177,3 +177,111 @@ Sem push ou alegação de integração remota/entrega do projeto.
 [Fecho documental](../bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
 pendentes são históricas; não descrevem o estado atual. Não se promovem
 requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
+
+## Extra posterior à base
+
+- [ADR-033 — Descoberta extra por divulgação de vizinhos e cache limitada](../../add.md#adr-033) — Proposta. Aplicável ao EXTRA-01 / IMP-034 e IMP-035.
+
+## ADR-033 — concretização de Design proposta
+
+Registo de 2026-11-11T12:49:29Z. [Design IMP-034](../bolts/034-overlay-extra/ddd-02-technical-design.md)
+concretiza isolamento OTD1, confiança, geração, TTL, caps e conflitos. ADR-033
+permanece Proposta; Model aprovado não é aprovação do protocolo. ADD explicita
+as exceções futuras face a ADR-019/CP-02/03, preservando o modo base.
+G-EXTRA-ADR exige aprovação da ADR e dos contratos afetados antes de Implement.
+O contrato adicional de reparação de IMP-035 exige revisão nesse incremento.
+
+## ADR-033 — revisão para aprovação após Design
+
+Registo de 2026-11-11T13:44:19Z. Design e Q-C-17 aprovados explicitamente; somente ADR
+foi autorizada. [Revisão](../bolts/034-overlay-extra/adr-review.md) confere
+isolamento, confiança, retenção e recursos. A proposta explicita a chave
+extra face à lista de ADR-010/016, mantendo as regras base. As 25 ADR aceites
+e ADR-003 Substituída conservam-se; ADR-033 permanece Proposta. Aprovação
+formal da ADR e contratos afetados pendente no G-EXTRA-ADR; Implement/Test
+não iniciados. Consultar ao trabalhar em config, descoberta, codec ou transporte.
+
+## ADR-034 — transporte revisto, proposta
+
+Registo de 2026-11-11T14:26:58Z. [ADR-034](../../add.md#adr-034), Proposta, substitui apenas
+a escolha de transporte da ADR-033: descoberta negociada no TCP persistente
+de controlo, framing/codec e FIFO comuns. ADR-033 conserva as políticas residuais
+aceites, com transporte OTD1 suspenso pelo utilizador. Aprovação antiga não
+fecha o gate novo. Consultar ao trabalhar em protocolo, handshake, filas e cache.
+G-EXTRA-ADR reaberto em IMP-034; IMP-035 mantém aprovação própria de reparação.
+
+### ADR-034 — refinamento de margem/conteúdo para revisão
+
+Registo de 2026-11-11T14:51:37Z. A proposta exige margem normal de uma posição e quota extra
+por fila de um; Q=1 não negocia descoberta. Distingue conteúdo extra inválido,
+completo e associado à sessão, de framing/truncamento/identidade terminais.
+Resultado tipado é validado no owner antes de rejeição atómica sem fecho.
+ADR-034 continua Proposta e G-EXTRA-ADR pendente. Ver Design secções 3, 5 e 8.
+
+### ADR-034 — capacidade obrigatória na execução normal
+
+Registo de 2026-11-11T15:15:24Z. O utilizador rejeitou as propostas de fallback e Q=1 degradado.
+A proposta atual exige Q>=2 com flag ativo antes de sockets e supported=required=1;
+seleção sem bit não cria sessão base. Perfis/APIs base e Q=1 antigos mantêm-se.
+[Design revisto](../bolts/034-overlay-extra/ddd-02-technical-design.md), ADR-034
+Proposta, gate pendente. Não confundir defaults base com os perfis normais required.
+
+### ADR-034 — requisito intrínseco em todos os nós overlay
+
+Registo de 2026-11-11T15:35:59Z. Substitui também ativação opcional/default false da proposta
+anterior, não apenas transporte. O papel overlay implica descoberta/Q>=2 por
+todas as APIs/perfis; sem ACTIVE_BASE ou API desligada. Peer deve suportar e
+exigir capacidade; bootstrap só inicial e formatos v1 usados preservados.
+[Plano dos testes](../bolts/034-overlay-extra/test-contract-migration.md).
+ADR-034 continua Proposta; aprovação antecede qualquer alteração Java.
+
+## ADR-034 — clarificação de operação e isolamento
+
+Registo de 2026-11-11T17:22:59Z. Proposta revista, não aceite: programa único/mesma versão
+de JAR, descoberta obrigatória e inputs de handshake inválidos rejeitados só
+na tentativa. Sem compatibilidade operacional com versões antigas nem FAILED
+global/fecho da CLI/sessões saudáveis. ADR-020 preservada; estado/retry por peer
+limitados, backoff existente. [Revisão](../bolts/034-overlay-extra/adr-034-review.md)
+e Design para aprovação; G-EXTRA-ADR pendente.
+
+## ADR-034 — TCP v2 uniforme (proposta revista)
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## Aprovação e retoma de Implement — TCP v2
+
+Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
+O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
+caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
+ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
+opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
+G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
+Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
+com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
+proveniência preservados. Testes incrementais com logs reais autorizados.
+Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
+manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
+próprio; sem commits/push ou início de outro IMP.
+
+## IMP-034 — Implement pronto para revisão
+
+Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
+Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
+normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
+v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
+Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
+JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
+com novo oráculo controlado; falhas/sondagens anteriores mantidas.
+66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
+v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
+XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
+Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+verify/regressão atual, manual reproduzido, revisão final e integração continuam
+necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.

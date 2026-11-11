@@ -1,0 +1,31 @@
+COMMAND ["/usr/lib/jvm/java-21-openjdk-amd64/bin/java", "--class-path", "/home/luis/ESR/ESR---TP2/experiments/construction/034-overlay-extra/test-verified-jar/ott-streaming-1.0-SNAPSHOT.jar", "/home/luis/ESR/ESR---TP2/experiments/overlay-discovery/ManualV033.java", "Codex", "cff5db105bd1f3eca73aebc101724fccbdbd66645056ef6e3278018592bf8d48", "/home/luis/ESR/ESR---TP2/experiments/construction/034-overlay-extra/test-verified-jar/ott-streaming-1.0-SNAPSHOT.jar", "/home/luis/ESR/ESR---TP2/experiments/construction/034-overlay-extra/test-manual-runs/20261111T192757Z-glsj42qv"]
+STARTED 2026-11-11T19:27:57.513428+00:00
+OPERATOR Codex AT 2026-11-11T19:27:58.123225703Z JAR /home/luis/ESR/ESR---TP2/experiments/construction/034-overlay-extra/test-verified-jar/ott-streaming-1.0-SNAPSHOT.jar SHA256 cff5db105bd1f3eca73aebc101724fccbdbd66645056ef6e3278018592bf8d48
+CHECK_PASS JDK 21
+CHECK_PASS verified JAR hash matches before execution
+CHECK_PASS offline Q1/false errors aggregated before node construction
+CHECK_PASS single operational codec v2 round trip
+CHECK_PASS negative version 1 rejected without v1 decoder
+CHECK_PASS negative version 0 rejected without v1 decoder
+CHECK_PASS negative version 3 rejected without v1 decoder
+CHECK_PASS negative version 255 rejected without v1 decoder
+CHECK_PASS retired type 3 rejected
+CHECK_PASS negative-peer admitted sessions require discovery
+CHECK_PASS negative-peer bootstrap terminated after initial lookup
+CHECK_PASS incompatible capability rejected locally without HELLO_OK
+CHECK_PASS invalid attempt terminates with EOF
+CHECK_PASS explicit per-peer incompatible state
+CHECK_PASS healthy session connectionId and node survive rejected peer
+CHECK_PASS candidate API still usable after rejection
+EVIDENCE negative-peer/rejection.txt
+CHECK_PASS negative-peer shutdown deadlines completed and TCP listener ports reusable
+Exception in thread "main" java.lang.IllegalArgumentException: Invalid degree
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.require(BootstrapServer.java:289)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.lambda$validate$3(BootstrapServer.java:333)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:986)
+	at java.base/java.util.Collections$UnmodifiableMap.forEach(Collections.java:1708)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.validate(BootstrapServer.java:323)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:102)
+	at ManualV033$Graph.<init>(ManualV033.java:58)
+	at ManualV033.cli(ManualV033.java:108)
+	at ManualV033.main(ManualV033.java:124)

@@ -1,6 +1,6 @@
 # Architecture Decision Document — serviço OTT
 
-Versão 1.0.2. Atualização: 2026-11-03T20:54:11Z. Base de código observada: `85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936`.
+Versão 1.0.3, extra em planeamento. Atualização: 2026-11-11T12:11:34Z. Base de código observada: `17c1ca27673930bfbf82078522059a243d96ccdb`.
 Respostas incorporadas: **1A, 2A, 3B, 4A**; clarificações aprovadas **CP-01, CP-02, CP-03**. Documento mestre para **Construction**.
 Aceite é o estado da decisão de desenho; não afirma implementação ou resultado.
 Nenhum bolt foi iniciado por gerar ou validar este documento.
@@ -18,8 +18,11 @@ Inclui testes incrementais, CORE, artigo e pacote reproduzível.
 
 Fora: DB, HTTP, contas, RTP/RTSP, multicast IP, pause/seek, failover do mesmo vídeo
 noutra fonte, entrada arbitrária de IDs não configurados e recuperação automática
-de falha exclusiva UDP. Novas vizinhanças fora do grafo configurado ficam
-adiadas como extra (CP-03). Não se acrescenta CI, linter ou limiar percentual global.
+de falha exclusiva UDP. EXTRA-01 / REQ-025 pede agora novas vizinhanças fora
+das arestas iniciais entre candidatos autorizados. Os IMP-034/035 preparam essa
+extensão antes do IMP-007. ADR-033 permanece proposta até revisão da política
+de admissão e concorrência. CP-03 conserva o histórico da base aprovada.
+Não se acrescenta CI, linter ou limiar percentual global.
 
 Inception desta base foi concluído por instrução explícita do utilizador.
 Os extras que venham a ser pedidos serão definidos numa retoma posterior de
@@ -32,9 +35,10 @@ Atores: operador/equipa configura, inicia e avalia; espectador escolhe/termina
 uma stream; docente avalia; Construction implementa e testa; revisores humanos
 aceitam as versões atribuídas. Operations só opera uma versão integrada se pedido.
 
-Estado observado: TASK-001–005 DONE, configuração/codec/TCP implementados;
-bootstrap tem apenas comentário e os serviços distribuídos/vídeo ainda faltam.
-Os 149 testes são evidência histórica de 27-10-2026, não reexecutada neste trabalho.
+Estado observado nesta retoma: base das fases 1 e 2 concluída e integrada,
+com configuração, codec, transporte, descoberta, vizinhança e CLI. O extra
+reabre a extensão da fase 2. Routing e streaming continuam planeados.
+Os 981 testes arquivados sustentam a base; não foram reexecutados no planeamento.
 
 ## 2. Fontes e precedência
 
@@ -502,6 +506,75 @@ validação, ACK e histerese quando o upstream atual continua válido.
 - **Como validar:** V-001, V-004, V-005, V-032, V-ADD. Cumprir os critérios IMP e os oráculos das secções 8–9 com resultado e limites registados.
 
 
+<a id="adr-033"></a>
+### ADR-033 — Descoberta extra por divulgação de vizinhos e cache limitada
+
+> Transporte separado e ativação opcional suspensos pelo utilizador;
+> [ADR-034](#adr-034) Aceite substitui esses pontos e o contrato TCP v1. As aprovações e escolhas OTD1 abaixo são históricas. Cache,
+> TTL, proveniência e callbacks mantêm-se; gate satisfeito só para Implement de IMP-034.
+
+- **Estado:** Aceite.
+- **Contexto e drivers:** O utilizador substituiu o catálogo inicial pela aprendizagem de candidatos através dos vizinhos diretos antes das falhas, mantendo o bootstrap apenas para arranque. Drivers: REQ-025.
+- **Decisão:** No modo extra opt-in, propor consultas OTD1 isoladas em TCP na dataPort já anunciada, vinculadas ao HELLO atual; v1 e UDP OTT1 conservam bytes, códigos e caps. Divulgar só adjacências ACTIVE, com geração por sessão, TTL local de 60 s, cache de 128 candidatos e quatro fontes por candidato. A morte do anunciante não apaga claims válidos. Partilhar o orçamento físico TCP existente e limitar frequência, consultas, filas e jobs. Em IMP-035, permitir novas arestas apenas por candidatos aprendidos válidos e admissão explícita; manter o menor nodeId como iniciador do controlo, com intenção de reparação possível por qualquer extremo. Admitir extra.discovery.enabled como única chave adicional à lista de ADR-010/016, apenas nos papéis overlay, sem alterar as 30 chaves/defaults existentes ou permitir afinação de formatos/caps.
+- **Alternativas rejeitadas:** Um catálogo global de endpoints no arranque foi substituído pelo utilizador. Consultar novamente o bootstrap foi rejeitado. Reutilizar tipos v1, negociar por payload HELLO modificado ou autodetetar codecs no controlo alteraria o contrato base. Uma nova porta arbitrária exigiria informação adicional de localização. Propagar a cache como adjacência direta ultrapassaria a descoberta local pretendida.
+- **Consequências, riscos e trade-offs:** O extra requer TCP livre na dataPort, configuração compatível e aprendizagem anterior às falhas. Não há autenticação criptográfica; o token HELLO correlaciona contexto e não prova honestidade do anunciante. Conflitos ficam indisponíveis, informação expira e saturação pode impedir descoberta. ADR-010/016 conservam a validação estrita e a configuração base, com a única chave opt-in adicional definida aqui. ADR-019 e CP-02/03 conservam a base; a exceção de admissão fora do grafo só pode ser implementada após aprovação desta ADR e dos contratos afetados. IMP-034 não cria arestas; IMP-035 exige o seu contrato de intenção/admissão revisto.
+- **Impacto:** config, overlay, app, protocol, transport; TASK-033 e TASK-034. Ficheiros nos IMP-034/035.
+- **Como validar:** V-033, V-034, regressão base e integração futura com routing/streaming.
+
+#### Alcance proposto da ADR-033 face à base aceite
+
+ADR-033 e contratos do IMP-034 **Aceites**, com aprovação registada em 2026-11-11T13:57:14Z.
+G-EXTRA-ADR satisfeito para IMP-034. O contrato de reparação de IMP-035 mantém
+o seu checkpoint próprio. Design e Q-C-17 aprovados pelo utilizador,
+com registo em 2026-11-11T13:38:55Z; a aprovação formal ADR/contratos é o próximo
+checkpoint antes de Implement. [Revisão ADR](memory-bank/bolts/034-overlay-extra/adr-review.md).
+Contrato detalhado: [Design IMP-034](memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+e [interfaces propostas](docs/07-API-AND-INTERFACES.md#extra-01--contrato-otd1-proposto).
+
+| Regra aceite | Modo base | Exceção proposta só no extra |
+|---|---|---|
+| ADR-010/016, lista de configuração | Validação estrita e 30 chaves/defaults existentes. | Apenas extra.discovery.enabled adicional nos papéis overlay; booleana, default false, sem alargar caps ou alterar wire por tuning. |
+| ADR-019, grafo/endpoint no HELLO | Admissão limitada aos pares configurados. | IMP-034 só aprende, sem admitir; IMP-035 poderá admitir par fora do grafo a partir de cache válida e contrato próprio aprovado. |
+| ADR-019, menor nodeId inicia | Mantido. | Mantido no controlo; uma intenção de reparação pode vir de qualquer extremo e desencadear o iniciador permitido. Não exigir que ambos percam todos os vizinhos. |
+| CP-02, regresso de IDs configurados | Mantido, com instância nova e consulta inicial após reinício. | Um ID aprendido pode ser novo na lista local, mas não há entrada arbitrária de ID sem proveniência válida. Não migrar endpoints por anúncio. |
+| CP-03, apenas alternativas configuradas | Mantido. | IMP-035 concretiza o extra adiado: S–C e R1–C são arestas realmente novas, após aprendizagem prévia e admissão limitada. |
+| Bootstrap / identidade / unicidade | Sem membership, nodeId global, uma sessão por par. | Mantidos; sem redescoberta periódica pelo bootstrap. |
+
+Proposta OTD1 v1: QUERY=1 e SNAPSHOT=2 num namespace isolado, framing u32,
+magic OTD1, corpo 76..32768, identidades dos dois extremos, queryId e token do
+HELLO atual. Snapshot completo até 63 vizinhos ACTIVE, generation positiva e
+roles explícitos; sem TTL remoto, hearsay ou respostas ERROR. QUERY/flush/EOF,
+validações e regras de comparação estão no Design. Desativado por default;
+`extra.discovery.enabled` ativa apenas a política aprovada. TCP de controlo
+continua a aceitar exclusivamente v1; UDP conserva dataPort/OTT1.
+
+Cache: 128 IDs, quatro claims por ID, 60 s desde a consulta local; conflitos
+não são utilizáveis e não renovam claims alheios. Cadência: elegibilidade por
+vizinho a cada 5 s, saída global no máximo 4 consultas/s, entrada por sessão
+no máximo 1/s e pausa de 30 s após falha. Até quatro canais/dials extra físicos
+(2+2), fila de um frame mais o frame em escrita e orçamento TCP total comum
+C<=64. Jobs DNS/bind continuam limitados e contam até terminação física.
+
+G-EXTRA-ADR exige aprovação **desta ADR e dos contratos afetados** antes de
+Implement. IMP-034 só introduz aprendizagem. O futuro contrato de intenção,
+admissão e corridas de IMP-035 também precisa de revisão/aprovação antes desse
+incremento; a aprovação de Design não o implementa nem fecha automaticamente o gate.
+
+
+<a id="adr-034"></a>
+### ADR-034 — Controlo TCP uniforme v2 e descoberta obrigatória
+
+- **Estado:** Aceite
+- **Contexto e drivers:** O utilizador interrompeu OTD1 separado e depois rejeitou a mistura operacional v1/v2. Fixa um programa/versão de JAR em todos os nós e decide migrar todo o controlo TCP, incluindo o bootstrap, para v2. O contrato v1 e as evidências são históricos; mantêm-se framing/caps, aprendizagem e isolamento de falhas. Drivers: REQ-025.
+- **Decisão:** Propor um único contrato e codec operacional TCP v2 para REGISTER/REGISTER_OK/ERROR do bootstrap, HELLO/HELLO_OK, mensagens normais e descoberta. MessageType tem 18 códigos ativos explícitos (1,2,4..19), com 3 rejeitado; sem parser/encoder/CodecPolicy/runtime v1, namespace alternativo ou fallback. Conservar ControlMessage e APIs encode/decode/read/write, agora exclusivamente v2; readFrame partilha o mesmo parser e permite rejeição tipada de conteúdo extra. HELLO exige supported=required=selected=1 e bits reservados zero. Todos os overlay exigem descoberta e Q>=2 offline; ausência da antiga chave exige, true é redundante e false é erro agregado; Q=1 genérico/bootstrap permanece. Um TCP persistente por par, FIFO/writer comuns, margem M=1, quota extra enfileirada de um e quatro tickets físicos. Bootstrap mantém só consulta inicial do grafo imutável e fecho após write/flush v2, sem membership. Rejeitar tentativa inválida localmente, sem NeighborUp/FAILED global/FATAL/fim da CLI ou queda de sessões saudáveis; estado/retry por peer limitados com backoff existente. Conteúdo extra completo/corrente pode ser rejeitado atomicamente; framing/truncamento/identidade permanecem terminais no handle afetado. Conservar vetores v2 independentes e migrar testes preservando garantias; por decisão explícita Q-C-19, retirar os arquivos TCP v1 e a variante abandonada após validar a migração. UDP OTT1 de vídeo permanece inalterado. IMP-034 aprende; IMP-035 repara depois com checkpoint próprio.
+- **Alternativas rejeitadas:** Misturar bootstrap/mensagens normais v1 com handshake/descoberta v2 foi substituído pela decisão explícita de contrato TCP único. Manter runtime v1, fallback, modo base opcional ou interoperabilidade com JAR antigo contraria o cenário operacional. OTD1 separado, outra fila/writer, negociação escondida em routing e falha global por input inválido de peer foram rejeitados. Atualizar apenas o byte de versão nas fixtures, sem oráculo independente e migração das garantias, não satisfaz a validação.
+- **Consequências, riscos e trade-offs:** A migração autorizada abrange MessageCodec/MessageType/ControlMessage, bootstrap servidor/cliente, transporte, testes e recursos; não é só configuração. Assinaturas Java existentes permanecem quando compatíveis com o novo contrato, mas deixam de aceitar/emitir TCP v1. O enum passa de 16 a 18 tipos; HELLO/ACK têm novos payloads; restante semântica e hard caps preservados. TCP v1 é apenas entrada negativa de versão, sem sucesso via decoder legado; a retenção do arquivo foi dispensada explicitamente em Q-C-19. Testes de UTF-8/framing/tipos/EOF/flush/identidade/unicidade/FIFO/shutdown são reexpressos com vetores v2 independentes, sem exclusão ou enfraquecimento. As 50 fixtures TCP v2 independentes e as 16 UDP intactas formam o conjunto operacional. Os arquivos TCP v1 foram retirados no fecho a pedido explícito do utilizador; a origem das expectativas UDP mantém-se num manifesto de 16 vetores extraído da base integrada. Manter cache 128x4, TTL local 60 s, proveniência, gerações e retenção após morte. INCOMPATIBLE é por peer, distinto de ausência temporária, com uma tentativa/agendamento, backoff e reservas físicas existentes; CLI e peers saudáveis continuam. ADR-033 conserva aprovação histórica/políticas residuais; a revisão de transporte/ativação e o contrato misto anterior ficam substituídos só quando ADR-034 for aprovada. Nenhum outro IMP é iniciado.
+- **Impacto:** bootstrap, config, overlay, protocol, transport; TASK-033/TASK-034. Âmbito completo em IMP-034; reparação continua no IMP-035.
+- **Como validar:** V-033/D01–D12, fixtures v2 independentes, arquivo v1, regressão migrada, V-ADD, manual e revisão; V-034 posterior.
+
+Contrato detalhado no [Design](memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md) e [interfaces](docs/07-API-AND-INTERFACES.md#extra-01-control-v2).
+Aprovação explícita do utilizador registada em 2026-11-11T17:55:50Z: Design, ADR-034, 29 caminhos e migração de testes/recursos aceites; G-EXTRA-ADR satisfeito apenas para IMP-034. Retomar só Implement. ADR-033 mantém políticas residuais e aprovação histórica; contrato TCP v1/variante mista não autorizam nova implementação. IMP-035 conserva checkpoint próprio.
+
 ## 6. Modelo de dados e contratos
 
 ### 6.1. Entidades e invariantes
@@ -566,12 +639,18 @@ bytes escritos. O prazo do bootstrap fecha a ligação sem bloquear callback. To
 futures pendentes terminam em fecho/shutdown; só o escritor resolve sucesso/ordem.
 Escrita/flush não é entrega remota/ACK e fila vazia não comprova escrita completa.
 
-Os formatos completos do [contrato v1, secções 3–7](docs/07-API-AND-INTERFACES.md)
-são incorporados por ADR-009/012: u32 big-endian length exclui o prefixo, corpo
-37..65536; envelope version/type/requestId/senderId/senderInstance; UTF-8 estrito.
-16 tipos ativos: 1 REGISTER, 2 REGISTER_OK, 4 NODE_LEAVE, 5 HELLO, 6 HELLO_OK,
-7/8 PING/PONG, 9 ANNOUNCE, 10 WITHDRAW, 11 ACTIVATE, 12 ACK, 13 DEACTIVATE,
-14 RENEW, 15 TRACE, 16 TRACE_RESULT e 17 ERROR. Código 3 retirado, sem fallback.
+O contrato TCP alvo é exclusivamente **v2**, por decisão do utilizador e
+[ADR-034 Aceite](#adr-034), incluindo bootstrap, handshake, controlo normal e
+descoberta. Esta revisão substitui a versão TCP incorporada anteriormente nas
+ADR-009/012/secções 3–7 das interfaces; conserva a sua semântica e os caps.
+A [retirada autorizada do arquivo TCP v1](memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada),
+foi registada em Q-C-19, sem suporte runtime/fallback. [Interfaces v2](docs/07-API-AND-INTERFACES.md)
+mantêm u32 big-endian/body 37..65536, envelope version=2/type/requestId/senderId/
+senderInstance e UTF-8 estrito. 18 tipos ativos: 1 REGISTER, 2 REGISTER_OK,
+4 NODE_LEAVE, 5 HELLO, 6 HELLO_OK, 7/8 PING/PONG, 9 ANNOUNCE, 10 WITHDRAW,
+11 ACTIVATE, 12 ACK, 13 DEACTIVATE, 14 RENEW, 15 TRACE, 16 TRACE_RESULT,
+17 ERROR, 18 DISCOVERY_QUERY, 19 DISCOVERY_SNAPSHOT; código 3 retirado.
+Migração operacional concluída e validada em V-033: 1065 testes e manual humano Luis com 53 checks.
 
 UDP: OTT1, versão 1/flags 0, cabeçalho 64, stream/session UUID, frameSeq,
 mediaTimeUs, frameLength e fragmentIndex/count. Aplicação ≤1200/payload ≤1136,
@@ -651,6 +730,18 @@ Hard caps preservados: 64 nós/deployment, 256 streams/origem, 32 IDs/path,
 dedup de 512 frames. Filas/caches/montagens da tabela podem ser reduzidas;
 aumentar hard caps ou alterar bytes exige ADR e compatibilidade explícita.
 
+### 6.4. Contrato revisto de descoberta extra
+
+[ADR-034 Aceite](#adr-034), [Design](memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+e [interfaces](docs/07-API-AND-INTERFACES.md#extra-01-control-v2) definem TCP
+uniforme v2 com bootstrap inicial v2, handshake obrigatório e descoberta no
+controlo persistente/FIFO comuns; UDP OTT1 permanece inalterado. A revisão
+substitui OTD1 e a proposta mista v1/v2, conservando cache/TTL/proveniência e
+isolamento de falhas. [Q-C-18](docs/construction-duvidas.md#q-c-18--descoberta-no-canal-de-controlo)
+regista a decisão; fixtures v1 arquivadas, v2 independentes preparadas offline.
+G-EXTRA-ADR permanece pendente antes de Implement, com âmbito de bootstrap/testes
+revisto; IMP-035 mantém checkpoint de reparação próprio.
+
 ## 7. Estrutura do repositório e convenções
 
 ```text
@@ -685,7 +776,8 @@ publicar ou contactar pessoas por inferência deste plano. Sem forçar históric
 ## 8. Guia de implementação por dependências
 
 A sequência é topológica, não numérica de bolt. Conservam-se os 18 IDs e
-acrescentam-se 15: **33 IMP, 33 bolts, 33 histórias, sete unidades**.
+acrescentam-se 15 na base original. EXTRA-01 acrescenta dois incrementos, IMP-034/035:
+**35 IMP, 35 bolts, 35 histórias, sete unidades**.
 TASK-032 precede TASK-006. TASK-020/025/026/031 são compostas; o pai só fecha
 quando todas as partes, critérios originais, revisão e integração estiverem feitos.
 
@@ -824,6 +916,47 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
   - [ ] Situação da avaliação registada sem datas inventadas.
   - [ ] Validação V-009 executada e evidência ligada no progresso.
 
+<a id="imp-034"></a>
+### IMP-034 — Extra — aprender candidatos através dos vizinhos
+
+- **Descrição/entrega:** EXTRA-01, parte A. Divulgar vizinhos diretos e aprender candidatos antes das falhas.
+- **Fase/unidade/tamanho:** PHASE-02 / 002-overlay / M.
+- **Bolt/origem:** [034-overlay-extra](memory-bank/bolts/034-overlay-extra/bolt.md); TASK-033.
+- **Ficheiros:** `overlay/NeighborDiscovery.java`, `overlay/CandidateCache.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `protocol/DiscoveryMessage.java`, `protocol/DiscoveryCodec.java`, `config/NodeConfiguration.java`, `config/ConfigurationLoader.java`, `overlay/NeighborDiscoveryTest.java`, `overlay/CandidateCacheTest.java`, `protocol/DiscoveryCodecTest.java`, `transport/Transport.java`, `transport/Connection.java`, `transport/TransportTest.java`, `experiments/overlay-discovery/`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `config/ConfigurationLoaderTest.java`, `Projeto/README.md`, `app/OttApplicationTest.java`, `bootstrap/BootstrapServer.java`, `bootstrap/BootstrapServerTest.java`, `Projeto/src/test/resources/protocol/`, `Projeto/docs/protocolos.md`, `scripts/validate-planning.py`.
+- **Dependências:** IMP-006 (004-overlay).
+- **ADR:** ADR-007, ADR-009, ADR-012, ADR-013, ADR-014, ADR-015, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. G-EXTRA-ADR satisfeito para IMP-034 por aprovação explícita de ADR-034/Design/âmbito e migração; IMP-035 mantém checkpoint próprio.
+- **REQ/NFR/CON/INT:** REQ-025.
+- **Testes exigidos:** V-033: TCP v2 em todos os 18 tipos, APIs, bootstrap servidor/cliente, handshake, mensagens normais e descoberta; código 3 e versões antigas rejeitados sem parser/fallback v1. Fixtures v2 independentes, sem gerar o esperado pelo codec de produção; UDP OTT1/16 fixtures intactos face à base integrada. Arquivos TCP v1 retirados por decisão explícita Q-C-19. Todos os overlay exigem descoberta/Q>=2, ausência/true redundante obrigatórios e false/Q=1 agregados offline; genérico/bootstrap Q=1 preservado. Validar versão/identidade/endpoint/capacidade/flush/unicidade, rejeição só da tentativa e estado/retry por peer limitados com backoff; A ACTIVE/CLI/aprendizagem utilizáveis quando B é rejeitado. Bootstrap v2 conserva grafo imutável/offline, instâncias zero na resposta, flush antes de EOF, prazos e shutdown. Cache/TTL/proveniência/gerações/callbacks antigos/conflitos/caps com relógio/transporte/escrita controlados; FIFO/margem/tickets físicos, conteúdo extra recuperável e framing/identidade terminais. Migrar testes sem eliminar as garantias; executar regressão JDK 21, V-ADD, TCP/CLI reais e manual após aprovação.
+- **Gates:** G-EXTRA-ADR.
+- **Critérios de aceitação:**
+
+  - [ ] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
+  - [ ] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
+  - [ ] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
+  - [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
+  - [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+
+<a id="imp-035"></a>
+### IMP-035 — Extra — reparar ligações com candidatos aprendidos
+
+- **Descrição/entrega:** EXTRA-01, parte B. Reconstruir conectividade com a cache aprendida. Vídeo na integração futura.
+- **Fase/unidade/tamanho:** PHASE-02 / 002-overlay / M.
+- **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
+- **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`.
+- **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
+- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. Manter o checkpoint próprio de intenção/admissão/reparação antes de código.
+- **REQ/NFR/CON/INT:** REQ-025.
+- **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+- **Gates:** G-EXTRA-ADR.
+- **Critérios de aceitação:**
+
+  - [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
+  - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+  - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+  - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+  - [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+  - [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+
 <a id="imp-007"></a>
 ### IMP-007 — Medir RTT e detetar falhas TCP
 
@@ -831,7 +964,7 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Fase/unidade/tamanho:** PHASE-03 / 003-rotas / M.
 - **Bolt/origem:** [005-rotas](memory-bank/bolts/005-rotas/bolt.md); TASK-010.
 - **Ficheiros:** `monitoring/NetworkMonitor.java`, `monitoring/LinkMetrics.java`, `monitoring/NetworkMonitorTest.java`.
-- **Dependências:** IMP-006 (004-overlay).
+- **Dependências:** IMP-006 (004-overlay), IMP-035 (035-overlay-extra).
 - **ADR:** ADR-004, ADR-016, ADR-022, ADR-024, ADR-025.
 - **REQ/NFR/CON/INT:** CON-008, INT-001, INT-002, REQ-003, REQ-008, REQ-014, REQ-021.
 - **Testes exigidos:** V-010. V-010: relógio falso confirma EWMA, reset após nova instância, perda de três sondas e ausência de falso positivo por um timeout; EOF invalida imediatamente.
@@ -1403,6 +1536,7 @@ com unitários verdes. TASK-031 e último bolt exigem confirmação humana do up
 | G-GUI | Reprodução identificável numa janela real para os critérios visuais de TASK-023/024 |
 | G-CORE | Runtime/IP/mapeamento e medições reais nas TASK-025–028 |
 | G-ASSESSMENTS | Datas/conteúdo reais ou situação pendente explicitamente registada; não inventar informação docente |
+| G-EXTRA-ADR | Satisfeito para IMP-034 por aprovação explícita de ADR-034/Design/29 caminhos/migração v2; IMP-035 mantém aprovação própria de admissão/reparação |
 | G-DELIVERY | PL/grupo/prazo reais antes de nomes/entrega finais |
 | G-SUBMISSION | Confirmação humana de upload para concluir TASK-031/último bolt |
 | G-REVIEW-032 | Pessoa distinta designada e revisão/integração registadas antes do DONE de TASK-032 |
@@ -1486,6 +1620,8 @@ derivado do ADD para verificação, não uma segunda arquitetura. Teste na matri
 **Por cobrir documentalmente: nenhuma entrada.** Implementação/provas continuam
 pendentes nos gates: cobertura de plano não significa conformidade técnica.
 
+| REQ-025 | Extra | ADR-033, ADR-034 | config, overlay, app, protocol, transport | IMP-034, IMP-035 | V-033, V-034 |
+
 ## 13. Questões em aberto e changelog
 
 | Questão | Resolução ou gate |
@@ -1524,3 +1660,59 @@ e planeamento posterior, sem apagar a base aprovada. Não se presume aprovação
 de código, medição de metas, execução de bolt ou submissão; gates de execução
 permanecem nas tarefas responsáveis. Alterar âmbito, hard caps ou contrato
 aplica a secção 11, considerando a autorização futura que o utilizador fornecer.
+
+### Retoma de Inception — EXTRA-01
+
+Registo de 2026-11-11T12:11:34Z. O utilizador pediu o extra antes de 005-rotas.
+Confirmou catálogo inicial de candidatos e implementação imediata da overlay,
+com validação do vídeo após routing/streaming. Os 33 bolts anteriores mantêm
+os IDs. Novo bolt 034-overlay-extra / IMP-034 / TASK-033, V-033. A seleção,
+admissão e concorrência detalhadas ficam para revisão do Model e ADR-033.
+
+### EXTRA-01 — Mudança para descoberta entre vizinhos
+
+Registo de 2026-11-11T12:26:03Z. Por instrução do utilizador, a opção anterior de catálogo
+global inicial foi substituída por anúncios dos vizinhos diretos e cache
+limitada aprendida durante a execução. IMP-034 trata aprendizagem e protocolo,
+IMP-035 trata reparação. Ordem 004-overlay → 034-overlay-extra →
+035-overlay-extra → 005-rotas. Os IDs existentes são preservados.
+A extensão binária e as regras de negociação/admissão aguardam Design/ADR.
+
+### EXTRA-01 — Model aprovado, Design proposto
+
+Registo de 2026-11-11T12:49:29Z: aprovação explícita de Model do IMP-034 e autorização apenas
+para Design. OTD1 isolado e as políticas concretas foram propostos em ADR-033,
+secção 6.4 e Q-C-17. ADR-019/CP-02/03 conservam o comportamento base. Nenhum
+Java foi alterado e V-033/V-034 permanecem por executar. Parar para revisão
+antes da etapa ADR e sem iniciar Implement/Test.
+
+### EXTRA-01 — Design aprovado, revisão ADR preparada
+
+Registo de 2026-11-11T13:44:19Z. O utilizador aprovou explicitamente Design e Q-C-17 do
+IMP-034, autorizando apenas ADR. A [revisão](memory-bank/bolts/034-overlay-extra/adr-review.md)
+confere isolamento OTD1, confiança limitada, retenção e recursos partilhados.
+ADR-033 explicita a única chave adicional face a ADR-010/016; as decisões
+aceites e o âmbito dos IMP-034/035 mantêm-se. ADR-033 continua Proposta,
+G-EXTRA-ADR e contratos afetados pendentes de aprovação. Sem Implement/Test.
+
+### EXTRA-01 — revisão de transporte pedida pelo utilizador
+
+Registo de 2026-11-11T14:26:58Z. OTD1 separado interrompido; trabalho/evidência preservados.
+ADR-034 propõe substituição parcial do transporte da ADR-033, mantendo políticas
+de aprendizagem. Design/contratos e âmbito IMP-034 revistos, G-EXTRA-ADR reaberto.
+Sem continuação Java até aprovação e sem início de outro IMP.
+
+### EXTRA-01 — capacidade requerida em vez de fallback
+
+Registo de 2026-11-11T15:15:24Z. Decisão explícita: normal todos os overlay com extra ativo,
+Q>=2 antes de I/O, negociação requerida; sem modo base automático. Base/APIs
+antigos Q=1 preservados. Design/ADR-034/REQ-025/oráculos atualizados para revisão;
+conteúdo recuperável e margem mantidos. Implement não continuado.
+
+### EXTRA-01 — alteração de requisito sem modo opcional
+
+Registo de 2026-11-11T15:35:59Z. Confirmação do utilizador: todos os nós overlay exigem a
+capacidade, sem ativação opcional, defaults desligados ou ACTIVE_BASE. Configuração,
+Design/ADR-034/REQ-025/oráculos revistos; plano de migração de testes justifica
+as expectativas alteradas e conserva bytes v1/UDP/invariantes. Fonte/evidências
+preservadas, sem código ou outro IMP antes de aprovação.

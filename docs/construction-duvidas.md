@@ -440,3 +440,224 @@ de repetição independente é uma limitação registada. A tentativa incompleta
 e as sondagens mantêm a sua classificação. A revisão final atribuída a
 Fillmore foi dada como concluída por indicação do utilizador.
 [Registo de Test](../memory-bank/bolts/004-overlay/test-walkthrough.md).
+
+## Q-C-16 — Retoma de Inception para EXTRA-01
+
+Registo de 2026-11-11T12:11:34Z. O utilizador pediu o extra antes de 005-rotas e
+confirmou implementar agora a reconstrução da overlay, com vídeo após
+routing/streaming. Aprovou o catálogo inicial de candidatos autorizados.
+
+O grafo do exemplo é S–R1–C e S–R2–C, sem S–C inicial. A nova sessão deve
+ser criada após a perda dos relays. ADR-019 admite hoje só vizinhos do
+grafo inicial. [ADR-033](../add.md#adr-033) propõe a extensão. A política
+de gatilho, iniciativa e admissão concorrente aguarda revisão de Model/Design,
+antes de alterar Java. A fronteira de validação evita declarar vídeo
+entregue quando só a conectividade foi reconstruída.
+[Model](../memory-bank/bolts/034-overlay-extra/ddd-01-domain-model.md).
+
+### EXTRA-01 — Cenário assimétrico acrescentado ao Model
+
+O utilizador acrescentou S–R1–R2–C e S–R1–R3–C. A morte de R2/R3
+isola C, enquanto R1 continua ligado a S. V-033 inclui a criação de R1–C
+e a preservação de S–R1. A política de iniciativa/admissão deve permitir
+essa reparação unilateral, dentro dos limites, sem esperar pela falha
+do vizinho que R1 ainda conserva. Catálogo inicial e bootstrap apenas
+na descoberta de arranque continuam como âmbito aprovado.
+
+### Q-C-16 — Decisão posterior, descoberta por vizinhos
+
+Registo de 2026-11-11T12:26:03Z. O utilizador mandou substituir o catálogo inicial
+pela divulgação de vizinhos diretos e pela conservação limitada de
+candidatos. O texto anterior conserva a escolha histórica entretanto
+substituída. A decisão atual é a aprendizagem durante a execução.
+
+A cache conserva candidatos aprendidos após a morte do anunciante até ao
+prazo próprio. Listas divulgam apenas adjacências diretas confirmadas,
+com frequência, tamanho e recursos limitados. A ausência de candidatos
+aprendidos antes das falhas deve ficar explícita. A extensão de protocolo,
+a confiança, o TTL e a admissão aguardam Design/ADR-033. O extra foi
+dividido em IMP-034 (aprendizagem) e IMP-035 (reparação), antes de 005-rotas.
+
+<a id="q-c-17--design-da-descoberta-extra-proposta"></a>
+## Q-C-17 — Design da descoberta extra (aprovado em Design)
+
+Proposta registada em 2026-11-11T12:49:29Z. **Estado: escolhas aprovadas
+explicitamente em Design; aprovação registada em 2026-11-11T13:38:55Z.**
+O utilizador declarou «Aprovo Design do IMP-034 e as escolhas de Q-C-17» e
+autorizou apenas ADR. A aprovação do Model isoladamente não fixava as escolhas
+seguintes; a aprovação posterior de Design inclui a tabela completa.
+ADR-033 e contratos afetados aguardam o checkpoint formal G-EXTRA-ADR, antes
+de Implement; não se infere autorização de código ou de fecho.
+[Design completo](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+e [ADR-033 Proposta](../add.md#adr-033).
+
+| Ponto material | Proposta concreta para revisão |
+|---|---|
+| Isolamento/localização | TCP separado na dataPort já anunciada; UDP mantém OTT1. Sem alteração do HELLO/control v1, sem fallback para essa porta de controlo. |
+| Ativação | extra.discovery.enabled=false por default; só SERVER/RELAY/CLIENT. Modo ativo exige portas TCP distintas e C>=8; erro agregado antes de I/O local. |
+| Confiança | Só sessão ACTIVE, identidades dos dois extremos, token requestId do HELLO e consulta/canal correntes. Laboratório sem criptografia; candidato continua não admitido. |
+| Formato | OTD1 v1, QUERY=1/SNAPSHOT=2, corpo limitado a 32768 bytes, até 63 adjacências diretas, UTF-8 estrito e papéis com códigos explícitos. |
+| Validade | generation positiva por sessão, estritamente crescente; TTL local 60 s desde início da consulta, sem renovar por callback/sessão/geração antigos. Morte da fonte conserva claims até ao prazo. |
+| Cache/conflitos | 128 IDs × 4 claims; self ignorado; configuração local autoritativa; divergência de endpoint/papel ou colisão entre IDs torna candidato CONFLICT até desaparecer a divergência. |
+| Ritmo/recursos | 5 s de elegibilidade por vizinho, 4 consultas/s globais, 1/s recebida por sessão, 30 s após falha; quatro sockets/dials extra sujeitos ao mesmo C<=64, filas 1+1, DNS físico partilhado/limitado. |
+| Exceção futura de admissão | IMP-035 poderá criar par fora do grafo apenas com cache válida e contrato aprovado. Menor nodeId continua a iniciar controlo; intenção pode partir de qualquer extremo, permitindo reparação unilateral. |
+
+Não se encontrou uma decisão aceite inviável que exija alterar código nesta
+etapa. Estas escolhas foram aprovadas em Design e continuam sujeitas à formalização
+ADR/contratos no gate, não a um [PRESSUPOSTO] usado para contornar aprovação. A porta TCP precisa de estar livre e o catálogo aprendido
+não garante disponibilidade. Sem cache válida não se inventa reparação.
+G-EXTRA-ADR exige ADR-033 e contratos afetados aprovados antes de Implement.
+O contrato adicional de reparação pertence ao Design/ADR do IMP-035/V-034.
+V-033 e os testes D01–D12 ainda não foram executados.
+
+### Q-C-17 — Entrada na revisão ADR
+
+Registo de 2026-11-11T13:44:19Z. A [revisão ADR](../memory-bank/bolts/034-overlay-extra/adr-review.md)
+confirma o âmbito aprovado. Explicita em ADR-033 que extra.discovery.enabled
+é a única chave adicional à lista de ADR-010/016, sem alteração das escolhas
+aprovadas. Não abre nova decisão de política nem nova Q-C. G-EXTRA-ADR e
+aprovação da revisão permanecem pendentes.
+
+<a id="q-c-18--descoberta-no-canal-de-controlo"></a>
+## Q-C-18 — Descoberta no canal de controlo
+
+Mudança pedida pelo utilizador, registada em 2026-11-11T14:17:12Z. **Decidido:** parar
+OTD1 separado e usar a ligação TCP persistente de controlo, com framing/codec
+partilhados, preservando bytes/tipos/caps v1 e as políticas de aprendizagem.
+**Ainda proposto:** o contrato concreto da [ADR-034](../add.md#adr-034) e do
+[Design revisto](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md).
+
+A proposta usa HELLO/HELLO_OK v2 para seleção de capacidade e tipos 18/19 só
+em v2; mensagens normais continuam v1 no mesmo TCP. Incompatibilidade permite
+um fallback de handshake para v1, sem upgrade numa sessão ACTIVE saudável.
+A fila comum Q+inFlight admite descoberta sem fecho quando cheia e limita
+quatro tickets reais de escrita; não existe fila paralela. Frame malformada
+pode fechar o controlo, uma consequência nova que exige aprovação explícita.
+Deixam de ser necessárias TCP/dataPort, portas distintas ou C>=8 para o extra.
+Cache 128×4, TTL 60 s, fontes, gerações e isolamento de callbacks mantêm-se.
+
+ADR-033 conserva as políticas residuais e a aprovação histórica; a escolha
+OTD1 foi suspensa, com substituição parcial proposta por ADR-034. G-EXTRA-ADR
+reaberto para IMP-034. O âmbito do ADD inclui os ficheiros comuns de protocolo
+e testes necessários; IMP-035 mantém o checkpoint próprio, sem início.
+[Arquivo preservado](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada).
+Nenhum Java/teste/target foi alterado nesta revisão; a compilação anterior já
+terminara, não é validação da nova proposta. Sem commits, push ou outro IMP.
+
+### Q-C-18 — Refinamento de margem e falhas
+
+> Histórico: a proposta de Q=1 com extra ativo degradar para base não foi
+> aprovada. Aplica-se a decisão posterior de extra requerido abaixo.
+
+Registo de 2026-11-11T14:51:37Z. O utilizador pediu margem de fila, comportamento explícito
+com Q=1 e rejeição recuperável de conteúdo, mantendo framing/identidade terminais.
+A [proposta revista](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+define M=1 e E(Q)=min(1,max(0,Q-1)), admissão com duas posições livres e quota
+extra enfileirada de um (incluindo transferência take→inFlight). Quatro tickets
+globais e Q+inFlight mantêm-se. Q=1 continua válido, mas não anuncia/seleciona
+descoberta e usa modo base, sem bypass. Esta indisponibilidade é explícita.
+
+Um anúncio extra completo/delimitado com identidades atuais pode produzir
+rejeição tipada de conteúdo, sem fecho ou alteração de cache/watermark/TTL;
+o owner confirma o handle e a identidade antes de a considerar recuperável.
+Comprimentos inválidos, truncamento, tipo/versão inválidos e identidade
+ilegível/incompatível mantêm-se terminais. Não absorver IOException genérica.
+D07a–D07e e D08a–D08f cobrem fronteiras, continuidade v1 e corridas.
+ADR-034 e contratos continuam Proposta/para revisão, G-EXTRA-ADR pendente;
+nenhum código, build, teste Java ou outro IMP foi continuado.
+
+### Q-C-18 — Decisão posterior: extra requerido no projeto
+
+> Histórico: as exceções opcionais/base e eventual falha global foram
+> substituídas pelas clarificações posteriores de obrigatoriedade e isolamento.
+
+Registo de 2026-11-11T15:15:24Z. O utilizador **não aprovou** Q=1/incompatibilidade passarem
+automaticamente a base. A execução normal exige extra ativo em todos os nós
+overlay. As propostas anteriores de fallback e Q=1 em base com flag ativo ficam
+rejeitadas, mantidas apenas como histórico nas evidências.
+
+A [revisão](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+define enabled⇒Q>=2 validado com erros agregados antes de I/O, supported=required=1
+e seleção obrigatória. Incompatibilidade confirmada de peer autorizado/corrente
+é erro explícito RequiredDiscoveryIncompatible/FAILED; ausência de resposta é
+falha transitória diagnosticada, com retry apenas v2. Nunca ACTIVE_BASE required.
+Perfis/API base continuam flag false/default e Q=1 válidos. Bootstrap mantém
+consulta inicial. O preflight normal loadProjectDeployment exige todos os perfis
+overlay true; não é um catálogo runtime. A margem e os erros de conteúdo da
+revisão anterior mantêm-se. ADR-034/contratos por aprovar, sem continuação Java.
+
+### Q-C-18 — Mudança de requisito: nenhuma ativação opcional
+
+Registo de 2026-11-11T15:35:59Z. O utilizador confirmou extra obrigatório em todos os nós
+overlay e mandou retirar a ativação opcional/ACTIVE_BASE. Esta decisão substitui
+as propostas anteriores de APIs/perfis base de nó, default false e validação
+apenas quando enabled. Não existe caminho de construção/carregamento desligado.
+
+A proposta atual deriva o requisito do papel: ausência da antiga chave já é
+obrigatório; true é no máximo declaração redundante, false é erro. Todo overlay
+exige Q>=2 antes de recursos, mesmo sem chave ou com false; bootstrap mantém
+só lookup inicial. Load/loadDeployment e construtores aplicam a mesma relação,
+sem loadProjectDeployment paralelo. Formats/transporte genérico v1 não são um
+modo de nó base. Peer required=0/sem capacidade é rejeitado explicitamente.
+
+[Justificação dos testes](../memory-bank/bolts/034-overlay-extra/test-contract-migration.md)
+separa bytes v1/Q=1 genérico preservados das expectativas operacionais alteradas.
+Fonte anterior e evidências mantidas; não houve alteração Java/testes/target.
+ADR-034/contratos pendentes antes de Implement; IMP-034 aprende, IMP-035 repara.
+
+## Q-C-18 — Clarificação operacional e isolamento por peer
+
+Registo de 2026-11-11T17:22:59Z; instante de documentação, não atribuído à mensagem humana.
+O utilizador fixa um único programa e a mesma versão do JAR em todos os nós.
+Todos os overlay implementam/exigem descoberta; não desenvolver funcionamento
+com versões antigas, modo base opcional ou fallback. Manter validação de versão,
+identidade, endpoint e capacidade. Inputs incompatíveis são negativos do
+protocolo; conservar os testes dos formatos v1 que continuam usados.
+
+A consequência FAILED global/failure()/FATAL/saída da CLI proposta acima foi
+rejeitada e substituída por rejeição **só da tentativa**, sem NeighborUp e sem
+afetar sessões saudáveis (ADR-020). Estado por peer limitado a configurados,
+uma tentativa/agendamento e backoff/jitter/deadlines/reservas existentes;
+ausência temporária distingue-se de rejeição confirmada, sem trocar protocolo.
+D02b–d/D11a exigem B inválido enquanto A permanece ACTIVE, CLI utilizável e
+QUERY/SNAPSHOT válidas de A continuam a alimentar a cache.
+
+false/Q=1 continuam erros agregados offline no overlay; não há desligamento
+para acomodar recursos insuficientes. Cache/TTL/proveniência/callbacks e fila
+comum mantêm-se. [Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+e [revisão ADR-034](../memory-bank/bolts/034-overlay-extra/adr-034-review.md)
+apresentados para aprovação, sem continuar código. IMP-034 aprende; IMP-035
+repara, com checkpoint próprio. Registos anteriores são históricos, não modos
+operacionais alternativos.
+
+### Q-C-18 — Decisão de controlo TCP uniforme v2
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## Aprovação e retoma de Implement — TCP v2
+
+Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
+O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
+caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
+ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
+opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
+G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
+Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
+com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
+proveniência preservados. Testes incrementais com logs reais autorizados.
+Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
+manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
+próprio; sem commits/push ou início de outro IMP.
+
+## Q-C-19 — Limpeza TCP v1 e fecho solicitado por Luis
+
+Registo de 2026-11-11T19:39:07Z. Após a execução humana V-033 (53 checks, MANUAL_PASS e saída 0), Luis pediu revisão final, integração e fecho do IMP-034, retirando os arquivos/testes da versão TCP v1 e conservando a versão v2. Esta instrução substitui a obrigação documental anterior de conservar o arquivo TCP v1 na árvore entregue. A revisão técnica final é do agente validador, solicitada por Luis; não se atribui revisão a Fillmore ou Waheed. Luis é o operador humano e autor da autorização de fecho.
+
+Conservam-se os negativos que rejeitam TCP v1, todos os testes operacionais TCP v2 e UDP OTT1 inalterado. UDP versão 1 é o formato de vídeo atual, não o codec TCP retirado. A limpeza não altera runtime, framing, caps ou garantias e não inicia IMP-035. O manifesto da limpeza lista paths/hashes retirados; execuções v2, manual humano, regressão e JAR final permanecem. Integração local e publicação remota são registadas separadamente.

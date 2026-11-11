@@ -120,6 +120,12 @@ public final class ConfigurationLoader {
             }
         }
         RuntimeConfiguration runtime = runtime(p, file, role, allowed, errors);
+        if (role != null && role != NodeRole.BOOTSTRAP) {
+            allowed.add("extra.discovery.enabled");
+            String raw = p.getProperty("extra.discovery.enabled");
+            if (raw != null && !raw.strip().equals("true"))
+                error(errors,file,"extra.discovery.enabled","descoberta obrigatória; apenas true redundante é aceite");
+        }
         unknownKeys(p, allowed, file, errors);
         if (errors.size() != start) return null;
         return new NodeConfiguration(file, id, role, bind, advertised, control, data,
@@ -143,6 +149,8 @@ public final class ConfigurationLoader {
         Duration shutdown = optionalDuration(p, file, "control.shutdown.timeout.ms", controlDefault.shutdownTimeout(), errors);
         Integer connections = optionalInteger(p, file, "control.max.connections", controlDefault.maxConnections(), 1, 64, errors);
         Integer queue = optionalInteger(p, file, "control.queue.capacity", controlDefault.queueCapacity(), 1, 256, errors);
+        if (overlayRole && queue != null && queue < 2)
+            error(errors,file,"control.queue.capacity","descoberta obrigatória exige capacidade >=2");
         Duration query = optionalDuration(p, file, "bootstrap.query.timeout.ms", controlDefault.bootstrapQueryTimeout(), errors);
         var control = allPresent(connect, shutdown, connections, queue, query)
                 ? new RuntimeConfiguration.Control(connect, shutdown, connections, queue, query) : null;
@@ -378,6 +386,8 @@ public final class ConfigurationLoader {
                 if (!n.advertisedHost().equals(allowed.host())) error(errors, n.sourceFile(), "advertised.host", "host difere da topologia");
                 if (n.controlPort() != allowed.controlPort()) error(errors, n.sourceFile(), "control.port", "porta difere da topologia");
                 if (n.dataPort() != allowed.dataPort()) error(errors, n.sourceFile(), "data.port", "porta difere da topologia");
+                if(n.runtime().control().maxConnections()<allowed.neighbors().size())
+                    error(errors,n.sourceFile(),"control.max.connections","capacidade inferior ao grau configurado da overlay");
             }
             var contact = n.bootstrap().orElseThrow();
             if (!contact.host().equals(bootstrap.advertisedHost())) {

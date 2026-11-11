@@ -21,9 +21,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Codec de controlo v1; não abre/fecha sockets nem executa operações de overlay. */
+/** Codec de controlo v2; não abre/fecha sockets nem executa operações de overlay. */
 public final class MessageCodec {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final int MIN_BODY_BYTES = 37;
     public static final int MAX_BODY_BYTES = 65536;
     public static final int MAX_NEIGHBORS = 64;
@@ -48,6 +48,8 @@ public final class MessageCodec {
         writeUuid(out, message.senderInstance());
         writePayload(out, message);
         byte[] body = buffer.bytes();
+        if ((message.type()==MessageType.DISCOVERY_QUERY || message.type()==MessageType.DISCOVERY_SNAPSHOT)
+                && body.length>DiscoveryCodec.MAX_BODY_BYTES) throw resource("Discovery body cap");
         var frame = new ByteArrayOutputStream(body.length + 4);
         var framed = new DataOutputStream(frame);
         framed.writeInt(body.length);
@@ -65,46 +67,118 @@ public final class MessageCodec {
         return message;
     }
 
-    /** Optional.empty apenas para EOF limpo, antes do primeiro byte do prefixo. */
+    /** Bounded decoded handshake context, only after its structural fields validate. */
+    public static final class HandshakeFailure extends Exception {
+        private final ControlMessage message;
+        private HandshakeFailure(ControlMessage message){super("Required discovery missing");this.message=message;}
+        public ControlMessage message(){return message;}
+    }
+    public static final class VersionFailure extends Exception {
+        private final int observed;
+        private VersionFailure(int observed){this.observed=observed;}
+        public int observed(){return observed;}
+    }
+    private static ProtocolException incompatibleHandshake(ControlMessage message) {
+        return new ProtocolException(ErrorCode.INVALID_MESSAGE,"Required discovery missing",new HandshakeFailure(message));
+    }
+    public sealed interface FrameRead permits Decoded, RejectedExtraContent { }
+    public record Decoded(ControlMessage message) implements FrameRead { }
+    public enum ContentRejection { INVALID_MESSAGE, RESOURCE_LIMIT }
+    public record ExtraEnvelope(int version, MessageType type, UUID queryId, String senderId,
+            UUID senderInstance, UUID helloRequestId, String recipientId, UUID recipientInstance) { }
+    public record RejectedExtraContent(ExtraEnvelope envelope, ContentRejection reason) implements FrameRead { }
+
+    /** Same parser as readFrame, strict caller facade; no alternate protocol version. */
     public static Optional<ControlMessage> read(InputStream source) throws IOException {
-        Objects.requireNonNull(source, "source");
-        int first = source.read();
-        if (first == -1) return Optional.empty();
-        var input = new DataInputStream(source);
-        long length = ((long) first << 24) | ((long) input.readUnsignedByte() << 16)
-                | ((long) input.readUnsignedByte() << 8) | input.readUnsignedByte();
-        require(length >= MIN_BODY_BYTES, "Corpo inferior a 37 bytes");
-        if (length > MAX_BODY_BYTES) throw resource("Corpo superior a 65536 bytes");
-        byte[] body = new byte[(int) length];
-        input.readFully(body);
-        var fields = new DataInputStream(new ByteArrayInputStream(body));
+        var result=readFrame(source);
+        if(result.isEmpty()) return Optional.empty();
+        if(result.get() instanceof Decoded decoded) return Optional.of(decoded.message());
+        var bad=(RejectedExtraContent)result.get();
+        throw new ProtocolException(bad.reason()==ContentRejection.RESOURCE_LIMIT?ErrorCode.RESOURCE_LIMIT:ErrorCode.INVALID_MESSAGE,
+                "Rejected discovery content");
+    }
+
+    /** One delimited frame, or clean EOF before its prefix. Never recovers framing/identity. */
+    public static Optional<FrameRead> readFrame(InputStream source) throws IOException {
+        Objects.requireNonNull(source,"source");
+        int first=source.read(); if(first==-1) return Optional.empty();
+        var input=new DataInputStream(source);
+        long length=((long)first<<24)|((long)input.readUnsignedByte()<<16)
+                |((long)input.readUnsignedByte()<<8)|input.readUnsignedByte();
+        require(length>=MIN_BODY_BYTES,"Body below 37 bytes");
+        if(length>MAX_BODY_BYTES) throw resource("Body above 65536 bytes");
+        // The two discriminator octets suffice to apply the smaller discovery cap
+        // before allocating its body. Domain checks still follow a complete frame.
+        int firstBody=input.readUnsignedByte(),secondBody=input.readUnsignedByte();
+        if(firstBody==VERSION && (secondBody==18 || secondBody==19) && length>DiscoveryCodec.MAX_BODY_BYTES)
+            throw resource("Discovery body cap");
+        byte[] body=new byte[(int)length];body[0]=(byte)firstBody;body[1]=(byte)secondBody;
+        input.readFully(body,2,body.length-2);
+        var in=new DataInputStream(new ByteArrayInputStream(body));
         try {
-            int version = fields.readUnsignedByte();
-            checkVersion(version);
-            MessageType type = MessageType.fromCode(fields.readUnsignedByte());
-            UUID requestId = readUuid(fields);
-            String senderId = readString(fields, 32);
-            UUID senderInstance = readUuid(fields);
-            var message = new ControlMessage(version, type, requestId, senderId,
-                    senderInstance, readPayload(fields, type));
-            require(fields.read() == -1, "Bytes inesperados no fim do payload");
-            validate(message);
-            return Optional.of(message);
-        } catch (EOFException ex) {
-            throw new ProtocolException(ErrorCode.INVALID_MESSAGE, "Campos incompletos no corpo recebido", ex);
+            int version=in.readUnsignedByte(); checkVersion(version);
+            MessageType type=MessageType.fromCode(in.readUnsignedByte());
+            UUID request=readUuid(in);String sender=readString(in,32);UUID instance=readUuid(in);
+            nodeId(sender); require(!UNKNOWN_INSTANCE.equals(instance),"Missing sender instance");
+            if(type==MessageType.DISCOVERY_QUERY || type==MessageType.DISCOVERY_SNAPSHOT) {
+                if(length>DiscoveryCodec.MAX_BODY_BYTES) throw resource("Discovery body cap");
+                require(!UNKNOWN_INSTANCE.equals(request),"Missing query identity");
+                UUID hello=readUuid(in);String recipient=readString(in,32);UUID recipientInstance=readUuid(in);
+                nodeId(recipient);
+                require(!UNKNOWN_INSTANCE.equals(hello)&&!UNKNOWN_INSTANCE.equals(recipientInstance)
+                        && !sender.equals(recipient),"Invalid discovery identity");
+                var envelope=new ExtraEnvelope(version,type,request,sender,instance,hello,recipient,recipientInstance);
+                return Optional.of(readExtra(in,envelope));
+            }
+            var message=new ControlMessage(version,type,request,sender,instance,readPayload(in,type));
+            require(in.read()==-1,"Trailing payload bytes");validate(message);
+            return Optional.of(new Decoded(message));
+        } catch(EOFException error) { throw new ProtocolException(ErrorCode.INVALID_MESSAGE,"Incomplete fields",error); }
+    }
+
+    private static FrameRead readExtra(DataInputStream in, ExtraEnvelope e) throws IOException {
+        Payload payload;
+        ContentRejection rejection=null;
+        if(e.type()==MessageType.DISCOVERY_QUERY) {
+            payload=new DiscoveryMessage.Query(e.helloRequestId(),e.recipientId(),e.recipientInstance());
+        } else {
+            long generation=in.readLong();int count=in.readUnsignedShort();
+            if(count>63) return new RejectedExtraContent(e,ContentRejection.RESOURCE_LIMIT);
+            var entries=new ArrayList<Endpoint>(count);
+            for(int n=0;n<count;n++) {
+                // Consume structural fields even when a candidate has bad semantics; later truncation wins.
+                String id=readCandidateString(in,32);UUID instance=readUuid(in);String host=readCandidateString(in,253);
+                int control=in.readUnsignedShort(),data=in.readUnsignedShort(),role=in.readUnsignedByte();
+                NodeRole decoded=switch(role) { case 1->NodeRole.SERVER;case 2->NodeRole.RELAY;case 3->NodeRole.CLIENT;default->null; };
+                entries.add(new Endpoint(id,instance,host,control,data,decoded));
+            }
+            payload=new DiscoveryMessage.Snapshot(e.helloRequestId(),e.recipientId(),e.recipientInstance(),generation,entries);
+            try { require(generation>0,"Generation must be positive");DiscoveryCodec.validateSnapshot(e.senderId(),entries); }
+            catch(IOException|IllegalArgumentException error) { rejection=ContentRejection.INVALID_MESSAGE; }
         }
+        if(in.read()!=-1) rejection=ContentRejection.INVALID_MESSAGE;
+        if(rejection!=null) return new RejectedExtraContent(e,rejection);
+        return new Decoded(new ControlMessage(e.version(),e.type(),e.queryId(),e.senderId(),e.senderInstance(),payload));
+    }
+    private static String readCandidateString(DataInputStream in,int max) throws IOException {
+        int length=in.readUnsignedShort();limit(length,max,"candidate field length");require(length>0,"Empty candidate field");
+        byte[] bytes=new byte[length];in.readFully(bytes);
+        try { return StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString(); }
+        catch(CharacterCodingException error) { return "\u0000"; }
     }
 
     private static Payload readPayload(DataInputStream in, MessageType type) throws IOException {
         return switch (type) {
-            case REGISTER, HELLO -> new EndpointPayload(readEndpoint(in));
+            case REGISTER -> new EndpointPayload(readEndpoint(in));
+            case HELLO -> new Hello(readEndpoint(in),readU32(in),readU32(in));
             case REGISTER_OK -> {
                 int count = readCount(in, MAX_NEIGHBORS);
                 var neighbors = new ArrayList<Endpoint>(count);
                 for (int i = 0; i < count; i++) neighbors.add(readEndpoint(in));
                 yield new NeighborList(neighbors);
             }
-            case HELLO_OK -> Empty.INSTANCE;
+            case HELLO_OK -> new HelloOk(readU32(in));
             case NODE_LEAVE -> new Leave(in.readUnsignedByte());
             case PROBE_PING, PROBE_PONG -> new Probe(in.readLong());
             case STREAM_ANNOUNCE -> new Announcement(readStream(in), in.readLong(), in.readLong(), readNodes(in));
@@ -115,19 +189,21 @@ public final class MessageCodec {
             case DEACTIVATE -> new Deactivation(readUuid(in), readUuid(in), readUuid(in), in.readLong());
             case ROUTE_TRACE -> new Trace(readUuid(in), readUuid(in), readUuid(in), in.readUnsignedByte(), readNodes(in));
             case TRACE_RESULT -> new TraceResult(readUuid(in), readUuid(in), readNodes(in));
+            case DISCOVERY_QUERY, DISCOVERY_SNAPSHOT -> throw invalid("Discovery uses common readFrame payload path");
             case ERROR -> new ErrorPayload(ErrorCode.fromCode(in.readUnsignedShort()), in.readUnsignedByte(), readString(in, 256));
         };
     }
 
     private static void writePayload(DataOutputStream out, ControlMessage m) throws IOException {
         switch (m.type()) {
-            case REGISTER, HELLO -> writeEndpoint(out, payload(m, EndpointPayload.class).endpoint());
+            case REGISTER -> writeEndpoint(out, payload(m, EndpointPayload.class).endpoint());
+            case HELLO -> { var p=payload(m,Hello.class);writeEndpoint(out,p.endpoint());out.writeInt((int)p.supportedMask());out.writeInt((int)p.requiredMask()); }
             case REGISTER_OK -> {
                 var p = payload(m, NeighborList.class);
                 out.writeShort(p.neighbors().size());
                 for (var endpoint : p.neighbors()) writeEndpoint(out, endpoint);
             }
-            case HELLO_OK -> { }
+            case HELLO_OK -> out.writeInt((int)payload(m,HelloOk.class).selectedMask());
             case NODE_LEAVE -> out.writeByte(payload(m, Leave.class).reason());
             case PROBE_PING, PROBE_PONG -> out.writeLong(payload(m, Probe.class).probeId());
             case STREAM_ANNOUNCE -> {
@@ -164,6 +240,13 @@ public final class MessageCodec {
                 var p = payload(m, TraceResult.class);
                 writeUuid(out, p.streamId());writeUuid(out, p.traceId());writeNodes(out, p.visited());
             }
+            case DISCOVERY_QUERY, DISCOVERY_SNAPSHOT -> {
+                var p=(DiscoveryMessage)m.payload();writeUuid(out,p.helloRequestId());writeString(out,p.recipientId());writeUuid(out,p.recipientInstance());
+                if(p instanceof DiscoveryMessage.Snapshot snapshot) {
+                    out.writeLong(snapshot.generation());out.writeShort(snapshot.directNeighbors().size());
+                    for(var e:snapshot.directNeighbors()) writeEndpoint(out,e);
+                }
+            }
             case ERROR -> {
                 var p = payload(m, ErrorPayload.class);
                 out.writeShort(p.code().code());out.writeByte(p.relatedType());writeString(out, p.detail());
@@ -176,14 +259,18 @@ public final class MessageCodec {
         checkVersion(m.version());
         require(m.type() != null, "Tipo ausente");
         uuid(m.requestId());nodeId(m.senderId());uuid(m.senderInstance());
+        require(!UNKNOWN_INSTANCE.equals(m.senderInstance()),"Missing sender instance");
+        if(m.type()==MessageType.HELLO || m.type()==MessageType.HELLO_OK)
+            require(!UNKNOWN_INSTANCE.equals(m.requestId()),"Missing handshake correlation");
         switch (m.type()) {
-            case REGISTER, HELLO -> endpoint(payload(m, EndpointPayload.class).endpoint(), false);
+            case REGISTER -> endpoint(payload(m, EndpointPayload.class).endpoint(), false);
+            case HELLO -> { var p=payload(m,Hello.class);endpoint(p.endpoint(),false);if(p.supportedMask()!=1||p.requiredMask()!=1)throw incompatibleHandshake(m); }
             case REGISTER_OK -> {
                 var p = payload(m, NeighborList.class);
                 limit(p.neighbors().size(), MAX_NEIGHBORS, "vizinhos");
                 for (var e : p.neighbors()) endpoint(e, true);
             }
-            case HELLO_OK -> payload(m, Empty.class);
+            case HELLO_OK -> { if(payload(m,HelloOk.class).selectedMask()!=1)throw incompatibleHandshake(m); }
             case NODE_LEAVE -> range(payload(m, Leave.class).reason(), 0, 1, "reason");
             case PROBE_PING, PROBE_PONG -> nonnegative(payload(m, Probe.class).probeId(), "probeId");
             case STREAM_ANNOUNCE -> {
@@ -213,6 +300,18 @@ public final class MessageCodec {
             }
             case TRACE_RESULT -> {
                 var p = payload(m, TraceResult.class);uuid(p.streamId());uuid(p.traceId());nodes(p.visited());
+            }
+            case DISCOVERY_QUERY, DISCOVERY_SNAPSHOT -> {
+                var p=payload(m,DiscoveryMessage.class);uuid(p.helloRequestId());nodeId(p.recipientId());uuid(p.recipientInstance());
+                require(!UNKNOWN_INSTANCE.equals(m.requestId())&&!UNKNOWN_INSTANCE.equals(p.helloRequestId())
+                        && !UNKNOWN_INSTANCE.equals(p.recipientInstance())&&!m.senderId().equals(p.recipientId()),"Discovery identity");
+                if(m.type()==MessageType.DISCOVERY_QUERY) require(p instanceof DiscoveryMessage.Query,"QUERY payload");
+                else {
+                    require(p instanceof DiscoveryMessage.Snapshot,"SNAPSHOT payload");var snap=(DiscoveryMessage.Snapshot)p;
+                    require(snap.generation()>0,"Positive generation required");
+                    try { DiscoveryCodec.validateSnapshot(m.senderId(),snap.directNeighbors()); }
+                    catch(IOException error) { throw invalid("Invalid snapshot"); }
+                }
             }
             case ERROR -> {
                 var p = payload(m, ErrorPayload.class);require(p.code() != null, "Código de erro ausente");
@@ -345,7 +444,8 @@ public final class MessageCodec {
     }
 
     private static void checkVersion(int version) throws ProtocolException {
-        if (version != VERSION) throw new ProtocolException(ErrorCode.UNSUPPORTED_VERSION, "Versão de protocolo não suportada");
+        if (version != VERSION) throw new ProtocolException(ErrorCode.UNSUPPORTED_VERSION,
+                "Versão de protocolo não suportada",new VersionFailure(version));
     }
 
     private static void require(boolean condition, String message) throws ProtocolException {

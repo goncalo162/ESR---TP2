@@ -31,6 +31,8 @@ public record NodeConfiguration(
         Objects.requireNonNull(mediaBase);
         Objects.requireNonNull(topology);
         Objects.requireNonNull(runtime);
+        if (role != NodeRole.BOOTSTRAP && runtime.control().queueCapacity() < 2)
+            throw new IllegalArgumentException("Overlay discovery requires control.queue.capacity>=2");
         streams = List.copyOf(streams);
     }
 
@@ -45,6 +47,9 @@ public record NodeConfiguration(
                 bootstrap, topologyFile, streamsFile, mediaBase, topology, streams,
                 RuntimeConfiguration.defaults());
     }
+
+    /** Intrinsic overlay capability, never an operational switch. */
+    public boolean discoveryRequired() { return role != NodeRole.BOOTSTRAP; }
 
     /** Contacto conhecido para obter a vizinhança, sem resolução de DNS na carga. */
     public record BootstrapContact(String host, int port) {

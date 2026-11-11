@@ -454,6 +454,17 @@ Este ficheiro especifica o que é exigido, sem declarar funcionalidades implemen
 - Tarefas relacionadas: TASK-032.
 - Verificação: V-ADD, V-032.
 
+<a id="req-025"></a>
+## REQ-025 — Extra — reconstrução dinâmica de vizinhanças
+
+- Natureza: Extra pedido explicitamente pelo utilizador.
+- Prioridade: P1.
+- Alias: novo identificador de extra.
+- Origem: pedido do utilizador para divulgação de vizinhos diretos e conservação limitada de candidatos aprendidos.
+- Critério de aceitação: Aprender candidatos através da divulgação limitada dos vizinhos diretos em sessões confirmadas, sem exigir a configuração prévia de todos os endpoints; conservar os candidatos com prazo local, proveniência e limites mesmo após morrer quem os anunciou. Após aprender candidatos e perder os relays nos cenários S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C, formar respetivamente S–C e R1–C, mantendo os sobreviventes e sem duplicados. A continuação de vídeo nessas ligações será verificada após routing e streaming. Todos os nós overlay da aplicação suportam e exigem a capacidade de descoberta, sem ativação opcional, API/perfil desligado ou ACTIVE_BASE operacional. Todos os caminhos validam Q>=2 antes de sockets, sem reduzir funcionalidades por insuficiência de recursos. O cenário operacional usa um único programa e a mesma versão do JAR em todos os nós. Versão, identidade, endpoint e capacidade são validados no handshake; tentativa inválida é rejeitada localmente, sem NeighborUp, FAILED global ou interrupção da CLI/sessões saudáveis. Estado por peer e retries têm limites/backoff; ausência temporária distingue-se de incompatibilidade confirmada. Incompatibilidade é entrada negativa de protocolo, sem suporte operacional a versões antigas. Uniformizar todo o controlo TCP em v2, incluindo bootstrap inicial, handshake, mensagens normais e descoberta, com um contrato/codec operacional e sem runtime v1/fallback. Arquivar contrato/fixtures TCP v1 e preparar fixtures v2 independentes, justificando a migração dos testes sem perder garantias. Preservar framing, hard caps, código 3 rejeitado, identidade/unicidade/FIFO/flush/isolamento/shutdown; UDP OTT1 de vídeo permanece inalterado.
+- Tarefas relacionadas: TASK-033, TASK-034.
+- Verificação: V-033, V-034. Integração com vídeo nas validações posteriores de routing/streaming.
+
 ## Qualidades e métricas
 
 As metas experimentais iniciais são ativação ≤5 s, recuperação TCP com alternativa

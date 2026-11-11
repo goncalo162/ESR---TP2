@@ -11,10 +11,10 @@ started: null
 completed: null
 current_stage: null
 stages_completed: []
-requires_bolts: ["004-overlay"]
+requires_bolts: ["004-overlay", "035-overlay-extra"]
 enables_bolts: ["021-rotas"]
 requires_units: ["002-overlay"]
-blocks: false
+blocks: true
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1
@@ -70,3 +70,5 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 - Prova futura: `experiments/construction/005-rotas/` e relatório local do bolt.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+
+O EXTRA-01 exige 034-overlay-extra (aprendizagem) e 035-overlay-extra (reparação) antes deste bolt. A conclusão e integração dos dois são pré-requisito de início.

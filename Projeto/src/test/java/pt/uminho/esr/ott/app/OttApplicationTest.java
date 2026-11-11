@@ -321,7 +321,7 @@ class OttApplicationTest {
                 assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO, hello.type());
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", remote,
-                    pt.uminho.esr.ott.protocol.ControlMessage.Empty.INSTANCE), socket.getOutputStream()); socket.getOutputStream().flush();
+                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), socket.getOutputStream()); socket.getOutputStream().flush();
                 child.await(t -> t.contains("NeighborUp[")); boot.send("quit"); assertEquals(0, boot.exit());
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.ERROR, UUID.randomUUID(), "N2", remote,
@@ -335,7 +335,7 @@ class OttApplicationTest {
                 UUID newRemote = UUID.randomUUID();
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", newRemote,
-                    pt.uminho.esr.ott.protocol.ControlMessage.Empty.INSTANCE), second.getOutputStream()); second.getOutputStream().flush();
+                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), second.getOutputStream()); second.getOutputStream().flush();
                 child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
                 assertTrue(child.text().contains(newRemote.toString())); child.send("quit");
                 var leave = pt.uminho.esr.ott.protocol.MessageCodec.read(second.getInputStream()).orElseThrow();
@@ -508,6 +508,39 @@ class OttApplicationTest {
             assertTrue(progress.stream().noneMatch(line -> line.contains("exit=") || line.startsWith("STOPPED")), progress.toString());
             assertTrue(progress.stream().anyMatch(line -> line.contains("phase=closing-output")), progress.toString());
         } finally { release.countDown(); }
+    }
+
+    @Test @Timeout(25) void D11aIncompatibleInputRejectsOnlyPeerWhileCliAndDiscoveryRemainUsable() throws Exception {
+        try(var d=new LiveDeployment();var rawPeer=new java.net.ServerSocket(d.ports[3],8,java.net.InetAddress.getLoopbackAddress())) {
+            rawPeer.setSoTimeout(4000);var boot=d.start(0);boot.await(t->t.contains("READY"));var a=d.start(1);var b=d.start(2);
+            var rejected=new HashSet<String>();long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(6);
+            while(rejected.size()<2) {
+                assertTrue(System.nanoTime()<deadline,"Both configured peers must exercise the negative handshake");
+                try(var socket=rawPeer.accept()) {
+                    socket.setSoTimeout(2000);var hello=pt.uminho.esr.ott.protocol.MessageCodec.read(socket.getInputStream()).orElseThrow();
+                    assertEquals(2,hello.version());assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO,hello.type());
+                    var reply=new pt.uminho.esr.ott.protocol.ControlMessage(pt.uminho.esr.ott.protocol.MessageType.HELLO_OK,
+                        hello.requestId(),"N2",UUID.randomUUID(),new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1));
+                    byte[] negative=pt.uminho.esr.ott.protocol.MessageCodec.encode(reply);java.nio.ByteBuffer.wrap(negative).putInt(negative.length-4,0);
+                    socket.getOutputStream().write(negative);socket.getOutputStream().flush();rejected.add(hello.senderId());
+                }
+            }
+            assertEquals(Set.of("N0","N1"),rejected);
+            for(var child:List.of(a,b)) {
+                child.await(t->t.contains("REQUIRED_DISCOVERY_MISSING")&&t.contains("NeighborUp[")&&t.contains("DISCOVERY_CACHE_REJECTION"));
+                long replies=child.text().lines().filter(l->l.contains("NEIGHBORS ")).count();child.send("neighbors");
+                child.await(t->t.lines().filter(l->l.contains("NEIGHBORS ")).count()>replies&&t.contains("state=ACTIVE"));
+                assertEquals(1,child.text().lines().filter(l->l.contains("NeighborUp[")).count());
+                assertFalse(child.text().contains("FATAL"));assertTrue(child.process.isAlive());
+            }
+            var help=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",System.getProperty("java.class.path"),OttApplication.class.getName(),"--help")
+                    .redirectErrorStream(true).start();
+            try {assertTrue(help.waitFor(3,TimeUnit.SECONDS));assertEquals(0,help.exitValue());assertTrue(new String(help.getInputStream().readAllBytes(),StandardCharsets.UTF_8).contains("Usage:"));}
+            finally {if(help.isAlive()){help.destroyForcibly();assertTrue(help.waitFor(3,TimeUnit.SECONDS));}}
+            boot.send("quit");assertEquals(0,boot.exit());
+            for(var child:List.of(a,b)){long replies=child.text().lines().filter(l->l.contains("NEIGHBORS ")).count();child.send("neighbors");child.await(t->t.lines().filter(l->l.contains("NEIGHBORS ")).count()>replies);}
+            a.send("quit");b.send("quit");assertEquals(0,a.exit());assertEquals(0,b.exit());
+        }
     }
 
 }

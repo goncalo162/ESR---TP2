@@ -69,12 +69,12 @@ class NeighborManagerLifecycleTest {
             assertTrue(f.manager.awaitTermination(BUDGET));
         }
     }
-    @Test void l02OnlyConfirmedDirectSessionGetsV1Leave() {
+    @Test void l02OnlyConfirmedDirectSessionGetsV2Leave() {
         try (var f = new Fixture("A")) {
             var c = active(f); var session = f.manager.snapshot().get("B");
             var stage = shutdown(f, BUDGET); f.pump(); var report = result(stage);
             var leave = c.last(); assertEquals(MessageType.NODE_LEAVE, leave.type());
-            assertEquals(1, leave.version()); assertEquals("A", leave.senderId()); assertEquals(f.instance, leave.senderInstance());
+            assertEquals(2, leave.version()); assertEquals("A", leave.senderId()); assertEquals(f.instance, leave.senderInstance());
             assertNotEquals(ZERO, leave.requestId()); assertEquals(new ControlMessage.Leave(0), leave.payload());
             assertEquals(List.of(new NeighborManager.LeaveAttempt(session, NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED)), report.attempts());
             assertFalse(report.notificationTimedOut()); assertFalse(c.open);
@@ -241,7 +241,7 @@ class NeighborManagerLifecycleTest {
                 var c = new FakeChannel(); var remote = UUID.randomUUID();
                 f.io.sink.opened(c, f.clock.get()); f.pump();
                 f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), configured.nodeId(), remote,
-                    new ControlMessage.EndpointPayload(endpoint(configured.nodeId(), remote, configured.controlPort()))));
+                    new ControlMessage.Hello(endpoint(configured.nodeId(), remote, configured.controlPort()),1,1)));
                 c.flush = false; channels.add(c);
             }
             assertEquals(63, f.manager.snapshot().size());
@@ -264,7 +264,7 @@ class NeighborManagerLifecycleTest {
             assertTrue(result(stage).notificationTimedOut()); assertFalse(c.open);
         }
     }
-    @Test void l12RealTcpReceivesV1LeaveBeforeConnectionCloses() throws Exception {
+    @Test void l12RealTcpReceivesV2LeaveBeforeConnectionCloses() throws Exception {
         try (var d = new Deployment()) {
             var a = d.managers.getFirst(); a.start().toCompletableFuture().get(3, TimeUnit.SECONDS);
             var config = d.configs.get(1); var remote = UUID.randomUUID();
@@ -274,12 +274,12 @@ class NeighborManagerLifecycleTest {
                 socket.setSoTimeout(2500);
                 var ep = new ControlMessage.Endpoint("N1", remote, "127.0.0.1", config.controlPort(), config.dataPort(), NodeRole.RELAY);
                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "N1", remote,
-                    new ControlMessage.EndpointPayload(ep)), socket.getOutputStream()); socket.getOutputStream().flush();
+                    new ControlMessage.Hello(ep,1,1)), socket.getOutputStream()); socket.getOutputStream().flush();
                 assertEquals(MessageType.HELLO_OK, MessageCodec.read(socket.getInputStream()).orElseThrow().type());
                 until(() -> receiver.snapshot().containsKey("N1"));
                 var report = receiver.requestShutdown(1, BUDGET).toCompletableFuture().get(2, TimeUnit.SECONDS);
                 var leave = MessageCodec.read(socket.getInputStream()).orElseThrow();
-                assertEquals(1, leave.version()); assertEquals(MessageType.NODE_LEAVE, leave.type());
+                assertEquals(2, leave.version()); assertEquals(MessageType.NODE_LEAVE, leave.type());
                 assertEquals(new ControlMessage.Leave(1), leave.payload()); assertNotEquals(ZERO, leave.senderInstance());
                 assertTrue(MessageCodec.read(socket.getInputStream()).isEmpty());
                 assertTrue(report.attempts().stream().anyMatch(t -> t.session().nodeId().equals("N1") && t.outcome() == NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED));
@@ -325,6 +325,7 @@ class NeighborManagerLifecycleTest {
                     if (message.type() == MessageType.NODE_LEAVE) throw new RejectedExecutionException("controlled output overflow");
                     return delegate.sendAndFlush(message);
                 }
+                public Connection.ExtensionEnqueue trySendExtension(ControlMessage message){return delegate.trySendExtension(message);}
                 public void close() { delegate.close(); }
             };
             f.io.sink.opened(channel, f.clock.get()); f.io.dials.get(1).future().complete(channel); f.pump();
@@ -351,6 +352,19 @@ class NeighborManagerLifecycleTest {
             assertThrows(IllegalStateException.class, f.manager::close);
             assertEquals(List.of(Duration.ofMillis(100), Duration.ofMillis(40)), f.io.awaitBudgets);
             f.io.consumeMillis = 0;
+        }
+    }
+
+    @Test void D10DiscoveryArrivingDuringShutdownCannotCloseBeforeLeaveFlush() {
+        try(var f=new Fixture("A")) {
+            var channel=active(f);var session=f.manager.snapshot().get("B");var token=channel.writes.getFirst().requestId();
+            var shutdown=shutdown(f,BUDGET); // draining set, notification event still queued
+            f.io.sink.message(channel,new ControlMessage(MessageType.DISCOVERY_QUERY,UUID.randomUUID(),"B",session.instanceId(),
+                new pt.uminho.esr.ott.protocol.DiscoveryMessage.Query(token,"A",f.instance)),f.clock.get());
+            assertTrue(channel.open,"normal input after stopping admissions cannot preempt the leave writer");
+            f.pump();var report=result(shutdown);assertEquals(MessageType.NODE_LEAVE,channel.last().type());
+            assertEquals(NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED,report.attempts().getFirst().outcome());
+            assertFalse(channel.open);assertTrue(f.manager.awaitTermination(BUDGET));
         }
     }
 

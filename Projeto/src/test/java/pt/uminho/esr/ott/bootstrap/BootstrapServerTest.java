@@ -231,18 +231,22 @@ class BootstrapServerTest {
         }
     }
 
-    @Test void coreAllFifteenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
-        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok-min", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route");
+    @Test void coreAllSeventeenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
+        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route", "discovery-query", "discovery-snapshot");
         var seen = new java.util.HashSet<MessageType>();
         try (var rig = new Rig(configuration())) {
             for (var name : names) {
-                var m = MessageCodec.decode(java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/tcp-" + name + ".bin")));
+                var m = MessageCodec.decode(java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/v2/tcp-" + name + ".bin")));
                 var ch = rig.opened(); rig.core.message(ch, m); rig.events.drain();
-                assertError(ch, pt.uminho.esr.ott.protocol.ErrorCode.INVALID_MESSAGE, m.requestId());
-                assertEquals(m.type().code(), ((ControlMessage.ErrorPayload) ch.sent.getFirst().payload()).relatedType());
-                seen.add(m.type()); rig.finish(ch);
+                if(m.type()==MessageType.ERROR) { assertTrue(ch.sent.isEmpty());assertFalse(ch.open); }
+                else {
+                    assertError(ch, pt.uminho.esr.ott.protocol.ErrorCode.INVALID_MESSAGE, m.requestId());
+                    assertEquals(m.type().code(), ((ControlMessage.ErrorPayload) ch.sent.getFirst().payload()).relatedType());
+                    rig.finish(ch);
+                }
+                seen.add(m.type());
             }
-            assertEquals(15, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
+            assertEquals(17, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
         }
     }
 
@@ -419,10 +423,10 @@ class BootstrapServerTest {
     @Test void malformedFramesAndEarlyCloseDoNotKillBootstrapListener() throws Exception {
         var config = configuration();
         try (var service = new BootstrapServer(config, new InetSocketAddress("127.0.0.1", 0))) {
-            for (String name : java.util.List.of("invalid-type", "invalid-length-small", "invalid-utf8", "invalid-trailing-byte", "invalid-short-prefix")) {
+            for (String name : java.util.List.of("invalid-type", "invalid-length-small", "invalid-identity-utf8", "invalid-trailing-byte", "invalid-short-prefix", "invalid-version-1")) {
                 try (var peer = new Socket()) {
                     peer.connect(service.localAddress()); peer.setSoTimeout(3000);
-                    peer.getOutputStream().write(java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/tcp-" + name + ".bin")));
+                    peer.getOutputStream().write(java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/v2/tcp-" + name + ".bin")));
                     peer.getOutputStream().flush(); peer.shutdownOutput();
                     try { assertTrue(MessageCodec.read(peer.getInputStream()).isEmpty()); }
                     catch (java.net.SocketException reset) { /* Reset is also a closed malformed connection. */ }
@@ -449,4 +453,15 @@ class BootstrapServerTest {
         var address = idle.localAddress(); idle.close(); idle.close();
         try (var rebound = new java.net.ServerSocket()) { rebound.bind(address); assertTrue(rebound.isBound()); }
     }
+    @Test void D11bVersionOneAndErrorInputsNeverProduceRegistrationOrAnErrorLoop() throws Exception {
+        try(var rig=new Rig(configuration())) {
+            var ordinary=request(configuration(),"R1");
+            var v1=new ControlMessage(1,ordinary.type(),ordinary.requestId(),ordinary.senderId(),ordinary.senderInstance(),ordinary.payload());
+            var old=rig.opened();rig.core.message(old,v1);rig.events.drain();assertFalse(old.open);assertTrue(old.sent.isEmpty());
+            var error=new ControlMessage(MessageType.ERROR,UUID.randomUUID(),"R1",UUID.randomUUID(),new ControlMessage.ErrorPayload(pt.uminho.esr.ott.protocol.ErrorCode.INVALID_MESSAGE,1,"negative input"));
+            var incoming=rig.opened();rig.core.message(incoming,error);rig.events.drain();assertFalse(incoming.open);assertTrue(incoming.sent.isEmpty());
+            var valid=rig.opened();rig.core.message(valid,ordinary);rig.events.drain();assertEquals(2,valid.sent.getFirst().version());assertEquals(MessageType.REGISTER_OK,valid.sent.getFirst().type());rig.finish(valid);
+        }
+    }
+
 }

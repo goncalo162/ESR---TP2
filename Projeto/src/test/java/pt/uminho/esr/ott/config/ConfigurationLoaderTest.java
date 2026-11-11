@@ -529,6 +529,13 @@ class ConfigurationLoaderTest {
     @ParameterizedTest(name = "{0} / {1}")
     @org.junit.jupiter.params.provider.MethodSource("runtimeBoundaries")
     void runtimeScalarBoundariesRespectCrossRelations(RuntimeCase c, int value) throws Exception { // D03,D08
+        if(c.key().equals("control.queue.capacity") && value==1) {
+            hasKey(failure(runtimeProfile(NodeRole.SERVER,c.key()+"=1\n"),NodeRole.SERVER),c.key());
+            assertEquals(1,new RuntimeConfiguration.Control(java.time.Duration.ofMillis(1),java.time.Duration.ofMillis(1),1,1,java.time.Duration.ofMillis(1)).queueCapacity());
+            assertEquals(1,runtimeLoad(NodeRole.BOOTSTRAP,"control.queue.capacity=1\n").runtime().control().queueCapacity());
+            assertEquals(2,runtimeLoad(NodeRole.SERVER,"control.queue.capacity=2\n").runtime().control().queueCapacity());
+            return;
+        }
         var boundary = runtimeBoundary(c, value);
         if (boundary.relationError() != null) hasKey(failure(runtimeProfile(NodeRole.SERVER, boundary.properties()), NodeRole.SERVER), boundary.relationError());
         else {
@@ -783,4 +790,10 @@ class ConfigurationLoaderTest {
         }
         return write(temp.resolve("runtime-" + role + ".properties"), body + properties);
     }
+    @Test void D01JointPreflightRejectsDegreeBeyondPhysicalConnectionCapacity() throws Exception {
+        Path dir=copyExamples();Files.writeString(dir.resolve("relay.properties"),"control.max.connections=1\n",StandardCharsets.UTF_8,java.nio.file.StandardOpenOption.APPEND);
+        var error=assertThrows(ConfigurationException.class,()->ConfigurationLoader.loadDeployment(examplePaths(dir)));
+        hasKey(error,"control.max.connections");
+    }
+
 }

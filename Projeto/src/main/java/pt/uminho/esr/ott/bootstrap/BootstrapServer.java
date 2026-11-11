@@ -482,6 +482,9 @@ public final class BootstrapServer implements AutoCloseable
                 if(context.responding) 
                     return;
 
+                if(message.version()!=pt.uminho.esr.ott.protocol.MessageCodec.VERSION) { finish(context);return; }
+                // ERROR is not a bootstrap request and must never generate an ERROR loop.
+                if(message.type()==MessageType.ERROR) { finish(context);return; }
                 ControlMessage.Payload response;
                 MessageType type;
 

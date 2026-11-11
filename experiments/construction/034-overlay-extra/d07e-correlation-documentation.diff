@@ -1,0 +1,178 @@
+diff --git a/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+--- a/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
++++ b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+@@ -10,6 +10,9 @@
+ de Design/ADR-034/29 caminhos/migração registada em 2026-11-11T17:55:50Z;
+ ADR-034 Aceite e G-EXTRA-ADR satisfeito só para IMP-034. Base Git integrada:
+ 17c1ca27673930bfbf82078522059a243d96ccdb, ramo Denji. Sem commits/push.
++
++**Correção D07e posterior:** a versão atual passou 142 testes incrementais afetados;
++os 1062 abaixo são a execução anterior. Ver a secção final desta revisão.
+ 
+ Todo o controlo TCP agora usa v2: bootstrap, handshake, mensagens normais e
+ aprendizagem. Um ControlMessage/MessageCodec operacional, 18 tipos explícitos
+@@ -115,7 +118,7 @@
+ shutdown-12 e o conjunto final validam a correção sem relaxar o oráculo.
+ red-13 regista duas falhas reais: grau/C no preflight e ERROR recebido no bootstrap.
+ 
+-**Última execução incremental:** [resultado/hashes](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14-result.json),
++**Execução incremental da primeira apresentação (histórica):** [resultado/hashes](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14-result.json),
+ 1062 testes, zero falhas/erros/skips; dez relatórios Surefire da própria invocação.
+ [Inventário dos logs da CLI](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14-cli-inventory.json)
+ preserva 109 ficheiros gerados nessa janela, separados de target/. Não somar
+@@ -141,7 +144,7 @@
+   50 referências independentes e arquivo de 45 originais; os hashes históricos
+   de planning-source-manifest.files não foram reescritos para simular aprovação.
+ 
+-O código/testes/configuração/fixtures finais são os mesmos da invocação 14;
++Na primeira apresentação, código/testes/configuração/fixtures eram os mesmos da invocação 14;
+ README/protocolos locais foram atualizados depois, sem alteração executável.
+ O JAR histórico validado continua preservado, não é um novo JAR v2 nem prova
+ desta versão. O diff fonte inclui ficheiros novos/não rastreados e binários;
+@@ -155,3 +158,55 @@
+ continua parcial (D12/manual/regressão atual); recolher evidência nova na etapa
+ Test. Revisão humana final e integração antes de DONE. IMP-035 mantém aprovação
+ própria de intenção/admissão/reparação; a cache disponível não é reparação feita.
++
++## Correção D07e — correlação antiga na ligação atual
++
++Registo de 2026-11-11T19:18:38Z. Revisão humana pediu duas correções antes de aprovar Implement.
++Não muda o Design/ADR: aplica as regras já aprovadas de identidade antes de
++correlação e descarte de token/geração antigos sem afetar a consulta atual.
++
++- NeighborDiscovery.identity agora verifica sender/recipient e instâncias,
++  separadamente do token HELLO. Identidade incompatível continua terminal.
++  Token antigo na sessão atual retorna descarte tratado, em QUERY/SNAPSHOT válidas
++  e em RejectedExtraContent; só o diagnóstico STALE é atualizado. Não fecha o
++  controlo nem altera query, ritmos/cooldown, cache, watermark ou TTL.
++- Geração <= watermark só regista STALE e retorna, antes de avaliar o prazo
++  dessa mensagem. A consulta mantém o prazo original e pode receber a resposta
++  válida posterior; os mecanismos normais de timeout continuam ativos.
++- Três testes novos determinísticos em NeighborManagerTest cobrem quatro formas
++  de token antigo, geração inferior/igual e oito negativos de sender/recipient.
++  Os dois testes positivos reproduziram as falhas antes da correção. Confirmam
++  cache/proveniência intactas após o descarte, aceitação de geração 5 no mesmo
++  requestId, origem exata do TTL na consulta original, refresh sem cooldown,
++  mesmo connectionId, uma única NeighborUp, zero NeighborDown e nenhum dial novo.
++  QUERY antiga/rejeitada não impede a resposta à QUERY legítima seguinte.
++  Nenhum método de teste anterior foi removido ou enfraquecido.
++
++Execuções novas, preservando integralmente os relatórios anteriores:
++
++| Evidência | Resultado real |
++|---|---|
++| [red-01](../../../experiments/construction/034-overlay-extra/d07e-correlation-red-01.log) | 3 testes, 2 falhas: canal fechado pelo token e resposta válida ignorada após geração antiga; negativo de identidade passou. |
++| [green-02](../../../experiments/construction/034-overlay-extra/d07e-correlation-green-02.log) | 3 testes novos passaram após a correção. |
++| [incremental-03](../../../experiments/construction/034-overlay-extra/d07e-correlation-incremental-03.log) | 142 testes, zero falhas, cinco erros de sockets proibidos na sandbox; preservado como execução incompleta. |
++| [incremental-04](../../../experiments/construction/034-overlay-extra/d07e-correlation-incremental-04.log) | 142 testes, zero falhas/erros/skips, JDK 21 e TCP local autorizado. |
++
++[Resultado, XML executados e hashes](../../../experiments/construction/034-overlay-extra/d07e-correlation-incremental-04-result.json).
++A seleção atual inclui NeighborManagerTest (54), NeighborDiscoveryTest (20),
++NeighborManagerLifecycleTest (33), CandidateCacheTest (9) e DiscoveryCodecTest (26).
++Não somar estes 142 aos 1062 anteriores para alegar uma regressão completa atual.
++
++[Diff exclusivo da correção](../../../experiments/construction/034-overlay-extra/d07e-correlation-correction.diff),
++[numstat](../../../experiments/construction/034-overlay-extra/d07e-correlation-correction.numstat),
++[diff atual de Projeto contra HEAD](../../../experiments/construction/034-overlay-extra/d07e-correlation-project-vs-head.diff),
++[V-ADD atual](../../../experiments/construction/034-overlay-extra/d07e-correlation-v-add.log) e
++[conferência final](../../../experiments/construction/034-overlay-extra/d07e-correlation-validation.json).
++Só dois ficheiros Java mudaram desde a revisão anterior: NeighborDiscovery.java
++(identidade/descarte) e NeighborManagerTest.java (helpers/três testes novos).
++Bytes/fixtures/configuração/POM/UDP e JAR histórico permanecem intactos. Os 595
++ficheiros de evidência já presentes à entrada desta correção foram preservados
++por hash. target/ fica excluído dos diffs fonte.
++
++Implement volta a revisão, sem avanço a Test, clean verify, manual, fecho,
++commits/push ou IMP-035. Continuam necessários regressão completa atual,
++manual humano antes da aprovação de Test, revisão final e integração.
+diff --git a/memory-bank/bolts/034-overlay-extra/bolt.md b/memory-bank/bolts/034-overlay-extra/bolt.md
+--- a/memory-bank/bolts/034-overlay-extra/bolt.md
++++ b/memory-bank/bolts/034-overlay-extra/bolt.md
+@@ -6,7 +6,7 @@
+ status: "in-progress"
+ stories: ["006-reconstruir-vizinhancas-apos-falhas"]
+ created: "2026-11-11T12:11:34Z"
+-updated: "2026-11-11T19:06:59Z"
++updated: "2026-11-11T19:18:38Z"
+ started: "2026-11-11T12:11:34Z"
+ completed: null
+ current_stage: "implement"
+@@ -166,3 +166,14 @@
+ Implement ainda aguarda revisão; current_stage permanece implement e Test não
+ foi iniciado. clean verify, manual, revisão humana final e integração pendentes;
+ sem DONE/commits/push. IMP-035 não iniciado.
++
++## Checkpoint atual — correção D07e para revisão de Implement
++
++Registo de 2026-11-11T19:18:38Z. Token HELLO antigo e geração antiga são descartados
++sem fechar a sessão nem terminar a consulta atual; identidade incompatível
++continua terminal. Três testes novos reproduziram e verificaram as correções.
++142 testes incrementais afetados passaram com JDK 21/TCP local. Os 1062 da
++apresentação anterior permanecem evidência histórica, sem alegar nova regressão
++completa. [Walkthrough atualizado](implementation-walkthrough.md).
++Implement aguarda aprovação; Test, clean verify, manual humano, revisão final
++e integração pendentes. Sem commits/push, DONE ou início de IMP-035.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -693,3 +693,12 @@
+ Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+ verify/regressão atual, manual reproduzido, revisão final e integração continuam
+ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
++
++## IMP-034 — correção de correlação D07e
++
++Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
++e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
++incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
++anterior ficam como histórico. [Walkthrough, red/green e evidência](../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
++Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
++continuam pendentes; sem DONE, commits/push ou início de IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -682,3 +682,12 @@
+ Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+ verify/regressão atual, manual reproduzido, revisão final e integração continuam
+ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
++
++## IMP-034 — revisão de Implement após D07e
++
++Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
++e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
++incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
++anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
++Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
++continuam pendentes; sem DONE, commits/push ou início de IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -309,3 +309,12 @@
+ com JDK 21, TCP local e CLI reais. [Walkthrough e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+ Test não iniciado: clean verify, manual, revisão final e integração pendentes.
+ Unidade e história in-progress; sem DONE/commits/push. IMP-035 não iniciado.
++
++## Estado atual — Implement revisto após D07e
++
++Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
++e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
++incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
++anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
++Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
++continuam pendentes; sem DONE, commits/push ou início de IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+@@ -50,3 +50,12 @@
+ 1062 testes incrementais aprovados; V-033 de fecho ainda parcial.
+ Test, clean verify, manual, revisão final e integração pendentes; sem DONE,
+ commits/push ou início de IMP-035. Os critérios acima aguardam validação final.
++
++## Estado atual — correção D07e para revisão
++
++Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
++e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
++incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
++anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
++Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
++continuam pendentes; sem DONE, commits/push ou início de IMP-035.

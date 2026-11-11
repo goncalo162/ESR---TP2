@@ -117,7 +117,7 @@ class TransportTest {
         try (var transport = new Transport(ephemeral(), events); var raw = new Socket()) {
             raw.connect(transport.localAddress()); Connection c = take(events.opened);
             byte[] frame;
-            try (var resource = getClass().getResourceAsStream("/protocol/tcp-probe-ping.bin")) {
+            try (var resource = getClass().getResourceAsStream("/protocol/v2/tcp-probe-ping.bin")) {
                 assertNotNull(resource); frame = resource.readAllBytes();
             }
             var output = raw.getOutputStream();
@@ -577,7 +577,7 @@ class TransportTest {
         var events = new Events();
         try (var transport = new Transport(ephemeral(), events); var peer = new Socket()) {
             peer.connect(transport.localAddress()); peer.setSoTimeout(3000); Connection c = take(events.opened);
-            var bad = confirmed(c, new ControlMessage(2, MessageType.PROBE_PING, UUID.randomUUID(), "N",
+            var bad = confirmed(c, new ControlMessage(1, MessageType.PROBE_PING, UUID.randomUUID(), "N",
                     UUID.randomUUID(), new ControlMessage.Probe(1)));
             var error = assertThrows(java.util.concurrent.ExecutionException.class, () -> bad.get(3, TimeUnit.SECONDS));
             assertInstanceOf(pt.uminho.esr.ott.protocol.ProtocolException.class, error.getCause()); assertTrue(c.isOpen());
@@ -687,4 +687,122 @@ class TransportTest {
             } finally { release.complete(null); driver.released.countDown(); }
         }
     }
+
+
+    private static ControlMessage extraQuery(int id) {
+        return new ControlMessage(MessageType.DISCOVERY_QUERY,new UUID(7,id),"A",new UUID(1,2),
+                new pt.uminho.esr.ott.protocol.DiscoveryMessage.Query(new UUID(3,4),"B",new UUID(5,6)));
+    }
+    @Test void D08_Q2MarginAndTakePublicationWindowPreserveCommonFifo() throws Exception {
+        var taken=new CountDownLatch(1);var release=new CountDownLatch(1);var first=new java.util.concurrent.atomic.AtomicBoolean(true);
+        var events=new Events();var remote=new Events();
+        Connection.WriteDriverFactory driver=socket->new Connection.WriteDriver(){
+            public void dequeued() throws IOException {
+                if(first.getAndSet(false)){taken.countDown();try{assertTrue(release.await(3,TimeUnit.SECONDS));}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException(e);}}
+            }
+            public void write(byte[] frame)throws IOException{socket.getOutputStream().write(frame);}
+            public void flush()throws IOException{socket.getOutputStream().flush();}
+        };
+        var options=new Transport.Options(2,4,WAIT,WAIT);
+        try(var sender=new Transport(ephemeral(),events,options,driver);var receiver=new Transport(ephemeral(),remote)) {
+            try {
+                var c=sender.connect(receiver.localAddress()).get(3,TimeUnit.SECONDS);take(events.opened);take(remote.opened);
+                var extra=c.trySendExtension(extraQuery(1));assertEquals(Connection.ExtensionStatus.ACCEPTED,extra.status());assertTrue(taken.await(3,TimeUnit.SECONDS));
+                assertEquals(0,c.queuedMessages());assertEquals(1,sender.extraWritesInProgress());
+                assertEquals(Connection.ExtensionStatus.BACKPRESSURED,c.trySendExtension(extraQuery(2)).status(),"taken extra still owns queued quota");
+                assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(2)));assertEquals(1,c.queuedMessages());
+                var copy=extra.written().toCompletableFuture();assertTrue(copy.cancel(true));assertEquals(1,sender.extraWritesInProgress());
+                release.countDown();extra.written().toCompletableFuture().get(3,TimeUnit.SECONDS);
+                assertEquals(extraQuery(1),take(remote.messages).message());assertEquals(ping(2),take(remote.messages).message());
+                eventually(()->sender.extraWritesInProgress()==0);assertTrue(c.isOpen());assertTrue(remote.closed.isEmpty());
+            }finally{release.countDown();}
+        }
+    }
+    @Test void D08_lastFreeSlotIsNeverTakenByExtraAndQ1GenericRemainsUsable() throws Exception {
+        for(int capacity:new int[]{1,2,3,256}) {
+            var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var events=new Events();
+            Connection.WriteDriverFactory driver=socket->new Connection.WriteDriver(){
+                public void write(byte[] frame)throws IOException{entered.countDown();try{release.await();}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException(e);}socket.getOutputStream().write(frame);}
+                public void flush()throws IOException{socket.getOutputStream().flush();}
+            };
+            try(var transport=new Transport(ephemeral(),events,new Transport.Options(capacity,2,WAIT,WAIT),driver);var raw=new Socket()) {
+                try {
+                    raw.connect(transport.localAddress());var c=take(events.opened);assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(1)));assertTrue(entered.await(3,TimeUnit.SECONDS));
+                    for(int n=0;n<capacity-1;n++)assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(n+2)));
+                    assertEquals(Connection.ExtensionStatus.BACKPRESSURED,c.trySendExtension(extraQuery(1)).status());assertTrue(c.isOpen());assertEquals(0,transport.extraWritesInProgress());
+                    assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(999))); // normal traffic can use its reserved position
+                    assertEquals(Connection.SendResult.INVALID_MESSAGE,c.send(extraQuery(2)),"ordinary API cannot bypass extra admission");
+                    release.countDown();
+                }finally{release.countDown();}
+            }
+        }
+    }
+    @Test void D10_fourPhysicalTicketsSurviveLogicalCancellationAndShutdownUntilWritersTerminate() throws Exception {
+        var entered=new CountDownLatch(2);var release=new CountDownLatch(1);var events=new Events();
+        Connection.WriteDriverFactory driver=socket->new Connection.WriteDriver(){
+            public void write(byte[] frame)throws IOException{socket.getOutputStream().write(frame);}
+            public void flush()throws IOException{
+                entered.countDown();boolean interrupted=false;
+                for(;;)try{release.await();break;}catch(InterruptedException e){interrupted=true;}
+                if(interrupted)Thread.currentThread().interrupt();socket.getOutputStream().flush();
+            }
+        };
+        var sender=new Transport(ephemeral(),events,new Transport.Options(3,8,WAIT,WAIT),driver);
+        try(var receiver=new Transport(ephemeral(),new Events())) {
+            try {
+                var a=sender.connect(receiver.localAddress()).get(3,TimeUnit.SECONDS);take(events.opened);
+                var b=sender.connect(receiver.localAddress()).get(3,TimeUnit.SECONDS);take(events.opened);
+                var first=a.trySendExtension(extraQuery(1));var second=b.trySendExtension(extraQuery(2));assertTrue(entered.await(3,TimeUnit.SECONDS));
+                var third=a.trySendExtension(extraQuery(3));var fourth=b.trySendExtension(extraQuery(4));
+                for(var w:java.util.List.of(first,second,third,fourth))assertEquals(Connection.ExtensionStatus.ACCEPTED,w.status());
+                assertEquals(4,sender.extraWritesInProgress());first.written().toCompletableFuture().cancel(true);
+                assertEquals(Connection.ExtensionStatus.BACKPRESSURED,a.trySendExtension(extraQuery(5)).status());assertTrue(a.isOpen());
+                sender.requestClose();assertFalse(sender.awaitTermination(Duration.ofMillis(20)));assertEquals(4,sender.extraWritesInProgress());
+                assertFalse(first.written().toCompletableFuture().isDone());release.countDown();assertTrue(sender.awaitTermination(WAIT));
+                assertEquals(0,sender.extraWritesInProgress());assertEquals(0,sender.connectionCount());
+                for(var w:java.util.List.of(first,second,third,fourth))assertTrue(w.written().toCompletableFuture().isCompletedExceptionally());
+            }finally{release.countDown();}
+        }finally{release.countDown();sender.close();}
+    }
+    @Test void D07_typedContentRejectionKeepsReaderAndFollowingV2FramesInOrder() throws Exception {
+        var rejections=new LinkedBlockingQueue<pt.uminho.esr.ott.protocol.MessageCodec.RejectedExtraContent>();
+        var events=new Events(){
+            public void rejectedExtraContent(Connection c,pt.uminho.esr.ott.protocol.MessageCodec.RejectedExtraContent rejection){
+                assertEquals("S1",rejection.envelope().senderId());assertEquals("C",rejection.envelope().recipientId());rejections.add(rejection);
+            }
+        };
+        try(var receiver=new Transport(ephemeral(),events);var raw=new Socket()) {
+            raw.connect(receiver.localAddress());var c=take(events.opened);
+            try(var bad=getClass().getResourceAsStream("/protocol/v2/tcp-snapshot-duplicate.bin")){assertNotNull(bad);raw.getOutputStream().write(bad.readAllBytes());}
+            raw.getOutputStream().write(pt.uminho.esr.ott.protocol.MessageCodec.encode(ping(10)));raw.getOutputStream().flush();
+            assertEquals(pt.uminho.esr.ott.protocol.MessageType.DISCOVERY_SNAPSHOT,take(rejections).envelope().type());
+            assertEquals(ping(10),take(events.messages).message());assertTrue(c.isOpen());assertTrue(events.closed.isEmpty());
+        }
+    }
+    @Test void D08_concurrentNormalAndExtraProducersCannotConsumeMarginFromStaleObservation() throws Exception {
+        for(int capacity:new int[]{2,3,256}) {
+            var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var ready=new CountDownLatch(2);var start=new CountDownLatch(1);var events=new Events();
+            Connection.WriteDriverFactory driver=socket->new Connection.WriteDriver(){
+                public void write(byte[] frame)throws IOException{entered.countDown();try{release.await();}catch(InterruptedException error){Thread.currentThread().interrupt();throw new IOException(error);}socket.getOutputStream().write(frame);}
+                public void flush()throws IOException{socket.getOutputStream().flush();}
+            };
+            try(var transport=new Transport(ephemeral(),events,new Transport.Options(capacity,2,WAIT,WAIT),driver);var raw=new Socket();var producers=Executors.newVirtualThreadPerTaskExecutor()) {
+                try {
+                    raw.connect(transport.localAddress());raw.setSoTimeout(3000);var c=take(events.opened);assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(1)));assertTrue(entered.await(3,TimeUnit.SECONDS));
+                    for(int n=0;n<capacity-2;n++)assertEquals(Connection.SendResult.ACCEPTED,c.send(ping(n+10)));
+                    var extra=producers.submit(()->{ready.countDown();start.await();return c.trySendExtension(extraQuery(99));});
+                    var normal=producers.submit(()->{ready.countDown();start.await();return c.send(ping(999));});
+                    assertTrue(ready.await(3,TimeUnit.SECONDS));start.countDown();var extraResult=extra.get(3,TimeUnit.SECONDS);
+                    assertEquals(Connection.SendResult.ACCEPTED,normal.get(3,TimeUnit.SECONDS));
+                    assertTrue(extraResult.status()==Connection.ExtensionStatus.ACCEPTED||extraResult.status()==Connection.ExtensionStatus.BACKPRESSURED);
+                    boolean admitted=extraResult.status()==Connection.ExtensionStatus.ACCEPTED;
+                    assertEquals(admitted?capacity:capacity-1,c.queuedMessages());assertTrue(c.isOpen());release.countDown();
+                    var frames=new ArrayList<ControlMessage>();for(int n=0;n<capacity+(admitted?1:0);n++)frames.add(pt.uminho.esr.ott.protocol.MessageCodec.read(raw.getInputStream()).orElseThrow());
+                    assertEquals(ping(1),frames.getFirst());assertEquals(admitted?1:0,frames.stream().filter(m->m.type()==MessageType.DISCOVERY_QUERY).count());assertTrue(frames.contains(ping(999)));
+                    eventually(()->transport.extraWritesInProgress()==0);
+                }finally{start.countDown();release.countDown();}
+            }
+        }
+    }
+
 }

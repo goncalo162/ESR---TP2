@@ -78,6 +78,15 @@ class NeighborManagerTest {
             writes.add(m); var f = new CompletableFuture<Void>(); confirmations.add(f);
             if (flush) f.complete(null); return f;
         }
+        final List<ControlMessage> extraWrites=new ArrayList<>();
+        final List<CompletableFuture<Void>> extraConfirmations=new ArrayList<>();
+        boolean extraBackpressure;
+        public Connection.ExtensionEnqueue trySendExtension(ControlMessage message) {
+            if(!open)return Connection.refused(Connection.ExtensionStatus.CLOSED);
+            if(extraBackpressure)return Connection.refused(Connection.ExtensionStatus.BACKPRESSURED);
+            extraWrites.add(message);var f=new CompletableFuture<Void>();extraConfirmations.add(f);
+            if(flush)f.complete(null);return new Connection.ExtensionEnqueue(Connection.ExtensionStatus.ACCEPTED,f.minimalCompletionStage());
+        }
         public void close() { open = false; }
         ControlMessage last() { return writes.getLast(); }
         void written() { confirmations.getLast().complete(null); }
@@ -85,19 +94,27 @@ class NeighborManagerTest {
     static final class FakeTimers implements NeighborManager.Deadlines {
         record Task(long began, long delay, Runnable action) {}
         final AtomicLong clock; final List<Task> tasks = new ArrayList<>();
+        static final class Repeating {long at;final long interval;final Runnable task;Repeating(long at,long interval,Runnable task){this.at=at;this.interval=interval;this.task=task;} }
+        final List<Repeating> periodic=new ArrayList<>();
         int limit, peak; boolean stopped;
+        public NeighborManager.Ticket periodic(Runnable task,long nanos) {
+            if(stopped||tasks.size()+periodic.size()>=limit)throw new RejectedExecutionException("Physical timer capacity");
+            var item=new Repeating(clock.get(),nanos,task);periodic.add(item);peak=Math.max(peak,tasks.size()+periodic.size());
+            return ()->periodic.remove(item);
+        }
         FakeTimers(AtomicLong clock) { this.clock = clock; }
         public void limit(int n) { limit = n; }
         public NeighborManager.Ticket schedule(Runnable r, long delay) {
-            if (stopped || tasks.size() >= limit) throw new RejectedExecutionException("Physical timer capacity");
-            var t = new Task(clock.get(), delay, r); tasks.add(t); peak = Math.max(peak, tasks.size());
+            if (stopped || tasks.size()+periodic.size() >= limit) throw new RejectedExecutionException("Physical timer capacity");
+            var t = new Task(clock.get(), delay, r); tasks.add(t); peak = Math.max(peak, tasks.size()+periodic.size());
             return () -> tasks.remove(t);
         }
         void advance(long nanos) {
             clock.addAndGet(nanos);
+            for(var repeat:List.copyOf(periodic))if(clock.get()-repeat.at>=repeat.interval){repeat.at=clock.get();repeat.task.run();}
             for (var t : List.copyOf(tasks)) if (clock.get() - t.began >= t.delay) { tasks.remove(t); t.action.run(); }
         }
-        public void requestClose() { stopped = true; tasks.clear(); }
+        public void requestClose() { stopped = true; tasks.clear();periodic.clear(); }
         public boolean awaitTermination(Duration d) { return stopped; }
     }
     static final class FakeIo implements NeighborManager.IoServices, NeighborManager.Resolver, NeighborManager.Network {
@@ -172,12 +189,12 @@ class NeighborManagerTest {
             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); io.dials.get(1).future.complete(c); pump(); return c;
         }
         void ok(FakeChannel c, UUID remote) {
-            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, ControlMessage.Empty.INSTANCE));
+            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, new ControlMessage.HelloOk(1)));
         }
         FakeChannel inbound(String id, UUID remote, boolean flush) {
             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); pump();
             message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), id, remote,
-                    new ControlMessage.EndpointPayload(endpoint(id, remote, 19002)))); return c;
+                    new ControlMessage.Hello(endpoint(id, remote, 19002),1,1))); return c;
         }
         long ups() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborUp).count(); }
         long downs() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborDown).count(); }
@@ -303,7 +320,7 @@ class NeighborManagerTest {
     @Test void d14ForgedHelloBeforeDialResultCannotBecomeInbound() {
         try (var f = new Fixture("A")) {
             f.ready("B"); var c = new FakeChannel(); f.io.sink.opened(c, f.clock.get());
-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.EndpointPayload(endpoint("B", UUID.randomUUID(), 19002))));
+            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.Hello(endpoint("B", UUID.randomUUID(), 19002),1,1)));
             assertTrue(c.writes.isEmpty()); assertEquals(0, f.ups());
             f.io.dials.get(1).future.complete(c); f.pump(); assertFalse(c.open); assertEquals(0, f.ups());
         }
@@ -421,7 +438,7 @@ class NeighborManagerTest {
             try (var bad = new Socket("127.0.0.1", d.configs.get(0).controlPort())) {
                 bad.setSoTimeout(2000); var remote = UUID.randomUUID();
                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "UNKNOWN", remote,
-                        new ControlMessage.EndpointPayload(endpoint("UNKNOWN", remote, 18002))), bad.getOutputStream());
+                        new ControlMessage.Hello(endpoint("UNKNOWN", remote, 18002),1,1)), bad.getOutputStream());
                 bad.getOutputStream().flush(); var reply = MessageCodec.read(bad.getInputStream()).orElseThrow();
                 assertEquals(MessageType.ERROR, reply.type());
                 assertEquals(ErrorCode.UNAUTHORIZED_NEIGHBOR, ((ControlMessage.ErrorPayload)reply.payload()).code());
@@ -469,7 +486,7 @@ class NeighborManagerTest {
                 default -> endpoint("B", ZERO, 19002);
             };
             f.io.sink.opened(c, f.clock.get()); f.pump();
-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.EndpointPayload(ep)));
+            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.Hello(ep,1,1)));
             assertEquals(0, f.ups()); assertFalse(c.open); assertEquals(2, f.io.resolved.size(), "No DNS from remote HELLO");
         }
         try (var f = new Fixture("A")) {
@@ -613,16 +630,18 @@ class NeighborManagerTest {
     }
     @Test void d20SmallerRuntimeCapsReachTransportAndHandshakeRetention() {
         var r = RuntimeConfiguration.defaults();
-        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(Duration.ofMillis(31), Duration.ofMillis(97), 2, 1, Duration.ofMillis(53)),
+        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(Duration.ofMillis(31), Duration.ofMillis(97), 2, 2, Duration.ofMillis(53)),
                 new RuntimeConfiguration.Overlay(Duration.ofMillis(71), Duration.ofMillis(11), Duration.ofMillis(47), 0, 8),
                 r.monitoring(), r.routing(), r.subscription(), r.video(), r.source());
         try (var f = new Fixture(runtimeConfig(runtime), true)) {
-            f.ready("B"); assertEquals(1, f.io.options.queueCapacity()); assertEquals(2, f.io.options.maxConnections());
+            f.ready("B"); assertEquals(2, f.io.options.queueCapacity()); assertEquals(2, f.io.options.maxConnections());
             assertEquals(Duration.ofMillis(31), f.io.options.connectTimeout()); assertEquals(Duration.ofMillis(97), f.io.options.shutdownTimeout());
             var c = f.outbound(false); var remote = UUID.randomUUID(); f.ok(c, remote);
             f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(1)));
             assertTrue(c.open);
             f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(2)));
+            assertTrue(c.open);
+            f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), "B", remote, new ControlMessage.Probe(3)));
             assertFalse(c.open); assertEquals(0, f.ups()); assertEquals(11, f.manager.diagnostics().get("B").retryDelayMillis());
         }
     }
@@ -688,8 +707,8 @@ class NeighborManagerTest {
             for (int i = 0; i < 3; i++) {
                 var c = new FakeChannel(); c.flush = false; candidates.add(c); var ep = desired.get(i); var remote = UUID.randomUUID();
                 f.io.sink.opened(c, f.clock.get()); f.pump();
-                f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.EndpointPayload(
-                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()))));
+                f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Hello(
+                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()),1,1)));
                 for (int n = 0; n < 3; n++) f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Probe(n)));
             }
             assertFalse(candidates.get(2).open); // Nine frames exceed R=8 while B=4 was not exceeded.
@@ -723,7 +742,7 @@ class NeighborManagerTest {
             f.ready("B"); var c = f.outbound(true);
             f.message(c, new ControlMessage(MessageType.HELLO_OK, kind == 0 ? UUID.randomUUID() : c.last().requestId(),
                     kind == 1 ? "WRONG" : "B", kind == 2 ? ZERO : UUID.randomUUID(),
-                    kind == 3 ? new ControlMessage.Probe(1) : ControlMessage.Empty.INSTANCE));
+                    kind == 3 ? new ControlMessage.Probe(1) : new ControlMessage.HelloOk(1)));
             assertFalse(c.open); assertEquals(0, f.ups()); assertTrue(f.manager.snapshot().isEmpty());
         }
     }
@@ -756,4 +775,147 @@ class NeighborManagerTest {
             assertTrue(f.manager.snapshot().isEmpty()); assertFalse(c.open); assertTrue(f.io.stopped); assertTrue(f.timers.stopped);
         }
     }
+    @Test void D11aBadPeerDoesNotStopHealthySessionOrCandidateLearning() throws Exception {
+        try(var f=new Fixture("Z")) {
+            var boot=f.discovery();f.message(boot,new ControlMessage(MessageType.REGISTER_OK,boot.last().requestId(),"BOOT",UUID.randomUUID(),
+                new ControlMessage.NeighborList(List.of(endpoint("A",ZERO,19002),endpoint("B",ZERO,19003)))));
+            var remote=UUID.randomUUID();var healthy=f.inbound("A",remote,true);var healthySession=f.manager.snapshot().get("A");
+            var bad=new FakeChannel();f.io.sink.opened(bad,f.clock.get());f.pump();var rejectedInstance=UUID.randomUUID();
+            f.message(bad,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",rejectedInstance,new ControlMessage.Hello(endpoint("B",rejectedInstance,19003),1,0)));
+            assertFalse(bad.open);assertEquals(healthySession,f.manager.snapshot().get("A"));assertEquals(1,f.ups());assertEquals(0,f.downs());
+            assertEquals(NeighborManager.CapabilityState.INCOMPATIBLE,f.manager.discoveryStatus().get("B").state());
+            assertFalse(f.owner.stopped);assertFalse(f.manager.start().toCompletableFuture().isCompletedExceptionally());
+            f.timers.advance(100_000_000L);f.pump();var query=healthy.extraWrites.getLast();var payload=(DiscoveryMessage.Query)query.payload();
+            f.message(healthy,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),"A",remote,
+                new DiscoveryMessage.Snapshot(payload.helloRequestId(),"Z",f.instance,1,List.of(endpoint("S",UUID.randomUUID(),18000)))));
+            var view=f.manager.candidates();f.pump();assertEquals("S",view.toCompletableFuture().get().getFirst().nodeId());
+            var fresh=new FakeChannel();f.io.sink.opened(fresh,f.clock.get());f.pump();var freshInstance=UUID.randomUUID();
+            f.message(fresh,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",freshInstance,new ControlMessage.Hello(endpoint("B",freshInstance,19003),1,1)));
+            assertEquals(2,f.ups());var b=f.manager.snapshot().get("B");
+            var old=new MessageCodec.ExtraEnvelope(2,MessageType.DISCOVERY_SNAPSHOT,UUID.randomUUID(),"B",rejectedInstance,UUID.randomUUID(),"Z",f.instance);
+            f.io.sink.rejected(bad,new MessageCodec.RejectedExtraContent(old,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
+            assertEquals(b,f.manager.snapshot().get("B"));assertEquals(healthySession,f.manager.snapshot().get("A"));assertEquals(0,f.downs());
+            assertEquals(NeighborManager.CapabilityState.ACTIVE_DISCOVERY,f.manager.discoveryStatus().get("B").state());
+        }
+    }
+    @Test void D02cConfirmedRejectionSurvivesTemporaryAbsenceAndBackoffThenValidRetry() throws Exception {
+        try(var f=new Fixture("A")) {
+            f.ready("B");var rejected=f.outbound(true);var remote=UUID.randomUUID();
+            f.message(rejected,new ControlMessage(MessageType.HELLO_OK,rejected.last().requestId(),"B",remote,new ControlMessage.HelloOk(0)));
+            var status=f.manager.discoveryStatus().get("B");assertEquals(NeighborManager.CapabilityState.INCOMPATIBLE,status.state());assertEquals(500,status.retryDelayMillis());
+            assertEquals(Optional.of(NeighborManager.Reason.REQUIRED_DISCOVERY_MISSING),status.lastConfirmedRejection());
+            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(500));f.pump();f.io.dials.getLast().future.completeExceptionally(new java.io.IOException("temporarily absent"));f.pump();
+            status=f.manager.discoveryStatus().get("B");assertEquals(NeighborManager.CapabilityState.TEMPORARILY_UNAVAILABLE,status.state());
+            assertEquals(Optional.of(NeighborManager.Reason.REQUIRED_DISCOVERY_MISSING),status.lastConfirmedRejection());assertEquals(1000,status.retryDelayMillis());
+            f.timers.advance(TimeUnit.MILLISECONDS.toNanos(1000));f.pump();var fresh=f.connect(f.io.dials.size()-1,true);f.ok(fresh,UUID.randomUUID());
+            assertEquals(NeighborManager.CapabilityState.ACTIVE_DISCOVERY,f.manager.discoveryStatus().get("B").state());assertEquals(0,f.manager.discoveryStatus().get("B").retryDelayMillis());
+            f.io.sink.closed(rejected,Connection.CloseReason.PROTOCOL_ERROR,f.clock.get());f.pump();assertEquals(1,f.manager.snapshot().size());assertEquals(0,f.downs());
+        }
+    }
+    private static List<CandidateCache.CandidateView> learnedCandidates(Fixture f) {
+        var result=f.manager.candidates();f.pump();return result.toCompletableFuture().join();
+    }
+    private static ControlMessage discoveryReply(Fixture f,UUID remote,
+            ControlMessage query,UUID hello,long generation,ControlMessage.Endpoint candidate) {
+        return new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),"B",remote,
+            new DiscoveryMessage.Snapshot(hello,"A",f.instance,generation,List.of(candidate)));
+    }
+    private static void assertDiscoverySessionUnchanged(Fixture f,FakeChannel channel,Neighbor.Session expected) {
+        assertTrue(channel.open,"A stale discovery frame must not close the current connection");
+        assertEquals(expected,f.manager.snapshot().get("B"));assertEquals(expected.connectionId(),channel.id());
+        assertEquals(1,f.ups());assertEquals(0,f.downs());assertEquals(2,f.io.dials.size());
+    }
+    @Test void D07eOldHelloTokenOnCurrentConnectionPreservesQueryAndClaims() {
+        for(String kind:List.of("snapshot","query","rejected-snapshot","rejected-query"))try(var f=new Fixture("A")) {
+            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
+            var session=f.manager.snapshot().get("B");f.timers.advance(NeighborDiscovery.TICK);f.pump();
+            var first=channel.extraWrites.getLast();var hello=((DiscoveryMessage.Query)first.payload()).helloRequestId();
+            var candidate=endpoint("S",UUID.randomUUID(),18000);
+            f.message(channel,discoveryReply(f,remote,first,hello,4,candidate));
+            var before=learnedCandidates(f);assertEquals(1,before.size());
+            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();var current=channel.extraWrites.getLast();long queryStarted=f.clock.get();
+            assertNotEquals(first.requestId(),current.requestId());int writes=channel.extraWrites.size();
+            var oldHello=UUID.randomUUID();assertNotEquals(hello,oldHello);
+            if(kind.startsWith("rejected-")) {
+                var type=kind.equals("rejected-query")?MessageType.DISCOVERY_QUERY:MessageType.DISCOVERY_SNAPSHOT;
+                var envelope=new MessageCodec.ExtraEnvelope(2,type,current.requestId(),"B",remote,oldHello,"A",f.instance);
+                f.io.sink.rejected(channel,new MessageCodec.RejectedExtraContent(envelope,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
+            } else if(kind.equals("query")) {
+                f.message(channel,new ControlMessage(MessageType.DISCOVERY_QUERY,current.requestId(),"B",remote,
+                    new DiscoveryMessage.Query(oldHello,"A",f.instance)));
+            } else f.message(channel,discoveryReply(f,remote,current,oldHello,Long.MAX_VALUE,endpoint("OTHER",UUID.randomUUID(),18100)));
+            assertDiscoverySessionUnchanged(f,channel,session);assertEquals(before,learnedCandidates(f),kind);
+            assertEquals(writes,channel.extraWrites.size(),"Stale QUERY must not elicit a response");
+            // An old inbound QUERY/rejection must not consume the current session's response budget.
+            if(kind.endsWith("query")) {
+                f.message(channel,new ControlMessage(MessageType.DISCOVERY_QUERY,UUID.randomUUID(),"B",remote,
+                    new DiscoveryMessage.Query(hello,"A",f.instance)));
+                assertEquals(writes+1,channel.extraWrites.size());assertEquals(MessageType.DISCOVERY_SNAPSHOT,channel.extraWrites.getLast().type());
+            }
+            f.timers.advance(NeighborDiscovery.TICK);f.pump();
+            f.message(channel,discoveryReply(f,remote,current,hello,5,candidate));
+            var after=learnedCandidates(f);assertEquals(1,after.size());var proof=after.getFirst().sources().getFirst();
+            assertEquals(5,proof.generation());assertEquals(queryStarted,proof.queryStartedNanos());
+            assertEquals(CandidateCache.TTL_NANOS,proof.ttlNanos());assertEquals(session.connectionId(),proof.source().connectionId());
+            assertEquals(hello,proof.source().helloRequestId());assertTrue(proof.queryStartedNanos()>before.getFirst().sources().getFirst().queryStartedNanos());
+            assertDiscoverySessionUnchanged(f,channel,session);
+            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();assertEquals(MessageType.DISCOVERY_QUERY,channel.extraWrites.getLast().type());
+            assertNotEquals(current.requestId(),channel.extraWrites.getLast().requestId(),"No cooldown may delay the next refresh");
+        }
+    }
+    @Test void D07eOldGenerationPreservesCurrentQueryUntilValidResponse() {
+        for(long stale:List.of(1L,4L))try(var f=new Fixture("A")) {
+            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
+            var session=f.manager.snapshot().get("B");f.timers.advance(NeighborDiscovery.TICK);f.pump();
+            var first=channel.extraWrites.getLast();var hello=((DiscoveryMessage.Query)first.payload()).helloRequestId();
+            var candidate=endpoint("S",UUID.randomUUID(),18000);
+            f.message(channel,discoveryReply(f,remote,first,hello,4,candidate));var before=learnedCandidates(f);
+            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();var current=channel.extraWrites.getLast();long queryStarted=f.clock.get();
+            assertNotEquals(first.requestId(),current.requestId());int writes=channel.extraWrites.size();
+            f.message(channel,discoveryReply(f,remote,current,hello,stale,endpoint("OTHER",UUID.randomUUID(),18100)));
+            assertEquals(before,learnedCandidates(f));assertDiscoverySessionUnchanged(f,channel,session);
+            assertEquals(writes,channel.extraWrites.size());
+            f.timers.advance(NeighborDiscovery.TICK);f.pump();
+            f.message(channel,discoveryReply(f,remote,current,hello,5,candidate));
+            var after=learnedCandidates(f);assertEquals(1,after.size());var proof=after.getFirst().sources().getFirst();
+            assertEquals(5,proof.generation());assertEquals(queryStarted,proof.queryStartedNanos());
+            assertEquals(CandidateCache.TTL_NANOS,proof.ttlNanos());assertEquals(session.connectionId(),proof.source().connectionId());
+            assertTrue(proof.queryStartedNanos()>before.getFirst().sources().getFirst().queryStartedNanos());
+            assertDiscoverySessionUnchanged(f,channel,session);
+            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();assertNotEquals(current.requestId(),channel.extraWrites.getLast().requestId());
+        }
+    }
+    @Test void D07eOldTokenDoesNotMaskIncompatibleSenderOrRecipient() {
+        for(boolean rejected:List.of(false,true))for(int field=0;field<4;field++)try(var f=new Fixture("A")) {
+            f.ready("B");var channel=f.outbound(true);var remote=UUID.randomUUID();f.ok(channel,remote);
+            f.timers.advance(NeighborDiscovery.TICK);f.pump();var query=channel.extraWrites.getLast();
+            var oldHello=UUID.randomUUID();String sender=field==0?"OTHER":"B",recipient=field==2?"OTHER":"A";
+            var senderInstance=field==1?UUID.randomUUID():remote;var recipientInstance=field==3?UUID.randomUUID():f.instance;
+            if(rejected) {
+                var envelope=new MessageCodec.ExtraEnvelope(2,MessageType.DISCOVERY_SNAPSHOT,query.requestId(),sender,senderInstance,oldHello,recipient,recipientInstance);
+                f.io.sink.rejected(channel,new MessageCodec.RejectedExtraContent(envelope,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
+            } else f.message(channel,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),sender,senderInstance,
+                new DiscoveryMessage.Snapshot(oldHello,recipient,recipientInstance,1,List.of())));
+            assertFalse(channel.open);assertEquals(1,f.downs());assertTrue(f.manager.snapshot().isEmpty());assertTrue(learnedCandidates(f).isEmpty());
+        }
+    }
+    @Test void D10CacheQueryAdmissionIsFourAndDoesNotFailNodeWhenFull() throws Exception {
+        try(var f=new Fixture("A")) {
+            f.ready("B");var queries=new ArrayList<CompletionStage<List<CandidateCache.CandidateView>>>();
+            for(int n=0;n<4;n++)queries.add(f.manager.candidates());
+            assertTrue(f.manager.candidates().toCompletableFuture().isCompletedExceptionally());assertFalse(f.owner.stopped);f.pump();
+            for(var query:queries)assertTrue(query.toCompletableFuture().get().isEmpty());assertFalse(f.manager.start().toCompletableFuture().isCompletedExceptionally());
+        }
+    }
+
+    @Test void D10PeriodicPhysicalTicketCannotBeReusedUntilRunningCallbackTerminates()throws Exception {
+        var timers=new NeighborManager.RealDeadlines(1);timers.limit(1);var entered=new CountDownLatch(1);var release=new CountDownLatch(1);
+        var ticket=timers.periodic(()->{entered.countDown();boolean interrupted=false;for(;;)try{release.await();break;}catch(InterruptedException e){interrupted=true;}if(interrupted)Thread.currentThread().interrupt();},1);
+        try {
+            assertTrue(entered.await(2,TimeUnit.SECONDS));ticket.cancel();
+            assertThrows(RejectedExecutionException.class,()->timers.schedule(()->{},1000));
+            timers.requestClose();assertFalse(timers.awaitTermination(Duration.ofMillis(20)));release.countDown();assertTrue(timers.awaitTermination(Duration.ofSeconds(2)));
+        }finally{release.countDown();timers.requestClose();assertTrue(timers.awaitTermination(Duration.ofSeconds(2)));}
+    }
+
 }

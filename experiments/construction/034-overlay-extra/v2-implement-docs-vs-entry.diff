@@ -1,0 +1,842 @@
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -510,8 +510,8 @@
+ ### ADR-033 — Descoberta extra por divulgação de vizinhos e cache limitada
+ 
+ > Transporte separado e ativação opcional suspensos pelo utilizador;
+-> [ADR-034](#adr-034) propõe substituí-los. As aprovações e escolhas OTD1 abaixo são históricas. Cache,
+-> TTL, proveniência e callbacks mantêm-se; código não pode avançar sem novo gate.
++> [ADR-034](#adr-034) Aceite substitui esses pontos e o contrato TCP v1. As aprovações e escolhas OTD1 abaixo são históricas. Cache,
++> TTL, proveniência e callbacks mantêm-se; gate satisfeito só para Implement de IMP-034.
+ 
+ - **Estado:** Aceite.
+ - **Contexto e drivers:** O utilizador substituiu o catálogo inicial pela aprendizagem de candidatos através dos vizinhos diretos antes das falhas, mantendo o bootstrap apenas para arranque. Drivers: REQ-025.
+@@ -564,7 +564,7 @@
+ <a id="adr-034"></a>
+ ### ADR-034 — Controlo TCP uniforme v2 e descoberta obrigatória
+ 
+-- **Estado:** Proposta
++- **Estado:** Aceite
+ - **Contexto e drivers:** O utilizador interrompeu OTD1 separado e depois rejeitou a mistura operacional v1/v2. Fixa um programa/versão de JAR em todos os nós e decide migrar todo o controlo TCP, incluindo o bootstrap, para v2. O contrato v1 e as evidências são históricos; mantêm-se framing/caps, aprendizagem e isolamento de falhas. Drivers: REQ-025.
+ - **Decisão:** Propor um único contrato e codec operacional TCP v2 para REGISTER/REGISTER_OK/ERROR do bootstrap, HELLO/HELLO_OK, mensagens normais e descoberta. MessageType tem 18 códigos ativos explícitos (1,2,4..19), com 3 rejeitado; sem parser/encoder/CodecPolicy/runtime v1, namespace alternativo ou fallback. Conservar ControlMessage e APIs encode/decode/read/write, agora exclusivamente v2; readFrame partilha o mesmo parser e permite rejeição tipada de conteúdo extra. HELLO exige supported=required=selected=1 e bits reservados zero. Todos os overlay exigem descoberta e Q>=2 offline; ausência da antiga chave exige, true é redundante e false é erro agregado; Q=1 genérico/bootstrap permanece. Um TCP persistente por par, FIFO/writer comuns, margem M=1, quota extra enfileirada de um e quatro tickets físicos. Bootstrap mantém só consulta inicial do grafo imutável e fecho após write/flush v2, sem membership. Rejeitar tentativa inválida localmente, sem NeighborUp/FAILED global/FATAL/fim da CLI ou queda de sessões saudáveis; estado/retry por peer limitados com backoff existente. Conteúdo extra completo/corrente pode ser rejeitado atomicamente; framing/truncamento/identidade permanecem terminais no handle afetado. Arquivar contrato/fixtures v1, preparar vetores v2 independentes e migrar testes preservando garantias. UDP OTT1 de vídeo permanece inalterado. IMP-034 aprende; IMP-035 repara depois com checkpoint próprio.
+ - **Alternativas rejeitadas:** Misturar bootstrap/mensagens normais v1 com handshake/descoberta v2 foi substituído pela decisão explícita de contrato TCP único. Manter runtime v1, fallback, modo base opcional ou interoperabilidade com JAR antigo contraria o cenário operacional. OTD1 separado, outra fila/writer, negociação escondida em routing e falha global por input inválido de peer foram rejeitados. Atualizar apenas o byte de versão nas fixtures, sem oráculo independente e migração das garantias, não satisfaz a validação.
+@@ -573,7 +573,7 @@
+ - **Como validar:** V-033/D01–D12, fixtures v2 independentes, arquivo v1, regressão migrada, V-ADD, manual e revisão; V-034 posterior.
+ 
+ Contrato detalhado no [Design](memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md) e [interfaces](docs/07-API-AND-INTERFACES.md#extra-01-control-v2).
+-G-EXTRA-ADR continua pendente de aprovação desta revisão/contratos/migração de testes antes de retomar Implement. ADR-033 mantém políticas residuais e aprovação histórica; contrato TCP v1/variante mista não autorizam nova implementação. IMP-035 conserva checkpoint próprio.
++Aprovação explícita do utilizador registada em 2026-11-11T17:55:50Z: Design, ADR-034, 29 caminhos e migração de testes/recursos aceites; G-EXTRA-ADR satisfeito apenas para IMP-034. Retomar só Implement. ADR-033 mantém políticas residuais e aprovação histórica; contrato TCP v1/variante mista não autorizam nova implementação. IMP-035 conserva checkpoint próprio.
+ 
+ ## 6. Modelo de dados e contratos
+ 
+@@ -924,7 +924,7 @@
+ - **Bolt/origem:** [034-overlay-extra](memory-bank/bolts/034-overlay-extra/bolt.md); TASK-033.
+ - **Ficheiros:** `overlay/NeighborDiscovery.java`, `overlay/CandidateCache.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `protocol/DiscoveryMessage.java`, `protocol/DiscoveryCodec.java`, `config/NodeConfiguration.java`, `config/ConfigurationLoader.java`, `overlay/NeighborDiscoveryTest.java`, `overlay/CandidateCacheTest.java`, `protocol/DiscoveryCodecTest.java`, `transport/Transport.java`, `transport/Connection.java`, `transport/TransportTest.java`, `experiments/overlay-discovery/`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `config/ConfigurationLoaderTest.java`, `Projeto/README.md`, `app/OttApplicationTest.java`, `bootstrap/BootstrapServer.java`, `bootstrap/BootstrapServerTest.java`, `Projeto/src/test/resources/protocol/`, `Projeto/docs/protocolos.md`, `scripts/validate-planning.py`.
+ - **Dependências:** IMP-006 (004-overlay).
+-- **ADR:** ADR-007, ADR-009, ADR-012, ADR-013, ADR-014, ADR-015, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. G-EXTRA-ADR reaberto: aprovar ADR-034 e contratos revistos antes de retomar código.
++- **ADR:** ADR-007, ADR-009, ADR-012, ADR-013, ADR-014, ADR-015, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. G-EXTRA-ADR satisfeito para IMP-034 por aprovação explícita de ADR-034/Design/âmbito e migração; IMP-035 mantém checkpoint próprio.
+ - **REQ/NFR/CON/INT:** REQ-025.
+ - **Testes exigidos:** V-033: TCP v2 em todos os 18 tipos, APIs, bootstrap servidor/cliente, handshake, mensagens normais e descoberta; código 3 e versões antigas rejeitados sem parser/fallback v1. Arquivo v1 com hashes e fixtures v2 independentes, sem gerar o esperado pelo codec de produção; UDP OTT1/16 fixtures intactos. Todos os overlay exigem descoberta/Q>=2, ausência/true redundante obrigatórios e false/Q=1 agregados offline; genérico/bootstrap Q=1 preservado. Validar versão/identidade/endpoint/capacidade/flush/unicidade, rejeição só da tentativa e estado/retry por peer limitados com backoff; A ACTIVE/CLI/aprendizagem utilizáveis quando B é rejeitado. Bootstrap v2 conserva grafo imutável/offline, instâncias zero na resposta, flush antes de EOF, prazos e shutdown. Cache/TTL/proveniência/gerações/callbacks antigos/conflitos/caps com relógio/transporte/escrita controlados; FIFO/margem/tickets físicos, conteúdo extra recuperável e framing/identidade terminais. Migrar testes sem eliminar as garantias; executar regressão JDK 21, V-ADD, TCP/CLI reais e manual após aprovação.
+ - **Gates:** G-EXTRA-ADR.
+@@ -1536,7 +1536,7 @@
+ | G-GUI | Reprodução identificável numa janela real para os critérios visuais de TASK-023/024 |
+ | G-CORE | Runtime/IP/mapeamento e medições reais nas TASK-025–028 |
+ | G-ASSESSMENTS | Datas/conteúdo reais ou situação pendente explicitamente registada; não inventar informação docente |
+-| G-EXTRA-ADR | Reaberto em IMP-034: aprovar ADR-034 e contratos revistos antes de retomar Implement; IMP-035 mantém aprovação própria de admissão/reparação |
++| G-EXTRA-ADR | Satisfeito para IMP-034 por aprovação explícita de ADR-034/Design/29 caminhos/migração v2; IMP-035 mantém aprovação própria de admissão/reparação |
+ | G-DELIVERY | PL/grupo/prazo reais antes de nomes/entrega finais |
+ | G-SUBMISSION | Confirmação humana de upload para concluir TASK-031/último bolt |
+ | G-REVIEW-032 | Pessoa distinta designada e revisão/integração registadas antes do DONE de TASK-032 |
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -2,13 +2,14 @@
+ 
+ > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+ 
+-**Revisão proposta por decisão explícita do utilizador: controlo TCP uniforme v2.**
++**Contrato aprovado em ADR-034: controlo TCP uniforme v2. Implement em revisão.**
+ Aplica-se a bootstrap, handshake, mensagens normais e descoberta, com um único
+ contrato/codec operacional, sem runtime v1/fallback. Mesmo programa/versão de
+-JAR em todos os processos. [ADR-034 Proposta](../add.md#adr-034) e
++JAR em todos os processos. [ADR-034 Aceite](../add.md#adr-034) e
+ [Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+-aguardam aprovação antes de retomar código. O código/JAR e as execuções
+-anteriores continuam históricos, sem alegar migração implementada.
++foram aprovados; o código foi migrado e tem testes incrementais registados no
++walkthrough. O JAR histórico/execuções anteriores não são validação v2; clean
++verify e manual da etapa Test continuam pendentes.
+ 
+ [Contrato e fixtures v1 arquivados](../experiments/construction/034-overlay-extra/protocol-v1-archive/README.md).
+ Bootstrap mantém só consulta do grafo imutável inicial, sem membership,
+@@ -429,9 +430,10 @@
+ <a id="extra-01-control-v2"></a>
+ ## EXTRA-01 — Contrato v2 único no controlo (proposto)
+ 
+-G-EXTRA-ADR pendente; [Design completo](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
++G-EXTRA-ADR satisfeito para IMP-034; [Design completo](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+ e [revisão ADR-034](../memory-bank/bolts/034-overlay-extra/adr-034-review.md)
+-aguardam aprovação. OTD1 e a mistura TCP v1/v2 são históricos, arquivados.
++estão aprovados. OTD1 e a mistura TCP v1/v2 são históricos, arquivados.
++Implement pronto para revisão, sem autorização inferida para Test/fecho.
+ 
+ Todo o TCP é v2: bootstrap REGISTER/REGISTER_OK/ERROR, handshake, mensagens
+ normais e descoberta. Um enum MessageType, 18 tipos explícitos (1,2,4..19),
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -662,3 +662,34 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## IMP-034 — Implement pronto para revisão
++
++Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
++Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
++normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
++v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
++Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
++JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
++com novo oráculo controlado; falhas/sondagens anteriores mantidas.
++66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
++v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
++XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
++Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
++verify/regressão atual, manual reproduzido, revisão final e integração continuam
++necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -155,3 +155,34 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## IMP-034 — Implement pronto para revisão
++
++Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
++Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
++normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
++v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
++Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
++JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
++com novo oráculo controlado; falhas/sondagens anteriores mantidas.
++66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
++v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
++XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
++Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
++verify/regressão atual, manual reproduzido, revisão final e integração continuam
++necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -640,3 +640,18 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
+diff --git a/docs/tasks/PHASE-02/TASK-033.md b/docs/tasks/PHASE-02/TASK-033.md
+--- a/docs/tasks/PHASE-02/TASK-033.md
++++ b/docs/tasks/PHASE-02/TASK-033.md
+@@ -57,3 +57,34 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## IMP-034 — Implement pronto para revisão
++
++Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
++Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
++normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
++v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
++Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
++JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
++com novo oráculo controlado; falhas/sondagens anteriores mantidas.
++66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
++v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
++XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
++Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
++verify/regressão atual, manual reproduzido, revisão final e integração continuam
++necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+diff --git a/memory-bank/architecture-traceability.json b/memory-bank/architecture-traceability.json
+--- a/memory-bank/architecture-traceability.json
++++ b/memory-bank/architecture-traceability.json
+@@ -1857,7 +1857,7 @@
+     {
+       "id": "ADR-034",
+       "title": "Controlo TCP uniforme v2 e descoberta obrigatória",
+-      "status": "Proposta",
++      "status": "Aceite",
+       "drivers": [
+         "REQ-025"
+       ],
+diff --git a/memory-bank/bolts/034-overlay-extra/adr-034-review.md b/memory-bank/bolts/034-overlay-extra/adr-034-review.md
+--- a/memory-bank/bolts/034-overlay-extra/adr-034-review.md
++++ b/memory-bank/bolts/034-overlay-extra/adr-034-review.md
+@@ -1,8 +1,8 @@
+ ---
+-stage: design
++stage: adr
+ bolt: "034-overlay-extra"
+ created: "2026-11-11T17:22:59Z"
+-status: "proposed-for-review"
++status: "approved"
+ updated: "2026-11-11T17:47:08Z"
+ ---
+ # IMP-034 — Revisão pendente de Design/ADR-034
+@@ -56,3 +56,32 @@
+ etapa concluída no contrato atual. OTD1/código parcial/evidências preservados.
+ V-033, regressão JDK 21, TCP/CLI reais, manual, revisão e integração continuam
+ por executar/concluir. Sem commits, push ou início de IMP-035/outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## Revisão formal concluída e resultado de Implement
++
++Design/ADR-034/29 caminhos/migração foram aprovados explicitamente pelo
++utilizador; aprovação registada em 2026-11-11T17:55:50Z. ADR-034 Aceite,
++G-EXTRA-ADR satisfeito para IMP-034. As referências anteriores a Proposta,
++pendência de gate e proibição de Java neste relatório descrevem a entrada
++histórica, substituída por essa aprovação.
++
++Implement segue o contrato v2 único e conserva ADR-013/014/015/017/018/019/020.
++Não surgiu necessidade de ADR nova ou substituição adicional: versão TCP/
++ativação/transporte foram as mudanças aprovadas; reparação mantém IMP-035.
++Ver walkthrough para resultados incrementais e correspondência com as garantias
++das fundações; esta revisão não aprova Test/fecho/integração.
+diff --git a/memory-bank/bolts/034-overlay-extra/bolt.md b/memory-bank/bolts/034-overlay-extra/bolt.md
+--- a/memory-bank/bolts/034-overlay-extra/bolt.md
++++ b/memory-bank/bolts/034-overlay-extra/bolt.md
+@@ -6,14 +6,14 @@
+ status: "in-progress"
+ stories: ["006-reconstruir-vizinhancas-apos-falhas"]
+ created: "2026-11-11T12:11:34Z"
+-updated: "2026-11-11T17:47:08Z"
++updated: "2026-11-11T19:06:59Z"
+ started: "2026-11-11T12:11:34Z"
+ completed: null
+-current_stage: "design"
+-stages_completed: [{"name":"model","completed":"2026-11-11T12:41:00Z","artifact":"ddd-01-domain-model.md"}]
++current_stage: "implement"
++stages_completed: [{"name":"model","completed":"2026-11-11T12:41:00Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T17:55:50Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T17:55:50Z","artifact":"adr-034-review.md"}]
+ stage_history: [{"name":"design","completed":"2026-11-11T13:38:55Z","artifact":"ddd-02-technical-design.md","revision":"OTD1 separate, suspended by user","archive":"experiments/construction/034-overlay-extra/otd1-preserved-before-control-channel.tar.gz","artifact_sha256":"1df2c1572282173ec5d04ac7312e6d3a49a3a57af2124101d11b6804b50cd82d"},{"name":"adr","completed":"2026-11-11T13:57:14Z","artifact":"adr-review.md","revision":"OTD1 separate, suspended by user","archive":"experiments/construction/034-overlay-extra/otd1-preserved-before-control-channel.tar.gz","artifact_sha256":"5c42483e2d61b199105548603cde7552174ce070f6d02da2d1e91630bef1aa92"}]
+-suspended_stage: "implement"
+-gate_status: {"G-EXTRA-ADR":"pending ADR-034 and revised contracts"}
++suspended_stage: null
++gate_status: {"G-EXTRA-ADR":"satisfied for IMP-034 only; revised TCP v2 contracts approved"}
+ requires_bolts: ["004-overlay"]
+ enables_bolts: ["035-overlay-extra"]
+ requires_units: ["001-base-validada"]
+@@ -46,8 +46,8 @@
+ ## Etapas
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`.
+-2. [ ] **design** → `ddd-02-technical-design.md`.
+-3. [ ] **adr** → `adr-034-review.md` (adr-review.md conserva a revisão OTD1 histórica).
++2. [x] **design** → `ddd-02-technical-design.md`.
++3. [x] **adr** → `adr-034-review.md` (adr-review.md conserva a revisão OTD1 histórica).
+ 4. [ ] **implement** → `implementation-walkthrough.md`.
+ 5. [ ] **test** → `ddd-03-test-report.md`.
+ 
+@@ -59,7 +59,7 @@
+ - [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, arquivar v1 e validar fixtures v2 independentes, sem runtime v1/fallback ou canal separado.
+ - [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+ 
+-## Estado atual — revisão de transporte
++## Histórico — revisão de transporte interrompida
+ 
+ Implement OTD1 interrompido por decisão explícita do utilizador; código e
+ execuções preservados. [Design revisto](ddd-02-technical-design.md) e
+@@ -142,3 +142,27 @@
+ OTT1/16 fixtures permanecem. Migração de testes justificada, sem execução Java.
+ Design/ADR-034 ainda para aprovação, G-EXTRA-ADR pendente, Implement suspenso.
+ Cache/TTL/proveniência/filas/shutdown/isolamento preservados. IMP-035 não iniciado.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## Checkpoint atual — Implement para revisão
++
++Registo de 2026-11-11T18:57:34Z. Código v2/aprendizagem implementados, com 1062 testes
++incrementais aprovados (JDK 21, TCP local e CLI reais). Ver
++[walkthrough](implementation-walkthrough.md) para mapa/evidência/remoções/diff.
++Implement ainda aguarda revisão; current_stage permanece implement e Test não
++foi iniciado. clean verify, manual, revisão humana final e integração pendentes;
++sem DONE/commits/push. IMP-035 não iniciado.
+diff --git a/memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md b/memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md
+--- a/memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md
++++ b/memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md
+@@ -7,7 +7,7 @@
+ ---
+ # Design revisto — IMP-034, descoberta no TCP de controlo
+ 
+-**Proposta para aprovação; Implement interrompido por decisão do utilizador.**
++**Design aprovado explicitamente; registo 2026-11-11T17:55:50Z.** Retoma autorizada apenas de Implement. O texto de proposta abaixo identifica o contrato agora aprovado; as pendências de execução mantêm-se.
+ O transporte OTD1 separado foi suspenso. Este documento substitui a proposta
+ ativa de transporte; as aprovações anteriores referiam-se à variante arquivada,
+ não autorizam o contrato abaixo. [ADR-034 proposta](../../../add.md#adr-034)
+diff --git a/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+@@ -0,0 +1,157 @@
++---
++stage: implement
++bolt: "034-overlay-extra"
++created: "2026-11-11T19:03:16Z"
++status: "ready-for-review"
++---
++# IMP-034 — TCP v2 uniforme e aprendizagem de candidatos
++
++**Implement pronto para revisão. Parar antes de Test/fecho.** Aprovação explícita
++de Design/ADR-034/29 caminhos/migração registada em 2026-11-11T17:55:50Z;
++ADR-034 Aceite e G-EXTRA-ADR satisfeito só para IMP-034. Base Git integrada:
++17c1ca27673930bfbf82078522059a243d96ccdb, ramo Denji. Sem commits/push.
++
++Todo o controlo TCP agora usa v2: bootstrap, handshake, mensagens normais e
++aprendizagem. Um ControlMessage/MessageCodec operacional, 18 tipos explícitos
++(1,2,4..19), código 3 retirado, sem codec runtime v1/OTD1, fallback ou flag para
++desligar descoberta. IMP-034 aprende/retém candidatos; IMP-035 continua planeado,
++com checkpoint próprio para admitir/reparar ligações. Não foi implementado vídeo.
++
++## Alterações e resultado
++
++- Codec: framing/UTF-8/UUID/strings/endpoint/buffer comuns, APIs existentes em v2;
++  HELLO(Endpoint+1+1)/ACK(1), QUERY/SNAPSHOT como payloads e readFrame tipado.
++  Framing global 37..65536 e cap extra 32768 antes de alocar, sem ressincronização.
++- Configuração: todo overlay exige Q>=2 antes de recursos, ausência/true redundante
++  obrigatórios, false inválido com erros agregados. Construtores 13/14 preservados.
++  Preflight conjunto rejeita grau conhecido maior que C; genérico/bootstrap Q=1 válido.
++- Bootstrap: consulta imutável/offline em v2, instâncias zero na lista, resposta
++  única após write/flush completo e fecho limitado; não responde ERROR a ERROR.
++- Transporte: uma FIFO Q+inFlight/writer, margem M=1, quota enfileirada extra=1
++  incluindo take→inFlight, quatro tickets físicos comuns, BACKPRESSURED não fecha.
++  Cancelar cópia de future/expirar lógica não liberta ticket de escrita prematuramente.
++- Vizinhos: capacidade obrigatória antes de Up, estado/razão limitados por peer,
++  retry/backoff existentes e rejeição local sem FAILED/FATAL/saída da CLI ou queda
++  das sessões saudáveis; correlação de sessão/handle/instância/token preservada.
++- Aprendizagem: snapshots dos vizinhos diretos ACTIVE, sem hearsay/catálogo global,
++  cache 128x4, TTL local 60 s desde QUERY, proveniência e geração por sessão.
++  Morte do anunciante conserva claims; conflito/expiração não inventam um caminho.
++- Lifecycle: mesmo owner e worker de deadlines. Tick físico único/coalescido,
++  callbacks curtos e jobs cancelados contam até terminarem. A corrida descoberta/
++  shutdown observada em teste existente foi corrigida: rejeitar admissões de
++  aplicação durante drenagem sem fechar antes de NODE_LEAVE escrever/flush.
++
++## Mapa D01–D12 / V-033 e garantias mantidas
++
++| Oráculo | Implementação e testes incrementais | Limite/pendência |
++|---|---|---|
++| D01/a–e | ConfigurationLoaderTest (741 casos), quatro casos de configuração de NeighborDiscoveryTest, MessageCodecTest (79); construtores, Q/false agregados, grau/C, 18 tipos e v1 rejeitado. | Nenhum socket para configuração inválida; assinatura anterior preservada. |
++| D02/a–d | NeighborManagerTest.D11aBadPeerDoesNotStopHealthySessionOrCandidateLearning, D02cConfirmedRejectionSurvivesTemporaryAbsenceAndBackoffThenValidRetry; codec negativos de máscara/versão e testes anteriores de handshake migrados. | Falha corrente por peer, último motivo confirmado separado da ausência transitória; sem modo base. |
++| D03 | NeighborDiscoveryTest.D03D05_realTcpLearnsSAndCWithoutBootstrapAndRetainsAfterRelayLoss e teste com relógio falso. | S–R1/R2–C, bootstrap parado após arranque; nós embutidos/TCP real. |
++| D04 | D04_realTcpLearnsR1AndRetainsHealthySR1SessionAfterR2R3Loss. | S–R1–R2/R3–C; S–R1 conserva connectionId; sem R1–C nova. |
++| D05 | D03D05_learnSourceViaDirectRelayRetainAfterDeathAndExpireFromQueryStart e CandidateCacheTest.D05. | A origem do prazo é QUERY; expiração exata em clock falso, não 60 s medidos de vídeo. |
++| D06 | CandidateCacheTest limites/wrap/conflitos/fontes; NeighborDiscoveryTest geração velha/nova/MAX, callbacks e watermark; DiscoveryCodecTest tamanho máximo 19674. | Fixture de fronteira injeta geração MAX por reflexão em teste, sem propriedade runtime. |
++| D07/a–e | 26 DiscoveryCodecTest: cinco fixtures de conteúdo, 13 negativos terminais, UTF-8/truncamento/identidade/cap; sequência rejeição→PING v2→snapshot; transporte real e callback antigo no gestor. | readFrame só retém envelope/motivo, sem corpo/lista inválidos. Owner valida sessão antes de recuperar. |
++| D08/a–f | TransportTest.D08_Q2MarginAndTakePublicationWindowPreserveCommonFifo, lastFreeSlot, concorrência Q2/3/256, tickets físicos; NeighborDiscoveryTest ritmo global, 2 consultas/2 respostas, cooldown, sem hearsay. | A margem não é promessa de burst/latência; overflow normal mantém testes anteriores Q1. |
++| D09 | Cache vazia/expirada e ausência de aprendizagem não causam dial; grafos reais conservam candidatos sem criar arestas. | Reparação/deteção de máquina silenciosa/fluxos/vídeo são incrementos posteriores. |
++| D10 | Ticket de writer/periodic worker não reutilizado antes de terminação física; tick coalescido; quatro consultas públicas; callbacks antigos; novo teste do shutdown durante admissão. | Deadline/shutdown e observador/owner saturado mantêm provas anteriores. |
++| D11/a–b | TCP real: dois grafos, seis ordens/arranque simultâneo/reconexão anteriores, 36 TransportTest, 20 BootstrapServerTest; OttApplicationTest.D11a e testes CLI existentes em JVM separada. | Peer inválido com saudável ACTIVE e descoberta/CLI úteis; bootstrap v2 com flush antes EOF; sem CORE/GUI. |
++| D12 | 1062 testes incrementais JDK21, hashes/XML/CLI preservados, V-ADD operacional+arquivo e diff. | clean verify completo, manual, revisão final e integração continuam por executar/concluir na etapa Test/fecho. |
++
++## Migração e cada remoção nas fundações
++
++[Plano aprovado e aplicado](test-contract-migration.md). Não se apagou nenhum
++método de teste anterior da baseline integrada: foram migrados nomes/expectativas
++v1/contagem/payloads e acrescentados casos. Os quatro testes específicos OTD1 do
++protótipo interrompido foram substituídos pelos testes de canal único/fila/quota;
++ficam integralmente no arquivo/entrada, sem os apresentar como testes da baseline.
++
++| Remoção/substituição | Justificação e garantia preservada |
++|---|---|
++| ControlMessage default 1→2; enum 16→18; HELLO EndpointPayload e ACK Empty substituídos por payloads tipados | Mudança explícita aprovada do contrato, com os números anteriores, 3 rejeitado, modelos/cópias defensivas e vetores independentes. Empty conserva nome Java como modelo antigo, sem tipo de sucesso associado. |
++| MessageCodec read/payload branches | Um parser de framing e payloads v2; nenhuma aceitação v1 nem segundo decoder. EOF/limites/UTF-8 e não escrever modelo inválido preservados. 50 fixtures independentes cobertas pelo Java, sem fabricar esperado pelo encoder. |
++| Connection reader direto read→readFrame; PendingWrite/flush bookkeeping estendidos | Entrega de rejeição tipada no mesmo reader; fila, writer, confirmação fora dos locks, overflow normal, cancelamento e terminação mantidos nos 31 testes anteriores + cinco novos. |
++| NeighborManager HELLO/ACK/envelope/application dispatch | V2/capacidade e dispatch interno 18/19; base de identidade/iniciador/unicidade/B/R/retentativas preservada. Não reescrever DNS/dial/reservas ou introduzir off-graph. |
++| Q1 em perfil overlay e teste D20 | Requisito obrigatório rejeita offline Q1; D20 usa Q2/B2 e provoca overflow à terceira frame, preservando a prova. Q1 genérico/bootstrap continua exercitado. |
++| Testes que esperavam version=1 ou version=2 inválida | NODE_LEAVE também migra para v2; versão antiga passa a negativo. Mesmas garantias de flush, EOF, classes/códigos de erro, ordens e limites. |
++| Bootstrap ERROR como pedido | Continua rejeitado; fechar sem resposta cumpre a regra aprovada de não responder ERROR a ERROR. Matriz de todos os 17 outros tipos mantém a rejeição; 16 casos continuam com erro correlacionado. Red real preservado. |
++| 29 pares TCP v1 retirados dos recursos operacionais | Copiados/verificados no arquivo antes da remoção; 50 pares v2 independentes em protocol/v2, manifesto com 66 total. UDP 16 intacto, POM e perfis main intactos. |
++| DiscoveryOptions/OTD1 facades/listener/dial/codec autónomo do protótipo | Escolhas substituídas pela ADR-034; arquivo conserva código/fixtures/testes/logs anteriores. Não é remoção de API de fundação: construtores 13/14 e APIs operacionais base preservam nomes e passam a v2. |
++
++[PRESSUPOSTO] A ajuda de D11a é --help existente, exercitada numa JVM separada;
++interativamente mantêm-se neighbors/quit, sem alterar OttApplication.java fora
++dos 29 caminhos. Não há novo comando de candidatos: existe API assíncrona
++candidates(). Namespaces de TCP e UDP são comparados separadamente, como na
++validação de configuração anterior; retirar TCP/dataPort OTD1 não pode criar
++uma colisão fictícia entre transportes diferentes.
++
++## Execuções reais, incluindo falhas preservadas
++
++| Execução | Saída | Resultado/alcance |
++|---|---:|---|
++| [v2-implement-red-01](../../../experiments/construction/034-overlay-extra/v2-implement-red-01.log) | 1 | 3 testes; 2 falhas; 1 erros |
++| [v2-implement-red-02](../../../experiments/construction/034-overlay-extra/v2-implement-red-02.log) | 1 | 4 testes; 3 falhas; 0 erros |
++| [v2-implement-green-01](../../../experiments/construction/034-overlay-extra/v2-implement-green-01.log) | 1 | compilação falhou; sem testes executados |
++| [v2-implement-green-02](../../../experiments/construction/034-overlay-extra/v2-implement-green-02.log) | 1 | compilação falhou; sem testes executados |
++| [v2-implement-green-03](../../../experiments/construction/034-overlay-extra/v2-implement-green-03.log) | 0 | 116 testes; 0 falhas; 0 erros |
++| [v2-implement-green-04](../../../experiments/construction/034-overlay-extra/v2-implement-green-04.log) | 1 | compilação falhou; sem testes executados |
++| [v2-implement-green-05](../../../experiments/construction/034-overlay-extra/v2-implement-green-05.log) | 1 | compilação falhou; sem testes executados |
++| [v2-implement-green-06](../../../experiments/construction/034-overlay-extra/v2-implement-green-06.log) | 1 | 1031 testes; 1 falhas; 52 erros |
++| [v2-implement-green-07](../../../experiments/construction/034-overlay-extra/v2-implement-green-07.log) | 1 | 1031 testes; 3 falhas; 1 erros |
++| [v2-implement-unit-08](../../../experiments/construction/034-overlay-extra/v2-implement-unit-08.log) | 0 | 935 testes; 0 falhas; 0 erros |
++| [v2-implement-transport-09](../../../experiments/construction/034-overlay-extra/v2-implement-transport-09.log) | 0 | 133 testes; 0 falhas; 0 erros |
++| [v2-implement-learning-10](../../../experiments/construction/034-overlay-extra/v2-implement-learning-10.log) | 0 | 95 testes; 0 falhas; 0 erros |
++| [v2-implement-cli-11](../../../experiments/construction/034-overlay-extra/v2-implement-cli-11.log) | 1 | 66 testes; 1 falhas; 0 erros |
++| [v2-implement-shutdown-12](../../../experiments/construction/034-overlay-extra/v2-implement-shutdown-12.log) | 0 | 80 testes; 0 falhas; 0 erros |
++| [v2-implement-red-13](../../../experiments/construction/034-overlay-extra/v2-implement-red-13.log) | 1 | 2 testes; 2 falhas; 0 erros |
++| [v2-implement-incremental-14](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14.log) | 0 | 1062 testes; 0 falhas; 0 erros |
++
++red-01 prova versão/codec ausentes; red-02 prova opcionalidade/recursos OTD1 ainda
++errados. As falhas de compilação green-01/02/04/05 são erros de implementação,
++sem alegar red comportamental. green-06 regista 52 erros de sockets na sandbox e
++uma expectativa de migração; green-07 fora da sandbox encontrou três falhas e
++um erro de migração. unit-08 foi seleção sem sockets; transport-09 e learning-10
++incluem TCP real. cli-11 preserva a falha de shutdown do teste v008 existente;
++shutdown-12 e o conjunto final validam a correção sem relaxar o oráculo.
++red-13 regista duas falhas reais: grau/C no preflight e ERROR recebido no bootstrap.
++
++**Última execução incremental:** [resultado/hashes](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14-result.json),
++1062 testes, zero falhas/erros/skips; dez relatórios Surefire da própria invocação.
++[Inventário dos logs da CLI](../../../experiments/construction/034-overlay-extra/v2-implement-incremental-14-cli-inventory.json)
++preserva 109 ficheiros gerados nessa janela, separados de target/. Não somar
++relatórios antigos. O runner inicial copiava todos os XML de target (podem conter
++outras invocações); a contagem inicial vem do log. Desde 09 há XML só das classes
++executadas e hashes que confirmam fontes estáveis durante a execução.
++
++## Diffs, hashes e validação documental
++
++- [Contra HEAD integrado — código/recursos/docs de Projeto](../../../experiments/construction/034-overlay-extra/v2-implement-project-vs-head.diff):
++  4330 adições/766 remoções textuais,
++  79 binários; [numstat](../../../experiments/construction/034-overlay-extra/v2-implement-project-vs-head.numstat).
++- [Desde a aprovação v2 — mesmo âmbito](../../../experiments/construction/034-overlay-extra/v2-implement-project-vs-entry.diff):
++  4077 adições/1282 remoções textuais,
++  79 binários; [numstat](../../../experiments/construction/034-overlay-extra/v2-implement-project-vs-entry.numstat).
++- [Documentação/índices/validador desde a entrada](../../../experiments/construction/034-overlay-extra/v2-implement-docs-vs-entry.diff)
++  separa esta implementação das revisões documentais/Inception anteriores.
++- [git diff --check](../../../experiments/construction/034-overlay-extra/v2-implement-diff-check.log) e
++  [manifesto de conferência](../../../experiments/construction/034-overlay-extra/v2-implement-validation.json) confirmam âmbito,
++  preservação das 338 evidências anteriores, POM/perfis main/UDP, fontes validadas
++  e ausência de outro IMP. target/ é gerado e fica fora dos patches de Projeto.
++- [V-ADD atual](../../../experiments/construction/034-overlay-extra/v2-implement-v-add-02.log) verifica 66 fixtures operacionais,
++  50 referências independentes e arquivo de 45 originais; os hashes históricos
++  de planning-source-manifest.files não foram reescritos para simular aprovação.
++
++O código/testes/configuração/fixtures finais são os mesmos da invocação 14;
++README/protocolos locais foram atualizados depois, sem alteração executável.
++O JAR histórico validado continua preservado, não é um novo JAR v2 nem prova
++desta versão. O diff fonte inclui ficheiros novos/não rastreados e binários;
++o numstat global de ficheiros rastreados contém alterações preexistentes e
++é guardado separadamente, sem as atribuir todas a esta etapa.
++
++## Pendências e paragem obrigatória
++
++Aguardar revisão de Implement. Não iniciar Test, clean verify completo/manual,
++fecho, commits/push ou outro IMP por inferência. V-033 como conjunto de fecho
++continua parcial (D12/manual/regressão atual); recolher evidência nova na etapa
++Test. Revisão humana final e integração antes de DONE. IMP-035 mantém aprovação
++própria de intenção/admissão/reparação; a cache disponível não é reparação feita.
+diff --git a/memory-bank/bolts/034-overlay-extra/test-contract-migration.md b/memory-bank/bolts/034-overlay-extra/test-contract-migration.md
+--- a/memory-bank/bolts/034-overlay-extra/test-contract-migration.md
++++ b/memory-bank/bolts/034-overlay-extra/test-contract-migration.md
+@@ -58,3 +58,28 @@
+ quit/EOF, flush e shutdown com prazo, portas livres e nenhum processo pendente.
+ Executar/recolher logs reais antes de aprovação de Test, sem alegar reparação
+ (IMP-035) ou continuidade de vídeo. O roteiro executável ainda não foi criado.
++
++## Aplicação em Implement
++
++A migração acima foi aplicada nos ficheiros aprovados. 1062 testes incrementais
++passaram; logs/XML/hashes no walkthrough. Os 50 vetores TCP operacionais são
++cópias byte a byte da proposta independente aprovada; os 16 UDP preservam
++bytes e expectativas. V-ADD agora verifica 66 operacionais e 45 arquivados.
++
++D20 do NeighborManager passou a Q=2/B=2 e testa overflow na terceira frame,
++mantendo a prova de retenção limitada; Q=1 overlay é negativo offline e Q=1
++genérico/bootstrap mantém testes. NODE_LEAVE passou a v2 sem alterar flush/EOF.
++O antigo negativo version=2 passou a version=1. Bootstrap continua a rejeitar
++os 17 outros tipos; ERROR recebido fecha sem resposta, conforme a regra
++aprovada de não responder ERROR a ERROR. O teste mantém a rejeição e os demais
++16 casos com resposta correlacionada, sem enfraquecer identidade/limites.
++
++[PRESSUPOSTO] A ajuda referida em D11a é a invocação --help já existente.
++A CLI interativa mantém neighbors/quit; não foi criado comando help nem
++alterado OttApplication.java fora do âmbito. O cenário executa --help e
++verifica neighbors em processos saudáveis durante a rejeição do peer.
++
++Conteúdo extra completo inválido conserva cache/watermark/TTL e a ligação;
++framing/identidade continuam terminais. O caso de shutdown que falhou no
++incremental foi corrigido no código, com novo teste, sem alargar timeout nem
++relaxar a exigência de NODE_LEAVE antes do fecho. Test/manual/integração pendentes.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -651,3 +651,34 @@
+   Framing/caps/identidade/FIFO/flush/isolamento/shutdown e cache mantidos;
+   UDP OTT1 inalterado. Código congelado e gate pendente de aprovação, sem
+   testes Java/commits/push. IMP-034 aprende; IMP-035 repara posteriormente.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## IMP-034 — Implement pronto para revisão
++
++Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
++Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
++normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
++v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
++Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
++JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
++com novo oráculo controlado; falhas/sondagens anteriores mantidas.
++66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
++v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
++XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
++Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
++verify/regressão atual, manual reproduzido, revisão final e integração continuam
++necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+@@ -12,7 +12,7 @@
+ bolt: "034-overlay-extra"
+ size: "M"
+ extra: true
+-updated: "2026-11-11T17:47:08Z"
++updated: "2026-11-11T19:06:59Z"
+ ---
+ # História — Extra — aprender candidatos através dos vizinhos
+ 
+@@ -27,16 +27,26 @@
+ - [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, arquivar v1 e validar fixtures v2 independentes, sem runtime v1/fallback ou canal separado.
+ - [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+ 
+-## Validação e revisão
++## Histórico — validação e revisão
+ 
+ V-033. Responsável proposto Denji, revisor proposto Fillmore.
+ [Bolt](../../../../../bolts/034-overlay-extra/bolt.md).
+ 
+ Model/Design e Q-C-17 aprovados pelo utilizador. [Revisão ADR para aprovação](../../../../../bolts/034-overlay-extra/adr-review.md); ADR-033/contratos ainda propostos. V-033, regressão atual, manual, revisão humana e integração pendentes.
+ 
+-## Revisão de transporte em curso
++## Histórico — revisão de transporte
+ 
+ [Design revisto](../../../../../bolts/034-overlay-extra/ddd-02-technical-design.md) e ADR-034 propostos para TCP persistente de controlo,
+ codec/framing e fila comuns. OTD1 separado interrompido, com código/evidência
+ preservados. Cache/TTL/proveniência/callbacks mantêm-se. G-EXTRA-ADR reaberto;
+ não retomar Java, Test ou fecho antes de nova aprovação.
++
++## Estado atual — Implement para revisão
++
++Registo de 2026-11-11T19:06:59Z. Design/ADR-034/29 caminhos aprovados;
++ADR-034 Aceite, G-EXTRA-ADR satisfeito para IMP-034. Implementação TCP v2 única
++e aprendizagem com TTL/proveniência/limites concluídas para revisão.
++[Walkthrough](../../../../../bolts/034-overlay-extra/implementation-walkthrough.md):
++1062 testes incrementais aprovados; V-033 de fecho ainda parcial.
++Test, clean verify, manual, revisão final e integração pendentes; sem DONE,
++commits/push ou início de IMP-035. Os critérios acima aguardam validação final.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -282,14 +282,14 @@
+ IMP-034: Model/Design e Q-C-17 aprovados; [revisão ADR para aprovação](../../../../bolts/034-overlay-extra/adr-review.md).
+ ADR-033/contratos pendentes; V-033, regressão, manual, revisão final e integração por executar.
+ 
+-## Revisão de transporte em curso
++## Histórico — revisão de transporte
+ 
+ [Design revisto](../../../../bolts/034-overlay-extra/ddd-02-technical-design.md) e ADR-034 propostos para TCP persistente de controlo,
+ codec/framing e fila comuns. OTD1 separado interrompido, com código/evidência
+ preservados. Cache/TTL/proveniência/callbacks mantêm-se. G-EXTRA-ADR reaberto;
+ não retomar Java, Test ou fecho antes de nova aprovação.
+ 
+-## Estado atual — Design de TCP uniforme v2
++## Histórico — Design de TCP uniforme v2
+ 
+ Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+ handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+@@ -299,3 +299,13 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Estado atual — Implement do IMP-034 para revisão
++
++Registo de 2026-11-11T19:06:59Z. Design/ADR-034/29 caminhos aprovados;
++ADR-034 Aceite e G-EXTRA-ADR satisfeito para IMP-034. TCP exclusivamente v2
++no bootstrap e vizinhos, descoberta obrigatória no mesmo canal/codec/fila;
++aprendizagem e retenção limitadas implementadas. 1062 testes incrementais passam
++com JDK 21, TCP local e CLI reais. [Walkthrough e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
++Test não iniciado: clean verify, manual, revisão final e integração pendentes.
++Unidade e história in-progress; sem DONE/commits/push. IMP-035 não iniciado.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -858,7 +858,7 @@
+       "base_revision": "17c1ca27673930bfbf82078522059a243d96ccdb",
+       "scope": "overlay now, video integration later",
+       "candidate_discovery": "bounded advertisements of confirmed direct neighbors and time-limited learned cache",
+-      "design_approval": "Uniform TCP v2 including bootstrap, handshake, normal messages and discovery; one operational codec/contract, no runtime v1/fallback; v1 archived, independent v2 fixtures and test migration/scope pending approval",
++      "design_approval": "Design/ADR-034/29-path scope/test-resource migration to uniform TCP v2 explicitly approved; G-EXTRA-ADR met for IMP-034; Implement only, IMP-035 separate checkpoint",
+       "imps": [
+         "IMP-034",
+         "IMP-035"
+@@ -867,7 +867,18 @@
+         "034-overlay-extra",
+         "035-overlay-extra"
+       ],
+-      "revised_at": "2026-11-11T17:47:08Z"
++      "revised_at": "2026-11-11T17:55:50Z",
++      "protocol_validation": {
++        "archive_root": "experiments/construction/034-overlay-extra/protocol-v1-archive",
++        "archive_inventory_sha256": "ef266b30bf01d37762db8b48b994865aea734fe0de4c41944c9f8bd3974fea4b",
++        "archive_tar": "experiments/construction/034-overlay-extra/protocol-v1-archive.tar.gz",
++        "archive_tar_sha256": "6ef0dfea7984340f62e79951f15f63d5fc3fb6001d8eadc6cb86bc2cfc764437",
++        "approved_v2_reference_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/manifest.json",
++        "approved_v2_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24",
++        "operational_tcp_fixtures": 50,
++        "preserved_udp_fixtures": 16,
++        "archived_fixtures": 45
++      }
+     }
+   ]
+ }
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-control-channel-design-review
++extras_planning: EXTRA-01-TCP-v2-approved-IMP034-implement-review
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -254,3 +254,34 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## Aprovação e retoma de Implement — TCP v2
++
++Registo de 2026-11-11T17:55:50Z; instante do registo, não data atribuída à mensagem humana.
++O utilizador aprovou explicitamente Design revisto, ADR-034, âmbito dos 29
++caminhos e migração justificada dos testes/recursos para TCP exclusivamente v2.
++ADR-034 Aceite: substitui o contrato TCP v1 e as propostas OTD1/mista/ativação
++opcional afetadas; v1/fixtures ficam arquivados, UDP OTT1 permanece inalterado.
++G-EXTRA-ADR satisfeito para IMP-034; formalizada revisão ADR e retoma apenas
++Implement. Um contrato/codec v2 no bootstrap e vizinhos, descoberta obrigatória,
++com framing/caps/identidade/unicidade/FIFO/flush/isolamento/shutdown e cache/TTL/
++proveniência preservados. Testes incrementais com logs reais autorizados.
++Parar para revisão de Implement antes de Test/fecho; V-033, regressão atual,
++manual, revisão humana e integração continuam exigidos. IMP-035 mantém checkpoint
++próprio; sem commits/push ou início de outro IMP.
++
++## IMP-034 — Implement pronto para revisão
++
++Registo de 2026-11-11T18:57:34Z. ADR-034 Aceite e G-EXTRA-ADR satisfeito apenas para IMP-034.
++Controlo TCP exclusivamente v2 implementado no bootstrap, handshake, mensagens
++normais e descoberta obrigatória; um codec/FIFO/writer, sem canal OTD1/runtime
++v1 ou fallback. Cache/TTL/proveniência, isolamento e shutdown preservados.
++Conjunto incremental JDK 21: 1062 testes, zero falhas/erros; inclui TCP local e
++JVM da CLI. Corrigida a corrida descoberta/shutdown detetada por teste existente,
++com novo oráculo controlado; falhas/sondagens anteriores mantidas.
++66 fixtures operacionais (50 TCP v2 independentes e 16 UDP intactas); arquivo
++v1 de 45 fixtures verificado separadamente. Ver walkthrough do bolt para logs,
++XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean verify.
++Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
++verify/regressão atual, manual reproduzido, revisão final e integração continuam
++necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em revisão de Design/transporte e 28 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em revisão de Implement (TCP v2) e 28 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -280,7 +280,7 @@
+ 
+ ## 002-overlay/006-reconstruir-vizinhancas-apos-falhas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement interrompido; Design/ADR-034 revistos para aprovação.
++**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement pronto para revisão; Design/ADR-034/29 caminhos aprovados.
+ **Bolt:** 034-overlay-extra. **Ficheiro:** [006-reconstruir-vizinhancas-apos-falhas](intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md).
+ IMP-034 aprende candidatos por divulgação dos vizinhos diretos. IMP-035 repara a overlay antes de 005-rotas. Vídeo na integração posterior.
+ 
+diff --git a/scripts/validate-planning.py b/scripts/validate-planning.py
+--- a/scripts/validate-planning.py
++++ b/scripts/validate-planning.py
+@@ -288,6 +288,65 @@
+         require(len(data) == item["bytes"] and hashlib.sha256(data).hexdigest() == item["sha256"],
+                 f"{item['id']}: size/hash mismatch")
+         require(bytes.fromhex((fixtures_dir / item["hex"]).read_text()) == data, f"{item['id']}: hex mismatch")
++    # ADR-034: operational TCP v2 and frozen historical v1 are separate evidence.
++    # The original planning snapshot/hashes remain immutable in manifest['files'].
++    protocol = next((extra.get("protocol_validation") for extra in manifest.get("extras", [])
++                     if extra.get("id") == "EXTRA-01"), None)
++    if protocol:
++        archive = ROOT / protocol["archive_root"]
++        inventory_file = archive / "inventory.json"
++        require(hashlib.sha256(inventory_file.read_bytes()).hexdigest() == protocol["archive_inventory_sha256"],
++                "Historical protocol inventory changed")
++        inventory = json.loads(inventory_file.read_text())
++        for original in inventory["files"]:
++            data = (archive / original["copy"]).read_bytes()
++            require(len(data) == original["bytes"] and hashlib.sha256(data).hexdigest() == original["sha256"],
++                    f"Historical archive changed: {original['source']}")
++        require(hashlib.sha256((archive / "baseline-contract-v1.md").read_bytes()).hexdigest()
++                == inventory["baseline_contract_sha256"], "Historical v1 contract changed")
++        require(hashlib.sha256((ROOT / protocol["archive_tar"]).read_bytes()).hexdigest()
++                == protocol["archive_tar_sha256"], "Historical v1 archive tar changed")
++        historic_dir = archive / "snapshot/Projeto/src/test/resources/protocol"
++        historic = json.loads((historic_dir / "manifest.json").read_text())["fixtures"]
++        require(len(historic) == protocol["archived_fixtures"] == 45, "Historical fixture count changed")
++        for row in historic:
++            data = (historic_dir / row["binary"]).read_bytes()
++            require(hashlib.sha256(data).hexdigest() == row["sha256"] and len(data) == row["bytes"],
++                    f"Historical fixture changed: {row['id']}")
++            require(bytes.fromhex((historic_dir / row["hex"]).read_text()) == data,
++                    f"Historical fixture hex mismatch: {row['id']}")
++        reference_path = ROOT / protocol["approved_v2_reference_manifest"]
++        require(hashlib.sha256(reference_path.read_bytes()).hexdigest() == protocol["approved_v2_reference_sha256"],
++                "Approved independent TCP v2 manifest changed")
++        reference = json.loads(reference_path.read_text())["fixtures"]
++        tcp = {row["id"]: row for row in fixtures if row["id"].startswith("tcp-")}
++        udp = {row["id"]: row for row in fixtures if row["id"].startswith("udp-")}
++        old_udp = {row["id"]: row for row in historic if row["id"].startswith("udp-")}
++        require(len(tcp) == len(reference) == protocol["operational_tcp_fixtures"] == 50,
++                "Operational TCP v2 fixture count mismatch")
++        require(len(udp) == protocol["preserved_udp_fixtures"] == 16 and udp == old_udp,
++                "UDP OTT1 fixtures/expectations changed")
++        active_types = set()
++        for row in reference:
++            reference_data = (reference_path.parent / "fixtures" / row["binary"]).read_bytes()
++            require(hashlib.sha256(reference_data).hexdigest() == row["sha256"],
++                    f"Independent reference bytes changed: {row['id']}")
++            require(bytes.fromhex((reference_path.parent / "fixtures" / row["hex"]).read_text()) == reference_data,
++                    f"Independent reference hex mismatch: {row['id']}")
++            operational = tcp.get(row["id"])
++            require(operational is not None, f"Missing v2 operational fixture: {row['id']}")
++            if operational is None:
++                continue
++            require(operational["sha256"] == row["sha256"] and operational["expected"] == row["expected"],
++                    f"Operational v2 differs from independent oracle: {row['id']}")
++            require((fixtures_dir / operational["binary"]).read_bytes() == reference_data,
++                    f"Operational v2 byte mismatch: {row['id']}")
++            if row["expected"]["outcome"] == "accept":
++                require(reference_data[4] == 2 and reference_data[5] == row["expected"]["fields"]["type"],
++                        f"Accepted TCP fixture is not the declared v2 type: {row['id']}")
++                active_types.add(reference_data[5])
++        require(active_types == {1, 2, *range(4, 20)}, "Independent v2 vectors must cover all 18 active types; code 3 retired")
++        checks.append("Protocolo operacional: 50 fixtures TCP v2 independentes (18 tipos), 16 UDP OTT1 intactas; arquivo histórico: 45 fixtures e contrato v1 verificados.")
+     xml_files = list((ROOT / "CORE/topologies").glob("*.xml"))
+     for p in xml_files:
+         ET.parse(p)

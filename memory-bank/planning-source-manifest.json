@@ -3,15 +3,15 @@
   "baseline_revision": "85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936",
   "intent": "001-ott-streaming",
   "expected_counts": {
-    "requirements": 40,
+    "requirements": 41,
     "legacy_requirements": 35,
     "units": 7,
-    "stories": 33,
-    "bolts": 33,
-    "tasks": 32,
-    "future_tasks": 27,
-    "implementation_tasks": 33,
-    "adrs": 26
+    "stories": 35,
+    "bolts": 35,
+    "tasks": 34,
+    "future_tasks": 29,
+    "implementation_tasks": 35,
+    "adrs": 28
   },
   "task_to_bolt": {
     "TASK-001": "001-base-validada",
@@ -45,7 +45,9 @@
     "TASK-028": "031-core",
     "TASK-029": "017-entrega",
     "TASK-030": "018-entrega",
-    "TASK-031": "032-entrega"
+    "TASK-031": "032-entrega",
+    "TASK-033": "034-overlay-extra",
+    "TASK-034": "035-overlay-extra"
   },
   "task_to_story": {
     "TASK-001": "memory-bank/intents/001-ott-streaming/units/001-base-validada/stories/001-verificar-base.md",
@@ -79,7 +81,9 @@
     "TASK-028": "memory-bank/intents/001-ott-streaming/units/006-core/stories/004-recolher-metricas-e-avaliar-resultados-e-limites.md",
     "TASK-029": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/001-escrever-artigo-com-protocolos-e-avaliacao-critica.md",
     "TASK-030": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/002-empacotar-codigo-e-verificar-reproducao-da-entrega.md",
-    "TASK-031": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/003-preparar-defesa-e-checklist-de-submissao-humana.md"
+    "TASK-031": "memory-bank/intents/001-ott-streaming/units/007-entrega/stories/003-preparar-defesa-e-checklist-de-submissao-humana.md",
+    "TASK-033": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md",
+    "TASK-034": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md"
   },
   "files": {
     "CORE/topologies/cenario1.xml": "45cbe4c5761811ab33855b9b21bb1f3e9ff00e41a5426e4df176a6f648f1a9b0",
@@ -304,7 +308,7 @@
     "docs/checkpoint_REPORT.md": "e771f50025e48db25054f2f0841596b90e1224c773ff25ea463df1ef83daa9b5",
     "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
   },
-  "updated": "2026-11-10T15:20:09Z",
+  "updated": "2026-11-11T19:39:07Z",
   "architecture_source": "add.md",
   "specification_source": "specs.md",
   "task_to_bolts": {
@@ -408,6 +412,12 @@
     "TASK-031": [
       "032-entrega",
       "033-entrega"
+    ],
+    "TASK-033": [
+      "034-overlay-extra"
+    ],
+    "TASK-034": [
+      "035-overlay-extra"
     ]
   },
   "reconciliation": {
@@ -835,6 +845,38 @@
         "docs/18-CONSTRUCTION-BOLTS.md": "ba0ed094634d45533cf5b349f5ac00473c15fce930fd23d2b4c8d87023973feb",
         "docs/tasks/PHASE-02/TASK-007.md": "518f6393353509d50c143c5f09bafd6e3141fc4e1d65544870f7d3f7721b27a7",
         "docs/phases/PHASE-02-OVERLAY.md": "a480c8291e52f720f0a9b4b23309840f6529af74c98bd32eb547723c6d2b2202"
+      }
+    }
+  ],
+  "extras": [
+    {
+      "id": "EXTRA-01",
+      "requirement": "REQ-025",
+      "task": "TASK-033",
+      "requested_at": "2026-11-11T12:11:34Z",
+      "insert_before": "005-rotas",
+      "base_revision": "17c1ca27673930bfbf82078522059a243d96ccdb",
+      "scope": "overlay now, video integration later",
+      "candidate_discovery": "bounded advertisements of confirmed direct neighbors and time-limited learned cache",
+      "design_approval": "Design/ADR-034/29-path scope/test-resource migration to uniform TCP v2 explicitly approved; G-EXTRA-ADR met for IMP-034; Implement only, IMP-035 separate checkpoint",
+      "imps": [
+        "IMP-034",
+        "IMP-035"
+      ],
+      "bolts": [
+        "034-overlay-extra",
+        "035-overlay-extra"
+      ],
+      "revised_at": "2026-11-11T19:39:07Z",
+      "protocol_validation": {
+        "approved_v2_reference_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/manifest.json",
+        "approved_v2_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24",
+        "operational_tcp_fixtures": 50,
+        "preserved_udp_fixtures": 16,
+        "udp_baseline_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/udp-baseline.json",
+        "udp_baseline_sha256": "85abb5834687046b15e1e59337f3e32029e726402eabab085b97d8ca24a4e4f6",
+        "retired_tcp_archive_removed": "Explicit user instruction; Q-C-19",
+        "cleanup_manifest": "experiments/construction/034-overlay-extra/cleanup-manifest.json"
       }
     }
   ]

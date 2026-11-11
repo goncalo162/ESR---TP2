@@ -1,0 +1,570 @@
+diff --git a/memory-bank/bolts/034-overlay-extra/bolt.md b/memory-bank/bolts/034-overlay-extra/bolt.md
+--- a/memory-bank/bolts/034-overlay-extra/bolt.md
++++ b/memory-bank/bolts/034-overlay-extra/bolt.md
+@@ -186,3 +186,11 @@
+ separada da regressão atual. Parar antes da aprovação de Test para repetição
+ humana; fecho exige critérios, revisão final e integração. Sem commits/push
+ ou início do IMP-035.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+--- a/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
++++ b/memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md
+@@ -210,3 +210,12 @@
+ Implement volta a revisão, sem avanço a Test, clean verify, manual, fecho,
+ commits/push ou IMP-035. Continuam necessários regressão completa atual,
+ manual humano antes da aprovação de Test, revisão final e integração.
++
++## Aprovação de Implement e entrada em Test
++
++Registo de 2026-11-11T19:31:01Z. O utilizador aprovou Implement e as correções D07e.
++[Relatório Test atual](ddd-03-test-report.md): clean verify JDK 21 com 1065
++testes aprovados; manual do agente com 53 CHECK_PASS, MANUAL_PASS e saída 0.
++A repetição humana de Luis e a aprovação de Test continuam pendentes, assim
++como revisão final e integração. Os estados de paragem anteriores são histórico.
++Sem commits/push ou início do IMP-035.
+diff --git a/experiments/overlay-discovery/README.md b/experiments/overlay-discovery/README.md
+--- a/experiments/overlay-discovery/README.md
++++ b/experiments/overlay-discovery/README.md
+@@ -1,22 +1,66 @@
+-# EXTRA-01 — aprendizagem de candidatos no controlo v2
++# V-033 — manual de aprendizagem de candidatos no controlo v2
+ 
+-IMP-034/V-033 aprende; IMP-035/V-034 repara depois. Mesmo JAR em todos os processos, TCP v2 também no bootstrap, descoberta obrigatória e UDP OTT1 inalterado.
++IMP-034 aprende e retém candidatos. A reparação pertence ao IMP-035, ainda não iniciado. Implement foi aprovado; Test aguarda repetição humana e aprovação, revisão final e integração.
+ 
+-## Provas incrementais implementadas
++## Repetir pessoalmente
+ 
+-A partir da raiz do repositório, com JDK 21 e sockets locais autorizados:
++Na raiz do repositório, numa bancada Linux autorizada para sockets locais, com Python 3 e JDK 21:
+ 
+ ```sh
+-cd Projeto
+-mvn -B -ntp -Dtest=NeighborDiscoveryTest,NeighborManagerTest,NeighborManagerLifecycleTest,MessageCodecTest,DiscoveryCodecTest,TransportTest,BootstrapServerTest,OttApplicationTest test
++python3 -B experiments/overlay-discovery/run-manual.py --operator Luis
+ ```
+ 
+-Os testes de aprendizagem executam ambos os grafos: S–R1/R2–C e S–R1–R2/R3–C. Fecham o bootstrap depois do arranque, aprendem S/C ou R1/C, terminam os anunciantes e verificam retenção sem criar novas arestas. São nós embutidos com TCP real na mesma JVM, não uma morte física em CORE. Relógio/transporte/escrita controlados verificam TTL, callbacks antigos, saturação, prazos e terminação física. CLI também é ensaiada em JVM separada.
++O comando usa o JAR preservado de clean verify, com SHA-256
++`cff5db105bd1f3eca73aebc101724fccbdbd66645056ef6e3278018592bf8d48`.
++Confere o hash antes/depois e cria um diretório novo em
++experiments/construction/034-overlay-extra/test-manual-runs/.
++O primeiro caminho impresso é o diretório real da execução; não reutiliza logs.
++Não precisa de sudo. Se a bancada bloquear sockets, a tentativa falha e fica registada.
+ 
+-Fontes, comandos/resultados, XML e diferenças estão em experiments/construction/034-overlay-extra/ (raiz do repositório), ligados no walkthrough do bolt. Os logs OTD1/sondagens anteriores conservam o seu resultado histórico, incluindo falhas.
++Aguardar cerca de 70–100 segundos: o TTL observado é o real de 60 segundos,
++sem o encurtar por configuração ou usar relógio falso. Conferir a saída e os
++ficheiros manual.log, result.json, snapshots learned/retained/expired e logs
++cli/quit.log, cli/eof.log e cli/help.log. O sucesso exige JAVA_EXIT 0
++(no JSON: java_exit=0), MANUAL_PASS, passed=true, hashes iguais e ausência
++de traceback. Se falhar, preservar o diretório e apresentar o resultado.
+ 
+-## Manual e validação da etapa Test — pendentes
++## O que observar
+ 
+-Após aprovação de Implement, preparar/executar manual reproduzível com o mesmo JAR/hash em todos os processos: consulta inicial v2, handshake, aprendizagem via API candidates(), bootstrap parado, retenção/expiração e rejeição local de inputs negativos com outro peer saudável. Conferir neighbors e --help existentes, quit/EOF, logs, prazos, portas e processos. Preservar separadamente a execução do agente e a repetição humana que for realizada.
++1. Validação offline rejeita false/Q=1 com erros agregados. O codec operacional
++   usa v2 e rejeita versões inválidas e o tipo retirado 3.
++2. Uma entrada negativa de capacidade é rejeitada localmente com estado explícito
++   por peer; a sessão saudável mantém connectionId e a API candidates continua útil.
++   O input negativo é um HELLO v2 válido cujo último byte (requiredMask) é alterado
++   no auxiliar. O codec de produção não codifica um modelo incompatível.
++3. A CLI real, em JVM separada, responde a neighbors e termina por quit/EOF;
++   --help é uma invocação separada. Cada JVM deve terminar com saída 0.
++4. Nos grafos S–R1/R2–C e S–R1–R2/R3–C, todos os vizinhos admitidos exigem
++   descoberta. Depois de parar o bootstrap, C aprende S ou R1 pelos vizinhos
++   diretos. Os snapshots registam endpoint, instâncias, connectionId, token,
++   geração, origem local do prazo e TTL.
++5. Encerrar R1/R2 no primeiro grafo e R2/R3 no segundo remove as sessões, mas
++   conserva os candidatos válidos. S–R1 mantém a mesma sessão no segundo grafo.
++   Não surgem S–C/R1–C novas: este IMP só aprende.
++6. Após o prazo local de 60 s, os candidatos retidos de C expiram em ambos os
++   grafos. O encerramento final cumpre os prazos das APIs e permite voltar a
++   abrir as portas dos listeners TCP usados pelo roteiro.
+ 
+-Não executar v1 para interoperabilidade, não desligar descoberta para Q insuficiente e não designar um teste JUnit como manual. clean verify completo JDK 21, manual, revisão humana e integração continuam necessários antes de DONE. Este roteiro não demonstra reparação, routing, vídeo, GUI, CORE ou FPS.
++Este manual usa as APIs públicas do JAR com nós embutidos numa JVM e TCP real
++em loopback; os ensaios da CLI usam processos próprios com o mesmo JAR.
++Os grafos são construídos pela API, sem catálogo de streams/vídeo; os perfis
++SERVER gerados servem de registo e não são perfis completos para arrancar a CLI.
++A perda de anunciantes é close/EOF da API, não uma morte física, kill -9 ou CORE.
++Não mede vídeo, FPS, perdas ou recuperação de rotas. Não substitui os oráculos
++com relógio/transporte controlados para saturação, conflitos, callbacks antigos
++ou a correlação D07e; estes são executados na regressão completa.
++
++## Evidência separada
++
++- [Regressão clean verify atual](../construction/034-overlay-extra/test-clean-verify-01.log).
++- [XML, hashes, JAR e classificação da execução](../construction/034-overlay-extra/test-build-summary.json).
++- [Relatório Test](../../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
++- [Walkthrough incremental histórico](../../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
++
++O operador Codex identifica a execução do agente. O comando acima identifica
++Luis; só a execução real e a revisão de Luis podem satisfazer essa repetição.
++O runner não inventa operador, data, aprovação ou estado DONE.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em revisão de Implement (TCP v2) e 28 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em Test para repetição humana (TCP v2) e 28 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -280,7 +280,7 @@
+ 
+ ## 002-overlay/006-reconstruir-vizinhancas-apos-falhas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement pronto para revisão; Design/ADR-034/29 caminhos aprovados.
++**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement aprovado; Test com 1065 testes/53 checks do agente, repetição humana e aprovação pendentes.
+ **Bolt:** 034-overlay-extra. **Ficheiro:** [006-reconstruir-vizinhancas-apos-falhas](intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md).
+ IMP-034 aprende candidatos por divulgação dos vizinhos diretos. IMP-035 repara a overlay antes de 005-rotas. Vídeo na integração posterior.
+ 
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-approved-IMP034-implement-review
++extras_planning: EXTRA-01-TCP-v2-IMP034-test-human-manual-pending
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -702,3 +702,11 @@
+ anterior ficam como histórico. [Walkthrough, red/green e evidência](../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
+ Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+ continuam pendentes; sem DONE, commits/push ou início de IMP-035.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -186,3 +186,11 @@
+ Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+ verify/regressão atual, manual reproduzido, revisão final e integração continuam
+ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/docs/tasks/PHASE-02/TASK-033.md b/docs/tasks/PHASE-02/TASK-033.md
+--- a/docs/tasks/PHASE-02/TASK-033.md
++++ b/docs/tasks/PHASE-02/TASK-033.md
+@@ -88,3 +88,11 @@
+ Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
+ verify/regressão atual, manual reproduzido, revisão final e integração continuam
+ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -691,3 +691,11 @@
+ anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+ Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+ continuam pendentes; sem DONE, commits/push ou início de IMP-035.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -318,3 +318,11 @@
+ anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+ Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+ continuam pendentes; sem DONE, commits/push ou início de IMP-035.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md
+@@ -59,3 +59,11 @@
+ anterior ficam como histórico. [Walkthrough, red/green e evidência](../../../../../bolts/034-overlay-extra/implementation-walkthrough.md).
+ Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+ continuam pendentes; sem DONE, commits/push ou início de IMP-035.
++
++## Estado atual — IMP-034 em Test para repetição humana
++
++Registo de 2026-11-11T19:31:01Z. Implement aprovado; clean verify JDK 21 executado
++com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
++MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
++Repetição pessoal de Luis, aprovação de Test, revisão final e integração
++pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+diff --git a/memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md b/memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md
+@@ -0,0 +1,128 @@
++---
++stage: test
++bolt: "034-overlay-extra"
++created: "2026-11-11T19:31:01Z"
++status: "awaiting-human-manual-and-review"
++---
++# IMP-034 / V-033 — Test para repetição humana e revisão
++
++Implement aprovado explicitamente pelo utilizador; entrada em Test registada
++em 2026-11-11T19:22:10Z. Este relatório não aprova Test nem fecha o bolt.
++Main/base integrada: 17c1ca27673930bfbf82078522059a243d96ccdb; ramo Denji.
++Sem commits/push ou início de IMP-035.
++
++## Regressão completa atual
++
++Com JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64, em Projeto/:
++
++```sh
++mvn -B -ntp clean verify
++```
++
++Execução real de 2026-11-11T19:22:14.950327+00:00 a
++2026-11-11T19:22:31.842099+00:00, saída 0 e BUILD SUCCESS.
++**1065 testes, zero falhas, erros ou skips**, dez XML Surefire da própria
++invocação. JDK 21, compilação release 21, JUnitPlatformProvider 3.5.4.
++São resultados atuais; os 1062/142 incrementais permanecem separados e históricos.
++
++| Classe | Testes | Falhas/erros/skips |
++|---|---:|---|
++| CandidateCacheTest | 9 | 0/0/0 |
++| NeighborManagerTest | 54 | 0/0/0 |
++| NeighborManagerLifecycleTest | 33 | 0/0/0 |
++| NeighborDiscoveryTest | 20 | 0/0/0 |
++| OttApplicationTest | 47 | 0/0/0 |
++| TransportTest | 36 | 0/0/0 |
++| ConfigurationLoaderTest | 741 | 0/0/0 |
++| DiscoveryCodecTest | 26 | 0/0/0 |
++| MessageCodecTest | 79 | 0/0/0 |
++| BootstrapServerTest | 20 | 0/0/0 |
++
++[Log Maven](../../../experiments/construction/034-overlay-extra/test-clean-verify-01.log),
++[comando, hashes e lista exata dos XML](../../../experiments/construction/034-overlay-extra/test-clean-verify-01-result.json),
++[resumo correto da execução e hashes dos XML/JAR/CLI](../../../experiments/construction/034-overlay-extra/test-build-summary.json).
++Os XML e TXT foram preservados fora de target/, assim como os 109 artefactos
++CLI gerados por esta execução. A flag not_a_clean_verify_or_manual do runner
++incremental genérico é constante e incorreta nesta invocação; o comando/log e
++o resumo classificam-na corretamente como clean verify completo. O resultado
++bruto foi preservado, sem o reescrever. POM e dependências mantidos.
++
++JAR construído/preservado em test-verified-jar/ott-streaming-1.0-SNAPSHOT.jar:
++
++```text
++cff5db105bd1f3eca73aebc101724fccbdbd66645056ef6e3278018592bf8d48
++```
++
++Este é o JAR TCP v2 desta execução, diferente do JAR histórico. Os fontes,
++testes, configuração e fixtures não mudaram durante/depois da execução;
++apenas README de Projeto foi atualizado posteriormente para indicar Test.
++
++## V-033 / D01–D12
++
++[Mapa completo de implementação e oráculos](implementation-walkthrough.md).
++Os casos correspondentes foram incluídos na regressão atual:
++
++| Oráculos | Evidência atual e alcance |
++|---|---|
++| D01/a–e | Configuração obrigatória Q>=2/false agregado/preflight, APIs preservadas, 18 tipos/versões/código 3; fixtures independentes comparadas pelo codec Java. |
++| D02/a–d | Capacidade/identidade/endpoint/versão, tentativa rejeitada localmente, diagnóstico/retry por peer, saudável ACTIVE/CLI/aprendizagem preservados. |
++| D03–D04 | Ambos os grafos aprovados aprendem com bootstrap parado; não criam arestas novas. TCP real na regressão e manual API. |
++| D05–D06 | TTL desde QUERY, morte do anunciante, fonte/geração/sessão, retenção/expiração/conflitos/caps. Relógio controlado para fronteiras; manual observa TTL real. |
++| D07/a–e | Conteúdo recuperável versus framing/identidade terminais; token antigo em mensagens/rejeições e geração antiga preservam query/sessão/cache/TTL; resposta válida posterior aceite sem Down. |
++| D08/a–f | FIFO comum, margem Q2, quota/tickets físicos, cadência/operações limitadas, sem hearsay. Fakes de clock/escrita e transporte real onde exigido. |
++| D09–D10 | Ausência de reparação, coalescência, callbacks antigos, shutdown global e reservas físicas; sem recursos artificiais ilimitados. |
++| D11/a–b | TCP/CLI reais, bootstrap v2 flush/EOF, grafos/reconexão e isolamento de peer incompatível. Manual público API e JVM CLI. |
++| D12 | Regressão completa/fixtures/V-ADD/diffs/hashes e manual do agente executados. Repetição humana, aprovação Test, revisão final e integração pendentes. |
++
++## Manual do agente e repetição humana
++
++[Roteiro/comando e alcance](../../../experiments/overlay-discovery/README.md).
++Manual autónomo contra o JAR, sem JUnit nem alterações ao runtime.
++Execução Codex de 2026-11-11T19:28:21.125978+00:00 a
++2026-11-11T19:29:24.035030+00:00: **53 CHECK_PASS, MANUAL_PASS, JAVA_EXIT=0**.
++[Log](../../../experiments/construction/034-overlay-extra/test-manual-runs/20261111T192821Z-o453w0bk/manual.log)
++e [resultado/hashes](../../../experiments/construction/034-overlay-extra/test-manual-runs/20261111T192821Z-o453w0bk/result.json).
++
++Confirma offline Q1/false, codec v2/negativos, peer incompatível sem queda de
++saudável, CLI neighbors/quit/EOF/help em JVM separada, ambos os grafos,
++bootstrap parado, proveniência, retenção após encerramento dos anunciantes,
++TTL real de 60 s, ausência de reparação e shutdown/portas dos listeners.
++Nós API dos grafos embutidos numa JVM; perda por close/EOF. Não é kill -9,
++morte física, CORE, GUI, routing/streaming, vídeo/FPS ou reparação IMP-035.
++A consulta normal do bootstrap não foi capturada em PCAP neste roteiro;
++fecho real do bootstrap e continuidade são observados pelas APIs/TCP.
++
++Tentativas anteriores do auxiliar, todas preservadas e sem MANUAL_PASS:
++
++- 20261111T192613Z-nr7eem_9: compilação do auxiliar falhou por leitura Optional;
++  zero checks. Não foi falha do código Java do projeto.
++- 20261111T192635Z-yrtieyw_: 12 checks; o encoder recusou corretamente o modelo
++  HELLO inválido antes da rede. Auxiliar passou a alterar só o byte da máscara
++  de um HELLO v2 válido para a entrada negativa de protocolo.
++- 20261111T192757Z-glsj42qv: 17 checks; o cenário CLI com grau zero foi recusado
++  corretamente pelo bootstrap. Roteiro corrigido para o grafo válido C–R.
++
++**Luis ainda não executou este manual nesta etapa.** Na raiz:
++
++```sh
++python3 -B experiments/overlay-discovery/run-manual.py --operator Luis
++```
++
++Cria um novo diretório, identifica operador e guarda comando/log/result.json
++sem sobrescrever os anteriores. Aguardar o TTL real e conferir passed=true,
++53 CHECK_PASS, um MANUAL_PASS, java_exit=0 e hashes iguais. Rever também os
++snapshots learned/retained/expired e logs CLI. Não inferir aprovação pela saída.
++
++## Conferências e estado final
++
++[V-ADD atual](../../../experiments/construction/034-overlay-extra/test-v-add-01.log),
++[conferência final](../../../experiments/construction/034-overlay-extra/test-validation.json),
++[diff de Projeto contra HEAD](../../../experiments/construction/034-overlay-extra/test-project-vs-head.diff)
++e [numstat](../../../experiments/construction/034-overlay-extra/test-project-vs-head.numstat).
++Documentação deste checkpoint separada das alterações aprovadas de Implement;
++recursos gerados de target/ excluídos dos patches fonte.
++
++Test fica em revisão, **sem conclusão de Test/DONE**. Pendentes: repetição
++pessoal de Luis, aprovação de Test, critérios finais, revisão humana final e
++integração. Não se atribui revisão/operador/datas a terceiros. G-EXTRA-ADR
++permanece satisfeito só para IMP-034; IMP-035 mantém checkpoint próprio.
+diff --git a/experiments/overlay-discovery/ManualV033.java b/experiments/overlay-discovery/ManualV033.java
+new file mode 100644
+--- /dev/null
++++ b/experiments/overlay-discovery/ManualV033.java
+@@ -0,0 +1,144 @@
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import java.io.*;
++import java.net.*;
++import java.nio.file.*;
++import java.security.MessageDigest;
++import java.time.*;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.function.BooleanSupplier;
++
++/** Standalone manual API/CLI exercise against the verified JAR; no JUnit or production changes. */
++public class ManualV033 {
++    static final UUID ZERO=new UUID(0,0);
++    static int checks;
++    static Path evidence,jar;
++    static void check(boolean ok,String label) {if(!ok)throw new AssertionError(label);checks++;System.out.println("CHECK_PASS "+label);}
++    static String sha(Path p)throws Exception{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(p)));}
++    static void waitFor(String label,long seconds,BooleanSupplier condition)throws Exception {
++        long began=System.nanoTime(),last=began;
++        while(!condition.getAsBoolean()) {
++            if(System.nanoTime()-began>TimeUnit.SECONDS.toNanos(seconds))throw new AssertionError("Timeout: "+label);
++            if(System.nanoTime()-last>TimeUnit.SECONDS.toNanos(10)){System.out.println("WAIT "+label);last=System.nanoTime();}
++            Thread.sleep(50);
++        }
++        check(true,label);
++    }
++    static final class Graph implements AutoCloseable {
++        final String label;
++        final Map<String,Set<String>> edges;
++        final Map<String,NodeConfiguration> configs=new LinkedHashMap<>();
++        final Map<String,OverlayNode> nodes=new LinkedHashMap<>();
++        final Set<String> stopped=new HashSet<>();
++        final List<Integer> ports=new ArrayList<>();
++        final Path dir;
++        BootstrapServer bootstrap;
++        Graph(String label,Map<String,Set<String>> edges)throws Exception {
++            this.label=label;this.edges=edges;dir=Files.createDirectory(evidence.resolve(label));
++            var reservations=new ArrayList<ServerSocket>();
++            try {for(int i=0;i<edges.size()*2+1;i++){var s=new ServerSocket(0,1,InetAddress.getByName("127.0.0.1"));reservations.add(s);ports.add(s.getLocalPort());}}
++            finally {for(var s:reservations)s.close();}
++            var topology=new LinkedHashMap<String,TopologyConfiguration.Node>();int index=0;
++            for(var entry:edges.entrySet()) {
++                String id=entry.getKey();int tcp=ports.get(1+2*index),udp=ports.get(2+2*index);index++;
++                var role=id.equals("S")?NodeRole.SERVER:id.equals("C")?NodeRole.CLIENT:NodeRole.RELAY;
++                topology.put(id,new TopologyConfiguration.Node(id,"127.0.0.1",tcp,udp,role,entry.getValue()));
++                var config=new NodeConfiguration(dir.resolve(id+".properties"),id,role,"127.0.0.1","127.0.0.1",tcp,udp,
++                    Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1",ports.getFirst())),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),List.of());
++                configs.put(id,config);
++                Files.writeString(config.sourceFile(),"# Public API graph; SERVER stream catalog not exercised here\nnode.id="+id+"\nnode.role="+role+"\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="+tcp+"\ndata.port="+udp+"\nbootstrap.host=127.0.0.1\nbootstrap.port="+ports.getFirst()+"\n");
++                nodes.put(id,new OverlayNode(config,UUID.randomUUID(),event->{}));
++            }
++            Files.writeString(dir.resolve("topology.txt"),topology.toString());
++            var config=new NodeConfiguration(dir.resolve("bootstrap.properties"),"BOOT",NodeRole.BOOTSTRAP,"127.0.0.1","127.0.0.1",ports.getFirst(),0,
++                Optional.empty(),Optional.of(dir.resolve("topology.txt")),Optional.empty(),Optional.empty(),Optional.of(new TopologyConfiguration(dir.resolve("topology.txt"),topology)),List.of());
++            bootstrap=new BootstrapServer(config);
++        }
++        void start(Set<String> ids)throws Exception {
++            for(var id:ids)nodes.get(id).start();
++            for(var id:ids)nodes.get(id).start().toCompletableFuture().get(10,TimeUnit.SECONDS);
++            waitFor(label+" admitted sessions require discovery",15,()->ids.stream().allMatch(id->{var expected=new HashSet<>(edges.get(id));expected.retainAll(ids);return nodes.get(id).snapshot().keySet().equals(expected)&&nodes.get(id).discoveryStatus().values().stream().filter(s->s.state()==NeighborManager.CapabilityState.ACTIVE_DISCOVERY).count()==expected.size();}));
++        }
++        List<CandidateCache.CandidateView> candidates(String id) {
++            try{return nodes.get(id).candidates().toCompletableFuture().get(2,TimeUnit.SECONDS);}catch(Exception e){throw new RuntimeException(e);}
++        }
++        boolean learned(String id,String target){return candidates(id).stream().anyMatch(v->v.nodeId().equals(target)&&v.state()==CandidateCache.CandidateState.AVAILABLE);}
++        void stopBootstrap(){bootstrap.close();bootstrap=null;check(true,label+" bootstrap terminated after initial lookup");}
++        void lose(String id){nodes.get(id).close();stopped.add(id);check(true,label+" abrupt API close/EOF "+id+" completed");}
++        void dump(String name)throws Exception {var text=new StringBuilder();for(var id:nodes.keySet())if(!stopped.contains(id))text.append(id).append(" sessions=").append(nodes.get(id).snapshot()).append(" candidates=").append(candidates(id)).append('\n');Files.writeString(dir.resolve(name+".txt"),text);System.out.println("EVIDENCE "+label+"/"+name+".txt");}
++        public void close() {
++            RuntimeException problem=null;
++            for(var id:nodes.keySet())try{nodes.get(id).close();}catch(RuntimeException e){if(problem==null)problem=e;else problem.addSuppressed(e);}
++            if(bootstrap!=null)try{bootstrap.close();}catch(RuntimeException e){if(problem==null)problem=e;else problem.addSuppressed(e);}
++            if(problem!=null)throw problem;
++            for(int port:ports)try(var s=new ServerSocket()){s.setReuseAddress(true);s.bind(new InetSocketAddress("127.0.0.1",port));}catch(IOException e){throw new AssertionError(label+" listener still bound: "+port,e);}
++            check(true,label+" shutdown deadlines completed and TCP listener ports reusable");
++        }
++    }
++    static void offline()throws Exception {
++        Path p=evidence.resolve("invalid-client.properties");Files.writeString(p,"node.id=C\nnode.role=CLIENT\nbind.host=127.0.0.1\ncontrol.port=4100\ndata.port=4200\nbootstrap.host=127.0.0.1\nbootstrap.port=4000\ncontrol.queue.capacity=1\nextra.discovery.enabled=false\n");
++        try {ConfigurationLoader.load(p,NodeRole.CLIENT);throw new AssertionError("Invalid configuration accepted");}
++        catch(ConfigurationException e){check(e.problems().stream().anyMatch(x->x.key().equals("control.queue.capacity"))&&e.problems().stream().anyMatch(x->x.key().equals("extra.discovery.enabled")),"offline Q1/false errors aggregated before node construction");}
++        var ping=new ControlMessage(MessageType.PROBE_PING,UUID.randomUUID(),"P",UUID.randomUUID(),new ControlMessage.Probe(1));
++        var bytes=MessageCodec.encode(ping);check((bytes[4]&255)==2&&MessageCodec.read(new ByteArrayInputStream(bytes)).orElseThrow().equals(ping),"single operational codec v2 round trip");
++        for(int version:List.of(1,0,3,255)){var bad=bytes.clone();bad[4]=(byte)version;try{MessageCodec.read(new ByteArrayInputStream(bad));throw new AssertionError("Version accepted "+version);}catch(pt.uminho.esr.ott.protocol.ProtocolException expected){check(true,"negative version "+version+" rejected without v1 decoder");}}
++        var bad=bytes.clone();bad[5]=3;try{MessageCodec.read(new ByteArrayInputStream(bad));throw new AssertionError("Retired type accepted");}catch(pt.uminho.esr.ott.protocol.ProtocolException expected){check(true,"retired type 3 rejected");}
++    }
++    static void incompatiblePeer()throws Exception {
++        try(var g=new Graph("negative-peer",Map.of("A",Set.of("Z"),"B",Set.of("Z"),"Z",Set.of("A","B")))) {
++            g.start(Set.of("A","Z"));var healthy=g.nodes.get("Z").snapshot().get("A");g.stopBootstrap();var b=g.configs.get("B");var z=g.configs.get("Z");var instance=UUID.randomUUID();
++            try(var socket=new Socket("127.0.0.1",z.controlPort())) {
++                socket.setSoTimeout(5000);
++                var hello=new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",instance,new ControlMessage.Hello(new ControlMessage.Endpoint("B",instance,b.advertisedHost(),b.controlPort(),b.dataPort(),b.role()),1,0));
++                var valid=new ControlMessage(MessageType.HELLO,hello.requestId(),"B",instance,new ControlMessage.Hello(new ControlMessage.Endpoint("B",instance,b.advertisedHost(),b.controlPort(),b.dataPort(),b.role()),1,1));
++                var negative=MessageCodec.encode(valid);negative[negative.length-1]=0;
++                socket.getOutputStream().write(negative);socket.getOutputStream().flush();var reply=MessageCodec.read(socket.getInputStream());
++                check(reply.isEmpty()||reply.get().type()==MessageType.ERROR&&reply.get().requestId().equals(hello.requestId()),"incompatible capability rejected locally without HELLO_OK");
++                check(reply.isEmpty()||socket.getInputStream().read()==-1,"invalid attempt terminates with EOF");
++            }
++            waitFor("explicit per-peer incompatible state",5,()->g.nodes.get("Z").discoveryStatus().get("B").lastConfirmedRejection().isPresent());
++            check(healthy.equals(g.nodes.get("Z").snapshot().get("A"))&&g.nodes.get("Z").failure().isEmpty(),"healthy session connectionId and node survive rejected peer");
++            check(g.candidates("Z")!=null,"candidate API still usable after rejection");g.dump("rejection");
++        }
++    }
++    static void cli()throws Exception {
++        try(var g=new Graph("cli",Map.of("C",Set.of("R"),"R",Set.of("C")))) {
++            g.start(Set.of("R"));
++            String javaBin=Path.of(System.getProperty("java.home"),"bin","java").toString();String main="pt.uminho.esr.ott.app.OttApplication";
++            for(String mode:List.of("quit","eof","help")) {
++                Path log=g.dir.resolve(mode+".log");var command=new ArrayList<>(List.of(javaBin,"-cp",jar.toString(),main));
++                if(mode.equals("help"))command.add("--help");else command.addAll(List.of("--role","CLIENT","--config",g.configs.get("C").sourceFile().toString()));
++                Process p=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
++                try {if(!mode.equals("help"))waitFor("CLI "+mode+" READY before input",8,()->{try{return Files.readString(log).contains("READY");}catch(IOException e){throw new UncheckedIOException(e);}});if(!mode.equals("help"))waitFor("CLI "+mode+" persistent neighbor admitted",8,()->g.nodes.get("R").snapshot().containsKey("C"));if(mode.equals("quit")){p.getOutputStream().write("neighbors\nquit\n".getBytes(java.nio.charset.StandardCharsets.UTF_8));p.getOutputStream().flush();}p.getOutputStream().close();if(!p.waitFor(12,TimeUnit.SECONDS))throw new AssertionError("CLI timeout "+mode);check(p.exitValue()==0,"CLI "+mode+" child JVM exit 0");String text=Files.readString(log);check(mode.equals("help")?text.contains("Usage:"):text.contains("READY"),"CLI "+mode+" expected output");if(mode.equals("quit"))check(text.contains("NEIGHBORS"),"CLI neighbors responded before quit");if(!mode.equals("help"))waitFor("CLI "+mode+" session removed after shutdown",5,()->g.nodes.get("R").snapshot().isEmpty());}
++                finally {if(p.isAlive()){p.destroyForcibly();p.waitFor(5,TimeUnit.SECONDS);}}
++            }
++        }
++    }
++    public static void main(String[] args)throws Exception {
++        if(args.length!=4)throw new IllegalArgumentException("operator expectedJarSha jar evidenceDirectory");
++        jar=Path.of(args[2]).toAbsolutePath();evidence=Path.of(args[3]).toAbsolutePath();
++        System.out.println("OPERATOR "+args[0]+" AT "+Instant.now()+" JAR "+jar+" SHA256 "+sha(jar));
++        check(Runtime.version().feature()==21,"JDK 21");check(sha(jar).equals(args[1]),"verified JAR hash matches before execution");
++        offline();incompatiblePeer();cli();
++        var shallow=Map.of("S",Set.of("R1","R2"),"R1",Set.of("S","C"),"R2",Set.of("S","C"),"C",Set.of("R1","R2"));
++        var deeper=Map.of("S",Set.of("R1"),"R1",Set.of("S","R2","R3"),"R2",Set.of("R1","C"),"R3",Set.of("R1","C"),"C",Set.of("R2","R3"));
++        try(var a=new Graph("S-R1R2-C",shallow);var b=new Graph("S-R1-R2R3-C",deeper)) {
++            a.start(a.nodes.keySet());b.start(b.nodes.keySet());a.stopBootstrap();b.stopBootstrap();
++            waitFor("S/C learned via direct relays with bootstrap stopped",15,()->a.learned("C","S")&&a.learned("S","C"));
++            waitFor("R1/C learned via R2/R3 with bootstrap stopped",15,()->b.learned("C","R1")&&b.learned("R1","C"));
++            for(var g:List.of(a,b)){g.dump("learned");check(g.candidates("C").stream().flatMap(v->v.sources().stream()).allMatch(p->g.edges.get("C").contains(p.source().nodeId())&&p.generation()>0&&p.ttlNanos()==CandidateCache.TTL_NANOS),g.label+" direct provenance, positive generation and 60s local TTL");}
++            var sr=b.nodes.get("S").snapshot().get("R1");a.lose("R1");a.lose("R2");b.lose("R2");b.lose("R3");
++            waitFor("lost relay sessions removed in both graphs",5,()->a.nodes.get("C").snapshot().isEmpty()&&a.nodes.get("S").snapshot().isEmpty()&&b.nodes.get("C").snapshot().isEmpty()&&b.nodes.get("R1").snapshot().keySet().equals(Set.of("S")));
++            check(a.learned("C","S")&&b.learned("C","R1"),"claims retained after both announcers terminate");check(sr.equals(b.nodes.get("S").snapshot().get("R1")),"healthy S-R1 connectionId preserved");
++            a.dump("retained");b.dump("retained");
++            check(!a.nodes.get("C").snapshot().containsKey("S")&&!b.nodes.get("C").snapshot().containsKey("R1"),"learning does not implement IMP-035 repair");
++            waitFor("real 60-second TTL expires retained C claims in both graphs",65,()->a.candidates("C").isEmpty()&&b.candidates("C").isEmpty());
++            a.dump("expired");b.dump("expired");check(sr.equals(b.nodes.get("S").snapshot().get("R1")),"healthy session and discovery remain live through expiry");
++        }
++        check(sha(jar).equals(args[1]),"JAR hash unchanged after execution");
++        System.out.println("MANUAL_PASS operator="+args[0]+" checks="+checks+" at="+Instant.now());
++    }
++}
+diff --git a/experiments/overlay-discovery/run-manual.py b/experiments/overlay-discovery/run-manual.py
+new file mode 100644
+--- /dev/null
++++ b/experiments/overlay-discovery/run-manual.py
+@@ -0,0 +1,33 @@
++#!/usr/bin/env python3
++"""Run the standalone V-033 manual with an explicit operator and preserve every attempt."""
++from pathlib import Path
++import argparse,datetime,hashlib,json,os,signal,subprocess,tempfile
++root=Path(__file__).resolve().parents[2]
++evidence=root/'experiments/construction/034-overlay-extra'
++parser=argparse.ArgumentParser(description=__doc__)
++parser.add_argument('--operator',required=True)
++parser.add_argument('--java',default='/usr/lib/jvm/java-21-openjdk-amd64/bin/java')
++args=parser.parse_args()
++if not args.operator.strip():parser.error('operator is required')
++build=json.loads((evidence/'test-build-summary.json').read_text())
++jar=root/build['jar'];source=Path(__file__).with_name('ManualV033.java')
++sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
++if sha(jar)!=build['jar_sha256']:raise SystemExit('Verified JAR hash mismatch; no manual started')
++now=lambda:datetime.datetime.now(datetime.timezone.utc).isoformat()
++parent=evidence/'test-manual-runs';parent.mkdir(exist_ok=True)
++run=Path(tempfile.mkdtemp(prefix=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ-'),dir=parent))
++command=[args.java,'--class-path',str(jar),str(source),args.operator,build['jar_sha256'],str(jar),str(run)]
++started=now();source_hash=sha(source);before=sha(jar);log=run/'manual.log'
++print(run,flush=True);timed_out=False
++with log.open('w') as out:
++    out.write('COMMAND '+json.dumps(command)+'\nSTARTED '+started+'\n');out.flush()
++    process=subprocess.Popen(command,cwd=root,stdout=out,stderr=subprocess.STDOUT,start_new_session=True)
++    try:code=process.wait(timeout=180)
++    except subprocess.TimeoutExpired:
++        timed_out=True;os.killpg(process.pid,signal.SIGTERM)
++        try:code=process.wait(timeout=5)
++        except subprocess.TimeoutExpired:os.killpg(process.pid,signal.SIGKILL);code=process.wait(timeout=5)
++text=log.read_text();result={'operator':args.operator,'started_at':started,'finished_at':now(),'command':command,'java_exit':code,'timed_out':timed_out,'check_pass':sum(line.startswith('CHECK_PASS ') for line in text.splitlines()),'manual_pass':sum(line.startswith('MANUAL_PASS ') for line in text.splitlines()),'jar_sha256_before':before,'jar_sha256_after':sha(jar),'source_sha256_before':source_hash,'source_sha256_after':sha(source),'log':str(log.relative_to(root)),'log_sha256':sha(log),'scope':'Standalone public API over real loopback TCP, embedded nodes in one JVM plus separate real CLI JVMs. API close/EOF, not physical host death, CORE, video or IMP-035 repair.','passed':code==0 and not timed_out and sum(line.startswith('MANUAL_PASS ') for line in text.splitlines())==1 and before==sha(jar) and source_hash==sha(source)}
++(run/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
++print(text,flush=True);print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
++raise SystemExit(0 if result['passed'] else 1)
+diff --git a/Projeto/README.md b/Projeto/README.md
+--- a/Projeto/README.md
++++ b/Projeto/README.md
+@@ -4,9 +4,9 @@
+ 
+ ## Estado
+ 
+-A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está em Implement para revisão: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
++A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está em Test, aguardando repetição humana e aprovação: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
+ 
+-IMP-034 aprende/retém candidatos; criar ligações novas após falhas pertence ao IMP-035, ainda não iniciado. Routing, streaming e demonstração de continuidade de vídeo permanecem nos seus incrementos. Testes incrementais não substituem clean verify, manual, revisão e integração da etapa Test.
++IMP-034 aprende/retém candidatos; criar ligações novas após falhas pertence ao IMP-035, ainda não iniciado. Routing, streaming e demonstração de continuidade de vídeo permanecem nos seus incrementos. O clean verify atual passou 1065 testes e o manual do agente passou 53 checks. A repetição humana, aprovação de Test, revisão final e integração continuam pendentes.
+ 
+ ## Compilar e testar
+ 

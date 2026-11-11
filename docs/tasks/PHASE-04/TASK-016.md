@@ -72,3 +72,13 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Integração futura de EXTRA-01
+
+O utilizador aprovou construir primeiro a aresta S–C no
+[IMP-034/035](../../../add.md#imp-035), antes de 005-rotas. Quando os componentes
+desta tarefa estiverem disponíveis, ligar a evidência de recuperação do
+caminho e do vídeo ao cenário S–R1–C / S–R2–C, com morte sequencial dos
+relays e formação de S–C. A aprendizagem e a reparação da overlay demonstram a conectividade.
+O teste integrado deve identificar stream, origem, nova aresta, percurso
+selecionado, confirmação de ativação e resultado observado.

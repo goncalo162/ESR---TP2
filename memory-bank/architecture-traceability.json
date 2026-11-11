@@ -1,6 +1,6 @@
 {
   "version": "1.0.2",
-  "updated": "2026-11-03T20:54:11Z",
+  "updated": "2026-11-11T15:35:59Z",
   "architecture_source": "add.md",
   "specification_source": "specs.md",
   "approval": {
@@ -875,6 +875,23 @@
       "tests": [
         "V-ADD",
         "V-032"
+      ]
+    },
+    "REQ-025": {
+      "id": "REQ-025",
+      "legacy_id": null,
+      "title": "Extra — reconstrução dinâmica de vizinhanças",
+      "nature": "Extra pedido explicitamente pelo utilizador",
+      "priority": "P1",
+      "acceptance": "Aprender candidatos através da divulgação limitada dos vizinhos diretos em sessões confirmadas, sem exigir a configuração prévia de todos os endpoints; conservar os candidatos com prazo local, proveniência e limites mesmo após morrer quem os anunciou. Após aprender candidatos e perder os relays nos cenários S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C, formar respetivamente S–C e R1–C, mantendo os sobreviventes e sem duplicados. A continuação de vídeo nessas ligações será verificada após routing e streaming. Todos os nós overlay da aplicação suportam e exigem a capacidade de descoberta, sem ativação opcional, API/perfil desligado ou ACTIVE_BASE operacional. Todos os caminhos validam Q>=2 antes de sockets, sem reduzir funcionalidades por insuficiência de recursos. O cenário operacional usa um único programa e a mesma versão do JAR em todos os nós. Versão, identidade, endpoint e capacidade são validados no handshake; tentativa inválida é rejeitada localmente, sem NeighborUp, FAILED global ou interrupção da CLI/sessões saudáveis. Estado por peer e retries têm limites/backoff; ausência temporária distingue-se de incompatibilidade confirmada. Incompatibilidade é entrada negativa de protocolo, sem suporte operacional a versões antigas. Uniformizar todo o controlo TCP em v2, incluindo bootstrap inicial, handshake, mensagens normais e descoberta, com um contrato/codec operacional e sem runtime v1/fallback. Arquivar contrato/fixtures TCP v1 e preparar fixtures v2 independentes, justificando a migração dos testes sem perder garantias. Preservar framing, hard caps, código 3 rejeitado, identidade/unicidade/FIFO/flush/isolamento/shutdown; UDP OTT1 de vídeo permanece inalterado.",
+      "origin": "Pedido do utilizador de descoberta por divulgação de vizinhos diretos, substituindo a opção de catálogo inicial",
+      "tasks": [
+        "TASK-033",
+        "TASK-034"
+      ],
+      "tests": [
+        "V-033",
+        "V-034"
       ]
     }
   },
@@ -1802,6 +1819,83 @@
         "V-032",
         "V-ADD"
       ]
+    },
+    {
+      "id": "ADR-033",
+      "title": "Descoberta extra por divulgação de vizinhos e cache limitada",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-025"
+      ],
+      "context": "O utilizador substituiu o catálogo inicial pela aprendizagem de candidatos através dos vizinhos diretos antes das falhas, mantendo o bootstrap apenas para arranque.",
+      "decision": "No modo extra opt-in, propor consultas OTD1 isoladas em TCP na dataPort já anunciada, vinculadas ao HELLO atual; v1 e UDP OTT1 conservam bytes, códigos e caps. Divulgar só adjacências ACTIVE, com geração por sessão, TTL local de 60 s, cache de 128 candidatos e quatro fontes por candidato. A morte do anunciante não apaga claims válidos. Partilhar o orçamento físico TCP existente e limitar frequência, consultas, filas e jobs. Em IMP-035, permitir novas arestas apenas por candidatos aprendidos válidos e admissão explícita; manter o menor nodeId como iniciador do controlo, com intenção de reparação possível por qualquer extremo. Admitir extra.discovery.enabled como única chave adicional à lista de ADR-010/016, apenas nos papéis overlay, sem alterar as 30 chaves/defaults existentes ou permitir afinação de formatos/caps.",
+      "alternatives": "Um catálogo global de endpoints no arranque foi substituído pelo utilizador. Consultar novamente o bootstrap foi rejeitado. Reutilizar tipos v1, negociar por payload HELLO modificado ou autodetetar codecs no controlo alteraria o contrato base. Uma nova porta arbitrária exigiria informação adicional de localização. Propagar a cache como adjacência direta ultrapassaria a descoberta local pretendida.",
+      "consequences": "O extra requer TCP livre na dataPort, configuração compatível e aprendizagem anterior às falhas. Não há autenticação criptográfica; o token HELLO correlaciona contexto e não prova honestidade do anunciante. Conflitos ficam indisponíveis, informação expira e saturação pode impedir descoberta. ADR-010/016 conservam a validação estrita e a configuração base, com a única chave opt-in adicional definida aqui. ADR-019 e CP-02/03 conservam a base; a exceção de admissão fora do grafo só pode ser implementada após aprovação desta ADR e dos contratos afetados. IMP-034 não cria arestas; IMP-035 exige o seu contrato de intenção/admissão revisto.",
+      "components": [
+        "config",
+        "overlay",
+        "app",
+        "protocol",
+        "transport"
+      ],
+      "files": [
+        "overlay/NeighborDiscovery.java",
+        "overlay/CandidateCache.java",
+        "overlay/OverlayRecovery.java",
+        "protocol/DiscoveryMessage.java",
+        "protocol/DiscoveryCodec.java"
+      ],
+      "source_tasks": [
+        "TASK-033",
+        "TASK-034"
+      ],
+      "tests": [
+        "V-033",
+        "V-034"
+      ]
+    },
+    {
+      "id": "ADR-034",
+      "title": "Controlo TCP uniforme v2 e descoberta obrigatória",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-025"
+      ],
+      "context": "O utilizador interrompeu OTD1 separado e depois rejeitou a mistura operacional v1/v2. Fixa um programa/versão de JAR em todos os nós e decide migrar todo o controlo TCP, incluindo o bootstrap, para v2. O contrato v1 e as evidências são históricos; mantêm-se framing/caps, aprendizagem e isolamento de falhas.",
+      "decision": "Propor um único contrato e codec operacional TCP v2 para REGISTER/REGISTER_OK/ERROR do bootstrap, HELLO/HELLO_OK, mensagens normais e descoberta. MessageType tem 18 códigos ativos explícitos (1,2,4..19), com 3 rejeitado; sem parser/encoder/CodecPolicy/runtime v1, namespace alternativo ou fallback. Conservar ControlMessage e APIs encode/decode/read/write, agora exclusivamente v2; readFrame partilha o mesmo parser e permite rejeição tipada de conteúdo extra. HELLO exige supported=required=selected=1 e bits reservados zero. Todos os overlay exigem descoberta e Q>=2 offline; ausência da antiga chave exige, true é redundante e false é erro agregado; Q=1 genérico/bootstrap permanece. Um TCP persistente por par, FIFO/writer comuns, margem M=1, quota extra enfileirada de um e quatro tickets físicos. Bootstrap mantém só consulta inicial do grafo imutável e fecho após write/flush v2, sem membership. Rejeitar tentativa inválida localmente, sem NeighborUp/FAILED global/FATAL/fim da CLI ou queda de sessões saudáveis; estado/retry por peer limitados com backoff existente. Conteúdo extra completo/corrente pode ser rejeitado atomicamente; framing/truncamento/identidade permanecem terminais no handle afetado. Conservar vetores v2 independentes e migrar testes preservando garantias; por decisão explícita Q-C-19, retirar os arquivos TCP v1 e a variante abandonada após validar a migração. UDP OTT1 de vídeo permanece inalterado. IMP-034 aprende; IMP-035 repara depois com checkpoint próprio.",
+      "alternatives": "Misturar bootstrap/mensagens normais v1 com handshake/descoberta v2 foi substituído pela decisão explícita de contrato TCP único. Manter runtime v1, fallback, modo base opcional ou interoperabilidade com JAR antigo contraria o cenário operacional. OTD1 separado, outra fila/writer, negociação escondida em routing e falha global por input inválido de peer foram rejeitados. Atualizar apenas o byte de versão nas fixtures, sem oráculo independente e migração das garantias, não satisfaz a validação.",
+      "consequences": "A migração autorizada abrange MessageCodec/MessageType/ControlMessage, bootstrap servidor/cliente, transporte, testes e recursos; não é só configuração. Assinaturas Java existentes permanecem quando compatíveis com o novo contrato, mas deixam de aceitar/emitir TCP v1. O enum passa de 16 a 18 tipos; HELLO/ACK têm novos payloads; restante semântica e hard caps preservados. TCP v1 é apenas entrada negativa de versão, sem sucesso via decoder legado; a retenção do arquivo foi dispensada explicitamente em Q-C-19. Testes de UTF-8/framing/tipos/EOF/flush/identidade/unicidade/FIFO/shutdown são reexpressos com vetores v2 independentes, sem exclusão ou enfraquecimento. As 50 fixtures TCP v2 independentes e as 16 UDP intactas formam o conjunto operacional. Os arquivos TCP v1 foram retirados no fecho a pedido explícito do utilizador; a origem das expectativas UDP mantém-se num manifesto de 16 vetores extraído da base integrada. Manter cache 128x4, TTL local 60 s, proveniência, gerações e retenção após morte. INCOMPATIBLE é por peer, distinto de ausência temporária, com uma tentativa/agendamento, backoff e reservas físicas existentes; CLI e peers saudáveis continuam. ADR-033 conserva aprovação histórica/políticas residuais; a revisão de transporte/ativação e o contrato misto anterior ficam substituídos só quando ADR-034 for aprovada. Nenhum outro IMP é iniciado.",
+      "components": [
+        "bootstrap",
+        "config",
+        "overlay",
+        "protocol",
+        "transport"
+      ],
+      "files": [
+        "protocol/MessageType.java",
+        "protocol/ControlMessage.java",
+        "protocol/MessageCodec.java",
+        "protocol/DiscoveryMessage.java",
+        "protocol/DiscoveryCodec.java",
+        "transport/Connection.java",
+        "transport/Transport.java",
+        "overlay/NeighborManager.java",
+        "overlay/NeighborDiscovery.java",
+        "overlay/OverlayNode.java",
+        "config/NodeConfiguration.java",
+        "config/ConfigurationLoader.java",
+        "bootstrap/BootstrapServer.java"
+      ],
+      "source_tasks": [
+        "TASK-033",
+        "TASK-034"
+      ],
+      "tests": [
+        "V-033",
+        "V-034"
+      ],
+      "supersedes_scope": "ADR-033 transport/optional activation and prior mixed v1/v2 proposal; all TCP moves to v2, preserving bootstrap semantics, limits and learning policies; UDP OTT1 unchanged"
     }
   ],
   "implementation_tasks": [
@@ -2199,7 +2293,8 @@
         "005-rotas",
         "006-rotas",
         "021-rotas",
-        "022-rotas"
+        "022-rotas",
+        "034-overlay-extra"
       ],
       "bolt_type": "simple-construction-bolt"
     },
@@ -2213,7 +2308,8 @@
       "part": null,
       "title": "Medir RTT e detetar falhas TCP",
       "requires_bolts": [
-        "004-overlay"
+        "004-overlay",
+        "035-overlay-extra"
       ],
       "requirements": [
         "CON-008",
@@ -3837,6 +3933,166 @@
       ],
       "enables_bolts": [],
       "bolt_type": "simple-construction-bolt"
+    },
+    {
+      "id": "IMP-034",
+      "bolt": "034-overlay-extra",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-033"
+      ],
+      "part": null,
+      "title": "Extra — aprender candidatos através dos vizinhos",
+      "requires_bolts": [
+        "004-overlay"
+      ],
+      "requirements": [
+        "REQ-025"
+      ],
+      "adr_ids": [
+        "ADR-007",
+        "ADR-009",
+        "ADR-012",
+        "ADR-013",
+        "ADR-014",
+        "ADR-015",
+        "ADR-017",
+        "ADR-018",
+        "ADR-019",
+        "ADR-020",
+        "ADR-024",
+        "ADR-033",
+        "ADR-034"
+      ],
+      "test_ids": [
+        "V-033"
+      ],
+      "tests": [
+        "V-033: TCP v2 em todos os 18 tipos, APIs, bootstrap servidor/cliente, handshake, mensagens normais e descoberta; código 3 e versões antigas rejeitados sem parser/fallback v1. Fixtures v2 independentes, sem gerar o esperado pelo codec de produção; UDP OTT1/16 fixtures intactos face à base integrada. Arquivos TCP v1 retirados por decisão explícita Q-C-19. Todos os overlay exigem descoberta/Q>=2, ausência/true redundante obrigatórios e false/Q=1 agregados offline; genérico/bootstrap Q=1 preservado. Validar versão/identidade/endpoint/capacidade/flush/unicidade, rejeição só da tentativa e estado/retry por peer limitados com backoff; A ACTIVE/CLI/aprendizagem utilizáveis quando B é rejeitado. Bootstrap v2 conserva grafo imutável/offline, instâncias zero na resposta, flush antes de EOF, prazos e shutdown. Cache/TTL/proveniência/gerações/callbacks antigos/conflitos/caps com relógio/transporte/escrita controlados; FIFO/margem/tickets físicos, conteúdo extra recuperável e framing/identidade terminais. Migrar testes sem eliminar as garantias; executar regressão JDK 21, V-ADD, TCP/CLI reais e manual após aprovação."
+      ],
+      "criteria": [
+        "Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.",
+        "Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.",
+        "Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.",
+        "Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.",
+        "V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual."
+      ],
+      "files": [
+        "overlay/NeighborDiscovery.java",
+        "overlay/CandidateCache.java",
+        "overlay/NeighborManager.java",
+        "overlay/OverlayNode.java",
+        "protocol/DiscoveryMessage.java",
+        "protocol/DiscoveryCodec.java",
+        "config/NodeConfiguration.java",
+        "config/ConfigurationLoader.java",
+        "overlay/NeighborDiscoveryTest.java",
+        "overlay/CandidateCacheTest.java",
+        "protocol/DiscoveryCodecTest.java",
+        "transport/Transport.java",
+        "transport/Connection.java",
+        "transport/TransportTest.java",
+        "experiments/overlay-discovery/",
+        "protocol/MessageType.java",
+        "protocol/ControlMessage.java",
+        "protocol/MessageCodec.java",
+        "protocol/MessageCodecTest.java",
+        "overlay/NeighborManagerTest.java",
+        "overlay/NeighborManagerLifecycleTest.java",
+        "config/ConfigurationLoaderTest.java",
+        "Projeto/README.md",
+        "app/OttApplicationTest.java",
+        "bootstrap/BootstrapServer.java",
+        "bootstrap/BootstrapServerTest.java",
+        "Projeto/src/test/resources/protocol/",
+        "Projeto/docs/protocolos.md",
+        "scripts/validate-planning.py"
+      ],
+      "size": "M",
+      "gates": [
+        "G-EXTRA-ADR"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md",
+      "story_id": "006-reconstruir-vizinhancas-apos-falhas",
+      "source_phase": "PHASE-02",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "035-overlay-extra"
+      ],
+      "bolt_type": "ddd-construction-bolt",
+      "extra": true
+    },
+    {
+      "id": "IMP-035",
+      "bolt": "035-overlay-extra",
+      "unit": "002-overlay",
+      "source_tasks": [
+        "TASK-034"
+      ],
+      "part": null,
+      "title": "Extra — reparar ligações com candidatos aprendidos",
+      "requires_bolts": [
+        "034-overlay-extra"
+      ],
+      "requirements": [
+        "REQ-025"
+      ],
+      "adr_ids": [
+        "ADR-013",
+        "ADR-014",
+        "ADR-017",
+        "ADR-018",
+        "ADR-019",
+        "ADR-020",
+        "ADR-024",
+        "ADR-033",
+        "ADR-034"
+      ],
+      "test_ids": [
+        "V-034"
+      ],
+      "tests": [
+        "V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado."
+      ],
+      "criteria": [
+        "Com o extra desativado, conservar o comportamento e os testes da overlay base.",
+        "Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.",
+        "Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.",
+        "Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.",
+        "Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.",
+        "V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming."
+      ],
+      "files": [
+        "overlay/OverlayRecovery.java",
+        "overlay/NeighborManager.java",
+        "overlay/OverlayNode.java",
+        "app/OttApplication.java",
+        "overlay/OverlayRecoveryTest.java",
+        "overlay/NeighborManagerTest.java",
+        "app/OttApplicationTest.java",
+        "experiments/overlay-recovery/"
+      ],
+      "size": "M",
+      "gates": [
+        "G-EXTRA-ADR"
+      ],
+      "story": "memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md",
+      "story_id": "007-reparar-vizinhancas-com-candidatos-aprendidos",
+      "source_phase": "PHASE-02",
+      "owner": "Denji",
+      "reviewer": "Fillmore",
+      "requires_units": [
+        "001-base-validada"
+      ],
+      "enables_bolts": [
+        "005-rotas"
+      ],
+      "bolt_type": "ddd-construction-bolt",
+      "extra": true
     }
   ],
   "coverage": [
@@ -5004,16 +5260,39 @@
         "V-032",
         "V-ADD"
       ]
+    },
+    {
+      "requirement": "REQ-025",
+      "legacy_id": null,
+      "adrs": [
+        "ADR-033",
+        "ADR-034"
+      ],
+      "components": [
+        "config",
+        "overlay",
+        "app",
+        "protocol",
+        "transport"
+      ],
+      "implementation_tasks": [
+        "IMP-034",
+        "IMP-035"
+      ],
+      "tests": [
+        "V-033",
+        "V-034"
+      ]
     }
   ],
   "counts": {
-    "requirements": 40,
-    "adrs": 26,
-    "implementation_tasks": 33,
-    "bolts": 33,
-    "stories": 33,
+    "requirements": 41,
+    "adrs": 28,
+    "implementation_tasks": 35,
+    "bolts": 35,
+    "stories": 35,
     "units": 7,
-    "source_tasks": 32
+    "source_tasks": 34
   },
   "parameters": [
     [

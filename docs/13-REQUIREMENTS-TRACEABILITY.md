@@ -215,3 +215,9 @@ Sem push ou alegação de integração remota/entrega do projeto.
 [Fecho documental](../memory-bank/bolts/003-overlay/closure-walkthrough.md). As referências anteriores a estados
 pendentes são históricas; não descrevem o estado atual. Não se promovem
 requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
+
+## Extra posterior ao âmbito base
+
+| Requisito | TASK / IMP | Estado | Evidência |
+|---|---|---|---|
+| [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS | V-033: 1065 testes e manual Luis/53 checks; Test e revisão técnica concluídos. IMP-035/V-034 por executar. [Fecho IMP-034](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md) |

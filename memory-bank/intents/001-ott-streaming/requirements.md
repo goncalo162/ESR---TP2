@@ -391,3 +391,54 @@ warm-up 10 s, medição 60 s e três repetições, ou desvio justificado. Nada f
 
 [Auditoria e gates externos](../../../docs/17-INCEPTION-AUDIT.md) identifica media, GUI, CORE, avaliações,
 PL/grupo/prazo e submissão humana. A falta de resultados não é sucesso presumido.
+
+## EXTRA-01 — Retoma após a base de Inception
+
+Pedido de 2026-11-11T12:11:34Z, [REQ-025](../../../specs.md#req-025). A criação de
+novas arestas é um extra aprovado em âmbito. A opção inicial do catálogo
+foi substituída por divulgação dos vizinhos diretos e cache limitada,
+por instrução posterior do utilizador. A política detalhada e ADR-033
+aguardam revisão.
+A reconstrução da overlay precede 005-rotas; a prova de vídeo segue a
+implementação dos seus componentes. [Bolt](../../bolts/034-overlay-extra/bolt.md).
+
+### EXTRA-01 — execução normal requerida
+
+> Histórico: as exceções opcionais/base e eventual falha global foram
+> substituídas pelas clarificações posteriores de obrigatoriedade e isolamento.
+
+Por decisão do utilizador, todos os nós overlay da execução normal têm o extra
+ativo e capacidade negociada obrigatória, com Q>=2 validado antes de I/O. Não
+há degradação para base por fila/peer incompatível. APIs/perfis base conservam
+compatibilidade/Q=1. A proposta de Design/ADR-034 concretiza erro explícito e
+preflight normal; não é autorização de implementação.
+
+### EXTRA-01 — mudança de requisito para todos os nós overlay
+
+O extra é obrigatório por papel da aplicação, sem chave de ativação opcional,
+construtor/API/perfil base ou ACTIVE_BASE operacional. Ausência já exige;
+false é erro; Q>=2 validado antes de recursos. Preservar formatos v1 usados,
+bootstrap inicial e UDP/vídeo, e justificar migração de expectativas opcionais.
+IMP-034 aprende candidatos; IMP-035 concretiza reparação. Design/ADR por aprovar.
+
+### EXTRA-01 — programa único e rejeição local
+
+Registo de 2026-11-11T17:22:59Z. Um único programa e a mesma versão do JAR em todos os nós;
+todos os overlay exigem descoberta. Versão, identidade, endpoint e capacidade
+continuam validados. Entradas inválidas são negativos do handshake, rejeitados
+só na tentativa, sem NeighborUp, FAILED global, fim da CLI ou fecho de sessões
+saudáveis. Estado/retry por peer limitados com backoff existente; ausência
+temporária distingue-se de incompatibilidade confirmada. Não desenvolver
+funcionamento com versões antigas/base opcional/fallback. IMP-034 aprende;
+IMP-035 repara depois. Design/ADR revistos para aprovação, código suspenso.
+
+### EXTRA-01 — todo o TCP em v2
+
+Registo de 2026-11-11T17:47:08Z. Decisão explícita: TCP exclusivamente v2 em bootstrap,
+handshake, mensagens normais e descoberta; um contrato/codec, 18 tipos explícitos,
+código 3 rejeitado, sem runtime v1/fallback. Arquivo v1 e fixtures v2 independentes
+preparados; migração dos testes justificada com garantias preservadas. Bootstrap
+continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento por
+peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+Implement suspenso, sem execução Java, commits, push ou outro IMP.

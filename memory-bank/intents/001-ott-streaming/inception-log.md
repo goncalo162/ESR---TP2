@@ -176,3 +176,11 @@ submissão mantêm o momento de resolução próprio. Não há decisão CP pende
 zero erros, 220 hashes conferidos e dependências sem ciclos. O snapshot mantém
 os hashes anteriores das fontes documentais atualizadas. A verificação não
 executou testes Java, GUI ou CORE.
+
+2026-11-11T12:11:34Z: retoma para EXTRA-01, com REQ-025, ADR-033 proposta, IMP-034 / TASK-033 e 034-overlay-extra. São agora 41 entradas, 27 ADR, 34 histórias/IMP/bolts e 33 TASK. Preservados os IDs e o fecho histórico da base.
+
+2026-11-11T12:26:03Z: revisão de EXTRA-01 a pedido do utilizador. Descoberta por
+divulgação de vizinhos diretos e cache limitada substitui o catálogo
+inicial. IMP-034/TASK-033 para aprendizagem, IMP-035/TASK-034 para reparação.
+41 entradas, 27 ADR, 35 histórias/IMP/bolts, 34 TASK. Só o Model de
+IMP-034 está em curso.
