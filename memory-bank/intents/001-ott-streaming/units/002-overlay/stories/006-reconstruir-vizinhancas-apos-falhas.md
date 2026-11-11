@@ -2,7 +2,7 @@
 id: "006-reconstruir-vizinhancas-apos-falhas"
 unit: "002-overlay"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-11T12:11:34Z"
 source_tasks: ["TASK-033"]
@@ -12,7 +12,9 @@ adr_ids: ["ADR-007", "ADR-009", "ADR-012", "ADR-013", "ADR-014", "ADR-015", "ADR
 bolt: "034-overlay-extra"
 size: "M"
 extra: true
-updated: "2026-11-11T19:06:59Z"
+updated: "2026-11-11T19:45:51Z"
+implemented: true
+completed: "2026-11-11T19:45:51Z"
 ---
 # História — Extra — aprender candidatos através dos vizinhos
 
@@ -21,11 +23,11 @@ Como nó, quero aprender os endpoints dos vizinhos dos meus vizinhos durante a e
 
 ## Critérios de aceitação
 
-- [ ] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
-- [ ] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
-- [ ] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
-- [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
-- [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+- [x] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
+- [x] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
+- [x] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
+- [x] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
+- [x] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
 
 ## Histórico — validação e revisão
 
@@ -67,3 +69,7 @@ com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
 MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
 Repetição pessoal de Luis, aprovação de Test, revisão final e integração
 pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+
+## Fecho atual
+
+2026-11-11T19:45:51Z: complete/implemented=true; V-033 e manual humano aceites, revisão técnica final concluída e versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local. [Fecho](../../../../../bolts/034-overlay-extra/closure-walkthrough.md). IMP-035 não iniciado.

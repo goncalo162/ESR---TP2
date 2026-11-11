@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-02"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-11T14:33:20Z"
+updated: "2026-11-11T19:45:51Z"
 completed: null
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
@@ -33,7 +33,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [x] [003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel](stories/003-compor-o-processo-overlay-e-encerrar-de-forma-previsivel.md) → [020-overlay](../../../../bolts/020-overlay/bolt.md); IMP-005 (M).
 - [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
 
-- [ ] [006-reconstruir-vizinhancas-apos-falhas](stories/006-reconstruir-vizinhancas-apos-falhas.md) → [034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md); IMP-034 (extra A, aprendizagem).
+- [x] [006-reconstruir-vizinhancas-apos-falhas](stories/006-reconstruir-vizinhancas-apos-falhas.md) → [034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md); IMP-034 (extra A, aprendizagem).
 - [ ] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
 
 ## Dependências e critérios de fecho
@@ -326,3 +326,7 @@ com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
 MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../../../../bolts/034-overlay-extra/ddd-03-test-report.md).
 Repetição pessoal de Luis, aprovação de Test, revisão final e integração
 pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+
+## IMP-034 concluído; IMP-035 por iniciar
+
+2026-11-11T19:45:51Z: seis dos sete bolts desta unidade complete. IMP-034/V-033: 1065 testes e manual humano Luis/53 checks, revisão técnica e integração local f650be02f2af10b95328f5b50c3d6941e2e75c15. [Fecho](../../../../bolts/034-overlay-extra/closure-walkthrough.md). Unidade in-progress, pois IMP-035 permanece planned; não há reparação implementada nem fase/REQ-025 concluída.

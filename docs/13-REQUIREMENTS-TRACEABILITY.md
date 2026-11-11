@@ -221,3 +221,7 @@ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
 | Requisito | TASK / IMP | Estado | Evidência |
 |---|---|---|---|
 | [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS | V-033: 1065 testes e manual Luis/53 checks; Test e revisão técnica concluídos. IMP-035/V-034 por executar. [Fecho IMP-034](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md) |
+
+## IMP-034 — fecho integrado
+
+2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.

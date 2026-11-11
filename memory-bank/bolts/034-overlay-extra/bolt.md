@@ -3,13 +3,13 @@ id: "034-overlay-extra"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["006-reconstruir-vizinhancas-apos-falhas"]
 created: "2026-11-11T12:11:34Z"
-updated: "2026-11-11T19:40:54Z"
+updated: "2026-11-11T19:45:51Z"
 started: "2026-11-11T12:11:34Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-11T19:45:51Z"
+current_stage: "complete"
 stages_completed: [{"name": "model", "completed": "2026-11-11T12:41:00Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-11T17:55:50Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-11T17:55:50Z", "artifact": "adr-034-review.md"}, {"name": "implement", "completed": "2026-11-11T19:22:10Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-11T19:40:54Z", "artifact": "ddd-03-test-report.md"}]
 stage_history: [{"name":"design","completed":"2026-11-11T13:38:55Z","artifact":"ddd-02-technical-design.md","revision":"OTD1 separate, suspended by user","archive_removed":"Q-C-19; explicit user cleanup","artifact_sha256":"1df2c1572282173ec5d04ac7312e6d3a49a3a57af2124101d11b6804b50cd82d"},{"name":"adr","completed":"2026-11-11T13:57:14Z","artifact":"adr-review.md","revision":"OTD1 separate, suspended by user","archive_removed":"Q-C-19; explicit user cleanup","artifact_sha256":"5c42483e2d61b199105548603cde7552174ce070f6d02da2d1e91630bef1aa92"}]
 suspended_stage: null
@@ -39,6 +39,8 @@ extra: true
 human_test_operator: "Luis"
 final_technical_reviewer: "Codex validator"
 closure_authorized_by: "Luis"
+integrated_revision: "f650be02f2af10b95328f5b50c3d6941e2e75c15"
+integration_scope: "local main; no push"
 ---
 # Bolt 034-overlay-extra — Extra — aprender candidatos através dos vizinhos
 
@@ -56,11 +58,11 @@ EXTRA-01, parte A, aprendizagem.
 
 ## Critérios de aceitação
 
-- [ ] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
-- [ ] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
-- [ ] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
-- [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
-- [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+- [x] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
+- [x] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
+- [x] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
+- [x] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
+- [x] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
 
 ## Histórico — revisão de transporte interrompida
 
@@ -201,3 +203,7 @@ pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
 ## Estado de fecho
 
 Test aceite pela instrução de Luis após execução pessoal de 53 checks/MANUAL_PASS/saída 0. Revisão técnica final do agente validador concluída; integração local pendente. Q-C-19 autoriza retirar os arquivos TCP v1. O histórico acima não descreve o estado atual. IMP-035 permanece planned.
+
+## Fecho concluído
+
+2026-11-11T19:45:51Z: cinco etapas concluídas, Test aceite após manual humano e revisão técnica final. Versão revista f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada por fast-forward em main local. [Prova de integração](../../../experiments/construction/034-overlay-extra/closure-integration.json). Sem push; IMP-035 continua planned.

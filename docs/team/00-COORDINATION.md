@@ -202,3 +202,7 @@ integrarem a entrega, a sua integração e avaliação devem preceder o artigo e
 o pacote finais. Este fecho documental não inicia nenhum bolt de Construction.
 
 Autorização e resumo: [registo Inception](../../memory-bank/intents/001-ott-streaming/inception-log.md).
+
+## EXTRA-01 / TASK-033 — revisão e fecho solicitados por Luis
+
+2026-11-11T19:45:51Z: as atribuições Denji/Fillmore da tarefa extra eram propostas. Luis executou V-033 (53 checks), forneceu o resultado e pediu ao agente validador a revisão técnica final e integração para fechar. Regista-se Codex validador como revisor técnico e Luis como operador humano/autor da aceitação de Test e autorização de fecho; não se atribui a Fillmore ou Waheed uma revisão não confirmada. Integração local da versão f650be02f2af10b95328f5b50c3d6941e2e75c15 em main verificada. Q-C-19 documenta a limpeza explícita dos arquivos TCP v1. As atribuições das outras TASK permanecem.

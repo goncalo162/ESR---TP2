@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
 created: "2026-11-11T12:26:03Z"
-updated: "2026-11-11T14:33:20Z"
+updated: "2026-11-11T19:45:51Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["034-overlay-extra"]
 enables_bolts: ["005-rotas"]
 requires_units: ["001-base-validada"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 3
@@ -63,3 +63,7 @@ Planeado. Aguardar a conclusão e integração de 034-overlay-extra antes de ini
 O contrato de divulgação, a confiança, os limites e a negociação da extensão
 aguardam Design/ADR-033. A base v1 conserva os bytes e os códigos.
 V-034 por executar. A prova de vídeo ocorre após routing/streaming.
+
+## Dependência integrada
+
+2026-11-11T19:45:51Z: IMP-034 complete e integrado em main local. Pré-requisito disponível; este bolt permanece planned, sem etapas iniciadas ou aprovação presumida do seu gate.

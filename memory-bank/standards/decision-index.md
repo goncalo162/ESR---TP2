@@ -285,3 +285,7 @@ XML, hashes, diff e mapa D01–D12; não confundir teste incremental com clean v
 Pendente aprovação humana de Implement antes de Test. V-033 completo, clean
 verify/regressão atual, manual reproduzido, revisão final e integração continuam
 necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planeado.
+
+## IMP-034 — fecho integrado
+
+2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.

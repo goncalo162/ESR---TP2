@@ -1,6 +1,6 @@
 # IMP-034 / 034-overlay-extra — Revisão final e integração
 
-Registo de 2026-11-11T19:40:54Z. Luis executou o manual humano e pediu revisão final, integração e fecho. Test aceite pela instrução explícita de fecho. Revisão técnica final: Codex validador, separado da sessão que implementou; não é atribuída revisão de código a Fillmore ou Waheed. Integração local ainda pendente neste registo preparatório.
+Registo de 2026-11-11T19:40:54Z. Luis executou o manual humano e pediu revisão final, integração e fecho. Test aceite pela instrução explícita de fecho. Revisão técnica final: Codex validador, separado da sessão que implementou; não é atribuída revisão de código a Fillmore ou Waheed. Integração local concluída; bolt/história complete e TASK-033 DONE.
 
 ## Evidência final
 
@@ -17,7 +17,7 @@ Permanecem 50 vetores TCP v2 independentes, os negativos de versão v1, 16 vetor
 
 ## Integração
 
-Pendente de integração local real em main. O fecho só será marcado complete após essa operação. Publicação remota é registada separadamente; não foi executado push nesta retoma.
+Main local avançou por fast-forward de 17c1ca27673930bfbf82078522059a243d96ccdb para f650be02f2af10b95328f5b50c3d6941e2e75c15, a versão revista. [Prova da integração](../../../experiments/construction/034-overlay-extra/closure-integration.json). Fecho registado em 2026-11-11T19:45:51Z após a integração. O commit documental de fecho será também integrado localmente; nenhum push foi executado.
 
 ## Verificação de integridade no fecho
 

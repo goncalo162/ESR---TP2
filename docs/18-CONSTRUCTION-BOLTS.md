@@ -194,3 +194,7 @@ com 1065 testes, zero falhas/erros/skips. Manual Codex: 53 CHECK_PASS,
 MANUAL_PASS, saída Java 0, incluindo TTL real. [Relatório/evidência](../memory-bank/bolts/034-overlay-extra/ddd-03-test-report.md).
 Repetição pessoal de Luis, aprovação de Test, revisão final e integração
 pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
+
+## IMP-034 — fecho integrado
+
+2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.

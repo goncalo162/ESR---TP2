@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: seis histórias/bolts complete, 034-overlay-extra em Test para repetição humana (TCP v2) e 28 planned.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete e 28 planned; IMP-035 é o próximo incremento, sem início autorizado.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -280,7 +280,7 @@ da versão revista continuam pendentes.
 
 ## 002-overlay/006-reconstruir-vizinhancas-apos-falhas.md ✅ GENERATED
 
-**Tarefa:** IMP-034 (EXTRA-01). **Estado:** in-progress, Implement aprovado; Test com 1065 testes/53 checks do agente, repetição humana e aprovação pendentes.
+**Tarefa:** IMP-034 (EXTRA-01). **Estado:** complete, implemented=true; 1065 testes, manual Luis/53 checks, Test/revisão técnica aceites e integração local f650be02f2af10b95328f5b50c3d6941e2e75c15.
 **Bolt:** 034-overlay-extra. **Ficheiro:** [006-reconstruir-vizinhancas-apos-falhas](intents/001-ott-streaming/units/002-overlay/stories/006-reconstruir-vizinhancas-apos-falhas.md).
 IMP-034 aprende candidatos por divulgação dos vizinhos diretos. IMP-035 repara a overlay antes de 005-rotas. Vídeo na integração posterior.
 

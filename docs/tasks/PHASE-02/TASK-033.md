@@ -4,7 +4,7 @@
 
 - ID: TASK-033
 - Fase: PHASE-02, EXTRA-01 posterior ao fecho da base.
-- Estado: IN PROGRESS
+- Estado: DONE
 - Natureza: Extra solicitado pelo utilizador.
 - Responsável proposto: Denji.
 - Revisão técnica final: Codex validador, solicitada por Luis; aceitação humana e manual: Luis (Q-C-19).
@@ -13,20 +13,20 @@
 
 ## 2. Objetivo e âmbito
 
-Divulgar vizinhos diretos e aprender candidatos com proveniência, TTL e limites. TCP v2 único no bootstrap e vizinhos; descoberta obrigatória/Q>=2 offline. ADR-034 Aceite e G-EXTRA-ADR satisfeito para este IMP. Test e manual humano aprovados; revisão técnica final concluída, integração local pendente. IMP-035 não iniciado.
+Divulgar vizinhos diretos e aprender candidatos com proveniência, TTL e limites. TCP v2 único no bootstrap e vizinhos; descoberta obrigatória/Q>=2 offline. ADR-034 Aceite e G-EXTRA-ADR satisfeito para este IMP. Test e manual humano aprovados; revisão técnica final concluída, integração local concluída. IMP-035 não iniciado.
 
 ## 3. Critérios de aceitação
 
-- [ ] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
-- [ ] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
-- [ ] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
-- [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
-- [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+- [x] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
+- [x] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
+- [x] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
+- [x] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
+- [x] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
 
 ## 4. Validação e fecho
 
 V-033: TCP v2 em todos os 18 tipos, APIs, bootstrap servidor/cliente, handshake, mensagens normais e descoberta; código 3 e versões antigas rejeitados sem parser/fallback v1. Fixtures v2 independentes, sem gerar o esperado pelo codec de produção; UDP OTT1/16 fixtures intactos face à base integrada. Arquivos TCP v1 retirados por decisão explícita Q-C-19. Todos os overlay exigem descoberta/Q>=2, ausência/true redundante obrigatórios e false/Q=1 agregados offline; genérico/bootstrap Q=1 preservado. Validar versão/identidade/endpoint/capacidade/flush/unicidade, rejeição só da tentativa e estado/retry por peer limitados com backoff; A ACTIVE/CLI/aprendizagem utilizáveis quando B é rejeitado. Bootstrap v2 conserva grafo imutável/offline, instâncias zero na resposta, flush antes de EOF, prazos e shutdown. Cache/TTL/proveniência/gerações/callbacks antigos/conflitos/caps com relógio/transporte/escrita controlados; FIFO/margem/tickets físicos, conteúdo extra recuperável e framing/identidade terminais. Migrar testes sem eliminar as garantias; executar regressão JDK 21, V-ADD, TCP/CLI reais e manual após aprovação.
-Estado: V-033 executado, Test aceite por Luis após manual pessoal, revisão técnica final concluída. Integração local precede DONE.
+Estado: V-033 executado, Test aceite por Luis após manual pessoal, revisão técnica final concluída. Versão revista integrada em main local antes de DONE.
 [Bolt](../../../memory-bank/bolts/034-overlay-extra/bolt.md).
 
 ## Revisão de transporte em curso
@@ -98,4 +98,6 @@ pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
 
 ## Revisão final atual
 
-[Fecho e evidência](../../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Manual Luis/53 checks e clean verify/1065 testes aprovados. Pendência atual: integração local; as secções datadas anteriores são histórico.
+[Fecho e evidência](../../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Manual Luis/53 checks e clean verify/1065 testes aprovados. Estado atual: DONE após integração local; as secções datadas anteriores são histórico.
+
+Fecho registado em 2026-11-11T19:45:51Z, revisão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local. [Prova](../../../experiments/construction/034-overlay-extra/closure-integration.json). Nenhuma publicação remota nesta retoma.

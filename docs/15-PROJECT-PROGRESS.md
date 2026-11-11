@@ -4,7 +4,7 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: IN PRO
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-009](tasks/PHASE-02/TASK-009.md), DONE. IMP-006/004-overlay completo com o ensaio técnico de V-009 e a dispensa de repetição em Q-C-15. Revisão final confirmada pelo utilizador e versão revista `cc478d1` integrada em main. [Fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
+**Última tarefa concluída:** [TASK-033](tasks/PHASE-02/TASK-033.md), DONE. IMP-034/V-033: 1065 testes, manual Luis/53 checks, Test e revisão técnica final aceites, versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md).
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -102,7 +102,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-007](tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | DONE | V-007/Test aprovados; clean verify 903 testes, manual Francisco 49 checks; revisão Denji e integração local 8db7b78; bolt complete |
 | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
-| [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | IN PROGRESS | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites. Integração local pendente |
+| [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
 | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | TODO | V-034 por executar. Precede 005-rotas |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
@@ -714,3 +714,7 @@ pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
 ## IMP-034 — Test aceite e revisão final
 
 2026-11-11T19:42:24Z: manual humano Luis/53 checks, MANUAL_PASS e saída 0, mesmo JAR. Test aceite pelo pedido explícito de revisão/integração/fecho. Revisão técnica final do agente validador concluída; nenhuma revisão atribuída a Fillmore/Waheed. Q-C-19 autoriza retirar os arquivos TCP v1; TCP v2/UDP OTT1 e evidências finais preservados. Integração local pendente. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md).
+
+## IMP-034 — fecho atual
+
+2026-11-11T19:45:51Z: TASK-033 DONE, bolt/história complete após integração local f650be02f2af10b95328f5b50c3d6941e2e75c15. [Prova](../experiments/construction/034-overlay-extra/closure-integration.json). Test/manual humano e revisão técnica concluídos, Q-C-19 aplicada; sem push. Sete bolts completos no projeto, 28 planned. IMP-035 não iniciado, unidade/PHASE-02/REQ-025 continuam em curso.

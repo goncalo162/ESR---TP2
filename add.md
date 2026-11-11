@@ -930,11 +930,11 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Gates:** G-EXTRA-ADR.
 - **Critérios de aceitação:**
 
-  - [ ] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
-  - [ ] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
-  - [ ] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
-  - [ ] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
-  - [ ] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
+  - [x] Aprender endpoints a partir de anúncios limitados de vizinhos diretos em sessões confirmadas, sem pré-carregar um catálogo global.
+  - [x] Guardar proveniência e prazo local por candidato; a morte do anunciante não elimina automaticamente os candidatos ainda válidos.
+  - [x] Limitar anúncios, cache, filas e frequência; rejeitar informação inválida, obsoleta, conflitante e o próprio nó segundo política aprovada.
+  - [x] Migrar todo o controlo TCP para um único contrato/codec v2, incluindo bootstrap, mensagens normais e descoberta; manter framing/hard caps/código 3 rejeitado e garantias anteriores, validar fixtures v2 independentes, com retirada dos arquivos TCP v1 autorizada em Q-C-19, sem runtime v1/fallback ou canal separado.
+  - [x] V-033 comprova aprendizagem, retenção após falha do anunciante, expiração, limites e regressão atual.
 
 <a id="imp-035"></a>
 ### IMP-035 — Extra — reparar ligações com candidatos aprendidos
@@ -1716,3 +1716,7 @@ capacidade, sem ativação opcional, defaults desligados ou ACTIVE_BASE. Configu
 Design/ADR-034/REQ-025/oráculos revistos; plano de migração de testes justifica
 as expectativas alteradas e conserva bytes v1/UDP/invariantes. Fonte/evidências
 preservadas, sem código ou outro IMP antes de aprovação.
+
+### Fecho IMP-034 e limpeza Q-C-19 — 2026-11-11T19:45:51Z
+
+Test aceite após manual humano Luis (53 checks/saída 0), revisão técnica final do agente validador concluída e versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; unidade e extensão EXTRA-01 permanecem em curso para IMP-035, ainda planned. A instrução explícita Q-C-19 dispensa os arquivos TCP v1; conserva testes negativos de versão e UDP OTT1. Sem push.
