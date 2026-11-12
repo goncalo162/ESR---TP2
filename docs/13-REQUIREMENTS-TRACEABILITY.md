@@ -220,8 +220,17 @@ requisitos globais, PHASE-02, unidade ou intent a concluídos por este fecho.
 
 | Requisito | TASK / IMP | Estado | Evidência |
 |---|---|---|---|
-| [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS | V-033: 1065 testes e manual Luis/53 checks; Test e revisão técnica concluídos. IMP-035/V-034 por executar. [Fecho IMP-034](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md) |
+| [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS apenas na integração futura de vídeo | Controlo EXTRA-01 concluído: V-033/1065/Luis53 e V-034/1113/Luis66, SIGKILL reais, sessões únicas e S–R1 preservada; tarefas e PHASE-02 DONE. [Fecho IMP-035](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Continuidade do vídeo por validar após routing/streaming. |
 
 ## IMP-034 — fecho integrado
 
 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
+
+## IMP-035 e PHASE-02 concluídos
+
+Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
+manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md>).
+Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
+de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+arestas fica para routing/streaming; projeto/intent não concluídos.

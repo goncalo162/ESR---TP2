@@ -1,5 +1,10 @@
 # PHASE-02 — Dossier de fecho
 
+**Estado atual: DONE, incluindo EXTRA-01 de controlo.** Aceitação final explícita
+registada em 2026-11-12T10:46:24Z. O dossier original abaixo descreve a base da fase;
+a extensão concluída está no suplemento final, sem substituir a sua evidência.
+
+
 Preparado em 2026-11-10T23:34:59Z sobre a base comum `223ea6ff342525fdd211445753b47129494f2805`.
 A evidência técnica da fase está reunida e as seis tarefas estão DONE e
 integradas. A PHASE-02 está DONE após confirmação da validação pela equipa.
@@ -60,3 +65,24 @@ TASK-010**, para RTT e falhas TCP.
 [Coordenação](../team/00-COORDINATION.md#5-quatro-momentos-de-revisão-por-tarefa) ·
 [Definition of Done](../14-DEFINITION-OF-DONE.md#fase) ·
 [Próximo bolt](../../memory-bank/bolts/005-rotas/bolt.md).
+
+## Suplemento — fecho de EXTRA-01
+
+Aceitação explícita de Luis em registo 2026-11-12T10:46:24Z: «Podes fechar o bolt e e esta fase».
+TASK-033/IMP-034 e TASK-034/IMP-035 DONE; as oito tarefas da tabela de PHASE-02
+estão DONE e os sete bolts da unidade002-overlay complete. Fonte/modelo de
+reparação: [ADR-035](../../add.md#adr-035).
+
+- Aprendizagem V-033:1065 testes/manuais Luis53, revisão e integração f650be0.
+- Reparação V-034:1113 testes/11 XML e manual humano selecionado66 checks,
+  MANUAL_PASS/passed/no_processes_pending. Dois grafos com SIGKILL sequencial,
+  bootstrap parado, mesmos sobreviventes, ligação física única e S–R1 preservada.
+- Versão15efdf2 integrada em main e documentaçãoff0ef0b já integradas antes do
+  fecho. [Fecho do bolt](../../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md)
+  e [aceitação/integridade](../../experiments/construction/035-overlay-extra/completion-authorization.json).
+- G-ASSESSMENTS continua com data/conteúdo docentes pendentes. A fase está
+  concluída no âmbito de controlo; continuidade de vídeo via novas arestas fica
+  para routing/streaming. Nenhum resultado GUI/CORE/vídeo é presumido.
+
+005-rotas/IMP-007 tem pré-requisitos satisfeitos e permanece planned. Nenhuma
+etapa da fase3 foi iniciada por este fecho; o intent/projeto continuam em curso.

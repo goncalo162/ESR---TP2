@@ -3,7 +3,8 @@
 Test aprovado por Luis após a execução humana20261112T102931Z-pr_nynth:
 66 CHECK_PASS/MANUAL_PASS, passed=true/no_processes_pending=true. Execução
 humana anterior preservada. Não é necessário repetir para esta aprovação.
-Commits e integração local autorizados; revisão humana final/fecho pendentes.
+Versão integrada em main; utilizador autorizou o fecho do bolt e da fase2.
+O manual mantém-se disponível para demonstração, sem repetição para este fecho.
 
 ## Repetir pessoalmente
 

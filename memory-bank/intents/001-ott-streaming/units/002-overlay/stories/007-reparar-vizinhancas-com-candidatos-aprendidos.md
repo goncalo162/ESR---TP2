@@ -2,7 +2,7 @@
 id: "007-reparar-vizinhancas-com-candidatos-aprendidos"
 unit: "002-overlay"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-11T12:26:03Z"
 source_tasks: ["TASK-034"]
@@ -12,7 +12,9 @@ adr_ids: ["ADR-013", "ADR-014", "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR
 bolt: "035-overlay-extra"
 size: "M"
 extra: true
-updated: "2026-11-12T10:35:23Z"
+updated: "2026-11-12T10:46:24Z"
+implemented: true
+completed: "2026-11-12T10:46:24Z"
 ---
 # História — Extra — reparar ligações com candidatos aprendidos
 
@@ -21,12 +23,12 @@ Como nó afetado por falhas, quero usar candidatos aprendidos para criar uma lig
 
 ## Critérios de aceitação
 
-- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
-- [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
-- [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
-- [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
-- [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
-- [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+- [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+- [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+- [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+- [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+- [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+- [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
 
 ## Validação e revisão
 
@@ -102,3 +104,12 @@ continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
 
 Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
 Test aprovado; revisão humana final da implementação/fecho pendentes.
+
+## IMP-035 e PHASE-02 concluídos
+
+Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
+manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
+Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
+de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+arestas fica para routing/streaming; projeto/intent não concluídos.

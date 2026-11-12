@@ -3,12 +3,12 @@ id: "035-overlay-extra"
 unit: "002-overlay"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
 created: "2026-11-11T12:26:03Z"
-updated: "2026-11-12T10:35:23Z"
+updated: "2026-11-12T10:46:24Z"
 started: "2026-11-11T22:20:02Z"
-completed: null
+completed: "2026-11-12T10:46:24Z"
 current_stage: null
 stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T23:39:43Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-12T00:28:31Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-12T10:35:23Z","artifact":"ddd-03-test-report.md"}]
 requires_bolts: ["034-overlay-extra"]
@@ -51,21 +51,21 @@ EXTRA-01, parte B, reparação.
 
 ## Critérios de aceitação
 
-- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
-- [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
-- [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
-- [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
-- [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
-- [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+- [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+- [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+- [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+- [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+- [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+- [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
 
 ## Estado e fronteiras
 
-Model/Design/ADR aprovados; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
-Test aprovado por Luis, incluindo execução humana66/MANUAL_PASS.
-As cinco etapas estão concluídas; fecho pendente de revisão humana final.
-O âmbito corrente aprovado é21 caminhos.
-Histórico das etapas abaixo preservado por ordem de registo. V-034 completo,
-regressão atual, manual humano com mortes reais, revisão final e integração pendentes.
+**Complete.** Test/manual humano aprovados; versão integrada em main antes do fecho.
+O utilizador autorizou explicitamente o fecho do bolt e da fase2; registo 2026-11-12T10:46:24Z.
+[Fecho/evidência](closure-walkthrough.md). Todas as cinco etapas e seis critérios
+concluídos no âmbito de controlo do IMP-035. O histórico datado abaixo conserva
+as decisões e checkpoints anteriores; pendências de então não são estado atual.
+Vídeo/rotas/CORE não são declarados executados por este fecho.
 
 ## Dependência integrada
 

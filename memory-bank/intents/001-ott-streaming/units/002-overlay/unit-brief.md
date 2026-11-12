@@ -3,10 +3,10 @@ unit: "002-overlay"
 intent: "001-ott-streaming"
 phase: "construction"
 source_phase: "PHASE-02"
-status: "in-progress"
+status: "complete"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-12T10:35:23Z"
-completed: null
+updated: "2026-11-12T10:46:24Z"
+completed: "2026-11-12T10:46:24Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024", "REQ-025"]
@@ -34,7 +34,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
 
 - [x] [006-reconstruir-vizinhancas-apos-falhas](stories/006-reconstruir-vizinhancas-apos-falhas.md) → [034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md); IMP-034 (extra A, aprendizagem).
-- [ ] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
+- [x] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
 
 ## Dependências e critérios de fecho
 
@@ -403,3 +403,12 @@ continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
 
 Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
 Test aprovado; revisão humana final da implementação/fecho pendentes.
+
+## IMP-035 e PHASE-02 concluídos
+
+Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
+manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
+Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
+de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+arestas fica para routing/streaming; projeto/intent não concluídos.

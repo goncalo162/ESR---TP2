@@ -2,17 +2,17 @@
 stage: test
 bolt: "035-overlay-extra"
 created: "2026-11-12T00:39:35Z"
-status: "approved-by-Luis"
+status: "approved-by-Luis-complete"
 ---
-# IMP-035 / V-034 — Test para repetição humana
+# IMP-035 / V-034 — Test aprovado e bolt concluído
 
 Implement aprovado explicitamente; entrada em Test registada em2026-11-12T00:28:31Z.
-Base main22622c1d7eb0fdab3df684f2fac10263cff11736. Só Test autorizado.
-**Test aprovado explicitamente por Luis; fecho do bolt ainda pendente.**
+Base de entrada22622c1; versão validada15efdf2/documentaçãoff0ef0b integradas em main.
+**Test aprovado explicitamente por Luis; fecho do bolt/fase2 autorizado e concluído.**
 Execução humana selecionada20261112T102931Z-pr_nynth,66 CHECK_PASS/MANUAL_PASS,
 passed=true/no_processes_pending=true. Execução humana anterior preservada.
-Commit e integração local em main autorizados; revisão humana final da implementação
-ainda não foi registada. Não atribuir revisão ao revisor apenas proposto.
+Aceitação final de fecho dada pelo utilizador após integração. Não se atribui
+revisão realizada ao colega que constava apenas como proposto.
 
 ## Regressão completa e novo JAR
 
@@ -169,3 +169,10 @@ Registo 2026-11-12T10:39:28Z. Commit 15efdf280b97327cfdc73e9040b9dfed4d4a5658 in
 fast-forward. [Prova](../../../experiments/construction/035-overlay-extra/integration-proof.json).
 Test concluído/aprovado, sem repetição de manual. Falta revisão humana final
 da implementação para fechar o bolt; não atribuir essa revisão por inferência.
+
+## Fecho autorizado e concluído
+
+Registo 2026-11-12T10:46:24Z. O utilizador autorizou explicitamente fechar o bolt e a fase2.
+A aceitação de fecho que faltava está satisfeita por essa instrução, sem atribuir
+revisão ao colega apenas proposto. [Fecho atual](closure-walkthrough.md).
+As pendências em secções datadas anteriores são históricas.

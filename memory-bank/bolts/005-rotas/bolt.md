@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["001-medir-rtt-e-publicar-falhas-de-vizinhanca"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-12T10:46:24Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["004-overlay", "035-overlay-extra"]
 enables_bolts: ["021-rotas"]
 requires_units: ["002-overlay"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1
@@ -72,3 +72,9 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
 
 O EXTRA-01 exige 034-overlay-extra (aprendizagem) e 035-overlay-extra (reparação) antes deste bolt. A conclusão e integração dos dois são pré-requisito de início.
+
+## Pré-requisitos disponíveis
+
+Registo 2026-11-12T10:46:24Z. PHASE-02/unidade002-overlay/035-overlay-extra concluídos.
+blocks=false; bolt permanece planned, sem started/current_stage/etapas executadas.
+O ponto de retoma é Model do IMP-007 quando autorizado; não foi iniciado.

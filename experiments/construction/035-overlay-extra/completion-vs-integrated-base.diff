@@ -1,0 +1,687 @@
+diff --git a/Projeto/README.md b/Projeto/README.md
+--- a/Projeto/README.md
++++ b/Projeto/README.md
+@@ -6,7 +6,7 @@
+ 
+ A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
+ 
+-IMP-035 tem Test aprovado: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e a versão15efdf2 foi integrada em main local. Fecho e revisão humana final da implementação permanecem pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
++IMP-035 está concluído e a fase2 de controlo está fechada: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e a versão15efdf2 foi integrada em main local. O utilizador autorizou o fecho do bolt e da fase2 após a integração. Routing/streaming/vídeo permanecem nos seus incrementos.
+ 
+ ## Compilar e testar
+ 
+@@ -57,7 +57,7 @@
+ 
+ UDP de vídeo conserva OTT1/version 1, cabeçalho 64, total <=1200 e payload <=1136. Testes locais não são demonstração CORE, GUI, FPS ou vídeo real.
+ 
+-## Reparação após isolamento — checkpoint Test
++## Reparação após isolamento — fase2 concluída
+ 
+ Usar `neighbors` para sessões confirmadas e `recovery` para estado, motivo,
+ candidato selecionado e atraso de retry. O evento `RepairStarted` identifica
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -970,19 +970,19 @@
+ - **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
+ - **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`, `overlay/NeighborDiscovery.java`, `overlay/NeighborDiscoveryTest.java`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `bootstrap/BootstrapServerTest.java`, `transport/TransportTest.java`, `Projeto/src/test/resources/protocol/`, `scripts/validate-planning.py`, `Projeto/README.md`, `Projeto/docs/protocolos.md`.
+ - **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
+-- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita. Implement aprovado; Test em repetição humana.
+-- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito. Test autorizado; aprovação humana pendente.
++- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita. Implement aprovado; Test aprovado e fecho autorizado, versão integrada em main.
++- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito. Test e aceitação final aprovados pelo utilizador; IMP-035 concluído.
+ - **REQ/NFR/CON/INT:** REQ-025.
+ - **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+ - **Gates:** G-EXTRA-ADR.
+ - **Critérios de aceitação:**
+ 
+-  - [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+-  - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+-  - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+-  - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+-  - [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+-  - [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
++  - [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
++  - [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
++  - [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
++  - [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
++  - [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
++  - [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+ 
+ <a id="imp-007"></a>
+ ### IMP-007 — Medir RTT e detetar falhas TCP
+diff --git a/docs/08-IMPLEMENTATION-ROADMAP.md b/docs/08-IMPLEMENTATION-ROADMAP.md
+--- a/docs/08-IMPLEMENTATION-ROADMAP.md
++++ b/docs/08-IMPLEMENTATION-ROADMAP.md
+@@ -5,6 +5,10 @@
+ Sete fases seguem dependências reais: formatos/configuração antes da rede; vizinhança antes de métricas/rotas; rotas antes de subscrições; árvores antes de vídeo integrado; integração local antes de CORE; evidências antes de relatório/entrega. Todas começam TODO. Há 31 tarefas com um oráculo V-XXX por tarefa.
+ 
+ Estado em 27-10-2026: PHASE-01 DONE; PHASE-02 IN PROGRESS, TASK-005 DONE. Build com 149 testes aprovados; próxima TASK-006 TODO. [Evidência](../experiments/task-005-transport-validation.md).
++
++Estado atual: PHASE-02 DONE, incluindo EXTRA-01 no controlo;005-rotas/IMP-007
++permanece planned. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md). A continuidade
++de vídeo será validada nas fases posteriores de routing/streaming.
+ 
+ ## Fases e entregáveis
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -220,8 +220,17 @@
+ 
+ | Requisito | TASK / IMP | Estado | Evidência |
+ |---|---|---|---|
+-| [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS | V-033: 1065 testes e manual Luis/53 checks; Test e revisão técnica concluídos. IMP-035/V-034 por executar. [Fecho IMP-034](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md) |
++| [REQ-025](../specs.md#req-025) | TASK-033/034, IMP-034/035 | IN PROGRESS apenas na integração futura de vídeo | Controlo EXTRA-01 concluído: V-033/1065/Luis53 e V-034/1113/Luis66, SIGKILL reais, sessões únicas e S–R1 preservada; tarefas e PHASE-02 DONE. [Fecho IMP-035](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Continuidade do vídeo por validar após routing/streaming. |
+ 
+ ## IMP-034 — fecho integrado
+ 
+ 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 base DONE após validação da equipa, com extensão EXTRA-01 IN PROGRESS antes da fase 3. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-033](tasks/PHASE-02/TASK-033.md), DONE. IMP-034/V-033: 1065 testes, manual Luis/53 checks, Test e revisão técnica final aceites, versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md).
++**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Próximo:005-rotas/IMP-007, planned, sem início.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -81,7 +81,7 @@
+ | Fase | Tarefas | Estado | Dependência / gate |
+ |---|---|---|---|
+ | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
+-| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | IN PROGRESS na extensão. [Base concluída](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
++| [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+ | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
+ | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
+ | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
+@@ -103,7 +103,7 @@
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+-| [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | IN PROGRESS | Design aprovado; revisão ADR para aprovação. V-034 por executar; precede 005-rotas |
++| [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+@@ -804,3 +804,12 @@
+ a partir de22622c1, sem conflitos. [Prova](<../experiments/construction/035-overlay-extra/integration-proof.json>). Test aprovado1113/Luis66;
+ execução humana anterior preservada. Nenhum target incluído, push ou outro IMP.
+ Bolt/TASK-034/história/unidade continuam em progresso até à revisão humana final.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -271,3 +271,12 @@
+ 
+ Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
+ Test aprovado; revisão humana final da implementação/fecho pendentes.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/docs/phases/PHASE-02-CLOSURE-REVIEW.md b/docs/phases/PHASE-02-CLOSURE-REVIEW.md
+--- a/docs/phases/PHASE-02-CLOSURE-REVIEW.md
++++ b/docs/phases/PHASE-02-CLOSURE-REVIEW.md
+@@ -1,4 +1,9 @@
+ # PHASE-02 — Dossier de fecho
++
++**Estado atual: DONE, incluindo EXTRA-01 de controlo.** Aceitação final explícita
++registada em 2026-11-12T10:46:24Z. O dossier original abaixo descreve a base da fase;
++a extensão concluída está no suplemento final, sem substituir a sua evidência.
++
+ 
+ Preparado em 2026-11-10T23:34:59Z sobre a base comum `223ea6ff342525fdd211445753b47129494f2805`.
+ A evidência técnica da fase está reunida e as seis tarefas estão DONE e
+@@ -60,3 +65,24 @@
+ [Coordenação](../team/00-COORDINATION.md#5-quatro-momentos-de-revisão-por-tarefa) ·
+ [Definition of Done](../14-DEFINITION-OF-DONE.md#fase) ·
+ [Próximo bolt](../../memory-bank/bolts/005-rotas/bolt.md).
++
++## Suplemento — fecho de EXTRA-01
++
++Aceitação explícita de Luis em registo 2026-11-12T10:46:24Z: «Podes fechar o bolt e e esta fase».
++TASK-033/IMP-034 e TASK-034/IMP-035 DONE; as oito tarefas da tabela de PHASE-02
++estão DONE e os sete bolts da unidade002-overlay complete. Fonte/modelo de
++reparação: [ADR-035](../../add.md#adr-035).
++
++- Aprendizagem V-033:1065 testes/manuais Luis53, revisão e integração f650be0.
++- Reparação V-034:1113 testes/11 XML e manual humano selecionado66 checks,
++  MANUAL_PASS/passed/no_processes_pending. Dois grafos com SIGKILL sequencial,
++  bootstrap parado, mesmos sobreviventes, ligação física única e S–R1 preservada.
++- Versão15efdf2 integrada em main e documentaçãoff0ef0b já integradas antes do
++  fecho. [Fecho do bolt](../../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md)
++  e [aceitação/integridade](../../experiments/construction/035-overlay-extra/completion-authorization.json).
++- G-ASSESSMENTS continua com data/conteúdo docentes pendentes. A fase está
++  concluída no âmbito de controlo; continuidade de vídeo via novas arestas fica
++  para routing/streaming. Nenhum resultado GUI/CORE/vídeo é presumido.
++
++005-rotas/IMP-007 tem pré-requisitos satisfeitos e permanece planned. Nenhuma
++etapa da fase3 foi iniciada por este fecho; o intent/projeto continuam em curso.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -6,7 +6,7 @@
+ 
+ ## 2. Contexto
+ 
+-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS para EXTRA-01. A base foi concluída e validada pela equipa. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O utilizador confirmou a validação da equipa e autorizou o fecho, registado em 2026-11-10T23:39:09Z sobre a base integrada `223ea6f`. [Dossier de fecho](PHASE-02-CLOSURE-REVIEW.md).
++Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: DONE, incluindo EXTRA-01 no plano de controlo. Fecho autorizado pelo utilizador em registo 2026-11-12T10:46:24Z. A base foi concluída e validada pela equipa. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O utilizador confirmou a validação da equipa e autorizou o fecho, registado em 2026-11-10T23:39:09Z sobre a base integrada `223ea6f`. [Dossier de fecho](PHASE-02-CLOSURE-REVIEW.md).
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -26,8 +26,8 @@
+ | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | DONE |
+ | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | DONE |
+ | [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | DONE |
+-| [TASK-033 — Extra A](../tasks/PHASE-02/TASK-033.md) | Aprender candidatos por divulgação de vizinhos | TASK-009 | V-033 | IN PROGRESS |
+-| [TASK-034 — Extra B](../tasks/PHASE-02/TASK-034.md) | Reparar ligações com candidatos aprendidos | TASK-033 | V-034 | TODO |
++| [TASK-033 — Extra A](../tasks/PHASE-02/TASK-033.md) | Aprender candidatos por divulgação de vizinhos | TASK-009 | V-033 | DONE |
++| [TASK-034 — Extra B](../tasks/PHASE-02/TASK-034.md) | Reparar ligações com candidatos aprendidos | TASK-033 | V-034 | DONE |
+ 
+ ## 6. Ordem de execução
+ 
+@@ -51,7 +51,7 @@
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
++- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+ - [x] Pelo menos três nós iniciam fora de ordem, trocam HELLO e reconectam sem canais duplicados.
+ - [x] Bootstrap só fornece localização dos vizinhos a partir da configuração; não mantém disponibilidade ou registos com renovação.
+ - [x] Nós já descobertos reconectam diretamente com bootstrap parado, sem consultas periódicas ou avisos de saída para ele.
+@@ -59,7 +59,7 @@
+ - [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+ - [x] Não há regressão nos componentes anteriores afetados pelas alterações.
+ 
+-- [ ] EXTRA-01 aprende candidatos por divulgação e cria S–C ou R1–C após as falhas, com V-033/V-034 e integração confirmados.
++- [x] EXTRA-01 aprende candidatos por divulgação e cria S–C ou R1–C após as falhas, com V-033/V-034 e integração confirmados.
+ 
+ ## 12. Definition of Done
+ 
+diff --git a/docs/tasks/PHASE-02/TASK-034.md b/docs/tasks/PHASE-02/TASK-034.md
+--- a/docs/tasks/PHASE-02/TASK-034.md
++++ b/docs/tasks/PHASE-02/TASK-034.md
+@@ -4,10 +4,10 @@
+ 
+ - ID: TASK-034
+ - Fase: PHASE-02, EXTRA-01 posterior ao fecho da base.
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Natureza: Extra solicitado pelo utilizador.
+ - Responsável proposto: Denji.
+-- Revisor proposto: Fillmore.
++- Aceitação final e fecho: Luis, por pedido explícito; revisão técnica: Codex. O revisor inicialmente proposto não é registado como executante.
+ - Dependências: [TASK-033](TASK-033.md).
+ - Fonte: [REQ-025](../../../specs.md#req-025), [IMP-035](../../../add.md#imp-035).
+ 
+@@ -17,17 +17,17 @@
+ 
+ ## 3. Critérios de aceitação
+ 
+-- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+-- [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+-- [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+-- [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+-- [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+-- [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
++- [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
++- [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
++- [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
++- [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
++- [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
++- [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+ 
+ ## 4. Validação e fecho
+ 
+ V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+-Estado: V-034 executado, Test aprovado por Luis; revisão humana final/fecho pendentes.
++Estado: V-034 executado/Test aprovado; aceitação final de fecho pelo utilizador e integração em main comprovadas. TASK-034 DONE.
+ ADR-033 residual/ADR-034 aceites não dispensam G-EXTRA-ADR próprio do IMP-035:
+ aprovar intenção/admissão/reparação e âmbito antes de Implement.
+ Revisão e integração precedem DONE.
+@@ -101,3 +101,12 @@
+ 
+ Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
+ Test aprovado; revisão humana final da implementação/fecho pendentes.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/memory-bank/bolts/005-rotas/bolt.md b/memory-bank/bolts/005-rotas/bolt.md
+--- a/memory-bank/bolts/005-rotas/bolt.md
++++ b/memory-bank/bolts/005-rotas/bolt.md
+@@ -6,7 +6,7 @@
+ status: "planned"
+ stories: ["001-medir-rtt-e-publicar-falhas-de-vizinhanca"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-12T10:46:24Z"
+ started: null
+ completed: null
+ current_stage: null
+@@ -14,7 +14,7 @@
+ requires_bolts: ["004-overlay", "035-overlay-extra"]
+ enables_bolts: ["021-rotas"]
+ requires_units: ["002-overlay"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+@@ -72,3 +72,9 @@
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+ 
+ O EXTRA-01 exige 034-overlay-extra (aprendizagem) e 035-overlay-extra (reparação) antes deste bolt. A conclusão e integração dos dois são pré-requisito de início.
++
++## Pré-requisitos disponíveis
++
++Registo 2026-11-12T10:46:24Z. PHASE-02/unidade002-overlay/035-overlay-extra concluídos.
++blocks=false; bolt permanece planned, sem started/current_stage/etapas executadas.
++O ponto de retoma é Model do IMP-007 quando autorizado; não foi iniciado.
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -3,12 +3,12 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-12T10:35:23Z"
++updated: "2026-11-12T10:46:24Z"
+ started: "2026-11-11T22:20:02Z"
+-completed: null
++completed: "2026-11-12T10:46:24Z"
+ current_stage: null
+ stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T23:39:43Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-12T00:28:31Z","artifact":"implementation-walkthrough.md"},{"name":"test","completed":"2026-11-12T10:35:23Z","artifact":"ddd-03-test-report.md"}]
+ requires_bolts: ["034-overlay-extra"]
+@@ -51,21 +51,21 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+-- [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+-- [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+-- [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+-- [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+-- [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
++- [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
++- [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
++- [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
++- [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
++- [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
++- [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+ 
+ ## Estado e fronteiras
+ 
+-Model/Design/ADR aprovados; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
+-Test aprovado por Luis, incluindo execução humana66/MANUAL_PASS.
+-As cinco etapas estão concluídas; fecho pendente de revisão humana final.
+-O âmbito corrente aprovado é21 caminhos.
+-Histórico das etapas abaixo preservado por ordem de registo. V-034 completo,
+-regressão atual, manual humano com mortes reais, revisão final e integração pendentes.
++**Complete.** Test/manual humano aprovados; versão integrada em main antes do fecho.
++O utilizador autorizou explicitamente o fecho do bolt e da fase2; registo 2026-11-12T10:46:24Z.
++[Fecho/evidência](closure-walkthrough.md). Todas as cinco etapas e seis critérios
++concluídos no âmbito de controlo do IMP-035. O histórico datado abaixo conserva
++as decisões e checkpoints anteriores; pendências de então não são estado atual.
++Vídeo/rotas/CORE não são declarados executados por este fecho.
+ 
+ ## Dependência integrada
+ 
+diff --git a/memory-bank/bolts/035-overlay-extra/closure-walkthrough.md b/memory-bank/bolts/035-overlay-extra/closure-walkthrough.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/closure-walkthrough.md
+@@ -0,0 +1,56 @@
++# IMP-035 / 035-overlay-extra — fecho e cascata da fase2
++
++Fecho registado em 2026-11-12T10:46:24Z. O utilizador autorizou: «Podes fechar o bolt e e
++esta fase», após Test/manual humano aprovados e integração da versão em main.
++A aceitação final que permanecia pendente está satisfeita por essa instrução;
++não se inventa revisão de código realizada por Fillmore ou outro colega.
++[Aceitação e base integrada](../../../experiments/construction/035-overlay-extra/completion-authorization.json).
++
++## Evidência aceite, sem repetir execuções
++
++- Clean verify/JDK21:1113 testes, zero falhas/erros/skips,11 XML. [Resumo/JAR](../../../experiments/construction/035-overlay-extra/test-build-summary.json).
++- Manual humano selecionado: Luis,20261112T102931Z-pr_nynth,66 CHECK_PASS,
++  MANUAL_PASS/passed=true/no_processes_pending=true. [Resultado](../../../experiments/construction/035-overlay-extra/test-manual-runs/20261112T102931Z-pr_nynth/result.json).
++  A execução humana anterior20261112T004311Z-ilbihqij e todas as tentativas do
++  agente ficam preservadas, incluindo as incompletas do observador IPv4.
++- Os dois grafos foram reparados após SIGKILL reais/sequenciais dos relays,
++  bootstrap parado, mesmos processos sobreviventes, uma ligação física reparada
++  e S–R1 preservada no segundo grafo. Auxiliar usa APIs públicas/JVM por nó e
++  relógio/transporte reais; CLI de produção exercitada separadamente na regressão.
++- Hash JAR: dea01ffa2c501b9b948594005e7e8e9ee70b387981dc5b3d83f9d7c331cc2526.
++  Código/testes/configuração/fixtures coincidem com a execução validada.
++- Versão15efdf280b97327cfdc73e9040b9dfed4d4a5658 e documentação
++  ff0ef0b15f1366272493d62cfaaa4ede9bd0ddd1 estão em main antes do fecho.
++  [Prova anterior](../../../experiments/construction/035-overlay-extra/integration-proof.json).
++
++## Cascata concluída
++
++035-overlay-extra complete, cinco etapas concluídas; história007 complete e
++implemented=true; TASK-034 DONE. Todos os sete bolts da unidade002-overlay
++complete, unidade complete. Todas as oito tarefas da PHASE-02 DONE, incluindo
++as partes A/B de EXTRA-01; fase DONE por aceitação explícita do utilizador.
++[Progresso](../../../docs/15-PROJECT-PROGRESS.md) e
++[dossier da fase](../../../docs/phases/PHASE-02-CLOSURE-REVIEW.md).
++
++005-rotas/IMP-007 deixa de estar bloqueado por dependências, mas permanece
++planned/sem início. Nenhum novo IMP, manual/build ou teste de rede foi iniciado.
++Este fecho é documental, com V-ADD e integridade dos artefactos.
++
++## Limites mantidos
++
++REQ-025 está concluído na aprendizagem/reparação do plano de controlo. A
++continuidade de vídeo nessas arestas permanece para a integração posterior
++com routing/streaming; o requisito global não é promovido a satisfeitos sem
++essa prova futura. CORE/GUI/FPS/entrega do projeto não são inferidos.
++G-ASSESSMENTS conserva a informação docente pendente aceite no marco anterior.
++Intent/projeto continuam em construção. Sem push por este pedido.
++
++## Verificação documental de fecho
++
++[Conferência de estados/hashes](../../../experiments/construction/035-overlay-extra/completion-validation.json),
++[diff contra a base integrada](../../../experiments/construction/035-overlay-extra/completion-vs-integrated-base.diff),
++[V-ADD](../../../experiments/construction/035-overlay-extra/completion-v-add-02.log)
++e [diff check](../../../experiments/construction/035-overlay-extra/completion-diff-check.log).
++1478 artefactos anteriores mantêm hashes; a versão anterior do roteiro README
++fica arquivada. Alterações de Projeto limitam-se ao README; nenhum código,
++teste, configuração, POM, fixture ou JAR foi alterado. Não se repete o manual.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md b/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md
+--- a/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md
++++ b/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md
+@@ -2,17 +2,17 @@
+ stage: test
+ bolt: "035-overlay-extra"
+ created: "2026-11-12T00:39:35Z"
+-status: "approved-by-Luis"
++status: "approved-by-Luis-complete"
+ ---
+-# IMP-035 / V-034 — Test para repetição humana
++# IMP-035 / V-034 — Test aprovado e bolt concluído
+ 
+ Implement aprovado explicitamente; entrada em Test registada em2026-11-12T00:28:31Z.
+-Base main22622c1d7eb0fdab3df684f2fac10263cff11736. Só Test autorizado.
+-**Test aprovado explicitamente por Luis; fecho do bolt ainda pendente.**
++Base de entrada22622c1; versão validada15efdf2/documentaçãoff0ef0b integradas em main.
++**Test aprovado explicitamente por Luis; fecho do bolt/fase2 autorizado e concluído.**
+ Execução humana selecionada20261112T102931Z-pr_nynth,66 CHECK_PASS/MANUAL_PASS,
+ passed=true/no_processes_pending=true. Execução humana anterior preservada.
+-Commit e integração local em main autorizados; revisão humana final da implementação
+-ainda não foi registada. Não atribuir revisão ao revisor apenas proposto.
++Aceitação final de fecho dada pelo utilizador após integração. Não se atribui
++revisão realizada ao colega que constava apenas como proposto.
+ 
+ ## Regressão completa e novo JAR
+ 
+@@ -169,3 +169,10 @@
+ fast-forward. [Prova](../../../experiments/construction/035-overlay-extra/integration-proof.json).
+ Test concluído/aprovado, sem repetição de manual. Falta revisão humana final
+ da implementação para fechar o bolt; não atribuir essa revisão por inferência.
++
++## Fecho autorizado e concluído
++
++Registo 2026-11-12T10:46:24Z. O utilizador autorizou explicitamente fechar o bolt e a fase2.
++A aceitação de fecho que faltava está satisfeita por essa instrução, sem atribuir
++revisão ao colega apenas proposto. [Fecho atual](closure-walkthrough.md).
++As pendências em secções datadas anteriores são históricas.
+diff --git a/memory-bank/bolts/035-overlay-extra/final-review-summary.md b/memory-bank/bolts/035-overlay-extra/final-review-summary.md
+--- a/memory-bank/bolts/035-overlay-extra/final-review-summary.md
++++ b/memory-bank/bolts/035-overlay-extra/final-review-summary.md
+@@ -1,4 +1,4 @@
+-# IMP-035 — versão aprovada em Test para integração
++# IMP-035 — versão aprovada, integrada e fechada
+ 
+ Registo 2026-11-12T10:35:23Z. Test aprovado por Luis, incluindo66 CHECK_PASS/MANUAL_PASS,
+ passed=true e no_processes_pending=true da execução20261112T102931Z-pr_nynth.
+@@ -20,12 +20,11 @@
+ 
+ ## Estado de aceitação
+ 
+-Luis aprovou Test e autorizou commits e integração em main. O revisor de código
+-Fillmore consta apenas como proposto; não se atribui revisão executada a esse
+-nome, a Waheed ou a outro colega. A revisão humana final da implementação
+-continua pendente conforme o checkpoint anterior. O bolt conserva in-progress,
+-current_stage=null/completed=null, cinco etapas concluídas; TASK-034/história/
+-unidade/EXTRA-01 não são promovidos a DONE por uma integração isolada.
++Luis aprovou Test e autorizou commits/integração; posteriormente autorizou
++explicitamente fechar o bolt e a fase2. A aceitação final pendente está satisfeita
++por esse pedido. Bolt/história/unidade complete e TASK-034/PHASE-02 DONE no
++âmbito de controlo. [Fecho atual](closure-walkthrough.md). Fillmore consta apenas
++como revisor inicialmente proposto; não se inventa uma revisão executada por ele.
+ 
+ A versão aprovada 15efdf280b97327cfdc73e9040b9dfed4d4a5658 foi integrada em main local por fast-forward
+ a partir de22622c1, sem conflitos. [Prova Git](../../../experiments/construction/035-overlay-extra/integration-proof.json).
+@@ -49,3 +48,10 @@
+ iguais ao clean verify1113 e aos manuais humanos. Nenhum target nos commits.
+ O fecho continua pendente apenas da revisão humana final da implementação;
+ 005-rotas não foi iniciado. Sem push.
++
++## Fecho autorizado e concluído
++
++Registo 2026-11-12T10:46:24Z. O utilizador autorizou explicitamente fechar o bolt e a fase2.
++A aceitação de fecho que faltava está satisfeita por essa instrução, sem atribuir
++revisão ao colega apenas proposto. [Fecho atual](closure-walkthrough.md).
++As pendências em secções datadas anteriores são históricas.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -780,3 +780,12 @@
+ a partir de22622c1, sem conflitos. [Prova](<../../../../../experiments/construction/035-overlay-extra/integration-proof.json>). Test aprovado1113/Luis66;
+ execução humana anterior preservada. Nenhum target incluído, push ou outro IMP.
+ Bolt/TASK-034/história/unidade continuam em progresso até à revisão humana final.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+@@ -2,7 +2,7 @@
+ id: "007-reparar-vizinhancas-com-candidatos-aprendidos"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-11T12:26:03Z"
+ source_tasks: ["TASK-034"]
+@@ -12,7 +12,9 @@
+ bolt: "035-overlay-extra"
+ size: "M"
+ extra: true
+-updated: "2026-11-12T10:35:23Z"
++updated: "2026-11-12T10:46:24Z"
++implemented: true
++completed: "2026-11-12T10:46:24Z"
+ ---
+ # História — Extra — reparar ligações com candidatos aprendidos
+ 
+@@ -21,12 +23,12 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+-- [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+-- [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+-- [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+-- [ ] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
+-- [ ] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
++- [x] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
++- [x] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
++- [x] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
++- [x] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
++- [x] Sem candidatos aprendidos válidos, manter estado explícito de isolamento e tentativas limitadas.
++- [x] V-034, regressão atual e ensaio de controlo executados com evidência. A prova de vídeo fica ligada à integração futura de routing e streaming.
+ 
+ ## Validação e revisão
+ 
+@@ -102,3 +104,12 @@
+ 
+ Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
+ Test aprovado; revisão humana final da implementação/fecho pendentes.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -3,10 +3,10 @@
+ intent: "001-ott-streaming"
+ phase: "construction"
+ source_phase: "PHASE-02"
+-status: "in-progress"
++status: "complete"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-12T10:35:23Z"
+-completed: null
++updated: "2026-11-12T10:46:24Z"
++completed: "2026-11-12T10:46:24Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "NFR-004", "REQ-024", "REQ-025"]
+@@ -34,7 +34,7 @@
+ - [x] [004-preparar-evidencia-do-primeiro-marco-intermedio](stories/004-preparar-evidencia-do-primeiro-marco-intermedio.md) → [004-overlay](../../../../bolts/004-overlay/bolt.md); IMP-006 (S).
+ 
+ - [x] [006-reconstruir-vizinhancas-apos-falhas](stories/006-reconstruir-vizinhancas-apos-falhas.md) → [034-overlay-extra](../../../../bolts/034-overlay-extra/bolt.md); IMP-034 (extra A, aprendizagem).
+-- [ ] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
++- [x] [007-reparar-vizinhancas-com-candidatos-aprendidos](stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md) → [035-overlay-extra](../../../../bolts/035-overlay-extra/bolt.md); IMP-035 (extra B, reparação).
+ 
+ ## Dependências e critérios de fecho
+ 
+@@ -403,3 +403,12 @@
+ 
+ Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
+ Test aprovado; revisão humana final da implementação/fecho pendentes.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -905,9 +905,11 @@
+         ],
+         "previous_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24"
+       },
+-      "implementation_status": "IMP-034 complete; IMP-035 Test approved Luis66, code integrated main15efdf2; final human implementation review/closure pending",
++      "implementation_status": "IMP-034/035 complete, PHASE02 control scope DONE; user accepted final closure; video integration remains future",
+       "integrated_revision": "f650be02f2af10b95328f5b50c3d6941e2e75c15",
+-      "repair_integrated_revision": "15efdf280b97327cfdc73e9040b9dfed4d4a5658"
++      "repair_integrated_revision": "15efdf280b97327cfdc73e9040b9dfed4d4a5658",
++      "control_completed_at": "2026-11-12T10:46:24Z",
++      "video_validation": "pending after routing/streaming, not asserted by phase02 closure"
+     }
+   ]
+ }
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-integrated-main-final-human-review-pending
++extras_planning: EXTRA-01-control-complete-PHASE02-DONE-video-validation-future
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+@@ -15,3 +15,6 @@
+ 
+ architecture_source: add.md
+ specification_source: specs.md
++
++phase_02_completed_at: 2026-11-12T10:46:24Z
++next_bolt: "005-rotas (planned, not started)"
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -318,3 +318,12 @@
+ [Resumo para revisão humana final](<../bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
+ revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
+ continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
++
++## IMP-035 e PHASE-02 concluídos
++
++Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
++manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../bolts/035-overlay-extra/closure-walkthrough.md>).
++Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
++de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
++005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
++arestas fica para routing/streaming; projeto/intent não concluídos.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 com Test aprovado e revisão final pendente e 27 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: oito histórias/bolts complete e27 planned; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -286,6 +286,6 @@
+ 
+ ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Cinco etapas concluídas; Test aprovado1113/manual Luis66; revisão humana final e fecho pendentes.
++**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** complete/implemented=true. Cinco etapas, Test1113/manual Luis66, aceitação final do utilizador e integração em main comprovadas.
+ **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+ Usa a cache aprendida de IMP-034 para reparar a overlay.

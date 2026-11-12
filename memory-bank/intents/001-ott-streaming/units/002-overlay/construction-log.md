@@ -780,3 +780,12 @@ Registo 2026-11-12T10:39:28Z. Commit 15efdf280b97327cfdc73e9040b9dfed4d4a5658 in
 a partir de22622c1, sem conflitos. [Prova](<../../../../../experiments/construction/035-overlay-extra/integration-proof.json>). Test aprovado1113/Luis66;
 execução humana anterior preservada. Nenhum target incluído, push ou outro IMP.
 Bolt/TASK-034/história/unidade continuam em progresso até à revisão humana final.
+
+## IMP-035 e PHASE-02 concluídos
+
+Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
+manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../../../../bolts/035-overlay-extra/closure-walkthrough.md>).
+Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
+de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+arestas fica para routing/streaming; projeto/intent não concluídos.

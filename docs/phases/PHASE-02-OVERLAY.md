@@ -6,7 +6,7 @@ Conectar processos reais por TCP full-duplex, descobrir vizinhos e preparar a pr
 
 ## 2. Contexto
 
-Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS para EXTRA-01. A base foi concluída e validada pela equipa. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O utilizador confirmou a validação da equipa e autorizou o fecho, registado em 2026-11-10T23:39:09Z sobre a base integrada `223ea6f`. [Dossier de fecho](PHASE-02-CLOSURE-REVIEW.md).
+Incremento 2 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: DONE, incluindo EXTRA-01 no plano de controlo. Fecho autorizado pelo utilizador em registo 2026-11-12T10:46:24Z. A base foi concluída e validada pela equipa. TASK-005 DONE com transporte TCP validado localmente; TASK-032 DONE/integrada; TASK-006 DONE, Test aprovado com clean verify/856 testes e manuais separados Codex/Luis/34 checks/saída 0 cada, revisão final atribuída a Waheed confirmada pelo utilizador e versão revista integrada em main; TASK-007 DONE após Test/manual humano, revisão Denji aprovada e integração local 8db7b78; TASK-008 DONE, com [fecho e integração](../../memory-bank/bolts/020-overlay/closure-walkthrough.md); TASK-009 DONE, com [marco técnico e integração](../../memory-bank/bolts/004-overlay/closure-walkthrough.md). O utilizador confirmou a validação da equipa e autorizou o fecho, registado em 2026-11-10T23:39:09Z sobre a base integrada `223ea6f`. [Dossier de fecho](PHASE-02-CLOSURE-REVIEW.md).
 
 ## 3. Pré-requisitos
 
@@ -26,8 +26,8 @@ RF-001, RF-002, RF-003, RF-004, RNF-003, RNF-004, RNF-005, RC-007, RP-006, RP-00
 | [TASK-007](../tasks/PHASE-02/TASK-007.md) | Gerir handshake, unicidade e reconexão de vizinhos | TASK-005, TASK-006 | V-007 | DONE |
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | V-008 | DONE |
 | [TASK-009](../tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | V-009 | DONE |
-| [TASK-033 — Extra A](../tasks/PHASE-02/TASK-033.md) | Aprender candidatos por divulgação de vizinhos | TASK-009 | V-033 | IN PROGRESS |
-| [TASK-034 — Extra B](../tasks/PHASE-02/TASK-034.md) | Reparar ligações com candidatos aprendidos | TASK-033 | V-034 | TODO |
+| [TASK-033 — Extra A](../tasks/PHASE-02/TASK-033.md) | Aprender candidatos por divulgação de vizinhos | TASK-009 | V-033 | DONE |
+| [TASK-034 — Extra B](../tasks/PHASE-02/TASK-034.md) | Reparar ligações com candidatos aprendidos | TASK-033 | V-034 | DONE |
 
 ## 6. Ordem de execução
 
@@ -51,7 +51,7 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
 - [x] Pelo menos três nós iniciam fora de ordem, trocam HELLO e reconectam sem canais duplicados.
 - [x] Bootstrap só fornece localização dos vizinhos a partir da configuração; não mantém disponibilidade ou registos com renovação.
 - [x] Nós já descobertos reconectam diretamente com bootstrap parado, sem consultas periódicas ou avisos de saída para ele.
@@ -59,7 +59,7 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 - [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
 - [x] Não há regressão nos componentes anteriores afetados pelas alterações.
 
-- [ ] EXTRA-01 aprende candidatos por divulgação e cria S–C ou R1–C após as falhas, com V-033/V-034 e integração confirmados.
+- [x] EXTRA-01 aprende candidatos por divulgação e cria S–C ou R1–C após as falhas, com V-033/V-034 e integração confirmados.
 
 ## 12. Definition of Done
 

@@ -318,3 +318,12 @@ humana anterior preservada; nenhuma repetição. Cinco etapas concluídas.
 [Resumo para revisão humana final](<../bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
 revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
 continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
+
+## IMP-035 e PHASE-02 concluídos
+
+Registo 2026-11-12T10:46:24Z. Aceitação explícita de fecho pelo utilizador após Test1113/
+manual Luis66 e versão integrada em mainff0ef0b. [Fecho e evidência](<../bolts/035-overlay-extra/closure-walkthrough.md>).
+Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
+de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+arestas fica para routing/streaming; projeto/intent não concluídos.

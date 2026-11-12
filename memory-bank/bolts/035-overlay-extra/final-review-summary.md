@@ -1,4 +1,4 @@
-# IMP-035 — versão aprovada em Test para integração
+# IMP-035 — versão aprovada, integrada e fechada
 
 Registo 2026-11-12T10:35:23Z. Test aprovado por Luis, incluindo66 CHECK_PASS/MANUAL_PASS,
 passed=true e no_processes_pending=true da execução20261112T102931Z-pr_nynth.
@@ -20,12 +20,11 @@ ela não constitui uma revisão humana independente da implementação.
 
 ## Estado de aceitação
 
-Luis aprovou Test e autorizou commits e integração em main. O revisor de código
-Fillmore consta apenas como proposto; não se atribui revisão executada a esse
-nome, a Waheed ou a outro colega. A revisão humana final da implementação
-continua pendente conforme o checkpoint anterior. O bolt conserva in-progress,
-current_stage=null/completed=null, cinco etapas concluídas; TASK-034/história/
-unidade/EXTRA-01 não são promovidos a DONE por uma integração isolada.
+Luis aprovou Test e autorizou commits/integração; posteriormente autorizou
+explicitamente fechar o bolt e a fase2. A aceitação final pendente está satisfeita
+por esse pedido. Bolt/história/unidade complete e TASK-034/PHASE-02 DONE no
+âmbito de controlo. [Fecho atual](closure-walkthrough.md). Fillmore consta apenas
+como revisor inicialmente proposto; não se inventa uma revisão executada por ele.
 
 A versão aprovada 15efdf280b97327cfdc73e9040b9dfed4d4a5658 foi integrada em main local por fast-forward
 a partir de22622c1, sem conflitos. [Prova Git](../../../experiments/construction/035-overlay-extra/integration-proof.json).
@@ -49,3 +48,10 @@ Registo 2026-11-12T10:39:28Z. main e Denji receberam a versão aprovada. Código
 iguais ao clean verify1113 e aos manuais humanos. Nenhum target nos commits.
 O fecho continua pendente apenas da revisão humana final da implementação;
 005-rotas não foi iniciado. Sem push.
+
+## Fecho autorizado e concluído
+
+Registo 2026-11-12T10:46:24Z. O utilizador autorizou explicitamente fechar o bolt e a fase2.
+A aceitação de fecho que faltava está satisfeita por essa instrução, sem atribuir
+revisão ao colega apenas proposto. [Fecho atual](closure-walkthrough.md).
+As pendências em secções datadas anteriores são históricas.
