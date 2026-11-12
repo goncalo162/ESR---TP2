@@ -130,3 +130,20 @@ aprovados. Resta integrar a versão revista; bolt/história/TASK/unidade continu
 em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
 exata preparados para autorização de integração. Nenhum staging/commit/push ou
 fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.

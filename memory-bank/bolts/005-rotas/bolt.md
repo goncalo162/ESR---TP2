@@ -3,12 +3,12 @@ id: "005-rotas"
 unit: "003-rotas"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["001-medir-rtt-e-publicar-falhas-de-vizinhanca"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-12T22:07:58Z"
+updated: "2026-11-12T22:37:24Z"
 started: "2026-11-12T14:21:47Z"
-completed: null
+completed: "2026-11-12T22:37:24Z"
 current_stage: "test"
 stages_completed: [{"name": "model", "completed": "2026-11-12T14:36:45Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-12T14:48:27Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-12T14:56:34Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-12T16:16:45Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-12T22:07:58Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["004-overlay", "035-overlay-extra"]
@@ -41,7 +41,7 @@ Ler [IMP-007](../../../add.md#imp-007) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](../../intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md).
+- [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](../../intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md).
 - Dependências: [004-overlay](../004-overlay/bolt.md), [035-overlay-extra](../035-overlay-extra/bolt.md).
 - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
 - Gates: nenhum adicional.
@@ -216,3 +216,20 @@ aprovados. Resta integrar a versão revista; bolt/história/TASK/unidade continu
 em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
 exata preparados para autorização de integração. Nenhum staging/commit/push ou
 fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.

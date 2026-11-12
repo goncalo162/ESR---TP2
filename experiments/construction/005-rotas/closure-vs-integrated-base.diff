@@ -1,0 +1,576 @@
+--- a/add.md
++++ b/add.md
+@@ -999,12 +999,13 @@
+ - **REQ/NFR/CON/INT:** CON-008, INT-001, INT-002, REQ-003, REQ-008, REQ-014, REQ-021.
+ - **Testes exigidos:** V-010. V-010: relógio falso confirma EWMA, reset após nova instância, perda de três sondas e ausência de falso positivo por um timeout; EOF invalida imediatamente.
+ - **Gates:** nenhum externo adicional.
+-- **Critérios de aceitação:**
+-
+-  - [ ] RTT é calculado sem comparar relógios de máquinas diferentes.
+-  - [ ] Falhas são correlacionadas à conexão correta.
+-  - [ ] Métrica sem amostra não é publicada como zero confiável.
+-  - [ ] Validação V-010 executada e evidência ligada no progresso.
++- **Estado:** concluído por autorização explícita; integração local `f9905038c614612b6f2798d4eca46dd72934743f`, Test1176/manual Francisco/revisão final Fillmore cumpridos. [Fecho e prova](memory-bank/bolts/005-rotas/closure-walkthrough.md).
++- **Critérios de aceitação:**
++
++  - [x] RTT é calculado sem comparar relógios de máquinas diferentes.
++  - [x] Falhas são correlacionadas à conexão correta.
++  - [x] Métrica sem amostra não é publicada como zero confiável.
++  - [x] Validação V-010 executada e evidência ligada no progresso.
+ 
+ <a id="imp-008"></a>
+ ### IMP-008 — Modelar candidatos e snapshots
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: Test de TASK-010 aprovado; revisão final/integração pendentes; PHASE-04–07 e TASK-011–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011–013 TODO; PHASE-04–07 e TASK-011–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Atual:005-rotas/IMP-007, Test1176/manual02/revisão final Fillmore aprovados; integração pendente; Q-C-25 resolvida.
++**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Nenhum outro IMP iniciado.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -104,7 +104,7 @@
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+-| [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | IN PROGRESS | Test/manual/revisão final Fillmore aprovados; integração pendente |
++| [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+@@ -940,3 +940,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -1,6 +1,6 @@
+ # Bolts Construction alinhados com o ADD
+ 
+-**Estado atual:** IMP-006/004-overlay complete e TASK-009 DONE após Test, revisão confirmada e integração de `cc478d1` em main. A base da unidade 002-overlay está completa e a extensão EXTRA-01 retomou Design para rever transporte; Implement OTD1 interrompido. [Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
++**Estado atual:** IMP-007/005-rotas complete, TASK-010 DONE após Test1176/manual Francisco/revisão final Fillmore e integração local `f990503`. Unidade003-rotas e PHASE-03 continuam em progresso; outros incrementos não iniciados. [Fecho](../memory-bank/bolts/005-rotas/closure-walkthrough.md).
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
+@@ -280,3 +280,20 @@
+ de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
+ 005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
+ arestas fica para routing/streaming; projeto/intent não concluídos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/docs/phases/PHASE-03-ROUTING.md
++++ b/docs/phases/PHASE-03-ROUTING.md
+@@ -6,7 +6,7 @@
+ 
+ ## 2. Contexto
+ 
+-Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
++Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-010 DONE; TASK-011–013 continuam TODO. O resultado global da fase ainda não foi demonstrado.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -20,7 +20,7 @@
+ 
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+-| [TASK-010](../tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | V-010 | TODO |
++| [TASK-010](../tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | V-010 | DONE |
+ | [TASK-011](../tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | V-011 | TODO |
+ | [TASK-012](../tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | V-012 | TODO |
+ | [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | TODO |
+@@ -190,3 +190,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/docs/tasks/PHASE-03/TASK-010.md
++++ b/docs/tasks/PHASE-03/TASK-010.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-010
+ - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Waheed](../../team/WAHEED.md).
+ - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-007](../PHASE-02/TASK-007.md), [TASK-008](../PHASE-02/TASK-008.md), [TASK-009](../PHASE-02/TASK-009.md), [TASK-034 — Extra, reparação](../PHASE-02/TASK-034.md).
+@@ -58,10 +58,10 @@
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] RTT é calculado sem comparar relógios de máquinas diferentes.
+-- [ ] Falhas são correlacionadas à conexão correta.
+-- [ ] Métrica sem amostra não é publicada como zero confiável.
+-- [ ] Validação V-010 executada e evidência ligada no progresso.
++- [x] RTT é calculado sem comparar relógios de máquinas diferentes.
++- [x] Falhas são correlacionadas à conexão correta.
++- [x] Métrica sem amostra não é publicada como zero confiável.
++- [x] Validação V-010 executada e evidência ligada no progresso.
+ 
+ ## 12. Definition of Done
+ 
+@@ -199,3 +199,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/bolts/005-rotas/bolt.md
++++ b/memory-bank/bolts/005-rotas/bolt.md
+@@ -3,12 +3,12 @@
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["001-medir-rtt-e-publicar-falhas-de-vizinhanca"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-12T22:07:58Z"
++updated: "2026-11-12T22:37:24Z"
+ started: "2026-11-12T14:21:47Z"
+-completed: null
++completed: "2026-11-12T22:37:24Z"
+ current_stage: "test"
+ stages_completed: [{"name": "model", "completed": "2026-11-12T14:36:45Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-12T14:48:27Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-12T14:56:34Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-12T16:16:45Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-12T22:07:58Z", "artifact": "ddd-03-test-report.md"}]
+ requires_bolts: ["004-overlay", "035-overlay-extra"]
+@@ -41,7 +41,7 @@
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](../../intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md).
++- [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](../../intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md).
+ - Dependências: [004-overlay](../004-overlay/bolt.md), [035-overlay-extra](../035-overlay-extra/bolt.md).
+ - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -216,3 +216,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- /dev/null
++++ b/memory-bank/bolts/005-rotas/closure-walkthrough.md
+@@ -0,0 +1,67 @@
++# IMP-007 / 005-rotas / TASK-010 — fecho documental
++
++Registo 2026-11-12T22:37:24Z. Fecho autorizado explicitamente pelo utilizador após prova da
++integração local em main: `f9905038c614612b6f2798d4eca46dd72934743f`. Não se inventa entrega, upload ou aprovação.
++A unidade003-rotas e a PHASE-03 continuam em progresso; outros IMP não iniciados.
++
++## Critérios e evidência cumpridos
++
++- Test aprovado: clean verify1176 testes,0falhas/0erros/0ignorados;
++  [resultado/JAR](../../../experiments/construction/005-rotas/test-build.json),
++  [log](../../../experiments/construction/005-rotas/test-clean-verify.log) e
++  [XML](../../../experiments/construction/005-rotas/test-clean-verify-xml/).
++- V-010/M01–M22/D01–D16 exercitados e [mapeados](test-oracles.md), incluindo
++  relógio/transporte falsos, TCP/JVM/reparação20 reais e shutdown físico limitado.
++- Manual humano Francisco execução02 cumprido com os limites aceites: quatro
++  saídas0, SIGKILL9/137 intencional, processos registados terminados/logger sem
++  erros e cinco portas disponíveis no bind final; PING/PONG/identidades conferidos.
++  [Conferência/limites](../../../experiments/construction/005-rotas/manual-human-02-review.md).
++- Fillmore realizou e aprovou a revisão final da implementação e evidência atuais,
++  incluindo Q-C-25, sem alterações pendentes, por confirmação explícita do utilizador.
++  [Confirmação vinculada aos hashes](../../../experiments/construction/005-rotas/fillmore-final-review-confirmation.json).
++- Integração:348 caminhos e hashes staged/commit iguais ao pacote revisto,
++  árvorec8976e7287a0185b601806313a18c4884d7d54ee. V-ADD0 em cópia extraída
++  do commit efetivo, sem overlay do working tree;3880 ficheiros verificados.
++  [Prova estruturada](../../../experiments/construction/005-rotas/integration-proof.json),
++  [resumo](../../../experiments/construction/005-rotas/integration-proof.md),
++  [V-ADD do commit](../../../experiments/construction/005-rotas/integration-proof/commit-v-add.log).
++
++Esta evidência posterior à integração é incluída agora no commit documental,
++sem alterar os bytes originais da prova, logs, XML, JAR ou fontes aprovadas.
++JAR330491bytes, SHA2563f39cab445ca05360525691b15c8f7193b7e0186b8033ef8cbd86d50690cfb15.
++Q-C-23/24 preservadas; Q-C-25 só a cadeia exata dos dois patches autorizados.
++Sem mudança de Java/NeighborManager/send/wire/caps, dependência ou ferramenta.
++
++## Estados de fecho
++
++Bolt complete, cinco etapas aprovadas; história complete/implemented=true,
++TASK-010 DONE. Nove bolts/histórias complete e26 planned no projeto, nenhum
++outro incremento iniciado. Unidade003-rotas permanece in-progress porque IMP-008,
++009 e010 continuam planned; PHASE-03 IN PROGRESS/TASK-011–013 TODO. Não se fecha
++a fase, intent, projeto ou requisitos globais sem a sua própria evidência.
++
++Os registos anteriores de revisão/integração/fecho pendentes são históricos;
++este fecho e metadados atuais prevalecem. [Autorização de fecho](../../../experiments/construction/005-rotas/closure-authorization.json).
++Sem gates externos adicionais, push ou início de outro IMP.
++
++## Commit documental e preservação
++
++Apenas documentação e evidência, com staging explícito da
++[allowlist de fecho](../../../experiments/construction/005-rotas/closure-allowlist.txt).
++[Diff contra f990503](../../../experiments/construction/005-rotas/closure-vs-integrated-base.diff),
++[numstat](../../../experiments/construction/005-rotas/closure-vs-integrated-base.numstat),
++[V-ADD novo](../../../experiments/construction/005-rotas/closure-v-add.log) e
++[conferência](../../../experiments/construction/005-rotas/closure-validation.json).
++Target/ e alterações alheias excluídos; outputs target existentes mantidos no disco.
++Nenhum Maven, manual ou ensaio de rede repetido, pois o código não mudou.
++O hash do próprio commit de fecho só pode ser apresentado depois de criado;
++não é antecipado nem inserido por amend nesta documentação.
++
++## Coerência derivada das dependências
++
++Primeiro V-ADD de fecho encontrou unicamente 021-rotas:blocks flag mismatch.
++[Log original](../../../experiments/construction/005-rotas/closure-v-add-attempt01.log)
++preservado. Corrigido apenas blocks=true→false em021-rotas, pois004-overlay e
++005-rotas estão complete. Status planned, started/current_stage/completed null
++e stages_completed=[] mantidos; isto não inicia IMP-008 nem concede autorização
++para iniciar outro incremento. Validador/alcance permanecem intactos.
+--- a/memory-bank/bolts/005-rotas/ddd-03-test-report.md
++++ b/memory-bank/bolts/005-rotas/ddd-03-test-report.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ created: "2026-11-12T16:16:45Z"
+ ---
+-# IMP-007 — Test e revisão final aprovados; integração pendente
++# IMP-007 — Test aprovado, integrado e fechado documentalmente
+ 
+ Implement aprovado pelo utilizador; Test autorizado. Manual humano execução02 de
+ Francisco confirmado pelo utilizador e conferido nos logs. Test aprovado
+@@ -129,3 +129,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/bolts/005-rotas/final-review-summary.md
++++ b/memory-bank/bolts/005-rotas/final-review-summary.md
+@@ -1,4 +1,4 @@
+-# IMP-007 — Test e revisão final aprovados; integração pendente
++# IMP-007 — concluído e integrado localmente em main
+ 
+ O monitor mede RTT local por sessão, calcula EWMA/custo e deteta ausência de PONG
+ ou EOF; compõe-se no owner e manager existentes e participa no shutdown global.
+@@ -83,8 +83,25 @@
+ código exigiriam validação e revisão da nova versão; esta aprovação não se estende
+ a alterações que não foram revistas.
+ 
+-Bolt continua in-progress/completed=null, história/unidade em progresso e TASK-010
+-IN PROGRESS. M22 conserva integração pendente; revisão final agora cumprida. Só depois de
++Estado atual: bolt/história complete, implemented=true e TASK-010 DONE; integração
++f990503 comprovada. Unidade003-rotas e PHASE-03 continuam em progresso. Só depois de
+ integração comprovada se poderá pedir/realizar fecho documental
+ na autorização apropriada. Sem staging, commits, push, DONE ou outro IMP.
+ Sem gates externos adicionais.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/bolts/005-rotas/test-oracles.md
++++ b/memory-bank/bolts/005-rotas/test-oracles.md
+@@ -2,7 +2,7 @@
+ 
+ Execução de clean verify do código aprovado:1176 testes,0falhas/0erros/0ignorados,
+ exit0; todos os métodos mapeados abaixo constam dos XML novos. M01–M21 e D01–D16
+-exercitados tecnicamente, sem inferir execução humana. M22 parcial por integração; revisão final Fillmore confirmada e Test aprovado e execução humana02
++exercitados tecnicamente, sem inferir execução humana. M22 cumprido após integração f990503; revisão final Fillmore confirmada e Test aprovado e execução humana02
+ confirmada e conferida nos logs. O mapa de Implement mantém o seu contexto histórico.
+ 
+ ## M01–M22
+@@ -28,7 +28,7 @@
+ - **M19**: `repairedHello20SessionGetsFreshMetricsWithoutBootstrapOrNewTransport`
+ - **M20**: `m20WireEnumAndCodecRetainV2AndRejectCodeThree`
+ - **M21**: `closeInsideOriginalObserverDoesNotSelfJoinOrHideItsEvent`; `partialFactoryFailureAndImmediateCloseCannotLeaveOwnerAlive`; `realCliSubprocessUsesTheNormalCompositionAndExitsCleanly`; `realTcpUsesSameOwnerV2ProbesAndEofInvalidatesCurrentLink`; `shutdownSharesOriginalDeadlineAndPreservesGracefulNodeLeave`
+-- **M22**: clean verify novo EXECUTADO (1176/0/0/0); manual humano execução02 cumprido e Test aprovado; revisão final do código Fillmore cumprida; integração PENDENTE.
++- **M22**: clean verify novo EXECUTADO (1176/0/0/0); manual humano execução02 cumprido e Test aprovado; revisão final do código Fillmore cumprida; integração f990503 cumprida e fecho documental autorizado.
+ 
+ ## D01–D16
+ 
+--- a/memory-bank/bolts/021-rotas/bolt.md
++++ b/memory-bank/bolts/021-rotas/bolt.md
+@@ -14,7 +14,7 @@
+ requires_bolts: ["004-overlay", "005-rotas"]
+ enables_bolts: ["006-rotas"]
+ requires_units: ["002-overlay"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -130,3 +130,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md
+@@ -2,7 +2,7 @@
+ id: "001-medir-rtt-e-publicar-falhas-de-vizinhanca"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-010"]
+@@ -11,6 +11,8 @@
+ adr_ids: ["ADR-004", "ADR-016", "ADR-022", "ADR-024", "ADR-025"]
+ bolt: "005-rotas"
+ size: "M"
++implemented: true
++completed: "2026-11-12T22:37:24Z"
+ ---
+ # História — Medir RTT e detetar falhas TCP
+ 
+@@ -22,10 +24,10 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] RTT é calculado sem comparar relógios de máquinas diferentes.
+-- [ ] Falhas são correlacionadas à conexão correta.
+-- [ ] Métrica sem amostra não é publicada como zero confiável.
+-- [ ] Validação V-010 executada e evidência ligada no progresso.
++- [x] RTT é calculado sem comparar relógios de máquinas diferentes.
++- [x] Falhas são correlacionadas à conexão correta.
++- [x] Métrica sem amostra não é publicada como zero confiável.
++- [x] Validação V-010 executada e evidência ligada no progresso.
+ 
+ ## Testes
+ 
+@@ -164,3 +166,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-12T14:27:02Z"
++updated: "2026-11-12T22:37:24Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -26,7 +26,7 @@
+ 
+ ## Histórias e bolts
+ 
+-- [ ] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
++- [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
+ - [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
+ - [ ] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
+ - [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
+@@ -161,3 +161,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,4 +17,8 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "005-rotas (planned, not started)"
++next_bolt: "021-rotas (planned; not started; requires explicit authorization)"
++
++last_completed_bolt: "005-rotas"
++last_integrated_commit: "f9905038c614612b6f2798d4eca46dd72934743f"
++phase_03_status: "in-progress"
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: oito histórias/bolts complete, IMP-007 em Test e26 planned; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e26 planned; nenhum incremento em execução; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -61,7 +61,7 @@
+ 
+ ## 003-rotas/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-007. **Estado:** in-progress (Model por aprovar). **Bolt:** 005-rotas.
++**Tarefa:** IMP-007. **Estado:** complete/implemented=true, TASK-010 DONE. **Bolt:** 005-rotas; integração f990503 e fecho documental autorizado.
+ **Ficheiro:** [001-medir-rtt-e-publicar-falhas-de-vizinhanca](intents/001-ott-streaming/units/003-rotas/stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md).
+ 
+ ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
+@@ -416,3 +416,20 @@
+ em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+ exata preparados para autorização de integração. Nenhum staging/commit/push ou
+ fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
++
++
++## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
++
++Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
++348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
++posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
++integration-proof.json e integration-proof.md, preservada byte a byte.
++Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
++com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
++cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
++complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
++in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
++intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
++Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
++neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
++ou o manual. Commit local limitado a documentação e evidência autorizadas.

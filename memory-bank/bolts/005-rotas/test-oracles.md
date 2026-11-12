@@ -2,7 +2,7 @@
 
 Execução de clean verify do código aprovado:1176 testes,0falhas/0erros/0ignorados,
 exit0; todos os métodos mapeados abaixo constam dos XML novos. M01–M21 e D01–D16
-exercitados tecnicamente, sem inferir execução humana. M22 parcial por integração; revisão final Fillmore confirmada e Test aprovado e execução humana02
+exercitados tecnicamente, sem inferir execução humana. M22 cumprido após integração f990503; revisão final Fillmore confirmada e Test aprovado e execução humana02
 confirmada e conferida nos logs. O mapa de Implement mantém o seu contexto histórico.
 
 ## M01–M22
@@ -28,7 +28,7 @@ confirmada e conferida nos logs. O mapa de Implement mantém o seu contexto hist
 - **M19**: `repairedHello20SessionGetsFreshMetricsWithoutBootstrapOrNewTransport`
 - **M20**: `m20WireEnumAndCodecRetainV2AndRejectCodeThree`
 - **M21**: `closeInsideOriginalObserverDoesNotSelfJoinOrHideItsEvent`; `partialFactoryFailureAndImmediateCloseCannotLeaveOwnerAlive`; `realCliSubprocessUsesTheNormalCompositionAndExitsCleanly`; `realTcpUsesSameOwnerV2ProbesAndEofInvalidatesCurrentLink`; `shutdownSharesOriginalDeadlineAndPreservesGracefulNodeLeave`
-- **M22**: clean verify novo EXECUTADO (1176/0/0/0); manual humano execução02 cumprido e Test aprovado; revisão final do código Fillmore cumprida; integração PENDENTE.
+- **M22**: clean verify novo EXECUTADO (1176/0/0/0); manual humano execução02 cumprido e Test aprovado; revisão final do código Fillmore cumprida; integração f990503 cumprida e fecho documental autorizado.
 
 ## D01–D16
 

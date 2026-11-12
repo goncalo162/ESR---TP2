@@ -999,12 +999,13 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **REQ/NFR/CON/INT:** CON-008, INT-001, INT-002, REQ-003, REQ-008, REQ-014, REQ-021.
 - **Testes exigidos:** V-010. V-010: relógio falso confirma EWMA, reset após nova instância, perda de três sondas e ausência de falso positivo por um timeout; EOF invalida imediatamente.
 - **Gates:** nenhum externo adicional.
+- **Estado:** concluído por autorização explícita; integração local `f9905038c614612b6f2798d4eca46dd72934743f`, Test1176/manual Francisco/revisão final Fillmore cumpridos. [Fecho e prova](memory-bank/bolts/005-rotas/closure-walkthrough.md).
 - **Critérios de aceitação:**
 
-  - [ ] RTT é calculado sem comparar relógios de máquinas diferentes.
-  - [ ] Falhas são correlacionadas à conexão correta.
-  - [ ] Métrica sem amostra não é publicada como zero confiável.
-  - [ ] Validação V-010 executada e evidência ligada no progresso.
+  - [x] RTT é calculado sem comparar relógios de máquinas diferentes.
+  - [x] Falhas são correlacionadas à conexão correta.
+  - [x] Métrica sem amostra não é publicada como zero confiável.
+  - [x] Validação V-010 executada e evidência ligada no progresso.
 
 <a id="imp-008"></a>
 ### IMP-008 — Modelar candidatos e snapshots

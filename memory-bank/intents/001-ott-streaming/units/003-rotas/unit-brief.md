@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-03"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-12T14:27:02Z"
+updated: "2026-11-12T22:37:24Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
@@ -26,7 +26,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 ## Histórias e bolts
 
-- [ ] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
+- [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
 - [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
 - [ ] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
 - [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
@@ -161,3 +161,20 @@ aprovados. Resta integrar a versão revista; bolt/história/TASK/unidade continu
 em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
 exata preparados para autorização de integração. Nenhum staging/commit/push ou
 fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.

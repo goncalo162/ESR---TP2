@@ -5,7 +5,7 @@
 - ID: TASK-010
 - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-007](../PHASE-02/TASK-007.md), [TASK-008](../PHASE-02/TASK-008.md), [TASK-009](../PHASE-02/TASK-009.md), [TASK-034 — Extra, reparação](../PHASE-02/TASK-034.md).
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] RTT é calculado sem comparar relógios de máquinas diferentes.
-- [ ] Falhas são correlacionadas à conexão correta.
-- [ ] Métrica sem amostra não é publicada como zero confiável.
-- [ ] Validação V-010 executada e evidência ligada no progresso.
+- [x] RTT é calculado sem comparar relógios de máquinas diferentes.
+- [x] Falhas são correlacionadas à conexão correta.
+- [x] Métrica sem amostra não é publicada como zero confiável.
+- [x] Validação V-010 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -199,3 +199,20 @@ aprovados. Resta integrar a versão revista; bolt/história/TASK/unidade continu
 em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
 exata preparados para autorização de integração. Nenhum staging/commit/push ou
 fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.

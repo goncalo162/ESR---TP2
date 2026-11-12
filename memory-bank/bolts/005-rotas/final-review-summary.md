@@ -1,4 +1,4 @@
-# IMP-007 — Test e revisão final aprovados; integração pendente
+# IMP-007 — concluído e integrado localmente em main
 
 O monitor mede RTT local por sessão, calcula EWMA/custo e deteta ausência de PONG
 ou EOF; compõe-se no owner e manager existentes e participa no shutdown global.
@@ -83,8 +83,25 @@ código ou JAR mudou, por isso não se repetiu build/manual. Alterações futura
 código exigiriam validação e revisão da nova versão; esta aprovação não se estende
 a alterações que não foram revistas.
 
-Bolt continua in-progress/completed=null, história/unidade em progresso e TASK-010
-IN PROGRESS. M22 conserva integração pendente; revisão final agora cumprida. Só depois de
+Estado atual: bolt/história complete, implemented=true e TASK-010 DONE; integração
+f990503 comprovada. Unidade003-rotas e PHASE-03 continuam em progresso. Só depois de
 integração comprovada se poderá pedir/realizar fecho documental
 na autorização apropriada. Sem staging, commits, push, DONE ou outro IMP.
 Sem gates externos adicionais.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.

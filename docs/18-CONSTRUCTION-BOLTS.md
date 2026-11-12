@@ -1,6 +1,6 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** IMP-006/004-overlay complete e TASK-009 DONE após Test, revisão confirmada e integração de `cc478d1` em main. A base da unidade 002-overlay está completa e a extensão EXTRA-01 retomou Design para rever transporte; Implement OTD1 interrompido. [Registo de fecho](../memory-bank/bolts/004-overlay/closure-walkthrough.md).
+**Estado atual:** IMP-007/005-rotas complete, TASK-010 DONE após Test1176/manual Francisco/revisão final Fillmore e integração local `f990503`. Unidade003-rotas e PHASE-03 continuam em progresso; outros incrementos não iniciados. [Fecho](../memory-bank/bolts/005-rotas/closure-walkthrough.md).
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
@@ -280,3 +280,20 @@ Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
 de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
 005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
 arestas fica para routing/streaming; projeto/intent não concluídos.
+
+
+## IMP-007 / 005-rotas / TASK-010 — fecho documental autorizado
+
+Registo 2026-11-12T22:37:24Z. Integração local comprovada em main: f9905038c614612b6f2798d4eca46dd72934743f;
+348 caminhos/hashes conferidos e V-ADD0 na cópia extraída do commit. Evidência
+posterior incluída neste fecho em experiments/construction/005-rotas/integration-proof/,
+integration-proof.json e integration-proof.md, preservada byte a byte.
+Clean verify1176/0falhas/0erros/0ignorados, manual humano Francisco execução02
+com limites documentados, revisão final Fillmore incluindo Q-C-25 e integração
+cumpridos. Fecho explicitamente autorizado pelo utilizador: bolt/história
+complete, implemented=true, TASK-010 DONE. Unidade003-rotas e PHASE-03 mantêm
+in-progress;26 outros bolts planned, nenhum novo IMP iniciado. Código/JAR/logs
+intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ou o manual. Commit local limitado a documentação e evidência autorizadas.
