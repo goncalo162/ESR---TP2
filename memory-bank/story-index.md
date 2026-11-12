@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete e 28 planned; IMP-035 é o próximo incremento, sem início autorizado.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 com Test aprovado e revisão final pendente e 27 planned.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -286,6 +286,6 @@ IMP-034 aprende candidatos por divulgação dos vizinhos diretos. IMP-035 repara
 
 ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
 
-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** planned.
+**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Cinco etapas concluídas; Test aprovado1113/manual Luis66; revisão humana final e fecho pendentes.
 **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
 Usa a cache aprendida de IMP-034 para reparar a overlay.

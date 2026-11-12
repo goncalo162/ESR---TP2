@@ -1,0 +1,177 @@
+{
+  "recorded_at": "2026-11-11T23:18:44Z",
+  "scope": "offline document arithmetic and expected-case table only; not Java codec/runtime tests",
+  "proposed_active_types": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "proposed_active_type_count": 19,
+  "new_type": {
+    "code": 20,
+    "name": "REPAIR_HELLO",
+    "payload": "existing Hello(Endpoint,supportedMask,requiredMask)",
+    "body_min": 72,
+    "body_max": 386
+  },
+  "HELLO_OK_body_min": 41,
+  "HELLO_OK_body_max": 72,
+  "proposed_mandatory_mask": 3,
+  "integrated_mandatory_mask": 1,
+  "normal_handshake_sendAndFlush": true,
+  "discovery_extra_cap_unchanged": 32768,
+  "global_frame_cap_unchanged": 65536,
+  "retired_type_unchanged": 3,
+  "no_return_dial_or_permissions": true,
+  "current_fixtures": 66,
+  "new_fixtures_proposed_accept": [
+    "repair-hello-min",
+    "repair-hello-max"
+  ],
+  "new_fixtures_proposed_negative": [
+    "repair-hello-discovery-only",
+    "repair-hello-mandatory-missing",
+    "repair-hello-reserved-mask",
+    "repair-hello-zero-request",
+    "repair-hello-truncated-endpoint",
+    "repair-hello-invalid-role",
+    "repair-hello-length-small",
+    "repair-hello-length-above-global-cap",
+    "repair-hello-unknown-type21",
+    "repair-hello-duplicate-owner"
+  ],
+  "owner_only_negative": [
+    "repair-hello-duplicate-owner"
+  ],
+  "migrated_fixture_ids": [
+    "tcp-hello",
+    "tcp-hello-ok",
+    "tcp-invalid-capability-not-required",
+    "tcp-invalid-capability-reserved"
+  ],
+  "remaining_62_fixture_hashes_preserve": {
+    "tcp-register": "bb5e19e1cc2f8f07545192fa9dac501a3016899f32fd9979d26dc021c5cfab55",
+    "tcp-register-ok": "2bf17f91550674cedb0002053b59387d4f78bbee63e11c1a020fb466a2b2eedb",
+    "tcp-node-leave": "54363148900ab96913c7c4f0217b24c21479cfd433b3cd8e15da7a753e339a73",
+    "tcp-node-leave-min": "91469b63ecf7cfeaeb58e63baa1dc6ad7540e7073c3cf4a2556b73975602e353",
+    "tcp-probe-ping": "1f0079f46f51da9865c1ecc7d1ef4f85824dd8e13d6e8b48301e68440851129a",
+    "tcp-probe-pong": "a51b1c63ff5a0debd4ef319a2c71cba9eaedd28919f7d36713387a13839c7508",
+    "tcp-stream-announce": "3cbfb908be2dee7138a5217ee50a74a7350891bfa93ea4fd1c49740648f2ae40",
+    "tcp-stream-announce-utf8": "5966df0d35f1d0368dbb413ce057b60b078bf1d47bde997620f21d6ebf554473",
+    "tcp-stream-withdraw": "df0cebbc5cf99a64cda9faa4baefbe1a9c684eb1207c3d2fd17d9bc1681eb11a",
+    "tcp-activate": "9ac38a5155bcd91d4df4f2a820d5ec1d37db53cfd21bceb4e76f1a73ec59c69d",
+    "tcp-activate-ack": "f7f4adc98fed709f9c6d02e83529eac5510689fedf315500320ecfc995c6105e",
+    "tcp-deactivate": "d8bc2b1206604e16484d7b343adacc891bd9cfaf02d9add5a01c43cf841fd097",
+    "tcp-subscription-renew": "0293fb02f8ba117cac07a5fe269ea20dd60d634ee9d5ecdbd884b888b70e6531",
+    "tcp-route-trace": "ac69f04db160f5efebc0c808795c1b0e0be4c5fbe73836600e6f35bf793de84e",
+    "tcp-trace-result": "5c47f8effe5035c6fbfa3ce53a8672265bb928f2e64f7eabf8c2f4949d169b09",
+    "tcp-error-no-route": "fe7069d1736ff06c72c5b7fa5d7b7e5e7e9477a0f0b99b40c823e951628df97a",
+    "tcp-error-discovery": "f88ddd196739ad1ef8f1dce5545607f4f9c331520c0adcbdefe57de7e4d5afa4",
+    "tcp-discovery-query": "711ca938e6dd0ba962f669450d7ae1ad4e0e366f8407de16b84bfecd87bb74c5",
+    "tcp-discovery-snapshot-empty": "6da29b79232eb3991542bd3ead22a1fb9710d5e5a507a4d2253d6474a4ee5a04",
+    "tcp-discovery-snapshot": "36e3f185d7c61f36a67392cc7f67e483030fa638a6f961129848fed33da0f89d",
+    "tcp-invalid-short-prefix": "709e80c88487a2411e1ee4dfb9f22a861492d20c4765150c0c794abd70f8147c",
+    "tcp-invalid-length-small": "b90b4a18500eb7e5f0553891c16101e137574d5f21f715393a64ffc7c3b730c5",
+    "tcp-invalid-length-large": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4",
+    "tcp-invalid-length-unsigned": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e",
+    "tcp-invalid-truncated-body": "1323d1733f0ad0bbcb26c2f328082e5a9961f8af31fb1ebca8c5ac0e1ada9dca",
+    "tcp-invalid-version-0": "4ece6184380ad5b5ba0d50704d4a54f2e891b4184e407f6a06b7e978d5c397da",
+    "tcp-invalid-version-1": "245ddcf51dcb3a78f77a5428b321674e57fba9a03183e0545b057ff5206898ed",
+    "tcp-invalid-version-3": "e74b76c8a05b8462cb0be6ae2be9750df65966f573f2f001a90c87f483ff8007",
+    "tcp-invalid-version-255": "4f4050025c238c1837ed9ec2c80da6e4300422435e93c0b82279fc04bcfe48a4",
+    "tcp-invalid-retired-type": "09d4009ab99bc5ced523756d1ec5cb174c904529597229fb9abf2bc06dd90add",
+    "tcp-invalid-type": "00e37d322f3871ccd52a92e2a5f09c9e09690293b9596096d01a71acb5f96a62",
+    "tcp-invalid-identity-utf8": "703b82e5f09b2c483a1a5ad02101ea84f6263efaadd99706c93ca3753d77f7e4",
+    "tcp-invalid-trailing-byte": "43cc27f03baeabe303bec2366ba82f2af033ab8ccd3c4f35ae985dc96c5278d8",
+    "tcp-invalid-negative-probe": "d0511a142f72f74f541b6dbb01a9465de8976f376313f2255c4cc35655f9b396",
+    "tcp-invalid-role": "a210ab2ce0bfcf639e727cd77406a71d37289b3e7f0028cbe785b470ca655a6f",
+    "tcp-invalid-path-count": "19e34c63f3e3231208d7997e5732c481a85037dc2cab0dfd12d078a52f0a6818",
+    "tcp-invalid-capability-missing": "76e562140022dd1119172189e5beb688cffecd2547ba37f10bddddead7a47a77",
+    "tcp-invalid-selection": "65a81cbe627188113b92af97324b6285a5f57c6930e8235d788f2d16292b7a10",
+    "tcp-snapshot-generation-zero": "0c10dcbe838b717c3f88daffb27ba10cd15f6ff3161a3ce1f48402fea5370ff5",
+    "tcp-snapshot-duplicate": "17ad717f3c19a37af1b3a0ea1255e7bb8fdb220eae6dadeb4eeb848a7d27931d",
+    "tcp-snapshot-invalid-role": "12fd11dfba48f716a0ffd8fdc61d81046da1bb202e3ae9c67a0aaac75d58950d",
+    "tcp-snapshot-invalid-count": "461f26219580f69a46611c1b272d0f415507c83adc85b5714393824a7c773d3d",
+    "tcp-snapshot-trailing": "05233ce4556fef7e3bce4535d79b8cb9dea2009f35114eef09d57b157ec21329",
+    "tcp-snapshot-truncated-endpoint": "418f708f2a7fa87dd9c3e7dc34f024b409856e79c6a87cb1c98cc0716e59486c",
+    "tcp-snapshot-field-length": "f25ce859903c5c7c6fccbb06e0096b7c9024f037f87ae3927041afbd345c8c67",
+    "tcp-discovery-over-cap": "dfc4115c5938ddee320cf90ce01aec6ec13e1be1b1414fea282a92ae497464b7",
+    "udp-min": "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7",
+    "udp-small": "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5",
+    "udp-split-first": "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6",
+    "udp-split-last": "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1",
+    "udp-invalid-short-header": "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd",
+    "udp-invalid-no-payload": "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f",
+    "udp-invalid-magic": "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4",
+    "udp-invalid-version": "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c",
+    "udp-invalid-flags": "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8",
+    "udp-invalid-header-length": "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170",
+    "udp-invalid-index": "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed",
+    "udp-invalid-count": "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340",
+    "udp-invalid-zero-frame": "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06",
+    "udp-invalid-large-frame": "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b",
+    "udp-invalid-negative-seq": "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1",
+    "udp-invalid-datagram-size": "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0"
+  },
+  "fixtures_proposed_total": 78,
+  "expected_arbitration_cases_not_executed": [
+    {
+      "case": "single smaller isolated",
+      "originator": "A",
+      "target": "Z",
+      "expected": "A->Z, same connection"
+    },
+    {
+      "case": "single greater isolated",
+      "originator": "Z",
+      "target": "A",
+      "expected": "Z->A, same connection, no return dial"
+    },
+    {
+      "case": "both outbound slots reserved before inbound",
+      "directions": [
+        "A->Z",
+        "Z->A"
+      ],
+      "expected": "A->Z wins while pending, either frame order"
+    },
+    {
+      "case": "incoming Z->A already chosen, A has no outgoing",
+      "expected": "new A->Z attempt prohibited by PairSlot; Z->A may complete"
+    },
+    {
+      "case": "ACTIVE Z->A, later smaller-origin A->Z",
+      "expected": "keep ACTIVE Z->A; reject late duplicate; no NeighborDown"
+    },
+    {
+      "case": "same-origin duplicate with another requestId",
+      "expected": "keep current requestId/context, reject duplicate"
+    },
+    {
+      "case": "loser connectionClosed after winner ACTIVE",
+      "expected": "ignore for winner, only clean losing resources"
+    },
+    {
+      "case": "opened before dial future association",
+      "expected": "UNCLASSIFIED and B/R barrier until direction known"
+    }
+  ],
+  "no_fixtures_generated_or_changed": true,
+  "all_snapshots_and_UDP_unchanged": true
+}

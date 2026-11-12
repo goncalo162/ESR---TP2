@@ -1,0 +1,1072 @@
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -410,9 +410,9 @@
+ <a id="adr-019"></a>
+ ### ADR-019 — Handshake, iniciador determinístico e reconexão direta
+ 
+-> Substituição parcial formalizada em [ADR-035 Proposta](#adr-035) para IMP-035.
+-> Design/política/âmbito aprovados; aprovação formal ADR pendente. As cláusulas
+-> Aceites abaixo conservam o estado até esse checkpoint; não autorizam código novo.
++> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
++> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
++> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+ 
+ - **Estado:** Aceite.
+ - **Contexto e drivers:** Arranques simultâneos e callbacks de ligações antigas podem duplicar ou apagar vizinhos. Drivers: REQ-002, REQ-003, REQ-004, NFR-003.
+@@ -513,9 +513,9 @@
+ <a id="adr-033"></a>
+ ### ADR-033 — Descoberta extra por divulgação de vizinhos e cache limitada
+ 
+-> Substituição parcial formalizada em [ADR-035 Proposta](#adr-035) para IMP-035.
+-> Design/política/âmbito aprovados; aprovação formal ADR pendente. As cláusulas
+-> Aceites abaixo conservam o estado até esse checkpoint; não autorizam código novo.
++> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
++> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
++> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+ 
+ > Transporte separado e ativação opcional suspensos pelo utilizador;
+ > [ADR-034](#adr-034) Aceite substitui esses pontos e o contrato TCP v1. As aprovações e escolhas OTD1 abaixo são históricas. Cache,
+@@ -572,9 +572,9 @@
+ <a id="adr-034"></a>
+ ### ADR-034 — Controlo TCP uniforme v2 e descoberta obrigatória
+ 
+-> Substituição parcial formalizada em [ADR-035 Proposta](#adr-035) para IMP-035.
+-> Design/política/âmbito aprovados; aprovação formal ADR pendente. As cláusulas
+-> Aceites abaixo conservam o estado até esse checkpoint; não autorizam código novo.
++> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
++> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
++> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+ 
+ - **Estado:** Aceite
+ - **Contexto e drivers:** O utilizador interrompeu OTD1 separado e depois rejeitou a mistura operacional v1/v2. Fixa um programa/versão de JAR em todos os nós e decide migrar todo o controlo TCP, incluindo o bootstrap, para v2. O contrato v1 e as evidências são históricos; mantêm-se framing/caps, aprendizagem e isolamento de falhas. Drivers: REQ-025.
+@@ -590,15 +590,15 @@
+ <a id="adr-035"></a>
+ ### ADR-035 — Reparação direta na ligação iniciada pelo isolado
+ 
+-- **Estado:** Proposta
++- **Estado:** Aceite
+ - **Contexto e drivers:** REQ-025 exige reparar S–C e S–R1–C com candidatos aprendidos antes das falhas, mesmos sobreviventes e bootstrap parado. O utilizador aprovou Design revisto, política cooperativa Q-C-22 e âmbito de 21 caminhos, pedindo apenas revisão ADR antes de Implement. Driver: REQ-025.
+ - **Decisão:** Manter HELLO5 no grafo configurado e menor nodeId como iniciador normal; permitir que qualquer isolado inicie REPAIR_HELLO20 e complete com HELLO_OK6 no mesmo TCP. Nas saídas concorrentes ainda pendentes, escolher menor originatorId; entrada escolhida bloqueia nova saída e ACTIVE nunca é substituída por tentativa tardia. Origem valida cache/proveniência/TTL; destino valida handshake, endpoint, identidade, capacidades, colisões e limites sem comprovar aprendizagem remota. Um codec TCP v2, 19 tipos 1,2,4..20 e código3 rejeitado; máscaras3 obrigatórias em HELLO5/20/ACK6, sem subconjunto ou fallback. Preservar framing, snapshots/cache/TTL/UDP, FIFO/flush, barreiras de dial, recursos físicos e shutdown.
+ - **Alternativas rejeitadas:** Menor ID universal com dial de retorno foi rejeitado pelo utilizador. Permissões/registry e quatro mensagens excedem a política cooperativa aprovada; cache recíproca impede unilateralidade. Sobrecarregar HELLO5 sem finalidade distinta ou substituir uma sessão ACTIVE enfraquece os contratos. Novo pool/listener/codec ou API de terminação não é necessário.
+-- **Consequências, riscos e trade-offs:** Substituição parcial proposta das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos estão aprovados, mas a aprovação formal desta ADR e a autorização de Implement ainda faltam. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Migrar quatro fixtures de máscara e acrescentar 12 independentes, alvo78; as 66 integradas continuam a única evidência wire atual. V-034, regressão JDK21, manual humano com mortes reais, revisão final e integração são obrigatórios antes de DONE.
++- **Consequências, riscos e trade-offs:** Substituição parcial aceite das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos e revisão ADR aprovados; só Implement autorizado, parando antes de Test. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Quatro fixtures de máscara migradas e 12 independentes acrescentadas: 78 operacionais, 62 TCP v2 e 16 UDP preservadas. V-034, regressão completa JDK21, manual humano com mortes reais, revisão final e integração continuam obrigatórios antes de DONE.
+ - **Impacto:** Componentes overlay, protocol, app e transport; TASK-034/IMP-035. Os 21 caminhos aprovados constam do IMP-035; sem alteração Java nesta revisão.
+ - **Como validar:** V-034, V-033, V-ADD; D01–D20/M01–M18, regressão atual, manual humano com mortes reais, revisão final e integração antes de DONE.
+ 
+-[Registo detalhado e substituição parcial](memory-bank/bolts/035-overlay-extra/adr-035-proposal.md); [revisão para aprovação](memory-bank/bolts/035-overlay-extra/adr-review.md). Os estados Aceites de ADR-019/033/034 não mudam até à aprovação formal da substituição parcial. Não iniciar Implement por esta formalização.
++[Registo detalhado e substituição parcial](memory-bank/bolts/035-overlay-extra/adr-035-proposal.md); [revisão aprovada](memory-bank/bolts/035-overlay-extra/adr-review.md). ADR-035 Aceite substitui só as cláusulas identificadas de019/033/034. Aprovação registada em 2026-11-11T23:39:43Z; só Implement, parar antes de Test.
+ 
+ ## 6. Modelo de dados e contratos
+ 
+@@ -665,17 +665,18 @@
+ Escrita/flush não é entrega remota/ACK e fila vazia não comprova escrita completa.
+ 
+ O contrato TCP alvo é exclusivamente **v2**, por decisão do utilizador e
+-[ADR-034 Aceite](#adr-034), incluindo bootstrap, handshake, controlo normal e
++[ADR-034/035 Aceites](#adr-035), incluindo bootstrap, handshake, controlo normal e
+ descoberta. Esta revisão substitui a versão TCP incorporada anteriormente nas
+ ADR-009/012/secções 3–7 das interfaces; conserva a sua semântica e os caps.
+ A [retirada autorizada do arquivo TCP v1](memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada),
+ foi registada em Q-C-19, sem suporte runtime/fallback. [Interfaces v2](docs/07-API-AND-INTERFACES.md)
+ mantêm u32 big-endian/body 37..65536, envelope version=2/type/requestId/senderId/
+-senderInstance e UTF-8 estrito. 18 tipos ativos: 1 REGISTER, 2 REGISTER_OK,
++senderInstance e UTF-8 estrito. 19 tipos ativos: 1 REGISTER, 2 REGISTER_OK,
+ 4 NODE_LEAVE, 5 HELLO, 6 HELLO_OK, 7/8 PING/PONG, 9 ANNOUNCE, 10 WITHDRAW,
+ 11 ACTIVATE, 12 ACK, 13 DEACTIVATE, 14 RENEW, 15 TRACE, 16 TRACE_RESULT,
+-17 ERROR, 18 DISCOVERY_QUERY, 19 DISCOVERY_SNAPSHOT; código 3 retirado.
+-Migração operacional concluída e validada em V-033: 1065 testes e manual humano Luis com 53 checks.
++17 ERROR, 18 DISCOVERY_QUERY, 19 DISCOVERY_SNAPSHOT,20 REPAIR_HELLO; código3 retirado.
++HELLO5/20 e ACK6 exigem máscaras3; contratos de reparação na ADR-035.
++Migração IMP-034 validada em V-033 com1065 testes e manual humano Luis/53 checks (histórico). IMP-035 em Implement para revisão; regressão/manual humano de mortes reais pendentes.
+ 
+ UDP: OTT1, versão 1/flags 0, cabeçalho 64, stream/session UUID, frameSeq,
+ mediaTimeUs, frameLength e fragmentIndex/count. Aplicação ≤1200/payload ≤1136,
+@@ -969,8 +970,8 @@
+ - **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
+ - **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`, `overlay/NeighborDiscovery.java`, `overlay/NeighborDiscoveryTest.java`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `bootstrap/BootstrapServerTest.java`, `transport/TransportTest.java`, `Projeto/src/test/resources/protocol/`, `scripts/validate-planning.py`, `Projeto/README.md`, `Projeto/docs/protocolos.md`.
+ - **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
+-- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 formalizada como Proposta; G-EXTRA-ADR ainda depende da aprovação formal desta revisão.
+-- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Proposta). Manter o checkpoint próprio de intenção/admissão/reparação antes de código.
++- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita; só Implement.
++- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito; só Implement autorizado.
+ - **REQ/NFR/CON/INT:** REQ-025.
+ - **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+ - **Gates:** G-EXTRA-ADR.
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -2,14 +2,11 @@
+ 
+ > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+ 
+-**Contrato integrado em IMP-034: controlo TCP uniforme v2, 18 tipos. A proposta IMP-035 abaixo ainda não o altera.**
+-Aplica-se a bootstrap, handshake, mensagens normais e descoberta, com um único
+-contrato/codec operacional, sem runtime v1/fallback. Mesmo programa/versão de
+-JAR em todos os processos. [ADR-034 Aceite](../add.md#adr-034) e
+-[Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
+-foram aprovados; o código foi migrado e tem testes incrementais registados no
+-walkthrough. O JAR histórico/execuções anteriores não são validação v2; clean
+-verify e manual da etapa Test continuam pendentes.
++**Contrato aprovado ADR-034/035: controlo TCP uniforme v2,19 tipos e capacidades3.**
++IMP-034 está integrado; IMP-035 está implementado para revisão antes de Test.
++Bootstrap, handshake, mensagens normais e descoberta usam o mesmo codec, sem
++runtime v1/fallback. Mesmo programa/versão de JAR em todos os processos.
++A regressão completa/manual humano desta versão continuam pendentes.
+ 
+ [Contrato e fixtures v1 arquivados](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada).
+ Bootstrap mantém só consulta do grafo imutável inicial, sem membership,
+@@ -107,7 +104,7 @@
+ 
+ MessageCodec.encode(ControlMessage) devolve os bytes de exatamente um frame; decode(byte[]) exige exatamente um frame e rejeita bytes adicionais. write(message, OutputStream) valida/serializa antes de escrever no destino; read(InputStream) lê um frame completo e devolve Optional.empty apenas perante EOF limpo antes do prefixo. EOF a meio do prefixo/corpo é EOFException; campos incompletos num corpo já recebido são ProtocolException INVALID_MESSAGE. Comprimento superior ao máximo, incluindo u32 com bit de sinal, é rejeitado antes da alocação do corpo. Strings e listas também verificam máximos antes de alocar.
+ 
+-ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem 18 tipos ativos (1,2,4..19) e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
++ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem19 tipos ativos (1,2,4..20) e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
+ 
+ O chamador gere flush/close e o único escritor por conexão. O codec não abre sockets. UUID são opacos e preservam todos os bits; a exceção de Endpoint.instanceId desconhecido aplica-se apenas a REGISTER_OK. u32 aceita 0..4294967295 e é exposto como long. Listas vazias, TTL zero ou percursos repetidos podem ter representação sintática; os handlers têm de verificar a validade operacional, origem/prefixo, ciclos, frescura e leases antes de agir. Host no Endpoint tem validação de domínio ASCII/comprimento; o handshake terá de o comparar com a configuração autorizada.
+ 
+@@ -149,8 +146,8 @@
+ | 2 | REGISTER_OK | apenas lista Endpoint dos vizinhos configurados, todos com instanceId zero; sem lease ou disponibilidade |
+ | 3 | Retirado/reservado | rejeitar como INVALID_MESSAGE; não implementar renovação de registo |
+ | 4 | NODE_LEAVE | reason u8 (0 normal, 1 erro); notifica exclusivamente vizinhos diretos, nunca bootstrap |
+-| 5 | HELLO | Endpoint local + supportedMask u32 + requiredMask u32, ambos 1; identidade/endpoint/grafo/instância/iniciador validados |
+-| 6 | HELLO_OK | selectedMask u32=1; confirma o contrato obrigatório após as barreiras de handshake/flush |
++| 5 | HELLO | Endpoint local + supportedMask u32 + requiredMask u32, ambos3; identidade/endpoint/grafo/instância/iniciador validados |
++| 6 | HELLO_OK | selectedMask u32=3; confirma o contrato obrigatório após as barreiras de handshake/flush |
+ | 7 | PROBE_PING | probeId i64 |
+ | 8 | PROBE_PONG | probeId i64, eco da sonda; RTT calculado com relógio local |
+ | 9 | STREAM_ANNOUNCE | StreamInfo, announceSeq i64, costMicros i64, path lista nodeId; path termina no sender |
+@@ -164,10 +161,11 @@
+ | 17 | ERROR | code u16, relatedType u8, detail string; correlacionado por requestId |
+ | 18 | DISCOVERY_QUERY | helloRequestId UUID, recipientId string, recipientInstance UUID; só sessão ACTIVE_DISCOVERY |
+ | 19 | DISCOVERY_SNAPSHOT | campos da QUERY + generation u64 positiva + count u16 (0..63) e endpoints diretos; cap extra 32768 |
++| 20 | REPAIR_HELLO | payload Hello comum, máscaras3; admissão reparadora cooperativa ADR-035, mesma conexão/ACK6 |
+ 
+ Bootstrap usa uma conexão TCP curta **v2** por consulta inicial: REGISTER → REGISTER_OK ou ERROR, seguido de fecho após envio completo. O requerente usa os endpoints configurados devolvidos para falar diretamente com os vizinhos. Falhas antes de obter resposta permitem retry limitado por tentativa; depois do sucesso não existem renovação, consultas periódicas, heartbeats ou NODE_LEAVE para bootstrap. Consultas repetidas não alteram a configuração; IDs duplicados/instâncias e saídas são geridos entre vizinhos. O handler de bootstrap só aceita REGISTER e responde da configuração, mesmo que os vizinhos estejam offline. O codec comum pode representar outras mensagens; isso não autoriza o handler de bootstrap a processá-las como operações suas.
+ 
+-O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede as mensagens de aplicação e descoberta; 3 continua retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1, 2 e 4–19, sempre version=2; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
++O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede as mensagens de aplicação e descoberta; 3 continua retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite1,2 e4–20, sempre version=2; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
+ 
+ STREAM_ANNOUNCE de uma fonte tem path=[serverId], custo=0 e sequência estritamente crescente por stream/epoch. Cada relay publica o seu path e custo acumulado; o recetor acrescenta-se antes de guardar/reenviar. Epoch muda a cada arranque do SERVER e coincide com sessionId dos datagramas. Ao ver nova época confirmada por anúncios de caminhos válidos, retirar a antiga até expirar o horizonte; não aceitar regresso a uma época retirada por anúncio atrasado.
+ 
+@@ -436,7 +434,7 @@
+ Implement pronto para revisão, sem autorização inferida para Test/fecho.
+ 
+ Todo o TCP é v2: bootstrap REGISTER/REGISTER_OK/ERROR, handshake, mensagens
+-normais e descoberta. Um enum MessageType, 18 tipos explícitos (1,2,4..19),
++normais e descoberta. Um enum MessageType, 19 tipos explícitos (1,2,4..20),
+ código 3 rejeitado. Um ControlMessage, um MessageCodec, um parser de framing/
+ strings/UUIDs/endpoints/buffer; mesmas APIs encode/decode/read/write agora v2.
+ Não criar ControlFrame, CodecPolicy, FrameListener, decoder legado ou fallback.
+@@ -450,8 +448,8 @@
+ de descoberta extra. A migração não altera a política do bootstrap (ADR-013/015).
+ 
+ Framing u32/body 37..65536, UTF-8 estrito e hard caps preservados. HELLO contém
+-Endpoint + supportedMask/requiredMask u32, ambos 1, bits reservados zero;
+-HELLO_OK selectedMask u32=1. Corpo HELLO 72..386 e ACK 41..72. Todos os nós
++HELLO5/REPAIR_HELLO20: Endpoint + supportedMask/requiredMask u32, ambos3, bits reservados zero;
++HELLO_OK selectedMask u32=3. Corpo HELLO 72..386 e ACK 41..72. Todos os nós
+ overlay exigem esta capacidade, versão/identidade/endpoint/grafo/instância/
+ requestId/iniciador/flush válidos antes de NeighborUp. Não há modo base.
+ 
+@@ -510,49 +508,37 @@
+ 
+ 
+ <a id="extra-01-recovery-proposed"></a>
+-## EXTRA-01 B — reparação direta proposta no Design do IMP-035
+-
+-**Design/contratos/política/21 caminhos aprovados, ainda sem código novo.**
+-Revisão ADR-035 formalizada como Proposta para aprovação antes de Implement.
+-[Design revisto](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md),
+-[ADR-035 Proposta](../memory-bank/bolts/035-overlay-extra/adr-035-proposal.md)
+-e [âmbito8→21 proposto](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md).
+-A versão anterior de permissões/quatro tipos/retorno não foi aprovada e fica
+-preservada nas evidências de Construction; não é a proposta ativa.
+-
+-O isolado usa candidato aprendido válido e inicia tipo20 REPAIR_HELLO (payload
+-Hello existente) independentemente da ordem dos IDs. O destino responde6
+-HELLO_OK na mesma ligação e conserva as sessões saudáveis. Não há dial de
+-retorno, registry/permissão, prova de anúncio, novo ACK ou canal auxiliar.
+-
+-Origem verifica/regista aprendizagem/proveniência/TTL; destino verifica o
+-handshake e os limites, sem exigir cache recíproca ou comprovar a aprendizagem.
+-É a admissão cooperativa de laboratório proposta, sem promessa de autenticação.
+-HELLO5 fora do grafo continua rejeitado;20 tem uma finalidade distinta.
+-
+-ADR-019 proposta: menor originatorId desempata saídas concorrentes ainda
+-pendentes. Saída é reservada antes de DNS/dial; uma entrada já escolhida impede
+-outra saída. ACTIVE nunca é substituída por tentativa tardia e um callback de
+-perdedor não pode remover o vencedor. Preservar barreira de associação do dial.
+-
+-Total proposto19 tipos1/2/4..20, máscaras3 em HELLO5/20/ACK6 obrigatórias, codec/
+-version2 comuns, tipo3 rejeitado, framing37..65536. HELLO20 tem72..386 eACK6
+-41..72. Snapshot19/DiscoveryMessage/cache não mudam, cap32768 da descoberta18/19
+-intacto e UDP OTT1 mantido. Quatro fixtures migram máscaras;12 novas independentes,
+-alvo78. Operacional integrado ainda tem18 tipos/máscara1/66 fixtures.
+-
+-sendAndFlush/FIFO normal de handshake para20/6; quotas extra só18/19. Mesmos
+-C/B/R, identidade/unicidade/owner, dials assíncronos e terminação física. Nenhuma
+-API nova de transporte. Design/contratos/âmbito aprovados; revisão ADR pendente antes de Implement;
+-nenhum Java/recurso foi alterado e não existe runtime/fallback de JAR antigo.
+-
+-## Revisão ADR do IMP-035 — contratos aprovados para futura implementação
+-
+-Registo de 2026-11-11T23:28:20Z. O utilizador aprovou esta revisão de Design/Q-C-22
+-e21 caminhos; [ADR-035 Proposta no ADD](../add.md#adr-035) e
+-[revisão ADR](../memory-bank/bolts/035-overlay-extra/adr-review.md) formalizam
+-as exceções019/033/034. O contrato operacional continua com18 tipos/máscara1/
+-66 fixtures até Implement autorizado e executado; alvo19/máscara3/78 fixtures.
+-Não alterar snapshots/UDP, regrasD07e ou APIs de transporte. Correlacionar ERROR
+-com o tipo original5/20, preservar UNCLASSIFIED/PairSlot, cobrança física e
+-callbacks do perdedor. V-034/regressão/manual humano/revisão/integração pendentes.
++## EXTRA-01 B — reparação direta aprovada, Implement para revisão
++
++ADR-035 Aceite por aprovação explícita registada em 2026-11-11T23:39:43Z;
++G-EXTRA-ADR satisfeito para IMP-035. [Design](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md),
++[ADR](../add.md#adr-035), [âmbito21](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md)
++e [walkthrough](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++
++O isolado inicia REPAIR_HELLO20 com payload Hello existente e qualquer ordem
++nodeId. Destino cooperativo responde HELLO_OK6 no mesmo TCP sem cache recíproca.
++Origem verifica cache/proveniência/TTL; destino valida identidade/endpoints/caps/
++colisões/limites sem comprovar aprendizagem remota. HELLO5 conserva grafo e menor
++iniciador. Só saídas pendentes sobrepostas elegem menor originator; ACTIVE é
++preservada. Losers continuam cobrados até terminação física; barreira UNCLASSIFIED
++não infere direção de opened antes da associação do dial.
++
++Codec/versão2 comum, 19 tipos1/2/4..20, código3 rejeitado, máscaras3 obrigatórias
++em5/20/6 sem fallback. Framing37..65536; corpo20 de72..386 e6 de41..72.
++Snapshot19, cache,TTL e UDP OTT1 não mudam. 78 fixtures operacionais62TCP+16UDP;
++quatro masks migradas,46TCP anteriores preservadas,12 novas independentes.
++Nenhum contrato de JAR antigo é suportado operacionalmente.
++
++20/6/ERROR usam FIFO/sendAndFlush normal; quotas/tickets extra só18/19. C≤64,
++grau≤min(C,63), dinâmica≤min(C,16), admissões20 pendentes≤2, saída autónoma≤1.
++Seleção só com zeroACTIVE, tick comum100ms, orçamento10s limitado ao TTL original,
++DNS/dial com prazos separados e backoff existente. Shutdown usa prazo global.
++
++ERROR mantém requestId/relatedType5/20/6 e identidade da sessão. D07e preservado
++em sessões configuradas/reparadas: token/query/geração antigos não terminam query
++nem provocam Down ou alteram cache/TTL. Aresta nova só é anunciada após Up.
++RepairStarted regista record imutável de proveniência por seleção admitida;
++recoveryStatus() é vista limitada, CLI recovery imprime uma linha limitada.
++
++A implementação e fixtures foram exercitadas incrementalmente; ainda faltam
++Test com clean verify, manual humano com mortes reais, revisão final e integração.
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -456,3 +456,10 @@
+ reservas. Alvo78 fixtures (quatro máscaras migradas,12 novas); atuais66 intactas.
+ Formalizar ADR-035 Proposta não executa Java/V-034/regressão/manual. Manual
+ humano com mortes reais, revisão final e integração continuam exigidos.
++
++## IMP-035 — fronteira das provas de Implement
++
++Os [D01–D20](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md)
++são mapeados para testes incrementais e pendências explícitas. Fecho de nós
++embutidos com TCP real não substitui SIGKILL de processos sobreviventes reais.
++V-034 completo/regressão/manual humano pertencem a Test, ainda não iniciado.
+diff --git a/docs/12-RISKS-AND-DECISIONS.md b/docs/12-RISKS-AND-DECISIONS.md
+--- a/docs/12-RISKS-AND-DECISIONS.md
++++ b/docs/12-RISKS-AND-DECISIONS.md
+@@ -231,3 +231,14 @@
+ [RevisãoADR](../memory-bank/bolts/035-overlay-extra/adr-review.md) confere APIs reais,
+ limites, flush, dials e oráculos sem editar Java. Não é novo resultado de teste
+ nem autorização de Implement; aprovação formalADR ainda pendente.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -759,3 +759,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -239,3 +239,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -783,3 +783,10 @@
+ aguarda aprovação formal desta revisão; não há autorização de Implement.
+ V-034, regressão, manual humano com mortes reais, revisão final e integração
+ continuam obrigatórios; sem commits/push/outro IMP.
++
++### Q-C-22 — revisão ADR aprovada, Implement autorizado
++
++Aprovação explícita registada em2026-11-11T23:39:43Z: ADR-035 Aceite, incluindo
++substituição parcial019/033/034 e contratos/âmbito21. G-EXTRA-ADR satisfeito para
++IMP-035. Só Implement autorizado; Test/V-034 completo/regressão/manual humano
++com mortes reais/revisão final/integração pendentes. Sem commits/push/outro IMP.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -95,3 +95,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/docs/tasks/PHASE-02/TASK-034.md b/docs/tasks/PHASE-02/TASK-034.md
+--- a/docs/tasks/PHASE-02/TASK-034.md
++++ b/docs/tasks/PHASE-02/TASK-034.md
+@@ -69,3 +69,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../../../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/architecture-traceability.json b/memory-bank/architecture-traceability.json
+--- a/memory-bank/architecture-traceability.json
++++ b/memory-bank/architecture-traceability.json
+@@ -1,6 +1,6 @@
+ {
+   "version": "1.0.2",
+-  "updated": "2026-11-11T23:28:20Z",
++  "updated": "2026-11-12T00:04:01Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "approval": {
+@@ -1554,7 +1554,8 @@
+       "tests": [
+         "V-007",
+         "V-008"
+-      ]
++      ],
++      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
+     },
+     {
+       "id": "ADR-020",
+@@ -1852,7 +1853,8 @@
+       "tests": [
+         "V-033",
+         "V-034"
+-      ]
++      ],
++      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
+     },
+     {
+       "id": "ADR-034",
+@@ -1895,19 +1897,20 @@
+         "V-033",
+         "V-034"
+       ],
+-      "supersedes_scope": "ADR-033 transport/optional activation and prior mixed v1/v2 proposal; all TCP moves to v2, preserving bootstrap semantics, limits and learning policies; UDP OTT1 unchanged"
++      "supersedes_scope": "ADR-033 transport/optional activation and prior mixed v1/v2 proposal; all TCP moves to v2, preserving bootstrap semantics, limits and learning policies; UDP OTT1 unchanged",
++      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
+     },
+     {
+       "id": "ADR-035",
+       "title": "Reparação direta na ligação iniciada pelo isolado",
+-      "status": "Proposta",
++      "status": "Aceite",
+       "drivers": [
+         "REQ-025"
+       ],
+       "context": "REQ-025 exige reparar S–C e S–R1–C com candidatos aprendidos antes das falhas, mesmos sobreviventes e bootstrap parado. O utilizador aprovou Design revisto, política cooperativa Q-C-22 e âmbito de 21 caminhos, pedindo apenas revisão ADR antes de Implement.",
+       "decision": "Manter HELLO5 no grafo configurado e menor nodeId como iniciador normal; permitir que qualquer isolado inicie REPAIR_HELLO20 e complete com HELLO_OK6 no mesmo TCP. Nas saídas concorrentes ainda pendentes, escolher menor originatorId; entrada escolhida bloqueia nova saída e ACTIVE nunca é substituída por tentativa tardia. Origem valida cache/proveniência/TTL; destino valida handshake, endpoint, identidade, capacidades, colisões e limites sem comprovar aprendizagem remota. Um codec TCP v2, 19 tipos 1,2,4..20 e código3 rejeitado; máscaras3 obrigatórias em HELLO5/20/ACK6, sem subconjunto ou fallback. Preservar framing, snapshots/cache/TTL/UDP, FIFO/flush, barreiras de dial, recursos físicos e shutdown.",
+       "alternatives": "Menor ID universal com dial de retorno foi rejeitado pelo utilizador. Permissões/registry e quatro mensagens excedem a política cooperativa aprovada; cache recíproca impede unilateralidade. Sobrecarregar HELLO5 sem finalidade distinta ou substituir uma sessão ACTIVE enfraquece os contratos. Novo pool/listener/codec ou API de terminação não é necessário.",
+-      "consequences": "Substituição parcial proposta das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos estão aprovados, mas a aprovação formal desta ADR e a autorização de Implement ainda faltam. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Migrar quatro fixtures de máscara e acrescentar 12 independentes, alvo78; as 66 integradas continuam a única evidência wire atual. V-034, regressão JDK21, manual humano com mortes reais, revisão final e integração são obrigatórios antes de DONE.",
++      "consequences": "Substituição parcial aceite das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos e revisão ADR aprovados; só Implement autorizado, parando antes de Test. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Quatro fixtures de máscara migradas e 12 independentes acrescentadas: 78 operacionais, 62 TCP v2 e 16 UDP preservadas. V-034, regressão completa JDK21, manual humano com mortes reais, revisão final e integração continuam obrigatórios antes de DONE.",
+       "components": [
+         "overlay",
+         "protocol",
+@@ -1950,9 +1953,10 @@
+         "ADR-033",
+         "ADR-034"
+       ],
+-      "activation": "Pending formal ADR checkpoint; no implementation authorization",
++      "activation": "Explicit ADR approval; Implement only, stop before Test",
+       "design_approval_recorded_at": "2026-11-11T23:28:20Z",
+-      "scope_approved_paths": 21
++      "scope_approved_paths": 21,
++      "accepted_at": "2026-11-11T23:39:43Z"
+     }
+   ],
+   "implementation_tasks": [
+diff --git a/memory-bank/bolts/035-overlay-extra/adr-035-proposal.md b/memory-bank/bolts/035-overlay-extra/adr-035-proposal.md
+--- a/memory-bank/bolts/035-overlay-extra/adr-035-proposal.md
++++ b/memory-bank/bolts/035-overlay-extra/adr-035-proposal.md
+@@ -2,16 +2,15 @@
+ stage: adr
+ bolt: "035-overlay-extra"
+ adr: "ADR-035"
+-status: "Proposta"
++status: "Aceite"
+ replaces_parts: ["ADR-019", "ADR-033", "ADR-034"]
+ ---
+ # ADR-035 — reparação direta na ligação iniciada pelo isolado
+ 
+-**Estado: Proposta formalizada para aprovação da revisão ADR.** Design, política
+-cooperativa e 21 caminhos aprovados; não há autorização de Implement. Até à
+-aprovação formal desta ADR,
+-[ADR-019/033/034 do ADD](../../../add.md#adr-019) conservam o seu estado vigente.
+-Gate G-EXTRA-ADR próprio do IMP-035 permanece pendente.
++**Estado: Aceite.** Aprovação explícita do utilizador registada em
++2026-11-11T23:39:43Z, incluindo revisão ADR, contratos e substituição parcial
++ADR-019/033/034. G-EXTRA-ADR satisfeito para IMP-035. Só Implement autorizado;
++parar antes de Test. O nome histórico deste ficheiro preserva os links existentes.
+ 
+ ## Contexto e drivers
+ 
+@@ -21,7 +20,7 @@
+ iniciar e completar a reparação na mesma ligação mesmo tendo o maior nodeId,
+ evitar dial de retorno e justificar o mínimo de admissão no laboratório.
+ 
+-## Decisão proposta
++## Decisão aceite
+ 
+ 1. Manter HELLO5/grafo e iniciador menor para a reconexão normal configurada.
+ 2. Acrescentar20 REPAIR_HELLO, com o payload Hello existente, para uma tentativa
+@@ -46,7 +45,7 @@
+    isolamento local, limites C/B/R/Q e shutdown com prazo. Contextos perdedores
+    continuam cobrados até terminação física; nenhuma API nova de terminação.
+ 
+-## Alcance da substituição proposta
++## Alcance da substituição aceite
+ 
+ - ADR-019: exceção ao iniciador menor e admissão por grafo **só para finalidade20**;
+   desempate menor apenas quando há saídas concorrentes pendentes. HELLO5 conserva
+@@ -91,14 +90,17 @@
+ sessões saudáveis, limites e terminação física. V-034, regressão atual/manual
+ SIGKILL/revisão final/integração antes de DONE.
+ 
+-Política, contratos de Design e âmbito já aprovados explicitamente. Falta
+-aprovação formal da revisão ADR antes de editar Java.
+-O ADD/catálogo registam agora ADR-035 como Proposta e os21 caminhos como âmbito
+-aprovado. Os textos Aceites anteriores mantêm estado enquanto a revisão ADR
+-aguarda aprovação. Não autoriza Implement/Test, commits ou push.
++Política, contratos, âmbito e revisão ADR aprovados explicitamente.
++ADD/catálogo registam ADR-035 Aceite; as cláusulas não substituídas de019/033/034
++mantêm-se. Implement não autoriza Test/fecho/commits/push.
+ 
+ ## Formalização desta revisão
+ 
+ Registo de 2026-11-11T23:28:20Z. [Revisão ADR e conferência das APIs reais](adr-review.md).
+ A política cooperativa e o âmbito já estão aprovados; este checkpoint pede
+ apenas validação formal da ADR/substituição parcial antes de Implement.
++
++## Aprovação formal
++
++Registo de 2026-11-11T23:39:43Z. ADR-035/revisão/substituição parcial aprovadas explicitamente.
++G-EXTRA-ADR satisfeito para IMP-035; só Implement, parar antes de Test.
+diff --git a/memory-bank/bolts/035-overlay-extra/adr-review.md b/memory-bank/bolts/035-overlay-extra/adr-review.md
+--- a/memory-bank/bolts/035-overlay-extra/adr-review.md
++++ b/memory-bank/bolts/035-overlay-extra/adr-review.md
+@@ -1,16 +1,15 @@
+ ---
+ stage: adr
+ bolt: "035-overlay-extra"
+-status: "ready-for-review"
++status: "approved"
+ created: "2026-11-11T23:28:20Z"
+ ---
+ # Revisão ADR — IMP-035 / reparação direta
+ 
+-**Revisão pronta para aprovação; parar antes de Implement.** O utilizador aprovou
+-Design revisto, política cooperativa de Q-C-22 e 21 caminhos. A aprovação foi
+-registada em 2026-11-11T23:28:20Z; é instante do registo, não timestamp da mensagem.
+-Só Model/Design concluídos. ADR-035 formalizada como **Proposta**, antes da sua
+-aprovação formal. G-EXTRA-ADR ainda depende deste checkpoint.
++**Revisão aprovada.** Registo da aprovação explícita em 2026-11-11T23:39:43Z.
++ADR-035 Aceite/substituição parcial019/033/034; G-EXTRA-ADR satisfeito para IMP-035.
++Model/Design/ADR concluídos. Apenas Implement autorizado, parar antes de Test.
++A análise abaixo foi feita antes do código; a evidência dessa revisão permanece intacta.
+ 
+ ## Decisão formalizada e substituição parcial
+ 
+@@ -19,7 +18,7 @@
+ [IMP-035](../../../add.md#imp-035) e no [catálogo](../../architecture-traceability.json),
+ sem autorização de alterações Java nesta fase.
+ 
+-| Decisão anterior | Delta formalizado em ADR-035 Proposta | Garantias que se mantêm |
++| Decisão anterior | Delta aceite em ADR-035 | Garantias que se mantêm |
+ |---|---|---|
+ | ADR-019: só menor ID inicia e grafo autoriza HELLO | Para finalidade20, qualquer isolado inicia com candidato aprendido e completa na mesma ligação. Menor originatorId desempata só saídas concorrentes ainda pendentes. | HELLO5/grafo/iniciador menor no caso configurado; correlação por conexão/execução, uma sessão por par e ACTIVE nunca substituída por tentativa tardia. |
+ | ADR-033 residual: extra de novas arestas com admissão própria | Admitir unilateralmente no laboratório: origem verifica cache/proveniência/TTL, destino verifica handshake/limites sem comprovar aprendizagem. | Cache128x4, TTL60s desde QUERY, fontes/gerações, retenção após anunciante morrer, sem catálogo ou bootstrap de reparação. |
+@@ -104,10 +103,9 @@
+ 
+ ## Estado do gate e paragem
+ 
+-Já aprovados: Model, Design revisto, Q-C-22/política cooperativa e21 caminhos.
+-Pendente: aprovação formal da revisão/ADR-035 antes de autorização de Implement.
+-Não pedir novamente aprovação da política/âmbito nem marcar G-EXTRA-ADR cumprido
+-prematuramente. ADR não consta em stages_completed enquanto falta este checkpoint.
++Aprovação explícita de Model/Design/Q-C-22/21 caminhos e desta revisão ADR.
++ADR-035 Aceite; G-EXTRA-ADR satisfeito para IMP-035. Implement em curso;
++[walkthrough](implementation-walkthrough.md) para revisão antes de Test.
+ 
+ [Entrada e hashes](../../../experiments/construction/035-overlay-extra/adr-entry.json),
+ [V-ADD](../../../experiments/construction/035-overlay-extra/adr-v-add-02.log),
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-11T23:28:20Z"
++updated: "2026-11-12T00:04:01Z"
+ started: "2026-11-11T22:20:02Z"
+ completed: null
+-current_stage: "adr"
+-stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"}]
++current_stage: "implement"
++stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T23:39:43Z","artifact":"adr-review.md"}]
+ requires_bolts: ["034-overlay-extra"]
+ enables_bolts: ["005-rotas"]
+ requires_units: ["001-base-validada"]
+@@ -29,7 +29,7 @@
+ validation_ids: ["V-034"]
+ test_ids: ["V-034"]
+ external_gates: ["G-EXTRA-ADR"]
+-gate_status: {"G-EXTRA-ADR":"Design/Q-C-22/21 paths approved; formal ADR-035 review approval pending before Implement"}
++gate_status: {"G-EXTRA-ADR":"satisfied for IMP035; ADR035/partial substitution/contracts approved"}
+ adr_ids: ["ADR-013", "ADR-014", "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR-024", "ADR-033", "ADR-034", "ADR-035"]
+ requirements: ["REQ-025"]
+ architecture_source: "add.md"
+@@ -45,7 +45,7 @@
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`.
+ 2. [x] **design** → `ddd-02-technical-design.md`.
+-3. [ ] **adr** → `adr-review.md`.
++3. [x] **adr** → `adr-review.md`.
+ 4. [ ] **implement** → `implementation-walkthrough.md`.
+ 5. [ ] **test** → `ddd-03-test-report.md`.
+ 
+@@ -60,12 +60,10 @@
+ 
+ ## Estado e fronteiras
+ 
+-Model aprovado; Design em revisão; IMP-034 complete e integrado localmente. Q-C-20 decide
+-reparação autónoma só com zero ACTIVE e atendimento possível por peer saudável.
+-Descoberta obrigatória/TCP v2, mesmo JAR e uma sessão persistente por par;
+-bootstrap apenas inicial. O texto anterior de modo opcional/v1 foi alinhado
+-com REQ-025/ADR-034, sem alterar decisões aceites ou âmbito de oito caminhos.
+-V-034 ainda não executado. A prova de vídeo fica após routing/streaming.
++Model/Design/ADR aprovados; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++Implement para revisão, sem passagem a Test. O âmbito corrente aprovado é21 caminhos.
++Histórico das etapas abaixo preservado por ordem de registo. V-034 completo,
++regressão atual, manual humano com mortes reais, revisão final e integração pendentes.
+ 
+ ## Dependência integrada
+ 
+@@ -122,3 +120,21 @@
+ [revisão para aprovação](adr-review.md). Só Model/Design concluídos.
+ Parar antes de Implement. V-034/regressão/manual humano com mortes reais,
+ revisão final e integração continuam obrigatórios; sem commits/push/outro IMP.
++
++## Aprovação ADR e entrada apenas em Implement
++
++Registo de 2026-11-11T23:39:43Z. ADR-035/substituição parcial aprovadas; gate satisfeito.
++21 caminhos/D01–D20 incrementais autorizados, preservar testes e correlação.
++Parar antes de Test. V-034/regressão completa/manual humano com mortes reais/
++revisão final/integração pendentes; sem commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md b/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md
+--- a/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md
++++ b/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md
+@@ -7,10 +7,11 @@
+ ---
+ # Design revisto — reparação na ligação iniciada pelo isolado
+ 
+-**Design, Q-C-22 e âmbito de 21 caminhos aprovados pelo utilizador; registo
+-2026-11-11T23:28:20Z. Aprovação formal da revisão ADR pendente, sem autorização de código.** O utilizador pediu simplificação: o isolado pode iniciar e
+-completar a reparação na mesma ligação, independentemente da ordem dos IDs.
+-G-EXTRA-ADR permanece pendente antes de Implement.
++**Design/Q-C-22/21 caminhos aprovados em registo de 2026-11-11T23:28:20Z;
++revisão ADR/ADR-035 aprovadas em registo de 2026-11-11T23:39:43Z.**
++G-EXTRA-ADR satisfeito para IMP-035; só Implement autorizado, parar antes de Test.
++O contrato abaixo é o desenho aprovado; o mapa de provas atual consta do
++[walkthrough](implementation-walkthrough.md), sem presumir a validação completa.
+ 
+ A proposta anterior de permissões/registry/retorno foi retirada da proposta
+ ativa e preservada, com hashes, em experiments/construction/035-overlay-extra/.
+@@ -312,7 +313,7 @@
+ aprendizagem/retention/TTL e separar «Discovery não cria aresta» de «aplicação
+ agora repara». Não introduzir flag off, apagar ou enfraquecer testes.
+ 
+-## 10. D01–D20 para M01–M18 / V-034 (não executados)
++## 10. D01–D20 para M01–M18 / V-034 (oráculos aprovados)
+ 
+ | Caso | Oráculo para Implement/Test | M |
+ |---|---|---|
+@@ -369,3 +370,11 @@
+ Registo de 2026-11-11T23:28:20Z. Design/Q-C-22/21 caminhos aprovados explicitamente.
+ [Revisão ADR](adr-review.md) confronta APIs reais e formaliza substituição
+ parcial de019/033/034 em ADR-035 Proposta. Sem Java/Maven/Implement/Test.
++
++## Concretizações de Implement
++
++RepairAttempt acrescenta geração/queryStarted/ttl/selectedAt ao esboço conceptual
++para fixar a autorização original. Um evento RepairStarted transporta esse record
++imutável uma vez por tentativa local admitida, sem dump da cache. RecoveryStatus
++permanece uma vista limitada. São concretizações do registo de proveniência
++exigido em D07, sem alteração wire/política/âmbito.
+diff --git a/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md b/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md
+@@ -0,0 +1,164 @@
++---
++stage: implement
++bolt: "035-overlay-extra"
++status: "ready-for-review"
++---
++# IMP-035 — Implement para revisão, antes de Test
++
++ADR-035/revisão e substituição parcial019/033/034 aprovadas explicitamente;
++registo2026-11-11T23:39:43Z. ADR-035 Aceite e G-EXTRA-ADR satisfeito **para IMP-035**.
++Âmbito21 aprovado; Model/Design/ADR concluídos. Só Implement autorizado.
++Não foi iniciado Test, feito clean verify, criado JAR novo, executado manual
++SIGKILL, feito commit/push/integração ou iniciado outro IMP.
++
++## Resultado e fronteira
++
++OverlayRecovery seleciona candidatos aprendidos quando zeroACTIVE. Origem
++fixa/revalida endpoint/proveniência/TTL e orçamento10s. REPAIR_HELLO20/ACK6
++completa na mesma ligação, sem regra de menor ID para iniciar. Menor originator
++só desempata saídas sobrepostas pendentes; sessão ACTIVE não é substituída.
++O destino cooperativo valida handshake/limites sem provar a aprendizagem remota.
++NeighborManager preserva barreira opened/future, UNCLASSIFIED/B/R, correlação
++ERROR5/20/6, instanceId/connectionId e contextos perdedores separados.
++
++Tick100ms partilhado com descoberta, sem pools/listeners/timers por candidato.
++C/grau/dinâmicos16/admissões2/saída1 e quotas extra18/19 preservados. Handshakes
++usam FIFO/sendAndFlush normal; Transport/Connection não foram alterados.
++Cancelamento não liberta reserva física; teste com writer bloqueado confirma-o.
++RecoveryStatus/CLI recovery limitados, RepairStarted uma vez por seleção com
++record imutável de proveniência. Shutdown não regressa de STOPPING a ISOLATED.
++
++Um codec operacional TCP v2 com19 tipos, máscaras3 e código3 rejeitado. Quatro
++fixtures de máscara migradas e12 independentes acrescentadas;46TCP anteriores,
++snapshots e16UDP intactos. Referência literal Python, sem encoder Java. Bytes
++UDP OTT1, framing/caps, POM e recursos de configuração não foram alterados.
++ControlMessage existente serve o payload20 sem exigir alteração desse caminho.
++
++## Testes primeiro e execução incremental
++
++Cada `*-result.json` conserva comando, JDK, instantes reais, hashes dos fontes,
++log/hash e cópia dos XML executados. Nenhuma soma de execuções repetidas é
++apresentada como total de regressão. Falhas/sandbox/compilação foram preservadas.
++
++| Evidência | Resultado real | Leitura |
++|---|---|---|
++| implement-red-01 |2 testes,2 erros| Tipo20 ausente/capacidade3 rejeitada antes de implementar. |
++| implement-protocol-green-02 |2 passaram| Codec mínimo verde. |
++| implement-admission-red-03 |2 falhas| Falta de admissão; uma fixture ainda tinha dial configurado pendente. |
++| implement-admission-red-04 |0 testes, compilação falhou| Acesso incorreto no teste novo, corrigido antes de usar o red como oráculo. |
++| implement-admission-red-05 |2 falhas| Fixture corrigida, admissão20 realmente ausente. |
++| implement-admission-green-06 |2 passaram| Admissão na mesma ligação. |
++| implement-protocol-07 |120 passaram| Codec comum e descoberta. |
++| implement-recovery-08 |15 passaram| Política/ordens controladas. |
++| implement-cli-red-09 |1 falha| Comando recovery ausente. |
++| implement-tcp-10 |228 passaram| Incrementais com TCP/CLI existentes. |
++| implement-timer-red-11 |1 falha| Timer adicional indevido na fase DNS reparadora. |
++| implement-timer-green-12 |1 falha,2 erros em18| Motivo TIMEOUT sobrescrito por BACKOFF e sockets bloqueados pela sandbox; não é sucesso. |
++| implement-recovery-13 |18 passaram| Motivo corrigido e execução com sockets autorizados. |
++| implement-incremental-14 |354 passaram| Saturação, dial tardio e reserva física. |
++| implement-incremental-15 |358,1 falha| Callback Down alterava STOPPING após shutdown. |
++| implement-incremental-16 |358 passaram| Correção de estado, D07e em sessão reparada, anúncio/CLI/shutdown. |
++| implement-cache-17 |9 passaram| Cache existente sem alteração, em execução separada. |
++| implement-claim-red-18 |1 falha| TTL podia expirar entre dial e envio antes do tick. |
++| implement-incremental-19 |368 passaram| Dez classes, incluindo cache e guarda de TTL imediatamente antes do envio. |
++
++[368 testes: resultado](../../../experiments/construction/035-overlay-extra/implement-incremental-19-result.json),
++[log](../../../experiments/construction/035-overlay-extra/implement-incremental-19.log),
++[XML](../../../experiments/construction/035-overlay-extra/implement-incremental-19-xml/).
++[Cache: resultado](../../../experiments/construction/035-overlay-extra/implement-cache-17-result.json).
++JDK21. As dez classes finais são OverlayRecoveryTest26, NeighborManagerTest54,
++NeighborManagerLifecycleTest34, NeighborDiscoveryTest20, OttApplicationTest48,
++TransportTest37, MessageCodecTest94, DiscoveryCodecTest26, BootstrapServerTest20
++e CandidateCacheTest9. A execução17 da cache fica preservada separadamente. Não executar Test sem aprovação.
++
++Reprodução incremental desde Projeto/, com JDK21 e sockets locais autorizados:
++
++```sh
++mvn -B -ntp -Dtest=OverlayRecoveryTest,NeighborManagerTest,NeighborManagerLifecycleTest,NeighborDiscoveryTest,TransportTest,BootstrapServerTest,OttApplicationTest,MessageCodecTest,DiscoveryCodecTest,CandidateCacheTest test
++```
++
++## Correspondência D01–D20
++
++| Oráculo | Prova incremental / limite |
++|---|---|
++| D01 | MessageCodecTest94 compara bytes/modelos às fixtures independentes; DiscoveryCodecTest26; V-ADD. |
++| D02 | D02_onlyIsolationTriggersAndOneOperationIsLogical e D03/D04: alternativa antes da segunda perda. |
++| D03 | D03_realTcpLearnsBeforeFailureAndFormsSCOnSameSurvivors; close de nós embutidos. SIGKILL/manual pendentes. |
++| D04 | D04_realTcpFormsR1CAndPreservesHealthySR1; mesma sessão S–R1. Mortes reais pendentes. |
++| D05 | Três testes D05: isolado maior, destino saudável, mesma conexão, sem retorno/cache recíproca. |
++| D06 | D03/D04 TCP real incluem C menor iniciando para S/R1 e confirmação dos dois extremos. |
++| D07 | Política empty/expired/conflict/self, claim original fixo e D07_selectionRecordsPinnedProvenanceOnce. |
++| D08 | D08_badEndpointIdentityCapabilitiesAndConfiguredHelloDoNotAdmit; codec/todos negativos anteriores preservados. |
++| D09 | Duas ordens de saídas/flush; opened antes do resultado retido; perdedor tardio não remove vencedor. |
++| D10 | D10_activeGreaterInitiatorIsNotReplacedBySmallerLateAttemptOrNewInstance; slot inbound bloqueia segunda saída pelo testeD11. |
++| D11 | D11_sameOriginDuplicatePendingDoesNotReplaceCurrentRequest e D09callbacks; não trocar request/contexto. |
++| D12 | D08/D10, ERROR relatedType5 não reconhecido como rejeição20 e correlação anterior de NeighborManagerTest. |
++| D13 | Dois testes pendentes2/dinâmicos16 e tick único; cache9, grau63/B/R anteriores e reserva física de TransportTest. |
++| D14 | TransportTest.D14_repairHandshakeConfirmationAndLosingPhysicalReservationUseNormalFifo e testes FIFO/quotas anteriores; ACK pendente em D11/D17. |
++| D15 | TTL original não renovado,10s/backoff/justiça, DNS timeout, native dial tardio e claim expirado antes do envio sem novo HELLO; callbacks antigos ignorados. |
++| D16 | D16_staleDiscoveryOnRepairedSessionPreservesQueryCacheAndConnection: tokens18/19, rejeitados tipados, query/geração velhas; resposta válida posterior mesma consulta/connectionId, zeroDown. D07e anteriores intactos. |
++| D17 | D17_onlyConfirmedRepairedAdjacencyIsAdvertised: antes de flush sem aresta, depois Up anúncio só de ACTIVE. |
++| D18 | Bootstrap recusa20; ERROR20 correlacionado; CLI recovery em JVM com peer rejeitado/sessão saudável. |
++| D19 | Política encerra admissão, lifecycle de sessão reparada e worker físico preso/timeout explícito; suite anterior de shutdown preservada. |
++| D20 | TCP real incremental/JDK21/XML/hashes executados. Clean verify completo, manual humano SIGKILL, revisão final/integração pendentes. |
++
++D01–D20 estão mapeados; isso **não conclui V-034**. D03/D04/D20 têm provas
++operacionais deliberadamente pendentes na etapa Test.
++
++## Justificação das remoções/substituições nas fundações
++
++Nenhum método de teste anterior foi apagado. Migrações abaixo correspondem ao
++contrato obrigatório aprovado, sem alterar testes para esconder falhas:
++
++- MessageType acrescenta20 à enum explícita; MessageCodec partilha os ramos de
++  Hello e troca masks1 por3, mantendo offsets/envelope/framing/caps. Não criar
++  segundo decoder. Os testes positivos mudam1→3; apenasDISCOVERY/zero continuam
++  negativos. Loops de tipos passam a19, bootstrap recusa mais um tipo. Quatro
++  fixtures alteram só a expectativa/campos de capacidade autorizados.
++- NeighborManager remove hardcodes de tipo5 na correlação/retém o tipo original
++  por Context, partilha construção Hello5/20, evita retry configurado para
++  dinâmicos e mantém reservas dos native dials. Acrescenta seleção/admissão sem
++  substituir o transporte. Casas de terminal/ativação/shutdown passam também
++  pelo controlador reparador; callbacks vencidos não tocam no escolhido.
++- NeighborDiscovery só compõe o tick para Recovery. Dois e2e de aplicação que
++  afirmavam não existir S–C/R1–C deixam de poder exigir ausência **depois** de
++  ambas as perdas. Passam a conferir retirada dos relays/aprendizagem e sessão
++  saudável; D03/D04 novos exigem a aresta nova. Os oráculos de aprendizagem
++  isolada sem dial permanecem. Não alterar cache, TTL ou regrasD07e.
++- OttApplication acrescenta recovery/help/delegação; testes CLI verificam o
++  comando real. Mask migrations em Manager/Lifecycle/App preservam os casos.
++- Validador passa50→62TCP/tipos19, confere referência anterior protegida, os46
++  vetores não migrados e16UDP. README de fixtures descreve25 aceites pelo codec,
++  32 rejeições terminais e5 de conteúdo; duplicata20 wireválida é rejeitada no owner.
++
++## Pendências antes do fecho
++
++Revisão humana de Implement antes de autorizar Test. Na etapa seguinte:
++clean verify completo JDK21/TCP, contagens/XML atuais, JAR novo/hash e manual
++com mortes reais nos dois grafos, executado e repetido pelo humano antes de
++aprovar Test. [Roteiro preparado](../../../experiments/overlay-recovery/README.md).
++Depois revisão final/integração. Sem vídeo/routing/CORE/GUI/FPS comprovados.
++O JAR preservado do IMP-034 não é uma build desta implementação.
++
++## Diff e preservação
++
++Base main22622c1d7eb0fdab3df684f2fac10263cff11736. O diff de Projeto inclui
++ficheiros novos e fixtures binárias; exclui todo target. [Numstat](../../../experiments/construction/035-overlay-extra/implement-project-vs-head.numstat)
++e [patch completo](../../../experiments/construction/035-overlay-extra/implement-project-vs-head.diff).
++[Documentação preexistente](../../../experiments/construction/035-overlay-extra/implement-docs-preexisting.diff)
++separada do [delta desta etapa](../../../experiments/construction/035-overlay-extra/implement-docs-vs-entry.diff).
++[Conferência final/hashes](../../../experiments/construction/035-overlay-extra/implement-validation.json),
++[V-ADD](../../../experiments/construction/035-overlay-extra/implement-v-add-03.log),
++[git diff --check](../../../experiments/construction/035-overlay-extra/implement-diff-check.log).
++
++181 dos206 ficheiros originais de Projeto preservados;26 novos. Os25 originais
++alterados estão nos21 caminhos aprovados. As662 evidências anteriores à entrada
++mantêm os hashes, incluindo o JAR histórico cff5db105bd1f3eca73aebc101724fccbdbd66645056ef6e3278018592bf8d48.
++109 artefactos CLI gerados na execução19 foram copiados fora de target com
++[inventário](../../../experiments/construction/035-overlay-extra/implement-incremental-19-cli-inventory.json).
++Listas Maven geradas em target ficam [separadas](../../../experiments/construction/035-overlay-extra/implement-generated-target.numstat).
++V-ADD final: zero erros,78 fixtures; não é execução CORE nem regressão Java.
++
++A execução V-ADD02 foi preservada com uma referência ao próprio relatório ainda
++inexistente no início da chamada. V-ADD03 passou após o ficheiro existir; a
++conferência04 volta a validar o estado documental final, sem apagar02.
+diff --git a/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md b/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md
+--- a/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md
++++ b/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md
+@@ -2,15 +2,16 @@
+ stage: design
+ bolt: "035-overlay-extra"
+ revision: "02-direct-repair"
+-status: "approved-scope-only-no-implementation"
++status: "approved"
+ ---
+ # IMP-035 — âmbito aprovado de 21 caminhos
+ 
+ Os 21 caminhos foram aprovados explicitamente pelo utilizador e atualizados
+ no [ADD](../../../add.md#imp-035). Esta aprovação substitui o âmbito de oito
+ caminhos; a proposta anterior de30 não foi aceite.
+-[Design revisto](ddd-02-technical-design.md) e [ADR-035 Proposta](adr-035-proposal.md).
+-Sem código/recursos alterados nesta etapa; não é autorização de Implement.
++[Design revisto](ddd-02-technical-design.md) e [ADR-035 Aceite](adr-035-proposal.md).
++Na etapa de aprovação de âmbito não houve alterações Java. A autorização posterior
++da revisão ADR, registada em 2026-11-11T23:39:43Z, permite só Implement nestes21 caminhos.
+ 
+ ## Caminhos já previstos
+ 
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -744,3 +744,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../../../../bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+@@ -70,3 +70,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../../../../../bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -371,3 +371,14 @@
+ Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+ V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+ Sem Implement/Test/fecho/commits/push/outro IMP.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../../../../bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -873,16 +873,39 @@
+       ],
+       "revised_at": "2026-11-11T23:28:20Z",
+       "protocol_validation": {
+-        "approved_v2_reference_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/manifest.json",
+-        "approved_v2_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24",
+-        "operational_tcp_fixtures": 50,
++        "approved_v2_reference_manifest": "experiments/overlay-recovery/reference-v2/manifest.json",
++        "approved_v2_reference_sha256": "53b8b558ac1d9892577bc7ff31cf42b9ac6aef260f84bfad1fde2241b859f468",
++        "operational_tcp_fixtures": 62,
+         "preserved_udp_fixtures": 16,
+         "udp_baseline_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/udp-baseline.json",
+         "udp_baseline_sha256": "85abb5834687046b15e1e59337f3e32029e726402eabab085b97d8ca24a4e4f6",
+         "retired_tcp_archive_removed": "Explicit user instruction; Q-C-19",
+-        "cleanup_manifest": "experiments/construction/034-overlay-extra/cleanup-manifest.json"
+-      },
+-      "implementation_status": "IMP-034 complete; IMP-035 Design/Q-C-22/21 paths approved, ADR-035 review pending; no Implement",
++        "cleanup_manifest": "experiments/construction/034-overlay-extra/cleanup-manifest.json",
++        "previous_reference_manifest": "experiments/construction/034-overlay-extra/protocol-v2-proposal/manifest.json",
++        "active_types": [
++          1,
++          2,
++          4,
++          5,
++          6,
++          7,
++          8,
++          9,
++          10,
++          11,
++          12,
++          13,
++          14,
++          15,
++          16,
++          17,
++          18,
++          19,
++          20
++        ],
++        "previous_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24"
++      },
++      "implementation_status": "IMP-034 complete; IMP-035 Model/Design/ADR035 approved; Implement ready for review before Test",
+       "integrated_revision": "f650be02f2af10b95328f5b50c3d6941e2e75c15"
+     }
+   ]
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-adr-review
++extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-implement-review
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -28,7 +28,7 @@
+ - [ADR-024 — ADD mestre e incrementos atómicos rastreáveis](../../add.md#adr-024) — Aceite.
+ - [ADR-025 — Sem recuperação automática de falha exclusiva UDP](../../add.md#adr-025) — Aceite.
+ - [ADR-026 — Qualidade sem ferramentas ou limiar percentual novos](../../add.md#adr-026) — Aceite.
+-- [ADR-035 — Reparação direta na ligação iniciada pelo isolado](../../add.md#adr-035) — Proposta; substituição parcial019/033/034 formalizada, aguardando checkpointADR. [Revisão](../bolts/035-overlay-extra/adr-review.md).
++- [ADR-035 — Reparação direta na ligação iniciada pelo isolado](../../add.md#adr-035) — Aceite; substituição parcial019/033/034 aprovada, G-EXTRA-ADR satisfeito para IMP-035. [Revisão](../bolts/035-overlay-extra/adr-review.md).
+ 
+ ## Clarificações aprovadas do checkpoint — 03-11-2026
+ 
+@@ -298,3 +298,14 @@
+ com delta parcial019/033/034 e garantias preservadas. Nenhuma ADR aceite anterior
+ foi apagada ou alterada de estado. Gate próprio pendente apenas de aprovação
+ formal desta revisão antes de Implement; fontes e JAR intactos, sem Java/Maven.
++
++## IMP-035 — Implement para revisão antes de Test
++
++Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
++explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
++[Walkthrough, mapa D01–D20 e evidência incremental](../bolts/035-overlay-extra/implementation-walkthrough.md).
++Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
++ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
++Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
++regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
++Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em revisão ADR e 27 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Implement para revisão e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -286,6 +286,6 @@
+ 
+ ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model/Design/Q-C-22/21 caminhos aprovados; ADR-035 Proposta em revisão antes de Implement.
++**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model/Design/ADR-035/Q-C-22/21 caminhos aprovados; Implement para revisão antes de Test.
+ **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+ Usa a cache aprendida de IMP-034 para reparar a overlay.
+diff --git a/scripts/validate-planning.py b/scripts/validate-planning.py
+--- a/scripts/validate-planning.py
++++ b/scripts/validate-planning.py
+@@ -288,7 +288,7 @@
+         require(len(data) == item["bytes"] and hashlib.sha256(data).hexdigest() == item["sha256"],
+                 f"{item['id']}: size/hash mismatch")
+         require(bytes.fromhex((fixtures_dir / item["hex"]).read_text()) == data, f"{item['id']}: hex mismatch")
+-    # ADR-034 / Q-C-19: only TCP v2 is retained; UDP OTT1 remains unchanged.
++    # ADR-034/035 / Q-C-19: only TCP v2 is retained; UDP OTT1 remains unchanged.
+     # The original planning snapshot/hashes remain immutable in manifest['files'].
+     protocol = next((extra.get("protocol_validation") for extra in manifest.get("extras", [])
+                      if extra.get("id") == "EXTRA-01"), None)
+@@ -304,10 +304,23 @@
+         tcp = {row["id"]: row for row in fixtures if row["id"].startswith("tcp-")}
+         udp = {row["id"]: row for row in fixtures if row["id"].startswith("udp-")}
+         old_udp = {row["id"]: row for row in historic_udp}
+-        require(len(tcp) == len(reference) == protocol["operational_tcp_fixtures"] == 50,
++        require(len(tcp) == len(reference) == protocol["operational_tcp_fixtures"] == 62,
+                 "Operational TCP v2 fixture count mismatch")
+         require(len(udp) == protocol["preserved_udp_fixtures"] == 16 and udp == old_udp,
+                 "UDP OTT1 fixtures/expectations changed")
++        previous_path = ROOT / protocol["previous_reference_manifest"]
++        require(hashlib.sha256(previous_path.read_bytes()).hexdigest() == protocol["previous_reference_sha256"],
++                "Previous 50-fixture TCP v2 reference changed")
++        previous = json.loads(previous_path.read_text())["fixtures"]
++        current_reference = {row["id"]: row for row in reference}
++        migrated = {"tcp-hello", "tcp-hello-ok", "tcp-invalid-capability-not-required", "tcp-invalid-capability-reserved"}
++        require(len(previous) == 50 and len(set(current_reference) - {row["id"] for row in previous}) == 12,
++                "ADR-035 fixture migration must add exactly 12 vectors")
++        for row in previous:
++            data = (previous_path.parent / "fixtures" / row["binary"]).read_bytes()
++            require(hashlib.sha256(data).hexdigest() == row["sha256"], f"Historical reference changed: {row['id']}")
++            if row["id"] not in migrated:
++                require(current_reference.get(row["id"]) == row, f"Unapproved fixture migration: {row['id']}")
+         active_types = set()
+         for row in reference:
+             reference_data = (reference_path.parent / "fixtures" / row["binary"]).read_bytes()
+@@ -327,8 +340,8 @@
+                 require(reference_data[4] == 2 and reference_data[5] == row["expected"]["fields"]["type"],
+                         f"Accepted TCP fixture is not the declared v2 type: {row['id']}")
+                 active_types.add(reference_data[5])
+-        require(active_types == {1, 2, *range(4, 20)}, "Independent v2 vectors must cover all 18 active types; code 3 retired")
+-        checks.append("Protocolo operacional: 50 fixtures TCP v2 independentes (18 tipos), 16 UDP OTT1 intactas face à base; arquivos TCP v1 retirados por decisão explícita Q-C-19.")
++        require(active_types == {1, 2, *range(4, 21)}, "Independent v2 vectors must cover all 19 active types; code 3 retired")
++        checks.append("Protocolo operacional: 62 fixtures TCP v2 independentes (19 tipos), 16 UDP OTT1 intactas face à base; arquivos TCP v1 retirados por decisão explícita Q-C-19.")
+     xml_files = list((ROOT / "CORE/topologies").glob("*.xml"))
+     for p in xml_files:
+         ET.parse(p)

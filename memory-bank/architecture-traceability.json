@@ -1,6 +1,6 @@
 {
   "version": "1.0.2",
-  "updated": "2026-11-11T15:35:59Z",
+  "updated": "2026-11-12T00:04:01Z",
   "architecture_source": "add.md",
   "specification_source": "specs.md",
   "approval": {
@@ -1554,7 +1554,8 @@
       "tests": [
         "V-007",
         "V-008"
-      ]
+      ],
+      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
     },
     {
       "id": "ADR-020",
@@ -1852,7 +1853,8 @@
       "tests": [
         "V-033",
         "V-034"
-      ]
+      ],
+      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
     },
     {
       "id": "ADR-034",
@@ -1895,7 +1897,66 @@
         "V-033",
         "V-034"
       ],
-      "supersedes_scope": "ADR-033 transport/optional activation and prior mixed v1/v2 proposal; all TCP moves to v2, preserving bootstrap semantics, limits and learning policies; UDP OTT1 unchanged"
+      "supersedes_scope": "ADR-033 transport/optional activation and prior mixed v1/v2 proposal; all TCP moves to v2, preserving bootstrap semantics, limits and learning policies; UDP OTT1 unchanged",
+      "partially_superseded_by": "ADR-035 Aceite for repair20, cooperative admission,19 types/masks3; unaffected clauses retained"
+    },
+    {
+      "id": "ADR-035",
+      "title": "Reparação direta na ligação iniciada pelo isolado",
+      "status": "Aceite",
+      "drivers": [
+        "REQ-025"
+      ],
+      "context": "REQ-025 exige reparar S–C e S–R1–C com candidatos aprendidos antes das falhas, mesmos sobreviventes e bootstrap parado. O utilizador aprovou Design revisto, política cooperativa Q-C-22 e âmbito de 21 caminhos, pedindo apenas revisão ADR antes de Implement.",
+      "decision": "Manter HELLO5 no grafo configurado e menor nodeId como iniciador normal; permitir que qualquer isolado inicie REPAIR_HELLO20 e complete com HELLO_OK6 no mesmo TCP. Nas saídas concorrentes ainda pendentes, escolher menor originatorId; entrada escolhida bloqueia nova saída e ACTIVE nunca é substituída por tentativa tardia. Origem valida cache/proveniência/TTL; destino valida handshake, endpoint, identidade, capacidades, colisões e limites sem comprovar aprendizagem remota. Um codec TCP v2, 19 tipos 1,2,4..20 e código3 rejeitado; máscaras3 obrigatórias em HELLO5/20/ACK6, sem subconjunto ou fallback. Preservar framing, snapshots/cache/TTL/UDP, FIFO/flush, barreiras de dial, recursos físicos e shutdown.",
+      "alternatives": "Menor ID universal com dial de retorno foi rejeitado pelo utilizador. Permissões/registry e quatro mensagens excedem a política cooperativa aprovada; cache recíproca impede unilateralidade. Sobrecarregar HELLO5 sem finalidade distinta ou substituir uma sessão ACTIVE enfraquece os contratos. Novo pool/listener/codec ou API de terminação não é necessário.",
+      "consequences": "Substituição parcial aceite das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos e revisão ADR aprovados; só Implement autorizado, parando antes de Test. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Quatro fixtures de máscara migradas e 12 independentes acrescentadas: 78 operacionais, 62 TCP v2 e 16 UDP preservadas. V-034, regressão completa JDK21, manual humano com mortes reais, revisão final e integração continuam obrigatórios antes de DONE.",
+      "components": [
+        "overlay",
+        "protocol",
+        "app",
+        "transport"
+      ],
+      "files": [
+        "overlay/OverlayRecovery.java",
+        "overlay/NeighborManager.java",
+        "overlay/OverlayNode.java",
+        "app/OttApplication.java",
+        "overlay/OverlayRecoveryTest.java",
+        "overlay/NeighborManagerTest.java",
+        "app/OttApplicationTest.java",
+        "experiments/overlay-recovery/",
+        "overlay/NeighborDiscovery.java",
+        "overlay/NeighborDiscoveryTest.java",
+        "protocol/MessageType.java",
+        "protocol/ControlMessage.java",
+        "protocol/MessageCodec.java",
+        "protocol/MessageCodecTest.java",
+        "overlay/NeighborManagerLifecycleTest.java",
+        "bootstrap/BootstrapServerTest.java",
+        "transport/TransportTest.java",
+        "Projeto/src/test/resources/protocol/",
+        "scripts/validate-planning.py",
+        "Projeto/README.md",
+        "Projeto/docs/protocolos.md"
+      ],
+      "source_tasks": [
+        "TASK-034"
+      ],
+      "tests": [
+        "V-034",
+        "V-033",
+        "V-ADD"
+      ],
+      "partially_supersedes": [
+        "ADR-019",
+        "ADR-033",
+        "ADR-034"
+      ],
+      "activation": "Explicit ADR approval; Implement only, stop before Test",
+      "design_approval_recorded_at": "2026-11-11T23:28:20Z",
+      "scope_approved_paths": 21,
+      "accepted_at": "2026-11-11T23:39:43Z"
     }
   ],
   "implementation_tasks": [
@@ -4050,7 +4111,8 @@
         "ADR-020",
         "ADR-024",
         "ADR-033",
-        "ADR-034"
+        "ADR-034",
+        "ADR-035"
       ],
       "test_ids": [
         "V-034"
@@ -4059,7 +4121,7 @@
         "V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado."
       ],
       "criteria": [
-        "Com o extra desativado, conservar o comportamento e os testes da overlay base.",
+        "Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.",
         "Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.",
         "Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.",
         "Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.",
@@ -4074,7 +4136,20 @@
         "overlay/OverlayRecoveryTest.java",
         "overlay/NeighborManagerTest.java",
         "app/OttApplicationTest.java",
-        "experiments/overlay-recovery/"
+        "experiments/overlay-recovery/",
+        "overlay/NeighborDiscovery.java",
+        "overlay/NeighborDiscoveryTest.java",
+        "protocol/MessageType.java",
+        "protocol/ControlMessage.java",
+        "protocol/MessageCodec.java",
+        "protocol/MessageCodecTest.java",
+        "overlay/NeighborManagerLifecycleTest.java",
+        "bootstrap/BootstrapServerTest.java",
+        "transport/TransportTest.java",
+        "Projeto/src/test/resources/protocol/",
+        "scripts/validate-planning.py",
+        "Projeto/README.md",
+        "Projeto/docs/protocolos.md"
       ],
       "size": "M",
       "gates": [
@@ -5266,7 +5341,8 @@
       "legacy_id": null,
       "adrs": [
         "ADR-033",
-        "ADR-034"
+        "ADR-034",
+        "ADR-035"
       ],
       "components": [
         "config",
@@ -5287,7 +5363,7 @@
   ],
   "counts": {
     "requirements": 41,
-    "adrs": 28,
+    "adrs": 29,
     "implementation_tasks": 35,
     "bolts": 35,
     "stories": 35,

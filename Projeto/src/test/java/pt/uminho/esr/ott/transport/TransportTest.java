@@ -805,4 +805,54 @@ class TransportTest {
         }
     }
 
+
+    @Test void D14_repairHandshakeConfirmationAndLosingPhysicalReservationUseNormalFifo()throws Exception {
+        var entered=new CountDownLatch(1);var release=new CompletableFuture<Void>();var events=new Events();
+        Connection.WriteDriver blocked=new Connection.WriteDriver(){
+            public void write(byte[] bytes){assertEquals(20,bytes[5]&255);entered.countDown();release.join();}
+            public void flush(){}
+        };
+        try(var transport=new Transport(ephemeral(),events,Transport.Options.defaults(),socket->blocked);var peer=new Socket()) {
+            try {
+                peer.connect(transport.localAddress());var c=take(events.opened);var instance=UUID.randomUUID();
+                var hello=new ControlMessage(MessageType.REPAIR_HELLO,UUID.randomUUID(),"N",instance,
+                    new ControlMessage.Hello(new ControlMessage.Endpoint("N",instance,"127.0.0.1",4100,4200,NodeRole.RELAY),3,3));
+                var written=c.sendAndFlush(hello);assertTrue(entered.await(3,TimeUnit.SECONDS));assertFalse(written.isDone());
+                c.close();assertEquals(1,transport.connectionCount());transport.requestClose();assertFalse(transport.awaitTermination(Duration.ofMillis(10)));
+                assertEquals(1,transport.connectionCount());release.complete(null);assertTrue(transport.awaitTermination(WAIT));
+                assertEquals(0,transport.connectionCount());assertTrue(written.isCompletedExceptionally());
+            } finally {release.complete(null);}
+        }
+    }
+    @Test void D13_degreeLoserAtC64RetainsPhysicalSlotUntilBlockedWriterTerminates()throws Exception {
+        var gates=java.util.List.of(new CompletableFuture<Void>(),new CompletableFuture<Void>());
+        var entered=new CountDownLatch(2);var index=new java.util.concurrent.atomic.AtomicInteger();var events=new Events();
+        Connection.WriteDriverFactory drivers=socket->{
+            int slot=index.getAndIncrement();return new Connection.WriteDriver(){
+                public void write(byte[] frame)throws IOException {
+                    socket.getOutputStream().write(frame);
+                    if(slot>=62){assertEquals(6,frame[5]&255);entered.countDown();gates.get(slot-62).join();}
+                }
+                public void flush()throws IOException{socket.getOutputStream().flush();}
+            };
+        };
+        var raw=new ArrayList<Socket>();var channels=new ArrayList<Connection>();
+        try(var transport=new Transport(ephemeral(),events,new Transport.Options(2,64,WAIT,WAIT),drivers)) {
+            try {
+                for(int n=0;n<64;n++){var peer=new Socket();raw.add(peer);peer.connect(transport.localAddress());channels.add(take(events.opened));}
+                assertEquals(64,transport.connectionCount());var winner=channels.get(62);var loser=channels.get(63);var instance=UUID.randomUUID();
+                var ack=new ControlMessage(MessageType.HELLO_OK,UUID.randomUUID(),"N",instance,new ControlMessage.HelloOk(3));
+                var winningFlush=winner.sendAndFlush(ack);var losingFlush=loser.sendAndFlush(ack);
+                assertTrue(entered.await(3,TimeUnit.SECONDS));assertFalse(winningFlush.isDone());assertFalse(losingFlush.isDone());
+                gates.getFirst().complete(null);winningFlush.get(3,TimeUnit.SECONDS);
+                // The degree decision closes only the excess channel; its physical writer is still blocked.
+                loser.close();assertFalse(loser.isOpen());assertEquals(64,transport.connectionCount());assertFalse(losingFlush.isDone());
+                var rejected=assertThrows(java.util.concurrent.ExecutionException.class,()->transport.connect(transport.localAddress()).get(3,TimeUnit.SECONDS));
+                assertInstanceOf(IOException.class,rejected.getCause());assertEquals(64,transport.connectionCount());
+                assertTrue(channels.subList(0,63).stream().allMatch(Connection::isOpen));
+                gates.getLast().complete(null);eventually(()->transport.connectionCount()==63);
+                assertTrue(losingFlush.isCompletedExceptionally());assertTrue(channels.subList(0,63).stream().allMatch(Connection::isOpen));
+            } finally {gates.forEach(g->g.complete(null));for(var peer:raw)peer.close();}
+        } finally {gates.forEach(g->g.complete(null));for(var peer:raw)peer.close();}
+    }
 }

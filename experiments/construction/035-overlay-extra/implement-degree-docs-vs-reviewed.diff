@@ -1,0 +1,72 @@
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -770,3 +770,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — confirmação concorrente do grau corrigida
++
++Registo 2026-11-12T00:23:42Z. [Complemento Implement/D13](../experiments/construction/035-overlay-extra/implement-degree-walkthrough.md):
++ACTIVE≤min(C,63) validado na confirmação comum de HELLO5/20, sem Up do excedente
++ou remoção dos saudáveis. Oito ordens de flush/ACK e retenção física com64 sockets;
++175 testes incrementais afetados passaram. Evidências anteriores preservadas.
++Sem passagem a Test, commits/push ou fecho. V-034 completo/regressão/manual humano
++com mortes reais/revisão final/integração permanecem pendentes.
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -6,7 +6,7 @@
+ status: "in-progress"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-12T00:04:01Z"
++updated: "2026-11-12T00:23:42Z"
+ started: "2026-11-11T22:20:02Z"
+ completed: null
+ current_stage: "implement"
+@@ -138,3 +138,11 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## Implement — correção de grau para revisão
++
++Registo 2026-11-12T00:23:42Z. [Provas e diffs suplementares](../../../experiments/construction/035-overlay-extra/implement-degree-walkthrough.md).
++Guarda comum no commit de ACTIVE≤min(C,63), sem retirar saudáveis.
++175 incrementais passaram; as evidências anteriores preservadas. Implement
++continua em revisão, sem Test/commits/push. Regressão completa, manual humano
++com mortes reais, revisão final e integração pendentes.
+diff --git a/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md b/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md
+--- a/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md
++++ b/memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md
+@@ -4,6 +4,11 @@
+ status: "ready-for-review"
+ ---
+ # IMP-035 — Implement para revisão, antes de Test
++
++**Atualização 2026-11-12T00:23:42Z: correção de grau concorrente concluída em Implement,
++175 testes afetados aprovados.** [Complemento D13](../../../experiments/construction/035-overlay-extra/implement-degree-walkthrough.md).
++As contagens/evidências anteriores abaixo são históricas desta etapa e permanecem
++preservadas; não substituem a regressão completa ainda pendente.
+ 
+ ADR-035/revisão e substituição parcial019/033/034 aprovadas explicitamente;
+ registo2026-11-11T23:39:43Z. ADR-035 Aceite e G-EXTRA-ADR satisfeito **para IMP-035**.
+@@ -162,3 +167,16 @@
+ A execução V-ADD02 foi preservada com uma referência ao próprio relatório ainda
+ inexistente no início da chamada. V-ADD03 passou após o ficheiro existir; a
+ conferência04 volta a validar o estado documental final, sem apagar02.
++
++## Correção de grau concorrente — novo checkpoint Implement
++
++activate() aplica ACTIVE≤min(C,63) antes de qualquer mutação, para5/20 e ambos
++os sentidos. Recusa só o excedente com RESOURCE_LIMIT, sem Up/Down dos saudáveis.
++Três testes determinísticos/oito ordens e um teste físico com64 sockets passaram;
++175 incrementais afetados sem falhas. [Walkthrough suplementar](../../../experiments/construction/035-overlay-extra/implement-degree-walkthrough.md).
++Sem Test/fecho/commits/push; restantes critérios mantêm-se pendentes.
++
++[Diff da correção](../../../experiments/construction/035-overlay-extra/implement-degree-project-vs-reviewed.diff),
++[numstat](../../../experiments/construction/035-overlay-extra/implement-degree-project-vs-reviewed.numstat)
++e [conferência de preservação atual](../../../experiments/construction/035-overlay-extra/implement-degree-validation.json):
+++98/−1 em Projeto, runtime+5/−0,1015 evidências anteriores preservadas.

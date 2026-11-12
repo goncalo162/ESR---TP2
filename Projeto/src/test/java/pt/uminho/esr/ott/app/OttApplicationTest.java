@@ -321,7 +321,7 @@ class OttApplicationTest {
                 assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO, hello.type());
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", remote,
-                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), socket.getOutputStream()); socket.getOutputStream().flush();
+                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3)), socket.getOutputStream()); socket.getOutputStream().flush();
                 child.await(t -> t.contains("NeighborUp[")); boot.send("quit"); assertEquals(0, boot.exit());
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.ERROR, UUID.randomUUID(), "N2", remote,
@@ -335,7 +335,7 @@ class OttApplicationTest {
                 UUID newRemote = UUID.randomUUID();
                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", newRemote,
-                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), second.getOutputStream()); second.getOutputStream().flush();
+                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3)), second.getOutputStream()); second.getOutputStream().flush();
                 child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
                 assertTrue(child.text().contains(newRemote.toString())); child.send("quit");
                 var leave = pt.uminho.esr.ott.protocol.MessageCodec.read(second.getInputStream()).orElseThrow();
@@ -520,7 +520,7 @@ class OttApplicationTest {
                     socket.setSoTimeout(2000);var hello=pt.uminho.esr.ott.protocol.MessageCodec.read(socket.getInputStream()).orElseThrow();
                     assertEquals(2,hello.version());assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO,hello.type());
                     var reply=new pt.uminho.esr.ott.protocol.ControlMessage(pt.uminho.esr.ott.protocol.MessageType.HELLO_OK,
-                        hello.requestId(),"N2",UUID.randomUUID(),new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1));
+                        hello.requestId(),"N2",UUID.randomUUID(),new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3));
                     byte[] negative=pt.uminho.esr.ott.protocol.MessageCodec.encode(reply);java.nio.ByteBuffer.wrap(negative).putInt(negative.length-4,0);
                     socket.getOutputStream().write(negative);socket.getOutputStream().flush();rejected.add(hello.senderId());
                 }
@@ -531,6 +531,8 @@ class OttApplicationTest {
                 long replies=child.text().lines().filter(l->l.contains("NEIGHBORS ")).count();child.send("neighbors");
                 child.await(t->t.lines().filter(l->l.contains("NEIGHBORS ")).count()>replies&&t.contains("state=ACTIVE"));
                 assertEquals(1,child.text().lines().filter(l->l.contains("NeighborUp[")).count());
+                child.send("recovery");child.await(t->t.contains("RECOVERY node=")&&t.contains("phase=ACTIVE"));
+                assertFalse(child.text().contains("COMMAND_ERROR unknown command"));
                 assertFalse(child.text().contains("FATAL"));assertTrue(child.process.isAlive());
             }
             var help=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",System.getProperty("java.class.path"),OttApplication.class.getName(),"--help")
@@ -543,4 +545,9 @@ class OttApplicationTest {
         }
     }
 
+    @Test void D18_recoveryCommandIsBoundedAndNotAnUnknownCommand() {
+        var h=new Harness();assertEquals(0,h.run("recovery\nquit\n","--role","RELAY","--config","src/main/resources/config/relay.properties"));
+        assertTrue(h.text().contains("RECOVERY node="));assertFalse(h.text().contains("unknown command"));
+        assertTrue(h.text().lines().filter(line->line.contains("RECOVERY ")).allMatch(line->line.length()<=OttApplication.MAX_LOG_CHARS));
+    }
 }

@@ -1,0 +1,334 @@
+{
+  "S": {
+    "kind": "state",
+    "node": "S",
+    "pid": 793959,
+    "instance": "6b50e135-bef4-43c1-99f5-183329dd8129",
+    "token": "5328a67867494fa99150da94b4ab040f",
+    "nano": 45067294478324,
+    "payload": {
+      "request": "95eb6c567ee64591afa394956065f6de",
+      "dropped": 0,
+      "sessions": {
+        "R1": {
+          "nodeId": "R1",
+          "instanceId": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+          "connectionId": "b15a1f9d-ccb3-4868-9bd8-71bbeb573bce",
+          "endpoint": {
+            "nodeId": "R1",
+            "instanceId": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+            "host": "127.0.0.1",
+            "controlPort": 52669,
+            "dataPort": 40845,
+            "role": "RELAY"
+          }
+        },
+        "R2": {
+          "nodeId": "R2",
+          "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+          "connectionId": "85b2a8d6-c77c-43df-9529-f0139a757ee6",
+          "endpoint": {
+            "nodeId": "R2",
+            "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+            "host": "127.0.0.1",
+            "controlPort": 44161,
+            "dataPort": 44063,
+            "role": "RELAY"
+          }
+        }
+      },
+      "candidates": [
+        {
+          "nodeId": "C",
+          "state": "AVAILABLE",
+          "endpoint": {
+            "nodeId": "C",
+            "host": "127.0.0.1",
+            "controlPort": 54351,
+            "dataPort": 41361,
+            "role": "CLIENT"
+          },
+          "sources": [
+            {
+              "source": {
+                "nodeId": "R2",
+                "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+                "connectionId": "85b2a8d6-c77c-43df-9529-f0139a757ee6",
+                "helloRequestId": "421a87b1-8cee-404c-9102-cc6d7c729066"
+              },
+              "generation": 1,
+              "advertised": {
+                "nodeId": "C",
+                "host": "127.0.0.1",
+                "controlPort": 54351,
+                "dataPort": 41361,
+                "role": "CLIENT"
+              },
+              "observedInstance": "f656ec28-4c37-4240-9245-45d731dab84b",
+              "queryStartedNanos": 45067248284804,
+              "learnedNanos": 45067267524350,
+              "ttlNanos": 60000000000
+            }
+          ]
+        }
+      ],
+      "recovery": {
+        "phase": "ACTIVE",
+        "reason": "SATISFIED",
+        "activeCount": 2,
+        "candidate": null,
+        "retryDelayMillis": 0
+      },
+      "failure": null
+    }
+  },
+  "R1": {
+    "kind": "state",
+    "node": "R1",
+    "pid": 793962,
+    "instance": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+    "token": "5328a67867494fa99150da94b4ab040f",
+    "nano": 45067301458342,
+    "payload": {
+      "request": "16e11fa269e54e52a4dd50615b1a9254",
+      "dropped": 0,
+      "sessions": {
+        "C": {
+          "nodeId": "C",
+          "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+          "connectionId": "9ab004a8-eb3e-4815-9da0-6514e7cf0394",
+          "endpoint": {
+            "nodeId": "C",
+            "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+            "host": "127.0.0.1",
+            "controlPort": 54351,
+            "dataPort": 41361,
+            "role": "CLIENT"
+          }
+        },
+        "S": {
+          "nodeId": "S",
+          "instanceId": "6b50e135-bef4-43c1-99f5-183329dd8129",
+          "connectionId": "9c4df2ff-9431-4cdd-b7f3-88eb12778b06",
+          "endpoint": {
+            "nodeId": "S",
+            "instanceId": "6b50e135-bef4-43c1-99f5-183329dd8129",
+            "host": "127.0.0.1",
+            "controlPort": 53145,
+            "dataPort": 41941,
+            "role": "SERVER"
+          }
+        }
+      },
+      "candidates": [
+        {
+          "nodeId": "R2",
+          "state": "AVAILABLE",
+          "endpoint": {
+            "nodeId": "R2",
+            "host": "127.0.0.1",
+            "controlPort": 44161,
+            "dataPort": 44063,
+            "role": "RELAY"
+          },
+          "sources": [
+            {
+              "source": {
+                "nodeId": "C",
+                "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+                "connectionId": "9ab004a8-eb3e-4815-9da0-6514e7cf0394",
+                "helloRequestId": "f1aa64c6-560e-4dc8-9030-c8453c8203ed"
+              },
+              "generation": 1,
+              "advertised": {
+                "nodeId": "R2",
+                "host": "127.0.0.1",
+                "controlPort": 44161,
+                "dataPort": 44063,
+                "role": "RELAY"
+              },
+              "observedInstance": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+              "queryStartedNanos": 45067255621212,
+              "learnedNanos": 45067277541244,
+              "ttlNanos": 60000000000
+            }
+          ]
+        }
+      ],
+      "recovery": {
+        "phase": "ACTIVE",
+        "reason": "SATISFIED",
+        "activeCount": 2,
+        "candidate": null,
+        "retryDelayMillis": 0
+      },
+      "failure": null
+    }
+  },
+  "R2": {
+    "kind": "state",
+    "node": "R2",
+    "pid": 793967,
+    "instance": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+    "token": "5328a67867494fa99150da94b4ab040f",
+    "nano": 45067309197698,
+    "payload": {
+      "request": "9f874239173b47a09ba6c73d89ca8b7c",
+      "dropped": 0,
+      "sessions": {
+        "C": {
+          "nodeId": "C",
+          "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+          "connectionId": "cc7a9e86-cd93-4145-a801-d4c0e309e15b",
+          "endpoint": {
+            "nodeId": "C",
+            "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+            "host": "127.0.0.1",
+            "controlPort": 54351,
+            "dataPort": 41361,
+            "role": "CLIENT"
+          }
+        },
+        "S": {
+          "nodeId": "S",
+          "instanceId": "6b50e135-bef4-43c1-99f5-183329dd8129",
+          "connectionId": "cc3e83ae-e83f-49f5-8c7f-0905cb21edb9",
+          "endpoint": {
+            "nodeId": "S",
+            "instanceId": "6b50e135-bef4-43c1-99f5-183329dd8129",
+            "host": "127.0.0.1",
+            "controlPort": 53145,
+            "dataPort": 41941,
+            "role": "SERVER"
+          }
+        }
+      },
+      "candidates": [
+        {
+          "nodeId": "R1",
+          "state": "AVAILABLE",
+          "endpoint": {
+            "nodeId": "R1",
+            "host": "127.0.0.1",
+            "controlPort": 52669,
+            "dataPort": 40845,
+            "role": "RELAY"
+          },
+          "sources": [
+            {
+              "source": {
+                "nodeId": "C",
+                "instanceId": "f656ec28-4c37-4240-9245-45d731dab84b",
+                "connectionId": "cc7a9e86-cd93-4145-a801-d4c0e309e15b",
+                "helloRequestId": "0b143a1a-3df3-4a0a-9610-7068b350b845"
+              },
+              "generation": 1,
+              "advertised": {
+                "nodeId": "R1",
+                "host": "127.0.0.1",
+                "controlPort": 52669,
+                "dataPort": 40845,
+                "role": "RELAY"
+              },
+              "observedInstance": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+              "queryStartedNanos": 45067243879300,
+              "learnedNanos": 45067264554113,
+              "ttlNanos": 60000000000
+            }
+          ]
+        }
+      ],
+      "recovery": {
+        "phase": "ACTIVE",
+        "reason": "SATISFIED",
+        "activeCount": 2,
+        "candidate": null,
+        "retryDelayMillis": 0
+      },
+      "failure": null
+    }
+  },
+  "C": {
+    "kind": "state",
+    "node": "C",
+    "pid": 793969,
+    "instance": "f656ec28-4c37-4240-9245-45d731dab84b",
+    "token": "5328a67867494fa99150da94b4ab040f",
+    "nano": 45067314757026,
+    "payload": {
+      "request": "275a4586494e4a3b8625a8e31f7ba0f1",
+      "dropped": 0,
+      "sessions": {
+        "R1": {
+          "nodeId": "R1",
+          "instanceId": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+          "connectionId": "7eebd962-a043-4c06-93f4-eba61d0ba47a",
+          "endpoint": {
+            "nodeId": "R1",
+            "instanceId": "630d1d3f-f98c-4e19-aec3-26cb0ff82d5c",
+            "host": "127.0.0.1",
+            "controlPort": 52669,
+            "dataPort": 40845,
+            "role": "RELAY"
+          }
+        },
+        "R2": {
+          "nodeId": "R2",
+          "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+          "connectionId": "a204dcd4-411a-471d-9e2f-869bc7f2b7e3",
+          "endpoint": {
+            "nodeId": "R2",
+            "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+            "host": "127.0.0.1",
+            "controlPort": 44161,
+            "dataPort": 44063,
+            "role": "RELAY"
+          }
+        }
+      },
+      "candidates": [
+        {
+          "nodeId": "S",
+          "state": "AVAILABLE",
+          "endpoint": {
+            "nodeId": "S",
+            "host": "127.0.0.1",
+            "controlPort": 53145,
+            "dataPort": 41941,
+            "role": "SERVER"
+          },
+          "sources": [
+            {
+              "source": {
+                "nodeId": "R2",
+                "instanceId": "827323d9-9676-449e-a0dc-41d1a7fb6a6a",
+                "connectionId": "a204dcd4-411a-471d-9e2f-869bc7f2b7e3",
+                "helloRequestId": "0b143a1a-3df3-4a0a-9610-7068b350b845"
+              },
+              "generation": 1,
+              "advertised": {
+                "nodeId": "S",
+                "host": "127.0.0.1",
+                "controlPort": 53145,
+                "dataPort": 41941,
+                "role": "SERVER"
+              },
+              "observedInstance": "6b50e135-bef4-43c1-99f5-183329dd8129",
+              "queryStartedNanos": 45067241835529,
+              "learnedNanos": 45067264266441,
+              "ttlNanos": 60000000000
+            }
+          ]
+        }
+      ],
+      "recovery": {
+        "phase": "ACTIVE",
+        "reason": "SATISFIED",
+        "activeCount": 2,
+        "candidate": null,
+        "retryDelayMillis": 0
+      },
+      "failure": null
+    }
+  }
+}

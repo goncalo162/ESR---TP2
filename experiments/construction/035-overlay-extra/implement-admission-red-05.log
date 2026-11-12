@@ -1,0 +1,85 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=OverlayRecoveryTest", "test"]
+STARTED=2026-11-11T23:42:12.194050+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 39 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 137 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 13 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[ERROR] Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.092 s <<< FAILURE! -- in pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[ERROR] pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D05_healthyDestinationPreservesExistingSessionAndDoesNotRequireReciprocalCache -- Time elapsed: 0.075 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D05_healthyDestinationPreservesExistingSessionAndDoesNotRequireReciprocalCache(OverlayRecoveryTest.java:27)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D05_greaterIsolatedPeerCompletesOnSameConnectionWithoutReturnDial -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D05_greaterIsolatedPeerCompletesOnSameConnectionWithoutReturnDial(OverlayRecoveryTest.java:18)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   OverlayRecoveryTest.D05_greaterIsolatedPeerCompletesOnSameConnectionWithoutReturnDial:18 expected: <true> but was: <false>
+[ERROR]   OverlayRecoveryTest.D05_healthyDestinationPreservesExistingSessionAndDoesNotRequireReciprocalCache:27 expected: <true> but was: <false>
+[INFO] 
+[ERROR] Tests run: 2, Failures: 2, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.505 s
+[INFO] Finished at: 2026-11-11T23:42:16Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

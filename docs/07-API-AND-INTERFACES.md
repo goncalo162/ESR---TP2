@@ -2,14 +2,11 @@
 
 > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
 
-**Contrato aprovado em ADR-034: controlo TCP uniforme v2. Implement em revisão.**
-Aplica-se a bootstrap, handshake, mensagens normais e descoberta, com um único
-contrato/codec operacional, sem runtime v1/fallback. Mesmo programa/versão de
-JAR em todos os processos. [ADR-034 Aceite](../add.md#adr-034) e
-[Design](../memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md)
-foram aprovados; o código foi migrado e tem testes incrementais registados no
-walkthrough. O JAR histórico/execuções anteriores não são validação v2; clean
-verify e manual da etapa Test continuam pendentes.
+**Contrato aprovado ADR-034/035: controlo TCP uniforme v2,19 tipos e capacidades3.**
+IMP-034 está integrado; IMP-035 está implementado para revisão antes de Test.
+Bootstrap, handshake, mensagens normais e descoberta usam o mesmo codec, sem
+runtime v1/fallback. Mesmo programa/versão de JAR em todos os processos.
+A regressão completa/manual humano desta versão continuam pendentes.
 
 [Contrato e fixtures v1 arquivados](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada).
 Bootstrap mantém só consulta do grafo imutável inicial, sem membership,
@@ -107,7 +104,7 @@ StreamInfo na rede: streamId UUID, serverId string, title string, codec u8 (1=MJ
 
 MessageCodec.encode(ControlMessage) devolve os bytes de exatamente um frame; decode(byte[]) exige exatamente um frame e rejeita bytes adicionais. write(message, OutputStream) valida/serializa antes de escrever no destino; read(InputStream) lê um frame completo e devolve Optional.empty apenas perante EOF limpo antes do prefixo. EOF a meio do prefixo/corpo é EOFException; campos incompletos num corpo já recebido são ProtocolException INVALID_MESSAGE. Comprimento superior ao máximo, incluindo u32 com bit de sinal, é rejeitado antes da alocação do corpo. Strings e listas também verificam máximos antes de alocar.
 
-ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem 18 tipos ativos (1,2,4..19) e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
+ControlMessage contém envelope, payloads tipados/imutáveis e Endpoint/StreamInfo do contrato. NeighborList(List<Endpoint>) é o payload de REGISTER_OK e não tem leaseMs. MessageType tem19 tipos ativos (1,2,4..20) e não inclui renovação de registo; o código 3 é rejeitado como INVALID_MESSAGE. MessageType e ErrorCode usam números explícitos; ProtocolException expõe errorCode sem enviar resposta nem fechar a conexão. Versão desconhecida é UNSUPPORTED_VERSION, formato/domínio incorreto é INVALID_MESSAGE e limites de tamanho excedidos são RESOURCE_LIMIT. Payload incompatível com o tipo também é rejeitado.
 
 O chamador gere flush/close e o único escritor por conexão. O codec não abre sockets. UUID são opacos e preservam todos os bits; a exceção de Endpoint.instanceId desconhecido aplica-se apenas a REGISTER_OK. u32 aceita 0..4294967295 e é exposto como long. Listas vazias, TTL zero ou percursos repetidos podem ter representação sintática; os handlers têm de verificar a validade operacional, origem/prefixo, ciclos, frescura e leases antes de agir. Host no Endpoint tem validação de domínio ASCII/comprimento; o handshake terá de o comparar com a configuração autorizada.
 
@@ -149,8 +146,8 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 2 | REGISTER_OK | apenas lista Endpoint dos vizinhos configurados, todos com instanceId zero; sem lease ou disponibilidade |
 | 3 | Retirado/reservado | rejeitar como INVALID_MESSAGE; não implementar renovação de registo |
 | 4 | NODE_LEAVE | reason u8 (0 normal, 1 erro); notifica exclusivamente vizinhos diretos, nunca bootstrap |
-| 5 | HELLO | Endpoint local + supportedMask u32 + requiredMask u32, ambos 1; identidade/endpoint/grafo/instância/iniciador validados |
-| 6 | HELLO_OK | selectedMask u32=1; confirma o contrato obrigatório após as barreiras de handshake/flush |
+| 5 | HELLO | Endpoint local + supportedMask u32 + requiredMask u32, ambos3; identidade/endpoint/grafo/instância/iniciador validados |
+| 6 | HELLO_OK | selectedMask u32=3; confirma o contrato obrigatório após as barreiras de handshake/flush |
 | 7 | PROBE_PING | probeId i64 |
 | 8 | PROBE_PONG | probeId i64, eco da sonda; RTT calculado com relógio local |
 | 9 | STREAM_ANNOUNCE | StreamInfo, announceSeq i64, costMicros i64, path lista nodeId; path termina no sender |
@@ -164,10 +161,11 @@ Os números são fixados por este contrato. Campos do envelope não são repetid
 | 17 | ERROR | code u16, relatedType u8, detail string; correlacionado por requestId |
 | 18 | DISCOVERY_QUERY | helloRequestId UUID, recipientId string, recipientInstance UUID; só sessão ACTIVE_DISCOVERY |
 | 19 | DISCOVERY_SNAPSHOT | campos da QUERY + generation u64 positiva + count u16 (0..63) e endpoints diretos; cap extra 32768 |
+| 20 | REPAIR_HELLO | payload Hello comum, máscaras3; admissão reparadora cooperativa ADR-035, mesma conexão/ACK6 |
 
 Bootstrap usa uma conexão TCP curta **v2** por consulta inicial: REGISTER → REGISTER_OK ou ERROR, seguido de fecho após envio completo. O requerente usa os endpoints configurados devolvidos para falar diretamente com os vizinhos. Falhas antes de obter resposta permitem retry limitado por tentativa; depois do sucesso não existem renovação, consultas periódicas, heartbeats ou NODE_LEAVE para bootstrap. Consultas repetidas não alteram a configuração; IDs duplicados/instâncias e saídas são geridos entre vizinhos. O handler de bootstrap só aceita REGISTER e responde da configuração, mesmo que os vizinhos estejam offline. O codec comum pode representar outras mensagens; isso não autoriza o handler de bootstrap a processá-las como operações suas.
 
-O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede as mensagens de aplicação e descoberta; 3 continua retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite 1, 2 e 4–19, sempre version=2; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
+O transporte de vizinhos mantém conexão full-duplex persistente. Handshake precede as mensagens de aplicação e descoberta; 3 continua retirado. TYPE desconhecido ou versão diferente fecha ligação após ERROR se for seguro responder. TYPE do envelope só admite1,2 e4–20, sempre version=2; relatedType no payload ERROR é o octeto bruto do tipo que falhou, podendo conter um valor desconhecido. reason em NODE_LEAVE só admite 0/1 e code em ERROR só admite 1–12. Um decoder rejeita formato, limites e valores enumerados inválidos; autorização do vizinho, correspondência HELLO/envelope, frescura, caminhos e subscrições são verificações de contexto nos componentes responsáveis. Uma fixture rejeitada não obriga a enviar ERROR quando o envelope não é seguro para resposta.
 
 STREAM_ANNOUNCE de uma fonte tem path=[serverId], custo=0 e sequência estritamente crescente por stream/epoch. Cada relay publica o seu path e custo acumulado; o recetor acrescenta-se antes de guardar/reenviar. Epoch muda a cada arranque do SERVER e coincide com sessionId dos datagramas. Ao ver nova época confirmada por anúncios de caminhos válidos, retirar a antiga até expirar o horizonte; não aceitar regresso a uma época retirada por anúncio atrasado.
 
@@ -436,7 +434,7 @@ estão aprovados. OTD1 e a mistura TCP v1/v2 são históricos, arquivados.
 Implement pronto para revisão, sem autorização inferida para Test/fecho.
 
 Todo o TCP é v2: bootstrap REGISTER/REGISTER_OK/ERROR, handshake, mensagens
-normais e descoberta. Um enum MessageType, 18 tipos explícitos (1,2,4..19),
+normais e descoberta. Um enum MessageType, 19 tipos explícitos (1,2,4..20),
 código 3 rejeitado. Um ControlMessage, um MessageCodec, um parser de framing/
 strings/UUIDs/endpoints/buffer; mesmas APIs encode/decode/read/write agora v2.
 Não criar ControlFrame, CodecPolicy, FrameListener, decoder legado ou fallback.
@@ -450,8 +448,8 @@ instâncias zero em REGISTER_OK e resposta completa antes de EOF, sem operaçõe
 de descoberta extra. A migração não altera a política do bootstrap (ADR-013/015).
 
 Framing u32/body 37..65536, UTF-8 estrito e hard caps preservados. HELLO contém
-Endpoint + supportedMask/requiredMask u32, ambos 1, bits reservados zero;
-HELLO_OK selectedMask u32=1. Corpo HELLO 72..386 e ACK 41..72. Todos os nós
+HELLO5/REPAIR_HELLO20: Endpoint + supportedMask/requiredMask u32, ambos3, bits reservados zero;
+HELLO_OK selectedMask u32=3. Corpo HELLO 72..386 e ACK 41..72. Todos os nós
 overlay exigem esta capacidade, versão/identidade/endpoint/grafo/instância/
 requestId/iniciador/flush válidos antes de NeighborUp. Não há modo base.
 
@@ -507,3 +505,40 @@ Owner serial partilhado, callbacks curtos, filas/timers físicos limitados e
 shutdown global com prazo, sem liberar recursos pela mera conclusão de future.
 UDP OTT1/version 1 de vídeo mantém bytes/caps e as 16 fixtures. IMP-034 aprende;
 IMP-035 repara após falhas, com checkpoint próprio; routing/vídeo continuam depois.
+
+
+<a id="extra-01-recovery-proposed"></a>
+## EXTRA-01 B — reparação direta aprovada, Implement para revisão
+
+ADR-035 Aceite por aprovação explícita registada em 2026-11-11T23:39:43Z;
+G-EXTRA-ADR satisfeito para IMP-035. [Design](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md),
+[ADR](../add.md#adr-035), [âmbito21](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md)
+e [walkthrough](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
+
+O isolado inicia REPAIR_HELLO20 com payload Hello existente e qualquer ordem
+nodeId. Destino cooperativo responde HELLO_OK6 no mesmo TCP sem cache recíproca.
+Origem verifica cache/proveniência/TTL; destino valida identidade/endpoints/caps/
+colisões/limites sem comprovar aprendizagem remota. HELLO5 conserva grafo e menor
+iniciador. Só saídas pendentes sobrepostas elegem menor originator; ACTIVE é
+preservada. Losers continuam cobrados até terminação física; barreira UNCLASSIFIED
+não infere direção de opened antes da associação do dial.
+
+Codec/versão2 comum, 19 tipos1/2/4..20, código3 rejeitado, máscaras3 obrigatórias
+em5/20/6 sem fallback. Framing37..65536; corpo20 de72..386 e6 de41..72.
+Snapshot19, cache,TTL e UDP OTT1 não mudam. 78 fixtures operacionais62TCP+16UDP;
+quatro masks migradas,46TCP anteriores preservadas,12 novas independentes.
+Nenhum contrato de JAR antigo é suportado operacionalmente.
+
+20/6/ERROR usam FIFO/sendAndFlush normal; quotas/tickets extra só18/19. C≤64,
+grau≤min(C,63), dinâmica≤min(C,16), admissões20 pendentes≤2, saída autónoma≤1.
+Seleção só com zeroACTIVE, tick comum100ms, orçamento10s limitado ao TTL original,
+DNS/dial com prazos separados e backoff existente. Shutdown usa prazo global.
+
+ERROR mantém requestId/relatedType5/20/6 e identidade da sessão. D07e preservado
+em sessões configuradas/reparadas: token/query/geração antigos não terminam query
+nem provocam Down ou alteram cache/TTL. Aresta nova só é anunciada após Up.
+RepairStarted regista record imutável de proveniência por seleção admitida;
+recoveryStatus() é vista limitada, CLI recovery imprime uma linha limitada.
+
+A implementação e fixtures foram exercitadas incrementalmente; ainda faltam
+Test com clean verify, manual humano com mortes reais, revisão final e integração.

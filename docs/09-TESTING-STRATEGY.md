@@ -348,6 +348,10 @@ Estado: NÃO EXECUTADO. [Model](../memory-bank/bolts/034-overlay-extra/ddd-01-do
 V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
 
 Estado: NÃO EXECUTADO. [Bolt](../memory-bank/bolts/035-overlay-extra/bolt.md).
+[Model/M01–M18 propostos](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
+Q-C-20: zero ACTIVE inicia reparação; perder um vizinho mantendo alternativa
+não cria aresta nova. Repetição com processos mortos abruptamente é distinta
+de close/EOF em nós embutidos. Obrigatório TCP v2/descoberta, gate próprio pendente.
 A prova de vídeo por S–C ou S–R1–C segue a integração com routing/streaming.
 
 ### V-033 — Design e evidência ainda pendente
@@ -423,3 +427,39 @@ continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento 
 peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
 IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
 Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## IMP-035 — Design de V-034 proposto
+
+Registo de 2026-11-11T22:41:27Z. [D01–D24](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
+mapeiam M01–M18: permissões anteriores às falhas, intenção unilateral/promoção/
+retorno, concorrência, limites, cache/TTL/D07e, FIFO/terminated, CLI e SIGKILL.
+Proposta de24 fixtures novas/sete migradas, total alvo90; nenhuma criada ou
+executada nesta etapa. V-ADD atual continua a validar as66 integradas.
+V-034/Maven/manual não executados; Model aprovado não satisfaz G-EXTRA-ADR/
+âmbito/contratos da futuraADR-035. Parar em Design para revisão.
+
+## IMP-035 — revisão simplificada dos oráculos de V-034
+
+Registo de 2026-11-11T23:17:55Z. A primeira proposta D01–D24/permissões/retorno não foi
+aprovada. [Design revisto/D01–D20](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
+prova reparação direta20/6 em ambos os sentidos de IDs, eleição de saídas
+concorrentes antes deACTIVE, preservação deACTIVE e callbacks do perdedor.
+Quatro fixtures de máscara migradas/12 novas, alvo78; snapshots e16UDP intactos.
+Admissão cooperativa não comprova aprendizagem remotamente; testar essa política
+sem alegar autenticação. Oráculos/V-034/Java pendentes; V-ADD atual valida66.
+
+## IMP-035 — handoff da revisão ADR
+
+Registo de 2026-11-11T23:28:20Z. Design/D01–D20/M01–M18 e âmbito21 aprovados;
+[revisão ADR](../memory-bank/bolts/035-overlay-extra/adr-review.md) exige correlacionar
+ERROR5/20, preservar barreira de dials/UNCLASSIFIED, PairSlot/ACTIVE e timers/
+reservas. Alvo78 fixtures (quatro máscaras migradas,12 novas); atuais66 intactas.
+Formalizar ADR-035 Proposta não executa Java/V-034/regressão/manual. Manual
+humano com mortes reais, revisão final e integração continuam exigidos.
+
+## IMP-035 — fronteira das provas de Implement
+
+Os [D01–D20](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md)
+são mapeados para testes incrementais e pendências explícitas. Fecho de nós
+embutidos com TCP real não substitui SIGKILL de processos sobreviventes reais.
+V-034 completo/regressão/manual humano pertencem a Test, ainda não iniciado.

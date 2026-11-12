@@ -231,8 +231,8 @@ class BootstrapServerTest {
         }
     }
 
-    @Test void coreAllSeventeenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
-        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route", "discovery-query", "discovery-snapshot");
+    @Test void coreAllEighteenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
+        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route", "discovery-query", "discovery-snapshot", "repair-hello-min");
         var seen = new java.util.HashSet<MessageType>();
         try (var rig = new Rig(configuration())) {
             for (var name : names) {
@@ -246,7 +246,7 @@ class BootstrapServerTest {
                 }
                 seen.add(m.type());
             }
-            assertEquals(17, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
+            assertEquals(18, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
         }
     }
 

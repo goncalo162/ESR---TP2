@@ -1,0 +1,16 @@
+STARTED node=N1 role=RELAY pid=761956
+READY node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 Diagnostic[phase=READY, reason=REQUIRED_DISCOVERY_MISSING, attemptId=Optional[8e52ba07-55f2-4e43-ac89-a4d14bf9d4de], connectionId=Optional[5fedc414-801f-42e9-848b-ace1723e34cb], session=Optional.empty, remoteMessage=Optional[ControlMessage[version=2, type=HELLO_OK, requestId=a1d8bb76-f6b3-4ff3-a80e-26a5852839e8, senderId=N2, senderInstance=1b703d67-a72f-4cc7-a1f8-bc77670faff7, payload=HelloOk[selectedMask=0]]]]
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 NeighborUp[session=Session[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, connectionId=a7c4673b-e8c6-4e3c-b897-876600f54618, endpoint=Endpoint[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, host=127.0.0.1, controlPort=38603, dataPort=43799, role=SERVER]]]
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 Diagnostic[phase=READY, reason=DISCOVERY_CACHE_REJECTION, attemptId=Optional.empty, connectionId=Optional.empty, session=Optional.empty, remoteMessage=Optional.empty]
+NEIGHBORS node=N1 role=RELAY count=2
+NEIGHBOR node=N0 state=ACTIVE session=Optional[Session[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, connectionId=a7c4673b-e8c6-4e3c-b897-876600f54618, endpoint=Endpoint[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, host=127.0.0.1, controlPort=38603, dataPort=43799, role=SERVER]]]
+NEIGHBOR node=N2 state=CONNECTING session=Optional.empty
+RECOVERY node=N1 RecoveryStatus[phase=ACTIVE, reason=SATISFIED, activeCount=1, candidate=Optional.empty, retryDelayMillis=0]
+NEIGHBORS node=N1 role=RELAY count=2
+NEIGHBOR node=N0 state=ACTIVE session=Optional[Session[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, connectionId=a7c4673b-e8c6-4e3c-b897-876600f54618, endpoint=Endpoint[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, host=127.0.0.1, controlPort=38603, dataPort=43799, role=SERVER]]]
+NEIGHBOR node=N2 state=CONNECTING session=Optional.empty
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 Diagnostic[phase=READY, reason=SHUTDOWN, attemptId=Optional[93222aaa-2230-4503-b82e-288f5f63afc9], connectionId=Optional[f4c326d5-076a-4577-bc63-95eedfbaee7b], session=Optional.empty, remoteMessage=Optional.empty]
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 Diagnostic[phase=CLOSED, reason=SHUTDOWN, attemptId=Optional.empty, connectionId=Optional[a7c4673b-e8c6-4e3c-b897-876600f54618], session=Optional[Session[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, connectionId=a7c4673b-e8c6-4e3c-b897-876600f54618, endpoint=Endpoint[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, host=127.0.0.1, controlPort=38603, dataPort=43799, role=SERVER]]], remoteMessage=Optional.empty]
+EVENT node=N1 instance=1180bb31-395b-4c19-8026-948c6b6d51c7 NeighborDown[session=Session[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, connectionId=a7c4673b-e8c6-4e3c-b897-876600f54618, endpoint=Endpoint[nodeId=N0, instanceId=97562746-7540-4ddf-bc1d-12615e947c03, host=127.0.0.1, controlPort=38603, dataPort=43799, role=SERVER]], reason=SHUTDOWN]
+SHUTDOWN node=N1 phase=closing-output

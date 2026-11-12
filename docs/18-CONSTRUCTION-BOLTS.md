@@ -198,3 +198,73 @@ pendentes. Bolt/história/unidade in-progress, sem DONE/commits/push/IMP-035.
 ## IMP-034 — fecho integrado
 
 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
+
+## IMP-035 — Model para revisão
+
+Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
+Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
+Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
+possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
+[Model e M01–M18 propostos](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
+de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
+Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
+Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+
+## IMP-035 — Model aprovado; Design para revisão
+
+Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
+pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
+[Design proposto/Q-C-21](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
+permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
+D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
+integrado/206 hashes de Projeto/JAR continuam intactos.
+Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
+V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+
+## IMP-035 — Design direto simplificado para revisão
+
+Registo de 2026-11-11T23:17:55Z. Revisão pedida pelo utilizador: isolado inicia e completa
+na mesma ligação mesmo com ID maior, sem retorno. [Design/Q-C-22](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
+propõe um tipo20/ACK6, admissão cooperativa sem permissões/registry e eleição
+do menor originator só entre saídas pendentes; ACTIVE nunca substituída.
+Âmbito8→21/ADR-035/contratos ainda propostos; versão anterior preservada nas
+evidências. Só Model concluído; nenhum Java/Maven/V-034/Implement/Test/commit/push.
+
+## IMP-035 — revisão ADR para aprovação antes de Implement
+
+Registo de 2026-11-11T23:28:20Z. Model/Design concluídos; Design revisto, Q-C-22/
+política cooperativa e21 caminhos aprovados explicitamente. [RevisãoADR](../memory-bank/bolts/035-overlay-extra/adr-review.md)
+formaliza ADR-035 Proposta e substituição parcial019/033/034, mesma ligação e
+ACTIVE preservada. APIs reais conferidas sem alteração de fontes.
+Só revisão ADR autorizada; aprovação formalADR/G-EXTRA-ADR ainda pendentes.
+V-034/regressão/manual humano com mortes reais/revisão final/integração obrigatórios.
+Sem Implement/Test/fecho/commits/push/outro IMP.
+
+## IMP-035 — Implement para revisão antes de Test
+
+Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
+explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
+[Walkthrough, mapa D01–D20 e evidência incremental](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
+Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
+ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
+Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+
+## IMP-035 — Test à espera de repetição humana
+
+Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
+JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
+CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
+parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
+incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
+integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+
+## IMP-035 — Test aprovado; integração autorizada
+
+Registo 2026-11-12T10:35:23Z. Luis aprovou Test/1113 e o manual humano20261112T102931Z-pr_nynth:
+66 CHECK_PASS/MANUAL_PASS, passed=true/no_processes_pending=true. Execução
+humana anterior preservada; nenhuma repetição. Cinco etapas concluídas.
+[Resumo para revisão humana final](<../memory-bank/bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
+revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
+continuam in-progress, sem implemented=true/DONE ou início de005-rotas.

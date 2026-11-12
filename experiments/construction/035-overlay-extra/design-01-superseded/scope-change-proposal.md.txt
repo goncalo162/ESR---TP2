@@ -1,0 +1,65 @@
+---
+stage: design
+bolt: "035-overlay-extra"
+status: "proposed-not-authorized-for-code"
+---
+# IMP-035 — proposta de âmbito 8 → 30 caminhos
+
+Os oito caminhos do [ADD](../../../add.md#imp-035) continuam autorizados.
+Esta proposta acompanha o [Design](ddd-02-technical-design.md): não permite
+alterar Java/recursos ou considerar ADR-035 Aceite. A revisão ADR deve confirmar
+APIs reais e aprovar qualquer substituição antes de Implement. Nenhuma nova
+dependência, configuração, porta, pipeline ou IMP é acrescentada.
+
+## Caminhos existentes
+
+1. overlay/OverlayRecovery.java — política de isolamento/intenção/admissão/registry.
+2. overlay/NeighborManager.java — contexto provisório/promoção/retorno, dials/HELLO existentes.
+3. overlay/OverlayNode.java — composição/owner/lifecycle/snapshot de recuperação.
+4. app/OttApplication.java — comando recovery e preservação de neighbors/quit/EOF.
+5. overlay/OverlayRecoveryTest.java — D01–D24 lógicos e integração correspondente.
+6. overlay/NeighborManagerTest.java — admissão/unicidade/callbacks e migração justificada.
+7. app/OttApplicationTest.java — CLI real, resultado limitado e shutdown.
+8. experiments/overlay-recovery/ — manual de processos/SIGKILL e evidência separada.
+
+## Ampliação proposta
+
+9. overlay/NeighborDiscovery.java — emissão/receção GRANT, prova em anúncio e tick comum.
+10. overlay/CandidateCache.java — prova opcional no claim sem mudar TTL/proveniência/caps.
+11. overlay/NeighborDiscoveryTest.java — provas/gerações, sem enfraquecer D07e.
+12. overlay/CandidateCacheTest.java — retention/conflicts/expiry e prova opcional.
+13. protocol/RepairMessage.java — quatro payloads imutáveis/enums de códigos explícitos.
+14. protocol/DiscoveryMessage.java — prova opcional por Endpoint no SNAPSHOT.
+15. protocol/DiscoveryCodec.java — validação payload/flag/prova no codec comum.
+16. protocol/MessageType.java — 20..23, preservando códigos anteriores e 3 rejeitado.
+17. protocol/ControlMessage.java — sealed Payload e validação de modelos novos.
+18. protocol/MessageCodec.java — mesmo parser, wire/caps/classificação dos novos campos/tipos.
+19. protocol/MessageCodecTest.java — 22 tipos e comparação com vetores independentes.
+20. protocol/DiscoveryCodecTest.java — SNAPSHOT/provas e garantias de erro antigas.
+21. protocol/RepairMessageTest.java — payloads/fronteiras/negativos dos novos tipos.
+22. transport/Connection.java — terminated aditivo e admissão extra de 20..23 na FIFO.
+23. transport/Transport.java — terminação física antes da publicação e quatro tickets comuns.
+24. transport/TransportTest.java — FIFO/Q2/quotas/futures/physical termination preservados.
+25. overlay/NeighborManagerLifecycleTest.java — shutdown com provisório/retorno pendente.
+26. bootstrap/BootstrapServerTest.java — novos tipos continuam pedidos inválidos no bootstrap.
+27. Projeto/src/test/resources/protocol/ — 24 vetores novos e sete migrados, sem tocar 16 UDP.
+28. scripts/validate-planning.py — validar catálogo operacional revisto, referências e garantias.
+29. Projeto/README.md — mesmo JAR, roteiro/control CLI e limites reais.
+30. Projeto/docs/protocolos.md — contrato revisto e estado operacional depois de executado.
+
+Os caminhos Java abreviados seguem os pacotes main/test pt/uminho/esr/ott já
+usados pelo ADD. Ficheiros documentais de Model/Design/ADR/índices/questões e
+experiments/construction/035-overlay-extra/ são documentação de construção.
+Não alterar POM/configuração de runtime ou BootstrapServer para contornar falha:
+se a revisão técnica exigir outro caminho, apresentar a nova divergência/âmbito.
+
+## Superfícies de contrato para revisão ADR
+
+- ADR-019: autorização fora do grafo por admissão limitada, preservando menor ID.
+- ADR-033 residual: permissão verificável do destino, intenção unilateral e registry.
+- ADR-034: 18→22 tipos, máscaras obrigatórias3, SNAPSHOT com prova, canal provisório e quota extra comum.
+- ADR-012/014/015/017/020: parser/limites/flush/owner/isolamento e observação física,
+  sem substituir as garantias. UDP, bootstrap inicial e tipo 3 permanecem.
+
+Não tratar a proposta como alargamento aceite. G-EXTRA-ADR próprio de IMP-035
+continua pendente até aprovação explícita de Design/contratos/ADR/âmbito.

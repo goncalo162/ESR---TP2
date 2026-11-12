@@ -1,0 +1,2059 @@
+diff --git a/Projeto/README.md b/Projeto/README.md
+index c33fbaa..633ccaf 100644
+--- a/Projeto/README.md
++++ b/Projeto/README.md
+@@ -6,7 +6,7 @@ TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/202
+ 
+ A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
+ 
+-IMP-034 aprende/retém candidatos; criar ligações novas após falhas pertence ao IMP-035, ainda não iniciado. Routing, streaming e demonstração de continuidade de vídeo permanecem nos seus incrementos. O clean verify atual passou 1065 testes e o manual do agente passou 53 checks. Luis repetiu pessoalmente o manual: 53 checks e saída 0. Test aceite e revisão técnica concluída; integração local concluída.
++IMP-035 está em Implement para revisão: aprende antes das falhas e tenta reparar quando fica sem vizinhos ACTIVE, criando a ligação direta na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3) em todos os nós. Os testes incrementais passaram368 casos em dez classes (incluindo9 de cache) na execução final. A regressão1065/manual53 checks pertence ao IMP-034 histórico, não à versão agora modificada. Clean verify completo, manual humano com mortes reais, revisão final e integração do IMP-035 continuam pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
+ 
+ ## Compilar e testar
+ 
+@@ -24,7 +24,7 @@ Os testes TCP/CLI precisam de permissão para sockets locais e criação de JVM.
+ Testes selecionados do incremento:
+ 
+ ```sh
+-mvn -B -ntp -Dtest=MessageCodecTest,DiscoveryCodecTest,NeighborDiscoveryTest,CandidateCacheTest test
++mvn -B -ntp -Dtest=MessageCodecTest,DiscoveryCodecTest,NeighborDiscoveryTest,CandidateCacheTest,OverlayRecoveryTest test
+ mvn -B -ntp -Dtest=TransportTest,BootstrapServerTest,NeighborManagerTest,NeighborManagerLifecycleTest,OttApplicationTest test
+ ```
+ 
+@@ -56,3 +56,17 @@ Não é necessária chave de ativação. extra.discovery.enabled=true é apenas
+ - [Progresso](../docs/15-PROJECT-PROGRESS.md) e [roteiro do incremento](../experiments/overlay-discovery/README.md).
+ 
+ UDP de vídeo conserva OTT1/version 1, cabeçalho 64, total <=1200 e payload <=1136. Testes locais não são demonstração CORE, GUI, FPS ou vídeo real.
++
++## Reparação após isolamento — checkpoint Implement
++
++Usar `neighbors` para sessões confirmadas e `recovery` para estado, motivo,
++candidato selecionado e atraso de retry. O evento `RepairStarted` identifica
++requestId/instância/sourceKey/geração/queryStarted/TTL da seleção. Não há nova
++consulta ao bootstrap depois do arranque. Um destino saudável pode aceitar o
++isolado, sem perder sessões ACTIVE. Ausência/expiração/conflito dos candidatos
++mantém isolamento explícito e tentativas limitadas.
++
++O [roteiro de mortes reais](../experiments/overlay-recovery/README.md) está
++preparado para Test; não foi executado nem substituído por close/EOF embutido.
++A evidência incremental está no
++[walkthrough](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
+diff --git a/Projeto/docs/protocolos.md b/Projeto/docs/protocolos.md
+index a634241..3a23414 100644
+--- a/Projeto/docs/protocolos.md
++++ b/Projeto/docs/protocolos.md
+@@ -17,14 +17,15 @@ u32 big-endian bodyLength, seguido do corpo completo de 37..65536 bytes. Envelop
+ | 15 / 16 | ROUTE_TRACE / TRACE_RESULT |
+ | 17 | ERROR |
+ | 18 / 19 | DISCOVERY_QUERY / DISCOVERY_SNAPSHOT |
++| 20 | REPAIR_HELLO (payload Hello comum) |
+ 
+-18 tipos com códigos explícitos; tipo 3 retirado/rejeitado. Os códigos do payload ERROR mantêm o contrato anterior (incluindo UNAUTHORIZED_NEIGHBOR=3); relatedType é o octeto bruto do tipo relacionado. Nunca responder ERROR a ERROR. O codec representar routing não significa que o serviço de routing esteja implementado.
++19 tipos com códigos explícitos; tipo 3 retirado/rejeitado. Os códigos do payload ERROR mantêm o contrato anterior (incluindo UNAUTHORIZED_NEIGHBOR=3); relatedType é o octeto bruto do tipo relacionado. Nunca responder ERROR a ERROR. O codec representar routing não significa que o serviço de routing esteja implementado.
+ 
+ ## Bootstrap e vizinhos
+ 
+ REGISTER leva Endpoint e REGISTER_OK só a lista configurada com instâncias zero, sem leases/membership. A conexão de consulta inicial v2 fecha depois de write/flush completos, com prazo. O bootstrap só admite REGISTER; depois do sucesso os nós não voltam a consultá-lo por falhas de vizinhos.
+ 
+-HELLO leva Endpoint+supportedMask u32+requiredMask u32; HELLO_OK leva selectedMask u32. Exigir supported=required=selected=1 e bits reservados zero. Validar identidade, endpoint/grafo, instância, requestId e iniciador menor nodeId, preservando unicidade e as barreiras de flush. Cada par tem um TCP persistente, uma FIFO/writer e um frame em escrita. Descoberta e mensagens normais partilham esse canal.
++HELLO leva Endpoint+supportedMask u32+requiredMask u32; HELLO_OK leva selectedMask u32. Exigir supported=required=selected=3 (DISCOVERY|REPAIR) e bits reservados zero. Validar identidade, endpoint/grafo, instância, requestId e iniciador menor nodeId, preservando unicidade e as barreiras de flush. Cada par tem um TCP persistente, uma FIFO/writer e um frame em escrita. Descoberta e mensagens normais partilham esse canal.
+ 
+ ## Aprendizagem limitada
+ 
+@@ -36,6 +37,16 @@ Anúncio completo inválido de sessão atual pode ser rejeitado atomicamente sem
+ 
+ ## UDP e arquivo
+ 
+-Vídeo mantém OTT1/version 1, cabeçalho 64, total <=1200, payload <=1136 e restantes caps. O [arquivo TCP v1](../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada) é histórico. As [fixtures operacionais](../src/test/resources/protocol/README.md) são 50 TCP v2 e 16 UDP originais; os vetores esperados são independentes do codec Java.
+-
+-IMP-034 apenas aprende/retém candidatos. IMP-035 trata reparação após falhas sob checkpoint próprio; não se alega continuidade de vídeo neste incremento.
++Vídeo mantém OTT1/version 1, cabeçalho 64, total <=1200, payload <=1136 e restantes caps. O [arquivo TCP v1](../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada) é histórico. As [fixtures operacionais](../src/test/resources/protocol/README.md) são 62 TCP v2 e 16 UDP originais; os vetores esperados são independentes do codec Java.
++
++IMP-034 aprende/retém; IMP-035 repara isolamento em Implement para revisão.
++HELLO5 mantém grafo/iniciador menor. REPAIR_HELLO20 permite qualquer iniciador
++isolado com claim válido; HELLO_OK6 termina no mesmo TCP. Menor originator só
++desempata saídas sobrepostas pendentes, nunca substitui ACTIVE. Origem revalida
++proveniência/TTL; destino cooperativo valida handshake/limites sem cache recíproca.
++20/6/ERROR usam sendAndFlush/FIFO normal, sem quota extra18/19; máscaras3 obrigatórias.
++Erro remoto só vale na correlação requestId/relatedType5/20/6 e contexto corrente.
++Dinâmicos≤min(16,C), admissões20 pendentes≤2, tentativa autónoma≤1, orçamento10s
++limitado ao TTL original, tick100ms partilhado. Recursos perdedores só libertam
++fisicamente ao terminarem. Manual SIGKILL e regressão completa ainda pendentes;
++não se alega continuidade de vídeo.
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index 9a96d7e..9052188 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -23,6 +23,7 @@ public final class OttApplication {
+     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
+     interface RunningService extends AutoCloseable {
+         Map<String, Neighbor> neighbors();
++        default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
+         void requestShutdown(int reason, Duration remainingBudget);
+         boolean awaitTermination(Duration remainingBudget);
+         default Optional<Throwable> failure() { return Optional.empty(); }
+@@ -78,7 +79,7 @@ public final class OttApplication {
+         final NodeConfiguration config;
+         try {
+             invocation = parse(arguments);
+-            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, quit"); return new ExecutionResult(0, true, true, true); }
++            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, quit"); return new ExecutionResult(0, true, true, true); }
+             config = ConfigurationLoader.load(invocation.config().orElseThrow(), invocation.role().orElseThrow());
+         } catch (ConfigurationException | IllegalArgumentException e) { error.println(bounded("CONFIG_ERROR " + e.getMessage())); return new ExecutionResult(2, true, true, true); }
+         var console = new Console(input, output, error, config, clock);
+@@ -110,6 +111,9 @@ public final class OttApplication {
+                     console.log("NEIGHBORS node=" + config.nodeId() + " role=" + config.role() + " count=" + neighbors.size(), false);
+                     neighbors.values().stream().sorted(Comparator.comparing(Neighbor::nodeId)).forEach(n ->
+                         console.log("NEIGHBOR node=" + n.nodeId() + " state=" + n.state() + " session=" + n.session(), false));
++                } else if(line.equals("recovery")) {
++                    var status=service.recoveryStatus();
++                    console.log("RECOVERY node="+config.nodeId()+" "+status.map(Object::toString).orElse("NOT_APPLICABLE"),false);
+                 } else if (line.equals("catalog") || line.equals("play") || line.startsWith("play "))
+                     console.log("NOT_IMPLEMENTED " + line.split(" ", 2)[0], false);
+                 else console.log("COMMAND_ERROR unknown command", true);
+@@ -174,6 +178,7 @@ public final class OttApplication {
+         });
+         return new RunningService() {
+             public Map<String, Neighbor> neighbors() { return node.diagnostics(); }
++            public Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.of(node.recoveryStatus());}
+             public void requestShutdown(int reason, Duration budget) { node.requestShutdown(reason, budget); }
+             public boolean awaitTermination(Duration budget) { return node.awaitTermination(budget); }
+             public Optional<Throwable> failure() { return node.failure(); }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
+index 5af7418..6f3c78e 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java
+@@ -18,6 +18,7 @@ public final class NeighborDiscovery {
+         Map<String,Neighbor.Session> active();
+         Connection.ExtensionEnqueue enqueue(Neighbor.Session session,ControlMessage message);
+         void diagnostic(Issue issue);
++        default void recoveryTick(long now) {}
+     }
+     private static final class Query {
+         final UUID id=UUID.randomUUID(); final long started;
+@@ -63,7 +64,7 @@ public final class NeighborDiscovery {
+     void start(NeighborManager.Deadlines timers) {
+         tick=timers.periodic(()->{
+             if(tickPending.compareAndSet(false,true)) {
+-                if(!host.post(()->{tickPending.set(false);if(!closed)maintain();}))tickPending.set(false);
++                if(!host.post(()->{tickPending.set(false);if(!closed){maintain();host.recoveryTick(clock.getAsLong());}}))tickPending.set(false);
+             }
+         },TICK);
+     }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+index c7001fe..cb1abd7 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+@@ -62,6 +62,7 @@ public final class NeighborManager implements AutoCloseable {
+         return shutdownView;
+     }
+     private void beginShutdown(int reason) {
++        if(recovery!=null)recovery.requestClose(0);
+         if(learner!=null)learner.close();
+         cancel(initialSlot); initialSlot = null;
+         if (discovery != null) retire(discovery);
+@@ -118,7 +119,11 @@ public final class NeighborManager implements AutoCloseable {
+         shutdownResult.complete(new ShutdownReport(attempts, notificationTimedOut));
+     }
+     public interface Observer { void onEvent(Event event); }
+-    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic {}
++    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic, RepairStarted {}
++    /** One bounded provenance event per admitted local repair operation, never a cache dump. */
++    public record RepairStarted(OverlayRecovery.RepairAttempt attempt) implements Event {
++        public RepairStarted { Objects.requireNonNull(attempt); }
++    }
+     public record NeighborUp(Neighbor.Session session) implements Event {
+         public NeighborUp { Objects.requireNonNull(session); }
+     }
+@@ -216,6 +221,9 @@ public final class NeighborManager implements AutoCloseable {
+     private volatile Map<String, Neighbor> diagnosticView = Map.of();
+     private volatile Map<String,PeerStatus> peerStatusView=Map.of();
+     private NeighborDiscovery learner;
++    private OverlayRecovery recovery;
++    private volatile OverlayRecovery.RecoveryStatus recoveryView=new OverlayRecovery.RecoveryStatus(OverlayRecovery.Phase.WAITING,OverlayRecovery.RecoveryReason.NONE,0,Optional.empty(),0);
++    public OverlayRecovery.RecoveryStatus recoveryStatus(){return recoveryView;}
+     private final Semaphore cacheCommands=new Semaphore(4);
+     private final Set<CompletableFuture<?>> commands = ConcurrentHashMap.newKeySet();
+     private final Semaphore commandSlots;
+@@ -234,18 +242,22 @@ public final class NeighborManager implements AutoCloseable {
+     private enum Direction { UNCLASSIFIED, INBOUND, OUTBOUND }
+     private static final class Peer {
+         final ControlMessage.Endpoint configured;
++        final boolean dynamic;
+         Neighbor.State state = Neighbor.State.DISCONNECTED;
+         Attempt attempt; Context context; Slot slot;
+         Neighbor.Session session; long base, delay;
+         CapabilityState capability=CapabilityState.NEGOTIATING_REQUIRED;
+         Reason currentReason=Reason.STALE,lastConfirmed;
+         int observedVersion;long supported,required,selected;
+-        Peer(ControlMessage.Endpoint endpoint) { configured = endpoint; }
++        Peer(ControlMessage.Endpoint endpoint) { this(endpoint,false); }
++        Peer(ControlMessage.Endpoint endpoint,boolean dynamic) { configured = endpoint;this.dynamic=dynamic; }
+     }
+     private static final class Attempt {
+         final UUID id = UUID.randomUUID(); final Peer peer;
+-        UUID job; boolean live = true; Context context;
+-        Attempt(Peer peer) { this.peer = peer; }
++        final OverlayRecovery.RepairAttempt repair;
++        UUID job; long connectBegan; boolean live = true; Context context;
++        Attempt(Peer peer) { this(peer,null); }
++        Attempt(Peer peer,OverlayRecovery.RepairAttempt repair) { this.peer=peer;this.repair=repair; }
+     }
+     private static final class Slot { Ticket ticket; boolean live = true; }
+     private record Frame(ControlMessage message, long observedAt) {}
+@@ -256,6 +268,7 @@ public final class NeighborManager implements AutoCloseable {
+         final ArrayDeque<Frame> frames = new ArrayDeque<>();
+         Attempt attempt; Peer peer; Slot deadline;
+         UUID request, remoteInstance; ControlMessage.Endpoint endpoint;
++        MessageType helloType=MessageType.HELLO;
+         boolean bootstrap, sent, written, acknowledged, responding, active;
+         Context(Channel channel, long at) { this.channel = channel; openedAt = at; }
+     }
+@@ -367,7 +380,8 @@ public final class NeighborManager implements AutoCloseable {
+     private long now() { return clock.getAsLong(); }
+     private long connectBudget() { return plan.config.runtime().control().connectTimeout().toNanos(); }
+     private long helloBudget() { return plan.config.runtime().overlay().helloTimeout().toNanos(); }
+-    private long budget(Context c) { return c.bootstrap ? plan.config.runtime().control().bootstrapQueryTimeout().toNanos() : helloBudget(); }
++    private long budget(Context c) { return c.bootstrap ? plan.config.runtime().control().bootstrapQueryTimeout().toNanos()
++            : c.helloType==MessageType.REPAIR_HELLO?Math.min(helloBudget(),OverlayRecovery.TOTAL_BUDGET):helloBudget(); }
+     private boolean expired(long began, long duration) { return now() - began >= duration; }
+     private boolean current(Context c) { return contexts.get(c.channel.id()) == c; }
+     private Slot schedule(long nanos, Runnable action) {
+@@ -408,7 +422,7 @@ public final class NeighborManager implements AutoCloseable {
+                 var c=contexts.get(ch.id());if(c==null)return;
+                 var remote=error.getCause() instanceof MessageCodec.HandshakeFailure h?h.message():null;
+                 if(remote!=null) {
+-                    if(remote.type()==MessageType.HELLO && c.direction==Direction.INBOUND && c.peer==null) {
++                    if((remote.type()==MessageType.HELLO || remote.type()==MessageType.REPAIR_HELLO) && c.direction==Direction.INBOUND && c.peer==null) {
+                         // Reuse normal endpoint/identity authorization; no unknown peer status can be created.
+                         hello(c,remote);return;
+                     }
+@@ -475,9 +489,14 @@ public final class NeighborManager implements AutoCloseable {
+         if (a.peer == null) { cancel(initialSlot); initialSlot = slot; }
+         else { cancel(a.peer.slot); a.peer.slot = slot; }
+     }
++    private void armConnectPhase(Attempt a) {
++        a.connectBegan=now();
++        // Dynamic attempts already have the shared recovery tick; do not charge an extra timer per candidate.
++        if(a.repair==null)phaseSlot(a,schedule(connectBudget(),()->{if(live(a))attemptFailed(a,Reason.TIMEOUT,null);}));
++    }
+     private void resolve(Attempt a, String host, int port) {
+         long began = now(); a.job = UUID.randomUUID();
+-        phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
++        armConnectPhase(a);
+         io.resolver().resolve(a.job, host).whenComplete((address, error) -> post(() -> {
+             if (!live(a)) return;
+             io.resolver().retire(a.job); a.job = null;
+@@ -485,7 +504,7 @@ public final class NeighborManager implements AutoCloseable {
+                 attemptFailed(a, error == null ? Reason.TIMEOUT : error instanceof RejectedExecutionException
+                         ? Reason.RESOURCE_LIMIT : Reason.TRANSPORT, null); return;
+             }
+-            phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
++            armConnectPhase(a);
+             if (nativeDials.size() >= plan.options.maxConnections()) { attemptFailed(a, Reason.RESOURCE_LIMIT, null); return; }
+             nativeDials.put(a.id, a);
+             io.network().connect(new InetSocketAddress(address, port)).whenComplete((ch, dialError) -> {
+@@ -496,6 +515,9 @@ public final class NeighborManager implements AutoCloseable {
+         }));
+     }
+     private void dialResult(Attempt a, Channel ch, Throwable error, long observed) {
++        if(a.repair!=null && live(a) && (expired(a.connectBegan,connectBudget()) || observed-a.connectBegan>=connectBudget())) {
++            if(ch!=null)ch.close();ch=null;error=new java.io.IOException("Repair dial deadline");attemptFailed(a,Reason.TIMEOUT,null);
++        }
+         // Associate this handle before excluding the token from any other channel's barrier.
+         if (ch != null) {
+             var c = contexts.get(ch.id());
+@@ -506,6 +528,7 @@ public final class NeighborManager implements AutoCloseable {
+             } else {
+                 c.direction = Direction.OUTBOUND; c.barrier.clear(); c.attempt = a; a.context = c;
+                 c.peer = a.peer; c.bootstrap = a.peer == null;
++                c.helloType=a.repair==null?MessageType.HELLO:MessageType.REPAIR_HELLO;
+                 if (a.peer != null) { a.peer.context = c; a.peer.state = Neighbor.State.HANDSHAKING; }
+                 phaseSlotCancel(a);
+                 armContext(c);
+@@ -552,10 +575,14 @@ public final class NeighborManager implements AutoCloseable {
+         drain(c);
+     }
+     private void beginOutbound(Context c) {
+-        c.request = UUID.randomUUID(); c.sent = true;
+-        var type = c.bootstrap ? MessageType.REGISTER : MessageType.HELLO;
++        // DNS/dial callbacks can arrive after a claim expires but before the shared tick runs.
++        if(c.attempt!=null && c.attempt.repair!=null && !recovery.eligible(c.attempt.repair,now())) {
++            finish(c,Reason.TIMEOUT,null);return;
++        }
++        c.request = c.attempt!=null && c.attempt.repair!=null?c.attempt.repair.requestId():UUID.randomUUID(); c.sent = true;
++        var type = c.bootstrap ? MessageType.REGISTER : c.helloType;
+         write(c, new ControlMessage(type, c.request, plan.local.nodeId(), instance,
+-                c.bootstrap?new ControlMessage.EndpointPayload(plan.local):new ControlMessage.Hello(plan.local,1,1)), false);
++                c.bootstrap?new ControlMessage.EndpointPayload(plan.local):new ControlMessage.Hello(plan.local,3,3)), false);
+     }
+     private void write(Context c, ControlMessage message, boolean closeAfter) {
+         if (c.responding) { finish(c, Reason.RESOURCE_LIMIT, null); return; }
+@@ -616,12 +643,12 @@ public final class NeighborManager implements AutoCloseable {
+             return;
+         }
+         if (c.direction == Direction.INBOUND && c.peer == null) {
+-            if (m.type() != MessageType.HELLO) { contextFailure(c, m); return; }
++            if (m.type() != MessageType.HELLO && m.type()!=MessageType.REPAIR_HELLO) { contextFailure(c, m); return; }
+             hello(c, m); return;
+         }
+         if (!identity(c, m)) { contextFailure(c, m); return; }
+         if (m.type() == MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p) {
+-            int related = c.direction == Direction.OUTBOUND ? 5 : 6;
++            int related = c.direction == Direction.OUTBOUND ? c.helloType.code() : 6;
+             if (c.request.equals(m.requestId()) && p.relatedType() == related) {
+                 finish(c, Reason.REMOTE_REJECTION, m); return;
+             }
+@@ -630,8 +657,8 @@ public final class NeighborManager implements AutoCloseable {
+         }
+         if (c.direction == Direction.OUTBOUND && m.type() == MessageType.HELLO_OK
+                 && m.payload() instanceof ControlMessage.HelloOk ack && c.request.equals(m.requestId()) && !c.acknowledged) {
+-            if(ack.selectedMask()!=1){incompatible(c.peer,m,Reason.REQUIRED_DISCOVERY_MISSING);finish(c,Reason.REQUIRED_DISCOVERY_MISSING,m);return;}
+-            c.peer.observedVersion=2;c.peer.selected=1;
++            if(ack.selectedMask()!=3){incompatible(c.peer,m,Reason.REQUIRED_DISCOVERY_MISSING);finish(c,Reason.REQUIRED_DISCOVERY_MISSING,m);return;}
++            c.peer.observedVersion=2;c.peer.selected=3;
+             c.remoteInstance = m.senderInstance(); c.endpoint = withInstance(c.peer.configured, c.remoteInstance);
+             c.acknowledged = true; activate(c); return;
+         }
+@@ -642,6 +669,7 @@ public final class NeighborManager implements AutoCloseable {
+         return c.peer != null && c.remoteInstance != null && (c.direction == Direction.INBOUND || c.acknowledged);
+     }
+     private void hello(Context c, ControlMessage m) {
++        if(m.type()==MessageType.REPAIR_HELLO){repairHello(c,m);return;}
+         if(ZERO.equals(m.requestId())){reject(c,m,ErrorCode.INVALID_MESSAGE);return;}
+         var p = peers.get(m.senderId());
+         if (p == null || !(m.payload() instanceof ControlMessage.Hello ep) || ep.endpoint() == null) {
+@@ -654,13 +682,13 @@ public final class NeighborManager implements AutoCloseable {
+         catch (IllegalArgumentException ex) { allowed = false; }
+         if (!allowed) { reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return; }
+         if (p.context != null || p.session != null || p.attempt != null) { reject(c, m, ErrorCode.DUPLICATE_ID); return; }
+-        if(ep.supportedMask()!=1||ep.requiredMask()!=1) {
++        if(ep.supportedMask()!=3||ep.requiredMask()!=3) {
+             incompatible(p,m,Reason.REQUIRED_DISCOVERY_MISSING);reject(c,m,ErrorCode.INVALID_MESSAGE);return;
+         }
+-        p.observedVersion=2;p.supported=1;p.required=1;
++        p.observedVersion=2;p.supported=3;p.required=3;
+         c.peer = p; c.endpoint = withInstance(p.configured, m.senderInstance()); c.remoteInstance = m.senderInstance();
+         c.request = m.requestId(); c.sent = true; p.context = c; p.state = Neighbor.State.HANDSHAKING; publish();
+-        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, new ControlMessage.HelloOk(1)), false);
++        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, new ControlMessage.HelloOk(3)), false);
+     }
+     private void incompatible(Peer p,ControlMessage m,Reason reason) {
+         if(p.session!=null)return;
+@@ -703,14 +731,102 @@ public final class NeighborManager implements AutoCloseable {
+                 var p=current(session);
+                 return p==null?Connection.refused(Connection.ExtensionStatus.CLOSED):p.context.channel.trySendExtension(message);
+             }
++            public void recoveryTick(long now){
++                for(var p:List.copyOf(peers.values())) {var a=p.attempt;
++                    if(a!=null && a.repair!=null && a.context==null && live(a) && expired(a.connectBegan,connectBudget()))attemptFailed(a,Reason.TIMEOUT,null);
++                }
++                pruneDynamic();if(recovery!=null)recovery.maintain(now);
++            }
+             public void diagnostic(NeighborDiscovery.Issue issue) {
+                 NeighborManager.this.diagnostic(Reason.valueOf("DISCOVERY_"+issue.name()),null,null,null);
+             }
+         });
++        recovery=new OverlayRecovery(plan.config,instance,clock,UUID::randomUUID,new OverlayRecovery.RecoveryPorts() {
++            public Map<String,Neighbor.Session> active(){return activeView;}
++            public List<CandidateCache.CandidateView> candidates(long now){return learner.snapshot();}
++            public boolean beginRepair(OverlayRecovery.RepairAttempt attempt,ControlMessage.Endpoint endpoint,long left){return startRepair(attempt,endpoint);}
++            public void cancelRepair(OverlayRecovery.RepairAttempt attempt){cancelRepairAttempt(attempt);}
++            public void publish(OverlayRecovery.RecoveryStatus status){recoveryView=status;}
++            public long retryDelay(long base){return nextDelay(base);}
++        });
+         learner.start(deadlines);
+         publish(); started.complete(null);
+         for (var p : peers.values()) if (initiates(p)) dialPeer(p);
+     }
++
++    private void pruneDynamic() {
++        boolean changed=peers.values().removeIf(p->p.dynamic && p.session==null && p.attempt==null && p.context==null
++            && nativeDials.values().stream().noneMatch(a->a.peer==p));
++        if(changed)publish();
++    }
++    private boolean startRepair(OverlayRecovery.RepairAttempt repair,ControlMessage.Endpoint endpoint) {
++        if(phase!=Phase.READY || stopping.get() || draining.get() || !activeView.isEmpty() || !recovery.isCurrent(repair) || io.network().reservations()>=plan.options.maxConnections())return false;
++        pruneDynamic();var p=peers.get(endpoint.nodeId());
++        if(p!=null && (!p.dynamic || p.session!=null || p.attempt!=null || p.context!=null))return false;
++        if(p==null) {
++            if(peers.values().stream().filter(peer->peer.dynamic).count()>=Math.min(16,plan.options.maxConnections()))return false;
++            p=new Peer(withInstance(endpoint,ZERO),true);peers.put(endpoint.nodeId(),p);
++        }
++        var selected=p;
++        if(nativeDials.values().stream().anyMatch(a->a.peer==selected))return false;
++        p.attempt=new Attempt(p,repair);p.state=Neighbor.State.CONNECTING;publish();
++        emit(new RepairStarted(repair));
++        resolve(p.attempt,p.configured.host(),p.configured.controlPort());return true;
++    }
++    private void cancelRepairAttempt(OverlayRecovery.RepairAttempt repair) {
++        var p=peers.get(repair.targetId());if(p==null || p.session!=null)return;
++        var a=p.attempt;
++        if(a==null || a.repair!=repair)return;
++        if(a.context!=null && current(a.context))finish(a.context,Reason.STALE,null);
++        else {retire(a);publish();}
++    }
++    private void repairTerminal(Attempt a,Reason reason) {
++        if(a!=null && a.repair!=null && recovery!=null)recovery.onAttemptTerminal(a.repair,
++            reason==Reason.TIMEOUT?OverlayRecovery.RecoveryReason.TIMEOUT:reason==Reason.REMOTE_REJECTION?
++                OverlayRecovery.RecoveryReason.REJECTED:reason==Reason.RESOURCE_LIMIT?
++                OverlayRecovery.RecoveryReason.RESOURCE_LIMIT:OverlayRecovery.RecoveryReason.TRANSPORT);
++    }
++    private boolean repairEndpoint(ControlMessage m,ControlMessage.Endpoint e) {
++        try {
++            validateEndpoint(e,false);
++            if(!m.senderId().equals(e.nodeId())||!m.senderInstance().equals(e.instanceId())||e.nodeId().equals(plan.local.nodeId())
++                    || sameAddress(e,plan.local))return false;
++            var boot=plan.config.bootstrap().orElseThrow();
++            if(key(e.host(),e.controlPort()).equals(key(boot.host(),boot.port())))return false;
++            for(var other:peers.values())if(!other.configured.nodeId().equals(e.nodeId()) && sameAddress(e,other.configured))return false;
++            var known=peers.get(e.nodeId());return known==null || sameEndpoint(e,known.configured);
++        }catch(IllegalArgumentException error){return false;}
++    }
++    private static boolean sameAddress(ControlMessage.Endpoint a,ControlMessage.Endpoint b) {
++        return key(a.host(),a.controlPort()).equals(key(b.host(),b.controlPort()))
++            || key(a.host(),a.dataPort()).equals(key(b.host(),b.dataPort()));
++    }
++    private void repairHello(Context c,ControlMessage m) {
++        if(ZERO.equals(m.requestId()) || !(m.payload() instanceof ControlMessage.Hello hello)
++                || !repairEndpoint(m,hello.endpoint()) || hello.supportedMask()!=3 || hello.requiredMask()!=3) {
++            reject(c,m,ErrorCode.INVALID_MESSAGE);return;
++        }
++        var p=peers.get(m.senderId());
++        if(p!=null && p.session!=null){reject(c,m,ErrorCode.DUPLICATE_ID);return;}
++        if(p!=null && (p.context!=null || p.attempt!=null)) {
++            boolean outgoing=p.attempt!=null || p.context!=null && p.context.direction==Direction.OUTBOUND;
++            if(!outgoing || plan.local.nodeId().compareTo(m.senderId())<0){reject(c,m,ErrorCode.DUPLICATE_ID);return;}
++            // Detach the losing context before retiring it: its callbacks may only clean its own resources.
++            var losing=p.context;p.context=null;var a=p.attempt;
++            if(a!=null){retire(a);repairTerminal(a,Reason.STALE);}
++            if(losing!=null)finish(losing,Reason.STALE,null);
++        }
++        long admissions=contexts.values().stream().filter(x->x!=c && x.helloType==MessageType.REPAIR_HELLO && x.direction==Direction.INBOUND && !x.active).count();
++        if(activeView.size()>=Math.min(63,plan.options.maxConnections()) || admissions>=2) {reject(c,m,ErrorCode.RESOURCE_LIMIT);return;}
++        if(p==null) {
++            pruneDynamic();if(peers.values().stream().filter(peer->peer.dynamic).count()>=Math.min(16,plan.options.maxConnections())){reject(c,m,ErrorCode.RESOURCE_LIMIT);return;}
++            p=new Peer(withInstance(hello.endpoint(),ZERO),true);peers.put(m.senderId(),p);
++        }
++        c.helloType=MessageType.REPAIR_HELLO;c.peer=p;c.endpoint=withInstance(p.configured,m.senderInstance());c.remoteInstance=m.senderInstance();
++        c.request=m.requestId();c.sent=true;p.context=c;p.state=Neighbor.State.HANDSHAKING;
++        p.observedVersion=2;p.supported=3;p.required=3;publish();armContext(c);
++        if(current(c))write(c,new ControlMessage(MessageType.HELLO_OK,c.request,plan.local.nodeId(),instance,new ControlMessage.HelloOk(3)),false);
++    }
+     private Map<String, Peer> validateList(ControlMessage.NeighborList list) {
+         if (list.neighbors().size() > 63 || list.neighbors().size() > plan.options.maxConnections())
+             throw new IllegalArgumentException("Configured degree exceeds capacity");
+@@ -732,13 +848,14 @@ public final class NeighborManager implements AutoCloseable {
+         if (!c.channel.isOpen() || expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
+         var p = c.peer;
+         if (p.context != c || p.session != null) { finish(c, Reason.CONTEXT, null); return; }
++        if(c.attempt!=null && c.attempt.repair!=null && !recovery.eligible(c.attempt.repair,now())){finish(c,Reason.TIMEOUT,null);return;}
+         c.active = true; cancel(c.deadline); c.deadline = null;
+         if (c.attempt != null) { c.attempt.live = false; p.attempt = null; }
+         p.session = new Neighbor.Session(p.configured.nodeId(), c.remoteInstance, c.channel.id(), c.endpoint);
+         p.state = Neighbor.State.ACTIVE; p.base = 0; p.delay = 0;
+-        p.capability=CapabilityState.ACTIVE_DISCOVERY;p.currentReason=Reason.STALE;p.lastConfirmed=null;
++        p.selected=3;p.capability=CapabilityState.ACTIVE_DISCOVERY;p.currentReason=Reason.STALE;p.lastConfirmed=null;
+         learner.up(p.session,c.request);
+-        publish(); emit(new NeighborUp(p.session)); drain(c);
++        publish();if(recovery!=null)recovery.onNeighborUp(p.session); emit(new NeighborUp(p.session)); drain(c);
+     }
+     private void retain(Context c, ControlMessage m, long at) {
+         int b = Math.min(4, plan.options.queueCapacity());
+@@ -752,7 +869,7 @@ public final class NeighborManager implements AutoCloseable {
+             var next = c.frames.peekFirst();
+             if (!c.active && legitimateWindow(c) && application(next.message.type())
+                     && !(next.message.type() == MessageType.ERROR && next.message.requestId().equals(c.request)
+-                    && ((ControlMessage.ErrorPayload) next.message.payload()).relatedType() == (c.direction == Direction.OUTBOUND ? 5 : 6))) return;
++                    && ((ControlMessage.ErrorPayload) next.message.payload()).relatedType() == (c.direction == Direction.OUTBOUND ? c.helloType.code() : 6))) return;
+             c.frames.removeFirst(); retained--; handle(c, next.message, next.observedAt);
+         }
+     }
+@@ -774,7 +891,8 @@ public final class NeighborManager implements AutoCloseable {
+             }
+             p.context = null; p.session = null; p.state = stopping.get() ? Neighbor.State.CLOSED : Neighbor.State.DISCONNECTED;
+             if (c.attempt != null) retire(c.attempt);
+-            publish(); if (old != null) emit(new NeighborDown(old, reason));
++            publish(); if (old != null) {if(recovery!=null)recovery.onNeighborDown(old);emit(new NeighborDown(old, reason));}
++            repairTerminal(c.attempt,reason);
+             if (!stopping.get()) retry(p);
+         } else if (c.bootstrap && c.attempt != null && live(c.attempt)) {
+             retire(c.attempt); retryDiscovery();
+@@ -790,7 +908,7 @@ public final class NeighborManager implements AutoCloseable {
+         if (!live(a)) return;
+         if (a.context != null && current(a.context)) { finish(a.context, reason, remote); return; }
+         if(a.peer!=null){a.peer.capability=CapabilityState.TEMPORARILY_UNAVAILABLE;a.peer.currentReason=reason;}
+-        diagnostic(reason, a, null, remote); retire(a);
++        diagnostic(reason, a, null, remote); retire(a);repairTerminal(a,reason);
+         if (a.peer == null) retryDiscovery(); else { publish(); retry(a.peer); }
+     }
+     private long nextDelay(long base) {
+@@ -806,6 +924,7 @@ public final class NeighborManager implements AutoCloseable {
+                 : previous > max / 2 ? max : Math.min(max, previous * 2);
+     }
+     private void retry(Peer p) {
++        if(p.dynamic)return;
+         if (phase != Phase.READY || stopping.get() || draining.get() || !initiates(p) || p.session != null || p.attempt != null) return;
+         cancel(p.slot); p.base = nextBase(p.base); p.delay = nextDelay(p.base);
+         p.slot = schedule(TimeUnit.MILLISECONDS.toNanos(p.delay), () -> { p.slot = null; dialPeer(p); }); publish();
+@@ -842,6 +961,7 @@ public final class NeighborManager implements AutoCloseable {
+         if (phase != Phase.FAILED) phase = Phase.CLOSED;
+         if (phase != Phase.FAILED && failure.get() != null) diagnostic(failure.get() instanceof RejectedExecutionException
+                 ? Reason.RESOURCE_LIMIT : Reason.CONSUMER_FAILURE, null, null, null);
++        if(recovery!=null)recovery.requestClose(0);
+         if(learner!=null)learner.close();
+         cancel(initialSlot); initialSlot = null;
+         if (discovery != null) retire(discovery);
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+index b1ababf..a0fd60a 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -57,6 +57,8 @@ public final class OverlayNode implements AutoCloseable {
+     public Map<String, Neighbor> diagnostics() { var m = manager; return m == null ? Map.of() : m.diagnostics(); }
+     public Map<String,NeighborManager.PeerStatus> discoveryStatus(){var m=manager;return m==null?Map.of():m.discoveryStatus();}
+     public CompletionStage<java.util.List<CandidateCache.CandidateView>> candidates(){var m=manager;return m==null?CompletableFuture.completedStage(java.util.List.of()):m.candidates();}
++    public OverlayRecovery.RecoveryStatus recoveryStatus(){var m=manager;return m==null?
++        new OverlayRecovery.RecoveryStatus(OverlayRecovery.Phase.WAITING,OverlayRecovery.RecoveryReason.NONE,0,Optional.empty(),0):m.recoveryStatus();}
+     public Optional<Throwable> failure() { return Optional.ofNullable(failure.get()); }
+     public synchronized CompletionStage<NeighborManager.ShutdownReport> requestShutdown(int reason, Duration remainingBudget) {
+         long nanos = budget(remainingBudget);
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayRecovery.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayRecovery.java
+new file mode 100644
+index 0000000..8a12a2d
+--- /dev/null
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayRecovery.java
+@@ -0,0 +1,130 @@
++package pt.uminho.esr.ott.overlay;
++
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.protocol.ControlMessage;
++import java.util.*;
++import java.util.function.LongSupplier;
++import java.util.function.Supplier;
++import java.util.concurrent.TimeUnit;
++
++/** Owner-confined selection/retry policy. Sockets, dials and physical accounting remain in NeighborManager. */
++public final class OverlayRecovery {
++    static final long TOTAL_BUDGET=10_000_000_000L;
++    public enum Phase { WAITING, ISOLATED, REQUESTING, ACTIVE, STOPPING }
++    public enum RecoveryReason { NONE, NO_CANDIDATE, BACKOFF, RESOURCE_LIMIT, CONNECTING,
++        EXPIRED, CONFLICT, TRANSPORT, TIMEOUT, REJECTED, SATISFIED, SHUTDOWN, EXHAUSTED }
++    public record RecoveryStatus(Phase phase,RecoveryReason reason,int activeCount,Optional<String> candidate,
++            long retryDelayMillis) {
++        public RecoveryStatus {Objects.requireNonNull(phase);Objects.requireNonNull(reason);Objects.requireNonNull(candidate);}
++    }
++    public record RepairAttempt(UUID requestId,UUID instanceId,long needEpoch,CandidateCache.SourceKey source,
++            String targetId,long generation,long queryStartedNanos,long ttlNanos,long selectedAtNanos) {
++        public RepairAttempt {Objects.requireNonNull(requestId);Objects.requireNonNull(instanceId);Objects.requireNonNull(source);Objects.requireNonNull(targetId);}
++    }
++    interface RecoveryPorts {
++        Map<String,Neighbor.Session> active();
++        List<CandidateCache.CandidateView> candidates(long now);
++        boolean beginRepair(RepairAttempt attempt,ControlMessage.Endpoint target,long remainingNanos);
++        void cancelRepair(RepairAttempt attempt);
++        void publish(RecoveryStatus status);
++        default long retryDelay(long baseMillis){return baseMillis;}
++    }
++    private record Retry(long began,long baseMillis,long delayMillis) {}
++    private final NodeConfiguration configuration;
++    private final UUID instance;
++    private final LongSupplier clock;
++    private final Supplier<UUID> ids;
++    private final RecoveryPorts ports;
++    private final Map<String,Retry> retries=new LinkedHashMap<>();
++    private RepairAttempt current;
++    private CandidateCache.CandidateEndpoint selectedEndpoint;
++    private long epoch;
++    private int cursor;
++    private boolean isolated,closed;
++    private RecoveryStatus status=new RecoveryStatus(Phase.WAITING,RecoveryReason.NONE,0,Optional.empty(),0);
++
++    OverlayRecovery(NodeConfiguration configuration,UUID instance,LongSupplier clock,Supplier<UUID> ids,RecoveryPorts ports) {
++        this.configuration=Objects.requireNonNull(configuration);this.instance=Objects.requireNonNull(instance);
++        this.clock=Objects.requireNonNull(clock);this.ids=Objects.requireNonNull(ids);this.ports=Objects.requireNonNull(ports);
++    }
++    void onNeighborUp(Neighbor.Session session){maintain(clock.getAsLong());}
++    void onNeighborDown(Neighbor.Session session){if(closed)return;publish(ports.active().isEmpty()?Phase.ISOLATED:Phase.ACTIVE,RecoveryReason.NONE,Optional.empty(),0);}
++    boolean isCurrent(RepairAttempt attempt){return !closed && current==attempt;}
++    private boolean expired(RepairAttempt a,long now) {
++        return now-a.selectedAtNanos()>=TOTAL_BUDGET || now-a.queryStartedNanos()<0 || now-a.queryStartedNanos()>=a.ttlNanos();
++    }
++    boolean eligible(RepairAttempt attempt,long now) {
++        if(!isCurrent(attempt)||!ports.active().isEmpty()||expired(attempt,now))return false;
++        return ports.candidates(now).stream().anyMatch(c->c.nodeId().equals(attempt.targetId())
++            && c.state()==CandidateCache.CandidateState.AVAILABLE && c.endpoint().filter(selectedEndpoint::equals).isPresent());
++    }
++    void onAttemptTerminal(RepairAttempt attempt,RecoveryReason reason) {
++        if(!isCurrent(attempt))return;
++        current=null;selectedEndpoint=null;
++        long max=configuration.runtime().overlay().retryMax().toMillis();var previous=retries.get(attempt.targetId());
++        long base=previous==null?configuration.runtime().overlay().retryInitial().toMillis():previous.baseMillis()>max/2?max:Math.min(max,previous.baseMillis()*2);
++        long delay=Math.max(1,Math.min(max,ports.retryDelay(base)));
++        retries.put(attempt.targetId(),new Retry(clock.getAsLong(),base,delay));
++        publish(Phase.ISOLATED,reason,Optional.of(attempt.targetId()),delay);
++    }
++    void maintain(long now) {
++        if(closed)return;
++        if(!ports.active().isEmpty()) {
++            var old=current;current=null;selectedEndpoint=null;isolated=false;
++            if(old!=null)ports.cancelRepair(old);
++            publish(Phase.ACTIVE,RecoveryReason.SATISFIED,Optional.empty(),0);return;
++        }
++        if(!isolated) {
++            if(epoch==Long.MAX_VALUE){publish(Phase.ISOLATED,RecoveryReason.EXHAUSTED,Optional.empty(),0);return;}
++            epoch++;isolated=true;
++        }
++        if(current!=null) {
++            if(eligible(current,now))return;
++            var old=current;var reason=now-old.selectedAtNanos()>=TOTAL_BUDGET?RecoveryReason.TIMEOUT:expired(old,now)?RecoveryReason.EXPIRED:RecoveryReason.CONFLICT;
++            onAttemptTerminal(old,reason);ports.cancelRepair(old);return;
++        }
++        var candidates=new ArrayList<>(ports.candidates(now));
++        if(candidates.size()>CandidateCache.MAX_CANDIDATES)throw new IllegalArgumentException("Candidate snapshot cap");
++        candidates.sort(Comparator.comparing(CandidateCache.CandidateView::nodeId));
++        var present=new HashSet<String>();for(var c:candidates)present.add(c.nodeId());retries.keySet().retainAll(present);
++        long nearest=Long.MAX_VALUE;int size=candidates.size();
++        for(int n=0;n<size;n++) {
++            int index=(cursor+n)%size;var c=candidates.get(index);
++            if(c.nodeId().equals(configuration.nodeId())||c.state()!=CandidateCache.CandidateState.AVAILABLE||c.endpoint().isEmpty())continue;
++            var retry=retries.get(c.nodeId());
++            if(retry!=null) {
++                long left=TimeUnit.MILLISECONDS.toNanos(retry.delayMillis())-(now-retry.began());
++                if(left>0){nearest=Math.min(nearest,left);continue;}
++            }
++            var proof=c.sources().stream().filter(p->p.ttlNanos()>0 && now-p.queryStartedNanos()>=0 && now-p.queryStartedNanos()<p.ttlNanos())
++                .sorted(Comparator.comparing((CandidateCache.Provenance p)->p.source().nodeId())
++                    .thenComparing(p->p.source().connectionId().toString())).findFirst();
++            if(proof.isEmpty())continue;
++            var id=Objects.requireNonNull(ids.get());if(id.equals(new UUID(0,0))){publish(Phase.ISOLATED,RecoveryReason.EXHAUSTED,Optional.empty(),0);return;}
++            var p=proof.get();selectedEndpoint=c.endpoint().orElseThrow();
++            current=new RepairAttempt(id,instance,epoch,p.source(),c.nodeId(),p.generation(),p.queryStartedNanos(),p.ttlNanos(),now);
++            var endpoint=new ControlMessage.Endpoint(c.nodeId(),new UUID(0,0),selectedEndpoint.host(),selectedEndpoint.controlPort(),selectedEndpoint.dataPort(),selectedEndpoint.role());
++            cursor=(index+1)%size;publish(Phase.REQUESTING,RecoveryReason.CONNECTING,Optional.of(c.nodeId()),0);
++            var attempt=current;long remaining=Math.min(TOTAL_BUDGET,p.ttlNanos()-(now-p.queryStartedNanos()));
++            if(!ports.beginRepair(attempt,endpoint,remaining))onAttemptTerminal(attempt,RecoveryReason.RESOURCE_LIMIT);
++            return;
++        }
++        boolean failure= switch(status.reason()) {
++            case RESOURCE_LIMIT,EXPIRED,CONFLICT,TRANSPORT,TIMEOUT,REJECTED -> true;
++            default -> false;
++        };
++        // Keep the terminal reason visible while reporting the remaining retry delay.
++        publish(Phase.ISOLATED,nearest==Long.MAX_VALUE?RecoveryReason.NO_CANDIDATE:failure?status.reason():RecoveryReason.BACKOFF,
++            nearest!=Long.MAX_VALUE&&failure?status.candidate():Optional.empty(),
++            nearest==Long.MAX_VALUE?0:Math.max(1,TimeUnit.NANOSECONDS.toMillis(nearest)));
++    }
++    void requestClose(long remainingNanos) {
++        if(closed)return;closed=true;var old=current;current=null;selectedEndpoint=null;
++        if(old!=null)ports.cancelRepair(old);retries.clear();publish(Phase.STOPPING,RecoveryReason.SHUTDOWN,Optional.empty(),0);
++    }
++    RecoveryStatus snapshot(){return status;}
++    private void publish(Phase phase,RecoveryReason reason,Optional<String> candidate,long retry) {
++        var next=new RecoveryStatus(phase,reason,ports.active().size(),candidate,retry);
++        if(!next.equals(status)){status=next;ports.publish(next);}
++    }
++}
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java b/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java
+index 0f5ab00..83f2a69 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java
+@@ -171,7 +171,7 @@ public final class MessageCodec {
+     private static Payload readPayload(DataInputStream in, MessageType type) throws IOException {
+         return switch (type) {
+             case REGISTER -> new EndpointPayload(readEndpoint(in));
+-            case HELLO -> new Hello(readEndpoint(in),readU32(in),readU32(in));
++            case HELLO, REPAIR_HELLO -> new Hello(readEndpoint(in),readU32(in),readU32(in));
+             case REGISTER_OK -> {
+                 int count = readCount(in, MAX_NEIGHBORS);
+                 var neighbors = new ArrayList<Endpoint>(count);
+@@ -197,7 +197,7 @@ public final class MessageCodec {
+     private static void writePayload(DataOutputStream out, ControlMessage m) throws IOException {
+         switch (m.type()) {
+             case REGISTER -> writeEndpoint(out, payload(m, EndpointPayload.class).endpoint());
+-            case HELLO -> { var p=payload(m,Hello.class);writeEndpoint(out,p.endpoint());out.writeInt((int)p.supportedMask());out.writeInt((int)p.requiredMask()); }
++            case HELLO, REPAIR_HELLO -> { var p=payload(m,Hello.class);writeEndpoint(out,p.endpoint());out.writeInt((int)p.supportedMask());out.writeInt((int)p.requiredMask()); }
+             case REGISTER_OK -> {
+                 var p = payload(m, NeighborList.class);
+                 out.writeShort(p.neighbors().size());
+@@ -260,17 +260,17 @@ public final class MessageCodec {
+         require(m.type() != null, "Tipo ausente");
+         uuid(m.requestId());nodeId(m.senderId());uuid(m.senderInstance());
+         require(!UNKNOWN_INSTANCE.equals(m.senderInstance()),"Missing sender instance");
+-        if(m.type()==MessageType.HELLO || m.type()==MessageType.HELLO_OK)
++        if(m.type()==MessageType.HELLO || m.type()==MessageType.REPAIR_HELLO || m.type()==MessageType.HELLO_OK)
+             require(!UNKNOWN_INSTANCE.equals(m.requestId()),"Missing handshake correlation");
+         switch (m.type()) {
+             case REGISTER -> endpoint(payload(m, EndpointPayload.class).endpoint(), false);
+-            case HELLO -> { var p=payload(m,Hello.class);endpoint(p.endpoint(),false);if(p.supportedMask()!=1||p.requiredMask()!=1)throw incompatibleHandshake(m); }
++            case HELLO, REPAIR_HELLO -> { var p=payload(m,Hello.class);endpoint(p.endpoint(),false);if(p.supportedMask()!=3||p.requiredMask()!=3)throw incompatibleHandshake(m); }
+             case REGISTER_OK -> {
+                 var p = payload(m, NeighborList.class);
+                 limit(p.neighbors().size(), MAX_NEIGHBORS, "vizinhos");
+                 for (var e : p.neighbors()) endpoint(e, true);
+             }
+-            case HELLO_OK -> { if(payload(m,HelloOk.class).selectedMask()!=1)throw incompatibleHandshake(m); }
++            case HELLO_OK -> { if(payload(m,HelloOk.class).selectedMask()!=3)throw incompatibleHandshake(m); }
+             case NODE_LEAVE -> range(payload(m, Leave.class).reason(), 0, 1, "reason");
+             case PROBE_PING, PROBE_PONG -> nonnegative(payload(m, Probe.class).probeId(), "probeId");
+             case STREAM_ANNOUNCE -> {
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java b/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java
+index 3283ac9..bf0a3ab 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java
+@@ -8,7 +8,7 @@ public enum MessageType {
+     HELLO(5), HELLO_OK(6), PROBE_PING(7), PROBE_PONG(8),
+     STREAM_ANNOUNCE(9), STREAM_WITHDRAW(10), ACTIVATE(11), ACTIVATE_ACK(12),
+     DEACTIVATE(13), SUBSCRIPTION_RENEW(14), ROUTE_TRACE(15), TRACE_RESULT(16), ERROR(17),
+-    DISCOVERY_QUERY(18), DISCOVERY_SNAPSHOT(19);
++    DISCOVERY_QUERY(18), DISCOVERY_SNAPSHOT(19), REPAIR_HELLO(20);
+ 
+     private final int code;
+ 
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+index 734754d..8b3c34b 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+@@ -321,7 +321,7 @@ class OttApplicationTest {
+                 assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO, hello.type());
+                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
+                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", remote,
+-                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), socket.getOutputStream()); socket.getOutputStream().flush();
++                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3)), socket.getOutputStream()); socket.getOutputStream().flush();
+                 child.await(t -> t.contains("NeighborUp[")); boot.send("quit"); assertEquals(0, boot.exit());
+                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
+                     pt.uminho.esr.ott.protocol.MessageType.ERROR, UUID.randomUUID(), "N2", remote,
+@@ -335,7 +335,7 @@ class OttApplicationTest {
+                 UUID newRemote = UUID.randomUUID();
+                 pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
+                     pt.uminho.esr.ott.protocol.MessageType.HELLO_OK, hello.requestId(), "N2", newRemote,
+-                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1)), second.getOutputStream()); second.getOutputStream().flush();
++                    new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3)), second.getOutputStream()); second.getOutputStream().flush();
+                 child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
+                 assertTrue(child.text().contains(newRemote.toString())); child.send("quit");
+                 var leave = pt.uminho.esr.ott.protocol.MessageCodec.read(second.getInputStream()).orElseThrow();
+@@ -520,7 +520,7 @@ class OttApplicationTest {
+                     socket.setSoTimeout(2000);var hello=pt.uminho.esr.ott.protocol.MessageCodec.read(socket.getInputStream()).orElseThrow();
+                     assertEquals(2,hello.version());assertEquals(pt.uminho.esr.ott.protocol.MessageType.HELLO,hello.type());
+                     var reply=new pt.uminho.esr.ott.protocol.ControlMessage(pt.uminho.esr.ott.protocol.MessageType.HELLO_OK,
+-                        hello.requestId(),"N2",UUID.randomUUID(),new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(1));
++                        hello.requestId(),"N2",UUID.randomUUID(),new pt.uminho.esr.ott.protocol.ControlMessage.HelloOk(3));
+                     byte[] negative=pt.uminho.esr.ott.protocol.MessageCodec.encode(reply);java.nio.ByteBuffer.wrap(negative).putInt(negative.length-4,0);
+                     socket.getOutputStream().write(negative);socket.getOutputStream().flush();rejected.add(hello.senderId());
+                 }
+@@ -531,6 +531,8 @@ class OttApplicationTest {
+                 long replies=child.text().lines().filter(l->l.contains("NEIGHBORS ")).count();child.send("neighbors");
+                 child.await(t->t.lines().filter(l->l.contains("NEIGHBORS ")).count()>replies&&t.contains("state=ACTIVE"));
+                 assertEquals(1,child.text().lines().filter(l->l.contains("NeighborUp[")).count());
++                child.send("recovery");child.await(t->t.contains("RECOVERY node=")&&t.contains("phase=ACTIVE"));
++                assertFalse(child.text().contains("COMMAND_ERROR unknown command"));
+                 assertFalse(child.text().contains("FATAL"));assertTrue(child.process.isAlive());
+             }
+             var help=new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",System.getProperty("java.class.path"),OttApplication.class.getName(),"--help")
+@@ -543,4 +545,9 @@ class OttApplicationTest {
+         }
+     }
+ 
++    @Test void D18_recoveryCommandIsBoundedAndNotAnUnknownCommand() {
++        var h=new Harness();assertEquals(0,h.run("recovery\nquit\n","--role","RELAY","--config","src/main/resources/config/relay.properties"));
++        assertTrue(h.text().contains("RECOVERY node="));assertFalse(h.text().contains("unknown command"));
++        assertTrue(h.text().lines().filter(line->line.contains("RECOVERY ")).allMatch(line->line.length()<=OttApplication.MAX_LOG_CHARS));
++    }
+ }
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java
+index bdf2627..5d71e8b 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java
+@@ -231,8 +231,8 @@ class BootstrapServerTest {
+         }
+     }
+ 
+-    @Test void coreAllSeventeenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
+-        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route", "discovery-query", "discovery-snapshot");
++    @Test void coreAllEighteenOtherActiveTypesAreRejectedWithoutSideEffects() throws Exception {
++        var names = java.util.List.of("register-ok", "node-leave", "hello", "hello-ok", "probe-ping", "probe-pong", "stream-announce", "stream-withdraw", "activate", "activate-ack", "deactivate", "subscription-renew", "route-trace", "trace-result", "error-no-route", "discovery-query", "discovery-snapshot", "repair-hello-min");
+         var seen = new java.util.HashSet<MessageType>();
+         try (var rig = new Rig(configuration())) {
+             for (var name : names) {
+@@ -246,7 +246,7 @@ class BootstrapServerTest {
+                 }
+                 seen.add(m.type());
+             }
+-            assertEquals(17, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
++            assertEquals(18, seen.size()); assertFalse(seen.contains(MessageType.REGISTER));
+         }
+     }
+ 
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborDiscoveryTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborDiscoveryTest.java
+index db0d0ea..218557b 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborDiscoveryTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborDiscoveryTest.java
+@@ -225,18 +225,20 @@ class NeighborDiscoveryTest {
+         try(var g=new Graph(false)) {
+             g.start();g.bootstrap.close();NeighborManagerTest.until(()->g.learned("C","S")&&g.learned("S","C"));
+             var before=g.candidates("C");assertTrue(before.stream().flatMap(v->v.sources().stream()).allMatch(p->Set.of("R1","R2").contains(p.source().nodeId())));
+-            g.lose("R1");g.lose("R2");NeighborManagerTest.until(()->g.nodes.get("C").snapshot().isEmpty()&&g.nodes.get("S").snapshot().isEmpty());
++            g.lose("R1");g.lose("R2");NeighborManagerTest.until(()->g.nodes.get("C").snapshot().keySet().stream().noneMatch(Set.of("R1","R2")::contains)&&g.nodes.get("S").snapshot().keySet().stream().noneMatch(Set.of("R1","R2")::contains));
+             assertTrue(g.learned("C","S"));assertTrue(g.learned("S","C"));assertFalse(g.nodes.get("C").start().toCompletableFuture().isCompletedExceptionally());
+-            assertFalse(g.nodes.get("C").snapshot().containsKey("S"),"Learning must not perform IMP-035 repair");
++            // The application now repairs; the isolated Discovery service still never dials (D09).
++            assertTrue(g.candidates("C").stream().anyMatch(c->c.nodeId().equals("S")));
+         }
+     }
+     @Test @org.junit.jupiter.api.Timeout(20) void D04_realTcpLearnsR1AndRetainsHealthySR1SessionAfterR2R3Loss()throws Exception {
+         try(var g=new Graph(true)) {
+             g.start();var surviving=g.nodes.get("S").snapshot().get("R1");g.bootstrap.close();
+             NeighborManagerTest.until(()->g.learned("C","R1")&&g.learned("R1","C"));g.lose("R2");g.lose("R3");
+-            NeighborManagerTest.until(()->g.nodes.get("C").snapshot().isEmpty()&&g.nodes.get("R1").snapshot().size()==1);
++            NeighborManagerTest.until(()->!g.nodes.get("C").snapshot().containsKey("R2")&&!g.nodes.get("C").snapshot().containsKey("R3")&&g.nodes.get("R1").snapshot().containsKey("S"));
+             assertEquals(surviving,g.nodes.get("S").snapshot().get("R1"));assertTrue(g.learned("C","R1"));assertTrue(g.learned("R1","C"));
+-            assertFalse(g.nodes.get("C").snapshot().containsKey("R1"),"No dynamic edge before IMP-035");
++            // Exact new-edge establishment is covered by OverlayRecoveryTest.D04; retain the learning oracle here.
++            assertTrue(g.learned("C","R1"));
+         }
+     }
+ 
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java
+index 6744a3e..559aced 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java
+@@ -241,7 +241,7 @@ class NeighborManagerLifecycleTest {
+                 var c = new FakeChannel(); var remote = UUID.randomUUID();
+                 f.io.sink.opened(c, f.clock.get()); f.pump();
+                 f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), configured.nodeId(), remote,
+-                    new ControlMessage.Hello(endpoint(configured.nodeId(), remote, configured.controlPort()),1,1)));
++                    new ControlMessage.Hello(endpoint(configured.nodeId(), remote, configured.controlPort()),3,3)));
+                 c.flush = false; channels.add(c);
+             }
+             assertEquals(63, f.manager.snapshot().size());
+@@ -274,7 +274,7 @@ class NeighborManagerLifecycleTest {
+                 socket.setSoTimeout(2500);
+                 var ep = new ControlMessage.Endpoint("N1", remote, "127.0.0.1", config.controlPort(), config.dataPort(), NodeRole.RELAY);
+                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "N1", remote,
+-                    new ControlMessage.Hello(ep,1,1)), socket.getOutputStream()); socket.getOutputStream().flush();
++                    new ControlMessage.Hello(ep,3,3)), socket.getOutputStream()); socket.getOutputStream().flush();
+                 assertEquals(MessageType.HELLO_OK, MessageCodec.read(socket.getInputStream()).orElseThrow().type());
+                 until(() -> receiver.snapshot().containsKey("N1"));
+                 var report = receiver.requestShutdown(1, BUDGET).toCompletableFuture().get(2, TimeUnit.SECONDS);
+@@ -368,4 +368,13 @@ class NeighborManagerLifecycleTest {
+         }
+     }
+ 
++    @Test void D19_repairedActiveSessionReceivesV2LeaveAndTerminatesWithinGlobalBudget()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var c=OverlayRecoveryTest.repair(f,"A",UUID.randomUUID(),18000,true);var session=f.manager.snapshot().get("A");
++            var stage=shutdown(f,BUDGET);f.pump();var report=result(stage);
++            assertEquals(MessageType.NODE_LEAVE,c.last().type());assertEquals(2,c.last().version());assertEquals(new ControlMessage.Leave(0),c.last().payload());
++            assertEquals(List.of(new NeighborManager.LeaveAttempt(session,NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED)),report.attempts());
++            assertFalse(report.notificationTimedOut());assertFalse(c.open);assertTrue(f.manager.awaitTermination(BUDGET));assertEquals(OverlayRecovery.Phase.STOPPING,f.manager.recoveryStatus().phase());
++        }
++    }
+ }
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+index 6bd4278..50eed97 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java
+@@ -189,12 +189,12 @@ class NeighborManagerTest {
+             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); io.dials.get(1).future.complete(c); pump(); return c;
+         }
+         void ok(FakeChannel c, UUID remote) {
+-            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, new ControlMessage.HelloOk(1)));
++            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, new ControlMessage.HelloOk(3)));
+         }
+         FakeChannel inbound(String id, UUID remote, boolean flush) {
+             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); pump();
+             message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), id, remote,
+-                    new ControlMessage.Hello(endpoint(id, remote, 19002),1,1))); return c;
++                    new ControlMessage.Hello(endpoint(id, remote, 19002),3,3))); return c;
+         }
+         long ups() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborUp).count(); }
+         long downs() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborDown).count(); }
+@@ -320,7 +320,7 @@ class NeighborManagerTest {
+     @Test void d14ForgedHelloBeforeDialResultCannotBecomeInbound() {
+         try (var f = new Fixture("A")) {
+             f.ready("B"); var c = new FakeChannel(); f.io.sink.opened(c, f.clock.get());
+-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.Hello(endpoint("B", UUID.randomUUID(), 19002),1,1)));
++            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.Hello(endpoint("B", UUID.randomUUID(), 19002),3,3)));
+             assertTrue(c.writes.isEmpty()); assertEquals(0, f.ups());
+             f.io.dials.get(1).future.complete(c); f.pump(); assertFalse(c.open); assertEquals(0, f.ups());
+         }
+@@ -438,7 +438,7 @@ class NeighborManagerTest {
+             try (var bad = new Socket("127.0.0.1", d.configs.get(0).controlPort())) {
+                 bad.setSoTimeout(2000); var remote = UUID.randomUUID();
+                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "UNKNOWN", remote,
+-                        new ControlMessage.Hello(endpoint("UNKNOWN", remote, 18002),1,1)), bad.getOutputStream());
++                        new ControlMessage.Hello(endpoint("UNKNOWN", remote, 18002),3,3)), bad.getOutputStream());
+                 bad.getOutputStream().flush(); var reply = MessageCodec.read(bad.getInputStream()).orElseThrow();
+                 assertEquals(MessageType.ERROR, reply.type());
+                 assertEquals(ErrorCode.UNAUTHORIZED_NEIGHBOR, ((ControlMessage.ErrorPayload)reply.payload()).code());
+@@ -486,7 +486,7 @@ class NeighborManagerTest {
+                 default -> endpoint("B", ZERO, 19002);
+             };
+             f.io.sink.opened(c, f.clock.get()); f.pump();
+-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.Hello(ep,1,1)));
++            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.Hello(ep,3,3)));
+             assertEquals(0, f.ups()); assertFalse(c.open); assertEquals(2, f.io.resolved.size(), "No DNS from remote HELLO");
+         }
+         try (var f = new Fixture("A")) {
+@@ -708,7 +708,7 @@ class NeighborManagerTest {
+                 var c = new FakeChannel(); c.flush = false; candidates.add(c); var ep = desired.get(i); var remote = UUID.randomUUID();
+                 f.io.sink.opened(c, f.clock.get()); f.pump();
+                 f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Hello(
+-                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()),1,1)));
++                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()),3,3)));
+                 for (int n = 0; n < 3; n++) f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Probe(n)));
+             }
+             assertFalse(candidates.get(2).open); // Nine frames exceed R=8 while B=4 was not exceeded.
+@@ -742,7 +742,7 @@ class NeighborManagerTest {
+             f.ready("B"); var c = f.outbound(true);
+             f.message(c, new ControlMessage(MessageType.HELLO_OK, kind == 0 ? UUID.randomUUID() : c.last().requestId(),
+                     kind == 1 ? "WRONG" : "B", kind == 2 ? ZERO : UUID.randomUUID(),
+-                    kind == 3 ? new ControlMessage.Probe(1) : new ControlMessage.HelloOk(1)));
++                    kind == 3 ? new ControlMessage.Probe(1) : new ControlMessage.HelloOk(3)));
+             assertFalse(c.open); assertEquals(0, f.ups()); assertTrue(f.manager.snapshot().isEmpty());
+         }
+     }
+@@ -790,7 +790,7 @@ class NeighborManagerTest {
+                 new DiscoveryMessage.Snapshot(payload.helloRequestId(),"Z",f.instance,1,List.of(endpoint("S",UUID.randomUUID(),18000)))));
+             var view=f.manager.candidates();f.pump();assertEquals("S",view.toCompletableFuture().get().getFirst().nodeId());
+             var fresh=new FakeChannel();f.io.sink.opened(fresh,f.clock.get());f.pump();var freshInstance=UUID.randomUUID();
+-            f.message(fresh,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",freshInstance,new ControlMessage.Hello(endpoint("B",freshInstance,19003),1,1)));
++            f.message(fresh,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",freshInstance,new ControlMessage.Hello(endpoint("B",freshInstance,19003),3,3)));
+             assertEquals(2,f.ups());var b=f.manager.snapshot().get("B");
+             var old=new MessageCodec.ExtraEnvelope(2,MessageType.DISCOVERY_SNAPSHOT,UUID.randomUUID(),"B",rejectedInstance,UUID.randomUUID(),"Z",f.instance);
+             f.io.sink.rejected(bad,new MessageCodec.RejectedExtraContent(old,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java
+new file mode 100644
+index 0000000..981b69f
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java
+@@ -0,0 +1,283 @@
++package pt.uminho.esr.ott.overlay;
++
++import org.junit.jupiter.api.Test;
++import pt.uminho.esr.ott.protocol.*;
++import java.util.*;
++import static org.junit.jupiter.api.Assertions.*;
++import static pt.uminho.esr.ott.overlay.NeighborManagerTest.*;
++
++class OverlayRecoveryTest {
++    static FakeChannel repair(Fixture f,String id,UUID instance,int port,boolean flush)throws Exception {
++        var c=new FakeChannel();c.flush=flush;f.io.sink.opened(c,f.clock.get());f.pump();
++        f.message(c,new ControlMessage(MessageType.fromCode(20),UUID.randomUUID(),id,instance,
++            new ControlMessage.Hello(endpoint(id,instance,port),3,3)));return c;
++    }
++    @Test void D05_greaterIsolatedPeerCompletesOnSameConnectionWithoutReturnDial()throws Exception {
++        try(var f=new Fixture("A")) {
++            f.ready("B");f.io.dials.getLast().future().completeExceptionally(new java.io.IOException("configured peer offline"));f.pump();var c=repair(f,"Z",UUID.randomUUID(),18000,true);
++            assertTrue(c.open);assertEquals(1,f.ups());assertEquals(0,f.downs());
++            assertEquals(c.id(),f.manager.snapshot().get("Z").connectionId());
++            assertEquals(MessageType.HELLO_OK,c.last().type());assertEquals(2,f.io.dials.size());
++        }
++    }
++    @Test void D05_healthyDestinationPreservesExistingSessionAndDoesNotRequireReciprocalCache()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var healthy=f.inbound("R",UUID.randomUUID(),true);var before=f.manager.snapshot().get("R");
++            var c=repair(f,"ZZ",UUID.randomUUID(),18000,true);
++            assertTrue(c.open);assertEquals(2,f.ups());assertEquals(0,f.downs());
++            assertEquals(before,f.manager.snapshot().get("R"));assertTrue(healthy.open);
++            assertEquals(c.id(),f.manager.snapshot().get("ZZ").connectionId());assertEquals(1,f.io.dials.size());
++        }
++    }
++
++    static void learn(Fixture f,FakeChannel relay,UUID remote,String target)throws Exception {
++        f.timers.advance(NeighborDiscovery.TICK);f.pump();var q=relay.extraWrites.getLast();
++        assertEquals(MessageType.DISCOVERY_QUERY,q.type());var payload=(DiscoveryMessage.Query)q.payload();
++        f.message(relay,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,q.requestId(),"R",remote,
++            new DiscoveryMessage.Snapshot(payload.helloRequestId(),"Z",f.instance,1,List.of(endpoint(target,UUID.randomUUID(),18000)))));
++    }
++    static void lose(Fixture f,FakeChannel channel) {
++        channel.close();f.io.sink.closed(channel,pt.uminho.esr.ott.transport.Connection.CloseReason.PEER_EOF,f.clock.get());f.pump();
++    }
++    static FakeChannel outgoing(Fixture f,boolean flush) {
++        var c=new FakeChannel();c.flush=flush;f.io.sink.opened(c,f.clock.get());f.io.dials.getLast().future().complete(c);f.pump();return c;
++    }
++    @Test void D05_isolatedGreaterSelectsLearnedCandidateAndKeepsSameTcp()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);
++            learn(f,relay,remote,"A");assertEquals(1,f.io.dials.size());lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();assertEquals(2,f.io.dials.size());
++            var c=outgoing(f,true);assertEquals(20,c.last().type().code());var id=c.last().requestId();
++            f.message(c,new ControlMessage(MessageType.HELLO_OK,id,"A",UUID.randomUUID(),new ControlMessage.HelloOk(3)));
++            assertEquals(c.id(),f.manager.snapshot().get("A").connectionId());assertEquals(2,f.io.dials.size());
++            assertEquals(OverlayRecovery.Phase.ACTIVE,f.manager.recoveryStatus().phase());assertEquals(1,f.downs());
++        }
++    }
++    @Test void D09_smallerInboundWinsPendingOutgoingAndLateLoserCannotRemoveWinner()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var losing=outgoing(f,false);var oldRequest=losing.last().requestId();
++            var winning=repair(f,"A",UUID.randomUUID(),18000,true);var winner=f.manager.snapshot().get("A");
++            assertNotNull(winner);assertEquals(winning.id(),winner.connectionId());assertFalse(losing.open);
++            losing.written();f.pump();f.message(losing,new ControlMessage(MessageType.HELLO_OK,oldRequest,"A",UUID.randomUUID(),new ControlMessage.HelloOk(3)));
++            f.io.sink.closed(losing,pt.uminho.esr.ott.transport.Connection.CloseReason.PEER_EOF,f.clock.get());f.pump();
++            assertEquals(winner,f.manager.snapshot().get("A"));assertEquals(1,f.downs());assertEquals(2,f.ups());
++        }
++    }
++    @Test void D09_smallerOutgoingWinsPendingGreaterInboundIncludingOpenedBeforeDialResult()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"ZZ");lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            var loser=repair(f,"ZZ",UUID.randomUUID(),18000,true);assertTrue(loser.open,"UNCLASSIFIED retains frame until dial result");
++            var winner=outgoing(f,true);assertEquals(20,winner.last().type().code());assertFalse(loser.open);
++            f.message(winner,new ControlMessage(MessageType.HELLO_OK,winner.last().requestId(),"ZZ",UUID.randomUUID(),new ControlMessage.HelloOk(3)));
++            assertEquals(winner.id(),f.manager.snapshot().get("ZZ").connectionId());assertEquals(1,f.downs());
++        }
++    }
++    @Test void D10_activeGreaterInitiatorIsNotReplacedBySmallerLateAttemptOrNewInstance()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var first=repair(f,"ZZ",UUID.randomUUID(),18000,true);var active=f.manager.snapshot().get("ZZ");
++            var late=repair(f,"ZZ",UUID.randomUUID(),18000,true);
++            assertFalse(late.open);assertTrue(first.open);assertEquals(active,f.manager.snapshot().get("ZZ"));assertEquals(1,f.ups());assertEquals(0,f.downs());
++        }
++    }
++    @Test void D11_sameOriginDuplicatePendingDoesNotReplaceCurrentRequest()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var instance=UUID.randomUUID();var chosen=repair(f,"A",instance,18000,false);
++            var duplicate=repair(f,"A",instance,18000,true);assertFalse(duplicate.open);assertEquals(0,f.ups());
++            chosen.written();f.pump();assertEquals(chosen.id(),f.manager.snapshot().get("A").connectionId());assertEquals(0,f.downs());
++        }
++    }
++    @Test void D08_badEndpointIdentityCapabilitiesAndConfiguredHelloDoNotAdmit()throws Exception {
++        for(int kind=0;kind<6;kind++)try(var f=new Fixture("Z")) {
++            f.ready("R");var instance=UUID.randomUUID();var c=new FakeChannel();f.io.sink.opened(c,f.clock.get());f.pump();
++            var ep=endpoint(kind==0?"OTHER":"A",kind==1?UUID.randomUUID():instance,kind==2?19001:18000);
++            var type=kind==5?MessageType.HELLO:MessageType.fromCode(20);
++            f.message(c,new ControlMessage(type,kind==3?ZERO:UUID.randomUUID(),"A",instance,new ControlMessage.Hello(ep,kind==4?1:3,kind==4?1:3)));
++            assertFalse(c.open);assertEquals(0,f.ups());assertTrue(f.manager.snapshot().isEmpty());
++        }
++    }
++    @Test void D18_repairErrorUsesRelatedType20WithoutErrorReply()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var c=outgoing(f,true);
++            var error=new ControlMessage(MessageType.ERROR,c.last().requestId(),"A",UUID.randomUUID(),new ControlMessage.ErrorPayload(ErrorCode.RESOURCE_LIMIT,20,"busy"));
++            f.message(c,error);assertFalse(c.open);assertEquals(1,c.writes.size());assertTrue(f.manager.snapshot().isEmpty());
++            assertEquals(OverlayRecovery.RecoveryReason.REJECTED,f.manager.recoveryStatus().reason());
++        }
++    }
++    static final class Policy implements OverlayRecovery.RecoveryPorts {
++        final java.util.concurrent.atomic.AtomicLong clock=new java.util.concurrent.atomic.AtomicLong(1);
++        final Map<String,Neighbor.Session> active=new LinkedHashMap<>();final List<CandidateCache.CandidateView> candidates=new ArrayList<>();
++        final List<OverlayRecovery.RepairAttempt> launched=new ArrayList<>(),cancelled=new ArrayList<>();
++        final OverlayRecovery service;boolean admit=true;long serial;
++        Policy(){service=new OverlayRecovery(config("C",19001),UUID.randomUUID(),clock::get,()->new UUID(1,++serial),this);}
++        CandidateCache.CandidateView candidate(String id,long began) {
++            var source=new CandidateCache.SourceKey("R",UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID());
++            var endpoint=new CandidateCache.CandidateEndpoint(id,"127.0.0.1",18000+serialAsInt(id),18100+serialAsInt(id),NodeRole.RELAY);
++            return new CandidateCache.CandidateView(id,CandidateCache.CandidateState.AVAILABLE,Optional.of(endpoint),List.of(new CandidateCache.Provenance(source,1,endpoint,UUID.randomUUID(),began,began,CandidateCache.TTL_NANOS)));
++        }
++        static int serialAsInt(String id){return Math.floorMod(id.hashCode(),50);}
++        public Map<String,Neighbor.Session> active(){return Map.copyOf(active);}
++        public List<CandidateCache.CandidateView> candidates(long now){return List.copyOf(candidates);}
++        public boolean beginRepair(OverlayRecovery.RepairAttempt a,ControlMessage.Endpoint ep,long remaining){assertTrue(remaining>0&&remaining<=OverlayRecovery.TOTAL_BUDGET);launched.add(a);return admit;}
++        public void cancelRepair(OverlayRecovery.RepairAttempt a){cancelled.add(a);}
++        public void publish(OverlayRecovery.RecoveryStatus status){}
++        void tick(long elapsed){clock.addAndGet(elapsed);service.maintain(clock.get());}
++    }
++    @Test void D02_onlyIsolationTriggersAndOneOperationIsLogical() {
++        var p=new Policy();p.candidates.add(p.candidate("A",0));var instance=UUID.randomUUID();p.active.put("R",new Neighbor.Session("R",instance,UUID.randomUUID(),endpoint("R",instance,19002)));
++        p.tick(0);assertTrue(p.launched.isEmpty());p.active.clear();p.tick(0);p.tick(1);assertEquals(1,p.launched.size());
++    }
++    @Test void D07_emptyExpiredConflictAndSelfNeverDial() {
++        var p=new Policy();p.tick(0);assertTrue(p.launched.isEmpty());
++        var c=p.candidate("A",0);p.candidates.add(new CandidateCache.CandidateView("A",CandidateCache.CandidateState.CONFLICT,Optional.empty(),c.sources()));p.tick(0);assertTrue(p.launched.isEmpty());
++        p.candidates.clear();p.candidates.add(p.candidate("C",0));p.tick(0);assertTrue(p.launched.isEmpty());
++        p.candidates.clear();p.candidates.add(c);p.tick(CandidateCache.TTL_NANOS);assertTrue(p.launched.isEmpty());
++    }
++    @Test void D15_originalClaimDeadlineDoesNotExtendAfterCacheRefresh() {
++        var p=new Policy();p.candidates.add(p.candidate("A",-59_000_000_000L));p.tick(0);assertEquals(1,p.launched.size());
++        p.tick(500_000_000L);p.candidates.set(0,p.candidate("A",p.clock.get()));p.tick(500_000_000L);
++        assertEquals(1,p.cancelled.size());assertEquals(OverlayRecovery.RecoveryReason.EXPIRED,p.service.snapshot().reason());
++    }
++    @Test void D15_totalBudgetAndOldCallbackCannotCancelFreshAttempt() {
++        var p=new Policy();p.candidates.add(p.candidate("A",0));p.tick(0);var old=p.launched.getFirst();
++        p.tick(OverlayRecovery.TOTAL_BUDGET);assertEquals(1,p.cancelled.size());assertEquals(OverlayRecovery.RecoveryReason.TIMEOUT,p.service.snapshot().reason());
++        p.tick(500_000_000L);var fresh=p.launched.getLast();assertNotSame(old,fresh);p.service.onAttemptTerminal(old,OverlayRecovery.RecoveryReason.TRANSPORT);
++        assertTrue(p.service.isCurrent(fresh));
++    }
++    @Test void D14_backoffIsBoundedAndOtherCandidateCanProgress() {
++        var p=new Policy();p.admit=false;p.candidates.add(p.candidate("A",0));p.candidates.add(p.candidate("B",0));
++        p.tick(0);p.tick(1);assertEquals(List.of("A","B"),p.launched.stream().map(OverlayRecovery.RepairAttempt::targetId).toList());
++        p.tick(1);assertEquals(2,p.launched.size());p.tick(500_000_000L);assertEquals(3,p.launched.size());
++        assertTrue(p.service.snapshot().retryDelayMillis()<=5000);
++    }
++    @Test void D19_shutdownCancelsLogicalAttemptAndForbidsNewAdmissions() {
++        var p=new Policy();p.candidates.add(p.candidate("A",0));p.tick(0);var a=p.launched.getFirst();p.service.requestClose(1);p.tick(99_000_000_000L);
++        assertEquals(List.of(a),p.cancelled);assertEquals(1,p.launched.size());assertEquals(OverlayRecovery.Phase.STOPPING,p.service.snapshot().phase());
++        p.service.onAttemptTerminal(a,OverlayRecovery.RecoveryReason.TRANSPORT);assertEquals(OverlayRecovery.Phase.STOPPING,p.service.snapshot().phase());
++    }
++
++    @Test @org.junit.jupiter.api.Timeout(20) void D03_realTcpLearnsBeforeFailureAndFormsSCOnSameSurvivors()throws Exception {
++        try(var g=new NeighborDiscoveryTest.Graph(false)) {
++            g.start();g.bootstrap.close();until(()->g.learned("C","S")&&g.learned("S","C"));
++            g.lose("R1");until(()->g.nodes.get("C").snapshot().keySet().equals(Set.of("R2"))&&g.nodes.get("S").snapshot().keySet().equals(Set.of("R2")));
++            assertFalse(g.nodes.get("C").snapshot().containsKey("S"));g.lose("R2");
++            until(()->g.nodes.get("C").snapshot().keySet().equals(Set.of("S"))&&g.nodes.get("S").snapshot().keySet().equals(Set.of("C")));
++            assertFalse(g.nodes.get("C").start().toCompletableFuture().isCompletedExceptionally());assertFalse(g.nodes.get("S").start().toCompletableFuture().isCompletedExceptionally());
++        }
++    }
++    @Test @org.junit.jupiter.api.Timeout(20) void D04_realTcpFormsR1CAndPreservesHealthySR1()throws Exception {
++        try(var g=new NeighborDiscoveryTest.Graph(true)) {
++            g.start();g.bootstrap.close();var healthy=g.nodes.get("S").snapshot().get("R1");
++            until(()->g.learned("C","R1")&&g.learned("R1","C"));g.lose("R2");
++            until(()->g.nodes.get("C").snapshot().keySet().equals(Set.of("R3")));assertFalse(g.nodes.get("C").snapshot().containsKey("R1"));
++            g.lose("R3");until(()->g.nodes.get("C").snapshot().keySet().equals(Set.of("R1"))&&g.nodes.get("R1").snapshot().keySet().equals(Set.of("S","C")));
++            assertEquals(healthy,g.nodes.get("S").snapshot().get("R1"));
++        }
++    }
++
++    @Test void D13_repairDnsDeadlineUsesExistingTickNotAnAdditionalPhysicalTimer()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");lose(f,relay);
++            f.io.holdDns=true;f.timers.limit(1);f.timers.advance(NeighborDiscovery.TICK);f.pump();
++            assertFalse(f.owner.stopped);assertEquals(1,f.timers.periodic.size());assertTrue(f.timers.tasks.isEmpty());
++            f.timers.advance(java.util.concurrent.TimeUnit.SECONDS.toNanos(2));f.pump();
++            assertFalse(f.owner.stopped);assertEquals(OverlayRecovery.RecoveryReason.TIMEOUT,f.manager.recoveryStatus().reason());
++        }
++    }
++
++    @Test void D13_atMostTwoPendingAdmissionsWithoutLosingHealthyState()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var first=repair(f,"A",UUID.randomUUID(),18000,false);var second=repair(f,"B",UUID.randomUUID(),18010,false);
++            var excess=repair(f,"D",UUID.randomUUID(),18020,true);assertFalse(excess.open);assertTrue(first.open);assertTrue(second.open);
++            assertEquals(0,f.ups());assertFalse(f.owner.stopped);assertEquals(3,f.manager.diagnostics().size());
++            first.written();f.pump();second.written();f.pump();assertEquals(Set.of("A","B"),f.manager.snapshot().keySet());assertEquals(0,f.downs());
++        }
++    }
++    @Test void D13_dynamicTableStopsAtSixteenAndPreservesAllActiveSessions()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var connections=new ArrayList<FakeChannel>();
++            for(int i=0;i<16;i++)connections.add(repair(f,"N"+i,UUID.randomUUID(),18000+i*10,true));
++            var before=f.manager.snapshot();assertEquals(16,before.size());var excess=repair(f,"N16",UUID.randomUUID(),18300,true);
++            assertFalse(excess.open);assertEquals(before,f.manager.snapshot());assertTrue(connections.stream().allMatch(c->c.open));
++            assertEquals(0,f.downs());assertFalse(f.owner.stopped);
++        }
++    }
++    @Test void D15_lateNativeDialCannotWriteRepairHelloEvenWithoutTimerDispatch()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();f.clock.addAndGet(java.util.concurrent.TimeUnit.SECONDS.toNanos(2));
++            var late=outgoing(f,true);assertFalse(late.open);assertTrue(late.writes.isEmpty());assertTrue(f.manager.snapshot().isEmpty());
++            assertEquals(OverlayRecovery.RecoveryReason.TIMEOUT,f.manager.recoveryStatus().reason());
++        }
++    }
++    @Test void D12_wrongErrorRelatedTypeCannotRejectCurrentRepairAsLegitimateRemoteError()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var c=outgoing(f,true);
++            f.message(c,new ControlMessage(MessageType.ERROR,c.last().requestId(),"A",UUID.randomUUID(),new ControlMessage.ErrorPayload(ErrorCode.RESOURCE_LIMIT,5,"wrong context")));
++            assertFalse(c.open);assertEquals(1,c.writes.size());assertNotEquals(OverlayRecovery.RecoveryReason.REJECTED,f.manager.recoveryStatus().reason());
++        }
++    }
++    static List<CandidateCache.CandidateView> candidates(Fixture f) {
++        var stage=f.manager.candidates();f.pump();return stage.toCompletableFuture().join();
++    }
++    @Test void D16_staleDiscoveryOnRepairedSessionPreservesQueryCacheAndConnection()throws Exception {
++        for(String kind:List.of("token-snapshot","token-query","rejected-snapshot","rejected-query","generation","query"))try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var c=repair(f,"A",remote,18000,true);var session=f.manager.snapshot().get("A");
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var first=c.extraWrites.getLast();
++            var hello=((DiscoveryMessage.Query)first.payload()).helloRequestId();var candidate=endpoint("S",UUID.randomUUID(),18100);
++            f.message(c,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,first.requestId(),"A",remote,
++                new DiscoveryMessage.Snapshot(hello,"Z",f.instance,4,List.of(candidate))));var before=candidates(f);
++            f.timers.advance(NeighborDiscovery.REFRESH);f.pump();var query=c.extraWrites.getLast();long began=f.clock.get();int writes=c.extraWrites.size();
++            assertNotEquals(first.requestId(),query.requestId());var token=kind.equals("generation")||kind.equals("query")?hello:UUID.randomUUID();
++            if(kind.startsWith("rejected")) {
++                var type=kind.endsWith("query")?MessageType.DISCOVERY_QUERY:MessageType.DISCOVERY_SNAPSHOT;
++                var envelope=new MessageCodec.ExtraEnvelope(2,type,query.requestId(),"A",remote,token,"Z",f.instance);
++                f.io.sink.rejected(c,new MessageCodec.RejectedExtraContent(envelope,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();
++            } else if(kind.equals("token-query")) {
++                f.message(c,new ControlMessage(MessageType.DISCOVERY_QUERY,query.requestId(),"A",remote,new DiscoveryMessage.Query(token,"Z",f.instance)));
++            } else f.message(c,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,kind.equals("query")?first.requestId():query.requestId(),"A",remote,
++                new DiscoveryMessage.Snapshot(token,"Z",f.instance,kind.equals("generation")?3:Long.MAX_VALUE,List.of(endpoint("OTHER",UUID.randomUUID(),18200)))));
++            assertTrue(c.open,kind);assertEquals(session,f.manager.snapshot().get("A"));assertEquals(0,f.downs());
++            assertEquals(before,candidates(f),kind);assertEquals(writes,c.extraWrites.size(),kind);
++            f.message(c,new ControlMessage(MessageType.DISCOVERY_SNAPSHOT,query.requestId(),"A",remote,
++                new DiscoveryMessage.Snapshot(hello,"Z",f.instance,5,List.of(candidate))));
++            var proof=candidates(f).getFirst().sources().getFirst();assertEquals(5,proof.generation(),kind);assertEquals(began,proof.queryStartedNanos());
++            assertEquals(session.connectionId(),proof.source().connectionId());assertEquals(hello,proof.source().helloRequestId());
++            assertEquals(session,f.manager.snapshot().get("A"));assertEquals(0,f.downs());
++        }
++    }
++    @Test void D17_onlyConfirmedRepairedAdjacencyIsAdvertised()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);var hello=relay.last().requestId();
++            var pending=repair(f,"A",UUID.randomUUID(),18000,false);assertFalse(f.manager.snapshot().containsKey("A"));
++            f.message(relay,new ControlMessage(MessageType.DISCOVERY_QUERY,UUID.randomUUID(),"R",remote,new DiscoveryMessage.Query(hello,"Z",f.instance)));
++            var before=(DiscoveryMessage.Snapshot)relay.extraWrites.getLast().payload();assertEquals(List.of("R"),before.directNeighbors().stream().map(ControlMessage.Endpoint::nodeId).toList());
++            pending.written();f.pump();assertTrue(f.manager.snapshot().containsKey("A"));f.timers.advance(NeighborDiscovery.INBOUND_INTERVAL);f.pump();
++            f.message(relay,new ControlMessage(MessageType.DISCOVERY_QUERY,UUID.randomUUID(),"R",remote,new DiscoveryMessage.Query(hello,"Z",f.instance)));
++            var after=(DiscoveryMessage.Snapshot)relay.extraWrites.getLast().payload();assertEquals(Set.of("R","A"),new HashSet<>(after.directNeighbors().stream().map(ControlMessage.Endpoint::nodeId).toList()));
++        }
++    }
++    @Test void D07_selectionRecordsPinnedProvenanceOnce()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");var proof=candidates(f).getFirst().sources().getFirst();lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();var events=f.events.stream().filter(NeighborManager.RepairStarted.class::isInstance).map(NeighborManager.RepairStarted.class::cast).toList();
++            assertEquals(1,events.size());var a=events.getFirst().attempt();assertEquals(proof.source(),a.source());assertEquals(proof.generation(),a.generation());
++            assertEquals(proof.queryStartedNanos(),a.queryStartedNanos());assertEquals(proof.ttlNanos(),a.ttlNanos());assertEquals(f.instance,a.instanceId());assertEquals("A",a.targetId());
++            assertNotEquals(ZERO,a.requestId());assertTrue(events.getFirst().toString().length()<1024);
++        }
++    }
++    @Test void D15_expiredOriginalClaimCannotEnqueueHelloWithoutTickDispatch()throws Exception {
++        try(var f=new Fixture("Z")) {
++            f.ready("R");var remote=UUID.randomUUID();var relay=f.inbound("R",remote,true);learn(f,relay,remote,"A");
++            long began=candidates(f).getFirst().sources().getFirst().queryStartedNanos();
++            f.clock.set(began+CandidateCache.TTL_NANOS-150_000_000L);lose(f,relay);
++            f.timers.advance(NeighborDiscovery.TICK);f.pump();assertEquals(2,f.io.dials.size());
++            f.clock.addAndGet(60_000_000L);var c=outgoing(f,true);
++            assertTrue(c.writes.isEmpty(),"Expired provenance must not authorize an enqueued REPAIR_HELLO");
++            assertFalse(c.open);assertEquals(0,f.manager.snapshot().size());assertEquals(1,f.downs());
++        }
++    }
++}
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java
+index 0a8d8fb..683c1b9 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java
+@@ -43,8 +43,10 @@ class MessageCodecTest {
+             Arguments.of("register",msg(MessageType.REGISTER,"S1",new EndpointPayload(ENDPOINT))),
+             Arguments.of("register-ok",msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(CONFIGURED_ENDPOINT)))),
+             Arguments.of("node-leave",msg(MessageType.NODE_LEAVE,"S1",new Leave(0))),
+-            Arguments.of("hello",msg(MessageType.HELLO,"S1",new Hello(ENDPOINT,1,1))),
+-            Arguments.of("hello-ok-min",msg(MessageType.HELLO_OK,"C",new HelloOk(1))),
++            Arguments.of("repair-hello-min",new ControlMessage(MessageType.REPAIR_HELLO,REQ,"A",INST,new Hello(new Endpoint("A",INST,"a",1,1,NodeRole.RELAY),3,3))),
++            Arguments.of("repair-hello-max",new ControlMessage(MessageType.REPAIR_HELLO,REQ,"N".repeat(32),INST,new Hello(new Endpoint("N".repeat(32),INST,"a".repeat(63)+"."+"b".repeat(63)+"."+"c".repeat(63)+"."+"d".repeat(61),65535,65535,NodeRole.RELAY),3,3))),
++            Arguments.of("hello",msg(MessageType.HELLO,"S1",new Hello(ENDPOINT,3,3))),
++            Arguments.of("hello-ok-min",msg(MessageType.HELLO_OK,"C",new HelloOk(3))),
+             Arguments.of("probe-ping",msg(MessageType.PROBE_PING,"S1",new Probe(42))),
+             Arguments.of("probe-pong",msg(MessageType.PROBE_PONG,"S1",new Probe(42))),
+             Arguments.of("stream-announce",announcement("A")),
+@@ -142,7 +144,7 @@ class MessageCodecTest {
+             long wire=((b[98]&255L)<<24)|((b[99]&255L)<<16)|((b[100]&255L)<<8)|(b[101]&255L);
+             assertEquals(lease,wire);
+         }
+-        var bits=new ControlMessage(MessageType.HELLO_OK,new UUID(Long.MIN_VALUE,-1),"C",new UUID(-1,Long.MIN_VALUE),new HelloOk(1));
++        var bits=new ControlMessage(MessageType.HELLO_OK,new UUID(Long.MIN_VALUE,-1),"C",new UUID(-1,Long.MIN_VALUE),new HelloOk(3));
+         assertEquals(bits,MessageCodec.decode(MessageCodec.encode(bits)));
+         var probe=msg(MessageType.PROBE_PONG,"S1",new Probe(Long.MAX_VALUE));
+         assertEquals(probe,MessageCodec.decode(MessageCodec.encode(probe)));
+@@ -163,9 +165,9 @@ class MessageCodecTest {
+     }
+ 
+     @Test void validatesIdsAndMaximumNeighborCount() throws Exception {
+-        assertEquals(45,MessageCodec.encode(msg(MessageType.HELLO_OK,"C",new HelloOk(1))).length);
++        assertEquals(45,MessageCodec.encode(msg(MessageType.HELLO_OK,"C",new HelloOk(3))).length);
+         for(String id:List.of("","á","bad/id","a".repeat(33)))
+-            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO_OK,id,new HelloOk(1))));
++            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO_OK,id,new HelloOk(3))));
+         List<Endpoint> neighbors=IntStream.range(0,64).mapToObj(i->new Endpoint("N"+i,NIL,"10.0.0.1",5000,5001,NodeRole.RELAY)).toList();
+         var m=msg(MessageType.REGISTER_OK,"B",new NeighborList(neighbors));assertEquals(m,MessageCodec.decode(MessageCodec.encode(m)));
+         var excess=new ArrayList<>(neighbors);excess.add(ENDPOINT);
+@@ -187,24 +189,24 @@ class MessageCodecTest {
+         var unknown=new Endpoint("N",NIL,"10.0.0.2",65535,65535,NodeRole.CLIENT);
+         var response=msg(MessageType.REGISTER_OK,"B",new NeighborList(List.of(unknown)));
+         assertEquals(response,MessageCodec.decode(MessageCodec.encode(response)));
+-        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"N",new Hello(unknown,1,1))));
++        assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"N",new Hello(unknown,3,3))));
+         byte[] zero=fixture("hello");Arrays.fill(zero,46,62,(byte)0);assertThrows(ProtocolException.class,()->MessageCodec.decode(zero));
+         for(NodeRole role:List.of(NodeRole.SERVER,NodeRole.RELAY,NodeRole.CLIENT)){
+             int code=switch(role){case SERVER->1;case RELAY->2;case CLIENT->3;default->throw new AssertionError();};
+-            var m=msg(MessageType.HELLO,"S1",new Hello(new Endpoint("S1",INST,"10.0.0.1",5000,5001,role),1,1));
++            var m=msg(MessageType.HELLO,"S1",new Hello(new Endpoint("S1",INST,"10.0.0.1",5000,5001,role),3,3));
+             byte[] b=MessageCodec.encode(m);assertEquals(code,b[76]);assertEquals(m,MessageCodec.decode(b));
+         }
+         for(Endpoint invalid:List.of(new Endpoint("S1",INST,"h",0,5001,NodeRole.SERVER),
+                 new Endpoint("S1",INST,"h",5000,65536,NodeRole.SERVER),new Endpoint("S1",INST,"bad host",5000,5001,NodeRole.SERVER),
+                 new Endpoint("S1",INST,"h",5000,5001,NodeRole.BOOTSTRAP)))
+-            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"S1",new Hello(invalid,1,1))));
++            assertThrows(ProtocolException.class,()->MessageCodec.encode(msg(MessageType.HELLO,"S1",new Hello(invalid,3,3))));
+     }
+ 
+     @Test void invalidModelsDoNotEmitPartialFrames(){
+         var output=new ByteArrayOutputStream();
+         assertThrows(ProtocolException.class,()->MessageCodec.write(msg(MessageType.PROBE_PING,"S1",Empty.INSTANCE),output));
+         assertEquals(0,output.size());assertThrows(ProtocolException.class,()->MessageCodec.encode(null));
+-        assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(1,MessageType.HELLO_OK,REQ,"C",INST,new HelloOk(1))));
++        assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(1,MessageType.HELLO_OK,REQ,"C",INST,new HelloOk(3))));
+         assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(MessageType.HELLO_OK,null,"C",INST,Empty.INSTANCE)));
+     }
+ 
+@@ -214,7 +216,7 @@ class MessageCodecTest {
+             @Override public void close(){closed=true;}
+             @Override public void flush(){flushed=true;}
+         }
+-        var output=new Output();MessageCodec.write(msg(MessageType.HELLO_OK,"C",new HelloOk(1)),output);
++        var output=new Output();MessageCodec.write(msg(MessageType.HELLO_OK,"C",new HelloOk(3)),output);
+         assertFalse(output.closed);assertFalse(output.flushed);
+         class Input extends ByteArrayInputStream {
+             boolean closed;
+@@ -241,9 +243,9 @@ class MessageCodecTest {
+     }
+ 
+     @Test void allMessageNumbersHaveIndependentVectors(){
+-        assertEquals(IntStream.rangeClosed(1,19).filter(code->code!=3).boxed().toList(),
++        assertEquals(IntStream.rangeClosed(1,20).filter(code->code!=3).boxed().toList(),
+                 goldenVectors().map(a->((ControlMessage)a.get()[1]).type().code()).distinct().sorted().toList());
+-        assertEquals(18,MessageType.values().length);
++        assertEquals(19,MessageType.values().length);
+     }
+ 
+     @Test void bootstrapReplyContainsOnlyConfiguredNeighbors() throws Exception {
+@@ -278,7 +280,7 @@ class MessageCodecTest {
+                 responses++;
+             }else{
+                 var endpoint=new Endpoint(node.nodeId(),instance,node.advertisedHost(),node.controlPort(),node.dataPort(),node.role());
+-                var message=new ControlMessage(MessageType.HELLO,REQ,node.nodeId(),instance,new Hello(endpoint,1,1));
++                var message=new ControlMessage(MessageType.HELLO,REQ,node.nodeId(),instance,new Hello(endpoint,3,3));
+                 assertEquals(message,MessageCodec.decode(MessageCodec.encode(message)));hellos++;
+             }
+             for(var stream:node.streams()){
+@@ -303,4 +305,23 @@ class MessageCodecTest {
+             assertNotNull(input,"Fixture em falta: "+name);return input.readAllBytes();
+         }
+     }
++    @Test void D01_repairHelloUsesSameV2HelloPayloadAndMandatoryCapabilities() throws Exception {
++        var type=MessageType.fromCode(20);
++        var message=new ControlMessage(type,REQ,"S1",INST,new Hello(ENDPOINT,3,3));
++        assertEquals(message,MessageCodec.decode(MessageCodec.encode(message)));
++        assertEquals(20,MessageCodec.encode(message)[5]&255);
++        assertEquals(2,MessageCodec.encode(message)[4]&255);
++    }
++    @Test void D01_normalHelloAndAckRequireBothCapabilities() throws Exception {
++        var hello=new ControlMessage(MessageType.HELLO,REQ,"S1",INST,new Hello(ENDPOINT,3,3));
++        assertEquals(hello,MessageCodec.decode(MessageCodec.encode(hello)));
++        var ack=new ControlMessage(MessageType.HELLO_OK,REQ,"S1",INST,new HelloOk(3));
++        assertEquals(ack,MessageCodec.decode(MessageCodec.encode(ack)));
++        assertThrows(ProtocolException.class,()->MessageCodec.encode(new ControlMessage(MessageType.HELLO,REQ,"S1",INST,new Hello(ENDPOINT,1,1))));
++    }
++    @ParameterizedTest @ValueSource(strings={"discovery-only","mandatory-missing","reserved-mask","zero-request","truncated-endpoint","invalid-role","length-small","length-above-global-cap","unknown-type21"})
++    void D01_repairNegativeIndependentFixtures(String name)throws Exception {
++        byte[] wire=java.nio.file.Files.readAllBytes(Path.of("src/test/resources/protocol/v2/tcp-repair-hello-"+name+".bin"));
++        assertThrows(ProtocolException.class,()->MessageCodec.decode(wire));
++    }
+ }
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
+index 29b1aec..1bb4b2f 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
+@@ -805,4 +805,23 @@ class TransportTest {
+         }
+     }
+ 
++
++    @Test void D14_repairHandshakeConfirmationAndLosingPhysicalReservationUseNormalFifo()throws Exception {
++        var entered=new CountDownLatch(1);var release=new CompletableFuture<Void>();var events=new Events();
++        Connection.WriteDriver blocked=new Connection.WriteDriver(){
++            public void write(byte[] bytes){assertEquals(20,bytes[5]&255);entered.countDown();release.join();}
++            public void flush(){}
++        };
++        try(var transport=new Transport(ephemeral(),events,Transport.Options.defaults(),socket->blocked);var peer=new Socket()) {
++            try {
++                peer.connect(transport.localAddress());var c=take(events.opened);var instance=UUID.randomUUID();
++                var hello=new ControlMessage(MessageType.REPAIR_HELLO,UUID.randomUUID(),"N",instance,
++                    new ControlMessage.Hello(new ControlMessage.Endpoint("N",instance,"127.0.0.1",4100,4200,NodeRole.RELAY),3,3));
++                var written=c.sendAndFlush(hello);assertTrue(entered.await(3,TimeUnit.SECONDS));assertFalse(written.isDone());
++                c.close();assertEquals(1,transport.connectionCount());transport.requestClose();assertFalse(transport.awaitTermination(Duration.ofMillis(10)));
++                assertEquals(1,transport.connectionCount());release.complete(null);assertTrue(transport.awaitTermination(WAIT));
++                assertEquals(0,transport.connectionCount());assertTrue(written.isCompletedExceptionally());
++            } finally {release.complete(null);}
++        }
++    }
+ }
+diff --git a/Projeto/src/test/resources/protocol/README.md b/Projeto/src/test/resources/protocol/README.md
+index 4e989ed..a208282 100644
+--- a/Projeto/src/test/resources/protocol/README.md
++++ b/Projeto/src/test/resources/protocol/README.md
+@@ -1,13 +1,19 @@
+ # Vetores operacionais — TCP v2 e UDP OTT1
+ 
+-66 fixtures: 50 TCP v2 independentes e 16 UDP OTT1/version 1 preservadas. Bin/hex, tamanhos, SHA-256 e expectativas estão em manifest.json. Os vetores TCP encontram-se em v2/; as fixtures UDP mantêm os nomes e bytes anteriores.
++78 fixtures: 62 TCP v2 independentes e 16 UDP OTT1/version 1 preservadas. Bin/hex, tamanhos, SHA-256 e expectativas estão em manifest.json. Os vetores TCP encontram-se em v2/; as fixtures UDP mantêm os nomes e bytes anteriores.
+ 
+-TCP: prefixo u32 big-endian, corpo 37..65536, envelope version=2/type/requestId/senderId/senderInstance; tipos 1,2,4..19 e código 3 rejeitado. HELLO contém Endpoint+supported/required=1, HELLO_OK selected=1. Bootstrap também é v2 e continua só consulta inicial. Não existe decoder/encoder runtime v1 ou fallback.
++TCP: prefixo u32 big-endian, corpo 37..65536, envelope version=2/type/requestId/senderId/senderInstance; tipos 1,2,4..20 e código 3 rejeitado. HELLO5/REPAIR_HELLO20 contêm Endpoint+supported/required=3, HELLO_OK selected=3. Bootstrap também é v2 e continua só consulta inicial. Não existe decoder/encoder runtime v1 ou fallback.
+ 
+-Os 50 vetores TCP foram construídos fora do codec Java a partir dos campos literais do Design, auditados por um leitor Python independente e aprovados pelo utilizador. Não os regenerar com o encoder de produção para obter testes verdes. MessageCodecTest compara bytes e modelos esperados em ambos os sentidos; DiscoveryCodecTest separa erros terminais de conteúdo extra rejeitado.
++Os vetores TCP foram construídos fora do codec Java a partir dos campos literais do Design, auditados por um leitor Python independente e aprovados pelo utilizador. Não os regenerar com o encoder de produção para obter testes verdes. MessageCodecTest compara bytes e modelos esperados em ambos os sentidos; DiscoveryCodecTest separa erros terminais de conteúdo extra rejeitado.
+ 
+-22 vetores positivos, 23 negativos terminais e cinco de conteúdo extra. reject-content exige adicionalmente validação de identidade/sessão atual no owner; a fixture isolada não prova autorização ou continuidade da ligação. Negativos de campos mantêm version=2 para testar a causa indicada; casos de versão errada são separados.
++25 vetores aceites pelo codec, 32 negativos terminais e 5 de conteúdo extra. A duplicata20 é válida no codec e recusada pelo owner. reject-content exige adicionalmente validação de identidade/sessão atual no owner; a fixture isolada não prova autorização ou continuidade da ligação. Negativos de campos mantêm version=2 para testar a causa indicada; casos de versão errada são separados.
+ 
+ UDP: OTT1, versão 1, cabeçalho 64, total <=1200, payload <=1136; inalterado. Os dados sintéticos não provam JPEG, GUI ou vídeo real.
+ 
+-Os arquivos TCP v1 foram retirados por decisão explícita Q-C-19. V-ADD verifica os 50 vetores TCP v2 independentes e os 16 UDP OTT1 face à base integrada; não substitui os testes Java/manual. Os testes negativos de rejeição da versão TCP v1 são parte do contrato v2.
++Os arquivos TCP v1 foram retirados por decisão explícita Q-C-19. V-ADD verifica os 62 vetores TCP v2 independentes e os 16 UDP OTT1 face à base integrada; não substitui os testes Java/manual. Os testes negativos de rejeição da versão TCP v1 são parte do contrato v2.
++
++ADR-035 aprovada: quatro vetores de máscara migrados;46TCP e16UDP anteriores
++preservados;12TCP novos. Gerador literal independente e manifesto em
++experiments/overlay-recovery/reference-v2/ (na raiz do repositório), sem chamar o
++encoder Java. MessageCodecTest compara os modelos/bytes, incluindo20; V-ADD
++verifica contagens, hashes, hex e correspondência da referência independente.
+diff --git a/Projeto/src/test/resources/protocol/manifest.json b/Projeto/src/test/resources/protocol/manifest.json
+index 838719c..a208b34 100644
+--- a/Projeto/src/test/resources/protocol/manifest.json
++++ b/Projeto/src/test/resources/protocol/manifest.json
+@@ -81,40 +81,6 @@
+         }
+       }
+     },
+-    {
+-      "id": "tcp-hello",
+-      "binary": "v2/tcp-hello.bin",
+-      "hex": "v2/tcp-hello.hex",
+-      "bytes": 85,
+-      "sha256": "02528fbfab8bd5f9e63a01d3af62e806aa0762a35ae223ed160a4f3595a89944",
+-      "expected": {
+-        "outcome": "accept",
+-        "stage": "codec",
+-        "fields": {
+-          "type": 5,
+-          "supported": 1,
+-          "required": 1,
+-          "endpointId": "S1",
+-          "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+-        }
+-      }
+-    },
+-    {
+-      "id": "tcp-hello-ok",
+-      "binary": "v2/tcp-hello-ok.bin",
+-      "hex": "v2/tcp-hello-ok.hex",
+-      "bytes": 45,
+-      "sha256": "7217dbed16e2df3b33b839e14981340213329f6d5cc71c6101e022df8933b903",
+-      "expected": {
+-        "outcome": "accept",
+-        "stage": "codec",
+-        "fields": {
+-          "type": 6,
+-          "selected": 1,
+-          "bodyLength": 41
+-        }
+-      }
+-    },
+     {
+       "id": "tcp-probe-ping",
+       "binary": "v2/tcp-probe-ping.bin",
+@@ -603,19 +569,6 @@
+         "error": "RESOURCE_LIMIT"
+       }
+     },
+-    {
+-      "id": "tcp-invalid-capability-not-required",
+-      "binary": "v2/tcp-invalid-capability-not-required.bin",
+-      "hex": "v2/tcp-invalid-capability-not-required.hex",
+-      "bytes": 85,
+-      "sha256": "a3a6f54d6f39092c29c074d2d93c59b5cfb93dab7101ca998d8bb7226944cd2b",
+-      "expected": {
+-        "outcome": "reject",
+-        "stage": "handshake",
+-        "fields": {},
+-        "error": "INVALID_MESSAGE"
+-      }
+-    },
+     {
+       "id": "tcp-invalid-capability-missing",
+       "binary": "v2/tcp-invalid-capability-missing.bin",
+@@ -629,19 +582,6 @@
+         "error": "INVALID_MESSAGE"
+       }
+     },
+-    {
+-      "id": "tcp-invalid-capability-reserved",
+-      "binary": "v2/tcp-invalid-capability-reserved.bin",
+-      "hex": "v2/tcp-invalid-capability-reserved.hex",
+-      "bytes": 85,
+-      "sha256": "7b68883b930fa13660cdac4075dd332ddeb13925a09a4ce35d05bf3039a37fa8",
+-      "expected": {
+-        "outcome": "reject",
+-        "stage": "handshake",
+-        "fields": {},
+-        "error": "INVALID_MESSAGE"
+-      }
+-    },
+     {
+       "id": "tcp-invalid-selection",
+       "binary": "v2/tcp-invalid-selection.bin",
+@@ -759,6 +699,230 @@
+         "error": "RESOURCE_LIMIT"
+       }
+     },
++    {
++      "id": "tcp-hello",
++      "binary": "v2/tcp-hello.bin",
++      "hex": "v2/tcp-hello.hex",
++      "bytes": 85,
++      "sha256": "7ed30f626b85e8dc9f0ab7e443f7cb6b6d2dda676a5c99ce77cbd6735540d965",
++      "expected": {
++        "outcome": "accept",
++        "stage": "codec",
++        "fields": {
++          "type": 5,
++          "supported": 3,
++          "required": 3,
++          "endpointId": "S1",
++          "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
++        }
++      }
++    },
++    {
++      "id": "tcp-hello-ok",
++      "binary": "v2/tcp-hello-ok.bin",
++      "hex": "v2/tcp-hello-ok.hex",
++      "bytes": 45,
++      "sha256": "75cef1acca9e74e558d3462bd67ef840810b716d4667f65045f94c173856817e",
++      "expected": {
++        "outcome": "accept",
++        "stage": "codec",
++        "fields": {
++          "type": 6,
++          "selected": 3,
++          "bodyLength": 41
++        }
++      }
++    },
++    {
++      "id": "tcp-invalid-capability-not-required",
++      "binary": "v2/tcp-invalid-capability-not-required.bin",
++      "hex": "v2/tcp-invalid-capability-not-required.hex",
++      "bytes": 85,
++      "sha256": "b8d4173297c4a6d674b9147c7134ee5d0278b89a4a24589ad3ee0250505942d1",
++      "expected": {
++        "outcome": "reject",
++        "stage": "handshake",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-invalid-capability-reserved",
++      "binary": "v2/tcp-invalid-capability-reserved.bin",
++      "hex": "v2/tcp-invalid-capability-reserved.hex",
++      "bytes": 85,
++      "sha256": "605ffb34852ecfaf5775d8d50724b780c71b87e3e7e8699bdbc46fc3690f8771",
++      "expected": {
++        "outcome": "reject",
++        "stage": "handshake",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-min",
++      "binary": "v2/tcp-repair-hello-min.bin",
++      "hex": "v2/tcp-repair-hello-min.hex",
++      "bytes": 76,
++      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815",
++      "expected": {
++        "outcome": "accept",
++        "stage": "codec",
++        "fields": {
++          "type": 20,
++          "supported": 3,
++          "required": 3
++        }
++      }
++    },
++    {
++      "id": "tcp-repair-hello-max",
++      "binary": "v2/tcp-repair-hello-max.bin",
++      "hex": "v2/tcp-repair-hello-max.hex",
++      "bytes": 390,
++      "sha256": "4b74ab3c7ae7bc2e50d33b6676e4db2d4046b4cd439ee438a9c6269c8870142d",
++      "expected": {
++        "outcome": "accept",
++        "stage": "codec",
++        "fields": {
++          "type": 20,
++          "supported": 3,
++          "required": 3
++        }
++      }
++    },
++    {
++      "id": "tcp-repair-hello-discovery-only",
++      "binary": "v2/tcp-repair-hello-discovery-only.bin",
++      "hex": "v2/tcp-repair-hello-discovery-only.hex",
++      "bytes": 85,
++      "sha256": "9510a4ab91aeced9ddd7d18e5a1b428a847310a08ec8812e00d62bc2223b3751",
++      "expected": {
++        "outcome": "reject",
++        "stage": "handshake",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-mandatory-missing",
++      "binary": "v2/tcp-repair-hello-mandatory-missing.bin",
++      "hex": "v2/tcp-repair-hello-mandatory-missing.hex",
++      "bytes": 85,
++      "sha256": "6e26196eb7f21c1469e8fa3c4a1c75c8918697eaaa0eca38d65f00aec06163c0",
++      "expected": {
++        "outcome": "reject",
++        "stage": "handshake",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-reserved-mask",
++      "binary": "v2/tcp-repair-hello-reserved-mask.bin",
++      "hex": "v2/tcp-repair-hello-reserved-mask.hex",
++      "bytes": 85,
++      "sha256": "55cbf9b3f8b2e9ffd7e6b821321948a657d9b3c9544f7314d58ee11f6dd3c75d",
++      "expected": {
++        "outcome": "reject",
++        "stage": "handshake",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-zero-request",
++      "binary": "v2/tcp-repair-hello-zero-request.bin",
++      "hex": "v2/tcp-repair-hello-zero-request.hex",
++      "bytes": 85,
++      "sha256": "b35df12668fe54601b1c81d558a01e9c836d2ca839cf4a4ad83498b5cd11b129",
++      "expected": {
++        "outcome": "reject",
++        "stage": "codec",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-truncated-endpoint",
++      "binary": "v2/tcp-repair-hello-truncated-endpoint.bin",
++      "hex": "v2/tcp-repair-hello-truncated-endpoint.hex",
++      "bytes": 66,
++      "sha256": "7a870dc39e1d073cf218a4be3c9e4032649002e04e9ba4253e3e69ea4e0f4ee0",
++      "expected": {
++        "outcome": "reject",
++        "stage": "codec",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-invalid-role",
++      "binary": "v2/tcp-repair-hello-invalid-role.bin",
++      "hex": "v2/tcp-repair-hello-invalid-role.hex",
++      "bytes": 85,
++      "sha256": "45ac5f8333429d5b7e5a693df8f25577f497d17c0d19d54abb0b80e1398c09bb",
++      "expected": {
++        "outcome": "reject",
++        "stage": "codec",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-length-small",
++      "binary": "v2/tcp-repair-hello-length-small.bin",
++      "hex": "v2/tcp-repair-hello-length-small.hex",
++      "bytes": 40,
++      "sha256": "e4485eb76277f285c93a19fd7b78cc5afeb859c756598b67e8bd655d224ce065",
++      "expected": {
++        "outcome": "reject",
++        "stage": "framing",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-length-above-global-cap",
++      "binary": "v2/tcp-repair-hello-length-above-global-cap.bin",
++      "hex": "v2/tcp-repair-hello-length-above-global-cap.hex",
++      "bytes": 4,
++      "sha256": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4",
++      "expected": {
++        "outcome": "reject",
++        "stage": "framing",
++        "fields": {},
++        "error": "RESOURCE_LIMIT"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-unknown-type21",
++      "binary": "v2/tcp-repair-hello-unknown-type21.bin",
++      "hex": "v2/tcp-repair-hello-unknown-type21.hex",
++      "bytes": 42,
++      "sha256": "2e230a17d00228124b4ef2b6a5c2fa2ea0c69a99e283fa227b8e30a7886fbd32",
++      "expected": {
++        "outcome": "reject",
++        "stage": "codec",
++        "fields": {},
++        "error": "INVALID_MESSAGE"
++      }
++    },
++    {
++      "id": "tcp-repair-hello-duplicate-owner",
++      "binary": "v2/tcp-repair-hello-duplicate-owner.bin",
++      "hex": "v2/tcp-repair-hello-duplicate-owner.hex",
++      "bytes": 76,
++      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815",
++      "expected": {
++        "outcome": "accept",
++        "stage": "codec",
++        "fields": {
++          "type": 20,
++          "ownerExpected": "DUPLICATE_ID"
++        }
++      }
++    },
+     {
+       "id": "udp-min",
+       "binary": "udp-min.bin",
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.bin b/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.bin
+index 60e965435f7b18e6d56d326d46e3343be8c1bf60..653db8f7e99f64424067076b7dce346091396104 100644
+GIT binary patch
+delta 6
+NcmdPZouI?W3;+ba0UH1S
+
+delta 6
+NcmdPZouI?W2ml1U0T}=Q
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.hex b/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.hex
+index ee5a14f..666c35d 100644
+--- a/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.hex
++++ b/Projeto/src/test/resources/protocol/v2/tcp-hello-ok.hex
+@@ -1,3 +1,3 @@
+ 00 00 00 29 02 06 00 11 22 33 44 55 66 77 88 99
+ aa bb cc dd ee ff 00 01 43 10 21 32 43 54 65 76
+-87 98 a9 ba cb dc ed fe 0f 00 00 00 01
++87 98 a9 ba cb dc ed fe 0f 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-hello.bin b/Projeto/src/test/resources/protocol/v2/tcp-hello.bin
+index 7762e1a0fc8d5c53e26f814fe5f3fcf54d154b51..5ef4dae5d87c698d154125a172f56b97e5cd7b8f 100644
+GIT binary patch
+delta 10
+RcmWFyoe;pv%)r3F3;+!|0hRy&
+
+delta 10
+RcmWFyoe;pv$iTqB2mlQ&0g?a!
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-hello.hex b/Projeto/src/test/resources/protocol/v2/tcp-hello.hex
+index 46bd748..3bda7f8 100644
+--- a/Projeto/src/test/resources/protocol/v2/tcp-hello.hex
++++ b/Projeto/src/test/resources/protocol/v2/tcp-hello.hex
+@@ -3,4 +3,4 @@ aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
+ 76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
+ 32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
+ 31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
+-01 00 00 00 01
++03 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.bin b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.bin
+index d2b484352a8b362272c4e1a293c56fd79e2ce0fa..6a9d5bb5dfe0bf294920a63500a53ada1ec089fb 100644
+GIT binary patch
+delta 10
+PcmWFyoe;pv%m4%c4K@Lj
+
+delta 10
+PcmWFyoe;pv$N&TY4J-kX
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.hex b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.hex
+index ea2553f..8db9f5c 100644
+--- a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.hex
++++ b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.hex
+@@ -3,4 +3,4 @@ aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
+ 76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
+ 32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
+ 31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
+-01 00 00 00 00
++03 00 00 00 00
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.bin b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.bin
+index 3247cc404c8bf1bc52349e82d5062ea873d0671c..27c42ab5df3bf141c6c1add79534df096b43ef70 100644
+GIT binary patch
+delta 10
+RcmWFyoe;pv&cMLH3;+#H0h#~+
+
+delta 10
+RcmWFyoe;pv%)r3F2mlQ?0h9m$
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.hex b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.hex
+index 895e170..42c70af 100644
+--- a/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.hex
++++ b/Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.hex
+@@ -3,4 +3,4 @@ aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
+ 76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
+ 32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
+ 31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
+-03 00 00 00 01
++07 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..f8a451e57b7a97f7992d5ac32d5e6e0df7d2351a
+GIT binary patch
+literal 85
+zcmZQzU<hOqVGvX@b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M;<raTprt
+RfuNyqhj1q&0|NsX0{|H)92x)s
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.hex
+new file mode 100644
+index 0000000..567db20
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.hex
+@@ -0,0 +1,6 @@
++00 00 00 51 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
++31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
++01 00 00 00 01
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..36f9a477a630d7d2bad4c629f0c0ddc6e0145605
+GIT binary patch
+literal 76
+zcmZQzVDMlPVGvX@b_q=@@0hu2_nEuz{xdK-3Md*mhoqLZ&se$Z^qsf=_^}ElGB7eQ
+LGBGePFoQ4v5#Jd%
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.hex
+new file mode 100644
+index 0000000..903390c
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.hex
+@@ -0,0 +1,5 @@
++00 00 00 48 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 01 41 10 21 32 43 54 65 76
++87 98 a9 ba cb dc ed fe 0f 00 01 41 10 21 32 43
++54 65 76 87 98 a9 ba cb dc ed fe 0f 00 01 61 00
++01 00 01 02 00 00 00 03 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..dee19d21dc3bfe099a0052ead54df5fe59cbcf89
+GIT binary patch
+literal 85
+zcmZQzU<hOqVGvX@b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M;<raTprt
+SfuNyqhj8bA1_lOZ5C#AuA{`t6
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.hex
+new file mode 100644
+index 0000000..f7320d8
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.hex
+@@ -0,0 +1,6 @@
++00 00 00 51 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
++31 30 2e 30 2e 30 2e 31 13 88 13 89 ff 00 00 00
++03 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..693ddc9ccea2f9aa65dd6de5f6d8836eea782945
+GIT binary patch
+literal 4
+LcmZQzWMBjU00;mB
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.hex
+new file mode 100644
+index 0000000..206bd37
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.hex
+@@ -0,0 +1 @@
++00 01 00 01
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..d4df3e81fbf1eec06eab37706517001befa0c57c
+GIT binary patch
+literal 40
+PcmZQzU{GNaVIT+q2w(s^
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.hex
+new file mode 100644
+index 0000000..6020078
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.hex
+@@ -0,0 +1,3 @@
++00 00 00 24 02 14 00 00 00 00 00 00 00 00 00 00
++00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
++00 00 00 00 00 00 00 00
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..defa75bbcdb184e4869cbc318abf26fa5aba1fea
+GIT binary patch
+literal 85
+zcmZQzU<hOqVGvX@b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M;<raTprt
+PfuNyqhj1q&0~7!N86q4Q
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.hex
+new file mode 100644
+index 0000000..ffb1f90
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.hex
+@@ -0,0 +1,6 @@
++00 00 00 51 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
++31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
++00 00 00 00 00
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..94750916517327453eb6cebe4a9d57cf41ea0fa5
+GIT binary patch
+literal 390
+zcmZQzU~FO%VGvX@b_q=@@0hu2_nEuz{xc}}5dZ>;M$RFrW$iOo?mB(v?LU4pbo@=E
+a4Cp0M2K16C19~Zxfd4?i#K6G748i~=Q<3`s
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.hex
+new file mode 100644
+index 0000000..38a0fe8
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.hex
+@@ -0,0 +1,25 @@
++00 00 01 82 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 20 4e 4e 4e 4e 4e 4e 4e 4e
++4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e
++4e 4e 4e 4e 4e 4e 4e 4e 10 21 32 43 54 65 76 87
++98 a9 ba cb dc ed fe 0f 00 20 4e 4e 4e 4e 4e 4e
++4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 4e
++4e 4e 4e 4e 4e 4e 4e 4e 4e 4e 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 fd 61 61 61 61
++61 61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
++61 61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
++61 61 61 61 61 61 61 61 61 61 61 61 61 61 61 61
++61 61 61 61 61 61 61 61 61 61 61 2e 62 62 62 62
++62 62 62 62 62 62 62 62 62 62 62 62 62 62 62 62
++62 62 62 62 62 62 62 62 62 62 62 62 62 62 62 62
++62 62 62 62 62 62 62 62 62 62 62 62 62 62 62 62
++62 62 62 62 62 62 62 62 62 62 62 2e 63 63 63 63
++63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63
++63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63
++63 63 63 63 63 63 63 63 63 63 63 63 63 63 63 63
++63 63 63 63 63 63 63 63 63 63 63 2e 64 64 64 64
++64 64 64 64 64 64 64 64 64 64 64 64 64 64 64 64
++64 64 64 64 64 64 64 64 64 64 64 64 64 64 64 64
++64 64 64 64 64 64 64 64 64 64 64 64 64 64 64 64
++64 64 64 64 64 64 64 64 64 ff ff ff ff 02 00 00
++00 03 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..36f9a477a630d7d2bad4c629f0c0ddc6e0145605
+GIT binary patch
+literal 76
+zcmZQzVDMlPVGvX@b_q=@@0hu2_nEuz{xdK-3Md*mhoqLZ&se$Z^qsf=_^}ElGB7eQ
+LGBGePFoQ4v5#Jd%
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.hex
+new file mode 100644
+index 0000000..903390c
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.hex
+@@ -0,0 +1,5 @@
++00 00 00 48 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 01 41 10 21 32 43 54 65 76
++87 98 a9 ba cb dc ed fe 0f 00 01 41 10 21 32 43
++54 65 76 87 98 a9 ba cb dc ed fe 0f 00 01 61 00
++01 00 01 02 00 00 00 03 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a8345764e2a55d3a3a609abd6a437a79d44de55
+GIT binary patch
+literal 85
+zcmZQzU<hOqVGvX@b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M;<raTprt
+TfuNyqhj1q&0|Ns)5HkY+8Au!=
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.hex
+new file mode 100644
+index 0000000..d5211fd
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.hex
+@@ -0,0 +1,6 @@
++00 00 00 51 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
++31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
++07 00 00 00 03
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..f4638255f121a12840c3eb88892de7dc520737e3
+GIT binary patch
+literal 66
+zcmZQzV6bBnVGvX@b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M;<ru_h(~
+E01JK^5dZ)H
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.hex
+new file mode 100644
+index 0000000..0d94c3e
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.hex
+@@ -0,0 +1,5 @@
++00 00 00 3e 02 14 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 05
++61 62
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..b3bdb1f10032bf223cba8a4e5bdb00f68090b381
+GIT binary patch
+literal 42
+ycmZQzU{GTcWe`*{b_q=@@0hu2_nEuz{xdKI8ww~IIftZ{wa-|&>-3$s|M&qD#SpXr
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.hex
+new file mode 100644
+index 0000000..ef67442
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.hex
+@@ -0,0 +1,3 @@
++00 00 00 26 02 15 00 11 22 33 44 55 66 77 88 99
++aa bb cc dd ee ff 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.bin b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..e5b74067bf9d8c4fda5280aa545a38b1bdebe844
+GIT binary patch
+literal 85
+zcmZQzU<hOqVL%5=!G;2gM$RFrW$iOo?mB(v?LU47Y+@XS26`Z9DBL03$p|!s8H54#
+C*AylI
+
+literal 0
+HcmV?d00001
+
+diff --git a/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.hex b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.hex
+new file mode 100644
+index 0000000..d3c58c0
+--- /dev/null
++++ b/Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.hex
+@@ -0,0 +1,6 @@
++00 00 00 51 02 14 00 00 00 00 00 00 00 00 00 00
++00 00 00 00 00 00 00 02 53 31 10 21 32 43 54 65
++76 87 98 a9 ba cb dc ed fe 0f 00 02 53 31 10 21
++32 43 54 65 76 87 98 a9 ba cb dc ed fe 0f 00 08
++31 30 2e 30 2e 30 2e 31 13 88 13 89 01 00 00 00
++03 00 00 00 03

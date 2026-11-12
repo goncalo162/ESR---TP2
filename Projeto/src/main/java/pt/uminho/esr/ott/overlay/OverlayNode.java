@@ -57,6 +57,8 @@ public final class OverlayNode implements AutoCloseable {
     public Map<String, Neighbor> diagnostics() { var m = manager; return m == null ? Map.of() : m.diagnostics(); }
     public Map<String,NeighborManager.PeerStatus> discoveryStatus(){var m=manager;return m==null?Map.of():m.discoveryStatus();}
     public CompletionStage<java.util.List<CandidateCache.CandidateView>> candidates(){var m=manager;return m==null?CompletableFuture.completedStage(java.util.List.of()):m.candidates();}
+    public OverlayRecovery.RecoveryStatus recoveryStatus(){var m=manager;return m==null?
+        new OverlayRecovery.RecoveryStatus(OverlayRecovery.Phase.WAITING,OverlayRecovery.RecoveryReason.NONE,0,Optional.empty(),0):m.recoveryStatus();}
     public Optional<Throwable> failure() { return Optional.ofNullable(failure.get()); }
     public synchronized CompletionStage<NeighborManager.ShutdownReport> requestShutdown(int reason, Duration remainingBudget) {
         long nanos = budget(remainingBudget);

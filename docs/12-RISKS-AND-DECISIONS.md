@@ -222,3 +222,23 @@ continua só inicial, UDP OTT1 inalterado, descoberta obrigatória e isolamento 
 peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
 IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
 Implement suspenso, sem execução Java, commits, push ou outro IMP.
+
+## ADR-035 — reparação direta, revisão para aprovação
+
+Registo de 2026-11-11T23:28:20Z. [ADR-035 Proposta](../add.md#adr-035) formaliza o
+Design/Q-C-22/âmbito21 já aprovados. Delta parcial019/033/034, mesma ligação20/6,
+admissão cooperativa sem prova remota e desempate só pendente; ACTIVE preservada.
+[RevisãoADR](../memory-bank/bolts/035-overlay-extra/adr-review.md) confere APIs reais,
+limites, flush, dials e oráculos sem editar Java. Não é novo resultado de teste
+nem autorização de Implement; aprovação formalADR ainda pendente.
+
+## IMP-035 — Implement para revisão antes de Test
+
+Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
+explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
+[Walkthrough, mapa D01–D20 e evidência incremental](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).
+Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
+ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
+Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+Sem commits, push ou outro IMP; 005-rotas continua bloqueado.

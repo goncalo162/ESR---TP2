@@ -82,40 +82,6 @@
       }
     },
     {
-      "id": "tcp-hello",
-      "binary": "v2/tcp-hello.bin",
-      "hex": "v2/tcp-hello.hex",
-      "bytes": 85,
-      "sha256": "02528fbfab8bd5f9e63a01d3af62e806aa0762a35ae223ed160a4f3595a89944",
-      "expected": {
-        "outcome": "accept",
-        "stage": "codec",
-        "fields": {
-          "type": 5,
-          "supported": 1,
-          "required": 1,
-          "endpointId": "S1",
-          "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
-        }
-      }
-    },
-    {
-      "id": "tcp-hello-ok",
-      "binary": "v2/tcp-hello-ok.bin",
-      "hex": "v2/tcp-hello-ok.hex",
-      "bytes": 45,
-      "sha256": "7217dbed16e2df3b33b839e14981340213329f6d5cc71c6101e022df8933b903",
-      "expected": {
-        "outcome": "accept",
-        "stage": "codec",
-        "fields": {
-          "type": 6,
-          "selected": 1,
-          "bodyLength": 41
-        }
-      }
-    },
-    {
       "id": "tcp-probe-ping",
       "binary": "v2/tcp-probe-ping.bin",
       "hex": "v2/tcp-probe-ping.hex",
@@ -604,37 +570,11 @@
       }
     },
     {
-      "id": "tcp-invalid-capability-not-required",
-      "binary": "v2/tcp-invalid-capability-not-required.bin",
-      "hex": "v2/tcp-invalid-capability-not-required.hex",
-      "bytes": 85,
-      "sha256": "a3a6f54d6f39092c29c074d2d93c59b5cfb93dab7101ca998d8bb7226944cd2b",
-      "expected": {
-        "outcome": "reject",
-        "stage": "handshake",
-        "fields": {},
-        "error": "INVALID_MESSAGE"
-      }
-    },
-    {
       "id": "tcp-invalid-capability-missing",
       "binary": "v2/tcp-invalid-capability-missing.bin",
       "hex": "v2/tcp-invalid-capability-missing.hex",
       "bytes": 85,
       "sha256": "76e562140022dd1119172189e5beb688cffecd2547ba37f10bddddead7a47a77",
-      "expected": {
-        "outcome": "reject",
-        "stage": "handshake",
-        "fields": {},
-        "error": "INVALID_MESSAGE"
-      }
-    },
-    {
-      "id": "tcp-invalid-capability-reserved",
-      "binary": "v2/tcp-invalid-capability-reserved.bin",
-      "hex": "v2/tcp-invalid-capability-reserved.hex",
-      "bytes": 85,
-      "sha256": "7b68883b930fa13660cdac4075dd332ddeb13925a09a4ce35d05bf3039a37fa8",
       "expected": {
         "outcome": "reject",
         "stage": "handshake",
@@ -757,6 +697,230 @@
         "stage": "codec",
         "fields": {},
         "error": "RESOURCE_LIMIT"
+      }
+    },
+    {
+      "id": "tcp-hello",
+      "binary": "v2/tcp-hello.bin",
+      "hex": "v2/tcp-hello.hex",
+      "bytes": 85,
+      "sha256": "7ed30f626b85e8dc9f0ab7e443f7cb6b6d2dda676a5c99ce77cbd6735540d965",
+      "expected": {
+        "outcome": "accept",
+        "stage": "codec",
+        "fields": {
+          "type": 5,
+          "supported": 3,
+          "required": 3,
+          "endpointId": "S1",
+          "endpointInstance": "10213243-5465-7687-98a9-bacbdcedfe0f"
+        }
+      }
+    },
+    {
+      "id": "tcp-hello-ok",
+      "binary": "v2/tcp-hello-ok.bin",
+      "hex": "v2/tcp-hello-ok.hex",
+      "bytes": 45,
+      "sha256": "75cef1acca9e74e558d3462bd67ef840810b716d4667f65045f94c173856817e",
+      "expected": {
+        "outcome": "accept",
+        "stage": "codec",
+        "fields": {
+          "type": 6,
+          "selected": 3,
+          "bodyLength": 41
+        }
+      }
+    },
+    {
+      "id": "tcp-invalid-capability-not-required",
+      "binary": "v2/tcp-invalid-capability-not-required.bin",
+      "hex": "v2/tcp-invalid-capability-not-required.hex",
+      "bytes": 85,
+      "sha256": "b8d4173297c4a6d674b9147c7134ee5d0278b89a4a24589ad3ee0250505942d1",
+      "expected": {
+        "outcome": "reject",
+        "stage": "handshake",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-invalid-capability-reserved",
+      "binary": "v2/tcp-invalid-capability-reserved.bin",
+      "hex": "v2/tcp-invalid-capability-reserved.hex",
+      "bytes": 85,
+      "sha256": "605ffb34852ecfaf5775d8d50724b780c71b87e3e7e8699bdbc46fc3690f8771",
+      "expected": {
+        "outcome": "reject",
+        "stage": "handshake",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-min",
+      "binary": "v2/tcp-repair-hello-min.bin",
+      "hex": "v2/tcp-repair-hello-min.hex",
+      "bytes": 76,
+      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815",
+      "expected": {
+        "outcome": "accept",
+        "stage": "codec",
+        "fields": {
+          "type": 20,
+          "supported": 3,
+          "required": 3
+        }
+      }
+    },
+    {
+      "id": "tcp-repair-hello-max",
+      "binary": "v2/tcp-repair-hello-max.bin",
+      "hex": "v2/tcp-repair-hello-max.hex",
+      "bytes": 390,
+      "sha256": "4b74ab3c7ae7bc2e50d33b6676e4db2d4046b4cd439ee438a9c6269c8870142d",
+      "expected": {
+        "outcome": "accept",
+        "stage": "codec",
+        "fields": {
+          "type": 20,
+          "supported": 3,
+          "required": 3
+        }
+      }
+    },
+    {
+      "id": "tcp-repair-hello-discovery-only",
+      "binary": "v2/tcp-repair-hello-discovery-only.bin",
+      "hex": "v2/tcp-repair-hello-discovery-only.hex",
+      "bytes": 85,
+      "sha256": "9510a4ab91aeced9ddd7d18e5a1b428a847310a08ec8812e00d62bc2223b3751",
+      "expected": {
+        "outcome": "reject",
+        "stage": "handshake",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-mandatory-missing",
+      "binary": "v2/tcp-repair-hello-mandatory-missing.bin",
+      "hex": "v2/tcp-repair-hello-mandatory-missing.hex",
+      "bytes": 85,
+      "sha256": "6e26196eb7f21c1469e8fa3c4a1c75c8918697eaaa0eca38d65f00aec06163c0",
+      "expected": {
+        "outcome": "reject",
+        "stage": "handshake",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-reserved-mask",
+      "binary": "v2/tcp-repair-hello-reserved-mask.bin",
+      "hex": "v2/tcp-repair-hello-reserved-mask.hex",
+      "bytes": 85,
+      "sha256": "55cbf9b3f8b2e9ffd7e6b821321948a657d9b3c9544f7314d58ee11f6dd3c75d",
+      "expected": {
+        "outcome": "reject",
+        "stage": "handshake",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-zero-request",
+      "binary": "v2/tcp-repair-hello-zero-request.bin",
+      "hex": "v2/tcp-repair-hello-zero-request.hex",
+      "bytes": 85,
+      "sha256": "b35df12668fe54601b1c81d558a01e9c836d2ca839cf4a4ad83498b5cd11b129",
+      "expected": {
+        "outcome": "reject",
+        "stage": "codec",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-truncated-endpoint",
+      "binary": "v2/tcp-repair-hello-truncated-endpoint.bin",
+      "hex": "v2/tcp-repair-hello-truncated-endpoint.hex",
+      "bytes": 66,
+      "sha256": "7a870dc39e1d073cf218a4be3c9e4032649002e04e9ba4253e3e69ea4e0f4ee0",
+      "expected": {
+        "outcome": "reject",
+        "stage": "codec",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-invalid-role",
+      "binary": "v2/tcp-repair-hello-invalid-role.bin",
+      "hex": "v2/tcp-repair-hello-invalid-role.hex",
+      "bytes": 85,
+      "sha256": "45ac5f8333429d5b7e5a693df8f25577f497d17c0d19d54abb0b80e1398c09bb",
+      "expected": {
+        "outcome": "reject",
+        "stage": "codec",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-length-small",
+      "binary": "v2/tcp-repair-hello-length-small.bin",
+      "hex": "v2/tcp-repair-hello-length-small.hex",
+      "bytes": 40,
+      "sha256": "e4485eb76277f285c93a19fd7b78cc5afeb859c756598b67e8bd655d224ce065",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-length-above-global-cap",
+      "binary": "v2/tcp-repair-hello-length-above-global-cap.bin",
+      "hex": "v2/tcp-repair-hello-length-above-global-cap.hex",
+      "bytes": 4,
+      "sha256": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4",
+      "expected": {
+        "outcome": "reject",
+        "stage": "framing",
+        "fields": {},
+        "error": "RESOURCE_LIMIT"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-unknown-type21",
+      "binary": "v2/tcp-repair-hello-unknown-type21.bin",
+      "hex": "v2/tcp-repair-hello-unknown-type21.hex",
+      "bytes": 42,
+      "sha256": "2e230a17d00228124b4ef2b6a5c2fa2ea0c69a99e283fa227b8e30a7886fbd32",
+      "expected": {
+        "outcome": "reject",
+        "stage": "codec",
+        "fields": {},
+        "error": "INVALID_MESSAGE"
+      }
+    },
+    {
+      "id": "tcp-repair-hello-duplicate-owner",
+      "binary": "v2/tcp-repair-hello-duplicate-owner.bin",
+      "hex": "v2/tcp-repair-hello-duplicate-owner.hex",
+      "bytes": 76,
+      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815",
+      "expected": {
+        "outcome": "accept",
+        "stage": "codec",
+        "fields": {
+          "type": 20,
+          "ownerExpected": "DUPLICATE_ID"
+        }
       }
     },
     {

@@ -410,6 +410,10 @@ sem alegar benefício de desempenho medido para a alternativa rejeitada.
 <a id="adr-019"></a>
 ### ADR-019 — Handshake, iniciador determinístico e reconexão direta
 
+> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
+> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
+> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+
 - **Estado:** Aceite.
 - **Contexto e drivers:** Arranques simultâneos e callbacks de ligações antigas podem duplicar ou apagar vizinhos. Drivers: REQ-002, REQ-003, REQ-004, NFR-003.
 - **Decisão:** Só o menor nodeId inicia o canal; HELLO valida grafo/endpoint/instância; uma conexão confirmada por par, retries com backoff/jitter e comparação de connectionId/instanceId.
@@ -509,6 +513,10 @@ validação, ACK e histerese quando o upstream atual continua válido.
 <a id="adr-033"></a>
 ### ADR-033 — Descoberta extra por divulgação de vizinhos e cache limitada
 
+> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
+> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
+> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+
 > Transporte separado e ativação opcional suspensos pelo utilizador;
 > [ADR-034](#adr-034) Aceite substitui esses pontos e o contrato TCP v1. As aprovações e escolhas OTD1 abaixo são históricas. Cache,
 > TTL, proveniência e callbacks mantêm-se; gate satisfeito só para Implement de IMP-034.
@@ -564,6 +572,10 @@ incremento; a aprovação de Design não o implementa nem fecha automaticamente 
 <a id="adr-034"></a>
 ### ADR-034 — Controlo TCP uniforme v2 e descoberta obrigatória
 
+> Substituição parcial por [ADR-035 Aceite](#adr-035) para IMP-035.
+> As cláusulas históricas abaixo mantêm-se fora do delta de reparação20/
+> admissão cooperativa/tipos e máscaras identificado na ADR-035.
+
 - **Estado:** Aceite
 - **Contexto e drivers:** O utilizador interrompeu OTD1 separado e depois rejeitou a mistura operacional v1/v2. Fixa um programa/versão de JAR em todos os nós e decide migrar todo o controlo TCP, incluindo o bootstrap, para v2. O contrato v1 e as evidências são históricos; mantêm-se framing/caps, aprendizagem e isolamento de falhas. Drivers: REQ-025.
 - **Decisão:** Propor um único contrato e codec operacional TCP v2 para REGISTER/REGISTER_OK/ERROR do bootstrap, HELLO/HELLO_OK, mensagens normais e descoberta. MessageType tem 18 códigos ativos explícitos (1,2,4..19), com 3 rejeitado; sem parser/encoder/CodecPolicy/runtime v1, namespace alternativo ou fallback. Conservar ControlMessage e APIs encode/decode/read/write, agora exclusivamente v2; readFrame partilha o mesmo parser e permite rejeição tipada de conteúdo extra. HELLO exige supported=required=selected=1 e bits reservados zero. Todos os overlay exigem descoberta e Q>=2 offline; ausência da antiga chave exige, true é redundante e false é erro agregado; Q=1 genérico/bootstrap permanece. Um TCP persistente por par, FIFO/writer comuns, margem M=1, quota extra enfileirada de um e quatro tickets físicos. Bootstrap mantém só consulta inicial do grafo imutável e fecho após write/flush v2, sem membership. Rejeitar tentativa inválida localmente, sem NeighborUp/FAILED global/FATAL/fim da CLI ou queda de sessões saudáveis; estado/retry por peer limitados com backoff existente. Conteúdo extra completo/corrente pode ser rejeitado atomicamente; framing/truncamento/identidade permanecem terminais no handle afetado. Conservar vetores v2 independentes e migrar testes preservando garantias; por decisão explícita Q-C-19, retirar os arquivos TCP v1 e a variante abandonada após validar a migração. UDP OTT1 de vídeo permanece inalterado. IMP-034 aprende; IMP-035 repara depois com checkpoint próprio.
@@ -574,6 +586,19 @@ incremento; a aprovação de Design não o implementa nem fecha automaticamente 
 
 Contrato detalhado no [Design](memory-bank/bolts/034-overlay-extra/ddd-02-technical-design.md) e [interfaces](docs/07-API-AND-INTERFACES.md#extra-01-control-v2).
 Aprovação explícita do utilizador registada em 2026-11-11T17:55:50Z: Design, ADR-034, 29 caminhos e migração de testes/recursos aceites; G-EXTRA-ADR satisfeito apenas para IMP-034. Retomar só Implement. ADR-033 mantém políticas residuais e aprovação histórica; contrato TCP v1/variante mista não autorizam nova implementação. IMP-035 conserva checkpoint próprio.
+
+<a id="adr-035"></a>
+### ADR-035 — Reparação direta na ligação iniciada pelo isolado
+
+- **Estado:** Aceite
+- **Contexto e drivers:** REQ-025 exige reparar S–C e S–R1–C com candidatos aprendidos antes das falhas, mesmos sobreviventes e bootstrap parado. O utilizador aprovou Design revisto, política cooperativa Q-C-22 e âmbito de 21 caminhos, pedindo apenas revisão ADR antes de Implement. Driver: REQ-025.
+- **Decisão:** Manter HELLO5 no grafo configurado e menor nodeId como iniciador normal; permitir que qualquer isolado inicie REPAIR_HELLO20 e complete com HELLO_OK6 no mesmo TCP. Nas saídas concorrentes ainda pendentes, escolher menor originatorId; entrada escolhida bloqueia nova saída e ACTIVE nunca é substituída por tentativa tardia. Origem valida cache/proveniência/TTL; destino valida handshake, endpoint, identidade, capacidades, colisões e limites sem comprovar aprendizagem remota. Um codec TCP v2, 19 tipos 1,2,4..20 e código3 rejeitado; máscaras3 obrigatórias em HELLO5/20/ACK6, sem subconjunto ou fallback. Preservar framing, snapshots/cache/TTL/UDP, FIFO/flush, barreiras de dial, recursos físicos e shutdown.
+- **Alternativas rejeitadas:** Menor ID universal com dial de retorno foi rejeitado pelo utilizador. Permissões/registry e quatro mensagens excedem a política cooperativa aprovada; cache recíproca impede unilateralidade. Sobrecarregar HELLO5 sem finalidade distinta ou substituir uma sessão ACTIVE enfraquece os contratos. Novo pool/listener/codec ou API de terminação não é necessário.
+- **Consequências, riscos e trade-offs:** Substituição parcial aceite das ADR-019/033/034, preservando as restantes cláusulas e garantias. Design/política/21 caminhos e revisão ADR aprovados; só Implement autorizado, parando antes de Test. O destino não autentica criptograficamente a aprendizagem; esta confiança de laboratório foi aceite. Quatro fixtures de máscara migradas e 12 independentes acrescentadas: 78 operacionais, 62 TCP v2 e 16 UDP preservadas. V-034, regressão completa JDK21, manual humano com mortes reais, revisão final e integração continuam obrigatórios antes de DONE.
+- **Impacto:** Componentes overlay, protocol, app e transport; TASK-034/IMP-035. Os 21 caminhos aprovados constam do IMP-035; sem alteração Java nesta revisão.
+- **Como validar:** V-034, V-033, V-ADD; D01–D20/M01–M18, regressão atual, manual humano com mortes reais, revisão final e integração antes de DONE.
+
+[Registo detalhado e substituição parcial](memory-bank/bolts/035-overlay-extra/adr-035-proposal.md); [revisão aprovada](memory-bank/bolts/035-overlay-extra/adr-review.md). ADR-035 Aceite substitui só as cláusulas identificadas de019/033/034. Aprovação registada em 2026-11-11T23:39:43Z; só Implement, parar antes de Test.
 
 ## 6. Modelo de dados e contratos
 
@@ -640,17 +665,18 @@ futures pendentes terminam em fecho/shutdown; só o escritor resolve sucesso/ord
 Escrita/flush não é entrega remota/ACK e fila vazia não comprova escrita completa.
 
 O contrato TCP alvo é exclusivamente **v2**, por decisão do utilizador e
-[ADR-034 Aceite](#adr-034), incluindo bootstrap, handshake, controlo normal e
+[ADR-034/035 Aceites](#adr-035), incluindo bootstrap, handshake, controlo normal e
 descoberta. Esta revisão substitui a versão TCP incorporada anteriormente nas
 ADR-009/012/secções 3–7 das interfaces; conserva a sua semântica e os caps.
 A [retirada autorizada do arquivo TCP v1](memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada),
 foi registada em Q-C-19, sem suporte runtime/fallback. [Interfaces v2](docs/07-API-AND-INTERFACES.md)
 mantêm u32 big-endian/body 37..65536, envelope version=2/type/requestId/senderId/
-senderInstance e UTF-8 estrito. 18 tipos ativos: 1 REGISTER, 2 REGISTER_OK,
+senderInstance e UTF-8 estrito. 19 tipos ativos: 1 REGISTER, 2 REGISTER_OK,
 4 NODE_LEAVE, 5 HELLO, 6 HELLO_OK, 7/8 PING/PONG, 9 ANNOUNCE, 10 WITHDRAW,
 11 ACTIVATE, 12 ACK, 13 DEACTIVATE, 14 RENEW, 15 TRACE, 16 TRACE_RESULT,
-17 ERROR, 18 DISCOVERY_QUERY, 19 DISCOVERY_SNAPSHOT; código 3 retirado.
-Migração operacional concluída e validada em V-033: 1065 testes e manual humano Luis com 53 checks.
+17 ERROR, 18 DISCOVERY_QUERY, 19 DISCOVERY_SNAPSHOT,20 REPAIR_HELLO; código3 retirado.
+HELLO5/20 e ACK6 exigem máscaras3; contratos de reparação na ADR-035.
+Migração IMP-034 validada em V-033 com1065 testes e manual humano Luis/53 checks (histórico). IMP-035 em Implement para revisão; regressão/manual humano de mortes reais pendentes.
 
 UDP: OTT1, versão 1/flags 0, cabeçalho 64, stream/session UUID, frameSeq,
 mediaTimeUs, frameLength e fragmentIndex/count. Aplicação ≤1200/payload ≤1136,
@@ -942,15 +968,16 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Descrição/entrega:** EXTRA-01, parte B. Reconstruir conectividade com a cache aprendida. Vídeo na integração futura.
 - **Fase/unidade/tamanho:** PHASE-02 / 002-overlay / M.
 - **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
-- **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`.
+- **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`, `overlay/NeighborDiscovery.java`, `overlay/NeighborDiscoveryTest.java`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `bootstrap/BootstrapServerTest.java`, `transport/TransportTest.java`, `Projeto/src/test/resources/protocol/`, `scripts/validate-planning.py`, `Projeto/README.md`, `Projeto/docs/protocolos.md`.
 - **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
-- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. Manter o checkpoint próprio de intenção/admissão/reparação antes de código.
+- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita. Implement aprovado; Test em repetição humana.
+- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito. Test autorizado; aprovação humana pendente.
 - **REQ/NFR/CON/INT:** REQ-025.
 - **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
 - **Gates:** G-EXTRA-ADR.
 - **Critérios de aceitação:**
 
-  - [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
+  - [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
   - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
   - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
   - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
@@ -1620,7 +1647,7 @@ derivado do ADD para verificação, não uma segunda arquitetura. Teste na matri
 **Por cobrir documentalmente: nenhuma entrada.** Implementação/provas continuam
 pendentes nos gates: cobertura de plano não significa conformidade técnica.
 
-| REQ-025 | Extra | ADR-033, ADR-034 | config, overlay, app, protocol, transport | IMP-034, IMP-035 | V-033, V-034 |
+| REQ-025 | Extra | ADR-033, ADR-034, ADR-035 | config, overlay, app, protocol, transport | IMP-034, IMP-035 | V-033, V-034 |
 
 ## 13. Questões em aberto e changelog
 

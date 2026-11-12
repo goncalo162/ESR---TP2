@@ -17,14 +17,15 @@ u32 big-endian bodyLength, seguido do corpo completo de 37..65536 bytes. Envelop
 | 15 / 16 | ROUTE_TRACE / TRACE_RESULT |
 | 17 | ERROR |
 | 18 / 19 | DISCOVERY_QUERY / DISCOVERY_SNAPSHOT |
+| 20 | REPAIR_HELLO (payload Hello comum) |
 
-18 tipos com códigos explícitos; tipo 3 retirado/rejeitado. Os códigos do payload ERROR mantêm o contrato anterior (incluindo UNAUTHORIZED_NEIGHBOR=3); relatedType é o octeto bruto do tipo relacionado. Nunca responder ERROR a ERROR. O codec representar routing não significa que o serviço de routing esteja implementado.
+19 tipos com códigos explícitos; tipo 3 retirado/rejeitado. Os códigos do payload ERROR mantêm o contrato anterior (incluindo UNAUTHORIZED_NEIGHBOR=3); relatedType é o octeto bruto do tipo relacionado. Nunca responder ERROR a ERROR. O codec representar routing não significa que o serviço de routing esteja implementado.
 
 ## Bootstrap e vizinhos
 
 REGISTER leva Endpoint e REGISTER_OK só a lista configurada com instâncias zero, sem leases/membership. A conexão de consulta inicial v2 fecha depois de write/flush completos, com prazo. O bootstrap só admite REGISTER; depois do sucesso os nós não voltam a consultá-lo por falhas de vizinhos.
 
-HELLO leva Endpoint+supportedMask u32+requiredMask u32; HELLO_OK leva selectedMask u32. Exigir supported=required=selected=1 e bits reservados zero. Validar identidade, endpoint/grafo, instância, requestId e iniciador menor nodeId, preservando unicidade e as barreiras de flush. Cada par tem um TCP persistente, uma FIFO/writer e um frame em escrita. Descoberta e mensagens normais partilham esse canal.
+HELLO leva Endpoint+supportedMask u32+requiredMask u32; HELLO_OK leva selectedMask u32. Exigir supported=required=selected=3 (DISCOVERY|REPAIR) e bits reservados zero. Validar identidade, endpoint/grafo, instância, requestId e iniciador menor nodeId, preservando unicidade e as barreiras de flush. Cada par tem um TCP persistente, uma FIFO/writer e um frame em escrita. Descoberta e mensagens normais partilham esse canal.
 
 ## Aprendizagem limitada
 
@@ -36,6 +37,16 @@ Anúncio completo inválido de sessão atual pode ser rejeitado atomicamente sem
 
 ## UDP e arquivo
 
-Vídeo mantém OTT1/version 1, cabeçalho 64, total <=1200, payload <=1136 e restantes caps. O [arquivo TCP v1](../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada) é histórico. As [fixtures operacionais](../src/test/resources/protocol/README.md) são 50 TCP v2 e 16 UDP originais; os vetores esperados são independentes do codec Java.
+Vídeo mantém OTT1/version 1, cabeçalho 64, total <=1200, payload <=1136 e restantes caps. O [arquivo TCP v1](../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md#limpeza-autorizada) é histórico. As [fixtures operacionais](../src/test/resources/protocol/README.md) são 62 TCP v2 e 16 UDP originais; os vetores esperados são independentes do codec Java.
 
-IMP-034 apenas aprende/retém candidatos. IMP-035 trata reparação após falhas sob checkpoint próprio; não se alega continuidade de vídeo neste incremento.
+IMP-034 aprende/retém; IMP-035 repara isolamento em Implement para revisão.
+HELLO5 mantém grafo/iniciador menor. REPAIR_HELLO20 permite qualquer iniciador
+isolado com claim válido; HELLO_OK6 termina no mesmo TCP. Menor originator só
+desempata saídas sobrepostas pendentes, nunca substitui ACTIVE. Origem revalida
+proveniência/TTL; destino cooperativo valida handshake/limites sem cache recíproca.
+20/6/ERROR usam sendAndFlush/FIFO normal, sem quota extra18/19; máscaras3 obrigatórias.
+Erro remoto só vale na correlação requestId/relatedType5/20/6 e contexto corrente.
+Dinâmicos≤min(16,C), admissões20 pendentes≤2, tentativa autónoma≤1, orçamento10s
+limitado ao TTL original, tick100ms partilhado. Recursos perdedores só libertam
+fisicamente ao terminarem. Manual SIGKILL e regressão completa ainda pendentes;
+não se alega continuidade de vídeo.

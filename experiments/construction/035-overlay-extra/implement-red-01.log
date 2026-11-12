@@ -1,0 +1,79 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=MessageCodecTest#D01_repairHelloUsesSameV2HelloPayloadAndMandatoryCapabilities+D01_normalHelloAndAckRequireBothCapabilities", "test"]
+STARTED=2026-11-11T23:40:06.451469+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 39 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 137 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 12 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.038 s <<< FAILURE! -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[ERROR] pt.uminho.esr.ott.protocol.MessageCodecTest.D01_normalHelloAndAckRequireBothCapabilities -- Time elapsed: 0.017 s <<< ERROR!
+pt.uminho.esr.ott.protocol.ProtocolException: Required discovery missing
+	at pt.uminho.esr.ott.protocol.MessageCodec.incompatibleHandshake(MessageCodec.java:82)
+	at pt.uminho.esr.ott.protocol.MessageCodec.validate(MessageCodec.java:267)
+	at pt.uminho.esr.ott.protocol.MessageCodec.encode(MessageCodec.java:41)
+	at pt.uminho.esr.ott.protocol.MessageCodecTest.D01_normalHelloAndAckRequireBothCapabilities(MessageCodecTest.java:315)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: pt.uminho.esr.ott.protocol.MessageCodec$HandshakeFailure: Required discovery missing
+	... 7 more
+
+[ERROR] pt.uminho.esr.ott.protocol.MessageCodecTest.D01_repairHelloUsesSameV2HelloPayloadAndMandatoryCapabilities -- Time elapsed: 0.006 s <<< ERROR!
+pt.uminho.esr.ott.protocol.ProtocolException: Tipo de mensagem desconhecido: 20
+	at pt.uminho.esr.ott.protocol.MessageType.fromCode(MessageType.java:25)
+	at pt.uminho.esr.ott.protocol.MessageCodecTest.D01_repairHelloUsesSameV2HelloPayloadAndMandatoryCapabilities(MessageCodecTest.java:307)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   MessageCodecTest.D01_normalHelloAndAckRequireBothCapabilities:315 » Protocol Required discovery missing
+[ERROR]   MessageCodecTest.D01_repairHelloUsesSameV2HelloPayloadAndMandatoryCapabilities:307 » Protocol Tipo de mensagem desconhecido: 20
+[INFO] 
+[ERROR] Tests run: 2, Failures: 0, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.121 s
+[INFO] Finished at: 2026-11-11T23:40:10Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: 
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

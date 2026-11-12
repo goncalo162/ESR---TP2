@@ -241,7 +241,7 @@ class NeighborManagerLifecycleTest {
                 var c = new FakeChannel(); var remote = UUID.randomUUID();
                 f.io.sink.opened(c, f.clock.get()); f.pump();
                 f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), configured.nodeId(), remote,
-                    new ControlMessage.Hello(endpoint(configured.nodeId(), remote, configured.controlPort()),1,1)));
+                    new ControlMessage.Hello(endpoint(configured.nodeId(), remote, configured.controlPort()),3,3)));
                 c.flush = false; channels.add(c);
             }
             assertEquals(63, f.manager.snapshot().size());
@@ -274,7 +274,7 @@ class NeighborManagerLifecycleTest {
                 socket.setSoTimeout(2500);
                 var ep = new ControlMessage.Endpoint("N1", remote, "127.0.0.1", config.controlPort(), config.dataPort(), NodeRole.RELAY);
                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "N1", remote,
-                    new ControlMessage.Hello(ep,1,1)), socket.getOutputStream()); socket.getOutputStream().flush();
+                    new ControlMessage.Hello(ep,3,3)), socket.getOutputStream()); socket.getOutputStream().flush();
                 assertEquals(MessageType.HELLO_OK, MessageCodec.read(socket.getInputStream()).orElseThrow().type());
                 until(() -> receiver.snapshot().containsKey("N1"));
                 var report = receiver.requestShutdown(1, BUDGET).toCompletableFuture().get(2, TimeUnit.SECONDS);
@@ -368,4 +368,13 @@ class NeighborManagerLifecycleTest {
         }
     }
 
+    @Test void D19_repairedActiveSessionReceivesV2LeaveAndTerminatesWithinGlobalBudget()throws Exception {
+        try(var f=new Fixture("Z")) {
+            f.ready("R");var c=OverlayRecoveryTest.repair(f,"A",UUID.randomUUID(),18000,true);var session=f.manager.snapshot().get("A");
+            var stage=shutdown(f,BUDGET);f.pump();var report=result(stage);
+            assertEquals(MessageType.NODE_LEAVE,c.last().type());assertEquals(2,c.last().version());assertEquals(new ControlMessage.Leave(0),c.last().payload());
+            assertEquals(List.of(new NeighborManager.LeaveAttempt(session,NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED)),report.attempts());
+            assertFalse(report.notificationTimedOut());assertFalse(c.open);assertTrue(f.manager.awaitTermination(BUDGET));assertEquals(OverlayRecovery.Phase.STOPPING,f.manager.recoveryStatus().phase());
+        }
+    }
 }

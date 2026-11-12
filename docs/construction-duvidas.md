@@ -661,3 +661,132 @@ próprio; sem commits/push ou início de outro IMP.
 Registo de 2026-11-11T19:39:07Z. Após a execução humana V-033 (53 checks, MANUAL_PASS e saída 0), Luis pediu revisão final, integração e fecho do IMP-034, retirando os arquivos/testes da versão TCP v1 e conservando a versão v2. Esta instrução substitui a obrigação documental anterior de conservar o arquivo TCP v1 na árvore entregue. A revisão técnica final é do agente validador, solicitada por Luis; não se atribui revisão a Fillmore ou Waheed. Luis é o operador humano e autor da autorização de fecho.
 
 Conservam-se os negativos que rejeitam TCP v1, todos os testes operacionais TCP v2 e UDP OTT1 inalterado. UDP versão 1 é o formato de vídeo atual, não o codec TCP retirado. A limpeza não altera runtime, framing, caps ou garantias e não inicia IMP-035. O manifesto da limpeza lista paths/hashes retirados; execuções v2, manual humano, regressão e JAR final permanecem. Integração local e publicação remota são registadas separadamente.
+
+## Q-C-20 — Gatilho da reparação do IMP-035
+
+Registo de 2026-11-11T22:22:21Z. **Decidido explicitamente pelo utilizador:**
+«Reparar quando fica isolado (recomendado)», em resposta à escolha entre zero
+vizinhos ACTIVE e reparar após qualquer perda.
+
+A necessidade autónoma nasce com zero sessões ACTIVE locais. Perder um relay
+mantendo outro não inicia uma aresta extra. Um nó saudável pode atender a
+intenção do isolado sem perder as suas sessões; não se exige isolamento nos
+dois extremos. O menor nodeId conserva a iniciativa do TCP persistente.
+Isolamento local não prova partição global, falha física ou ausência de rota.
+Sem candidato válido ou recurso, mantém-se diagnóstico e tentativas limitadas.
+
+O critério antigo «extra desativado» de IMP-035/TASK-034 foi alinhado com REQ-025
+/ADR-034 já aprovados: todos os nós exigem descoberta/TCP v2, sem modo base
+opcional ou fallback. Não há novo formato, alteração de cap ou ADR aceite.
+
+[Model para revisão](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
+O gatilho está decidido; Model ainda não aprovado. Design deverá concretizar
+intenção, admissão e confiança unilaterais, incluindo cache não recíproca,
+iniciador menor, limites e corridas. Os oito caminhos atuais do ADD não incluem
+protocolo/transporte/cache: apresentar ampliação e eventual ADR-035 Proposta se
+esses contratos forem afetados. G-EXTRA-ADR próprio de IMP-035 permanece pendente
+antes de Implement. Esta decisão não autoriza Design/Java/Test/fecho/commits/push.
+
+### Q-C-20 — Aprovação de Model e clarificação de atendimento
+
+Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e o avanço apenas para Design.
+Clarificação: o destino pode estabelecer a ligação pedida pelo nó isolado,
+conservando sessões existentes. Manter S–C e S–R1–C, candidatos aprendidos antes
+das falhas e S–R1 preservada. Gate próprio/contratos/ADR continuam obrigatórios
+antes de Implement. Não é aprovação da proposta técnica Q-C-21 abaixo.
+
+## Q-C-21 — Proposta de intenção, admissão e retorno do IMP-035
+
+**Histórico: proposta não aprovada, substituída pela revisão Q-C-22 a pedido do utilizador.**
+
+Registo de 2026-11-11T22:41:27Z. **Proposto para revisão de Design; não aprovado.**
+[Design](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
+e [âmbito proposto](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md).
+
+- Permissões opacas emitidas pelo destino aos vizinhos ACTIVE antes das falhas,
+  divulgadas só junto de adjacências diretas e retidas para validação após Down.
+  Registry256, até quatro por sessão, validade local120 s, renovação elegível30 s;
+  geração crescente por sessão e janela30 s de divulgação no anunciante.
+  Cache128x4/TTL60 s/proveniência não mudam. Permissão não é autenticação
+  criptográfica; confiança em introdução de laboratório é explícita.
+- Mesmo TCP/codec v2, quatro tipos20..23 (GRANT/INTENT/RESULT/BIND); 22 tipos ativos.
+  SNAPSHOT19 ganha presença/prova por Endpoint, máximo21753 dentro do cap32768.
+  HELLO/ACK mantêm formato e exigem máscaras3 (DISCOVERY|REPAIR); rejeitar
+  só DISCOVERY sem fallback. Preservar bootstrap/restantes payloads e16UDP;
+  migrar sete fixtures e
+  preparar24 novas independentes, total alvo90. Sem runtime/fallback de JAR antigo.
+- Canal provisório no listener de controlo: isolado menor promove o canal;
+  isolado maior instala espera e ACK, destino menor fecha/aguarda terminação
+  física e faz dial/BIND de retorno. Uma sessão persistente por par, sem dataPort
+  ou listener auxiliar; sessões saudáveis preservadas. Resultado/flush não é ACK.
+- Uma tentativa autónoma, duas admissões recebidas, dinâmica<=min(16,C), grau
+  total<=min(63,C), orçamento total15 s/subfases2 s, sempre limitado por claim/
+  permissão e restante global de shutdown. Backoff/jitter já configurados.
+  Quotas/FIFO/Q>=2/tickets físicos mantidos, sem fila/pool/timer ilimitado.
+- Connection.terminated() é proposta aditiva que observa fim físico dos workers
+  e libertação da reserva, com conclusão fora dos locks, sem bloquear owner.
+- Âmbito8→30 e minuta para futura ADR-035 exigem revisão explícita. Não inserir
+  ainda tipos/records/fixtures no projeto, nem alterar ADR-034 Aceite por esta
+  proposta. Os oito caminhos do ADD continuam o âmbito normativo atual.
+
+G-EXTRA-ADR continua pendente para IMP-035. Este registo não antecipa a etapa ADR
+nem autoriza Implement/Test, commits, push ou outro IMP. Todos os D01–D24/V-034
+são oráculos planeados; codec Java/mortes reais/manual ainda não executados.
+
+## Q-C-22 — Simplificação da reparação na mesma ligação
+
+Registo de 2026-11-11T23:17:55Z. **Pedido explícito do utilizador:** apresentar proposta mais
+simples; o isolado inicia e completa na mesma ligação mesmo tendo o maior ID,
+sem dial de retorno. Rever ADR-019 e tentativas simultâneas; justificar o mínimo
+de admissão unilateral no laboratório. Não avançar para código antes de contratos/ADR.
+
+[Design revisto](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md),
+[ADR-035 Proposta](../memory-bank/bolts/035-overlay-extra/adr-035-proposal.md)
+e [âmbito8→21 proposto](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md).
+
+**Proposta técnica para revisão, não aprovada:**
+
+- Um tipo20 REPAIR_HELLO, payload Hello existente; resposta6 HELLO_OK no mesmo
+  TCP. Erros17 existentes, sem códigos novos. Retirar GRANT/INTENT/RESULT/BIND,
+  permissões/registry/provas, retorno e API Connection.terminated.
+- Origem verifica/regista cache válida/proveniência/TTL. Destino admite o pedido
+  unilateral após validação de identidade/endpoint/capacidade/colisões/limites,
+  sem exigir cache recíproca. Não comprova a aprendizagem da origem. Esta é a
+  confiança cooperativa proposta para o laboratório; não alegar autenticação
+  ou rejeição de toda autoafirmação maliciosa com campos válidos.
+- HELLO5 configurado conserva grafo e iniciador menor. Exceção20 permite qualquer
+  isolado iniciar. Duas saídas pendentes elegem menor originatorId; entrada já
+  escolhida bloqueia nova saída para o par; ACTIVE nunca substituída por menor
+  ID tardio. Associação de dials/UNCLASSIFIED/B/R e cobrança física preservadas.
+- Mesma versão/codec v2;19 tipos1/2/4..20, tipo3 retirado. Capacidades3
+  DISCOVERY|REPAIR obrigatórias em HELLO5/20/ACK6, sem subconjunto/fallback.
+  Quatro fixtures de máscara migradas e12 novas independentes, alvo78.
+  Restantes46TCP/16UDP intactas, incluindo snapshots. Nenhuma fixture alterada agora.
+- Cache128x4/TTL60s, C<=64, grau<=min(C,63), Q>=2/quotas da descoberta e owner/
+  shutdown preservados. Uma tentativa autónoma, até duas admissões recebidas,
+  dinâmica<=min(16,C), backoff existente e orçamento total10s proposto (não SLA).
+
+Decidido pelo pedido: preparar Design direto sem retorno. Ainda propostos:
+confiança de admissão, exceção/desempate detalhado, tipo20/máscaras/fixtures/
+âmbito e ADR-035. G-EXTRA-ADR próprio permanece pendente. Só Model consta como
+concluído; continuar em Design para revisão antes de ADR/Implement/Test.
+
+### Q-C-22 — Aprovação de Design/política/âmbito e revisão ADR
+
+Registo de 2026-11-11T23:28:20Z. O utilizador aprovou explicitamente Design revisto,
+política cooperativa e21 caminhos. Aceitou que a origem valide cache/proveniência/
+TTL e o destino handshake/limites sem comprovar a aprendizagem. Mantém mesma
+ligação, desempate só entre pendentes e ACTIVE preservada. Autorizou apenas
+revisão ADR: [ADR-035 Proposta](../add.md#adr-035) formaliza delta parcial019/033/034,
+com [revisão antes de Implement](../memory-bank/bolts/035-overlay-extra/adr-review.md).
+Não voltar a pedir confirmação da política ou âmbito já aprovados. G-EXTRA-ADR
+aguarda aprovação formal desta revisão; não há autorização de Implement.
+V-034, regressão, manual humano com mortes reais, revisão final e integração
+continuam obrigatórios; sem commits/push/outro IMP.
+
+### Q-C-22 — revisão ADR aprovada, Implement autorizado
+
+Aprovação explícita registada em2026-11-11T23:39:43Z: ADR-035 Aceite, incluindo
+substituição parcial019/033/034 e contratos/âmbito21. G-EXTRA-ADR satisfeito para
+IMP-035. Só Implement autorizado; Test/V-034 completo/regressão/manual humano
+com mortes reais/revisão final/integração pendentes. Sem commits/push/outro IMP.

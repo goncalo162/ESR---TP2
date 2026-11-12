@@ -1,0 +1,88 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=OverlayRecoveryTest,NeighborManagerTest,NeighborManagerLifecycleTest,NeighborDiscoveryTest,TransportTest,BootstrapServerTest,OttApplicationTest,MessageCodecTest,DiscoveryCodecTest", "test"]
+STARTED=2026-11-12T00:01:59.966947+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 40 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 13 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Tests run: 54, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.496 s -- in pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.795 s -- in pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[ERROR] Tests run: 34, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.088 s <<< FAILURE! -- in pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[ERROR] pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.D19_repairedActiveSessionReceivesV2LeaveAndTerminatesWithinGlobalBudget -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <STOPPING> but was: <ISOLATED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.D19_repairedActiveSessionReceivesV2LeaveAndTerminatesWithinGlobalBudget(NeighborManagerLifecycleTest.java:377)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.569 s -- in pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Running pt.uminho.esr.ott.app.OttApplicationTest
+[INFO] Tests run: 48, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.013 s -- in pt.uminho.esr.ott.app.OttApplicationTest
+[INFO] Running pt.uminho.esr.ott.transport.TransportTest
+[INFO] Tests run: 37, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.445 s -- in pt.uminho.esr.ott.transport.TransportTest
+[INFO] Running pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Tests run: 94, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.103 s -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Running pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+Bootstrap control processing failed; stopping bounded service
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.128 s -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   NeighborManagerLifecycleTest.D19_repairedActiveSessionReceivesV2LeaveAndTerminatesWithinGlobalBudget:377 expected: <STOPPING> but was: <ISOLATED>
+[INFO] 
+[ERROR] Tests run: 358, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.996 s
+[INFO] Finished at: 2026-11-12T00:02:15Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

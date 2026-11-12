@@ -1,0 +1,61 @@
+{
+  "method": "per-PID /proc FD inode and TCP established tuple correlation",
+  "nodes": {
+    "S": {
+      "pid": 795728,
+      "start_identity": "4800270",
+      "network_namespace": "net:[4026531840]",
+      "socket_fds": {
+        "7": "1681171",
+        "8": "1681178",
+        "11": "1663310"
+      },
+      "established_owned": [
+        {
+          "inode": "1663310",
+          "family": "tcp6",
+          "endpoints": [
+            "127.0.0.1:46342",
+            "127.0.0.1:54219"
+          ]
+        }
+      ]
+    },
+    "R1": {
+      "pid": 795730,
+      "start_identity": "4800270",
+      "network_namespace": "net:[4026531840]",
+      "socket_fds": {
+        "7": "1670017",
+        "8": "1670024",
+        "11": "1694281",
+        "12": "1695552"
+      },
+      "established_owned": [
+        {
+          "inode": "1695552",
+          "family": "tcp6",
+          "endpoints": [
+            "127.0.0.1:36801",
+            "127.0.0.1:42956"
+          ]
+        },
+        {
+          "inode": "1694281",
+          "family": "tcp6",
+          "endpoints": [
+            "127.0.0.1:46342",
+            "127.0.0.1:54219"
+          ]
+        }
+      ]
+    }
+  },
+  "matching_connections": [
+    [
+      "127.0.0.1:46342",
+      "127.0.0.1:54219"
+    ]
+  ],
+  "ss_is_diagnostic_only": true
+}

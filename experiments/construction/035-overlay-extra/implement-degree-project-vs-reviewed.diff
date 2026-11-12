@@ -1,0 +1,139 @@
+diff --git a/Projeto/README.md b/Projeto/README.md
+index 633ccaf..82548aa 100644
+--- a/Projeto/README.md
++++ b/Projeto/README.md
+@@ -6,7 +6,7 @@ TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/202
+ 
+ A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
+ 
+-IMP-035 está em Implement para revisão: aprende antes das falhas e tenta reparar quando fica sem vizinhos ACTIVE, criando a ligação direta na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3) em todos os nós. Os testes incrementais passaram368 casos em dez classes (incluindo9 de cache) na execução final. A regressão1065/manual53 checks pertence ao IMP-034 histórico, não à versão agora modificada. Clean verify completo, manual humano com mortes reais, revisão final e integração do IMP-035 continuam pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
++IMP-035 está em Implement para revisão: aprende antes das falhas e tenta reparar quando fica sem vizinhos ACTIVE, criando a ligação direta na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3) em todos os nós. A execução incremental anterior passou368 casos em dez classes; após corrigir a confirmação concorrente do grau, as cinco classes afetadas passaram175 casos na execução22. São execuções distintas, sem as somar como regressão completa. A regressão1065/manual53 checks pertence ao IMP-034 histórico, não à versão agora modificada. Clean verify completo, manual humano com mortes reais, revisão final e integração do IMP-035 continuam pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
+ 
+ ## Compilar e testar
+ 
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+index cb1abd7..12622a6 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java
+@@ -848,6 +848,11 @@ public final class NeighborManager implements AutoCloseable {
+         if (!c.channel.isOpen() || expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
+         var p = c.peer;
+         if (p.context != c || p.session != null) { finish(c, Reason.CONTEXT, null); return; }
++        // Admissions can overlap: recheck the shared degree at the serial confirmation point.
++        // Both configured and repairing sessions must pass this guard before any ACTIVE mutation.
++        if (activeView.size() >= Math.min(plan.options.maxConnections(), 63)) {
++            finish(c, Reason.RESOURCE_LIMIT, null); return;
++        }
+         if(c.attempt!=null && c.attempt.repair!=null && !recovery.eligible(c.attempt.repair,now())){finish(c,Reason.TIMEOUT,null);return;}
+         c.active = true; cancel(c.deadline); c.deadline = null;
+         if (c.attempt != null) { c.attempt.live = false; p.attempt = null; }
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java
+index 981b69f..bd47013 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java
+@@ -280,4 +280,65 @@ class OverlayRecoveryTest {
+             assertFalse(c.open);assertEquals(0,f.manager.snapshot().size());assertEquals(1,f.downs());
+         }
+     }
++    /** Configure 62 confirmed peers plus an optional 63rd configured attempt. No time advances. */
++    static void degreeBoundary(Fixture f,String configuredPending) {
++        var bootstrap=f.discovery();var entries=new ArrayList<ControlMessage.Endpoint>();
++        for(int n=0;n<62;n++)entries.add(endpoint(String.format("P%02d",n),ZERO,20000+n*2));
++        if(configuredPending!=null)entries.add(endpoint(configuredPending,ZERO,21000));
++        f.message(bootstrap,new ControlMessage(MessageType.REGISTER_OK,bootstrap.last().requestId(),"BOOT",UUID.randomUUID(),new ControlMessage.NeighborList(entries)));
++        assertEquals(64,f.io.options.maxConnections());
++    }
++    static Map<String,Neighbor.Session> confirmSixtyTwo(Fixture f) {
++        for(int n=0;n<62;n++)configuredPending(f,String.format("P%02d",n),20000+n*2,true);
++        assertEquals(62,f.manager.snapshot().size());assertEquals(62,f.ups());return f.manager.snapshot();
++    }
++    static FakeChannel configuredPending(Fixture f,String id,int port,boolean flush) {
++        var c=new FakeChannel();c.flush=flush;var remote=UUID.randomUUID();f.io.sink.opened(c,f.clock.get());f.pump();
++        f.message(c,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),id,remote,new ControlMessage.Hello(endpoint(id,remote,port),3,3)));return c;
++    }
++    static void assertDegreeWinner(Fixture f,Map<String,Neighbor.Session> healthy,String winner,String loser,FakeChannel losing) {
++        assertEquals(63,f.manager.snapshot().size());assertEquals(63,f.ups());assertEquals(0,f.downs());assertFalse(losing.open);
++        assertTrue(f.manager.snapshot().containsKey(winner));assertFalse(f.manager.snapshot().containsKey(loser));
++        healthy.forEach((id,session)->assertEquals(session,f.manager.snapshot().get(id),"Healthy session must survive confirmation saturation"));
++        assertTrue(f.events.stream().filter(NeighborManager.NeighborUp.class::isInstance).map(NeighborManager.NeighborUp.class::cast).noneMatch(e->e.session().nodeId().equals(loser)));
++        assertTrue(f.events.stream().filter(NeighborManager.Diagnostic.class::isInstance).map(NeighborManager.Diagnostic.class::cast)
++            .anyMatch(e->e.reason()==NeighborManager.Reason.RESOURCE_LIMIT&&e.connectionId().filter(losing.id()::equals).isPresent()));
++        assertFalse(f.owner.stopped);
++    }
++    @Test void D13_degreeConfirmationTwoRepairsCannotBothPassSixtyThree()throws Exception {
++        for(boolean firstWins:List.of(false,true))try(var f=new Fixture("Z")) {
++            degreeBoundary(f,null);var healthy=confirmSixtyTwo(f);
++            var a=repair(f,"A",UUID.randomUUID(),22000,false);var b=repair(f,"B",UUID.randomUUID(),22200,false);
++            assertTrue(a.open);assertTrue(b.open);assertEquals(62,f.manager.snapshot().size());
++            var winner=firstWins?a:b;var loser=firstWins?b:a;winner.written();f.pump();assertEquals(63,f.manager.snapshot().size());
++            loser.written();f.pump();assertDegreeWinner(f,healthy,firstWins?"A":"B",firstWins?"B":"A",loser);
++        }
++    }
++    @Test void D13_degreeConfiguredInboundAndRepairShareConfirmationLimit()throws Exception {
++        for(boolean configuredWins:List.of(false,true))try(var f=new Fixture("Z")) {
++            degreeBoundary(f,"P62");var healthy=confirmSixtyTwo(f);
++            var normal=configuredPending(f,"P62",21000,false);var extra=repair(f,"A",UUID.randomUUID(),22000,false);
++            assertTrue(normal.open);assertTrue(extra.open);assertEquals(62,f.manager.snapshot().size());
++            var winner=configuredWins?normal:extra;var loser=configuredWins?extra:normal;winner.written();f.pump();assertEquals(63,f.manager.snapshot().size());
++            loser.written();f.pump();assertDegreeWinner(f,healthy,configuredWins?"P62":"A",configuredWins?"A":"P62",loser);
++        }
++    }
++    @Test void D13_degreeConfiguredOutboundAckAndFlushInterleaveWithRepair()throws Exception {
++        for(int order=0;order<4;order++)try(var f=new Fixture("Z")) {
++            degreeBoundary(f,"ZZ");var normal=outgoing(f,false);assertEquals(MessageType.HELLO,normal.last().type());var healthy=confirmSixtyTwo(f);
++            var extra=repair(f,"A",UUID.randomUUID(),22000,false);var ack=new ControlMessage(MessageType.HELLO_OK,normal.last().requestId(),"ZZ",UUID.randomUUID(),new ControlMessage.HelloOk(3));
++            // An ACK alone or a local flush alone never confirms an outbound session.
++            if(order%2==0)f.message(normal,ack);else {normal.written();f.pump();}
++            assertEquals(62,f.manager.snapshot().size());assertEquals(62,f.ups());
++            boolean configuredWins=order<2;
++            if(configuredWins) {
++                if(order%2==0){normal.written();f.pump();}else f.message(normal,ack);
++                assertEquals(63,f.manager.snapshot().size());extra.written();f.pump();
++            }else {
++                extra.written();f.pump();assertEquals(63,f.manager.snapshot().size());
++                if(order%2==0){normal.written();f.pump();}else f.message(normal,ack);
++            }
++            assertDegreeWinner(f,healthy,configuredWins?"ZZ":"A",configuredWins?"A":"ZZ",configuredWins?extra:normal);
++        }
++    }
+ }
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
+index 1bb4b2f..ceeef94 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java
+@@ -824,4 +824,35 @@ class TransportTest {
+             } finally {release.complete(null);}
+         }
+     }
++    @Test void D13_degreeLoserAtC64RetainsPhysicalSlotUntilBlockedWriterTerminates()throws Exception {
++        var gates=java.util.List.of(new CompletableFuture<Void>(),new CompletableFuture<Void>());
++        var entered=new CountDownLatch(2);var index=new java.util.concurrent.atomic.AtomicInteger();var events=new Events();
++        Connection.WriteDriverFactory drivers=socket->{
++            int slot=index.getAndIncrement();return new Connection.WriteDriver(){
++                public void write(byte[] frame)throws IOException {
++                    socket.getOutputStream().write(frame);
++                    if(slot>=62){assertEquals(6,frame[5]&255);entered.countDown();gates.get(slot-62).join();}
++                }
++                public void flush()throws IOException{socket.getOutputStream().flush();}
++            };
++        };
++        var raw=new ArrayList<Socket>();var channels=new ArrayList<Connection>();
++        try(var transport=new Transport(ephemeral(),events,new Transport.Options(2,64,WAIT,WAIT),drivers)) {
++            try {
++                for(int n=0;n<64;n++){var peer=new Socket();raw.add(peer);peer.connect(transport.localAddress());channels.add(take(events.opened));}
++                assertEquals(64,transport.connectionCount());var winner=channels.get(62);var loser=channels.get(63);var instance=UUID.randomUUID();
++                var ack=new ControlMessage(MessageType.HELLO_OK,UUID.randomUUID(),"N",instance,new ControlMessage.HelloOk(3));
++                var winningFlush=winner.sendAndFlush(ack);var losingFlush=loser.sendAndFlush(ack);
++                assertTrue(entered.await(3,TimeUnit.SECONDS));assertFalse(winningFlush.isDone());assertFalse(losingFlush.isDone());
++                gates.getFirst().complete(null);winningFlush.get(3,TimeUnit.SECONDS);
++                // The degree decision closes only the excess channel; its physical writer is still blocked.
++                loser.close();assertFalse(loser.isOpen());assertEquals(64,transport.connectionCount());assertFalse(losingFlush.isDone());
++                var rejected=assertThrows(java.util.concurrent.ExecutionException.class,()->transport.connect(transport.localAddress()).get(3,TimeUnit.SECONDS));
++                assertInstanceOf(IOException.class,rejected.getCause());assertEquals(64,transport.connectionCount());
++                assertTrue(channels.subList(0,63).stream().allMatch(Connection::isOpen));
++                gates.getLast().complete(null);eventually(()->transport.connectionCount()==63);
++                assertTrue(losingFlush.isCompletedExceptionally());assertTrue(channels.subList(0,63).stream().allMatch(Connection::isOpen));
++            } finally {gates.forEach(g->g.complete(null));for(var peer:raw)peer.close();}
++        } finally {gates.forEach(g->g.complete(null));for(var peer:raw)peer.close();}
++    }
+ }

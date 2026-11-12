@@ -1,0 +1,408 @@
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -970,8 +970,8 @@
+ - **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
+ - **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`, `overlay/NeighborDiscovery.java`, `overlay/NeighborDiscoveryTest.java`, `protocol/MessageType.java`, `protocol/ControlMessage.java`, `protocol/MessageCodec.java`, `protocol/MessageCodecTest.java`, `overlay/NeighborManagerLifecycleTest.java`, `bootstrap/BootstrapServerTest.java`, `transport/TransportTest.java`, `Projeto/src/test/resources/protocol/`, `scripts/validate-planning.py`, `Projeto/README.md`, `Projeto/docs/protocolos.md`.
+ - **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
+-- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita; só Implement.
+-- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito; só Implement autorizado.
++- **Design aprovado:** reparação direta/Q-C-22/política cooperativa e 21 caminhos aprovados pelo utilizador; [revisão ADR](memory-bank/bolts/035-overlay-extra/adr-review.md) antes de Implement. ADR-035 Aceite/G-EXTRA-ADR satisfeito por aprovação explícita. Implement aprovado; Test em repetição humana.
++- **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034, ADR-035 (Aceite). G-EXTRA-ADR satisfeito. Test autorizado; aprovação humana pendente.
+ - **REQ/NFR/CON/INT:** REQ-025.
+ - **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+ - **Gates:** G-EXTRA-ADR.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -779,3 +779,12 @@
+ 175 testes incrementais afetados passaram. Evidências anteriores preservadas.
+ Sem passagem a Test, commits/push ou fecho. V-034 completo/regressão/manual humano
+ com mortes reais/revisão final/integração permanecem pendentes.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -250,3 +250,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -106,3 +106,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../../memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/docs/tasks/PHASE-02/TASK-034.md b/docs/tasks/PHASE-02/TASK-034.md
+--- a/docs/tasks/PHASE-02/TASK-034.md
++++ b/docs/tasks/PHASE-02/TASK-034.md
+@@ -80,3 +80,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../../../memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-12T00:23:42Z"
++updated: "2026-11-12T00:39:35Z"
+ started: "2026-11-11T22:20:02Z"
+ completed: null
+-current_stage: "implement"
+-stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T23:39:43Z","artifact":"adr-review.md"}]
++current_stage: "test"
++stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"},{"name":"design","completed":"2026-11-11T23:28:20Z","artifact":"ddd-02-technical-design.md"},{"name":"adr","completed":"2026-11-11T23:39:43Z","artifact":"adr-review.md"},{"name":"implement","completed":"2026-11-12T00:28:31Z","artifact":"implementation-walkthrough.md"}]
+ requires_bolts: ["034-overlay-extra"]
+ enables_bolts: ["005-rotas"]
+ requires_units: ["001-base-validada"]
+@@ -46,7 +46,7 @@
+ 1. [x] **model** → `ddd-01-domain-model.md`.
+ 2. [x] **design** → `ddd-02-technical-design.md`.
+ 3. [x] **adr** → `adr-review.md`.
+-4. [ ] **implement** → `implementation-walkthrough.md`.
++4. [x] **implement** → `implementation-walkthrough.md`.
+ 5. [ ] **test** → `ddd-03-test-report.md`.
+ 
+ ## Critérios de aceitação
+@@ -61,7 +61,8 @@
+ ## Estado e fronteiras
+ 
+ Model/Design/ADR aprovados; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
+-Implement para revisão, sem passagem a Test. O âmbito corrente aprovado é21 caminhos.
++Implement aprovado; Test executado pelo agente e aguarda repetição humana/aprovação.
++O âmbito corrente aprovado é21 caminhos.
+ Histórico das etapas abaixo preservado por ordem de registo. V-034 completo,
+ regressão atual, manual humano com mortes reais, revisão final e integração pendentes.
+ 
+@@ -146,3 +147,17 @@
+ 175 incrementais passaram; as evidências anteriores preservadas. Implement
+ continua em revisão, sem Test/commits/push. Regressão completa, manual humano
+ com mortes reais, revisão final e integração pendentes.
++
++## Implement aprovado — entrada apenas em Test
++
++Aprovação explícita registada em 2026-11-12T00:28:31Z. Clean verify/JDK21/JAR novo e
++manual V-034 com mortes reais nos dois grafos autorizados. Parar antes da
++aprovação de Test para repetição humana. Sem fecho/commits/push/outro IMP.
++
++## Checkpoint Test — repetição humana pendente
++
++Registo 2026-11-12T00:39:35Z. [Relatório](ddd-03-test-report.md): clean verify/JDK21/1113 testes,
++11 XML/JAR novo preservados; manual Codex68 CHECK_PASS/MANUAL_PASS, dois grafos
++com SIGKILL real e S–R1 preservada. Duas tentativas incompletas arquivadas.
++Aguardar execução pessoal de Luis antes da aprovação de Test. Sem DONE/fecho/
++commits/push/outro IMP; revisão final e integração pendentes.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md b/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/ddd-03-test-report.md
+@@ -0,0 +1,151 @@
++---
++stage: test
++bolt: "035-overlay-extra"
++created: "2026-11-12T00:39:35Z"
++status: "awaiting-human-manual-and-Test-approval"
++---
++# IMP-035 / V-034 — Test para repetição humana
++
++Implement aprovado explicitamente; entrada em Test registada em2026-11-12T00:28:31Z.
++Base main22622c1d7eb0fdab3df684f2fac10263cff11736. Só Test autorizado.
++**O relatório não aprova Test nem fecha o bolt.** Luis ainda não repetiu este
++manual. Revisão final e integração pendentes; sem commits/push/outro IMP.
++
++## Regressão completa e novo JAR
++
++Com JDK21 em Projeto:
++
++```sh
++mvn -B -ntp clean verify
++```
++
++Execução real2026-11-12T00:28:35.345275+00:00 até
++2026-11-12T00:28:51.832399+00:00, saída0/BUILD SUCCESS.
++**1113 testes, zero falhas, erros ou skips**,11 XML Surefire da própria invocação.
++Java release21, Surefire3.5.4/JUnitPlatformProvider. Não somar os175/368
++incrementais nem usar1065/981/149 históricos como resultado atual.
++
++| Classe | Testes | Falhas/erros/skips |
++|---|---:|---|
++| CandidateCacheTest | 9 |0/0/0|
++| NeighborManagerTest | 54 |0/0/0|
++| OverlayRecoveryTest | 29 |0/0/0|
++| NeighborManagerLifecycleTest | 34 |0/0/0|
++| NeighborDiscoveryTest | 20 |0/0/0|
++| OttApplicationTest | 48 |0/0/0|
++| TransportTest | 38 |0/0/0|
++| ConfigurationLoaderTest | 741 |0/0/0|
++| DiscoveryCodecTest | 26 |0/0/0|
++| MessageCodecTest | 94 |0/0/0|
++| BootstrapServerTest | 20 |0/0/0|
++
++[Log Maven](../../../experiments/construction/035-overlay-extra/test-clean-verify-01.log),
++[resultado/comando/hashes](../../../experiments/construction/035-overlay-extra/test-clean-verify-01-result.json),
++[resumo/XML/JAR/CLI](../../../experiments/construction/035-overlay-extra/test-build-summary.json).
++11 XML e109 artefactos CLI preservados fora de target; não foi alegada cópia de
++relatórios TXT. POM/configuração/fixtures/código do resultado permanecem iguais;
++apenas documentação é atualizada depois da execução.
++
++[JAR preservado](../../../experiments/construction/035-overlay-extra/test-verified-jar/ott-streaming-1.0-SNAPSHOT.jar), SHA-256:
++
++```text
++dea01ffa2c501b9b948594005e7e8e9ee70b387981dc5b3d83f9d7c331cc2526
++```
++
++É o JAR novo desta execução, não o JAR histórico de IMP-034.
++
++## Manual V-034 do agente — mortes reais
++
++[Repetir pessoalmente / alcance do auxiliar](../../../experiments/overlay-recovery/README.md).
++[Resultado Codex](../../../experiments/construction/035-overlay-extra/test-manual-runs/20261112T003609Z-sj9_ljkn/result.json),
++[log68 CHECK_PASS/MANUAL_PASS](../../../experiments/construction/035-overlay-extra/test-manual-runs/20261112T003609Z-sj9_ljkn/manual.log)
++e [ações/PIDs/SIGKILL](../../../experiments/construction/035-overlay-extra/test-manual-runs/20261112T003609Z-sj9_ljkn/actions.json).
++Python saiu0; no_processes_pending=true. Não é execução nem aprovação de Luis.
++
++| Grafo | Resultado real |
++|---|---|
++| S–R1–C e S–R2–C | Bootstrap0 antes das mortes; R1-9 seguido de R2-9. S–C único, sobreviventes S/C com mesmos PIDs/instanceIds. Sobreviventes encerraram0. |
++| S–R1–R2–C e S–R1–R3–C | Bootstrap0; R2-9 seguido de R3-9. R1–C único, S/R1/C originais preservados; sessões S–R1 idênticas nos dois extremos. Sobreviventes encerraram0. |
++
++Cada JVM carrega o mesmo JAR/hash; o auxiliar usa só APIs públicas/defaults,
++sem fake clock ou transporte. Os snapshots02 e05 provam a aprendizagem/retenção
++antes das falhas e a seleção posterior associa sourceKey/geração/queryStarted/TTL
++à prova já observada. Nenhum candidato é inserido pelo manual. Após primeira
++morte manteve-se alternativa/sem nova aresta durante a janela registada≈1s.
++Após segunda, aresta reparada estável no intervalo observado≈2s; um Up por
++extremo e zeroDown do peer reparado. Não extrapolar esses intervalos para SLA.
++
++Unicidade física confirmada pelas tuplas TCP estabelecidas/inodes/FDs de ambos
++os PIDs, nas tabelas tcp/tcp6; S–R1 também conferida no segundo grafo. Os UUID
++connectionId de extremos diferentes são locais e não têm de coincidir.
++Não ficaram JVMs/readers do ensaio; portas de listener reutilizáveis após shutdown.
++
++O auxiliar expõe cache/snapshots pela API, não é a main OttApplication.
++A CLI real/TCP real também foi exercitada na regressão; estes factos são separados.
++Loopback não substitui CORE, vídeo/routing ou falhas IP silenciosas. Não há
++resultados FPS/latência/vídeo atribuídos.
++
++### Tentativas incompletas preservadas
++
++- `20261112T003341Z-sx6crb8t`: 29 CHECK_PASS; failed em AssertionError('09-repaired: exactly one physical TCP between S,C'); no_processes_pending=True.
++- `20261112T003506Z-add17tte`: 30 CHECK_PASS; failed em AssertionError('09-repaired: exactly one owned physical TCP between S,C'); no_processes_pending=True.
++
++O observador inicial procurava apenas IPv4/tcp; sockets dual stack Java estavam
++em tcp6. Foram preservadas saídas ss/tabelas, logs/resultados failed, limpeza e
++sources exatos dos runners. Corrigiu-se só o observador Python, acrescentando
++TCP6/mapeamento IPv4; não se alterou produção ou enfraqueceram oráculos.
++[Inventário das três tentativas](../../../experiments/construction/035-overlay-extra/test-manual-evidence-inventory.json).
++
++## D01–D20 / V-034
++
++[Mapa detalhado dos casos](implementation-walkthrough.md) e
++[complemento de grau](../../../experiments/construction/035-overlay-extra/implement-degree-walkthrough.md).
++Todos os testes do mapa entram agora no clean verify atual.
++
++| Oráculos | Prova atual |
++|---|---|
++| D01 | Codec/v2/19 tipos/masks3/78 fixtures independentes, bytes/caps e UDP; MessageCodec/DiscoveryCodec e V-ADD. |
++| D02/D05/D06 | Gatilho só zeroACTIVE, mesma ligação20/6, maior/menor iniciador, admissão cooperativa saudável; oráculos controlados e TCP real. |
++| D03/D04 | Manual agora com JVM por nó, quatro SIGKILL reais/sequenciais e bootstrap parado; S–C e S–R1–C, sobreviventes originais e S–R1 preservada. |
++| D07/D08 | Claim/proveniência/TTL original, cache128x4, vazio/expirado/conflito/self/candidato indisponível; endpoint/identidade/caps/HELLO5 negativo. Cache e manager com portas/clock controlados; manual comprova aprendizagem real. |
++| D09/D10/D11/D12 | Barreira native dial/opened, eleição só pendente, ACTIVE preservada, duplicatas/instâncias/callbacks e ERROR5/20/6; flush/ACK controlados. |
++| D13/D14 | Grau total<=min(C,63) no commit comum: oito ordens62→63, sem Up/Down indevido. C64 físico/writer preso, FIFO/quotas/tickets/limites e liberação apenas após término. |
++| D15 | TTL antes de envio/commit, DNS/dial/handshake/10s/backoff/jitter, callbacks tardios, justiça; relógio/escrita controlados. |
++| D16/D17 | D07e em sessão reparada preserva query/cache/sessão perante token/query/geração antigos e aceita resposta válida posterior. Anunciar aresta só após Up. |
++| D18/D19 | CLI/recovery, bootstrap rejeita20, isolamento local; shutdown global/reservas físicas e timeout explícito quando worker não termina. |
++| D20 | Clean verify1113/XML/JARhash, manual do agente com mortes reais e evidências/diff executados. Repetição humana, aprovação Test, revisão final e integração ainda pendentes. |
++
++## Repetição humana pendente
++
++Na raiz:
++
++```sh
++python3 -B experiments/overlay-recovery/run-manual.py --operator Luis
++```
++
++Enviar o caminho novo impresso e o resultado real. Esperar MANUAL_PASS,
++passed=true, saída0 e no_processes_pending=true. O número de checks pode variar
++se os dois extremos iniciarem a seleção; não é critério fixo de sucesso.
++Não preencher execução, aprovação ou data de Luis por inferência. Bolt/história/
++unidade permanecem in-progress e Test não consta em stages_completed.
++
++## Diff e preservação
++
++[Conferência final/hashes](../../../experiments/construction/035-overlay-extra/test-validation.json),
++[V-ADD](../../../experiments/construction/035-overlay-extra/test-v-add-01.log),
++[git diff --check](../../../experiments/construction/035-overlay-extra/test-diff-check.log).
++[Delta de Projeto nesta etapa](../../../experiments/construction/035-overlay-extra/test-project-vs-before-Test.diff):
+++4/−4 só em README; nenhum fonte/teste/configuração/fixture ou POM alterado.
++[Diff completo de Projeto contra main22622c1](../../../experiments/construction/035-overlay-extra/test-project-vs-head.diff):
+++1108/−140 e16 binários, incluindo a migração de fixtures já aprovada em Implement.
++[Documentação de Test](../../../experiments/construction/035-overlay-extra/test-docs-vs-entry.diff)
++e [auxiliares do manual](../../../experiments/construction/035-overlay-extra/test-manual-tools.diff)
++separados. As listas geradas em target ficam
++[separadas](../../../experiments/construction/035-overlay-extra/test-generated-target.numstat).
++
++1042 artefactos anteriores conservam os hashes originais. O roteiro README de
++experiments/overlay-recovery foi atualizado para Test e o conteúdo anterior
++fica [arquivado](../../../experiments/construction/035-overlay-extra/test-previous-manual-readme.md)
++com o hash original. Logs/resultados/JAR históricos não foram reescritos.
++A conferência V-ADD final02 valida o estado documental apresentado;78 fixtures,
++sem CORE/GUI ou aprovação humana inferida.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ created: "2026-11-03T22:09:01Z"
+-updated: "2026-11-04T12:29:39Z"
++updated: "2026-11-12T00:39:35Z"
+ ---
+ # Registo Construction — 002-overlay
+ 
+@@ -755,3 +755,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../../../../bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+@@ -12,7 +12,7 @@
+ bolt: "035-overlay-extra"
+ size: "M"
+ extra: true
+-updated: "2026-11-11T23:28:20Z"
++updated: "2026-11-12T00:39:35Z"
+ ---
+ # História — Extra — reparar ligações com candidatos aprendidos
+ 
+@@ -81,3 +81,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../../../../../bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-11T23:28:20Z"
++updated: "2026-11-12T00:39:35Z"
+ completed: null
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+@@ -382,3 +382,12 @@
+ Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+ regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+ Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
++
++## IMP-035 — Test à espera de repetição humana
++
++Registo 2026-11-12T00:39:35Z. Implement aprovado; [Test](<../../../../bolts/035-overlay-extra/ddd-03-test-report.md>) executou clean verify
++JDK21/1113 testes sem falhas e preservou11 XML/JAR novo. Manual Codex68
++CHECK_PASS/MANUAL_PASS: JVM por nó, mortes SIGKILL sequenciais, bootstrap
++parado, S–C/R1–C únicos, sobreviventes originais e S–R1 preservada. Duas tentativas
++incompletas mantidas. Execução pessoal de Luis/aprovação de Test/revisão final/
++integração pendentes. Sem DONE/commits/push ou início de outro IMP.
+diff --git a/memory-bank/planning-source-manifest.json b/memory-bank/planning-source-manifest.json
+--- a/memory-bank/planning-source-manifest.json
++++ b/memory-bank/planning-source-manifest.json
+@@ -905,7 +905,7 @@
+         ],
+         "previous_reference_sha256": "217b9eb8f4c44df1575e0b0c03f29532cc8144ead1652ee96dcb6eaff550db24"
+       },
+-      "implementation_status": "IMP-034 complete; IMP-035 Model/Design/ADR035 approved; Implement ready for review before Test",
++      "implementation_status": "IMP-034 complete; IMP-035 Implement approved, Test clean verify1113/manual Codex68 passed; human repetition/Test approval/final review/integration pending",
+       "integrated_revision": "f650be02f2af10b95328f5b50c3d6941e2e75c15"
+     }
+   ]
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-implement-review
++extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-test-human-repeat-pending
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Implement para revisão e 27 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Test para repetição humana e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -286,6 +286,6 @@
+ 
+ ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model/Design/ADR-035/Q-C-22/21 caminhos aprovados; Implement para revisão antes de Test.
++**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model/Design/ADR/Implement aprovados; Test1113/manual Codex68, repetição humana e aprovação pendentes.
+ **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+ Usa a cache aprendida de IMP-034 para reparar a overlay.

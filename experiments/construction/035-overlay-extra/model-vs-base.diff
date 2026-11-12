@@ -1,0 +1,644 @@
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -950,7 +950,7 @@
+ - **Gates:** G-EXTRA-ADR.
+ - **Critérios de aceitação:**
+ 
+-  - [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
++  - [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+   - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+   - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+   - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -348,6 +348,10 @@
+ V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+ 
+ Estado: NÃO EXECUTADO. [Bolt](../memory-bank/bolts/035-overlay-extra/bolt.md).
++[Model/M01–M18 propostos](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
++Q-C-20: zero ACTIVE inicia reparação; perder um vizinho mantendo alternativa
++não cria aresta nova. Repetição com processos mortos abruptamente é distinta
++de close/EOF em nós embutidos. Obrigatório TCP v2/descoberta, gate próprio pendente.
+ A prova de vídeo por S–C ou S–R1–C segue a integração com routing/streaming.
+ 
+ ### V-033 — Design e evidência ainda pendente
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -103,7 +103,7 @@
+ | [TASK-008](tasks/PHASE-02/TASK-008.md) | Compor o processo overlay e encerrar de forma previsível | TASK-003, TASK-006, TASK-007 | DONE | V-008 e clean verify 981/zero falhas, manual de Luis e verificação complementar, V-ADD aprovado, revisão Waheed confirmada pelo utilizador e integração em main |
+ | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+-| [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | TODO | V-034 por executar. Precede 005-rotas |
++| [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | IN PROGRESS | Model em revisão; Q-C-20 decidida. V-034 por executar; precede 005-rotas |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+@@ -718,3 +718,14 @@
+ ## IMP-034 — fecho atual
+ 
+ 2026-11-11T19:45:51Z: TASK-033 DONE, bolt/história complete após integração local f650be02f2af10b95328f5b50c3d6941e2e75c15. [Prova](../experiments/construction/034-overlay-extra/closure-integration.json). Test/manual humano e revisão técnica concluídos, Q-C-19 aplicada; sem push. Sete bolts completos no projeto, 28 planned. IMP-035 não iniciado, unidade/PHASE-02/REQ-025 continuam em curso.
++
++## IMP-035 — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
++Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
++Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
++possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
++[Model e M01–M18 propostos](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
++de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
++Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
++Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -198,3 +198,14 @@
+ ## IMP-034 — fecho integrado
+ 
+ 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
++
++## IMP-035 — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
++Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
++Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
++possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
++[Model e M01–M18 propostos](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
++de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
++Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
++Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -661,3 +661,28 @@
+ Registo de 2026-11-11T19:39:07Z. Após a execução humana V-033 (53 checks, MANUAL_PASS e saída 0), Luis pediu revisão final, integração e fecho do IMP-034, retirando os arquivos/testes da versão TCP v1 e conservando a versão v2. Esta instrução substitui a obrigação documental anterior de conservar o arquivo TCP v1 na árvore entregue. A revisão técnica final é do agente validador, solicitada por Luis; não se atribui revisão a Fillmore ou Waheed. Luis é o operador humano e autor da autorização de fecho.
+ 
+ Conservam-se os negativos que rejeitam TCP v1, todos os testes operacionais TCP v2 e UDP OTT1 inalterado. UDP versão 1 é o formato de vídeo atual, não o codec TCP retirado. A limpeza não altera runtime, framing, caps ou garantias e não inicia IMP-035. O manifesto da limpeza lista paths/hashes retirados; execuções v2, manual humano, regressão e JAR final permanecem. Integração local e publicação remota são registadas separadamente.
++
++## Q-C-20 — Gatilho da reparação do IMP-035
++
++Registo de 2026-11-11T22:22:21Z. **Decidido explicitamente pelo utilizador:**
++«Reparar quando fica isolado (recomendado)», em resposta à escolha entre zero
++vizinhos ACTIVE e reparar após qualquer perda.
++
++A necessidade autónoma nasce com zero sessões ACTIVE locais. Perder um relay
++mantendo outro não inicia uma aresta extra. Um nó saudável pode atender a
++intenção do isolado sem perder as suas sessões; não se exige isolamento nos
++dois extremos. O menor nodeId conserva a iniciativa do TCP persistente.
++Isolamento local não prova partição global, falha física ou ausência de rota.
++Sem candidato válido ou recurso, mantém-se diagnóstico e tentativas limitadas.
++
++O critério antigo «extra desativado» de IMP-035/TASK-034 foi alinhado com REQ-025
++/ADR-034 já aprovados: todos os nós exigem descoberta/TCP v2, sem modo base
++opcional ou fallback. Não há novo formato, alteração de cap ou ADR aceite.
++
++[Model para revisão](../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
++O gatilho está decidido; Model ainda não aprovado. Design deverá concretizar
++intenção, admissão e confiança unilaterais, incluindo cache não recíproca,
++iniciador menor, limites e corridas. Os oito caminhos atuais do ADD não incluem
++protocolo/transporte/cache: apresentar ampliação e eventual ADR-035 Proposta se
++esses contratos forem afetados. G-EXTRA-ADR próprio de IMP-035 permanece pendente
++antes de Implement. Esta decisão não autoriza Design/Java/Test/fecho/commits/push.
+diff --git a/docs/phases/PHASE-02-OVERLAY.md b/docs/phases/PHASE-02-OVERLAY.md
+--- a/docs/phases/PHASE-02-OVERLAY.md
++++ b/docs/phases/PHASE-02-OVERLAY.md
+@@ -74,3 +74,14 @@
+ ## IMP-034 — fecho integrado
+ 
+ 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../../memory-bank/bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
++
++## IMP-035 — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
++Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
++Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
++possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
++[Model e M01–M18 propostos](../../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
++de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
++Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
++Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+diff --git a/docs/tasks/PHASE-02/TASK-034.md b/docs/tasks/PHASE-02/TASK-034.md
+--- a/docs/tasks/PHASE-02/TASK-034.md
++++ b/docs/tasks/PHASE-02/TASK-034.md
+@@ -4,7 +4,7 @@
+ 
+ - ID: TASK-034
+ - Fase: PHASE-02, EXTRA-01 posterior ao fecho da base.
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Natureza: Extra solicitado pelo utilizador.
+ - Responsável proposto: Denji.
+ - Revisor proposto: Fillmore.
+@@ -17,7 +17,7 @@
+ 
+ ## 3. Critérios de aceitação
+ 
+-- [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
++- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+ - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+ - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+ - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+@@ -27,6 +27,15 @@
+ ## 4. Validação e fecho
+ 
+ V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+-Estado: NÃO EXECUTADO. Resolver ADR-033 e os contratos afetados antes
+-de Implement. Revisão e integração precedem DONE.
++Estado: V-034 NÃO EXECUTADO. Model em revisão; Q-C-20 do gatilho decidida.
++ADR-033 residual/ADR-034 aceites não dispensam G-EXTRA-ADR próprio do IMP-035:
++aprovar intenção/admissão/reparação e âmbito antes de Implement.
++Revisão e integração precedem DONE.
+ [Bolt](../../../memory-bank/bolts/035-overlay-extra/bolt.md).
++
++## 5. Entrada em Model
++
++Registo de 2026-11-11T22:22:21Z. Pré-requisito integrado em main local, base 22622c1.
++Apenas documentação de Model; reparação ao ficar isolado, sem desativação de
++descoberta ou fallback v1. [Model/M01–M18](../../../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
++Nenhuma execução V-034/Java/Maven/manual nova. Parar antes de Design.
+diff --git a/memory-bank/architecture-traceability.json b/memory-bank/architecture-traceability.json
+--- a/memory-bank/architecture-traceability.json
++++ b/memory-bank/architecture-traceability.json
+@@ -1,6 +1,6 @@
+ {
+   "version": "1.0.2",
+-  "updated": "2026-11-11T15:35:59Z",
++  "updated": "2026-11-11T22:22:21Z",
+   "architecture_source": "add.md",
+   "specification_source": "specs.md",
+   "approval": {
+@@ -4059,7 +4059,7 @@
+         "V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado."
+       ],
+       "criteria": [
+-        "Com o extra desativado, conservar o comportamento e os testes da overlay base.",
++        "Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.",
+         "Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.",
+         "Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.",
+         "Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.",
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -3,13 +3,13 @@
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-11T19:45:51Z"
+-started: null
++updated: "2026-11-11T22:22:21Z"
++started: "2026-11-11T22:20:02Z"
+ completed: null
+-current_stage: null
++current_stage: "model"
+ stages_completed: []
+ requires_bolts: ["034-overlay-extra"]
+ enables_bolts: ["005-rotas"]
+@@ -29,6 +29,7 @@
+ validation_ids: ["V-034"]
+ test_ids: ["V-034"]
+ external_gates: ["G-EXTRA-ADR"]
++gate_status: {"G-EXTRA-ADR":"pending for IMP-035; intention/admission/repair contract not yet approved"}
+ adr_ids: ["ADR-013", "ADR-014", "ADR-017", "ADR-018", "ADR-019", "ADR-020", "ADR-024", "ADR-033", "ADR-034"]
+ requirements: ["REQ-025"]
+ architecture_source: "add.md"
+@@ -50,7 +51,7 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
++- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+ - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+ - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+ - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+@@ -59,11 +60,25 @@
+ 
+ ## Estado e fronteiras
+ 
+-Planeado. Aguardar a conclusão e integração de 034-overlay-extra antes de iniciar.
+-O contrato de divulgação, a confiança, os limites e a negociação da extensão
+-aguardam Design/ADR-033. A base v1 conserva os bytes e os códigos.
+-V-034 por executar. A prova de vídeo ocorre após routing/streaming.
++Model em revisão; IMP-034 complete e integrado localmente. Q-C-20 decide
++reparação autónoma só com zero ACTIVE e atendimento possível por peer saudável.
++Descoberta obrigatória/TCP v2, mesmo JAR e uma sessão persistente por par;
++bootstrap apenas inicial. O texto anterior de modo opcional/v1 foi alinhado
++com REQ-025/ADR-034, sem alterar decisões aceites ou âmbito de oito caminhos.
++V-034 ainda não executado. A prova de vídeo fica após routing/streaming.
+ 
+ ## Dependência integrada
+ 
+ 2026-11-11T19:45:51Z: IMP-034 complete e integrado em main local. Pré-requisito disponível; este bolt permanece planned, sem etapas iniciadas ou aprovação presumida do seu gate.
++
++## Checkpoint atual — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Início apenas de Model autorizado pelo utilizador (opção 1).
++[Modelo de domínio](ddd-01-domain-model.md) com M01–M18 propostos para V-034;
++Q-C-20 do gatilho decidida explicitamente. Dependência integrada em
++22622c1d7eb0fdab3df684f2fac10263cff11736, árvore limpa à entrada. Os 206 caminhos
++não gerados de Projeto e JAR do pré-requisito são conferidos por hash, sem
++análise/alteração Java ou execução Maven. Model não aprovado, stages_completed
++vazio; parar antes de Design. Gate próprio de intenção/admissão pendente;
++contrato/âmbito adicional e eventual ADR nova só em revisão posterior.
++Sem Test/fecho/commits/push ou início de outro IMP.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md b/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md
+@@ -0,0 +1,272 @@
++---
++stage: model
++bolt: "035-overlay-extra"
++created: "2026-11-11T22:20:02Z"
++status: "ready-for-review"
++---
++# Model — IMP-035 / EXTRA-01 B — reparar com candidatos aprendidos
++
++Model preparado para revisão; Design, ADR, Implement e Test não iniciados.
++[IMP-035](../../../add.md#imp-035), [REQ-025](../../../specs.md#req-025),
++[história](../../intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
++Uma tarefa M, unidade 002-overlay, TASK-034, oráculo V-034.
++
++## 1. Fontes, dependência e âmbito
++
++Enunciado ESR-TP2-26-27.pdf, pp. 1–5, specs/intent, ADD e contratos de descoberta.
++As secções 2/5/6/8/9/10/11/12 do ADD governam esta etapa. As formulações
++históricas de extra opt-in/TCP v1 cedem à decisão operacional posterior:
++mesmo programa/JAR, todo controlo TCP v2, descoberta obrigatória, um codec e
++um TCP persistente por par. UDP OTT1 mantém o seu formato de vídeo.
++
++IMP-034/034-overlay-extra complete e integrado localmente: revisão funcional
++f650be02f2af10b95328f5b50c3d6941e2e75c15 e fecho
++22622c1d7eb0fdab3df684f2fac10263cff11736. main e Denji apontam à segunda revisão;
++árvore limpa à entrada. A dependência transitiva 001-base-validada está complete.
++[Prova do pré-requisito](../../../experiments/construction/034-overlay-extra/closure-integration.json).
++Os 1065 testes e o manual Luis/53 checks são evidência histórica desse incremento;
++não foram reexecutados neste Model e não demonstram reparação.
++
++IMP-035 consome a cache de IMP-034 para formar arestas novas. Não aprende um
++catálogo global nem altera a política de anúncios. Continua antes de 005-rotas.
++Não implementa routing, escolha de parent, stream, failover de origem ou vídeo.
++A aresta aplicacional precisa de conectividade IP entre endpoints sobreviventes;
++este extra não repara a rede underlay nem prova alcançabilidade a partir da cache.
++
++## 2. Decisão explícita de gatilho — Q-C-20
++
++O utilizador escolheu **reparar quando o nó fica isolado**, entendido como zero
++sessões vizinhas ACTIVE. Não se inicia reparação autónoma apenas por diminuir
++o grau enquanto subsiste um vizinho ACTIVE. Um nó saudável pode atender a
++intenção do isolado, sem perder as suas sessões, e sem ter de ficar isolado.
++[Decisão e limites](../../../docs/construction-duvidas.md#q-c-20--gatilho-da-reparação-do-imp-035).
++
++Isolamento é um estado local de vizinhança, não um diagnóstico de partição
++global ou de disponibilidade de vídeo. READY/consulta bootstrap concluída não
++significam presença de vizinhos. O arranque pode ficar sem ACTIVE enquanto
++aguarda vizinhos configurados; Design deve coordenar essa janela, os retries
++existentes e a elegibilidade de candidatos sem disparos/ciclos ilimitados.
++Sem candidato aprendido utilizável, o estado isolado é explícito, sem inventar
++endpoints ou voltar a consultar o bootstrap. Uma ligação configurada pode
++recuperar em paralelo pelos mecanismos já existentes.
++
++## 3. Entidades e objetos de valor
++
++- **Nó overlay**: nodeId estável, instanceId desta execução, endpoint/papel,
++  sessões atuais e ciclo de vida. Possui estado no executor serial (ADR-017).
++- **Par de nós**: dois nodeIds ordenados. Identifica a unicidade da ligação,
++  independentemente de quem detetou isolamento. O menor nodeId continua a ser
++  o iniciador permitido da ligação TCP persistente (ADR-019 residual).
++- **Candidato aprendido**: nodeId/endpoint/papel e pistas de instância, estado
++  AVAILABLE ou CONFLICT e claims. É localização autorizável, não vizinho ACTIVE,
++  rota, stream ou prova de que o destino está vivo.
++- **Claim/proveniência**: anunciante, instanceId/connectionId/token HELLO, geração,
++  instante monotónico local da QUERY e prazo. Mantém a definição do IMP-034:
++  128 candidatos, quatro fontes por ID, TTL local 60 s. Morte do anunciante não
++  apaga claims; reparação não fabrica ou renova esses prazos.
++- **Necessidade de reparação**: isolamento local e respetivo contexto de execução.
++  Desaparece quando surge a primeira sessão ACTIVE ou começa shutdown; não é
++  uma quantidade de vizinhos a repor até ao grau inicial.
++- **Intenção de reparação**: propósito efémero de ligar um par com candidato
++  válido. Pode nascer em qualquer extremo. Transporta contexto suficiente para
++  o iniciador permitido agir e para o recetor validar; não é autorização
++  automática de um ID desconhecido. O formato/transporte concreto fica em Design.
++- **Admissão de par aprendido**: autorização limitada e efémera para tentar esse
++  par fora do grafo inicial, separada do grafo imutável do bootstrap e da cache.
++  O contrato de confiança e prova verificável pelo outro extremo exige aprovação.
++- **Tentativa de reparação**: identidade própria, par, execução, versão do candidato,
++  prazo e reservas. Não é a sessão confirmada; callbacks só podem alterar a
++  tentativa/contexto a que pertencem.
++- **Sessão reparada**: mesmos invariantes de uma sessão configurada: identidade,
++  endpoint, capacidade obrigatória, correlação HELLO/ACK, flush e unicidade.
++  connectionId/instanceId reais substituem pistas do anúncio apenas nessa sessão.
++- **Resultado/diagnóstico**: estados e razões finitos por nó/par, sem histórico
++  ilimitado: isolamento, ausência de candidato, espera/backoff, falta de recurso,
++  tentativa, rejeição, ACTIVE, shutdown. Ausência transitória não é incompatibilidade.
++
++Os nomes são linguagem de domínio, não novas assinaturas/enums Java aprovadas.
++Snapshots/publicações são imutáveis, com coleções copiadas e tamanho limitado.
++
++## 4. Agregados e serviços de domínio
++
++A **vizinhança do nó** é a raiz do agregado: sessões configuradas e reparadas,
++necessidade local, admissões/tentativas, diagnósticos e reservas partilhadas.
++OverlayRecovery coordena a política dentro do owner existente; NeighborManager
++continua responsável pela sessão e pelo mecanismo de reconexão. OverlayNode
++integra o ciclo de vida. Não criar um segundo proprietário do estado ou uma
++rede paralela de sessões de descoberta/reparação.
++
++A **cache de candidatos** conserva ownership e invariantes de IMP-034. A
++reparação consulta snapshots e revalida a elegibilidade antes dos compromissos;
++não altera gerações/watermarks, TTL ou fonte para tornar candidato utilizável.
++Uma admissão pendente deixa de valer quando a prova necessária expira/conflita;
++Design define o ponto de decisão e invalidação. Uma sessão já validada não
++cai só porque o claim que permitiu descobri-la expira: tem identidade e vida
++próprias. Se essa sessão cair, a elegibilidade de nova reparação é reavaliada,
++sem converter a antiga sessão numa autorização eterna.
++
++Serviços conceptuais: observar isolamento, consultar/selecionar candidatos,
++coordenar intenção e iniciador, reservar/admitir, confirmar sessão, cancelar
++operações lógicas e libertar recursos físicos quando terminam. Não se fixam
++assinaturas, bytes, códigos novos ou algoritmos de temporização nesta etapa.
++
++Repositórios conceptuais: leitura limitada da cache; visão das sessões atuais;
++registo volátil e limitado de admissões/tentativas/reservas. Não acrescentar DB,
++persistência ou pesquisa de membros no bootstrap.
++
++## 5. Invariantes e corridas
++
++1. Todos os nós exigem descoberta em TCP v2; não há extra desligado, ACTIVE_BASE,
++   codec v1, fallback, outro JAR operacional ou novo listener de descoberta.
++2. Apenas isolamento local inicia necessidade autónoma; nó saudável pode atender
++   intenção válida. Não exigir isolamento simultâneo ou aprendizagem recíproca
++   como condição universal: o contrato aprovado tem de suportar unilateralidade.
++3. Só candidatos locais aprendidos válidos, não-self/não-conflitantes/não-expirados,
++   podem motivar uma intenção. Uma intenção recebida exige validação própria;
++   confiar cegamente no endpoint afirmado pelo requerente não satisfaz a admissão.
++4. Configuração/topologia imutável não é reescrita por reparação; o bootstrap
++   continua só inicial, sem listas suplementares, membership ou tráfego periódico.
++5. Menor nodeId inicia o TCP persistente; qualquer extremo pode manifestar intenção.
++   Não usar duas sessões concorrentes, regras de desempate acidentais ou colisões
++   de sockets como substituto da coordenação. Unicidade é por par global de IDs.
++6. Sender/recipient/endpoint/instanceId/connectionId e contexto da tentativa são
++   validados. A instância observada pelo anunciante é pista, não identidade eterna.
++7. Uma sessão só produz NeighborUp após validações e barreira de flush existentes.
++   send=ACCEPTED e conclusão de um future não provam receção ou terminação física.
++8. Uma sessão saudável não é fechada/substituída para admitir reparação, aumentar
++   grau ou tratar peer inválido. Sem recurso, rejeitar/adiar com diagnóstico.
++9. Grau total ACTIVE configurado+reparado <= min(C,63), coerente com C<=64 e
++   snapshots de adjacência até 63. Reservas/dials/jobs/filas/timers físicos contam
++   no orçamento comum existente, incluindo trabalhos cancelados ainda vivos.
++10. Cache de 128 IDs não autoriza 128 dials/status/timers ativos. Design deve fixar
++    caps de admissões, tentativas, retenção e intenções, e relação com C/B/R.
++    Estados por peer limitados; uma tentativa e retry por par, sem busy retry.
++11. Esperas/backoff e frequência globais são limitados. A eleição/ordenação de
++    candidatos é determinística e justa dentro dos limites que Design concretiza;
++    não usa RTT ainda não implementado, nem promete caminho mínimo/ótimo.
++12. A primeira sessão ACTIVE satisfaz a necessidade autónoma. Operações concorrentes
++    perdem a elegibilidade lógica; libertação física aguarda terminação. Design
++    define o commit para impedir duas novas admissões por um único isolamento.
++13. Reconexão configurada e reparação concorrem no mesmo agregado. Se uma resolver
++    isolamento, a outra não pode publicar sessão extra a partir de estado antigo.
++    Não interromper sessões que já tenham sido validamente confirmadas.
++14. Tokens/queryId/gerações antigos em descoberta mantêm o descarte de D07e do
++    IMP-034: não Down, não terminar consulta atual, não renovar cache/TTL/watermark.
++    Contextos de reparação antigos só terminam os seus recursos.
++15. Rejeição, timeout, cache vazia/expirada/conflitante e candidato indisponível
++    deixam diagnóstico limitado e preservam CLI/aprendizagem/peers saudáveis.
++    Nada disso provoca FAILED global por defeito ou alarga caps.
++16. Aresta reparada ACTIVE é agora uma adjacência real, divulgável por IMP-034.
++    A cache aprendida sozinha nunca é retransmitida como vizinhança direta.
++17. Shutdown bloqueia novas intenções/admissões, cancela operações lógicas e usa
++    o prazo global restante; owner/callbacks não bloqueiam nem fazem joins.
++18. Não há garantia universal de recuperar conectividade: faltando candidato/prova,
++    recurso ou alcance IP, registar isolamento/indisponibilidade e tentativas limitadas.
++    Falha silenciosa depende da futura deteção do IMP-007, não de um timer inventado.
++
++## 6. Eventos e transições conceptuais
++
++Eventos: NeighborUp/Down corrente, isolamento observado, snapshot de candidatos
++consultado/expirado/conflitante, intenção recebida, admissão concedida/recusada,
++reserva obtida, dial/handshake/flush concluído, timeout/retry elegível, shutdown.
++Cada evento transporta a identidade e a correlação mínimas; callbacks são curtos
++e publicados no mesmo executor serial. Relógio é monotónico local.
++
++Com vizinhos ACTIVE não há procura autónoma. Zero ACTIVE produz necessidade;
++sem candidato válido há isolamento explícito. Candidato válido pode levar a
++intenção/admissão e tentativa limitada. Falha regressa a espera/backoff enquanto
++subsistir a necessidade; sucesso regressa à vizinhança ACTIVE. Receber intenção
++válida também é possível quando já há sessões ACTIVE, sem criar necessidade local.
++Shutdown é terminal para novas operações. Estados não implicam novos enums wire.
++
++## 7. Cenários e critérios de sucesso
++
++**S–R1/R2–C:** arrancar todos, confirmar sessões e aprendizagem de S por C e de C
++por S; parar bootstrap. Matar R1: S/C conservam R2, sem procura de novas arestas.
++Matar R2: sobreviventes originais isolados podem coordenar uma única S–C. Os
++processos e instanceIds de S/C mantêm-se; connectionId pertence à nova sessão.
++
++**S–R1–R2/R3–C:** aprender R1/C por R2/R3 e parar bootstrap. Matar R2: ainda há R3,
++sem procura autónoma. Matar R3: C isolado pede reparação; R1 conserva S e pode
++admitir C. Resultado S–R1–C com mesmo connectionId S–R1 e uma única R1–C.
++
++**Unilateralidade e ordenação inversa:** o extremo que precisa de reparar pode
++ter nodeId maior que o saudável. A intenção deve acionar o menor como iniciador
++permitido sem exigir perda de todos os vizinhos no saudável. O contrato também
++precisa de tratar cache/proveniência não recíprocas, saturação e expiração.
++
++O ensaio V-034 terá mortes reais de processos (p. ex. SIGKILL), com mesmos
++sobreviventes e bootstrap parado, logs/operador/hashes e limpeza verificáveis.
++Teste com close/EOF em JVM embutida pode complementar, mas não será apresentado
++como morte abrupta real, ensaio CORE, vídeo ou recuperação da rede IP.
++
++## 8. Oráculos propostos de V-034 — M01–M18 (não executados)
++
++| Caso | Oráculo a concretizar em Design/Implement/Test |
++|---|---|
++| M01 | Descoberta obrigatória/TCP v2, bytes/caps/tipo 3/UDP e testes anteriores preservados; nenhum fallback ou nova dependência. |
++| M02 | Zero ACTIVE gera necessidade; perder só um relay mantendo alternativa não cria nova aresta; READY e isolamento são distintos. |
++| M03 | Aprendizagem real e morte sequencial de R1/R2 forma S–C, mesmos sobreviventes e bootstrap parado. |
++| M04 | Aprendizagem real e morte de R2/R3 forma R1–C, conservando S–R1 e respetivo connectionId. |
++| M05 | Só extremo isolado manifesta intenção; menor nodeId saudável inicia o TCP quando a ordenação exige. Não exigir cache recíproca universal. |
++| M06 | Intenção/admissão inválida, forjada, fora de contexto ou endpoint/identidade/capacidade incompatível não produz Up nem afeta saudável. |
++| M07 | Cache vazia, expirada, self ou conflitante não produz dial inválido, consulta bootstrap ou aprendizagem fabricada; isolamento explícito. |
++| M08 | Candidato indisponível implica backoff/tentativas e diagnóstico limitados; outro candidato elegível pode progredir segundo política justa. |
++| M09 | Intenções simultâneas, duplicadas e dials cruzados conservam um iniciador e uma sessão por par; eventos finitos no owner. |
++| M10 | Limites globais/por peer/grau e reservas comuns mantêm-se com saturação; não sacrificar sessão saudável para abrir espaço. |
++| M11 | Expiração/conflito durante admissão/dial invalida a autorização pendente; sessão já confirmada sobrevive à expiração do claim. |
++| M12 | Eventos de sessão/tentativa/execução antigas não apagam a sessão nova, mudam TTL ou libertam reservas físicas atuais. |
++| M13 | Reconexão configurada e duas reparações concorrem: primeira confirmação satisfaz necessidade, elimina commits pendentes obsoletos e mantém unicidade. |
++| M14 | Sessão reparada cumpre HELLO/ACK/flush/identidade v2 e passa a adjacência direta; cache sozinha não é anunciada como ligação. |
++| M15 | CLI expõe vizinhança/isolamento/resultado com saída limitada; erro local preserva CLI, descoberta e peers saudáveis. |
++| M16 | Cancelamento/timeout lógico não reutiliza reserva antes de terminação física; shutdown global com prazo e sem recursos pendentes. |
++| M17 | Clock/transporte/escrita controlados para fronteiras/corridas e TCP real para estabelecimento/falhas; sem usar sleeps como único oráculo lógico. |
++| M18 | Regressão clean verify JDK 21, fixtures/V-ADD, manual reproduzível, mortes reais e revisão/integração com comandos, XML/logs/hashes atuais. |
++
++## 9. Handoff, âmbito e gate próprio
++
++O âmbito autorizado do ADD conserva os oito caminhos: OverlayRecovery,
++NeighborManager, OverlayNode, OttApplication, respetivos três testes e
++experiments/overlay-recovery/. Os nomes/caminhos completos continuam no ADD;
++não criar nem alterar Java nesta etapa.
++
++O contrato TCP v2 integrado tem 18 tipos, HELLO sem contexto específico de
++intenção/admissão reparadora e autorização inicial por grafo. Isso consta dos
++contratos aprovados; **não se verificou código Java neste Model**. Ainda não
++está demonstrado que os oito caminhos bastem para intenção unilateral segura,
++particularmente sem cache recíproca. Não esconder uma operação em PROBE/ERROR,
++REGISTER ou mensagens de routing, nem abrir canal paralelo por inferência.
++
++Design deve propor contrato de intenção/admissão, confiança/proveniência,
++correlação, iniciador, framing/versão se afetados, quotas/FIFO/flush, fair selection,
++resolução de endpoint, reservas físicas e ciclo de vida. Se afetar protocolo,
++transporte, configuração, cache ou seus testes fora dos oito caminhos, apresentar
++ampliação do âmbito e eventual ADR-035 **Proposta**, sem editar esses ficheiros
++antes da aprovação. Não modificar ADR-034 Aceite para fabricar compatibilidade.
++
++G-EXTRA-ADR está **pendente para IMP-035**; a aprovação de IMP-034 não o satisfaz.
++Q-C-20 aprova apenas o gatilho, não wire, admissão ou este Model. Nenhuma ADR nova
++é emitida nesta etapa. Revisão de Design/ADR e âmbito são obrigatórios antes de
++Implement; V-034/regressão/manual/revisão final/integração antes de DONE.
++
++[PRESSUPOSTO] Laboratório controlado conforme ADR-021; proveniência limita
++admissão, mas não fornece autenticação criptográfica. Nenhuma promessa de
++reparação perante nós maliciosos, ausência de alcance IP ou falha exclusiva UDP.
++
++## 10. Glossário
++
++Isolado: zero vizinhos ACTIVE locais. Saudável: conserva sessão ACTIVE válida.
++Candidato: localização aprendida com claims válidos. Intenção: pedido de
++coordenação, não sessão/autorização por si. Admissão: autorização efémera limitada.
++Tentativa: operação correlacionada com reservas. Reparação: nova aresta confirmada
++fora do grafo inicial. Rota/fluxo: trabalho futuro; conectividade não comprova vídeo.
++
++Parar para revisão de Model. Sem Design, Java, Maven, manual, commits ou push.
++
++## Conferência documental desta etapa
++
++[Entrada/hashes/base](../../../experiments/construction/035-overlay-extra/model-entry.json),
++[V-ADD](../../../experiments/construction/035-overlay-extra/model-v-add-01.log),
++[conferência final](../../../experiments/construction/035-overlay-extra/model-validation.json)
++e [diff contra a base](../../../experiments/construction/035-overlay-extra/model-vs-base.diff).
++Validação documental não executa V-034 nem confirma viabilidade do contrato wire.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -703,3 +703,14 @@
+ ## IMP-034 — fecho integrado
+ 
+ 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../../../../bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
++
++## IMP-035 — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
++Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
++Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
++possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
++[Model e M01–M18 propostos](../../../../bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
++de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
++Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
++Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+@@ -2,7 +2,7 @@
+ id: "007-reparar-vizinhancas-com-candidatos-aprendidos"
+ unit: "002-overlay"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-11T12:26:03Z"
+ source_tasks: ["TASK-034"]
+@@ -12,7 +12,7 @@
+ bolt: "035-overlay-extra"
+ size: "M"
+ extra: true
+-updated: "2026-11-11T14:33:20Z"
++updated: "2026-11-11T22:22:21Z"
+ ---
+ # História — Extra — reparar ligações com candidatos aprendidos
+ 
+@@ -21,7 +21,7 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Com o extra desativado, conservar o comportamento e os testes da overlay base.
++- [ ] Manter descoberta obrigatória e controlo exclusivamente TCP v2 em todos os nós, preservando as garantias e os testes existentes, sem modo base opcional ou fallback.
+ - [ ] Após aprendizagem pelos vizinhos e morte dos relays, formar S–C no primeiro cenário e R1–C no segundo, preservando S–R1.
+ - [ ] Candidatos aprendidos, grau, tentativas e temporizadores têm limites verificáveis e uma sessão confirmada por par.
+ - [ ] Callbacks antigos e reparações concorrentes ou assimétricas não apagam ligações novas nem ultrapassam os limites.
+@@ -32,3 +32,11 @@
+ 
+ V-034. Responsável proposto Denji, revisor proposto Fillmore.
+ [Bolt](../../../../../bolts/035-overlay-extra/bolt.md).
++
++## Estado atual — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. IMP-034 complete e integrado; apenas Model iniciado.
++[Modelo e M01–M18](../../../../../bolts/035-overlay-extra/ddd-01-domain-model.md).
++Q-C-20: procurar nova ligação só com zero ACTIVE, atender intenção no saudável.
++Model não aprovado, V-034 não executado. G-EXTRA-ADR/Design/ADR/Implement/Test,
++manual/revisão final/integração pendentes; história não implemented/DONE.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-11T19:45:51Z"
++updated: "2026-11-11T22:22:21Z"
+ completed: null
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+@@ -330,3 +330,14 @@
+ ## IMP-034 concluído; IMP-035 por iniciar
+ 
+ 2026-11-11T19:45:51Z: seis dos sete bolts desta unidade complete. IMP-034/V-033: 1065 testes e manual humano Luis/53 checks, revisão técnica e integração local f650be02f2af10b95328f5b50c3d6941e2e75c15. [Fecho](../../../../bolts/034-overlay-extra/closure-walkthrough.md). Unidade in-progress, pois IMP-035 permanece planned; não há reparação implementada nem fase/REQ-025 concluída.
++
++## IMP-035 — Model para revisão
++
++Registo de 2026-11-11T22:22:21Z. Apenas Model iniciado por autorização do utilizador.
++Pré-requisito IMP-034 complete e integrado localmente na base 22622c1.
++Q-C-20: reparação autónoma só ao ficar isolado (zero ACTIVE), atendimento
++possível por peer saudável. Descoberta obrigatória/TCP v2, sem modo opcional.
++[Model e M01–M18 propostos](../../../../bolts/035-overlay-extra/ddd-01-domain-model.md). G-EXTRA-ADR próprio pendente: contrato
++de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
++Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
++Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-planned
++extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-model-review
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete e 28 planned; IMP-035 é o próximo incremento, sem início autorizado.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Model e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -286,6 +286,6 @@
+ 
+ ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** planned.
++**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model para revisão; Q-C-20 decidida, sem avanço a Design.
+ **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+ Usa a cache aprendida de IMP-034 para reparar a overlay.

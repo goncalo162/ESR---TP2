@@ -225,18 +225,20 @@ class NeighborDiscoveryTest {
         try(var g=new Graph(false)) {
             g.start();g.bootstrap.close();NeighborManagerTest.until(()->g.learned("C","S")&&g.learned("S","C"));
             var before=g.candidates("C");assertTrue(before.stream().flatMap(v->v.sources().stream()).allMatch(p->Set.of("R1","R2").contains(p.source().nodeId())));
-            g.lose("R1");g.lose("R2");NeighborManagerTest.until(()->g.nodes.get("C").snapshot().isEmpty()&&g.nodes.get("S").snapshot().isEmpty());
+            g.lose("R1");g.lose("R2");NeighborManagerTest.until(()->g.nodes.get("C").snapshot().keySet().stream().noneMatch(Set.of("R1","R2")::contains)&&g.nodes.get("S").snapshot().keySet().stream().noneMatch(Set.of("R1","R2")::contains));
             assertTrue(g.learned("C","S"));assertTrue(g.learned("S","C"));assertFalse(g.nodes.get("C").start().toCompletableFuture().isCompletedExceptionally());
-            assertFalse(g.nodes.get("C").snapshot().containsKey("S"),"Learning must not perform IMP-035 repair");
+            // The application now repairs; the isolated Discovery service still never dials (D09).
+            assertTrue(g.candidates("C").stream().anyMatch(c->c.nodeId().equals("S")));
         }
     }
     @Test @org.junit.jupiter.api.Timeout(20) void D04_realTcpLearnsR1AndRetainsHealthySR1SessionAfterR2R3Loss()throws Exception {
         try(var g=new Graph(true)) {
             g.start();var surviving=g.nodes.get("S").snapshot().get("R1");g.bootstrap.close();
             NeighborManagerTest.until(()->g.learned("C","R1")&&g.learned("R1","C"));g.lose("R2");g.lose("R3");
-            NeighborManagerTest.until(()->g.nodes.get("C").snapshot().isEmpty()&&g.nodes.get("R1").snapshot().size()==1);
+            NeighborManagerTest.until(()->!g.nodes.get("C").snapshot().containsKey("R2")&&!g.nodes.get("C").snapshot().containsKey("R3")&&g.nodes.get("R1").snapshot().containsKey("S"));
             assertEquals(surviving,g.nodes.get("S").snapshot().get("R1"));assertTrue(g.learned("C","R1"));assertTrue(g.learned("R1","C"));
-            assertFalse(g.nodes.get("C").snapshot().containsKey("R1"),"No dynamic edge before IMP-035");
+            // Exact new-edge establishment is covered by OverlayRecoveryTest.D04; retain the learning oracle here.
+            assertTrue(g.learned("C","R1"));
         }
     }
 

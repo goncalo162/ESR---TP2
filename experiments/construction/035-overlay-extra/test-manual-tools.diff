@@ -1,0 +1,537 @@
+diff --git a/experiments/overlay-recovery/ManualV034Node.java b/experiments/overlay-recovery/ManualV034Node.java
+new file mode 100644
+--- /dev/null
++++ b/experiments/overlay-recovery/ManualV034Node.java
+@@ -0,0 +1,92 @@
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.overlay.*;
++import java.nio.file.*;
++import java.nio.charset.StandardCharsets;
++import java.security.MessageDigest;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++
++/** Observation-only manual helper. Real public JAR APIs, default clocks/transports and one JVM per node. */
++public final class ManualV034Node {
++    static final ArrayBlockingQueue<String> output=new ArrayBlockingQueue<>(4096);
++    static final AtomicBoolean logging=new AtomicBoolean(true);
++    static final AtomicInteger dropped=new AtomicInteger();
++    static String node,token,jarHash;
++    static UUID instance;
++    static String json(Object value) {
++        if(value==null)return "null";
++        if(value instanceof Optional<?> optional)return json(optional.orElse(null));
++        if(value instanceof Number||value instanceof Boolean)return value.toString();
++        if(value instanceof Map<?,?> map) {
++            var pairs=new ArrayList<String>();map.forEach((k,v)->pairs.add(json(k.toString())+":"+json(v)));return "{"+String.join(",",pairs)+"}";
++        }
++        if(value instanceof Collection<?> items)return "["+String.join(",",items.stream().map(ManualV034Node::json).toList())+"]";
++        if(value.getClass().isRecord()) {
++            var fields=new LinkedHashMap<String,Object>();
++            try{for(var field:value.getClass().getRecordComponents())fields.put(field.getName(),field.getAccessor().invoke(value));}
++            catch(ReflectiveOperationException error){throw new IllegalStateException(error);}
++            return json(fields);
++        }
++        var s=value.toString();var escaped=new StringBuilder("\"");
++        for(char c:s.toCharArray())switch(c){case '"'->escaped.append("\\\"");case '\\'->escaped.append("\\\\");case '\n'->escaped.append("\\n");case '\r'->escaped.append("\\r");case '\t'->escaped.append("\\t");default->{if(c<32)escaped.append(String.format("\\u%04x",(int)c));else escaped.append(c);}}
++        return escaped.append('"').toString();
++    }
++    static void emit(String kind,Object payload) {
++        var line=new LinkedHashMap<String,Object>();line.put("kind",kind);line.put("node",node);line.put("pid",ProcessHandle.current().pid());line.put("instance",instance);line.put("token",token);line.put("nano",System.nanoTime());line.put("payload",payload);
++        if(!output.offer(json(line)))dropped.incrementAndGet();
++    }
++    static String hash(Path path)throws Exception{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(path)));}
++    public static void main(String[] args)throws Exception {
++        if(args.length>0&&args[0].equals("validate")) {
++            var configurations=ConfigurationLoader.loadDeployment(Arrays.stream(args).skip(1).map(Path::of).toList());
++            System.out.println(json(Map.of("kind","offline-valid","nodes",configurations.stream().map(NodeConfiguration::nodeId).toList())));return;
++        }
++        if(args.length!=4)throw new IllegalArgumentException("ROLE CONFIG RUN_TOKEN JAR_SHA256");
++        var role=NodeRole.valueOf(args[0]);var config=ConfigurationLoader.load(Path.of(args[1]),role);
++        node=config.nodeId();token=args[2];jarHash=args[3];instance=UUID.randomUUID();
++        Path actualJar=Path.of(OverlayNode.class.getProtectionDomain().getCodeSource().getLocation().toURI());
++        if(!hash(actualJar).equals(jarHash))throw new IllegalStateException("JAR hash mismatch before sockets");
++        Thread writer=Thread.ofPlatform().name("manual-v034-output").start(()->{
++            while(logging.get()||!output.isEmpty())try{String line=output.poll(100,TimeUnit.MILLISECONDS);if(line!=null){System.out.println(line);System.out.flush();}}
++            catch(InterruptedException error){Thread.currentThread().interrupt();return;}
++        });
++        int exit=0;OverlayNode overlay=null;BootstrapServer bootstrap=null;
++        try {
++            emit("started",Map.of("jar",actualJar.toString(),"jarSha256",jarHash,"role",role,"config",config.sourceFile()));
++            if(role==NodeRole.BOOTSTRAP)bootstrap=new BootstrapServer(config);
++            else {
++                overlay=new OverlayNode(config,instance,event->emit("event",Map.of("type",event.getClass().getSimpleName(),"data",event)));
++                overlay.start().toCompletableFuture().get(12,TimeUnit.SECONDS);
++            }
++            emit("ready",Map.of("jarSha256",jarHash));
++            var input=new java.io.BufferedReader(new java.io.InputStreamReader(System.in,StandardCharsets.UTF_8));
++            for(String line;(line=input.readLine())!=null;) {
++                if(line.equals("quit"))break;
++                if(!line.startsWith("state "))throw new IllegalArgumentException("manual helper accepts state TOKEN or quit");
++                var state=new LinkedHashMap<String,Object>();state.put("request",line.substring(6));state.put("dropped",dropped.get());
++                if(overlay!=null) {
++                    state.put("sessions",new TreeMap<>(overlay.snapshot()));state.put("candidates",overlay.candidates().toCompletableFuture().get(2,TimeUnit.SECONDS));
++                    state.put("recovery",overlay.recoveryStatus());state.put("failure",overlay.failure().map(Object::toString));
++                }
++                emit("state",state);
++            }
++            if(overlay!=null) {
++                var report=overlay.requestShutdown(0,Duration.ofSeconds(3)).toCompletableFuture().get(3,TimeUnit.SECONDS);
++                if(!overlay.awaitTermination(Duration.ofSeconds(3)))throw new IllegalStateException("Overlay shutdown timeout");
++                emit("shutdown",report);overlay=null;
++            }
++            if(bootstrap!=null){bootstrap.close();bootstrap=null;}
++            emit("ended",Map.of("dropped",dropped.get()));
++            if(dropped.get()!=0)exit=2;
++        }catch(Throwable error){exit=1;emit("failure",Map.of("error",error.toString()));error.printStackTrace(System.err);}
++        finally {
++            if(overlay!=null)try{overlay.close();}catch(Throwable error){exit=1;error.printStackTrace(System.err);}
++            if(bootstrap!=null)try{bootstrap.close();}catch(Throwable error){exit=1;error.printStackTrace(System.err);}
++            logging.set(false);writer.join(2000);if(writer.isAlive())exit=3;
++        }
++        System.exit(exit);
++    }
++}
+diff --git a/experiments/overlay-recovery/README.md b/experiments/overlay-recovery/README.md
+--- a/experiments/overlay-recovery/README.md
++++ b/experiments/overlay-recovery/README.md
+@@ -1,72 +1,82 @@
+-# Reparação da overlay — IMP-035
++# V-034 — reparação da overlay com mortes reais
+ 
+-Implement preparado para revisão; Test ainda não autorizado. Os comandos de
+-execução manual abaixo são o plano da próxima etapa, sem resultados atribuídos.
++Implement aprovado; Test executado pelo agente e à espera da repetição de Luis.
++Não há aprovação de Test, fecho ou integração deste incremento.
+ 
+-## Evidência incremental
++## Repetir pessoalmente
+ 
+-Desde a raiz, com JDK21 e sockets locais autorizados:
++Na raiz do repositório, numa bancada Linux autorizada para sockets locais,
++com Python3, JDK21, javac, /proc e ss:
+ 
+ ```sh
+-cd Projeto
+-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+-export PATH="$JAVA_HOME/bin:$PATH"
+-mvn -B -ntp -Dtest=OverlayRecoveryTest,NeighborManagerTest,NeighborManagerLifecycleTest,NeighborDiscoveryTest,TransportTest,BootstrapServerTest,OttApplicationTest,MessageCodecTest,DiscoveryCodecTest test
+-mvn -B -ntp -Dtest=CandidateCacheTest test
++python3 -B experiments/overlay-recovery/run-manual.py --operator Luis
+ ```
+ 
+-Logs/XML/hashes das execuções reais em experiments/construction/035-overlay-extra/.
+-D03/D04 do teste usam nós embutidos e TCP real com close explícito; não são
+-SIGKILL nem manual humano. Um teste de writer retém um worker sem o libertar
+-por interrupção para verificar reserva física/shutdown, libertando-o no finally.
++O runner usa o JAR preservado do clean verify1113, SHA-256:
+ 
+-## Roteiro a executar em Test
++```text
++dea01ffa2c501b9b948594005e7e8e9ee70b387981dc5b3d83f9d7c331cc2526
++```
+ 
+-Preparar duas execuções com diretórios novos, operador identificado, instantes
+-reais, comandos, logs separados por processo, PIDs, instanceIds e hash do mesmo
+-JAR novo em todos os nós. O JAR histórico do IMP-034 é apenas evidência preservada.
+-Só construir/validar a regressão completa depois de aprovado Implement.
++Não precisa de sudo. Não reconstruir o JAR para repetir esta versão. O primeiro
++caminho impresso identifica o novo diretório em
++experiments/construction/035-overlay-extra/test-manual-runs/. Guardar esse caminho;
++manual.log/result.json e subdiretórios dos dois grafos contêm os resultados reais.
++O número de CHECK_PASS pode variar se ambos os extremos iniciarem uma tentativa;
++o runner exige todos os oráculos, MANUAL_PASS, passed=true, saída Python0 e
++no_processes_pending=true. O operador é declarado, não verificado como identidade
++ou aprovação. Só a tua execução/revisão satisfaz a repetição humana.
+ 
+-| Ensaio | Grafo inicial | Após primeira morte | Após segunda morte |
+-|---|---|---|---|
+-| A | S–R1–C; S–R2–C | R1 morto: alternativa R2, sem S–C | R2 morto: formar S–C |
+-| B | S–R1–R2–C; S–R1–R3–C | R2 morto: alternativa R3, sem R1–C | R3 morto: formar R1–C, conservar S–R1 |
++O comando compila um auxiliar de observação fora de Projeto e arranca uma JVM
++por nó, carregando as APIs públicas reais do mesmo JAR. Usa configuração validada,
++clock/transporte/limites padrão e aprendizagem real. Não usa JUnit, nós embutidos
++no mesmo processo, fake clock ou mensagens wire injetadas. O auxiliar só expõe
++snapshots/cache que a CLI de produção não imprime. A CLI real foi exercitada
++separadamente pelo clean verify (OttApplicationTest48); não se atribui ao auxiliar
++uma execução da main OttApplication. Não altera fontes nem classes do JAR.
+ 
+-1. Criar perfis locais isolados para cada grafo. Bootstrap leva topology.file com
+-   grafo simétrico; SERVER, RELAY e CLIENT levam respetivos IDs/portas/roles e
+-   o mesmo bootstrap. Configurar catálogo de streams válido para SERVER. Usar
+-   portas livres, respeitar Q≥2 e todos os limites. Não partilhar um perfil mutável
+-   entre execuções. Os perfis existentes em Projeto/src/main/resources/config/
+-   mostram a gramática, mas o seu grafo não é nenhum destes dois ensaios.
+-2. Arrancar BOOTSTRAP e cada nó em terminal próprio com o mesmo JAR:
+-   `java -cp "$JAR" pt.uminho.esr.ott.app.OttApplication --role "$ROLE" --config "$PROFILE"`.
+-   Guardar STARTED/READY e confirmar neighbors; o servidor aqui não emite vídeo.
+-3. Antes das falhas, comprovar aprendizagem por anúncios dos relays. Os eventos
+-   RepairStarted posteriores identificam a seleção por sourceKey, geração,
+-   queryStarted/TTL e requestId. Não preencher resultados antes de os observar.
+-4. Parar bootstrap por quit; manter sobreviventes originais. Em cada nó consultar
+-   neighbors/recovery. Registar a sessão S–R1 do ensaio B antes das mortes.
+-5. Identificar o PID exato de cada relay pelos logs STARTED e cmdline/perfil.
+-   Executar `kill -KILL "$RELAY_PID"` só sobre o processo do ensaio. Não usar
+-   pkill global. Após primeira morte esperar NeighborDown e confirmar alternativa
+-   preservada, sem reparação prematura. Repetir para o segundo relay depois da
+-   primeira observação, dentro do TTL60s da aprendizagem necessária.
+-6. Confirmar a aresta nova por NeighborUp/neighbors nos dois extremos, mesmo
+-   connectionId por sessão e sobreviventes com PIDs/instanceIds inalterados.
+-   No ensaio B, conferir S–R1 byte a byte. Correlacionar RepairStarted com a
+-   aprendizagem anterior, sem consulta nova ao bootstrap. Não confundir snapshot
+-   em cache com sessão ACTIVE. O caso sem candidato deve mostrar isolamento.
+-7. Exercitar neighbors/recovery enquanto há rejeições/retries. Encerrar
+-   sobreviventes por quit/EOF, conferir saídas, ausência de processos pendentes
+-   e portas livres. Registar insucesso/limitações, não ajustar a posteriori.
+-8. Luis repete o manual antes da aprovação de Test. V-034, regressão completa,
+-   revisão final e integração são pendências próprias. A ligação de controlo
+-   reparada não prova routing, recuperação de stream ou vídeo.
++## Oráculos dos dois grafos
+ 
+-## Fixtures independentes
++| Grafo inicial | Primeira morte | Segunda morte |
++|---|---|---|
++| S–R1–C; S–R2–C | SIGKILL R1: alternativa R2, sem S–C | SIGKILL R2: formar S–C |
++| S–R1–R2–C; S–R1–R3–C | SIGKILL R2: alternativa R3, sem R1–C | SIGKILL R3: formar R1–C, manter S–R1 |
+ 
+-reference-v2/build-reference-fixtures.py usa campos literais com struct/uuid,
+-sem importar codec Java. A referência tem62TCP: quatro vetores de máscaras
+-migrados,46 preservados e12 novos. UDP16 permanece intacto. Não regenerar com
+-produção para fazer passar testes. O validador confere a referência anterior,
+-os deltas autorizados e a correspondência da cópia operacional.
++1. Conferir os perfis completos/validação offline, PIDs, instanceIds, grafo inicial
++   e JAR/hash carregado por cada processo. Antes das falhas, os snapshots02
++   devem mostrar candidatos aprendidos por vizinhos diretos, sourceKey, geração
++   e TTL60s desde queryStarted, sem catálogo global de candidatos.
++2. O bootstrap termina por quit/saída0 antes das mortes. Cada SIGKILL é precedido
++   da confirmação de PID, starttime de /proc, cmdline/perfil/token deste ensaio;
++   só morrem os relays criados pelo próprio runner. Saída esperada dos mortos:-9.
++3. Após a primeira morte, observar alternativa existente e ausência da nova
++   aresta durante a janela registada de cerca de1s. Antes da segunda, guardar
++   candidatos retidos e os claims já observados. Não remover os sobreviventes.
++4. Após a segunda, observar a sessão única nova nos dois extremos. RepairStarted
++   deve corresponder a proveniência observada antes da morte, dentro do TTL
++   original. PIDs/instanceIds dos sobreviventes permanecem iguais; no segundo
++   grafo também as sessões/connectionIds S–R1 em ambos os extremos.
++5. Os snapshots08 conferem estabilidade durante a janela registada de cerca de2s.
++   Os eventos devem mostrar um NeighborUp do peer reparado por extremo e nenhum
++   NeighborDown desse peer no intervalo. São observações limitadas ao ensaio,
++   não promessa de estabilidade infinita ou SLA de recuperação.
++6. A unicidade física usa os inodes dos FDs e as tabelas TCP/TCP6 em /proc dos
++   próprios PIDs, incluindo IPv4 mapeado em sockets Java dual stack. Esperar uma
++   única tupla TCP entre os extremos. ss fica como diagnóstico adicional.
++   connectionId é local a cada extremo; não se exige o mesmo UUID nos dois lados.
++7. Os sobreviventes terminam por shutdown público com prazo/saída0; bootstraps0,
++   relays mortos-9. Conferir no_processes_pending, logs de shutdown e portas
++   de listener reutilizáveis. Se falhar, manter o diretório e apresentar o erro.
++
++## Execução do agente e histórico
++
++Codex passou68 checks/MANUAL_PASS em20261112T003609Z-sj9_ljkn. As duas tentativas
++anteriores permanecem: a reparação S–C ocorreu, mas o observador só verificava
++IPv4/tcp e não encontrava os sockets dual stack em tcp6. Ambas foram marcadas
++failed e limparam os processos. A correção foi só no observador Python; nenhum
++fonte de produção mudou. Os sources desses runners estão arquivados nas tentativas.
++
++Os snapshots/ações/logs comprovam controlo TCP em loopback e mortes de processos
++reais. Não demonstram vídeo, routing, FPS, falhas de IP silenciosas ou CORE.
++As entradas negativas, concorrência/saturação/TTL/fronteiras são cobertas pela
++regressão com relógio/transporte/escrita controlados onde previsto.
+diff --git a/experiments/overlay-recovery/run-manual.py b/experiments/overlay-recovery/run-manual.py
+new file mode 100644
+--- /dev/null
++++ b/experiments/overlay-recovery/run-manual.py
+@@ -0,0 +1,290 @@
++#!/usr/bin/env python3
++"""V-034: separate real JVMs, public JAR APIs, real sequential SIGKILL; no sudo/fake clock/wire injections."""
++import argparse
++import datetime as dt
++import hashlib
++import ipaddress
++import json
++import os
++from pathlib import Path
++import re
++import shutil
++import signal
++import socket
++import subprocess
++import sys
++import tempfile
++import threading
++import time
++import uuid
++
++ROOT=Path(__file__).resolve().parents[2]
++EVIDENCE=ROOT/'experiments/construction/035-overlay-extra'
++HELPER=Path(__file__).with_name('ManualV034Node.java')
++
++def utc():return dt.datetime.now(dt.timezone.utc).isoformat()
++def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
++def save(p,data):Path(p).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
++
++class Child:
++    def __init__(self,run,ident,role,profile,classpath,token):
++        self.run=run;self.ident=ident;self.profile=profile;self.token=token;self.records=[];self.replies={};self.cv=threading.Condition()
++        self.log_path=profile.with_suffix('.log');self.command=[str(run.java),'-cp',classpath,'ManualV034Node',role,str(profile),token,run.jar_hash]
++        self.proc=subprocess.Popen(self.command,cwd=ROOT,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,bufsize=1)
++        self.start_identity=self.identity();self.reader=threading.Thread(target=self.read,daemon=True);self.reader.start()
++        run.actions.append({'at':utc(),'action':'spawn','node':ident,'pid':self.proc.pid,'identity':self.start_identity,'command':self.command})
++    def identity(self):
++        data=Path(f'/proc/{self.proc.pid}/stat').read_text();return data[data.rfind(')')+2:].split()[19]
++    def read(self):
++        with self.log_path.open('w') as log:
++            for line in self.proc.stdout:
++                log.write(line);log.flush()
++                try:record=json.loads(line)
++                except ValueError:continue
++                with self.cv:
++                    if len(self.records)>=10000:
++                        self.records.append({'kind':'parent-log-overflow'});self.cv.notify_all();return
++                    self.records.append(record)
++                    if record.get('kind')=='state':self.replies[record['payload']['request']]=record
++                    self.cv.notify_all()
++    def wait(self,predicate,timeout=15):
++        deadline=time.monotonic()+timeout
++        with self.cv:
++            while True:
++                value=predicate()
++                if value:return value
++                if self.proc.poll() is not None:raise RuntimeError(f'{self.ident} exited {self.proc.returncode}; see {self.log_path}')
++                left=deadline-time.monotonic()
++                if left<=0:raise TimeoutError(f'{self.ident} observation timeout; see {self.log_path}')
++                self.cv.wait(min(left,.1))
++    def ready(self):
++        return self.wait(lambda:next((r for r in self.records if r.get('kind')=='ready'),None))
++    def send(self,text):self.proc.stdin.write(text+'\n');self.proc.stdin.flush()
++    def state(self):
++        request=uuid.uuid4().hex;self.send('state '+request)
++        record=self.wait(lambda:self.replies.pop(request,None),5)
++        assert record['pid']==self.proc.pid and record['token']==self.token
++        assert record['payload']['dropped']==0 and record['payload'].get('failure') is None,record
++        return record
++    def finish(self):
++        code=self.proc.wait(timeout=8);self.reader.join(2)
++        assert not self.reader.is_alive(),self.ident+' log reader did not end'
++        self.proc.stdin.close();self.proc.stdout.close();return code
++    def quit(self):self.send('quit');return self.finish()
++    def kill_relay(self):
++        assert self.ident.startswith('R') and self.proc.poll() is None
++        cmdline=Path(f'/proc/{self.proc.pid}/cmdline').read_bytes().split(b'\0')
++        assert self.identity()==self.start_identity and str(self.profile).encode() in cmdline and self.token.encode() in cmdline
++        assert b'ManualV034Node' in cmdline and Path(cmdline[0].decode()).resolve()==self.run.java.resolve()
++        self.run.actions.append({'at':utc(),'action':'SIGKILL','node':self.ident,'pid':self.proc.pid,'identity':self.start_identity,'cmdline':[s.decode() for s in cmdline if s]})
++        self.proc.kill();code=self.finish();self.run.check(code==-signal.SIGKILL,f'{self.ident}: real SIGKILL exit -9')
++    def events(self,kind):
++        with self.cv:return [r for r in self.records if r.get('kind')=='event' and r['payload']['type']==kind]
++
++class Run:
++    def __init__(self,args):
++        self.operator=args.operator;self.java=Path(args.java).resolve();self.javac=self.java.with_name('javac')
++        self.build=json.loads((EVIDENCE/'test-build-summary.json').read_text());self.jar=(ROOT/args.jar).resolve() if args.jar else ROOT/self.build['jar']['path']
++        self.jar_hash=self.build['jar']['sha256'];self.started=utc();self.actions=[];self.checks=[];self.graphs=[];self.all_children=[]
++        runs=EVIDENCE/'test-manual-runs';runs.mkdir(exist_ok=True)
++        self.path=Path(tempfile.mkdtemp(prefix=dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ-'),dir=runs))
++        print(self.path,flush=True);self.log=(self.path/'manual.log').open('w');self.helper_hash=sha(HELPER)
++    def message(self,text):print(text,flush=True);self.log.write(utc()+' '+text+'\n');self.log.flush()
++    def check(self,condition,label):
++        if not condition:raise AssertionError(label)
++        self.checks.append({'at':utc(),'label':label});self.message('CHECK_PASS '+label)
++    def prepare(self):
++        self.check(sha(self.jar)==self.jar_hash,'verified clean-verify JAR hash before any child')
++        version=subprocess.run([str(self.java),'-version'],capture_output=True,text=True);(self.path/'java-version.log').write_text(version.stdout+version.stderr)
++        self.check(version.returncode==0 and re.search(r'version "21[.\"]',version.stderr+version.stdout) is not None,'JDK 21 selected')
++        self.classes=self.path/'helper-classes';self.classes.mkdir();command=[str(self.javac),'--release','21','-cp',str(self.jar),'-d',str(self.classes),str(HELPER)]
++        result=subprocess.run(command,capture_output=True,text=True);(self.path/'helper-compile.log').write_text('COMMAND '+json.dumps(command)+'\n'+result.stdout+result.stderr+'\nEXIT '+str(result.returncode)+'\n')
++        self.check(result.returncode==0,'observation helper compiled against verified JAR')
++        self.classpath=os.pathsep.join([str(self.jar),str(self.classes)])
++    def snapshot(self,label,children):
++        value={key:child.state() for key,child in children.items() if key!='BOOT' and child.proc.poll() is None}
++        for key,record in value.items():self.record_proofs(key,record)
++        return value
++    def record_proofs(self,key,state):
++        if not hasattr(self,'proofs'):self.proofs={}
++        bucket=self.proofs.setdefault(key,[])
++        for candidate in state['payload']['candidates']:
++            for proof in candidate['sources']:
++                row={'target':candidate['nodeId'],'proof':proof}
++                if row not in bucket:bucket.append(row)
++    def wait_graph(self,children,expected,timeout=15):
++        deadline=time.monotonic()+timeout
++        while True:
++            value=self.snapshot('poll',children)
++            if set(value)==set(expected) and all(set(value[n]['payload']['sessions'])==set(peers) for n,peers in expected.items()):return value
++            if time.monotonic()>=deadline:raise TimeoutError('graph not converged: '+json.dumps({n:list(s['payload']['sessions']) for n,s in value.items()}))
++            time.sleep(.1)
++    def ss(self,folder,label,children,pair):
++        # Correlate each JVM's FD inodes with TCP and TCP6, including Java dual-stack mapped IPv4.
++        # Keep ss as an additional diagnostic rather than assuming all sockets are AF_INET.
++        command=['ss','-Htnp','state','established'];result=subprocess.run(command,capture_output=True,text=True,timeout=5)
++        (folder/(label+'-ss.log')).write_text('COMMAND '+json.dumps(command)+'\n'+result.stdout+result.stderr+'\nEXIT '+str(result.returncode)+'\n')
++        links={};observed={}
++        def address(raw):
++            ip,port=raw.split(':');data=bytes.fromhex(ip)
++            if len(data)==4:host=socket.inet_ntoa(data[::-1])
++            else:
++                ipv6=ipaddress.IPv6Address(b''.join(data[n:n+4][::-1] for n in range(0,16,4)))
++                host=str(ipv6.ipv4_mapped) if ipv6.ipv4_mapped else '['+str(ipv6)+']'
++            return host+':'+str(int(port,16))
++        for name in pair:
++            child=children[name];pid=child.proc.pid
++            assert child.proc.poll() is None and child.identity()==child.start_identity
++            fdlinks={}
++            for fd in Path(f'/proc/{pid}/fd').iterdir():
++                try:target=os.readlink(fd)
++                except FileNotFoundError:continue
++                match=re.fullmatch(r'socket:\[(\d+)\]',target)
++                if match:fdlinks[fd.name]=match.group(1)
++            owned=[]
++            for family in ['tcp','tcp6']:
++                table=Path(f'/proc/{pid}/net/{family}').read_text()
++                (folder/(label+'-'+name+'-proc-'+family+'.log')).write_text(table)
++                for row in table.splitlines()[1:]:
++                    fields=row.split()
++                    if fields[3]!='01' or fields[9] not in fdlinks.values():continue
++                    endpoints=tuple(sorted([address(fields[1]),address(fields[2])]))
++                    owned.append({'inode':fields[9],'family':family,'endpoints':list(endpoints)})
++                    links.setdefault(endpoints,set()).add(pid)
++            observed[name]={'pid':pid,'start_identity':child.start_identity,'network_namespace':os.readlink(f'/proc/{pid}/ns/net'),'socket_fds':fdlinks,'established_owned':owned}
++        pids={children[n].proc.pid for n in pair};matching=[list(key) for key,owners in links.items() if pids<=owners]
++        save(folder/(label+'-physical-tcp.json'),{'method':'per-PID /proc FD inode and TCP established tuple correlation','nodes':observed,'matching_connections':matching,'ss_is_diagnostic_only':True})
++        self.check(len(matching)==1,label+': exactly one owned physical TCP between '+','.join(pair))
++        return matching
++    def graph(self,deeper):
++        name='B-S-R1-R2R3-C' if deeper else 'A-S-R1R2-C';folder=self.path/name;folder.mkdir();token=uuid.uuid4().hex
++        edges={'S':['R1'],'R1':['S','R2','R3'],'R2':['R1','C'],'R3':['R1','C'],'C':['R2','R3']} if deeper else {'S':['R1','R2'],'R1':['S','C'],'R2':['S','C'],'C':['R1','R2']}
++        reservations=[];ports=[]
++        try:
++            for n in range(1+2*len(edges)):
++                sock=socket.socket();sock.bind(('127.0.0.1',0));reservations.append(sock);ports.append(sock.getsockname()[1])
++        finally:
++            for sock in reservations:sock.close()
++        roles={n:'SERVER' if n=='S' else 'CLIENT' if n=='C' else 'RELAY' for n in edges}
++        assigned={n:(ports[1+2*i],ports[2+2*i]) for i,n in enumerate(edges)}
++        topology='node.ids='+','.join(edges)+'\n'
++        for n,peers in edges.items():
++            topology+='\n'+f'node.{n}.host=127.0.0.1\nnode.{n}.controlPort={assigned[n][0]}\nnode.{n}.dataPort={assigned[n][1]}\nnode.{n}.role={roles[n]}\nnode.{n}.neighbors='+','.join(peers)+'\n'
++        (folder/'topology.properties').write_text(topology)
++        profiles={};common='bind.host=127.0.0.1\nadvertised.host=127.0.0.1\n'
++        profiles['BOOT']=folder/'BOOT.properties';profiles['BOOT'].write_text('node.id=BOOT\nnode.role=BOOTSTRAP\n'+common+f'control.port={ports[0]}\ntopology.file=topology.properties\n')
++        streamfile=ROOT/'Projeto/src/main/resources/config/streams-s1.properties'
++        for n in edges:
++            p=folder/(n+'.properties');text=f'node.id={n}\nnode.role={roles[n]}\n'+common+f'control.port={assigned[n][0]}\ndata.port={assigned[n][1]}\nbootstrap.host=127.0.0.1\nbootstrap.port={ports[0]}\n'
++            if n=='S':text+=f'streams.file={streamfile}\nmedia.base={ROOT/"media"}\n'
++            p.write_text(text);profiles[n]=p
++        command=[str(self.java),'-cp',self.classpath,'ManualV034Node','validate']+[str(p) for p in profiles.values()]
++        validated=subprocess.run(command,capture_output=True,text=True,timeout=10);(folder/'offline-validation.log').write_text('COMMAND '+json.dumps(command)+'\n'+validated.stdout+validated.stderr+'\nEXIT '+str(validated.returncode)+'\n')
++        self.check(validated.returncode==0,name+': complete profiles validated offline')
++        children={}
++        def start(n,role):
++            child=Child(self,n,role,profiles[n],self.classpath,token);children[n]=child;self.all_children.append(child);return child
++        boot=start('BOOT','BOOTSTRAP');boot.ready()
++        for n in edges:start(n,roles[n])
++        for n in edges:children[n].ready()
++        for n,c in children.items():
++            begun=next(r for r in c.records if r.get('kind')=='started')
++            self.check(begun['payload']['jarSha256']==self.jar_hash,name+': '+n+' actual loaded JAR hash matches')
++        initial=self.wait_graph(children,edges);save(folder/'01-initial.json',initial);self.check(True,name+': all configured sessions ACTIVE')
++        survivor_ids=['S','R1','C'] if deeper else ['S','C'];original={n:{'pid':initial[n]['pid'],'instance':initial[n]['instance']} for n in survivor_ids}
++        healthy={n:initial[n]['payload']['sessions'][other] for n,other in [('S','R1'),('R1','S')]} if deeper else {}
++        targets={'C':'R1','R1':'C'} if deeper else {'C':'S','S':'C'}
++        def learned(states):return all(any(c['nodeId']==target and c['state']=='AVAILABLE' and c['sources'] for c in states[n]['payload']['candidates']) for n,target in targets.items())
++        deadline=time.monotonic()+12
++        while True:
++            before=self.snapshot('before',children)
++            if learned(before):break
++            if time.monotonic()>=deadline:raise TimeoutError(name+': candidates not learned')
++            time.sleep(.1)
++        save(folder/'02-learned-before-failures.json',before)
++        self.check(True,name+': both repair endpoints learned before failures')
++        for n,target in targets.items():
++            c=next(c for c in before[n]['payload']['candidates'] if c['nodeId']==target)
++            self.check(all(p['source']['nodeId'] in edges[n] and p['generation']>0 and p['ttlNanos']==60_000_000_000 and p['learnedNanos']>=p['queryStartedNanos'] and p['source']['connectionId']==before[n]['payload']['sessions'][p['source']['nodeId']]['connectionId'] for p in c['sources']),name+': '+n+' direct provenance and original TTL recorded')
++        self.actions.append({'at':utc(),'action':'quit-bootstrap','graph':name,'pid':boot.proc.pid});self.check(boot.quit()==0,name+': bootstrap stopped with exit 0 before relay deaths')
++        first,second=('R2','R3') if deeper else ('R1','R2');children[first].kill_relay()
++        expected={n:[p for p in peers if p!=first] for n,peers in edges.items() if n!=first}
++        after_first=self.wait_graph(children,expected);save(folder/'03-after-first-death.json',after_first)
++        self.check(True,name+': first death preserved configured alternative without new edge')
++        first_observations=[];until=time.monotonic()+1
++        while time.monotonic()<until:
++            states=self.snapshot('first-window',children);first_observations.append(states)
++            assert all(set(states[n]['payload']['sessions'])==set(peers) for n,peers in expected.items());time.sleep(.15)
++        save(folder/'04-first-death-window.json',first_observations)
++        self.check(len(first_observations)>1,name+': no premature repair during recorded first-death interval')
++        before_second=self.snapshot('before-second',children);save(folder/'05-before-second-death.json',before_second)
++        self.check(learned(before_second),name+': candidates retained after first announcer death')
++        pinned={n:list(self.proofs.get(n,[])) for n in targets};save(folder/'05-proofs-seen-before-second-death.json',pinned)
++        children[second].kill_relay()
++        expected={'S':['R1'],'R1':['S','C'],'C':['R1']} if deeper else {'S':['C'],'C':['S']}
++        repaired=self.wait_graph(children,expected);save(folder/'06-repaired.json',repaired);self.check(True,name+': new direct edge confirmed on both endpoints')
++        for n,old in original.items():self.check(repaired[n]['pid']==old['pid'] and repaired[n]['instance']==old['instance'] and children[n].proc.poll() is None,name+': '+n+' original process/instance survived')
++        if deeper:
++            self.check(repaired['S']['payload']['sessions']['R1']==healthy['S'] and repaired['R1']['payload']['sessions']['S']==healthy['R1'],name+': S-R1 sessions/connectionIds unchanged in both directions')
++        selection_events=[]
++        for n,target in targets.items():
++            events=[r for r in children[n].events('RepairStarted') if r['payload']['data']['attempt']['targetId']==target]
++            for event in events:
++                a=event['payload']['data']['attempt'];proofs=[v['proof'] for v in pinned[n] if v['target']==target]
++                self.check(any(a['source']==p['source'] and a['generation']==p['generation'] and a['queryStartedNanos']==p['queryStartedNanos'] and a['ttlNanos']==p['ttlNanos'] for p in proofs),name+': '+n+' selection matches provenance observed before death')
++                self.check(0<=a['selectedAtNanos']-a['queryStartedNanos']<a['ttlNanos'],name+': '+n+' selected within original claim TTL')
++                selection_events.append(event)
++        self.check(bool(selection_events),name+': repair had a locally learned selection witness');save(folder/'07-selected-provenance.json',selection_events)
++        observations=[];until=time.monotonic()+2
++        while time.monotonic()<until:
++            states=self.snapshot('stable',children);observations.append(states)
++            for n,peers in expected.items():
++                assert set(states[n]['payload']['sessions'])==set(peers)
++                for peer in peers:assert states[n]['payload']['sessions'][peer]==repaired[n]['payload']['sessions'][peer]
++            time.sleep(.2)
++        save(folder/'08-stability-window.json',observations);self.check(len(observations)>1,name+': sessions unchanged during recorded two-second interval')
++        for n,target in targets.items():
++            ups=[r for r in children[n].events('NeighborUp') if r['payload']['data']['session']['nodeId']==target]
++            downs=[r for r in children[n].events('NeighborDown') if r['payload']['data']['session']['nodeId']==target]
++            self.check(len(ups)==1 and not downs,name+': '+n+' exactly one repaired NeighborUp and no repaired NeighborDown')
++        pair=('R1','C') if deeper else ('S','C');physical=self.ss(folder,'09-repaired',children,pair)
++        if deeper:self.ss(folder,'10-preserved-S-R1',children,('S','R1'))
++        self.check(boot.proc.poll()==0,name+': bootstrap remains stopped after repair')
++        # End surviving processes gracefully and preserve their individual exit codes.
++        for n in survivor_ids:children[n].send('quit')
++        codes={n:children[n].finish() for n in survivor_ids};self.check(all(c==0 for c in codes.values()),name+': every surviving JVM exited 0 after bounded shutdown')
++        for port in ports:
++            with socket.socket() as s:s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);s.bind(('127.0.0.1',port))
++        self.check(all(c.proc.poll() is not None and not c.reader.is_alive() for c in children.values()),name+': no test process/log reader remains and listener ports reusable')
++        result={'graph':name,'token':token,'profiles':{n:str(p.relative_to(ROOT)) for n,p in profiles.items()},'ports':ports,'original_survivors':original,'final_exits':{n:c.proc.returncode for n,c in children.items()},'physical_repaired_TCP':physical,'passed':True}
++        self.graphs.append(result);save(folder/'result.json',result)
++    def execute(self):
++        passed=False;error=None
++        try:
++            self.prepare();self.graph(False);self.graph(True)
++            self.check(sha(self.jar)==self.jar_hash and sha(HELPER)==self.helper_hash,'verified JAR and observation helper hashes unchanged')
++            self.message('MANUAL_PASS');passed=True
++        except BaseException as failure:
++            error=repr(failure);self.message('MANUAL_FAIL '+error)
++        finally:
++            cleanup=[]
++            for child in self.all_children:
++                if child.proc.poll() is None:
++                    passed=False
++                    try:
++                        self.actions.append({'at':utc(),'action':'failure-cleanup-terminate-owned-child','pid':child.proc.pid,'node':child.ident})
++                        child.proc.terminate()
++                        try:child.proc.wait(timeout=5)
++                        except subprocess.TimeoutExpired:child.proc.kill();child.proc.wait(timeout=5)
++                        child.reader.join(2);cleanup.append({'pid':child.proc.pid,'exit':child.proc.returncode})
++                    except BaseException as failure:cleanup.append({'pid':child.proc.pid,'error':repr(failure)})
++            save(self.path/'actions.json',self.actions)
++            inventory={str(p.relative_to(self.path)):sha(p) for p in self.path.rglob('*') if p.is_file() and p.name not in ['result.json','manual.log']}
++            save(self.path/'result.json',{'operator':self.operator,'started_at':self.started,'finished_at':utc(),'run_directory':str(self.path.relative_to(ROOT)),'jar':str(self.jar.relative_to(ROOT)) if self.jar.is_relative_to(ROOT) else str(self.jar),'jar_sha256':self.jar_hash,'helper_sha256':self.helper_hash,'runner_sha256':sha(__file__),'passed':passed,'error':error,'checks':self.checks,'check_pass':len(self.checks),'graphs':self.graphs,'cleanup_after_failure':cleanup,'files':inventory,'human_approval':'not inferred','scope':'real separate JVMs/default public OverlayNode and BootstrapServer APIs, real sequential SIGKILL; loopback control only; helper not production OttApplication CLI; no video/CORE','no_processes_pending':all(c.proc.poll() is not None and not c.reader.is_alive() for c in self.all_children)})
++            self.log.close()
++        return 0 if passed else 1
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--operator',required=True);parser.add_argument('--java',default='/usr/lib/jvm/java-21-openjdk-amd64/bin/java');parser.add_argument('--jar');args=parser.parse_args()
++    return Run(args).execute()
++if __name__=='__main__':sys.exit(main())

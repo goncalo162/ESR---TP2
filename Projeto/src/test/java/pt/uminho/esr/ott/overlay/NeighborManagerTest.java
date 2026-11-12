@@ -189,12 +189,12 @@ class NeighborManagerTest {
             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); io.dials.get(1).future.complete(c); pump(); return c;
         }
         void ok(FakeChannel c, UUID remote) {
-            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, new ControlMessage.HelloOk(1)));
+            message(c, new ControlMessage(MessageType.HELLO_OK, c.last().requestId(), "B", remote, new ControlMessage.HelloOk(3)));
         }
         FakeChannel inbound(String id, UUID remote, boolean flush) {
             var c = new FakeChannel(); c.flush = flush; io.sink.opened(c, clock.get()); pump();
             message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), id, remote,
-                    new ControlMessage.Hello(endpoint(id, remote, 19002),1,1))); return c;
+                    new ControlMessage.Hello(endpoint(id, remote, 19002),3,3))); return c;
         }
         long ups() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborUp).count(); }
         long downs() { return events.stream().filter(e -> e instanceof NeighborManager.NeighborDown).count(); }
@@ -320,7 +320,7 @@ class NeighborManagerTest {
     @Test void d14ForgedHelloBeforeDialResultCannotBecomeInbound() {
         try (var f = new Fixture("A")) {
             f.ready("B"); var c = new FakeChannel(); f.io.sink.opened(c, f.clock.get());
-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.Hello(endpoint("B", UUID.randomUUID(), 19002),1,1)));
+            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", UUID.randomUUID(), new ControlMessage.Hello(endpoint("B", UUID.randomUUID(), 19002),3,3)));
             assertTrue(c.writes.isEmpty()); assertEquals(0, f.ups());
             f.io.dials.get(1).future.complete(c); f.pump(); assertFalse(c.open); assertEquals(0, f.ups());
         }
@@ -438,7 +438,7 @@ class NeighborManagerTest {
             try (var bad = new Socket("127.0.0.1", d.configs.get(0).controlPort())) {
                 bad.setSoTimeout(2000); var remote = UUID.randomUUID();
                 MessageCodec.write(new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "UNKNOWN", remote,
-                        new ControlMessage.Hello(endpoint("UNKNOWN", remote, 18002),1,1)), bad.getOutputStream());
+                        new ControlMessage.Hello(endpoint("UNKNOWN", remote, 18002),3,3)), bad.getOutputStream());
                 bad.getOutputStream().flush(); var reply = MessageCodec.read(bad.getInputStream()).orElseThrow();
                 assertEquals(MessageType.ERROR, reply.type());
                 assertEquals(ErrorCode.UNAUTHORIZED_NEIGHBOR, ((ControlMessage.ErrorPayload)reply.payload()).code());
@@ -486,7 +486,7 @@ class NeighborManagerTest {
                 default -> endpoint("B", ZERO, 19002);
             };
             f.io.sink.opened(c, f.clock.get()); f.pump();
-            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.Hello(ep,1,1)));
+            f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), "B", remote, new ControlMessage.Hello(ep,3,3)));
             assertEquals(0, f.ups()); assertFalse(c.open); assertEquals(2, f.io.resolved.size(), "No DNS from remote HELLO");
         }
         try (var f = new Fixture("A")) {
@@ -708,7 +708,7 @@ class NeighborManagerTest {
                 var c = new FakeChannel(); c.flush = false; candidates.add(c); var ep = desired.get(i); var remote = UUID.randomUUID();
                 f.io.sink.opened(c, f.clock.get()); f.pump();
                 f.message(c, new ControlMessage(MessageType.HELLO, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Hello(
-                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()),1,1)));
+                        new ControlMessage.Endpoint(ep.nodeId(), remote, ep.host(), ep.controlPort(), ep.dataPort(), ep.role()),3,3)));
                 for (int n = 0; n < 3; n++) f.message(c, new ControlMessage(MessageType.PROBE_PING, UUID.randomUUID(), ep.nodeId(), remote, new ControlMessage.Probe(n)));
             }
             assertFalse(candidates.get(2).open); // Nine frames exceed R=8 while B=4 was not exceeded.
@@ -742,7 +742,7 @@ class NeighborManagerTest {
             f.ready("B"); var c = f.outbound(true);
             f.message(c, new ControlMessage(MessageType.HELLO_OK, kind == 0 ? UUID.randomUUID() : c.last().requestId(),
                     kind == 1 ? "WRONG" : "B", kind == 2 ? ZERO : UUID.randomUUID(),
-                    kind == 3 ? new ControlMessage.Probe(1) : new ControlMessage.HelloOk(1)));
+                    kind == 3 ? new ControlMessage.Probe(1) : new ControlMessage.HelloOk(3)));
             assertFalse(c.open); assertEquals(0, f.ups()); assertTrue(f.manager.snapshot().isEmpty());
         }
     }
@@ -790,7 +790,7 @@ class NeighborManagerTest {
                 new DiscoveryMessage.Snapshot(payload.helloRequestId(),"Z",f.instance,1,List.of(endpoint("S",UUID.randomUUID(),18000)))));
             var view=f.manager.candidates();f.pump();assertEquals("S",view.toCompletableFuture().get().getFirst().nodeId());
             var fresh=new FakeChannel();f.io.sink.opened(fresh,f.clock.get());f.pump();var freshInstance=UUID.randomUUID();
-            f.message(fresh,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",freshInstance,new ControlMessage.Hello(endpoint("B",freshInstance,19003),1,1)));
+            f.message(fresh,new ControlMessage(MessageType.HELLO,UUID.randomUUID(),"B",freshInstance,new ControlMessage.Hello(endpoint("B",freshInstance,19003),3,3)));
             assertEquals(2,f.ups());var b=f.manager.snapshot().get("B");
             var old=new MessageCodec.ExtraEnvelope(2,MessageType.DISCOVERY_SNAPSHOT,UUID.randomUUID(),"B",rejectedInstance,UUID.randomUUID(),"Z",f.instance);
             f.io.sink.rejected(bad,new MessageCodec.RejectedExtraContent(old,MessageCodec.ContentRejection.INVALID_MESSAGE),f.clock.get());f.pump();

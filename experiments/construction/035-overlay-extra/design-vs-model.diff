@@ -1,0 +1,938 @@
+diff --git a/add.md b/add.md
+--- a/add.md
++++ b/add.md
+@@ -944,6 +944,7 @@
+ - **Bolt/origem:** [035-overlay-extra](memory-bank/bolts/035-overlay-extra/bolt.md); TASK-034.
+ - **Ficheiros:** `overlay/OverlayRecovery.java`, `overlay/NeighborManager.java`, `overlay/OverlayNode.java`, `app/OttApplication.java`, `overlay/OverlayRecoveryTest.java`, `overlay/NeighborManagerTest.java`, `app/OttApplicationTest.java`, `experiments/overlay-recovery/`.
+ - **Dependências:** IMP-034 (034-overlay-extra). Inserir antes de IMP-007 / 005-rotas.
++- **Design para revisão:** [intenção/admissão/retorno](memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md) e [âmbito proposto8→30](memory-bank/bolts/035-overlay-extra/scope-change-proposal.md). Q-C-20/Model aprovados; Q-C-21 e minuta da futura ADR-035 propostos. Os oito caminhos e contratos aceites não são alterados por esta proposta; G-EXTRA-ADR pendente antes de Implement.
+ - **ADR:** ADR-013, ADR-014, ADR-017, ADR-018, ADR-019, ADR-020, ADR-024, ADR-033, ADR-034. Manter o checkpoint próprio de intenção/admissão/reparação antes de código.
+ - **REQ/NFR/CON/INT:** REQ-025.
+ - **Testes exigidos:** V-034: após aprendizagem real, matar sequencialmente os relays nos grafos S–R1–C / S–R2–C e S–R1–R2–C / S–R1–R3–C forma respetivamente S–C e R1–C, com mesmos sobreviventes e bootstrap parado. Testar sessão única, reparação unilateral, callbacks antigos, candidato indisponível, cache vazia ou expirada e shutdown limitado.
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -2,7 +2,7 @@
+ 
+ > Arquitetura normativa: [add.md](../add.md). Requisitos consolidados: [specs.md](../specs.md). Este documento mantém detalhe técnico/proveniência e deve ser interpretado pela precedência do ADD; não é uma autoridade arquitetural concorrente.
+ 
+-**Contrato aprovado em ADR-034: controlo TCP uniforme v2. Implement em revisão.**
++**Contrato integrado em IMP-034: controlo TCP uniforme v2, 18 tipos. A proposta IMP-035 abaixo ainda não o altera.**
+ Aplica-se a bootstrap, handshake, mensagens normais e descoberta, com um único
+ contrato/codec operacional, sem runtime v1/fallback. Mesmo programa/versão de
+ JAR em todos os processos. [ADR-034 Aceite](../add.md#adr-034) e
+@@ -507,3 +507,37 @@
+ shutdown global com prazo, sem liberar recursos pela mera conclusão de future.
+ UDP OTT1/version 1 de vídeo mantém bytes/caps e as 16 fixtures. IMP-034 aprende;
+ IMP-035 repara após falhas, com checkpoint próprio; routing/vídeo continuam depois.
++
++
++<a id="extra-01-recovery-proposed"></a>
++## EXTRA-01 B — intenção e admissão propostas no Design do IMP-035
++
++**Proposta para revisão, não contrato operacional.** Só Model está aprovado.
++[Design completo](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
++e [âmbito8→30](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md).
++O contrato integrado acima tem18 tipos e66 fixtures; permanece inalterado.
++
++Q-C-20: zero ACTIVE inicia necessidade; o destino pode estabelecer a ligação
++pedida e conservar sessões existentes. Proposta: permissão emitida pelo destino
++antes das falhas, incluída na proveniência do anúncio direto. Sem lookup no
++bootstrap, catálogo global ou requisito de cache recíproca. Registry limitado
++conserva permissões após Down do anunciante até expiração local120 s.
++
++O Design propõe tipos20 GRANT,21 INTENT,22 RESULT e23 BIND; total22 tipos,
++mesmo envelope/codec/version2, código3 retirado, framing37..65536/cap extra32768.
++SNAPSHOT19 acrescenta flag/prova por Endpoint; máximo21753. Grant inclui geração
++por sessão; prova não renova TTL60 s da cache nem muda a origem local da QUERY.
++HELLO/ACK conservam largura e passam a exigir máscaras3 (DISCOVERY|REPAIR),
++sem subconjunto operacional ou fallback. Trata-se de alteração proposta da
++ADR-034; bytes REGISTER/restantes payloads e UDP OTT1 mantidos.
++
++Se o isolado é o menor, o canal de intenção promove-se após RESULT DIRECT e
++HELLO normal. Se o destino é o menor, só faz retorno depois de REVERSE/ACK e
++terminação física local do canal inicial; BIND correlaciona a espera antes do
++HELLO. Não abre outro listener ou TCP/dataPort, nem segundo TCP persistente.
++Connection.terminated(), quotas, registry/caps/prazos/erros e D01–D24 constam do
++Design para revisão de contratos/ADR. Nenhuma destas APIs/tipos foi implementada.
++
++Gate G-EXTRA-ADR próprio e aprovação de âmbito/contratos/minutaADR-035 pendentes.
++Não tomar esta secção por alteração aceite da ADR-034 ou compatibilidade runtime
++com a versão anterior do JAR v2. O cenário continua a usar um mesmo JAR em todos.
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -427,3 +427,13 @@
+ peer/CLI saudável mantidos; cache/TTL/proveniência/shutdown conservados.
+ IMP-034 aprende, IMP-035 repara depois. Design/ADR-034/âmbito para aprovação;
+ Implement suspenso, sem execução Java, commits, push ou outro IMP.
++
++## IMP-035 — Design de V-034 proposto
++
++Registo de 2026-11-11T22:41:27Z. [D01–D24](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
++mapeiam M01–M18: permissões anteriores às falhas, intenção unilateral/promoção/
++retorno, concorrência, limites, cache/TTL/D07e, FIFO/terminated, CLI e SIGKILL.
++Proposta de24 fixtures novas/sete migradas, total alvo90; nenhuma criada ou
++executada nesta etapa. V-ADD atual continua a validar as66 integradas.
++V-034/Maven/manual não executados; Model aprovado não satisfaz G-EXTRA-ADR/
++âmbito/contratos da futuraADR-035. Parar em Design para revisão.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -729,3 +729,14 @@
+ de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
+ Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
+ Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -209,3 +209,14 @@
+ de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
+ Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
+ Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -686,3 +686,47 @@
+ protocolo/transporte/cache: apresentar ampliação e eventual ADR-035 Proposta se
+ esses contratos forem afetados. G-EXTRA-ADR próprio de IMP-035 permanece pendente
+ antes de Implement. Esta decisão não autoriza Design/Java/Test/fecho/commits/push.
++
++### Q-C-20 — Aprovação de Model e clarificação de atendimento
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e o avanço apenas para Design.
++Clarificação: o destino pode estabelecer a ligação pedida pelo nó isolado,
++conservando sessões existentes. Manter S–C e S–R1–C, candidatos aprendidos antes
++das falhas e S–R1 preservada. Gate próprio/contratos/ADR continuam obrigatórios
++antes de Implement. Não é aprovação da proposta técnica Q-C-21 abaixo.
++
++## Q-C-21 — Proposta de intenção, admissão e retorno do IMP-035
++
++Registo de 2026-11-11T22:41:27Z. **Proposto para revisão de Design; não aprovado.**
++[Design](../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md)
++e [âmbito proposto](../memory-bank/bolts/035-overlay-extra/scope-change-proposal.md).
++
++- Permissões opacas emitidas pelo destino aos vizinhos ACTIVE antes das falhas,
++  divulgadas só junto de adjacências diretas e retidas para validação após Down.
++  Registry256, até quatro por sessão, validade local120 s, renovação elegível30 s;
++  geração crescente por sessão e janela30 s de divulgação no anunciante.
++  Cache128x4/TTL60 s/proveniência não mudam. Permissão não é autenticação
++  criptográfica; confiança em introdução de laboratório é explícita.
++- Mesmo TCP/codec v2, quatro tipos20..23 (GRANT/INTENT/RESULT/BIND); 22 tipos ativos.
++  SNAPSHOT19 ganha presença/prova por Endpoint, máximo21753 dentro do cap32768.
++  HELLO/ACK mantêm formato e exigem máscaras3 (DISCOVERY|REPAIR); rejeitar
++  só DISCOVERY sem fallback. Preservar bootstrap/restantes payloads e16UDP;
++  migrar sete fixtures e
++  preparar24 novas independentes, total alvo90. Sem runtime/fallback de JAR antigo.
++- Canal provisório no listener de controlo: isolado menor promove o canal;
++  isolado maior instala espera e ACK, destino menor fecha/aguarda terminação
++  física e faz dial/BIND de retorno. Uma sessão persistente por par, sem dataPort
++  ou listener auxiliar; sessões saudáveis preservadas. Resultado/flush não é ACK.
++- Uma tentativa autónoma, duas admissões recebidas, dinâmica<=min(16,C), grau
++  total<=min(63,C), orçamento total15 s/subfases2 s, sempre limitado por claim/
++  permissão e restante global de shutdown. Backoff/jitter já configurados.
++  Quotas/FIFO/Q>=2/tickets físicos mantidos, sem fila/pool/timer ilimitado.
++- Connection.terminated() é proposta aditiva que observa fim físico dos workers
++  e libertação da reserva, com conclusão fora dos locks, sem bloquear owner.
++- Âmbito8→30 e minuta para futura ADR-035 exigem revisão explícita. Não inserir
++  ainda tipos/records/fixtures no projeto, nem alterar ADR-034 Aceite por esta
++  proposta. Os oito caminhos do ADD continuam o âmbito normativo atual.
++
++G-EXTRA-ADR continua pendente para IMP-035. Este registo não antecipa a etapa ADR
++nem autoriza Implement/Test, commits, push ou outro IMP. Todos os D01–D24/V-034
++são oráculos planeados; codec Java/mortes reais/manual ainda não executados.
+diff --git a/docs/tasks/PHASE-02/TASK-034.md b/docs/tasks/PHASE-02/TASK-034.md
+--- a/docs/tasks/PHASE-02/TASK-034.md
++++ b/docs/tasks/PHASE-02/TASK-034.md
+@@ -39,3 +39,14 @@
+ Apenas documentação de Model; reparação ao ficar isolado, sem desativação de
+ descoberta ou fallback v1. [Model/M01–M18](../../../memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md).
+ Nenhuma execução V-034/Java/Maven/manual nova. Parar antes de Design.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../../../memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/memory-bank/bolts/035-overlay-extra/bolt.md b/memory-bank/bolts/035-overlay-extra/bolt.md
+--- a/memory-bank/bolts/035-overlay-extra/bolt.md
++++ b/memory-bank/bolts/035-overlay-extra/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["007-reparar-vizinhancas-com-candidatos-aprendidos"]
+ created: "2026-11-11T12:26:03Z"
+-updated: "2026-11-11T22:22:21Z"
++updated: "2026-11-11T22:41:27Z"
+ started: "2026-11-11T22:20:02Z"
+ completed: null
+-current_stage: "model"
+-stages_completed: []
++current_stage: "design"
++stages_completed: [{"name":"model","completed":"2026-11-11T22:35:39Z","artifact":"ddd-01-domain-model.md"}]
+ requires_bolts: ["034-overlay-extra"]
+ enables_bolts: ["005-rotas"]
+ requires_units: ["001-base-validada"]
+@@ -43,7 +43,7 @@
+ 
+ ## Etapas
+ 
+-1. [ ] **model** → `ddd-01-domain-model.md`.
++1. [x] **model** → `ddd-01-domain-model.md`.
+ 2. [ ] **design** → `ddd-02-technical-design.md`.
+ 3. [ ] **adr** → `adr-review.md`.
+ 4. [ ] **implement** → `implementation-walkthrough.md`.
+@@ -82,3 +82,22 @@
+ vazio; parar antes de Design. Gate próprio de intenção/admissão pendente;
+ contrato/âmbito adicional e eventual ADR nova só em revisão posterior.
+ Sem Test/fecho/commits/push ou início de outro IMP.
++
++## Aprovação de Model e entrada apenas em Design
++
++Registo de 2026-11-11T22:35:39Z (instante do registo). O utilizador aprovou Model e
++clarificou atendimento: o destino pode estabelecer a ligação pedida pelo nó
++isolado, conservando sessões existentes. Manter S–C e S–R1–C com candidatos
++aprendidos antes das falhas e S–R1 preservada. G-EXTRA-ADR e revisão de
++contratos/ADR continuam obrigatórios antes de Implement. Só Model concluído;
++sem aprovação de Design/ADR/Implement/Test, commits ou push.
++
++## Checkpoint atual — Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. [Design técnico](ddd-02-technical-design.md) com D01–D24
++para M01–M18/V-034 e [ampliação proposta8→30](scope-change-proposal.md).
++Q-C-21 apresenta permissões prévias, quatro tipos adicionais, snapshot com prova,
++promoção/retorno conforme menor ID e terminated aditivo; tudo proposto, sem
++alterar contratos operacionais. Só Model em stages_completed.
++G-EXTRA-ADR, âmbito e revisão da futura ADR-035 pendentes antes de Implement.
++Parar antes de ADR/Java/Test/fecho/commits/push.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md b/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md
+--- a/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md
++++ b/memory-bank/bolts/035-overlay-extra/ddd-01-domain-model.md
+@@ -2,7 +2,7 @@
+ stage: model
+ bolt: "035-overlay-extra"
+ created: "2026-11-11T22:20:02Z"
+-status: "ready-for-review"
++status: "approved"
+ ---
+ # Model — IMP-035 / EXTRA-01 B — reparar com candidatos aprendidos
+ 
+@@ -270,3 +270,11 @@
+ [conferência final](../../../experiments/construction/035-overlay-extra/model-validation.json)
+ e [diff contra a base](../../../experiments/construction/035-overlay-extra/model-vs-base.diff).
+ Validação documental não executa V-034 nem confirma viabilidade do contrato wire.
++
++## Aprovação de Model
++
++Registo de 2026-11-11T22:35:39Z. Model aprovado explicitamente pelo utilizador, com
++avanço apenas para Design. O destino pode estabelecer a ligação solicitada
++pelo nó isolado, conservando sessões saudáveis; manter os dois cenários e
++aprendizagem anterior às falhas. Contratos/ADR e G-EXTRA-ADR pendentes antes
++de Implement. O histórico de revisão acima não constitui aprovação de Design.
+diff --git a/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md b/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/ddd-02-technical-design.md
+@@ -0,0 +1,502 @@
++---
++stage: design
++bolt: "035-overlay-extra"
++created: "2026-11-11T22:35:39Z"
++status: "proposed-for-review"
++---
++# Design proposto — IMP-035 / V-034 — reparação unilateral
++
++**Só Model aprovado. Design, contratos, âmbito e minuta ADR abaixo são propostas.**
++G-EXTRA-ADR permanece pendente para IMP-035; não continuar Java/Implement/Test.
++Base integrada 22622c1d7eb0fdab3df684f2fac10263cff11736. Não ler/analisar código
++Java nesta etapa: as APIs de base são as documentadas nas interfaces/walkthrough
++aprovados. A compatibilidade efetiva será conferida na revisão ADR/Implement.
++
++## 1. Requisito e clarificação do atendimento
++
++Q-C-20: um nó inicia procura autónoma apenas com **zero vizinhos ACTIVE**.
++O utilizador aprovou Model e esclareceu: **o destino pode estabelecer a ligação
++pedida pelo isolado, preservando sessões existentes**. Não exigir que o destino
++fique isolado, perca sessões ou tenha aprendido reciprocamente o requerente.
++
++Conservar o menor nodeId como iniciador do TCP persistente. Atender significa
++validar/admitir o pedido e completar a sessão: se o destino é o menor ID, ele
++faz o dial de retorno; se é o maior, confirma o pedido e recebe o HELLO na
++conexão iniciada pelo isolado. Não introduzir exceção silenciosa à ADR-019.
++Ambos os casos resultam numa única sessão persistente e mesmo codec/listener.
++
++Cenário A: S–R1/R2–C; morte de R1 conserva alternativa R2, sem aresta nova;
++morte de R2 isola S/C e permite S–C. Cenário B: S–R1–R2/R3–C; morte de R2
++conserva R3, sem procura; morte de R3 isola C. R1 admite C, conservando S–R1
++com o mesmo connectionId. Os candidatos e autorizações são aprendidos antes
++das falhas. Não consultar bootstrap novamente, reiniciar sobreviventes ou
++apresentar conectividade de controlo como vídeo. Falha silenciosa/UDP-only
++não ganha deteção nova; morte abrupta com EOF/RST é ensaiável neste incremento.
++
++## 2. Porquê uma autorização prévia emitida pelo destino
++
++O contrato integrado divulga endpoints e proveniência do anunciante. Isso
++permite ao isolado localizar o destino, mas não permite ao destino verificar
++uma introdução unilateral se não tiver cache recíproca. Aceitar só a afirmação
++«R2 anunciou-te» autorizaria qualquer ID/endereço que inventasse essa frase.
++
++Proposta: cada nó emite aos vizinhos ACTIVE **permissões opacas de introdução**.
++O vizinho pode anexar a permissão aos anúncios desse nó para os seus próprios
++vizinhos. O destino guarda o registo limitado das permissões que emitiu e pode
++validá-las depois da morte do anunciante, sem procurar o anunciante/bootstrap.
++
++Exemplo: R1 emite uma permissão a R2 na sessão R1–R2. R2 anuncia R1 e essa
++permissão a C. Quando R2/R3 morrem, C apresenta a permissão a R1. R1 valida o
++seu próprio registo, identidade/endpoint de C e contexto; não precisa de ter
++uma entrada C na cache. Uma cache de endpoints sem permissão pode continuar a
++servir a descoberta, mas não autoriza reparação: estado explícito NO_PERMISSION.
++Isso não desativa descoberta ou cria modo base; a função aguarda autorização.
++
++Não é autenticação criptográfica. A permissão é transferível por vizinho direto
++no laboratório confiável da ADR-021; o destino valida emissão/proveniência,
++não prova criptograficamente a honestidade de C/R2 nem que C está isolado.
++Um nó malicioso ou um token copiado fora da regra exigiria outra política de
++segurança. Não usar IP remoto como identidade, assinaturas inventadas ou DB.
++
++## 3. Registos imutáveis e APIs propostas
++
++Nomes e assinaturas abaixo são propostas a conferir na revisão ADR, sem código
++Java lido/alterado. Usar records, enums de códigos explícitos e cópias defensivas.
++
++- protocol/RepairMessage.java: sealed Payload com Grant, Intent, Result e Bind.
++  Grant contém contexto HELLO, destinatário/instância, permitId, grantGeneration positiva e validForMillis.
++  Intent contém destinatário/instância, Endpoint do requerente e prova
++  (permitId, grantHelloId, introducerId, introducerInstance).
++  Result contém destinatário/instância, relatedType, disposição, motivo e
++  admissionId. Bind contém destinatário/instância, intentId, admissionId e
++  Endpoint do iniciador permitido. requestId é sempre o intentId nos tipos
++  21/22/23; o HELLO posterior tem o seu requestId próprio, atual e não zero.
++- DiscoveryMessage.Snapshot conserva directNeighbors(): List<Endpoint> e ganha
++  permits(): List<Optional<PermitRef>>, com cardinalidade igual/cópia defensiva.
++  PermitRef(permitId, grantHelloId) é imutável. Construtor Java anterior cria
++  Optional.empty para cada endpoint; não aceita o formato binário anterior.
++- CandidateCache.Provenance ganha Optional<PermitRef>; conservar construtor
++  anterior por overload com Optional.empty. SourceKey/geração/queryStarted/TTL
++  conservam significado; issuerInstance vem do Endpoint e introducerId/instance
++  da proveniência da sessão do anúncio. Nunca fabricar prova ao ler cache.
++- OverlayRecovery é componente confinado ao SerialOwner do nó. Contrato interno
++  conceptual: onNeighborUp/Down(Session), onGrant(Session, Grant, observedAt),
++  onIntent(Channel, ControlMessage, observedAt), onResult/onBind, maintain(now),
++  onCandidateSnapshot(...), requestClose(remainingBudget), snapshot(). Não criar
++  executor, writer, listener ou rede em OverlayRecovery.
++- NeighborManager continua a possuir Context/Attempt/Peer e os mecanismos de
++  dial/DNS/HELLO/flush; recebe o modo do dial (configurado, intenção ou retorno)
++  e emite callbacks correlacionados a Recovery. Não copiar o transporte.
++- OverlayNode.recoveryStatus(): RecoveryStatus devolve snapshot publicado
++  imutável; também manter candidates/snapshot/discoveryStatus anteriores.
++  RecoveryStatus: fase/motivo, ACTIVE count, candidato opcional e retry relativo,
++  sem nonce/token/payload ou histórico. Fases ISOLATED/WAITING/REQUESTING/
++  ADMITTING/ACTIVE/STOPPING e razões finitas, não enums wire.
++- Connection.terminated(): CompletionStage<Void> novo/aditivo, mínimo e só
++  completado depois dos dois workers e libertação física da reserva. Conclusão
++  fora dos locks. Não significa connectionClosed nem fecho lógico. Preservar
++  send/sendAndFlush/close e comparar connectionId/instanceId no callback.
++- CLI mantém neighbors/quit/--help e ganha recovery: uma linha de estado e até
++  oito candidatos/motivos, sem tokens. Informação útil sobre isolamento/retry,
++  sem imprimir mapas, cache completa ou detalhes internos sem limite.
++
++## 4. Permissões, TTL e cache
++
++1. Em sessão ACTIVE, o emissor pode enviar REPAIR_GRANT ao vizinho. Cada emissão
++   tem nonce UUID não zero e único na execução; lookup usa (issuerInstance,
++   permitId). GrantGeneration cresce por sessão, 1..Long.MAX_VALUE sem wrap; só avança
++   após enqueue aceite. O registo guarda vizinho id/instance/HELLO e endpoint/execução do
++   próprio emissor. Não usar contador que faça wrap ou reutilizar nonce ativo.
++2. ValidForMillis wire é exatamente 120000; expiração **no emissor** desde a
++   admissão da GRANT na fila comum, medida em relógio monotónico local. Permissão
++   expirada não é válida mesmo se um future de escrita concluir tarde.
++3. Registry local: até 256 permissões, com até quatro por sessão emissora. Sem
++   espaço, não emitir/evictar uma permissão viva para fingir continuidade; motivo
++   PERMISSION_CAPACITY. Expirar no tick comum, sem timer por permissão.
++4. Renovação elegível a cada 30 s/sessão; seleção round-robin, saída de GRANT
++   <=4/s global, sem fila de mensagens à espera. A nonce só entra no registry
++   após admissão atómica de envio; falha de envio/prazo retira a emissão lógica,
++   conservando recursos físicos até terminarem. Não revogar permissões válidas
++   já entregues só por fechar a sessão do anunciante; continuam até 120 s.
++5. O vizinho conserva só a última GRANT válida por sessão (<=63). Verifica o
++   HELLO/identidade/destinatário atuais e geração estritamente crescente; duplicata
++   ou geração/token antigos não substituem/renovam a prova nem o prazo de 30 s.
++   Só a divulga durante os primeiros 30 s locais desde a receção, em snapshots
++   de adjacências ACTIVE. Ausência/atraso de GRANT produz prova ausente, sem
++   fingir incapacidade do peer ou fechar o controlo.
++6. Não há relógios sincronizados nem TTL absoluto remoto. Uma GRANT atrasada
++   pode já estar inválida no emissor; o lookup final deste é autoritativo.
++   120/30 s dão margem ao TTL de cache 60 s em condições normais, sem prometer
++   disponibilidade para mensagens arbitrariamente atrasadas ou fila saturada.
++7. Em R2, o snapshot de R1 contém endpoint atual de R1 e PermitRef obtida na
++   sessão R1–R2. C guarda-a no mesmo claim (R2, instância, conexão, HELLO,
++   geração, queryStarted). Não são anunciadas entradas da cache como adjacências.
++   Campo ausente, inválido ou prova expirada não prolonga o claim.
++8. Cache conserva 128 IDs x quatro fontes e TTL 60 s desde QUERY admitida. Apenas
++   snapshot corrente e geração crescente pode substituir prova/renovar claim.
++   D07e continua: token/queryId/geração antigos não alteram cache, query,
++   watermark, TTL ou sessão. Fechar R2 não apaga a prova retida por C nem o
++   registry de R1 que ainda permite verificá-la.
++9. Sessão reparada já confirmada vive independentemente do TTL/GRANT. Antes de
++   novo commit, revalidar claim na origem e permissão no destino; expiração ou
++   conflito invalida pendente, não fecha sessão saudável. Reiniciar o emissor
++   muda instanceId e perde registry, invalidando permissões antigas.
++
++## 5. Contrato TCP v2 proposto e comprimentos
++
++**Delta de contrato, não mera configuração.** Um codec/envelope TCP version=2,
++framing u32/body 37..65536, UTF-8 estrito, código 3 rejeitado. Não mudar bootstrap, framing/envelope, códigos existentes ou UDP.
++Os formatos HELLO/HELLO_OK conservam largura, com nova máscara obrigatória abaixo. Tipos novos explícitos: 20 REPAIR_GRANT,
++21 REPAIR_INTENT, 22 REPAIR_RESULT, 23 REPAIR_BIND. Total proposto: 22 tipos
++ativos (1,2,4..23), em vez dos 18 do contrato integrado. Nenhum runtime antigo,
++negociação com JAR antigo ou fallback; todos executam o mesmo JAR revisto.
++HELLO/ACK passam a supported=required=selected=3: DISCOVERY=bit0 (1) e
++REPAIR=bit1 (2), ambos obrigatórios e bits restantes zero. Não negociar um
++subconjunto nem admitir um peer só DISCOVERY. Isto altera os valores de máscara
++dos tipos5/6 da ADR-034 e precisa de aprovação explícita da revisão; os tamanhos
++HELLO72..386/ACK41..72 permanecem. Incompatibilidade rejeita apenas a tentativa,
++sem fallback ou efeito global. Todos os nós da mesma versão do JAR exigem ambos.
++
++SNAPSHOT (19) mantém cabeçalho, contexto/geração/count e Endpoint; **após cada
++Endpoint** acrescenta u8 hasPermit (0/1) e, se 1, UUID permitId + UUID grantHelloId.
++Não autodetetar ou tentar descodificar o formato anterior. O construtor anterior
++é compatibilidade Java, não runtime wire. Sem entradas, bytes do snapshot ficam
++iguais; com entradas mudam explicitamente e precisam de fixtures independentes.
++
++Todos os inteiros usam big-endian. String é u16 + UTF-8; IDs 1..32, host 1..253;
++UUID de execução/token/admissão/pedido não zero. Endpoint conserva formato.
++Envelope comum: 36+s bytes; Endpoint: 25+n+h; s/n/r/i são bytes de nodeId e h host.
++
++| Tipo | Campos de payload na ordem wire | Corpo mínimo..máximo |
++|---|---|---:|
++| 20 GRANT | helloId UUID, recipientId string, recipientInstance UUID, permitId UUID, grantGeneration u64 positiva <=Long.MAX_VALUE, validForMillis u32=120000 | 100..162 |
++| 21 INTENT | recipientId string, recipientInstance UUID, requester Endpoint, permitId UUID, grantHelloId UUID, introducerId string, introducerInstance UUID | 134..510 |
++| 22 RESULT | recipientId string, recipientInstance UUID, relatedType u8 (21/23), disposition u8, reason u8, admissionId UUID | 75..137 |
++| 23 BIND | recipientId string, recipientInstance UUID, intentId UUID, admissionId UUID, initiator Endpoint | 115..460 |
++| 19 SNAPSHOT revisto | campos existentes + por endpoint hasPermit e dois UUIDs quando 1 | 82..21753 |
++
++RESULT dispositions: DIRECT=0, REVERSE=1, ACK_REVERSE=2, REJECT=3.
++Reasons: OK=0, NO_PERMISSION=1, EXPIRED=2, BAD_PROVENANCE=3, BUSY=4,
++ALREADY_ACTIVE=5, IN_PROGRESS=6, NO_NEED=7, IDENTITY=8. Códigos explícitos;
++DIRECT/REVERSE/ACK usam OK e admissionId não zero; REJECT usa reason !=OK e
++admissionId zero. DIRECT/REVERSE/ACK têm relatedType=21; resposta ao BIND usa
++DIRECT/REJECT com relatedType=23. BIND.intentId deve igualar o requestId.
++HELLO posterior usa novo ID; admissionId não substitui a correlação do HELLO.
++
++Cap extra 32768 aplica-se antes de alocar a 18..23; máximo SNAPSHOT 21753 ainda
++cabe. Count <=63 verificado antes da lista, hasPermit só 0/1, UUIDs/bytes finais
++validados atomicamente. Snapshot sem prova continua aprendizagem, sem autorização
++reparadora. GRANT não altera cache/geração/query nem é anúncio de candidato.
++
++## 6. Pedido, atendimento e iniciador
++
++### 6.1. Pedido inicial
++
++Isolado A seleciona B/claim com PermitRef válida localmente. Abre um canal
++**provisório de controlo na controlPort de B**, usando o mesmo Transport, codec,
++FIFO/writer/caps. Envia INTENT em vez de HELLO automático. Não abre dataPort,
++listener/codec auxiliar nem segunda sessão persistente. O canal conta em C e
++nos limites de pré-handshake; não produz NeighborUp ou adjacência anunciável.
++
++B valida versão/tipo/identidade/endpoint, destinatário e a sua própria instância;
++faz lookup do nonce e confere grantHelloId/introducer id/instance, validade e
++limites. Só depois reserva admissão para (A,B), admissionId e Context próprio.
++A intenção não altera o grafo bootstrap. B não precisa de cache A ou isolamento.
++Antes da validação não cria Peer/status por ID desconhecido; apenas contexto
++físico limitado e diagnóstico genérico com throttling.
++
++### 6.2. A é o menor ID: promoção do mesmo canal
++
++B responde RESULT DIRECT e conclui write/flush. A recebe/valida, confirma que
++continua isolado e que o claim não expirou/conflitou, e envia HELLO v2 normal
++nesse canal. B só aceita esse HELLO para o par/endpoint/execução da admissão
++local do Context; não uma exceção global ao grafo. HELLO_OK e barreiras de
++flush existentes completam uma sessão. O canal provisório torna-se persistente,
++sem segundo dial. B preserva as outras sessões.
++
++### 6.3. A é o maior ID: o destino B estabelece a ligação
++
++B responde RESULT REVERSE com admissionId. **A instala a espera de retorno
++antes de enviar RESULT ACK_REVERSE**, com os mesmos intentId/admissionId.
++B só programa retorno após receber esse ACK válido; flush local do REVERSE não
++prova receção remota. ACK não produz ACK de ACK.
++
++O canal de intenção é fechado após o ACK; B aguarda Connection.terminated()
++local e só então resolve/diala o endpoint de A. A mantém apenas a espera
++limitada e o seu listener de controlo já existente. Nenhuma thread/slot do
++canal antigo é reutilizado por ter terminado apenas o future lógico.
++
++No retorno, B envia BIND com intentId/admissionId e o seu Endpoint. A valida
++contra a espera atual/instanceId/endpoint B aprendido, isolamento e claim ainda
++válido. A responde RESULT DIRECT relatedType=23 no mesmo canal. B então envia
++HELLO v2 normal, sendo o menor nodeId. Ambas as pontas usam a admissão efémera
++para autorizar fora do grafo. Completar handshake/flush e só depois NeighborUp.
++
++A agenda de retorno não apaga sessões saudáveis de B. Se A entretanto ganha
++vizinho configurado, cancela a espera e rejeita BIND NO_NEED; não aceita uma
++segunda aresta por um isolamento já satisfeito. Canal antigo ainda fisicamente
++cobrado ou falta de recurso pode levar a BUSY/retry, sem violar C.
++
++```mermaid
++sequenceDiagram
++    participant A as Isolado A (ID maior)
++    participant B as Destino B (ID menor, saudável)
++    A->>B: INTENT + permissão aprendida antes da falha
++    B-->>A: RESULT REVERSE + admissionId
++    Note over A: Instalar espera correlacionada
++    A->>B: ACK_REVERSE
++    Note over A,B: Fechar canal provisório; B espera terminação física local
++    B->>A: Dial de retorno + BIND
++    A-->>B: RESULT DIRECT (BIND)
++    B->>A: HELLO v2
++    A-->>B: HELLO_OK v2 e flush
++    Note over A,B: Uma sessão ACTIVE; sessões saudáveis de B preservadas
++```
++
++## 7. Seleção, concorrência, limites e prazos
++
++- Trigger: consulta inicial terminada e zero ACTIVE. Cache começa vazia; não há
++  reparação sem aprendizagem prévia. READY sem vizinhos publica ISOLATED.
++  Não esperar que todos os candidatos/configurados tenham falhado para observar
++  isolamento, mas coordenar reservas com os retries configurados existentes.
++- Uma tentativa autónoma lógica por nó, uma por par; até duas admissões recebidas
++  (também quando saudável). Tabelas dinâmicas até min(16,C) pares; tabela
++  configurada mantém <=63. Grau ACTIVE total <=min(C,63). São limites distintos,
++  não somar os mapas para permitir mais sockets. Todas as reservas físicas <=C.
++- Recusa de unknown/invalid INTENT não cria entrada dinâmica. Entrada dinâmica
++  terminal sem sessão sai quando terminam recursos; rejeições não deixam mapa
++  ilimitado de desconhecidos. Status/cooldown candidatos limita-se aos 128 IDs
++  presentes na cache; nunca 128 timers/dials. Registry/GRANT usam os limites da §4.
++- Sort por nodeId e SourceKey estável, round-robin entre candidatos/até quatro
++  claims. Não marcar candidato inteiro indisponível por falhar uma de várias
++  provas. Sem RTT/custo ou preferência por SERVER; não são rotas/streams.
++- Backoff por candidato usa overlay.retry.initial/max/jitter já existentes
++  (defaults 500/5000 ms e 10%), limitado pelo teto com aritmética verificada.
++  Não inventar o teto de 30 s: essa pausa pertence à descoberta. Uma ronda
++  esgotada espera o menor prazo elegível; sem candidatos só reagir ao tick/evento,
++  sem socket, DNS ou fila de tentativas armazenadas.
++- Uma admissão por par; simultâneos A→B e B→A convergem para a intenção cujo
++  requerente é o menor ID. Retirar logicamente a oposta, aguardar terminação
++  física e não substituir sessão ACTIVE. Duplicata do mesmo requerente recebe
++  IN_PROGRESS, sem reeleger por UUID/ordem acidental ou renovar prazo.
++- Distinguir necessidade local de intenção recebida: um NeighborUp satisfaz a
++  necessidade local e cancela commits autónomos obsoletos. Não cancelar pedido
++  remoto só porque o destino tem S ACTIVE; esse é precisamente o cenário B.
++- Operação total de reparação <=15 s locais desde a seleção/receção inicial;
++  cada lado tem o seu prazo e nunca o renova por resposta duplicada. Origem
++  limita também ao TTL restante do claim; destino, à GRANT/admissão. Subfases
++  INTENT/RESULT/ACK/BIND: <=2 s; DNS/bind e dial usam control.connectTimeout
++  separadamente; HELLO usa overlay.helloTimeout, sempre min com o restante.
++  O teto de 15 s é orçamento de operação proposto, não SLA de recuperação.
++- Revalidar necessidade/claim/prova/recurso em cada commit. Primeira confirmação
++  ACTIVE fecha a necessidade. Uma configuração que recupera primeiro vence
++  antes do commit da reparação; nenhum callback antigo remove sessão já válida.
++- Todos os extras 18..23 usam admissão da FIFO comum: Q>=2, duas posições livres,
++  no máximo um extra enfileirado (incluindo take→inFlight), um em escrita por
++  ligação, quatro tickets físicos globais. BACKPRESSURED adia/falha só a operação;
++  não fecha sessão saudável nem cria fila extra. Tipos normais não podem ser
++  usados para contornar a quota. GRANT/INTENT/RESULT/BIND têm o mesmo tratamento.
++- Usar o tick 100 ms coalescido já existente, chamado também para Recovery no
++  mesmo owner. Registry expirado, estados e deadlines lógicos não ganham jobs
++  por entrada. Não criar outro pool/timer/listener. Resolver/dials continuam a
++  contar até terminação física, mesmo depois de cancelar future lógico.
++
++## 8. Identidade, erros e callbacks antigos
++
++Antes de recuperar conteúdo, validar handle/execução/identidades/estado. Em
++ACTIVE, GRANT completa com token HELLO antigo é descarte STALE sem Down ou
++alterar prova corrente. Snapshot preserva exatamente D07e: geração/token antigos
++não terminam consulta nem impõem cooldown. GRANT inválida atual completa pode
++ser descartada com diagnóstico limitado sem fechar controlo saudável. Snapshot
++com permit flag/nonce inválido é rejeitado atomicamente, sem aprendizagem parcial.
++
++readFrame.RejectedExtraContent é ampliado ao tipo20, cujo prefixo HELLO/recipient
++é o mesmo formato já legível. GRANT rejeitada vai para Recovery, nunca para
++a regra que falha uma QUERY de Discovery. Tipos21..23 não têm recuperação de
++conteúdo fora da sua máquina de tentativa.
++
++Nos canais provisórios, frame sem contexto, intenção/nonce/instância inválida,
++comprimento/truncamento/UTF-8 de identidade ilegível é terminal **nessa tentativa**.
++Rejeição semântica segura pode produzir RESULT REJECT após flush e fechar;
++se framing/envelope inseguros, só fechar. ERROR recebido não recebe ERROR nem
++RESULT de resposta. Conteúdo inválido num canal provisório não é autorização
++para continuar a receber HELLO. Resultados/replays fora do intentId/admissionId/
++connectionId/instanceId correntes não mudam a admissão nova.
++
++Prazo/cancelamento remove elegibilidade, não marca workers terminados. Conclusão
++de escrita/terminated publica evento curto fora de locks; owner compara Context,
++Attempt e epoch local da necessidade. Nunca uma callback antiga fecha o handle
++novo. Guardar apenas IDs/enums/escalares limitados para diagnóstico, sem pacote
++inteiro inválido ou exception textual na rede. JAR antigo não é cenário suportado.
++
++## 9. Shutdown e isolamento de falhas
++
++requestShutdown/recovery.requestClose bloqueiam novas permissões/intenção/dials,
++cancelam necessidade/admissões lógicas e limpam registry/cache auxiliar limitada.
++Usar prazo global restante do nó; não acrescentar 15 s ao shutdown de 3 s.
++Sessões ACTIVE mantêm NODE_LEAVE/write/flush e o mecanismo anterior; canais
++provisórios terminam localmente com cleanup limitado. Callbacks nunca esperam
++sendAndFlush/terminated/joins no owner. A reserva só sai na terminação física.
++
++Worker preso produz timeout explícito e continua cobrado, sem alegar shutdown
++completo. Peer inválido, indisponível, sem permissão ou sem slot não provoca
++FAILED global/fim da CLI nem fecha S–R1. Saturação crítica de owner conserva a
++semântica operacional já aceite; não transformar falha de infra em sucesso.
++
++## 10. Âmbito proposto e compatibilidade
++
++[Proposta de ampliação de oito para 30 caminhos](scope-change-proposal.md).
++É necessária para GRANT, prova no SNAPSHOT, INTENT/RESULT/BIND, codec comum,
++cache e observação de terminação física. **Não está aprovada pelo início de Design.**
++Não alterar catálogo/ADD para aparentar autorização: os oito caminhos continuam
++normativos até revisão de âmbito/ADR. Nenhum Java/recurso/POM foi alterado.
++
++Preservar bytes de REGISTER/bootstrap/UDP e restantes payloads. Há dois deltas
++explícitos: máscara obrigatória dos tipos5/6 e prova do SNAPSHOT19. Sete vetores
++precisam de migração: tcp-hello, tcp-hello-ok, tcp-invalid-capability-not-required,
++tcp-invalid-capability-reserved e tcp-discovery-snapshot, tcp-snapshot-duplicate,
++tcp-snapshot-invalid-role. Os outros43 TCP e16 UDP ficam byte a byte.
++Nas máscaras, positivos1→3; negativo not-required usa supported3/required0 e
++reserved usa supported7/required3 para continuar a atingir bit reservado, não
++apenas ausência de REPAIR. Missing0/0 permanece negativo byte a byte. Nos três
++snapshots, continuar sucesso/duplicação/role inválido, não EOF mascarado.
++Os 18 tipos integrados mantêm códigos; somam-se quatro tipos, sem reutilizar 3.
++
++Propor 24 fixtures novas independentes (10 positivas/14 negativas), total alvo
++90=50 TCP (sete migradas)+24 TCP novas+16 UDP. Nenhuma fixture criada por este Design.
++As positivas cobrem GRANT min/max, INTENT min/max, quatro dispositions RESULT
++com contexto válido e BIND min/max. Negativas: nonce/HELLO zero, validade fora
++de 120000, capacidade só DISCOVERY, tipo relacionado inválido, códigos/disposition
++ou reason incompatíveis, ACK fora de contexto, BIND intentId divergente,
++truncamento, flag de prova inválida, prova truncada e comprimento extra fora cap.
++Oráculos de contexto/estado podem usar wire válido e rejeição pelo owner, não
++rotular erro de sessão como erro do decoder. V-ADD verifica bytes/referências,
++Java compara encoder/decoder com vetores sem produzir o esperado por si.
++
++Os testes V-033 migram payloads com Optional.empty por omissão e acrescentam
++provas; cache/TTL/D07e/FIFO/flush/identidade mantêm oráculos. Os cenários que
++provavam «IMP-034 não repara» passam a usar aprendizagem isolada por componente;
++a aplicação normal agora repara obrigatoriamente ao isolar. Não criar flag off
++para manter testes verdes nem apagar testes. Testes de bootstrap negativos
++passam a percorrer os quatro tipos novos, sem introduzir bootstrap de reparação.
++
++## 11. Injeções e oráculos D01–D24 / M01–M18
++
++Injetar clock monotónico, fonte de nonce/intent/admission determinística,
++resolver/transport adapter, writer/flush/terminated e SerialOwner manual pelos
++pontos de teste documentados de NeighborManager/Transport. Recovery recebe essas
++portas, não cria sockets em testes lógicos. Nonces fake não são configuração.
++Fake physical worker segura a reserva após cancelamento e até sinal explícito;
++clock falso avança prazos sem sleeps. Repetir trajetos de promoção/retorno com TCP
++real, não substituir entrega/flush por future simulado no oráculo de rede.
++
++| D | Prova exigida | M |
++|---|---|---|
++| D01 | Byte/version/caps e90 fixtures alvo; máscaras3 obrigatórias e peer só DISCOVERY rejeitado localmente; versões antigas/3 rejeitados, mesmo codec/UDP. | M01 |
++| D02 | Arranque/cache vazia sem loop; perda de um relay com alternativa não dispara; zero ACTIVE sim. | M02/M07 |
++| D03 | S–C após mortes sequenciais reais, mesmos sobreviventes/bootstrap parado. | M03/M18 |
++| D04 | R1–C após R2/R3; S–R1 mesmo connectionId. | M04/M18 |
++| D05 | Isolado com ID maior aprende destino; saudável menor faz retorno sem cache recíproca. | M05 |
++| D06 | Isolado menor promove canal inicial; só um dial/HELLO/Up e provas correntes. | M05/M14 |
++| D07 | GRANT emitida/retida no registry após Down, geração crescente/duplicatas/wrap, cache60 s e grant120/relay30 s com fronteiras exatas; sem renovar TTL. | M07/M11 |
++| D08 | Prova inexistente/forjada/wrong issuer/introducer/HELLO/instância rejeitada; desconhecidos não crescem tabelas. | M06/M10 |
++| D09 | Intenções simultâneas/duplicadas e reconexão configurada concorrem sem segunda sessão/commit obsoleto. | M09/M13 |
++| D10 | Claim expira/conflita antes de DIRECT/BIND/HELLO commit: falha só a operação; ACTIVE já válida não cai. | M11 |
++| D11 | Token/query/geração antigos, inclusive RejectedExtraContent, preservam D07e e prova. | M12/M17 |
++| D12 | GRANT/INTENT/RESULT/BIND respeitam Q2/margem/tickets/take→inFlight e FIFO normal. | M10/M17 |
++| D13 | Registry256/4 por sessão, dinâmica16, duas admissões, grau63/C e cache128x4; saturação não rouba sessões. | M10 |
++| D14 | Backoff/jitter/teto existentes, quatro claims/candidato, justiça e nenhum busy retry/DNS sem prova. | M08 |
++| D15 | ACK_REVERSE instalado antes da escrita; ausência/duplicata/ACK errado não causa retorno; flush não é receção. | M05/M12 |
++| D16 | Retorno só após terminated físico; cancelamento/close/future lógico não liberta reserva/timer antes do worker. | M16 |
++| D17 | Callbacks de dial/intent/admission/HELLO/execução antigos não fecham sessão nova; deadline total não renova. | M12/M17 |
++| D18 | Conteúdo GRANT/SNAPSHOT recuperável atual versus framing/identidade terminal; canal saudável mantém PING/descoberta. | M06/M12 |
++| D19 | Negativo de reparação com S saudável mantém CLI/recovery/candidates e nenhum FAILED global. | M06/M15 |
++| D20 | Aresta reparada só anunciada depois de Up; cache/prova só não é adjacência. | M14 |
++| D21 | Shutdown com intenção/GRANT/write/dial/retorno pendentes usa restante global; stuck worker explícito. | M16 |
++| D22 | Bootstrap só inicial; novos tipos rejeitados aí; nenhum pedido após bootstrap parado. | M01/M18 |
++| D23 | CLI JVM separada neighbors/recovery/quit/EOF e logs limitados sem permissão/nonce exposta. | M15 |
++| D24 | clean verify JDK21, M01–M18, manual SIGKILL, XML/logs/hashes e revisão/integração reais. | M18 |
++
++## 12. Ensaio e evidência futura
++
++Roteiro em experiments/overlay-recovery/ só após aprovação do âmbito/Implement.
++Mesmo JAR/hash por processo; aprender endpoint e permissão antes das falhas e
++capturar snapshots/correlação. Parar bootstrap, matar relays um de cada vez com
++SIGKILL e identificar PIDs/sessões inequívocos. Conferir ausência de aresta após
++primeira morte, aresta única após segunda, sobreviventes/instâncias/S–R1 iguais,
++handshake/grant/intenção nos logs e shutdown/portas/processos. Repetição humana
++antes de aprovar Test. TCP loopback não é CORE; vídeo aguarda routing/streaming.
++
++Nada disto foi executado neste Design. Os 1065 testes/53 checks do IMP-034 são
++históricos. Não afirmar recuperação em tempo fixo, entrega de vídeo ou avaliação.
++
++## 13. Minuta de decisão para futura ADR-035 — Proposta
++
++Não é revisão ADR concluída nem nova ADR Aceite. Na etapa ADR, propor substituição
++parcial de ADR-033/034/019: admissão de arestas por permissão emitida pelo destino,
++prova no snapshot19, quatro tipos novos v2 e máscaras obrigatórias3 em HELLO/ACK,
++canal provisório no mesmo listener,
++retorno pelo menor nodeId e observação aditiva de terminação física. Conservar
++cache/TTL/proveniência, isolamento/recursos e UDP. Substituição não alarga caps
++nem altera bootstrap/UDP; os tipos5/6 mudam apenas a máscara obrigatória. Atualizar secções6/8/interfaces, testes e
++catálogo só quando âmbito/contrato forem revistos e aprovados.
++
++Alternativas rejeitadas nesta proposta: confiar só em endpoint autoafirmado;
++exigir cache recíproca (não suporta M05); ambos dialarem sessão persistente;
++maior ID persistente sem exceção aprovada; catálogo/bootstrap de reparação;
++canal/dataPort separado; HMAC/PKI novas sem necessidade do laboratório; tratar
++cancelamento como terminação; desativar extra/Q1 para evitar quotas.
++
++**Decisões novas para revisão (Q-C-21):** permissão transferível e seus prazos/
++caps, alteração de SNAPSHOT19, máscaras3 e22 tipos, troca provisória/promoção/retorno/ACK,
++limites de admissão e teto15 s, Connection.terminated e âmbito30. A clarificação
++humana de atendimento já está aceite; não se presume aprovação destes detalhes.
++
++Parar em Design para revisão antes de ADR/Implement/Test. Sem commits/push.
++
++## 14. Contratos de integração propostos (documentação)
++
++Assinaturas para revisão; não representam interfaces já implementadas:
++
++```java
++OverlayRecovery(NodeConfiguration config, UUID instanceId, LongSupplier clock,
++                Entropy entropy, RecoveryPorts ports);
++void onNeighborUp(Neighbor.Session session);
++void onNeighborDown(Neighbor.Session session);
++void onFrame(ChannelLease channel, ControlMessage message, long observedAt);
++void onRejected(ChannelLease channel, MessageCodec.RejectedExtraContent rejected);
++void maintain(long now);
++void requestClose(long remainingNanos);
++RecoveryStatus snapshot();
++
++interface Entropy { UUID nextId(); }
++interface RecoveryPorts {
++    Map<String, Neighbor.Session> active();
++    List<CandidateCache.CandidateView> candidates(long now);
++    boolean post(Runnable event);
++    DialLease dial(AttemptKey attempt, ControlMessage.Endpoint endpoint, long remainingNanos);
++    Connection.ExtensionEnqueue sendExtra(ChannelLease channel, ControlMessage message);
++    void close(ChannelLease channel);
++    void publish(RecoveryStatus status);
++}
++record AttemptKey(UUID instanceId, UUID intentId, long needEpoch, String targetId) {}
++record DialLease(CompletionStage<ChannelLease> connected, CompletionStage<Void> terminated) {}
++record ChannelLease(UUID connectionId, CompletionStage<Void> terminated) {}
++```
++
++As portas acedem pelo owner; connected dá resultado lógico, terminated só fim
++físico, incluindo resolver/dial nativos ainda vivos e Connection.terminated
++quando houve socket. Handles reais ficam no adapter NeighborManager; lease não permite que
++Recovery escreva diretamente no socket. As stages publicadas são mínimas;
++cancelar uma cópia não cancela arbitrariamente recursos do nó. NeedEpoch é
++contador local monotónico sem wrap; ao esgotar recusar necessidade nova com
++motivo explícito, sem reciclar correlação. snapshot é valor imutável publicado,
++não um mapa vivo. APIs públicas anteriores conservam comportamento documentado.
++
++## 15. Conferência offline desta proposta
++
++[Auditoria de tamanhos, tipos e inventário de vetores](../../../experiments/construction/035-overlay-extra/design-wire-audit.json),
++[V-ADD atual](../../../experiments/construction/035-overlay-extra/design-v-add-02.log),
++[diff desde a aprovação de Model](../../../experiments/construction/035-overlay-extra/design-vs-model.diff)
++e [conferência de preservação](../../../experiments/construction/035-overlay-extra/design-validation.json).
++A auditoria offline não executa codec Java, socket, regressão ou V-034.
+diff --git a/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md b/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md
+new file mode 100644
+--- /dev/null
++++ b/memory-bank/bolts/035-overlay-extra/scope-change-proposal.md
+@@ -0,0 +1,65 @@
++---
++stage: design
++bolt: "035-overlay-extra"
++status: "proposed-not-authorized-for-code"
++---
++# IMP-035 — proposta de âmbito 8 → 30 caminhos
++
++Os oito caminhos do [ADD](../../../add.md#imp-035) continuam autorizados.
++Esta proposta acompanha o [Design](ddd-02-technical-design.md): não permite
++alterar Java/recursos ou considerar ADR-035 Aceite. A revisão ADR deve confirmar
++APIs reais e aprovar qualquer substituição antes de Implement. Nenhuma nova
++dependência, configuração, porta, pipeline ou IMP é acrescentada.
++
++## Caminhos existentes
++
++1. overlay/OverlayRecovery.java — política de isolamento/intenção/admissão/registry.
++2. overlay/NeighborManager.java — contexto provisório/promoção/retorno, dials/HELLO existentes.
++3. overlay/OverlayNode.java — composição/owner/lifecycle/snapshot de recuperação.
++4. app/OttApplication.java — comando recovery e preservação de neighbors/quit/EOF.
++5. overlay/OverlayRecoveryTest.java — D01–D24 lógicos e integração correspondente.
++6. overlay/NeighborManagerTest.java — admissão/unicidade/callbacks e migração justificada.
++7. app/OttApplicationTest.java — CLI real, resultado limitado e shutdown.
++8. experiments/overlay-recovery/ — manual de processos/SIGKILL e evidência separada.
++
++## Ampliação proposta
++
++9. overlay/NeighborDiscovery.java — emissão/receção GRANT, prova em anúncio e tick comum.
++10. overlay/CandidateCache.java — prova opcional no claim sem mudar TTL/proveniência/caps.
++11. overlay/NeighborDiscoveryTest.java — provas/gerações, sem enfraquecer D07e.
++12. overlay/CandidateCacheTest.java — retention/conflicts/expiry e prova opcional.
++13. protocol/RepairMessage.java — quatro payloads imutáveis/enums de códigos explícitos.
++14. protocol/DiscoveryMessage.java — prova opcional por Endpoint no SNAPSHOT.
++15. protocol/DiscoveryCodec.java — validação payload/flag/prova no codec comum.
++16. protocol/MessageType.java — 20..23, preservando códigos anteriores e 3 rejeitado.
++17. protocol/ControlMessage.java — sealed Payload e validação de modelos novos.
++18. protocol/MessageCodec.java — mesmo parser, wire/caps/classificação dos novos campos/tipos.
++19. protocol/MessageCodecTest.java — 22 tipos e comparação com vetores independentes.
++20. protocol/DiscoveryCodecTest.java — SNAPSHOT/provas e garantias de erro antigas.
++21. protocol/RepairMessageTest.java — payloads/fronteiras/negativos dos novos tipos.
++22. transport/Connection.java — terminated aditivo e admissão extra de 20..23 na FIFO.
++23. transport/Transport.java — terminação física antes da publicação e quatro tickets comuns.
++24. transport/TransportTest.java — FIFO/Q2/quotas/futures/physical termination preservados.
++25. overlay/NeighborManagerLifecycleTest.java — shutdown com provisório/retorno pendente.
++26. bootstrap/BootstrapServerTest.java — novos tipos continuam pedidos inválidos no bootstrap.
++27. Projeto/src/test/resources/protocol/ — 24 vetores novos e sete migrados, sem tocar 16 UDP.
++28. scripts/validate-planning.py — validar catálogo operacional revisto, referências e garantias.
++29. Projeto/README.md — mesmo JAR, roteiro/control CLI e limites reais.
++30. Projeto/docs/protocolos.md — contrato revisto e estado operacional depois de executado.
++
++Os caminhos Java abreviados seguem os pacotes main/test pt/uminho/esr/ott já
++usados pelo ADD. Ficheiros documentais de Model/Design/ADR/índices/questões e
++experiments/construction/035-overlay-extra/ são documentação de construção.
++Não alterar POM/configuração de runtime ou BootstrapServer para contornar falha:
++se a revisão técnica exigir outro caminho, apresentar a nova divergência/âmbito.
++
++## Superfícies de contrato para revisão ADR
++
++- ADR-019: autorização fora do grafo por admissão limitada, preservando menor ID.
++- ADR-033 residual: permissão verificável do destino, intenção unilateral e registry.
++- ADR-034: 18→22 tipos, máscaras obrigatórias3, SNAPSHOT com prova, canal provisório e quota extra comum.
++- ADR-012/014/015/017/020: parser/limites/flush/owner/isolamento e observação física,
++  sem substituir as garantias. UDP, bootstrap inicial e tipo 3 permanecem.
++
++Não tratar a proposta como alargamento aceite. G-EXTRA-ADR próprio de IMP-035
++continua pendente até aprovação explícita de Design/contratos/ADR/âmbito.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/construction-log.md
+@@ -714,3 +714,14 @@
+ de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
+ Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
+ Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../../../../bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md
+@@ -12,7 +12,7 @@
+ bolt: "035-overlay-extra"
+ size: "M"
+ extra: true
+-updated: "2026-11-11T22:22:21Z"
++updated: "2026-11-11T22:41:27Z"
+ ---
+ # História — Extra — reparar ligações com candidatos aprendidos
+ 
+@@ -40,3 +40,14 @@
+ Q-C-20: procurar nova ligação só com zero ACTIVE, atender intenção no saudável.
+ Model não aprovado, V-034 não executado. G-EXTRA-ADR/Design/ADR/Implement/Test,
+ manual/revisão final/integração pendentes; história não implemented/DONE.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../../../../../bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+--- a/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/002-overlay/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-02"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-11T22:22:21Z"
++updated: "2026-11-11T22:41:27Z"
+ completed: null
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+@@ -341,3 +341,14 @@
+ de intenção/admissão e eventual âmbito adicional exigem revisão antes de código.
+ Model não aprovado; V-034 não executado, sem Java/Maven/manual/commits/push.
+ Parar antes de Design. Unidade/REQ-025/extra continuam em curso; 005-rotas não iniciado.
++
++## IMP-035 — Model aprovado; Design para revisão
++
++Registo de 2026-11-11T22:41:27Z. O utilizador aprovou Model e clarificou que o destino
++pode estabelecer a ligação pedida pelo isolado, conservando sessões saudáveis.
++[Design proposto/Q-C-21](../../../../bolts/035-overlay-extra/ddd-02-technical-design.md) concretiza intenção/admissão unilateral,
++permissões anteriores às falhas, promoção/retorno pelo menor ID, limites e
++D01–D24. Âmbito8→30 e minuta para futuraADR-035 ainda propostos; o contrato
++integrado/206 hashes de Projeto/JAR continuam intactos.
++Só Model concluído, current_stage=design. Gate próprio, Design/ADR/Implement/
++V-034/manual/revisão final/integração pendentes. Sem Java/Maven/commits/push.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -4,7 +4,7 @@
+ intent: 001-ott-streaming
+ inception_status: complete
+ inception_completed_at: 2026-11-03T20:54:11Z
+-extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-model-review
++extras_planning: EXTRA-01-TCP-v2-IMP034-complete-IMP035-design-review
+ language: Java 21
+ build: Maven
+ source_root: Projeto/src
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Model e 27 planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: sete histórias/bolts complete, IMP-035 em Design e 27 planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -286,6 +286,6 @@
+ 
+ ## 002-overlay/007-reparar-vizinhancas-com-candidatos-aprendidos.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model para revisão; Q-C-20 decidida, sem avanço a Design.
++**Tarefa:** IMP-035 (EXTRA-01 B). **Estado:** in-progress, Model aprovado; Design/Q-C-21/âmbito propostos, parar antes de ADR.
+ **Bolt:** 035-overlay-extra. **Ficheiro:** [007-reparar-vizinhancas-com-candidatos-aprendidos](intents/001-ott-streaming/units/002-overlay/stories/007-reparar-vizinhancas-com-candidatos-aprendidos.md).
+ Usa a cache aprendida de IMP-034 para reparar a overlay.

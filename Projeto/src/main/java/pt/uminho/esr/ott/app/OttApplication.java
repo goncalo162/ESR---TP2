@@ -23,6 +23,7 @@ public final class OttApplication {
     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
     interface RunningService extends AutoCloseable {
         Map<String, Neighbor> neighbors();
+        default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
         void requestShutdown(int reason, Duration remainingBudget);
         boolean awaitTermination(Duration remainingBudget);
         default Optional<Throwable> failure() { return Optional.empty(); }
@@ -78,7 +79,7 @@ public final class OttApplication {
         final NodeConfiguration config;
         try {
             invocation = parse(arguments);
-            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, quit"); return new ExecutionResult(0, true, true, true); }
+            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, quit"); return new ExecutionResult(0, true, true, true); }
             config = ConfigurationLoader.load(invocation.config().orElseThrow(), invocation.role().orElseThrow());
         } catch (ConfigurationException | IllegalArgumentException e) { error.println(bounded("CONFIG_ERROR " + e.getMessage())); return new ExecutionResult(2, true, true, true); }
         var console = new Console(input, output, error, config, clock);
@@ -110,6 +111,9 @@ public final class OttApplication {
                     console.log("NEIGHBORS node=" + config.nodeId() + " role=" + config.role() + " count=" + neighbors.size(), false);
                     neighbors.values().stream().sorted(Comparator.comparing(Neighbor::nodeId)).forEach(n ->
                         console.log("NEIGHBOR node=" + n.nodeId() + " state=" + n.state() + " session=" + n.session(), false));
+                } else if(line.equals("recovery")) {
+                    var status=service.recoveryStatus();
+                    console.log("RECOVERY node="+config.nodeId()+" "+status.map(Object::toString).orElse("NOT_APPLICABLE"),false);
                 } else if (line.equals("catalog") || line.equals("play") || line.startsWith("play "))
                     console.log("NOT_IMPLEMENTED " + line.split(" ", 2)[0], false);
                 else console.log("COMMAND_ERROR unknown command", true);
@@ -174,6 +178,7 @@ public final class OttApplication {
         });
         return new RunningService() {
             public Map<String, Neighbor> neighbors() { return node.diagnostics(); }
+            public Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.of(node.recoveryStatus());}
             public void requestShutdown(int reason, Duration budget) { node.requestShutdown(reason, budget); }
             public boolean awaitTermination(Duration budget) { return node.awaitTermination(budget); }
             public Optional<Throwable> failure() { return node.failure(); }

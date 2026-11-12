@@ -1,0 +1,104 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=OverlayRecoveryTest", "test"]
+STARTED=2026-11-11T23:54:58.548231+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 40 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 13 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[ERROR] Tests run: 18, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 0.146 s <<< FAILURE! -- in pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[ERROR] pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D03_realTcpLearnsBeforeFailureAndFormsSCOnSameSurvivors -- Time elapsed: 0.009 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:278)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest$Graph.<init>(NeighborDiscoveryTest.java:197)
+	at pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D03_realTcpLearnsBeforeFailureAndFormsSCOnSameSurvivors(OverlayRecoveryTest.java:162)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D13_repairDnsDeadlineUsesExistingTickNotAnAdditionalPhysicalTimer -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <TIMEOUT> but was: <BACKOFF>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D13_repairDnsDeadlineUsesExistingTickNotAnAdditionalPhysicalTimer(OverlayRecoveryTest.java:186)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D04_realTcpFormsR1CAndPreservesHealthySR1 -- Time elapsed: 0.001 s <<< ERROR!
+java.net.SocketException: Operação não permitida
+	at java.base/sun.nio.ch.Net.socket0(Native Method)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:556)
+	at java.base/sun.nio.ch.Net.serverSocket(Net.java:550)
+	at java.base/sun.nio.ch.NioSocketImpl.create(NioSocketImpl.java:464)
+	at java.base/java.net.ServerSocket.getImpl(ServerSocket.java:311)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:390)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:278)
+	at pt.uminho.esr.ott.overlay.NeighborDiscoveryTest$Graph.<init>(NeighborDiscoveryTest.java:197)
+	at pt.uminho.esr.ott.overlay.OverlayRecoveryTest.D04_realTcpFormsR1CAndPreservesHealthySR1(OverlayRecoveryTest.java:171)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   OverlayRecoveryTest.D13_repairDnsDeadlineUsesExistingTickNotAnAdditionalPhysicalTimer:186 expected: <TIMEOUT> but was: <BACKOFF>
+[ERROR] Errors: 
+[ERROR]   OverlayRecoveryTest.D03_realTcpLearnsBeforeFailureAndFormsSCOnSameSurvivors:162 » Socket Operação não permitida
+[ERROR]   OverlayRecoveryTest.D04_realTcpFormsR1CAndPreservesHealthySR1:171 » Socket Operação não permitida
+[INFO] 
+[ERROR] Tests run: 18, Failures: 1, Errors: 2, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.641 s
+[INFO] Finished at: 2026-11-11T23:55:02Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

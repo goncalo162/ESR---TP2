@@ -6,7 +6,7 @@ TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/202
 
 A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
 
-IMP-034 aprende/retém candidatos; criar ligações novas após falhas pertence ao IMP-035, ainda não iniciado. Routing, streaming e demonstração de continuidade de vídeo permanecem nos seus incrementos. O clean verify atual passou 1065 testes e o manual do agente passou 53 checks. Luis repetiu pessoalmente o manual: 53 checks e saída 0. Test aceite e revisão técnica concluída; integração local concluída.
+IMP-035 tem Test aprovado: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e autorizou integração local. Fecho e revisão humana final da implementação permanecem pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
 
 ## Compilar e testar
 
@@ -24,7 +24,7 @@ Os testes TCP/CLI precisam de permissão para sockets locais e criação de JVM.
 Testes selecionados do incremento:
 
 ```sh
-mvn -B -ntp -Dtest=MessageCodecTest,DiscoveryCodecTest,NeighborDiscoveryTest,CandidateCacheTest test
+mvn -B -ntp -Dtest=MessageCodecTest,DiscoveryCodecTest,NeighborDiscoveryTest,CandidateCacheTest,OverlayRecoveryTest test
 mvn -B -ntp -Dtest=TransportTest,BootstrapServerTest,NeighborManagerTest,NeighborManagerLifecycleTest,OttApplicationTest test
 ```
 
@@ -56,3 +56,17 @@ Não é necessária chave de ativação. extra.discovery.enabled=true é apenas 
 - [Progresso](../docs/15-PROJECT-PROGRESS.md) e [roteiro do incremento](../experiments/overlay-discovery/README.md).
 
 UDP de vídeo conserva OTT1/version 1, cabeçalho 64, total <=1200 e payload <=1136. Testes locais não são demonstração CORE, GUI, FPS ou vídeo real.
+
+## Reparação após isolamento — checkpoint Test
+
+Usar `neighbors` para sessões confirmadas e `recovery` para estado, motivo,
+candidato selecionado e atraso de retry. O evento `RepairStarted` identifica
+requestId/instância/sourceKey/geração/queryStarted/TTL da seleção. Não há nova
+consulta ao bootstrap depois do arranque. Um destino saudável pode aceitar o
+isolado, sem perder sessões ACTIVE. Ausência/expiração/conflito dos candidatos
+mantém isolamento explícito e tentativas limitadas.
+
+O [roteiro de mortes reais](../experiments/overlay-recovery/README.md) foi
+executado pelo agente com JVMs separadas e SIGKILL, e foi repetido por Luis com Test aprovado.
+A evidência incremental está no
+[walkthrough](../memory-bank/bolts/035-overlay-extra/implementation-walkthrough.md).

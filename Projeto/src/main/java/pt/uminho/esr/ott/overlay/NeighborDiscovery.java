@@ -18,6 +18,7 @@ public final class NeighborDiscovery {
         Map<String,Neighbor.Session> active();
         Connection.ExtensionEnqueue enqueue(Neighbor.Session session,ControlMessage message);
         void diagnostic(Issue issue);
+        default void recoveryTick(long now) {}
     }
     private static final class Query {
         final UUID id=UUID.randomUUID(); final long started;
@@ -63,7 +64,7 @@ public final class NeighborDiscovery {
     void start(NeighborManager.Deadlines timers) {
         tick=timers.periodic(()->{
             if(tickPending.compareAndSet(false,true)) {
-                if(!host.post(()->{tickPending.set(false);if(!closed)maintain();}))tickPending.set(false);
+                if(!host.post(()->{tickPending.set(false);if(!closed){maintain();host.recoveryTick(clock.getAsLong());}}))tickPending.set(false);
             }
         },TICK);
     }

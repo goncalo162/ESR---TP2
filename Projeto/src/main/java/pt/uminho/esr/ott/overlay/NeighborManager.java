@@ -62,6 +62,7 @@ public final class NeighborManager implements AutoCloseable {
         return shutdownView;
     }
     private void beginShutdown(int reason) {
+        if(recovery!=null)recovery.requestClose(0);
         if(learner!=null)learner.close();
         cancel(initialSlot); initialSlot = null;
         if (discovery != null) retire(discovery);
@@ -118,7 +119,11 @@ public final class NeighborManager implements AutoCloseable {
         shutdownResult.complete(new ShutdownReport(attempts, notificationTimedOut));
     }
     public interface Observer { void onEvent(Event event); }
-    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic {}
+    public sealed interface Event permits NeighborUp, NeighborDown, Received, Diagnostic, RepairStarted {}
+    /** One bounded provenance event per admitted local repair operation, never a cache dump. */
+    public record RepairStarted(OverlayRecovery.RepairAttempt attempt) implements Event {
+        public RepairStarted { Objects.requireNonNull(attempt); }
+    }
     public record NeighborUp(Neighbor.Session session) implements Event {
         public NeighborUp { Objects.requireNonNull(session); }
     }
@@ -216,6 +221,9 @@ public final class NeighborManager implements AutoCloseable {
     private volatile Map<String, Neighbor> diagnosticView = Map.of();
     private volatile Map<String,PeerStatus> peerStatusView=Map.of();
     private NeighborDiscovery learner;
+    private OverlayRecovery recovery;
+    private volatile OverlayRecovery.RecoveryStatus recoveryView=new OverlayRecovery.RecoveryStatus(OverlayRecovery.Phase.WAITING,OverlayRecovery.RecoveryReason.NONE,0,Optional.empty(),0);
+    public OverlayRecovery.RecoveryStatus recoveryStatus(){return recoveryView;}
     private final Semaphore cacheCommands=new Semaphore(4);
     private final Set<CompletableFuture<?>> commands = ConcurrentHashMap.newKeySet();
     private final Semaphore commandSlots;
@@ -234,18 +242,22 @@ public final class NeighborManager implements AutoCloseable {
     private enum Direction { UNCLASSIFIED, INBOUND, OUTBOUND }
     private static final class Peer {
         final ControlMessage.Endpoint configured;
+        final boolean dynamic;
         Neighbor.State state = Neighbor.State.DISCONNECTED;
         Attempt attempt; Context context; Slot slot;
         Neighbor.Session session; long base, delay;
         CapabilityState capability=CapabilityState.NEGOTIATING_REQUIRED;
         Reason currentReason=Reason.STALE,lastConfirmed;
         int observedVersion;long supported,required,selected;
-        Peer(ControlMessage.Endpoint endpoint) { configured = endpoint; }
+        Peer(ControlMessage.Endpoint endpoint) { this(endpoint,false); }
+        Peer(ControlMessage.Endpoint endpoint,boolean dynamic) { configured = endpoint;this.dynamic=dynamic; }
     }
     private static final class Attempt {
         final UUID id = UUID.randomUUID(); final Peer peer;
-        UUID job; boolean live = true; Context context;
-        Attempt(Peer peer) { this.peer = peer; }
+        final OverlayRecovery.RepairAttempt repair;
+        UUID job; long connectBegan; boolean live = true; Context context;
+        Attempt(Peer peer) { this(peer,null); }
+        Attempt(Peer peer,OverlayRecovery.RepairAttempt repair) { this.peer=peer;this.repair=repair; }
     }
     private static final class Slot { Ticket ticket; boolean live = true; }
     private record Frame(ControlMessage message, long observedAt) {}
@@ -256,6 +268,7 @@ public final class NeighborManager implements AutoCloseable {
         final ArrayDeque<Frame> frames = new ArrayDeque<>();
         Attempt attempt; Peer peer; Slot deadline;
         UUID request, remoteInstance; ControlMessage.Endpoint endpoint;
+        MessageType helloType=MessageType.HELLO;
         boolean bootstrap, sent, written, acknowledged, responding, active;
         Context(Channel channel, long at) { this.channel = channel; openedAt = at; }
     }
@@ -367,7 +380,8 @@ public final class NeighborManager implements AutoCloseable {
     private long now() { return clock.getAsLong(); }
     private long connectBudget() { return plan.config.runtime().control().connectTimeout().toNanos(); }
     private long helloBudget() { return plan.config.runtime().overlay().helloTimeout().toNanos(); }
-    private long budget(Context c) { return c.bootstrap ? plan.config.runtime().control().bootstrapQueryTimeout().toNanos() : helloBudget(); }
+    private long budget(Context c) { return c.bootstrap ? plan.config.runtime().control().bootstrapQueryTimeout().toNanos()
+            : c.helloType==MessageType.REPAIR_HELLO?Math.min(helloBudget(),OverlayRecovery.TOTAL_BUDGET):helloBudget(); }
     private boolean expired(long began, long duration) { return now() - began >= duration; }
     private boolean current(Context c) { return contexts.get(c.channel.id()) == c; }
     private Slot schedule(long nanos, Runnable action) {
@@ -408,7 +422,7 @@ public final class NeighborManager implements AutoCloseable {
                 var c=contexts.get(ch.id());if(c==null)return;
                 var remote=error.getCause() instanceof MessageCodec.HandshakeFailure h?h.message():null;
                 if(remote!=null) {
-                    if(remote.type()==MessageType.HELLO && c.direction==Direction.INBOUND && c.peer==null) {
+                    if((remote.type()==MessageType.HELLO || remote.type()==MessageType.REPAIR_HELLO) && c.direction==Direction.INBOUND && c.peer==null) {
                         // Reuse normal endpoint/identity authorization; no unknown peer status can be created.
                         hello(c,remote);return;
                     }
@@ -475,9 +489,14 @@ public final class NeighborManager implements AutoCloseable {
         if (a.peer == null) { cancel(initialSlot); initialSlot = slot; }
         else { cancel(a.peer.slot); a.peer.slot = slot; }
     }
+    private void armConnectPhase(Attempt a) {
+        a.connectBegan=now();
+        // Dynamic attempts already have the shared recovery tick; do not charge an extra timer per candidate.
+        if(a.repair==null)phaseSlot(a,schedule(connectBudget(),()->{if(live(a))attemptFailed(a,Reason.TIMEOUT,null);}));
+    }
     private void resolve(Attempt a, String host, int port) {
         long began = now(); a.job = UUID.randomUUID();
-        phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
+        armConnectPhase(a);
         io.resolver().resolve(a.job, host).whenComplete((address, error) -> post(() -> {
             if (!live(a)) return;
             io.resolver().retire(a.job); a.job = null;
@@ -485,7 +504,7 @@ public final class NeighborManager implements AutoCloseable {
                 attemptFailed(a, error == null ? Reason.TIMEOUT : error instanceof RejectedExecutionException
                         ? Reason.RESOURCE_LIMIT : Reason.TRANSPORT, null); return;
             }
-            phaseSlot(a, schedule(connectBudget(), () -> { if (live(a)) attemptFailed(a, Reason.TIMEOUT, null); }));
+            armConnectPhase(a);
             if (nativeDials.size() >= plan.options.maxConnections()) { attemptFailed(a, Reason.RESOURCE_LIMIT, null); return; }
             nativeDials.put(a.id, a);
             io.network().connect(new InetSocketAddress(address, port)).whenComplete((ch, dialError) -> {
@@ -496,6 +515,9 @@ public final class NeighborManager implements AutoCloseable {
         }));
     }
     private void dialResult(Attempt a, Channel ch, Throwable error, long observed) {
+        if(a.repair!=null && live(a) && (expired(a.connectBegan,connectBudget()) || observed-a.connectBegan>=connectBudget())) {
+            if(ch!=null)ch.close();ch=null;error=new java.io.IOException("Repair dial deadline");attemptFailed(a,Reason.TIMEOUT,null);
+        }
         // Associate this handle before excluding the token from any other channel's barrier.
         if (ch != null) {
             var c = contexts.get(ch.id());
@@ -506,6 +528,7 @@ public final class NeighborManager implements AutoCloseable {
             } else {
                 c.direction = Direction.OUTBOUND; c.barrier.clear(); c.attempt = a; a.context = c;
                 c.peer = a.peer; c.bootstrap = a.peer == null;
+                c.helloType=a.repair==null?MessageType.HELLO:MessageType.REPAIR_HELLO;
                 if (a.peer != null) { a.peer.context = c; a.peer.state = Neighbor.State.HANDSHAKING; }
                 phaseSlotCancel(a);
                 armContext(c);
@@ -552,10 +575,14 @@ public final class NeighborManager implements AutoCloseable {
         drain(c);
     }
     private void beginOutbound(Context c) {
-        c.request = UUID.randomUUID(); c.sent = true;
-        var type = c.bootstrap ? MessageType.REGISTER : MessageType.HELLO;
+        // DNS/dial callbacks can arrive after a claim expires but before the shared tick runs.
+        if(c.attempt!=null && c.attempt.repair!=null && !recovery.eligible(c.attempt.repair,now())) {
+            finish(c,Reason.TIMEOUT,null);return;
+        }
+        c.request = c.attempt!=null && c.attempt.repair!=null?c.attempt.repair.requestId():UUID.randomUUID(); c.sent = true;
+        var type = c.bootstrap ? MessageType.REGISTER : c.helloType;
         write(c, new ControlMessage(type, c.request, plan.local.nodeId(), instance,
-                c.bootstrap?new ControlMessage.EndpointPayload(plan.local):new ControlMessage.Hello(plan.local,1,1)), false);
+                c.bootstrap?new ControlMessage.EndpointPayload(plan.local):new ControlMessage.Hello(plan.local,3,3)), false);
     }
     private void write(Context c, ControlMessage message, boolean closeAfter) {
         if (c.responding) { finish(c, Reason.RESOURCE_LIMIT, null); return; }
@@ -616,12 +643,12 @@ public final class NeighborManager implements AutoCloseable {
             return;
         }
         if (c.direction == Direction.INBOUND && c.peer == null) {
-            if (m.type() != MessageType.HELLO) { contextFailure(c, m); return; }
+            if (m.type() != MessageType.HELLO && m.type()!=MessageType.REPAIR_HELLO) { contextFailure(c, m); return; }
             hello(c, m); return;
         }
         if (!identity(c, m)) { contextFailure(c, m); return; }
         if (m.type() == MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p) {
-            int related = c.direction == Direction.OUTBOUND ? 5 : 6;
+            int related = c.direction == Direction.OUTBOUND ? c.helloType.code() : 6;
             if (c.request.equals(m.requestId()) && p.relatedType() == related) {
                 finish(c, Reason.REMOTE_REJECTION, m); return;
             }
@@ -630,8 +657,8 @@ public final class NeighborManager implements AutoCloseable {
         }
         if (c.direction == Direction.OUTBOUND && m.type() == MessageType.HELLO_OK
                 && m.payload() instanceof ControlMessage.HelloOk ack && c.request.equals(m.requestId()) && !c.acknowledged) {
-            if(ack.selectedMask()!=1){incompatible(c.peer,m,Reason.REQUIRED_DISCOVERY_MISSING);finish(c,Reason.REQUIRED_DISCOVERY_MISSING,m);return;}
-            c.peer.observedVersion=2;c.peer.selected=1;
+            if(ack.selectedMask()!=3){incompatible(c.peer,m,Reason.REQUIRED_DISCOVERY_MISSING);finish(c,Reason.REQUIRED_DISCOVERY_MISSING,m);return;}
+            c.peer.observedVersion=2;c.peer.selected=3;
             c.remoteInstance = m.senderInstance(); c.endpoint = withInstance(c.peer.configured, c.remoteInstance);
             c.acknowledged = true; activate(c); return;
         }
@@ -642,6 +669,7 @@ public final class NeighborManager implements AutoCloseable {
         return c.peer != null && c.remoteInstance != null && (c.direction == Direction.INBOUND || c.acknowledged);
     }
     private void hello(Context c, ControlMessage m) {
+        if(m.type()==MessageType.REPAIR_HELLO){repairHello(c,m);return;}
         if(ZERO.equals(m.requestId())){reject(c,m,ErrorCode.INVALID_MESSAGE);return;}
         var p = peers.get(m.senderId());
         if (p == null || !(m.payload() instanceof ControlMessage.Hello ep) || ep.endpoint() == null) {
@@ -654,13 +682,13 @@ public final class NeighborManager implements AutoCloseable {
         catch (IllegalArgumentException ex) { allowed = false; }
         if (!allowed) { reject(c, m, ErrorCode.UNAUTHORIZED_NEIGHBOR); return; }
         if (p.context != null || p.session != null || p.attempt != null) { reject(c, m, ErrorCode.DUPLICATE_ID); return; }
-        if(ep.supportedMask()!=1||ep.requiredMask()!=1) {
+        if(ep.supportedMask()!=3||ep.requiredMask()!=3) {
             incompatible(p,m,Reason.REQUIRED_DISCOVERY_MISSING);reject(c,m,ErrorCode.INVALID_MESSAGE);return;
         }
-        p.observedVersion=2;p.supported=1;p.required=1;
+        p.observedVersion=2;p.supported=3;p.required=3;
         c.peer = p; c.endpoint = withInstance(p.configured, m.senderInstance()); c.remoteInstance = m.senderInstance();
         c.request = m.requestId(); c.sent = true; p.context = c; p.state = Neighbor.State.HANDSHAKING; publish();
-        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, new ControlMessage.HelloOk(1)), false);
+        write(c, new ControlMessage(MessageType.HELLO_OK, c.request, plan.local.nodeId(), instance, new ControlMessage.HelloOk(3)), false);
     }
     private void incompatible(Peer p,ControlMessage m,Reason reason) {
         if(p.session!=null)return;
@@ -703,13 +731,101 @@ public final class NeighborManager implements AutoCloseable {
                 var p=current(session);
                 return p==null?Connection.refused(Connection.ExtensionStatus.CLOSED):p.context.channel.trySendExtension(message);
             }
+            public void recoveryTick(long now){
+                for(var p:List.copyOf(peers.values())) {var a=p.attempt;
+                    if(a!=null && a.repair!=null && a.context==null && live(a) && expired(a.connectBegan,connectBudget()))attemptFailed(a,Reason.TIMEOUT,null);
+                }
+                pruneDynamic();if(recovery!=null)recovery.maintain(now);
+            }
             public void diagnostic(NeighborDiscovery.Issue issue) {
                 NeighborManager.this.diagnostic(Reason.valueOf("DISCOVERY_"+issue.name()),null,null,null);
             }
         });
+        recovery=new OverlayRecovery(plan.config,instance,clock,UUID::randomUUID,new OverlayRecovery.RecoveryPorts() {
+            public Map<String,Neighbor.Session> active(){return activeView;}
+            public List<CandidateCache.CandidateView> candidates(long now){return learner.snapshot();}
+            public boolean beginRepair(OverlayRecovery.RepairAttempt attempt,ControlMessage.Endpoint endpoint,long left){return startRepair(attempt,endpoint);}
+            public void cancelRepair(OverlayRecovery.RepairAttempt attempt){cancelRepairAttempt(attempt);}
+            public void publish(OverlayRecovery.RecoveryStatus status){recoveryView=status;}
+            public long retryDelay(long base){return nextDelay(base);}
+        });
         learner.start(deadlines);
         publish(); started.complete(null);
         for (var p : peers.values()) if (initiates(p)) dialPeer(p);
+    }
+
+    private void pruneDynamic() {
+        boolean changed=peers.values().removeIf(p->p.dynamic && p.session==null && p.attempt==null && p.context==null
+            && nativeDials.values().stream().noneMatch(a->a.peer==p));
+        if(changed)publish();
+    }
+    private boolean startRepair(OverlayRecovery.RepairAttempt repair,ControlMessage.Endpoint endpoint) {
+        if(phase!=Phase.READY || stopping.get() || draining.get() || !activeView.isEmpty() || !recovery.isCurrent(repair) || io.network().reservations()>=plan.options.maxConnections())return false;
+        pruneDynamic();var p=peers.get(endpoint.nodeId());
+        if(p!=null && (!p.dynamic || p.session!=null || p.attempt!=null || p.context!=null))return false;
+        if(p==null) {
+            if(peers.values().stream().filter(peer->peer.dynamic).count()>=Math.min(16,plan.options.maxConnections()))return false;
+            p=new Peer(withInstance(endpoint,ZERO),true);peers.put(endpoint.nodeId(),p);
+        }
+        var selected=p;
+        if(nativeDials.values().stream().anyMatch(a->a.peer==selected))return false;
+        p.attempt=new Attempt(p,repair);p.state=Neighbor.State.CONNECTING;publish();
+        emit(new RepairStarted(repair));
+        resolve(p.attempt,p.configured.host(),p.configured.controlPort());return true;
+    }
+    private void cancelRepairAttempt(OverlayRecovery.RepairAttempt repair) {
+        var p=peers.get(repair.targetId());if(p==null || p.session!=null)return;
+        var a=p.attempt;
+        if(a==null || a.repair!=repair)return;
+        if(a.context!=null && current(a.context))finish(a.context,Reason.STALE,null);
+        else {retire(a);publish();}
+    }
+    private void repairTerminal(Attempt a,Reason reason) {
+        if(a!=null && a.repair!=null && recovery!=null)recovery.onAttemptTerminal(a.repair,
+            reason==Reason.TIMEOUT?OverlayRecovery.RecoveryReason.TIMEOUT:reason==Reason.REMOTE_REJECTION?
+                OverlayRecovery.RecoveryReason.REJECTED:reason==Reason.RESOURCE_LIMIT?
+                OverlayRecovery.RecoveryReason.RESOURCE_LIMIT:OverlayRecovery.RecoveryReason.TRANSPORT);
+    }
+    private boolean repairEndpoint(ControlMessage m,ControlMessage.Endpoint e) {
+        try {
+            validateEndpoint(e,false);
+            if(!m.senderId().equals(e.nodeId())||!m.senderInstance().equals(e.instanceId())||e.nodeId().equals(plan.local.nodeId())
+                    || sameAddress(e,plan.local))return false;
+            var boot=plan.config.bootstrap().orElseThrow();
+            if(key(e.host(),e.controlPort()).equals(key(boot.host(),boot.port())))return false;
+            for(var other:peers.values())if(!other.configured.nodeId().equals(e.nodeId()) && sameAddress(e,other.configured))return false;
+            var known=peers.get(e.nodeId());return known==null || sameEndpoint(e,known.configured);
+        }catch(IllegalArgumentException error){return false;}
+    }
+    private static boolean sameAddress(ControlMessage.Endpoint a,ControlMessage.Endpoint b) {
+        return key(a.host(),a.controlPort()).equals(key(b.host(),b.controlPort()))
+            || key(a.host(),a.dataPort()).equals(key(b.host(),b.dataPort()));
+    }
+    private void repairHello(Context c,ControlMessage m) {
+        if(ZERO.equals(m.requestId()) || !(m.payload() instanceof ControlMessage.Hello hello)
+                || !repairEndpoint(m,hello.endpoint()) || hello.supportedMask()!=3 || hello.requiredMask()!=3) {
+            reject(c,m,ErrorCode.INVALID_MESSAGE);return;
+        }
+        var p=peers.get(m.senderId());
+        if(p!=null && p.session!=null){reject(c,m,ErrorCode.DUPLICATE_ID);return;}
+        if(p!=null && (p.context!=null || p.attempt!=null)) {
+            boolean outgoing=p.attempt!=null || p.context!=null && p.context.direction==Direction.OUTBOUND;
+            if(!outgoing || plan.local.nodeId().compareTo(m.senderId())<0){reject(c,m,ErrorCode.DUPLICATE_ID);return;}
+            // Detach the losing context before retiring it: its callbacks may only clean its own resources.
+            var losing=p.context;p.context=null;var a=p.attempt;
+            if(a!=null){retire(a);repairTerminal(a,Reason.STALE);}
+            if(losing!=null)finish(losing,Reason.STALE,null);
+        }
+        long admissions=contexts.values().stream().filter(x->x!=c && x.helloType==MessageType.REPAIR_HELLO && x.direction==Direction.INBOUND && !x.active).count();
+        if(activeView.size()>=Math.min(63,plan.options.maxConnections()) || admissions>=2) {reject(c,m,ErrorCode.RESOURCE_LIMIT);return;}
+        if(p==null) {
+            pruneDynamic();if(peers.values().stream().filter(peer->peer.dynamic).count()>=Math.min(16,plan.options.maxConnections())){reject(c,m,ErrorCode.RESOURCE_LIMIT);return;}
+            p=new Peer(withInstance(hello.endpoint(),ZERO),true);peers.put(m.senderId(),p);
+        }
+        c.helloType=MessageType.REPAIR_HELLO;c.peer=p;c.endpoint=withInstance(p.configured,m.senderInstance());c.remoteInstance=m.senderInstance();
+        c.request=m.requestId();c.sent=true;p.context=c;p.state=Neighbor.State.HANDSHAKING;
+        p.observedVersion=2;p.supported=3;p.required=3;publish();armContext(c);
+        if(current(c))write(c,new ControlMessage(MessageType.HELLO_OK,c.request,plan.local.nodeId(),instance,new ControlMessage.HelloOk(3)),false);
     }
     private Map<String, Peer> validateList(ControlMessage.NeighborList list) {
         if (list.neighbors().size() > 63 || list.neighbors().size() > plan.options.maxConnections())
@@ -732,13 +848,19 @@ public final class NeighborManager implements AutoCloseable {
         if (!c.channel.isOpen() || expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
         var p = c.peer;
         if (p.context != c || p.session != null) { finish(c, Reason.CONTEXT, null); return; }
+        // Admissions can overlap: recheck the shared degree at the serial confirmation point.
+        // Both configured and repairing sessions must pass this guard before any ACTIVE mutation.
+        if (activeView.size() >= Math.min(plan.options.maxConnections(), 63)) {
+            finish(c, Reason.RESOURCE_LIMIT, null); return;
+        }
+        if(c.attempt!=null && c.attempt.repair!=null && !recovery.eligible(c.attempt.repair,now())){finish(c,Reason.TIMEOUT,null);return;}
         c.active = true; cancel(c.deadline); c.deadline = null;
         if (c.attempt != null) { c.attempt.live = false; p.attempt = null; }
         p.session = new Neighbor.Session(p.configured.nodeId(), c.remoteInstance, c.channel.id(), c.endpoint);
         p.state = Neighbor.State.ACTIVE; p.base = 0; p.delay = 0;
-        p.capability=CapabilityState.ACTIVE_DISCOVERY;p.currentReason=Reason.STALE;p.lastConfirmed=null;
+        p.selected=3;p.capability=CapabilityState.ACTIVE_DISCOVERY;p.currentReason=Reason.STALE;p.lastConfirmed=null;
         learner.up(p.session,c.request);
-        publish(); emit(new NeighborUp(p.session)); drain(c);
+        publish();if(recovery!=null)recovery.onNeighborUp(p.session); emit(new NeighborUp(p.session)); drain(c);
     }
     private void retain(Context c, ControlMessage m, long at) {
         int b = Math.min(4, plan.options.queueCapacity());
@@ -752,7 +874,7 @@ public final class NeighborManager implements AutoCloseable {
             var next = c.frames.peekFirst();
             if (!c.active && legitimateWindow(c) && application(next.message.type())
                     && !(next.message.type() == MessageType.ERROR && next.message.requestId().equals(c.request)
-                    && ((ControlMessage.ErrorPayload) next.message.payload()).relatedType() == (c.direction == Direction.OUTBOUND ? 5 : 6))) return;
+                    && ((ControlMessage.ErrorPayload) next.message.payload()).relatedType() == (c.direction == Direction.OUTBOUND ? c.helloType.code() : 6))) return;
             c.frames.removeFirst(); retained--; handle(c, next.message, next.observedAt);
         }
     }
@@ -774,7 +896,8 @@ public final class NeighborManager implements AutoCloseable {
             }
             p.context = null; p.session = null; p.state = stopping.get() ? Neighbor.State.CLOSED : Neighbor.State.DISCONNECTED;
             if (c.attempt != null) retire(c.attempt);
-            publish(); if (old != null) emit(new NeighborDown(old, reason));
+            publish(); if (old != null) {if(recovery!=null)recovery.onNeighborDown(old);emit(new NeighborDown(old, reason));}
+            repairTerminal(c.attempt,reason);
             if (!stopping.get()) retry(p);
         } else if (c.bootstrap && c.attempt != null && live(c.attempt)) {
             retire(c.attempt); retryDiscovery();
@@ -790,7 +913,7 @@ public final class NeighborManager implements AutoCloseable {
         if (!live(a)) return;
         if (a.context != null && current(a.context)) { finish(a.context, reason, remote); return; }
         if(a.peer!=null){a.peer.capability=CapabilityState.TEMPORARILY_UNAVAILABLE;a.peer.currentReason=reason;}
-        diagnostic(reason, a, null, remote); retire(a);
+        diagnostic(reason, a, null, remote); retire(a);repairTerminal(a,reason);
         if (a.peer == null) retryDiscovery(); else { publish(); retry(a.peer); }
     }
     private long nextDelay(long base) {
@@ -806,6 +929,7 @@ public final class NeighborManager implements AutoCloseable {
                 : previous > max / 2 ? max : Math.min(max, previous * 2);
     }
     private void retry(Peer p) {
+        if(p.dynamic)return;
         if (phase != Phase.READY || stopping.get() || draining.get() || !initiates(p) || p.session != null || p.attempt != null) return;
         cancel(p.slot); p.base = nextBase(p.base); p.delay = nextDelay(p.base);
         p.slot = schedule(TimeUnit.MILLISECONDS.toNanos(p.delay), () -> { p.slot = null; dialPeer(p); }); publish();
@@ -842,6 +966,7 @@ public final class NeighborManager implements AutoCloseable {
         if (phase != Phase.FAILED) phase = Phase.CLOSED;
         if (phase != Phase.FAILED && failure.get() != null) diagnostic(failure.get() instanceof RejectedExecutionException
                 ? Reason.RESOURCE_LIMIT : Reason.CONSUMER_FAILURE, null, null, null);
+        if(recovery!=null)recovery.requestClose(0);
         if(learner!=null)learner.close();
         cancel(initialSlot); initialSlot = null;
         if (discovery != null) retire(discovery);

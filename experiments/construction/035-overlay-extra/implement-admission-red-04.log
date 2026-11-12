@@ -1,0 +1,45 @@
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+COMMAND=["mvn", "-B", "-ntp", "-Dtest=OverlayRecoveryTest", "test"]
+STARTED=2026-11-11T23:41:56.722098+00:00
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 39 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 137 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 13 source files with javac [debug release 21] to target/test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/luis/ESR/ESR---TP2/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java:[17,46] future has private access in pt.uminho.esr.ott.overlay.NeighborManagerTest.FakeIo.Dial
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.526 s
+[INFO] Finished at: 2026-11-11T23:41:59Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:testCompile (default-testCompile) on project ott-streaming: Compilation failure
+[ERROR] /home/luis/ESR/ESR---TP2/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java:[17,46] future has private access in pt.uminho.esr.ott.overlay.NeighborManagerTest.FakeIo.Dial
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+
+MAVEN_EXIT=1

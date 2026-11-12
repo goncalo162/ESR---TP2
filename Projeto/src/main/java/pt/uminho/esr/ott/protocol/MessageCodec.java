@@ -171,7 +171,7 @@ public final class MessageCodec {
     private static Payload readPayload(DataInputStream in, MessageType type) throws IOException {
         return switch (type) {
             case REGISTER -> new EndpointPayload(readEndpoint(in));
-            case HELLO -> new Hello(readEndpoint(in),readU32(in),readU32(in));
+            case HELLO, REPAIR_HELLO -> new Hello(readEndpoint(in),readU32(in),readU32(in));
             case REGISTER_OK -> {
                 int count = readCount(in, MAX_NEIGHBORS);
                 var neighbors = new ArrayList<Endpoint>(count);
@@ -197,7 +197,7 @@ public final class MessageCodec {
     private static void writePayload(DataOutputStream out, ControlMessage m) throws IOException {
         switch (m.type()) {
             case REGISTER -> writeEndpoint(out, payload(m, EndpointPayload.class).endpoint());
-            case HELLO -> { var p=payload(m,Hello.class);writeEndpoint(out,p.endpoint());out.writeInt((int)p.supportedMask());out.writeInt((int)p.requiredMask()); }
+            case HELLO, REPAIR_HELLO -> { var p=payload(m,Hello.class);writeEndpoint(out,p.endpoint());out.writeInt((int)p.supportedMask());out.writeInt((int)p.requiredMask()); }
             case REGISTER_OK -> {
                 var p = payload(m, NeighborList.class);
                 out.writeShort(p.neighbors().size());
@@ -260,17 +260,17 @@ public final class MessageCodec {
         require(m.type() != null, "Tipo ausente");
         uuid(m.requestId());nodeId(m.senderId());uuid(m.senderInstance());
         require(!UNKNOWN_INSTANCE.equals(m.senderInstance()),"Missing sender instance");
-        if(m.type()==MessageType.HELLO || m.type()==MessageType.HELLO_OK)
+        if(m.type()==MessageType.HELLO || m.type()==MessageType.REPAIR_HELLO || m.type()==MessageType.HELLO_OK)
             require(!UNKNOWN_INSTANCE.equals(m.requestId()),"Missing handshake correlation");
         switch (m.type()) {
             case REGISTER -> endpoint(payload(m, EndpointPayload.class).endpoint(), false);
-            case HELLO -> { var p=payload(m,Hello.class);endpoint(p.endpoint(),false);if(p.supportedMask()!=1||p.requiredMask()!=1)throw incompatibleHandshake(m); }
+            case HELLO, REPAIR_HELLO -> { var p=payload(m,Hello.class);endpoint(p.endpoint(),false);if(p.supportedMask()!=3||p.requiredMask()!=3)throw incompatibleHandshake(m); }
             case REGISTER_OK -> {
                 var p = payload(m, NeighborList.class);
                 limit(p.neighbors().size(), MAX_NEIGHBORS, "vizinhos");
                 for (var e : p.neighbors()) endpoint(e, true);
             }
-            case HELLO_OK -> { if(payload(m,HelloOk.class).selectedMask()!=1)throw incompatibleHandshake(m); }
+            case HELLO_OK -> { if(payload(m,HelloOk.class).selectedMask()!=3)throw incompatibleHandshake(m); }
             case NODE_LEAVE -> range(payload(m, Leave.class).reason(), 0, 1, "reason");
             case PROBE_PING, PROBE_PONG -> nonnegative(payload(m, Probe.class).probeId(), "probeId");
             case STREAM_ANNOUNCE -> {

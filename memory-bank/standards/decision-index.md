@@ -28,6 +28,7 @@ Fonte normativa: [ADD](../../add.md).
 - [ADR-024 — ADD mestre e incrementos atómicos rastreáveis](../../add.md#adr-024) — Aceite.
 - [ADR-025 — Sem recuperação automática de falha exclusiva UDP](../../add.md#adr-025) — Aceite.
 - [ADR-026 — Qualidade sem ferramentas ou limiar percentual novos](../../add.md#adr-026) — Aceite.
+- [ADR-035 — Reparação direta na ligação iniciada pelo isolado](../../add.md#adr-035) — Aceite; substituição parcial019/033/034 aprovada, G-EXTRA-ADR satisfeito para IMP-035. [Revisão](../bolts/035-overlay-extra/adr-review.md).
 
 ## Clarificações aprovadas do checkpoint — 03-11-2026
 
@@ -289,3 +290,31 @@ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planead
 ## IMP-034 — fecho integrado
 
 2026-11-11T19:45:51Z: V-033 executado (1065 testes), manual humano Luis/53 checks/saída 0 e Test aceites; revisão técnica final do validador concluída. Versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; Q-C-19 retira arquivos TCP v1, preservando testes operacionais v2 e UDP OTT1. [Fecho](../bolts/034-overlay-extra/closure-walkthrough.md). Sem push. IMP-035 mantém planned e gate próprio; REQ-025 e unidade/fase continuam em curso.
+
+## IMP-035 — revisão ADR para aprovação
+
+Registo de 2026-11-11T23:28:20Z. Design/Q-C-22/política cooperativa e21 caminhos
+aprovados pelo utilizador. ADR-035 formalizada como Proposta no ADD/catálogo,
+com delta parcial019/033/034 e garantias preservadas. Nenhuma ADR aceite anterior
+foi apagada ou alterada de estado. Gate próprio pendente apenas de aprovação
+formal desta revisão antes de Implement; fontes e JAR intactos, sem Java/Maven.
+
+## IMP-035 — Implement para revisão antes de Test
+
+Registo de 2026-11-12T00:04:01Z. Revisão ADR/ADR-035/substituição parcial019/033/034 aprovadas
+explicitamente; ADR-035 Aceite e G-EXTRA-ADR satisfeito para IMP-035.
+[Walkthrough, mapa D01–D20 e evidência incremental](../bolts/035-overlay-extra/implementation-walkthrough.md).
+Reparação20/6 no mesmo TCP v2, candidatos aprendidos, menor originator só pendente,
+ACTIVE preservada e quotas existentes. 78 fixtures operacionais, snapshots/UDP intactos.
+Sem clean verify ou manual humano de mortes reais nesta etapa; V-034 completo,
+regressão, revisão final e integração pendentes. Não marcar DONE nem iniciar Test.
+Sem commits, push ou outro IMP; 005-rotas continua bloqueado.
+
+## IMP-035 — Test aprovado; integração autorizada
+
+Registo 2026-11-12T10:35:23Z. Luis aprovou Test/1113 e o manual humano20261112T102931Z-pr_nynth:
+66 CHECK_PASS/MANUAL_PASS, passed=true/no_processes_pending=true. Execução
+humana anterior preservada; nenhuma repetição. Cinco etapas concluídas.
+[Resumo para revisão humana final](<../bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
+revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
+continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
