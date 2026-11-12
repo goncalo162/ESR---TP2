@@ -1,0 +1,92 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 40 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 15 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.transport.TransportTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.002 s -- in pt.uminho.esr.ott.transport.TransportTest
+[INFO] Running pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+Bootstrap control processing failed; stopping bounded service
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.285 s -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[INFO] Running pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] Tests run: 48, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 14.21 s <<< FAILURE! -- in pt.uminho.esr.ott.app.OttApplicationTest
+[ERROR] pt.uminho.esr.ott.app.OttApplicationTest.m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap -- Time elapsed: 1.529 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <PROBE_PING> but was: <DISCOVERY_QUERY>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at pt.uminho.esr.ott.app.OttApplicationTest.m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap(OttApplicationTest.java:354)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Tests run: 741, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.050 s -- in pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Running pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.049 s -- in pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Tests run: 94, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.115 s -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Running pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[INFO] Tests run: 52, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.122 s -- in pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.271 s -- in pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.385 s -- in pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.508 s -- in pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Tests run: 54, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.633 s -- in pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Running pt.uminho.esr.ott.overlay.CandidateCacheTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in pt.uminho.esr.ott.overlay.CandidateCacheTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] Tests run: 34, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.085 s -- in pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   OttApplicationTest.m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap:354 expected: <PROBE_PING> but was: <DISCOVERY_QUERY>
+[INFO] 
+[ERROR] Tests run: 1176, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  29.539 s
+[INFO] Finished at: 2026-11-12T15:49:46Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -790,3 +790,146 @@ Aprovação explícita registada em2026-11-11T23:39:43Z: ADR-035 Aceite, incluin
 substituição parcial019/033/034 e contratos/âmbito21. G-EXTRA-ADR satisfeito para
 IMP-035. Só Implement autorizado; Test/V-034 completo/regressão/manual humano
 com mortes reais/revisão final/integração pendentes. Sem commits/push/outro IMP.
+
+## Q-C-23 — Composição do monitor na base v2
+
+- Estado atual: opção 1 aprovada explicitamente pelo utilizador; decisão de âmbito resolvida.
+  A evidência e opções seguintes preservam o registo original de Model, em 2026-11-12T14:25:37Z; base 3dedf007.
+- ADD8 autoriza só NetworkMonitor.java, LinkMetrics.java e NetworkMonitorTest.java.
+  Os dois main são placeholders; teste ainda não existe.
+- Evidência: NeighborManager fornece Up/Down/Received/Diagnostic/RepairStarted,
+  send(Session,...) para 7/8, disconnect(Session) e owner emprestado. OverlayNode
+  cria owner/manager privados; APIs de snapshots/descoberta/reparação/lifecycle
+  não permitem instalar o monitor com acesso às mesmas sessões/envio/owner.
+  OttApplication apenas compõe o observer de logs; não há monitor instalado.
+- Impacto: fakes podem provar componente embutível; não demonstram monitor a operar
+  na CLI. Owner paralelo, reflexão ou novo transporte contornariam ADR-017/contratos.
+- Opção 1: autorizar extensão mínima de composição em OverlayNode e respetivos
+  testes, documentando exceção de âmbito e lifecycle antes de implementar.
+- Opção 2: confirmar entrega embutível neste IMP, atribuindo explicitamente onde
+  e quando a integração real será feita; não declarar monitorização da CLI pronta.
+- Nenhuma opção aprovada nesta retoma. Preservar fechos IMP-005/034/035; não alterar
+  ADD/contratos/Java por inferência. Não foi demonstrada ADR aceite inviável;
+  eventual substituição exigirá próxima ADR livre e aprovação, não reutilizar033.
+- [Model](../memory-bank/bolts/005-rotas/ddd-01-domain-model.md), secção8. Parar em Model.
+
+## Q-C-24 — Origem temporal e reset da métrica
+
+- Estado atual: concretizações aprovadas explicitamente pelo utilizador; decisão resolvida.
+  O registo seguinte preserva as propostas de Model de 2026-11-12T14:25:37Z.
+  Aprovações da retoma cancelada não contam. Não altera Java nem contrato aceite.
+- Fontes exigem RTT no mesmo relógio monotónico e reset quando muda instanceId;
+  send() existente só confirma enfileiramento. Não fixam um instante de escrita
+  observável no manager nem a conservação da EWMA numa nova conexão da mesma instância.
+- Proposta nova: guardar início na criação/admissão local da sonda, incluindo filas
+  locais até tratamento do PONG. Não chamar RTT no fio a essa medição. Alternativa:
+  timestamp de escrita capturado na infraestrutura exigiria porta/âmbito adicional
+  e tratamento do PONG que chega antes da conclusão local; não supor flush exposto.
+- Proposta nova: qualquer nova Session/connectionId inicia sem amostra, mesmo com
+  mesma instanceId, evitando vender RTT de outro canal como atual. Alternativa:
+  conservar histórico identificado, limitado e sem custo utilizável antes de nova
+  medição; decidir explicitamente se tal histórico influencia ou não a nova EWMA.
+- Preservar requestId no PONG já é exigido por docs/07 secção4, que manda respostas
+  ecoarem requestId; não necessita nem herda a aprovação cancelada desse detalhe.
+- Recomenda-se validar as duas propostas simples antes de Design; nenhuma está
+  marcada como aprovada. Oráculos M01/M09/M10/M12/M14 tornam as decisões verificáveis.
+- [Model](../memory-bank/bolts/005-rotas/ddd-01-domain-model.md), secções5–8.
+
+### Aprovação de Model/Q-C-23/24 e autorização limitada de Design
+
+Registo em 2026-11-12T14:36:45Z. O utilizador aprovou este Model e Q-C-23 opção1: documentar
+extensão mínima de composição em OverlayNode e testes próprios, com allowlist
+exata apresentada em Design. Usar mesmo owner/manager/sessões, preservar eventos
+alheios e integrar shutdown no budget global; sem transporte ou comando CLI novo.
+Aprovou Q-C-24: início na criação/admissão local incluindo filas até tratar PONG;
+reset completo por nova Session/connectionId mesmo com mesma instanceId; primeira
+sonda elegível no Up e cadência subordinada à conclusão, sem bursts. São decisões
+desta retoma, não aprovação reaproveitada da retoma cancelada nem texto do PDF.
+Aprovação resolve decisões de âmbito/semântica, não valida comportamento ainda
+inexistente. Apenas Design autorizado, parar antes de ADR/Implement.
+Sem Java/staging/commits/push; V-010/regressão/manual antes de aprovar Test, revisão
+Fillmore e integração obrigatórios, sem gates externos adicionais.
+
+
+## IMP-007 — Design aprovado; checkpoint ADR
+
+Registo 2026-11-12T14:48:27Z: utilizador aprovou Design e allowlist exata dos cinco ficheiros.
+Confirmou revisão de Fillmore do Design atual; não constitui revisão final do
+código ainda não implementado. Q-C-23/24 preservadas. Análise ADR preparada para
+aprovação, sem divergência/inviabilidade concreta identificada documentalmente;
+reutiliza decisões aceites, sem ADR nova ou alteração de estado das existentes.
+current_stage=adr; só Model/Design concluídos. Implement/Test não iniciados.
+V-010, regressão atual, manual humano antes de aprovar Test, revisão final do
+código e integração pendentes; sem gates externos adicionais. Sem Java, staging,
+commits, push ou fecho. Relatório: memory-bank/bolts/005-rotas/adr-review.md.
+
+
+## Q-C-25 — Leitura histórica de NODE_LEAVE face à primeira sonda aprovada
+
+- **Estado:** RESOLVIDA após os dois patches autorizados e regressão04 aprovada tecnicamente (1176/0/0/0); aprovação de Implement/Test ainda pendente.
+- **Registo:** 2026-11-12T15:44:13.032355+00:00; evidência real de regressão Implement, não aprovação de Test.
+- **Fontes:** Q-C-24/Design aprovado (elegibilidade da primeira sonda no Up),
+  preservação expressa de testes históricos e allowlist de cinco caminhos.
+- **Evidência:** implement-regression-01.log:1176 testes/2falhas/0erros/0ignorados.
+  Uma falha é do novo teste de identidade/ordem e foi corrigida no seu ficheiro
+  autorizado (indexOf por igualdade encontrava um Up anterior igual; agora localiza
+  a mesma referência). A outra, histórica, é OttApplicationTest.
+  m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap:342:
+  esperava NODE_LEAVE, recebeu PROBE_PING. Os originais/teste histórico estão intactos.
+- **Causa:** após nova sessão HELLO5/6, o monitor envia a primeira sonda aprovada;
+  o peer controlado histórico lê só um frame após quit e presume que será Leave.
+  As mensagens Probe7/8 já são wire v2; esta alteração operacional é precisamente
+  o IMP-007 autorizado. Não é uma falha de encode/identidade/flush demonstrada.
+- **Impacto:** não se pode declarar regressão verde nem Implement aprovado. Não
+  alterar este teste fora da allowlist, desligar monitor, atrasar artificialmente
+  a sonda ou esconder/excluir a falha para obter verde. Test continua por iniciar.
+- **Opção recomendada:** autorizar exclusivamente o patch de teste
+  experiments/construction/005-rotas/q-c-25-proposed.patch, acrescentando o sexto
+  caminho Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java só para
+  esta adaptação. O peer drena no máximo8 frames/2500ms, aceita apenas PING válido
+  v2/identidade da nova sessão/IDs válidos, responde com PONG correlacionado, e
+  continua a exigir NODE_LEAVE payload0 e saída0. As garantias históricas de ERROR,
+  reconexão sem bootstrap, nova instância e shutdown permanecem; nada é apagado.
+- **Alternativa:** manter o teste histórico literalmente intacto, documentando a
+  incompatibilidade e a regressão reprovada; sem fecho ou promoção a Test aprovado.
+- **ADR:** nenhuma decisão aceite se mostrou inviável; não se propõe ADR nova por
+  inferência. O pedido é extensão explícita e localizada de âmbito de teste, não
+  substituição de wire, caps, Q-C-23/24 ou política de sondagem aprovada.
+- **Estado da proposta antes da resposta humana:** NÃO AUTORIZADA/NÃO APLICADA.
+
+
+### Q-C-25 — autorização explícita e aplicação exclusiva
+
+Registo 2026-11-12T15:48:58.371559+00:00. Resposta do utilizador: «Autorizar o patch e repetir a regressão
+em Implement». Patch exato aplicado após git apply --check, sem staging; hashes
+antes/depois registados em q-c-25-application.json. Nova execução focada e regressão
+atuais a executar antes de resolver a questão. Sem outro teste histórico alterado,
+Test, commits ou push; allowlist ampliada só para esta adaptação concreta.
+
+
+### Q-C-25 — resultado real e complemento proposto
+
+Registo 2026-11-12T15:51:21.802346+00:00. Teste focado do
+patch inicial passou (1/0falhas/0erros/0ignorados). Regressão03:1176 testes,
+1falha/0erros/0ignorados; 52monitoring+11integração novos passaram. A única falha
+continua no mesmo peer histórico: esperava PROBE_PING durante a drenagem, recebeu
+DISCOVERY_QUERY. Não se resolveu a questão só pelo sucesso focado.
+
+Complemento concreto q-c-25-discovery-proposed.patch, NÃO APLICADO: mesmo caminho
+e mesmo limite8frames/2500ms. Aceita apenas Query18 com helloRequestId/recipiente/
+instanceId exatos da nova Session e devolve Snapshot19 vazio, requestId correlacionado
+e geração local crescente. Todos os outros frames continuam a exigir Ping7 ou
+Leave4, com identidade v2 correta; mantém Leave payload0 e saída0. Não altera
+transporte, tipos, quotas, produção ou outro teste. Autorização inicial era só
+o primeiro patch; requer aprovação explícita do complemento antes de aplicar.
+
+
+### Q-C-25 — complemento aprovado e resolução com evidência
+
+Registo 2026-11-12T15:55:04.977106+00:00. Utilizador respondeu
+«Autorizar o complemento e repetir a regressão». Aplicado exclusivamente
+q-c-25-discovery-proposed.patch após git apply --check; cadeia de hashes em
+q-c-25-application.json e q-c-25-discovery-application.json. Regressão04 executada:
+1176 testes,0falhas/0erros/0ignorados,exit0. XML/log preservados em experiments/
+construction/005-rotas. Resolve-se a questão de adaptação do peer controlado;
+não se promove Implement/Test, fecho, manual ou revisão final a aprovados.

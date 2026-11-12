@@ -542,3 +542,77 @@ recoveryStatus() é vista limitada, CLI recovery imprime uma linha limitada.
 
 A implementação e fixtures foram exercitadas incrementalmente; ainda faltam
 Test com clean verify, manual humano com mortes reais, revisão final e integração.
+
+
+## IMP-007 — composição e monitorização: decisões aprovadas, Design proposto
+
+Q-C-23 opção 1 e Q-C-24 aprovadas pelo utilizador nesta retoma. O
+[Design](../memory-bank/bolts/005-rotas/ddd-02-technical-design.md) apresenta
+assinaturas, records, política de falhas e oráculos; ainda aguarda aprovação.
+Não existem APIs novas implementadas nesta etapa.
+
+Exceção mínima aos três ficheiros monitoring do ADD: OverlayNode.java e novo
+OverlayNodeMonitoringTest.java, com os caminhos completos na allowlist do Design.
+Composição com o mesmo SerialOwner, NeighborManager e Session; nenhum transporte,
+executor de estado ou comando CLI adicional. O tap recebe Up/Down/Received, trata
+PROBE_PING/PONG e entrega todos os eventos originais uma vez e por ordem ao
+observador existente, incluindo ERROR, Diagnostic e RepairStarted.
+
+RTT monotónico local desde criação/admissão até tratamento do PONG, filas incluídas.
+Reset completo para qualquer nova Session/connectionId mesmo instanceId; Up torna
+a primeira sonda elegível, apenas uma pendência por sessão, sem bursts. PONG
+preserva requestId e probeId; nenhum relógio remoto entra no cálculo. Sem amostra
+não há custo zero confiável; EWMA mantém precisão e custo usa ceil mínimo 1.
+
+Proposta de APIs: LinkMetrics imutável; NetworkMonitor com portas de controlo,
+relógio/scheduler injetáveis, snapshot defensivo e requestClose/awaitTermination
+separando término lógico de físico; OverlayNode.monitoringSnapshot(). Pending
+existe antes de send: um PONG antecipado guarda apenas o instante local e só
+produz amostra após ACCEPTED. Recusa descarta-o; callbacks antigos nunca alteram
+sessões novas. CLOSED/OVERFLOW não contam como perda remota; INVALID_MESSAGE ou
+falha inesperada de admissão são falhas locais observáveis e encerram normalmente
+o nó. Recursos esgotados antes da admissão adiam a sonda sem penalizar o vizinho.
+
+Limites propostos: N=min(63,maxConnections), B=min(eventsCapacity,2*N);
+N entradas/pendências, B tickets físicos de send e um ticket reservado de close,
+N pedidos lógicos de close, um PONG antecipado por pendência, dois trabalhos
+físicos de timer no máximo e um wakeup enfileirado mais um em execução. Recursos
+retirados logicamente continuam contados até término físico. Paragem fecha
+admissão antes do graceful leave e partilha o prazo global original do nó, sem
+renovação nem espera bloqueante no owner. Detalhes e testes no Design.
+
+TCP operacional v2/19 tipos ativos/código 3 rejeitado e caps existentes preservados
+(ADR-033/034/035); nenhuma propriedade de configuração altera wire ou hard caps.
+Decisões da retoma cancelada não são tomadas como aprovação desta retoma.
+
+
+## IMP-007 — Design aprovado; checkpoint ADR
+
+Registo 2026-11-12T14:48:27Z: utilizador aprovou Design e allowlist exata dos cinco ficheiros.
+Confirmou revisão de Fillmore do Design atual; não constitui revisão final do
+código ainda não implementado. Q-C-23/24 preservadas. Análise ADR preparada para
+aprovação, sem divergência/inviabilidade concreta identificada documentalmente;
+reutiliza decisões aceites, sem ADR nova ou alteração de estado das existentes.
+current_stage=adr; só Model/Design concluídos. Implement/Test não iniciados.
+V-010, regressão atual, manual humano antes de aprovar Test, revisão final do
+código e integração pendentes; sem gates externos adicionais. Sem Java, staging,
+commits, push ou fecho. Relatório: memory-bank/bolts/005-rotas/adr-review.md.
+
+
+### IMP-007 — Q-C-25: adaptação autorizada do peer de teste
+
+Registo 2026-11-12T15:48:58.371559+00:00. Utilizador autorizou exclusivamente q-c-25-proposed.patch e
+repetição da regressão em Implement. Sexto caminho: OttApplicationTest.java,
+só o teste m06AndM08ActiveErrorIsObservedAndReconnectNeedsNoBootstrap. Primeira
+PROBE_PING elegível no Up e FIFO existentes preservados; peer controlado responde
+com PONG correlacionado antes de exigir NODE_LEAVE, limitado a8frames/2500ms.
+Continua a exigir identidade v2 da nova Session, payload0 e saída0. Não modifica
+contrato operacional, wire/caps ou decisões Q-C-23/24. Não é nova ADR ou revisão
+final do código. Aplicação/hashes em experiments/construction/005-rotas/q-c-25-application.json.
+
+Complemento q-c-25-discovery-proposed.patch igualmente autorizado e aplicado:
+Query18 exige helloRequestId/recipientId/recipientInstance da Session nova e recebe
+Snapshot19 vazio, requestId correlacionado e geração local crescente. Mantém
+8frames/2500ms e as restantes exigências, sem aceitar mensagens arbitrárias.
+Regressão04:1176/0falhas/0erros/0ignorados,exit0. Q-C-25 resolvida neste âmbito;
+Implement/Test ainda por aprovar.

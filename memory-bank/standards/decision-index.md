@@ -327,3 +327,20 @@ Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
 de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
 005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
 arestas fica para routing/streaming; projeto/intent não concluídos.
+
+
+## IMP-007 — reutilização ADR, sem decisão nova
+
+Registo 2026-11-12T14:48:27Z. Design aprovado; Fillmore reviu apenas o Design, não código final.
+[Análise para aprovação](../bolts/005-rotas/adr-review.md): ADR-004/014–022/024–026
+com transversais001/002/007/012/021 e033 residual/034/035, sem substituição ou nova
+ADR. Q-C-23/24 preservadas; TCPv2/19tipos/3rejeitado. Catálogo/estados das decisões
+existentes inalterados. Checkpoint ADR aberto; Implement não autorizado.
+
+
+## IMP-007 — reutilização aprovada; Implement para revisão
+
+ADR/reutilização aprovadas pelo utilizador; sem ADR nova. Comportamentos e testes
+executados, regressão04:1176/0/0/0. Q-C-25 limita-se aos dois patches de peer de
+teste aprovados, sem alteração arquitetural ou estado das decisões aceites.
+Implement para aprovação; Test/fecho pendentes. Revisão Fillmore continua só Design.

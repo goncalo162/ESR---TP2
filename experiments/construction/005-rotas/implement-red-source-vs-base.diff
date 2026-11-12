@@ -1,0 +1,349 @@
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java
+@@ -0,0 +1,22 @@
++package pt.uminho.esr.ott.monitoring;
++
++import pt.uminho.esr.ott.overlay.Neighbor;
++import java.util.Objects;
++import java.util.OptionalDouble;
++import java.util.OptionalLong;
++
++/** Immutable local measurement contract; never encoded on the control wire. */
++public record LinkMetrics(Neighbor.Session session, State state, OptionalDouble ewmaMicros,
++        OptionalLong costMicros, long sampleCount, boolean sampleCountSaturated,
++        OptionalLong lastSampleAtNanos, int missedCount) {
++    public enum State { UNMEASURED, MEASURED, SUSPECT }
++    public LinkMetrics {
++        Objects.requireNonNull(session); Objects.requireNonNull(state);
++        Objects.requireNonNull(ewmaMicros); Objects.requireNonNull(costMicros);
++        Objects.requireNonNull(lastSampleAtNanos);
++        // Cross-field invariants are deliberately left for the behaviour checkpoint.
++    }
++    public OptionalLong sampleAgeNanos(long now) {
++        throw new UnsupportedOperationException("IMP-007: sample age not implemented");
++    }
++}
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java
+@@ -0,0 +1,90 @@
++package pt.uminho.esr.ott.monitoring;
++
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.overlay.Neighbor;
++import pt.uminho.esr.ott.overlay.NeighborManager;
++import pt.uminho.esr.ott.protocol.ControlMessage;
++import pt.uminho.esr.ott.transport.Connection;
++import java.time.Duration;
++import java.util.Map;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.UUID;
++import java.util.concurrent.CompletionStage;
++import java.util.function.LongSupplier;
++
++/** IMP-007 contract scaffold. No worker, transport or monitoring behaviour yet. */
++public final class NetworkMonitor implements AutoCloseable {
++    public interface ControlPort {
++        CompletionStage<Connection.SendResult> send(Neighbor.Session session, ControlMessage message);
++        CompletionStage<Boolean> disconnect(Neighbor.Session session);
++    }
++    @FunctionalInterface public interface Observer { void onEvent(Event event); }
++    @FunctionalInterface public interface Factory {
++        NetworkMonitor create(NodeConfiguration config, UUID instanceId,
++                NeighborManager.SerialOwner owner, ControlPort control, Observer observer);
++    }
++    public interface Ticket { void cancel(); }
++    public interface Scheduler {
++        Ticket schedule(Runnable task, long delayNanos);
++        void requestClose();
++        boolean awaitTermination(Duration budget);
++    }
++    public enum Phase { NEW, RUNNING, CLOSING, STOPPED }
++    public enum Reason {
++        NONE, TIMEOUT, DOWN, ADMISSION_CLOSED, OUTPUT_OVERFLOW, INVALID_LOCAL_MESSAGE,
++        ADMISSION_FAILURE, LOCAL_CAPACITY, ECHO_BACKPRESSURE, SCHEDULER_REJECTED,
++        OWNER_REJECTED, CONSUMER_FAILURE, CLOCK_ERROR, PROBE_ID_EXHAUSTED, STOPPED
++    }
++    public sealed interface Event permits Updated, Invalidated, LocalFailure { }
++    public record Updated(LinkMetrics metrics) implements Event {
++        public Updated { Objects.requireNonNull(metrics); }
++    }
++    public record Invalidated(Neighbor.Session session, Reason reason) implements Event {
++        public Invalidated { Objects.requireNonNull(session); Objects.requireNonNull(reason); }
++    }
++    public record LocalFailure(Optional<Neighbor.Session> session, Reason reason, boolean fatal) implements Event {
++        public LocalFailure { Objects.requireNonNull(session); Objects.requireNonNull(reason); }
++    }
++    public record Diagnostics(Phase phase, int sessions, int pending, int sendTickets,
++            int closeTickets, int timerTickets, int queuedCloses, Reason lastReason,
++            Optional<Neighbor.Session> lastSession, long localFailures, boolean countersSaturated) {
++        public Diagnostics {
++            Objects.requireNonNull(phase); Objects.requireNonNull(lastReason);
++            Objects.requireNonNull(lastSession);
++        }
++    }
++    public record Snapshot(long publishedAtNanos, Map<String, LinkMetrics> links, Diagnostics diagnostics) {
++        public Snapshot {
++            Objects.requireNonNull(links); Objects.requireNonNull(diagnostics);
++            if (links.size() > 63) throw new IllegalArgumentException("At most 63 monitored sessions");
++            links = Map.copyOf(links);
++        }
++    }
++    public NetworkMonitor(NodeConfiguration config, UUID instanceId, NeighborManager.SerialOwner owner,
++            ControlPort control, Observer observer) {
++        Objects.requireNonNull(config); Objects.requireNonNull(instanceId);
++        Objects.requireNonNull(owner); Objects.requireNonNull(control); Objects.requireNonNull(observer);
++    }
++    NetworkMonitor(NodeConfiguration config, UUID instanceId, NeighborManager.SerialOwner owner,
++            ControlPort control, Observer observer, LongSupplier clock, Scheduler scheduler, LongSupplier probeIds) {
++        this(config, instanceId, owner, control, observer);
++        Objects.requireNonNull(clock); Objects.requireNonNull(scheduler); Objects.requireNonNull(probeIds);
++    }
++    /** Behaviour intentionally absent while the first red tests establish the contract. */
++    public void start() { }
++    public void onEvent(NeighborManager.Event event) { Objects.requireNonNull(event); }
++    public Snapshot snapshot() {
++        return new Snapshot(0, Map.of(), new Diagnostics(Phase.NEW, 0, 0, 0, 0, 0, 0,
++                Reason.NONE, Optional.empty(), 0, false));
++    }
++    public CompletionStage<Void> requestClose() {
++        throw new UnsupportedOperationException("IMP-007: logical cleanup not implemented");
++    }
++    public boolean awaitTermination(Duration budget) {
++        throw new UnsupportedOperationException("IMP-007: physical cleanup not implemented");
++    }
++    @Override public void close() {
++        throw new UnsupportedOperationException("IMP-007: bounded shutdown not implemented");
++    }
++}
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -1,6 +1,7 @@
+ package pt.uminho.esr.ott.overlay;
+ 
+ import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.monitoring.NetworkMonitor;
+ import java.time.Duration;
+ import java.util.Map;
+ import java.util.Objects;
+@@ -27,6 +28,15 @@
+         instance = Objects.requireNonNull(instanceId); this.observer = Objects.requireNonNull(observer);
+         // Reuse the existing offline validation before creating even the serial thread.
+         new NeighborManager(configuration, instance, observer);
++    }
++    /** Composition seam only; wiring is reserved for the next implementation checkpoint. */
++    OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
++            NetworkMonitor.Factory monitorFactory) {
++        this(configuration, instanceId, observer);
++        Objects.requireNonNull(monitorFactory);
++    }
++    public NetworkMonitor.Snapshot monitoringSnapshot() {
++        throw new UnsupportedOperationException("IMP-007: monitoring composition not implemented");
+     }
+     public synchronized CompletionStage<Void> start() {
+         if (closed || launched) return started.minimalCompletionStage();
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/monitoring/NetworkMonitorTest.java
+@@ -0,0 +1,173 @@
++package pt.uminho.esr.ott.monitoring;
++
++import org.junit.jupiter.api.Test;
++import pt.uminho.esr.ott.config.NodeConfiguration;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.Connection;
++import java.nio.file.Path;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import static org.junit.jupiter.api.Assertions.*;
++
++/** First contract tests; fake time and ports, no sleeps, threads or sockets. */
++class NetworkMonitorTest {
++    static final UUID LOCAL = UUID.fromString("00000000-0000-0000-0000-000000000001");
++    static final UUID REMOTE = UUID.fromString("00000000-0000-0000-0000-000000000002");
++    static NodeConfiguration config() {
++        return new NodeConfiguration(Path.of("monitor-fixture.properties"), "A", NodeRole.RELAY,
++                "127.0.0.1", "127.0.0.1", 19001, 19101,
++                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", 19000)),
++                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), List.of());
++    }
++    static Neighbor.Session session(long connection) {
++        return new Neighbor.Session("B", REMOTE, new UUID(0, connection),
++                new ControlMessage.Endpoint("B", REMOTE, "127.0.0.1", 19002, 19102, NodeRole.RELAY));
++    }
++    static LinkMetrics measured(long at) {
++        return new LinkMetrics(session(10), LinkMetrics.State.MEASURED,
++                OptionalDouble.of(1200), OptionalLong.of(1200), 2, false, OptionalLong.of(at), 0);
++    }
++    static final class Owner implements NeighborManager.SerialOwner {
++        final ArrayDeque<Runnable> queue = new ArrayDeque<>();
++        final List<Runnable> cleanup = new ArrayList<>();
++        boolean stopped;
++        public int capacity() { return 4096; }
++        public boolean isOwnerThread() { return true; }
++        public boolean offer(Runnable r) { if (stopped || queue.size() == capacity()) return false; queue.add(r); return true; }
++        public NeighborManager.Registration onStop(Runnable r) { cleanup.add(r); return () -> cleanup.remove(r); }
++        public void fail(Throwable error) { requestClose(); }
++        public void requestClose() { stopped = true; List.copyOf(cleanup).forEach(Runnable::run); queue.clear(); }
++        public boolean awaitTermination(Duration budget) { return stopped; }
++        public void close() { requestClose(); }
++        void drain() { int guard = 10000; while (!queue.isEmpty()) { assertTrue(--guard > 0, "No owner spin"); queue.remove().run(); } }
++    }
++    static final class Timers implements NetworkMonitor.Scheduler {
++        static final class Job implements NetworkMonitor.Ticket {
++            final Runnable task; final long due; boolean canceled;
++            Job(Runnable task, long due) { this.task = task; this.due = due; }
++            public void cancel() { canceled = true; }
++        }
++        final List<Job> jobs = new ArrayList<>(); long now; boolean stopped;
++        public NetworkMonitor.Ticket schedule(Runnable task, long delay) {
++            assertTrue(delay >= 0); if (stopped) throw new RejectedExecutionException();
++            Job j = new Job(task, now + delay); jobs.add(j); return j;
++        }
++        public void requestClose() { stopped = true; jobs.clear(); }
++        public boolean awaitTermination(Duration budget) { return stopped; }
++        void advance(long nanos) {
++            now += nanos;
++            var due = jobs.stream().filter(j -> j.due <= now).toList();
++            jobs.removeAll(due); due.stream().filter(j -> !j.canceled).forEach(j -> j.task.run());
++        }
++    }
++    static final class Port implements NetworkMonitor.ControlPort {
++        record Sent(Neighbor.Session session, ControlMessage message, CompletableFuture<Connection.SendResult> admission) { }
++        final List<Sent> sent = new ArrayList<>(); final List<Neighbor.Session> closed = new ArrayList<>();
++        boolean hold;
++        public CompletionStage<Connection.SendResult> send(Neighbor.Session session, ControlMessage message) {
++            var future = new CompletableFuture<Connection.SendResult>(); sent.add(new Sent(session, message, future));
++            if (!hold) future.complete(Connection.SendResult.ACCEPTED); return future;
++        }
++        public CompletionStage<Boolean> disconnect(Neighbor.Session session) { closed.add(session); return CompletableFuture.completedStage(true); }
++    }
++    static final class Fixture {
++        final Owner owner = new Owner(); final Timers timers = new Timers(); final Port port = new Port();
++        final List<NetworkMonitor.Event> events = new ArrayList<>(); long nextId;
++        final NetworkMonitor monitor = new NetworkMonitor(config(), LOCAL, owner, port, events::add,
++                () -> timers.now, timers, () -> nextId++);
++        void up(Neighbor.Session s) { monitor.start(); monitor.onEvent(new NeighborManager.NeighborUp(s)); owner.drain(); timers.advance(0); owner.drain(); }
++        Port.Sent ping() { assertFalse(port.sent.isEmpty(), "Up must make the first probe eligible"); return port.sent.getLast(); }
++        void pong(Port.Sent ping) {
++            monitor.onEvent(new NeighborManager.Received(ping.session(), new ControlMessage(MessageType.PROBE_PONG,
++                    ping.message().requestId(), "B", REMOTE, ping.message().payload()))); owner.drain();
++        }
++        void advance(long nanos) { timers.advance(nanos); owner.drain(); }
++        LinkMetrics metrics() { var m = monitor.snapshot().links().get("B"); assertNotNull(m, "Current session must be published"); return m; }
++    }
++    @Test void d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp() {
++        assertEquals(OptionalLong.of(250), assertDoesNotThrow(() -> measured(-500).sampleAgeNanos(-250)));
++    }
++    @Test void d16RejectsAFalseReliableZeroCost() {
++        assertThrows(IllegalArgumentException.class, () -> new LinkMetrics(session(10), LinkMetrics.State.MEASURED,
++                OptionalDouble.of(0), OptionalLong.of(0), 1, false, OptionalLong.of(0), 0));
++    }
++    @Test void d16SnapshotMakesADefensiveCopy() {
++        var f = new Fixture(); var map = new HashMap<String, LinkMetrics>(); map.put("B", measured(0));
++        var snapshot = new NetworkMonitor.Snapshot(0, map, f.monitor.snapshot().diagnostics()); map.clear();
++        assertEquals(1, snapshot.links().size()); assertThrows(UnsupportedOperationException.class, snapshot.links()::clear);
++    }
++    @Test void d04UpStartsOneV2ProbeAndNoReliableZero() {
++        var f = new Fixture(); f.up(session(10)); var ping = f.ping();
++        assertEquals(2, ping.message().version()); assertEquals(MessageType.PROBE_PING, ping.message().type());
++        assertEquals(LOCAL, ping.message().senderInstance()); assertEquals(1, f.port.sent.size());
++        assertTrue(f.metrics().costMicros().isEmpty());
++    }
++    @Test void d02FirstRttAndEwmaUseIndependentExpectedValues() {
++        var f = new Fixture(); f.up(session(10)); var first = f.ping(); f.advance(1_000_000); f.pong(first);
++        assertEquals(1000.0, f.metrics().ewmaMicros().orElseThrow());
++        f.advance(999_000_000); var second = f.ping(); assertNotEquals(first.message().requestId(), second.message().requestId());
++        f.advance(2_000_000); f.pong(second);
++        assertEquals(1200.0, f.metrics().ewmaMicros().orElseThrow(), 0.000001);
++        assertEquals(1200L, f.metrics().costMicros().orElseThrow());
++    }
++    @Test void d05EarlyPongWaitsForAdmissionAndKeepsCapturedTime() {
++        var f = new Fixture(); f.port.hold = true; f.up(session(10)); var ping = f.ping();
++        f.advance(1_200_000); f.pong(ping); assertTrue(f.metrics().ewmaMicros().isEmpty());
++        f.advance(50_000_000); ping.admission().complete(Connection.SendResult.ACCEPTED); f.owner.drain();
++        assertEquals(1200.0, f.metrics().ewmaMicros().orElseThrow(), .000001);
++    }
++    @Test void d06RefusedAdmissionDiscardsEarlyPongWithoutRemoteLoss() {
++        var f = new Fixture(); f.port.hold = true; f.up(session(10)); var ping = f.ping();
++        f.advance(1_000_000); f.pong(ping); ping.admission().complete(Connection.SendResult.CLOSED); f.owner.drain();
++        assertTrue(f.monitor.snapshot().links().isEmpty()); assertEquals(List.of(session(10)), f.port.closed);
++        assertTrue(f.events.stream().noneMatch(e -> e instanceof NetworkMonitor.Invalidated i && i.reason() == NetworkMonitor.Reason.TIMEOUT));
++    }
++    @Test void d07ExactDeadlineCannotBeReclassifiedAsGoodPong() {
++        var f = new Fixture(); f.up(session(10)); var ping = f.ping();
++        f.advance(1_000_000_000); f.pong(ping);
++        assertEquals(1, f.metrics().missedCount()); assertTrue(f.metrics().ewmaMicros().isEmpty());
++    }
++    @Test void d03NewConnectionSameInstanceResetsAllMetrics() {
++        var f = new Fixture(); f.up(session(10)); var old = f.ping(); f.advance(1_000_000); f.pong(old);
++        f.up(session(11)); f.pong(old); var m = f.metrics();
++        assertEquals(session(11), m.session()); assertEquals(0, m.sampleCount());
++        assertEquals(0, m.missedCount()); assertTrue(m.costMicros().isEmpty());
++    }
++    @Test void d08WrongRequestCannotCompleteCurrentProbe() {
++        var f = new Fixture(); f.up(session(10)); var ping = f.ping(); f.advance(1_000_000);
++        f.monitor.onEvent(new NeighborManager.Received(session(10), new ControlMessage(MessageType.PROBE_PONG,
++                new UUID(8, 8), "B", REMOTE, ping.message().payload())));
++        assertTrue(f.metrics().ewmaMicros().isEmpty()); f.pong(ping); assertEquals(1, f.metrics().sampleCount());
++    }
++    @Test void d09ThreeAdmittedTimeoutsCloseOnlyExpectedSession() {
++        var f = new Fixture(); f.up(session(10)); f.ping();
++        f.advance(1_000_000_000); assertTrue(f.port.closed.isEmpty());
++        f.advance(1_000_000_000); assertTrue(f.port.closed.isEmpty());
++        f.advance(1_000_000_000); assertEquals(List.of(session(10)), f.port.closed);
++        assertTrue(f.monitor.snapshot().links().isEmpty());
++    }
++    @Test void d09DownInvalidatesImmediatelyWithoutThreeTimeouts() {
++        var f = new Fixture(); f.up(session(10));
++        f.monitor.onEvent(new NeighborManager.NeighborDown(session(10), NeighborManager.Reason.TRANSPORT)); f.owner.drain();
++        assertTrue(f.monitor.snapshot().links().isEmpty());
++        assertTrue(f.events.stream().anyMatch(e -> e instanceof NetworkMonitor.Invalidated i && i.session().equals(session(10))));
++    }
++    @Test void d10EchoPreservesRequestAndProbeIds() {
++        var f = new Fixture(); f.up(session(10)); f.ping(); var request = new UUID(7, 9);
++        f.monitor.onEvent(new NeighborManager.Received(session(10), new ControlMessage(MessageType.PROBE_PING,
++                request, "B", REMOTE, new ControlMessage.Probe(42)))); f.owner.drain(); var echo = f.port.sent.getLast().message();
++        assertEquals(MessageType.PROBE_PONG, echo.type()); assertEquals(request, echo.requestId());
++        assertEquals(new ControlMessage.Probe(42), echo.payload()); assertEquals(LOCAL, echo.senderInstance());
++    }
++    @Test void d15LogicalCleanupDoesNotClaimPhysicalCompletionWithHeldAdmission() {
++        var f = new Fixture(); f.port.hold = true; f.up(session(10)); var ping = f.ping();
++        var closing = assertDoesNotThrow(f.monitor::requestClose); f.owner.drain();
++        assertTrue(closing.toCompletableFuture().isDone());
++        assertFalse(assertDoesNotThrow(() -> f.monitor.awaitTermination(Duration.ZERO)));
++        ping.admission().complete(Connection.SendResult.CLOSED); f.owner.drain();
++        assertTrue(assertDoesNotThrow(() -> f.monitor.awaitTermination(Duration.ZERO)));
++        assertTrue(f.monitor.snapshot().links().isEmpty());
++    }
++}
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java
+@@ -0,0 +1,26 @@
++package pt.uminho.esr.ott.overlay;
++
++import org.junit.jupiter.api.Test;
++import pt.uminho.esr.ott.monitoring.NetworkMonitor;
++import java.util.UUID;
++import static org.junit.jupiter.api.Assertions.*;
++
++/** First composition contracts. Real TCP/lifecycle integration remains pending. */
++class OverlayNodeMonitoringTest {
++    @Test void snapshotBeforeStartIsEmptyAndDoesNotConstructTheMonitor() {
++        int[] calls = {0};
++        try (var node = new OverlayNode(NeighborManagerTest.config("A", 19001), new UUID(0, 1), e -> {},
++                (c, id, owner, control, observer) -> {
++                    calls[0]++; return new NetworkMonitor(c, id, owner, control, observer);
++                })) {
++            var snapshot = assertDoesNotThrow(node::monitoringSnapshot);
++            assertTrue(snapshot.links().isEmpty()); assertEquals(0, calls[0]);
++        }
++    }
++    @Test void snapshotAfterCloseBeforeStartRemainsReadableAndEmpty() {
++        var node = new OverlayNode(NeighborManagerTest.config("A", 19001), new UUID(0, 1), e -> {});
++        node.close();
++        var snapshot = assertDoesNotThrow(node::monitoringSnapshot);
++        assertTrue(snapshot.links().isEmpty());
++    }
++}

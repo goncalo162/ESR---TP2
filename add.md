@@ -991,6 +991,9 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Fase/unidade/tamanho:** PHASE-03 / 003-rotas / M.
 - **Bolt/origem:** [005-rotas](memory-bank/bolts/005-rotas/bolt.md); TASK-010.
 - **Ficheiros:** `monitoring/NetworkMonitor.java`, `monitoring/LinkMetrics.java`, `monitoring/NetworkMonitorTest.java`.
+- **Exceção de composição aprovada (Q-C-23):** acrescentar exclusivamente `overlay/OverlayNode.java` e `overlay/OverlayNodeMonitoringTest.java` aos três caminhos acima. Mesmo owner, manager e sessões existentes; preservar todos os eventos alheios e participar no budget global de shutdown. Sem transporte, executor de estado ou comando CLI novo; fechos anteriores preservados. [Allowlist exata e Design proposto](memory-bank/bolts/005-rotas/ddd-02-technical-design.md).
+- **Decisão aprovada Q-C-24:** relógio monotónico local desde criação/admissão da sonda até tratamento do PONG, incluindo filas; reset completo em qualquer nova Session/connectionId, mesmo instanceId; primeira sonda elegível no Up e cadência subordinada à conclusão da pendência, sem bursts. Concretizações aprovadas pelo utilizador, não atribuídas ao enunciado.
+- **Extensão de teste aprovada Q-C-25:** acrescentar `Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java` exclusivamente para os patches `experiments/construction/005-rotas/q-c-25-proposed.patch` e `q-c-25-discovery-proposed.patch`, ambos autorizados explicitamente pelo utilizador. O peer histórico drena/responde apenas a sondas e queries de descoberta v2 válidas (até8 frames/2500ms), preservando NODE_LEAVE/payload0/exit0 e os oráculos de ERROR/reconexão. Não alterar outros testes históricos nem o comportamento de monitorização para acomodar uma leitura antiga.
 - **Dependências:** IMP-006 (004-overlay), IMP-035 (035-overlay-extra).
 - **ADR:** ADR-004, ADR-016, ADR-022, ADR-024, ADR-025.
 - **REQ/NFR/CON/INT:** CON-008, INT-001, INT-002, REQ-003, REQ-008, REQ-014, REQ-021.
@@ -1747,3 +1750,16 @@ preservadas, sem código ou outro IMP antes de aprovação.
 ### Fecho IMP-034 e limpeza Q-C-19 — 2026-11-11T19:45:51Z
 
 Test aceite após manual humano Luis (53 checks/saída 0), revisão técnica final do agente validador concluída e versão f650be02f2af10b95328f5b50c3d6941e2e75c15 integrada em main local antes do fecho. TASK-033/bolt/história DONE/complete; unidade e extensão EXTRA-01 permanecem em curso para IMP-035, ainda planned. A instrução explícita Q-C-19 dispensa os arquivos TCP v1; conserva testes negativos de versão e UDP OTT1. Sem push.
+
+
+## IMP-007 — Design aprovado; checkpoint ADR
+
+Registo 2026-11-12T14:48:27Z: utilizador aprovou Design e allowlist exata dos cinco ficheiros.
+Confirmou revisão de Fillmore do Design atual; não constitui revisão final do
+código ainda não implementado. Q-C-23/24 preservadas. Análise ADR preparada para
+aprovação, sem divergência/inviabilidade concreta identificada documentalmente;
+reutiliza decisões aceites, sem ADR nova ou alteração de estado das existentes.
+current_stage=adr; só Model/Design concluídos. Implement/Test não iniciados.
+V-010, regressão atual, manual humano antes de aprovar Test, revisão final do
+código e integração pendentes; sem gates externos adicionais. Sem Java, staging,
+commits, push ou fecho. Relatório: memory-bank/bolts/005-rotas/adr-review.md.

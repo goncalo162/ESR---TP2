@@ -1,0 +1,43 @@
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java
+@@ -339,10 +339,11 @@
+                 child.await(t -> t.lines().filter(l -> l.contains("NeighborUp[")).count() == 2);
+                 assertTrue(child.text().contains(newRemote.toString())); child.send("quit");
+                 // IMP-007 sends the first probe as soon as this Session is admitted.
+-                // Drain only valid probes, answering on the same Session; keep a finite budget.
++                // Drain only valid probes/discovery queries on this Session within a finite budget.
+                 pt.uminho.esr.ott.protocol.ControlMessage leave = null;
+                 long drainStarted = System.nanoTime();
+                 long drainBudget = TimeUnit.MILLISECONDS.toNanos(2500);
++                long discoveryGeneration = 0;
+                 for (int frames = 0; frames < 8; frames++) {
+                     long remaining = drainBudget - (System.nanoTime() - drainStarted);
+                     assertTrue(remaining > 0, "NODE_LEAVE must arrive within the original read budget");
+@@ -351,12 +352,22 @@
+                     assertEquals(2, frame.version()); assertEquals("N1", frame.senderId());
+                     assertEquals(hello.senderInstance(), frame.senderInstance());
+                     if (frame.type() == pt.uminho.esr.ott.protocol.MessageType.NODE_LEAVE) { leave = frame; break; }
+-                    assertEquals(pt.uminho.esr.ott.protocol.MessageType.PROBE_PING, frame.type());
+                     assertNotEquals(new UUID(0, 0), frame.requestId());
+-                    var probe = assertInstanceOf(pt.uminho.esr.ott.protocol.ControlMessage.Probe.class, frame.payload());
+-                    assertTrue(probe.probeId() >= 0);
+-                    pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
+-                        pt.uminho.esr.ott.protocol.MessageType.PROBE_PONG, frame.requestId(), "N2", newRemote, probe), second.getOutputStream());
++                    if (frame.type() == pt.uminho.esr.ott.protocol.MessageType.DISCOVERY_QUERY) {
++                        var query = assertInstanceOf(pt.uminho.esr.ott.protocol.DiscoveryMessage.Query.class, frame.payload());
++                        assertEquals(hello.requestId(), query.helloRequestId());
++                        assertEquals("N2", query.recipientId()); assertEquals(newRemote, query.recipientInstance());
++                        pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
++                            pt.uminho.esr.ott.protocol.MessageType.DISCOVERY_SNAPSHOT, frame.requestId(), "N2", newRemote,
++                            new pt.uminho.esr.ott.protocol.DiscoveryMessage.Snapshot(query.helloRequestId(), "N1",
++                                hello.senderInstance(), ++discoveryGeneration, List.of())), second.getOutputStream());
++                    } else {
++                        assertEquals(pt.uminho.esr.ott.protocol.MessageType.PROBE_PING, frame.type());
++                        var probe = assertInstanceOf(pt.uminho.esr.ott.protocol.ControlMessage.Probe.class, frame.payload());
++                        assertTrue(probe.probeId() >= 0);
++                        pt.uminho.esr.ott.protocol.MessageCodec.write(new pt.uminho.esr.ott.protocol.ControlMessage(
++                            pt.uminho.esr.ott.protocol.MessageType.PROBE_PONG, frame.requestId(), "N2", newRemote, probe), second.getOutputStream());
++                    }
+                     second.getOutputStream().flush();
+                 }
+                 assertNotNull(leave, "A bounded probe drain must still end with NODE_LEAVE");

@@ -1,0 +1,16 @@
+CHECK_PASS ports_available_before
+CHECK_PASS ready_BOOT-01
+CHECK_PASS ready_R1-01
+CHECK_PASS ready_R2-01
+CHECK_PASS probe_ping_pong_v2_both_directions
+ACTION SIGSTOP node=R2 owned_pid=5664
+CHECK_PASS one_second_without_eof_does_not_kill_node
+CHECK_PASS timeout_detected_while_peer_process_alive
+ACTION SIGCONT node=R2
+CHECK_PASS same_instance_new_connection
+CHECK_PASS java_exit_zero_BOOT-01
+CHECK_PASS shutdown_record_BOOT-01
+CHECK_PASS intentional_peer_death_recorded
+CHECK_PASS survivor_alive_after_eof_without_bootstrap
+TECHNICAL_REHEARSAL_FAIL AssertionError('Deadline: READY R2-02')
+CLEANUP_COMPLETE

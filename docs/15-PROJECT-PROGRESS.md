@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03–07 e TASK-010–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: Test de TASK-010 aprovado; revisão final/integração pendentes; PHASE-04–07 e TASK-011–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Próximo:005-rotas/IMP-007, planned, sem início.
+**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Atual:005-rotas/IMP-007, Test1176/manual02/revisão final Fillmore aprovados; integração pendente; Q-C-25 resolvida.
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -82,7 +82,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
-| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | TODO | PHASE-02 DONE |
+| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | IN PROGRESS | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
 | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
@@ -104,7 +104,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-009](tasks/PHASE-02/TASK-009.md) | Preparar evidência do primeiro marco intermédio | TASK-008 | DONE | V-009 técnico aceite em Test, dispensa Q-C-15, revisão final confirmada e integração em main. [Evidência](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
 | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
 | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
-| [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | TODO | V-010: NÃO EXECUTADO |
+| [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | IN PROGRESS | Test/manual/revisão final Fillmore aprovados; integração pendente |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
@@ -813,3 +813,130 @@ Bolt/história/unidade002-overlay complete; TASK-034 e PHASE-02 DONE no âmbito
 de controlo incluindo EXTRA-01. Oito bolts complete no projeto;27 planned.
 005-rotas desimpedido e planned, sem início. Continuidade de vídeo nas novas
 arestas fica para routing/streaming; projeto/intent não concluídos.
+
+## IMP-007 — Model v2 preparado para aprovação
+
+Registo em 2026-11-12T14:27:02Z. Base 3dedf007f52f43f53eaf254bef7c25e35f986e5a, main,
+entrada limpa. Dependências IMP-006/004-overlay e IMP-035/035-overlay-extra
+complete; unidade002-overlay complete. Apenas Model iniciado; current_stage=model,
+stages_completed=[], completed=null. Modelo preparado com TCP v2/19 tipos/3 rejeitado,
+identidades, sondas, RTT/EWMA, falhas, limites, ownership e shutdown. Q-C-23/24
+registam composição e concretizações pendentes; nenhuma aprovação da retoma
+cancelada foi reutilizada. V-010/regressão/manual/revisão Fillmore/integração
+continuam futuros, sem gates externos adicionais. Sem Java, serviços, Maven,
+staging, commits/push ou avanço Design/ADR/Implement/Test.
+
+
+## IMP-007 — Model aprovado; Design para aprovação
+
+Model e Q-C-23 opção 1/Q-C-24 aprovados explicitamente pelo utilizador nesta
+retoma. current_stage=design; só Model concluído; Design/ADR/Implement/Test não
+aprovados. Design preparado com allowlist futura de cinco ficheiros, APIs,
+limites físicos, admissão/PONG, falhas locais, composição e budget global.
+Decisões registadas em ADD e contratos; nenhum Java alterado ou teste executado.
+V-010, regressão atual, manual humano antes de aprovar Test, revisão de Fillmore e
+integração continuam pendentes. Sem gates externos adicionais. Parar antes de
+ADR/Implement; sem staging, commits, push ou fecho. Os registos Model acima são
+históricos e não substituem este estado atual.
+
+
+## IMP-007 — Design aprovado; checkpoint ADR
+
+Registo 2026-11-12T14:48:27Z: utilizador aprovou Design e allowlist exata dos cinco ficheiros.
+Confirmou revisão de Fillmore do Design atual; não constitui revisão final do
+código ainda não implementado. Q-C-23/24 preservadas. Análise ADR preparada para
+aprovação, sem divergência/inviabilidade concreta identificada documentalmente;
+reutiliza decisões aceites, sem ADR nova ou alteração de estado das existentes.
+current_stage=adr; só Model/Design concluídos. Implement/Test não iniciados.
+V-010, regressão atual, manual humano antes de aprovar Test, revisão final do
+código e integração pendentes; sem gates externos adicionais. Sem Java, staging,
+commits, push ou fecho. Relatório: memory-bank/bolts/005-rotas/adr-review.md.
+
+
+## IMP-007 — ADR aprovada; primeiro checkpoint Implement (vermelho)
+
+Registo 2026-11-12T14:56:34Z: ADR/reutilização aprovadas pelo utilizador; apenas interfaces/tipos
+e primeiros testes autorizados nos cinco ficheiros. current_stage=implement;
+Model/Design/ADR concluídos, Implement/Test por aprovar. 16 testes selecionados:
+1 passou,15 falharam por asserção,0 erros/ignorados. Não é V-010 concluído nem
+regressão. Dependências entre pré-condições e asserções explicadas no walkthrough.
+Revisão de Fillmore continua limitada ao Design. Sem comportamentos de sondagem,
+composição ou cleanup implementados. Parar antes desses comportamentos.
+V-010, regressão atual, manual humano, revisão final do código e integração
+pendentes; sem gates externos adicionais. Sem staging, commits, push ou Test.
+
+
+## IMP-007 — comportamentos Implement para aprovação
+
+Registo 2026-11-12T15:56:53.776762+00:00. Comportamentos do Design implementados nos cinco caminhos aprovados,
+mais exceção de teste Q-C-25 exclusivamente pelos dois patches autorizados.
+Q-C-23/24 preservadas; Q-C-25 resolvida após regressão04:1176 testes,
+0falhas/0erros/0ignorados,exit0 (52monitoring+11integração própria). Testes reais TCP,
+reparação20 e JVM da CLI com término comprovado; não substituem manual humano.
+current_stage=implement; só Model/Design/ADR concluídos. Implement para aprovação,
+Test não iniciado, história não implementada/bolt não complete. M22/clean verify,
+manual humano, revisão final do código e integração pendentes. Fillmore confirmou
+revisão de Design, não de código final. Target separado; sem staging/commits/push,
+fecho ou outro IMP; sem gates externos adicionais. Ver implementation-walkthrough
+no bolt e experiments/construction/005-rotas/implement-results.json.
+
+
+## IMP-007 — Implement aprovado; Test técnico executado, manual humano pendente
+
+Registo 2026-11-12T16:16:45Z. Utilizador aprovou Implement e autorizou Test. Novo clean verify:
+1176 testes,0falhas/0erros/0ignorados,exit0;52monitoring+11integração própria.
+JAR novo 330491 bytes,SHA256 3f39cab445ca05360525691b15c8f7193b7e0186b8033ef8cbd86d50690cfb15; cópia de evidência fora de target.
+V-010/M01–M21/D01–D16 exercitados e mapeados nos XML; M22 conserva manual humano,
+aprovação de Test, revisão final do código e integração pendentes. Ensaio técnico
+02:24checks e cleanup confirmado; não conta como humano. Manual reproduzível em
+experiments/construction/005-rotas/manual-instructions.md, sem logs pessoais criados.
+current_stage=test; Model/Design/ADR/Implement concluídos, Test por aprovar;
+bolt/história/TASK/unidade ainda em progresso, sem fecho. Código aprovado intacto
+por SHA256; Q-C-25 só os patches autorizados. Revisão Fillmore continua só Design.
+Sem gates externos adicionais, staging, commits, push ou outro IMP.
+
+
+## IMP-007 — manual humano02 conferido; Test para aprovação
+
+Registo 2026-11-12T22:03:45Z. Utilizador confirmou manual humano de Francisco em
+experiments/construction/005-rotas/manual-humano-execucao-02/. Conferência:
+quatro saídas normais JAVA_EXIT0 e R2-01 por SIGKILL intencional9/estado137;
+cinco processos registados terminados,logger_error=null,cinco portas disponíveis
+no bind final. Sondas bidirecionais correlacionadas; mesma instanceId/nova
+connectionId na reconexão e nova instanceId/conexão no reinício.
+STOP/CONT/sem-bootstrap/EOF são contexto confirmado pelo operador; CLI apresenta
+Down TRANSPORT sem registo de sinais/timestamps/PEER_EOF literal. Limites e
+contagens/diagnósticos preservados em manual-human-02-review.json/.md, sem
+medições ou resultados humanos inventados. Código/JAR e Q-C-25 intactos.
+Test para aprovação; só Model/Design/ADR/Implement concluídos. Clean verify
+1176/0/0/0 permanece válido; não repetido sem mudança de código. Revisão final do
+código e integração pendentes; Fillmore confirmado apenas para Design. Bolt,
+história,TASK e unidade continuam em progresso. Sem commits/push/fecho ou gates
+externos adicionais.
+
+
+## IMP-007 — Test aprovado; pacote para revisão final e integração
+
+Registo 2026-11-12T22:07:58Z. Utilizador aprovou Test: clean verify1176/0falhas/0erros/0ignorados,
+V-ADD e manual humano de Francisco execução02 cumprido com os limites documentados.
+Cinco etapas concluídas; current_stage=test/status=in-progress/completed=null.
+Bolt aberto, história/unidade em progresso e TASK-010 IN PROGRESS até revisão
+final do código e integração comprovadas. A revisão anterior de Fillmore abrange
+só Design; não há revisão final do código confirmada. Pacote em final-review-summary
+no bolt, allowlist exata e hashes em experiments/construction/005-rotas.
+Código aprovado e logs preservados; Q-C-25 só os dois patches autorizados;
+target/ e alterações alheias excluídos. Sem staging, commits, push, fecho ou outro
+IMP; sem gates externos adicionais. Faltam revisão final do código e integração.
+
+
+## IMP-007 — revisão final da implementação aprovada por Fillmore
+
+Registo 2026-11-12T22:19:48Z. Utilizador confirmou revisão final por Fillmore do código e
+evidência atuais, incluindo Q-C-25, aprovada sem alterações pendentes. Confirmação
+associada aos seis hashes de código, JAR e manifesto da versão revista em
+experiments/construction/005-rotas/fillmore-final-review-confirmation.json.
+Não se confunde esta revisão com a revisão anterior de Design. Test/manual já
+aprovados. Resta integrar a versão revista; bolt/história/TASK/unidade continuam
+em progresso/completed=null. Plano/allowlist/manifesto atualizados e simulação
+exata preparados para autorização de integração. Nenhum staging/commit/push ou
+fecho autorizado; nenhum novo gate externo ou IMP. Código/JAR/logs intactos.

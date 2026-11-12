@@ -1,0 +1,28 @@
+CHECK_PASS ports_available_before
+CHECK_PASS ready_BOOT-01
+CHECK_PASS ready_R1-01
+CHECK_PASS ready_R2-01
+CHECK_PASS probe_ping_pong_v2_both_directions
+ACTION SIGSTOP node=R2 owned_pid=6088
+CHECK_PASS one_second_without_eof_does_not_kill_node
+CHECK_PASS timeout_detected_while_peer_process_alive
+CHECK_PASS java_exit_zero_BOOT-01
+CHECK_PASS shutdown_record_BOOT-01
+ACTION SIGCONT node=R2
+CHECK_PASS same_instance_new_connection
+CHECK_PASS intentional_peer_death_recorded
+CHECK_PASS survivor_alive_after_eof_without_bootstrap
+CHECK_PASS ready_BOOT-02
+CHECK_PASS ready_R2-02
+CHECK_PASS java_exit_zero_BOOT-02
+CHECK_PASS shutdown_record_BOOT-02
+CHECK_PASS new_instance_new_connection
+CHECK_PASS no_fatal_on_surviving_or_restarted_nodes
+CHECK_PASS neighbors_command_still_operational
+CHECK_PASS java_exit_zero_R2-02
+CHECK_PASS shutdown_record_R2-02
+CHECK_PASS java_exit_zero_R1-01
+CHECK_PASS shutdown_record_R1-01
+CHECK_PASS all_owned_processes_exited
+TECHNICAL_REHEARSAL_PASS CHECKS=24
+CLEANUP_COMPLETE

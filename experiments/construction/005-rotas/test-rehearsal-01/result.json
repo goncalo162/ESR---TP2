@@ -1,0 +1,86 @@
+{
+  "mode": "agent_technical_rehearsal",
+  "human_manual_performed": false,
+  "jar_sha256": "3f39cab445ca05360525691b15c8f7193b7e0186b8033ef8cbd86d50690cfb15",
+  "started_at": "2026-11-12T16:08:58.968063+00:00",
+  "passed": false,
+  "error": "AssertionError('Deadline: READY R2-02')",
+  "finished_at": "2026-11-12T16:09:15.682001+00:00",
+  "checks": [
+    "ports_available_before",
+    "ready_BOOT-01",
+    "ready_R1-01",
+    "ready_R2-01",
+    "probe_ping_pong_v2_both_directions",
+    "one_second_without_eof_does_not_kill_node",
+    "timeout_detected_while_peer_process_alive",
+    "same_instance_new_connection",
+    "java_exit_zero_BOOT-01",
+    "shutdown_record_BOOT-01",
+    "intentional_peer_death_recorded",
+    "survivor_alive_after_eof_without_bootstrap"
+  ],
+  "processes": [
+    {
+      "name": "BOOT-01",
+      "pid": 5662,
+      "returncode": 0,
+      "argv": [
+        "java",
+        "-cp",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/test-build/ott-streaming-1.0-SNAPSHOT.jar",
+        "pt.uminho.esr.ott.app.OttApplication",
+        "--role",
+        "BOOTSTRAP",
+        "--config",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/manual-profiles/BOOT.properties"
+      ]
+    },
+    {
+      "name": "R1-01",
+      "pid": 5663,
+      "returncode": 143,
+      "argv": [
+        "java",
+        "-cp",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/test-build/ott-streaming-1.0-SNAPSHOT.jar",
+        "pt.uminho.esr.ott.app.OttApplication",
+        "--role",
+        "RELAY",
+        "--config",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/manual-profiles/R1.properties"
+      ]
+    },
+    {
+      "name": "R2-01",
+      "pid": 5664,
+      "returncode": -9,
+      "argv": [
+        "java",
+        "-cp",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/test-build/ott-streaming-1.0-SNAPSHOT.jar",
+        "pt.uminho.esr.ott.app.OttApplication",
+        "--role",
+        "RELAY",
+        "--config",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/manual-profiles/R2.properties"
+      ]
+    },
+    {
+      "name": "R2-02",
+      "pid": 5665,
+      "returncode": 143,
+      "argv": [
+        "java",
+        "-cp",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/test-build/ott-streaming-1.0-SNAPSHOT.jar",
+        "pt.uminho.esr.ott.app.OttApplication",
+        "--role",
+        "RELAY",
+        "--config",
+        "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/005-rotas/manual-profiles/R2.properties"
+      ]
+    }
+  ],
+  "no_owned_processes_pending": true
+}

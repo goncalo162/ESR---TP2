@@ -1,0 +1,106 @@
+{
+  "command": "mvn -B -ntp -f Projeto/pom.xml -Dtest=NetworkMonitorTest,OverlayNodeMonitoringTest test",
+  "exit_code": 1,
+  "tests": 16,
+  "failures": 15,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d09ThreeAdmittedTimeoutsCloseOnlyExpectedSession",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d09DownInvalidatesImmediatelyWithoutThreeTimeouts",
+      "status": "failed",
+      "message": "expected: <true> but was: <false>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d15LogicalCleanupDoesNotClaimPhysicalCompletionWithHeldAdmission",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d03NewConnectionSameInstanceResetsAllMetrics",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d16SnapshotMakesADefensiveCopy",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp",
+      "status": "failed",
+      "message": "Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: sample age not implemented"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d07ExactDeadlineCannotBeReclassifiedAsGoodPong",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d10EchoPreservesRequestAndProbeIds",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d04UpStartsOneV2ProbeAndNoReliableZero",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d05EarlyPongWaitsForAdmissionAndKeepsCapturedTime",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d08WrongRequestCannotCompleteCurrentProbe",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d02FirstRttAndEwmaUseIndependentExpectedValues",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d16RejectsAFalseReliableZeroCost",
+      "status": "failed",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "class": "pt.uminho.esr.ott.monitoring.NetworkMonitorTest",
+      "test": "d06RefusedAdmissionDiscardsEarlyPongWithoutRemoteLoss",
+      "status": "failed",
+      "message": "Up must make the first probe eligible ==> expected: <false> but was: <true>"
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest",
+      "test": "snapshotBeforeStartIsEmptyAndDoesNotConstructTheMonitor",
+      "status": "failed",
+      "message": "Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented"
+    },
+    {
+      "class": "pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest",
+      "test": "snapshotAfterCloseBeforeStartRemainsReadableAndEmpty",
+      "status": "failed",
+      "message": "Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented"
+    }
+  ]
+}

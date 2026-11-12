@@ -1,0 +1,273 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 40 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 15 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[ERROR] Tests run: 14, Failures: 13, Errors: 0, Skipped: 0, Time elapsed: 0.184 s <<< FAILURE! -- in pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d09ThreeAdmittedTimeoutsCloseOnlyExpectedSession -- Time elapsed: 0.062 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d09ThreeAdmittedTimeoutsCloseOnlyExpectedSession(NetworkMonitorTest.java:145)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d09DownInvalidatesImmediatelyWithoutThreeTimeouts -- Time elapsed: 0.011 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d09DownInvalidatesImmediatelyWithoutThreeTimeouts(NetworkMonitorTest.java:155)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d15LogicalCleanupDoesNotClaimPhysicalCompletionWithHeldAdmission -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d15LogicalCleanupDoesNotClaimPhysicalCompletionWithHeldAdmission(NetworkMonitorTest.java:165)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d03NewConnectionSameInstanceResetsAllMetrics -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d03NewConnectionSameInstanceResetsAllMetrics(NetworkMonitorTest.java:133)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: sample age not implemented
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp(NetworkMonitorTest.java:90)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.UnsupportedOperationException: IMP-007: sample age not implemented
+	at pt.uminho.esr.ott.monitoring.LinkMetrics.sampleAgeNanos(LinkMetrics.java:20)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.lambda$d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp$0(NetworkMonitorTest.java:90)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d07ExactDeadlineCannotBeReclassifiedAsGoodPong -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d07ExactDeadlineCannotBeReclassifiedAsGoodPong(NetworkMonitorTest.java:128)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d10EchoPreservesRequestAndProbeIds -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d10EchoPreservesRequestAndProbeIds(NetworkMonitorTest.java:158)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d04UpStartsOneV2ProbeAndNoReliableZero -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d04UpStartsOneV2ProbeAndNoReliableZero(NetworkMonitorTest.java:102)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d05EarlyPongWaitsForAdmissionAndKeepsCapturedTime -- Time elapsed: 0.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d05EarlyPongWaitsForAdmissionAndKeepsCapturedTime(NetworkMonitorTest.java:116)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d08WrongRequestCannotCompleteCurrentProbe -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d08WrongRequestCannotCompleteCurrentProbe(NetworkMonitorTest.java:139)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d02FirstRttAndEwmaUseIndependentExpectedValues -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d02FirstRttAndEwmaUseIndependentExpectedValues(NetworkMonitorTest.java:108)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d16RejectsAFalseReliableZeroCost -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:73)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3128)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d16RejectsAFalseReliableZeroCost(NetworkMonitorTest.java:93)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d06RefusedAdmissionDiscardsEarlyPongWithoutRemoteLoss -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Up must make the first probe eligible ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest$Fixture.ping(NetworkMonitorTest.java:81)
+	at pt.uminho.esr.ott.monitoring.NetworkMonitorTest.d06RefusedAdmissionDiscardsEarlyPongWithoutRemoteLoss(NetworkMonitorTest.java:122)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[ERROR] Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.027 s <<< FAILURE! -- in pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[ERROR] pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.snapshotBeforeStartIsEmptyAndDoesNotConstructTheMonitor -- Time elapsed: 0.019 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.snapshotBeforeStartIsEmptyAndDoesNotConstructTheMonitor(OverlayNodeMonitoringTest.java:16)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+	at pt.uminho.esr.ott.overlay.OverlayNode.monitoringSnapshot(OverlayNode.java:39)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+[ERROR] pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.snapshotAfterCloseBeforeStartRemainsReadableAndEmpty -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:75)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:58)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3259)
+	at pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.snapshotAfterCloseBeforeStartRemainsReadableAndEmpty(OverlayNodeMonitoringTest.java:23)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+	at pt.uminho.esr.ott.overlay.OverlayNode.monitoringSnapshot(OverlayNode.java:39)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:71)
+	... 6 more
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   NetworkMonitorTest.d02AgeUsesLocalSubtractionAndAllowsNegativeTimestamp:90 Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: sample age not implemented
+[ERROR]   NetworkMonitorTest.d02FirstRttAndEwmaUseIndependentExpectedValues:108 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d03NewConnectionSameInstanceResetsAllMetrics:133 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d04UpStartsOneV2ProbeAndNoReliableZero:102 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d05EarlyPongWaitsForAdmissionAndKeepsCapturedTime:116 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d06RefusedAdmissionDiscardsEarlyPongWithoutRemoteLoss:122 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d07ExactDeadlineCannotBeReclassifiedAsGoodPong:128 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d08WrongRequestCannotCompleteCurrentProbe:139 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d09DownInvalidatesImmediatelyWithoutThreeTimeouts:155 expected: <true> but was: <false>
+[ERROR]   NetworkMonitorTest.d09ThreeAdmittedTimeoutsCloseOnlyExpectedSession:145 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d10EchoPreservesRequestAndProbeIds:158 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d15LogicalCleanupDoesNotClaimPhysicalCompletionWithHeldAdmission:165 Up must make the first probe eligible ==> expected: <false> but was: <true>
+[ERROR]   NetworkMonitorTest.d16RejectsAFalseReliableZeroCost:93 Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
+[ERROR]   OverlayNodeMonitoringTest.snapshotAfterCloseBeforeStartRemainsReadableAndEmpty:23 Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+[ERROR]   OverlayNodeMonitoringTest.snapshotBeforeStartIsEmptyAndDoesNotConstructTheMonitor:16 Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-007: monitoring composition not implemented
+[INFO] 
+[ERROR] Tests run: 16, Failures: 15, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.180 s
+[INFO] Finished at: 2026-11-12T14:55:39Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
