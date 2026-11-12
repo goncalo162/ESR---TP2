@@ -773,3 +773,10 @@ humana anterior preservada; nenhuma repetição. Cinco etapas concluídas.
 [Resumo para revisão humana final](<../../../../bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
 revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
 continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
+
+## IMP-035 — versão aprovada integrada em main
+
+Registo 2026-11-12T10:39:28Z. Commit 15efdf280b97327cfdc73e9040b9dfed4d4a5658 integrado por fast-forward
+a partir de22622c1, sem conflitos. [Prova](<../../../../../experiments/construction/035-overlay-extra/integration-proof.json>). Test aprovado1113/Luis66;
+execução humana anterior preservada. Nenhum target incluído, push ou outro IMP.
+Bolt/TASK-034/história/unidade continuam em progresso até à revisão humana final.

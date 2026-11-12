@@ -162,3 +162,10 @@ sem CORE/GUI ou aprovação humana inferida.
 Registo 2026-11-12T10:35:23Z. Luis aprovou Test/1113 testes e a execução humana selecionada,
 autorizando commits e integração local em main. [Resumo para revisão final](final-review-summary.md).
 Sem repetição do manual ou início de outro IMP.
+
+## Integração local da versão aprovada
+
+Registo 2026-11-12T10:39:28Z. Commit 15efdf280b97327cfdc73e9040b9dfed4d4a5658 integrado em main por
+fast-forward. [Prova](../../../experiments/construction/035-overlay-extra/integration-proof.json).
+Test concluído/aprovado, sem repetição de manual. Falta revisão humana final
+da implementação para fechar o bolt; não atribuir essa revisão por inferência.

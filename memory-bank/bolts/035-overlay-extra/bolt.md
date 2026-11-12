@@ -162,3 +162,10 @@ Registo 2026-11-12T00:39:35Z. [Relatório](ddd-03-test-report.md): clean verify/
 com SIGKILL real e S–R1 preservada. Duas tentativas incompletas arquivadas.
 Aguardar execução pessoal de Luis antes da aprovação de Test. Sem DONE/fecho/
 commits/push/outro IMP; revisão final e integração pendentes.
+
+## IMP-035 — versão aprovada integrada em main
+
+Registo 2026-11-12T10:39:28Z. Commit 15efdf280b97327cfdc73e9040b9dfed4d4a5658 integrado por fast-forward
+a partir de22622c1, sem conflitos. [Prova](<../../../experiments/construction/035-overlay-extra/integration-proof.json>). Test aprovado1113/Luis66;
+execução humana anterior preservada. Nenhum target incluído, push ou outro IMP.
+Bolt/TASK-034/história/unidade continuam em progresso até à revisão humana final.

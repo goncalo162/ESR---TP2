@@ -27,7 +27,9 @@ continua pendente conforme o checkpoint anterior. O bolt conserva in-progress,
 current_stage=null/completed=null, cinco etapas concluídas; TASK-034/história/
 unidade/EXTRA-01 não são promovidos a DONE por uma integração isolada.
 
-A integração local da versão aprovada e a evidência Git serão registadas a seguir.
+A versão aprovada 15efdf280b97327cfdc73e9040b9dfed4d4a5658 foi integrada em main local por fast-forward
+a partir de22622c1, sem conflitos. [Prova Git](../../../experiments/construction/035-overlay-extra/integration-proof.json).
+O commit documental seguinte regista este resultado e não altera o runtime.
 Sem push autorizado ou início de outro IMP. Vídeo/routing/CORE permanecem fora
 desta prova de reparação do controlo em loopback.
 
@@ -40,3 +42,10 @@ originais protegidos por hashes; o check bruto dessa pasta regista os avisos,
 sem normalizar ou esconder a execução. [Check operacional](../../../experiments/construction/035-overlay-extra/integration-code-docs-diff-check.log),
 [avisos das evidências brutas](../../../experiments/construction/035-overlay-extra/integration-whitespace-raw-evidence.log).
 Nenhum caminho Projeto/target está preparado para commit.
+
+## Integração concluída
+
+Registo 2026-11-12T10:39:28Z. main e Denji receberam a versão aprovada. Código/testes/fixtures
+iguais ao clean verify1113 e aos manuais humanos. Nenhum target nos commits.
+O fecho continua pendente apenas da revisão humana final da implementação;
+005-rotas não foi iniciado. Sem push.

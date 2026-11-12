@@ -98,3 +98,6 @@ humana anterior preservada; nenhuma repetição. Cinco etapas concluídas.
 [Resumo para revisão humana final](<../../../memory-bank/bolts/035-overlay-extra/final-review-summary.md>). Commit/main autorizados;
 revisão humana final da implementação e fecho pendentes. Bolt/história/unidade
 continuam in-progress, sem implemented=true/DONE ou início de005-rotas.
+
+Integração local comprovada:15efdf280b97327cfdc73e9040b9dfed4d4a5658 em main.
+Test aprovado; revisão humana final da implementação/fecho pendentes.

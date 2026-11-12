@@ -6,7 +6,7 @@ TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/202
 
 A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
 
-IMP-035 tem Test aprovado: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e autorizou integração local. Fecho e revisão humana final da implementação permanecem pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
+IMP-035 tem Test aprovado: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e a versão15efdf2 foi integrada em main local. Fecho e revisão humana final da implementação permanecem pendentes. Routing/streaming/vídeo permanecem nos seus incrementos.
 
 ## Compilar e testar
 
