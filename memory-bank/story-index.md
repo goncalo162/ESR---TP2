@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 com Test/revisão final aceites, integração pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e25 planned; nenhum incremento em execução; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -66,7 +66,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
 
 ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
 
-**Tarefa:** IMP-008. **Estado:** in-progress (Test/revisão final Luis aceites; integração pendente). **Bolt:** 021-rotas.
+**Tarefa:** IMP-008. **Estado:** complete/implemented=true; TASK-011 DONE, integração3b7aa74. **Bolt:** 021-rotas.
 **Ficheiro:** [002-modelar-candidatos-custos-e-snapshots-por-stream](intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
 
 ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
@@ -524,3 +524,19 @@ Utilizador confirmou revisão final por Luis substituindo Waheed; não se presum
 revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
 concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
 D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

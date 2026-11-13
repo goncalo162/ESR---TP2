@@ -2,10 +2,12 @@
 id: "002-modelar-candidatos-custos-e-snapshots-por-stream"
 unit: "003-rotas"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 started: "2026-11-13T16:04:28Z"
-updated: "2026-11-13T17:59:03Z"
+updated: "2026-11-13T18:09:37Z"
+completed: "2026-11-13T18:09:37Z"
+implemented: true
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-011"]
 implementation_tasks: ["IMP-008"]
@@ -24,10 +26,10 @@ A tarefa normativa é [IMP-008](../../../../../../add.md#imp-008); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Cada fluxo tem custo, origem, destinos e estado.
-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
-- [ ] Expirar um candidato não apaga alternativas válidas.
-- [ ] Validação V-011 executada e evidência ligada no progresso.
+- [x] Cada fluxo tem custo, origem, destinos e estado.
+- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
+- [x] Expirar um candidato não apaga alternativas válidas.
+- [x] Validação V-011 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -120,3 +122,19 @@ Utilizador confirmou revisão final por Luis substituindo Waheed; não se presum
 revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
 concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
 D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

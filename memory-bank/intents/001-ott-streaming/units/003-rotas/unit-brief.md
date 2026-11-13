@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-03"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-13T17:59:03Z"
+updated: "2026-11-13T18:09:37Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
@@ -27,7 +27,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 ## Histórias e bolts
 
 - [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
-- [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
+- [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
 - [ ] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
 - [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
 
@@ -269,3 +269,19 @@ Utilizador confirmou revisão final por Luis substituindo Waheed; não se presum
 revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
 concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
 D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

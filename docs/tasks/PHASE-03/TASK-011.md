@@ -5,7 +5,7 @@
 - ID: TASK-011
 - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor final: Luis, substituindo Waheed por confirmação explícita do utilizador; revisão final aceite antes da integração.
 - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-010](../PHASE-03/TASK-010.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Criar modelos tipados e validar invariantes.
-- [ ] Implementar insert/update/expire/remove por candidato.
-- [ ] Selecionar melhor candidato e manter alternativas válidas.
-- [ ] Produzir snapshot de custo, origem, destinos vazios e estado INACTIVE/UNAVAILABLE.
+- [x] Criar modelos tipados e validar invariantes.
+- [x] Implementar insert/update/expire/remove por candidato.
+- [x] Selecionar melhor candidato e manter alternativas válidas.
+- [x] Produzir snapshot de custo, origem, destinos vazios e estado INACTIVE/UNAVAILABLE.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada fluxo tem custo, origem, destinos e estado.
-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
-- [ ] Expirar um candidato não apaga alternativas válidas.
-- [ ] Validação V-011 executada e evidência ligada no progresso.
+- [x] Cada fluxo tem custo, origem, destinos e estado.
+- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
+- [x] Expirar um candidato não apaga alternativas válidas.
+- [x] Validação V-011 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -163,3 +163,19 @@ Utilizador confirmou revisão final por Luis substituindo Waheed; não se presum
 revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
 concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
 D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

@@ -32,7 +32,7 @@ Ler [guia da IA](../AI-IMPLEMENTATION-GUIDE.md), [roadmap](../08-IMPLEMENTATION-
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) — Compor o processo overlay e encerrar de forma previsível | 02 | [Denji](DENJI.md) | [Waheed](WAHEED.md) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-006](../tasks/PHASE-02/TASK-006.md) (Fillmore), [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed) | TODO |
 | [TASK-009](../tasks/PHASE-02/TASK-009.md) — Preparar evidência do primeiro marco intermédio | 02 | [Denji](DENJI.md) | [Fillmore](FILLMORE.md) | [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji) | TODO |
 | [TASK-010](../tasks/PHASE-03/TASK-010.md) — Medir RTT e publicar falhas de vizinhança | 03 | [Waheed](WAHEED.md) | [Fillmore](FILLMORE.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed), [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji), [TASK-009](../tasks/PHASE-02/TASK-009.md) (Denji) | TODO |
-| [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | 03 | [Fillmore](FILLMORE.md) | Luis (substitui Waheed; revisão final confirmada) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | IN PROGRESS |
+| [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | 03 | [Fillmore](FILLMORE.md) | Luis (substitui Waheed; revisão final confirmada) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | DONE |
 | [TASK-012](../tasks/PHASE-03/TASK-012.md) — Difundir anúncios e construir catálogo e rotas | 03 | [Fillmore](FILLMORE.md) | [Denji](DENJI.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed), [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore) | TODO |
 | [TASK-013](../tasks/PHASE-03/TASK-013.md) — Diagnosticar percursos pela tabela de rotas | 03 | [Denji](DENJI.md) | [Fillmore](FILLMORE.md) | [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji), [TASK-012](../tasks/PHASE-03/TASK-012.md) (Fillmore) | TODO |
 | [TASK-014](../tasks/PHASE-04/TASK-014.md) — Ativar árvores com ACK e procura agregada | 04 | [Fillmore](FILLMORE.md) | [Waheed](WAHEED.md) | [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore), [TASK-012](../tasks/PHASE-03/TASK-012.md) (Fillmore), [TASK-013](../tasks/PHASE-03/TASK-013.md) (Denji) | TODO |
@@ -214,3 +214,19 @@ Registo 2026-11-13T17:59:03Z. O utilizador confirmou «Luis reviu e aprova a ver
 substituindo Waheed». Autor efetivo da implementação: Codex; responsável previsto
 Fillmore preservado como proveniência. Test/manual Luis43 aceites; integração
 pendente nesta preparação. Nenhuma revisão de Waheed é inventada.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

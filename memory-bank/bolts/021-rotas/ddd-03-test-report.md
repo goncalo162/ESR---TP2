@@ -9,9 +9,9 @@ created: "2026-11-13T17:42:46Z"
 
 ✅ Test e manual humano de Luis aprovados explicitamente pelo utilizador.
 Registo 2026-11-13T17:59:03Z. Cinco etapas concluídas; revisão final por Luis confirmada,
-substituindo Waheed. D22 fica parcial só até integração comprovada; bolt/história/
-TASK/unidade continuam em progresso nesta preparação. Fecho/commits/push para main
-autorizados, ainda sem integração realizada. Outro IMP não iniciado.
+substituindo Waheed. D22 cumprido após integração em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;
+bolt/história complete e TASK-011 DONE no fecho autorizado. Unidade/PHASE-03
+continuam em progresso. Outro IMP não iniciado.
 
 ## 1. Versão, autorização e preservação
 
@@ -73,10 +73,10 @@ alegam bilhões de revisões nem alocação máxima de um milhão de slots.
 | Manual técnico offline | ✅Codex,43 CHECK_PASS/MANUAL_PASS/Java0, mesmo JAR |
 | Repetição humana antes de aprovar Test | ✅Luis,43 checks/MANUAL_PASS/Java0, relatório original preservado |
 | Aprovação de Test | ✅Recebida explicitamente do utilizador |
-| Revisão humana final e integração | ✅Revisão final Luis confirmada, substituindo Waheed; ⏳integração ainda pendente |
+| Revisão humana final e integração | ✅Revisão final Luis confirmada, substituindo Waheed; ✅integração em main3b7aa74 comprovada |
 
-D22 continua **PARCIAL** até à integração. V-011/Test e manual humano estão
-aprovados, sem promover requisito global, fase ou bolt a DONE antes da integração.
+D22 está **CUMPRIDO** após integração comprovada. V-011/Test, manual humano e
+revisão final aceites; bolt/história fechados, sem promover requisito global/fase.
 Sem gates externos adicionais.
 
 ## 4. Manual offline reproduzível
@@ -128,8 +128,24 @@ e tempo do manual são controlados; não são medições de rede. Sem dependênc
 runtime novas, JaCoCo, limiar de cobertura, CI ou linter (ADR-026).
 
 1 - ✅ Manual humano/Test/revisão final Luis aceites.
-2 - ⏳ Integração e prova antes do fecho documental autorizado.
+2 - ✅ Integração e prova concluídas; fecho documental autorizado aplicado.
 
 Fecho/commits/integração/push main autorizados pelo utilizador. Este relatório
 não os presume executados. Registos de pendências anteriores são históricos;
 cinco etapas concluídas, bolt ainda aberto até integração. Nenhum outro IMP iniciado.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.

@@ -3,12 +3,12 @@ id: "021-rotas"
 unit: "003-rotas"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["002-modelar-candidatos-custos-e-snapshots-por-stream"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-13T17:59:03Z"
+updated: "2026-11-13T18:09:37Z"
 started: "2026-11-13T16:04:28Z"
-completed: null
+completed: "2026-11-13T18:09:37Z"
 current_stage: "test"
 stages_completed: ["model", "design", "adr", "implement", "test"]
 requires_bolts: ["004-overlay", "005-rotas"]
@@ -41,7 +41,7 @@ Ler [IMP-008](../../../add.md#imp-008) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](../../intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+- [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](../../intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
 - Dependências: [004-overlay](../004-overlay/bolt.md), [005-rotas](../005-rotas/bolt.md).
 - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
 - Gates: nenhum adicional.
@@ -58,10 +58,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Cada fluxo tem custo, origem, destinos e estado.
-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
-- [ ] Expirar um candidato não apaga alternativas válidas.
-- [ ] Validação V-011 executada e evidência ligada no progresso.
+- [x] Cada fluxo tem custo, origem, destinos e estado.
+- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
+- [x] Expirar um candidato não apaga alternativas válidas.
+- [x] Validação V-011 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -128,9 +128,27 @@ D22 parcial até manual humano, aprovação de Test, revisão final e integraç�
 Fonte aprovada intacta, delta Java deste Test0; target separado. Sem fecho,
 commits/push ou outro IMP. Sem gates externos adicionais.
 
-## Estado atual — Test e revisão final aprovados; integração pendente
+## Histórico — Test e revisão final aprovados; integração pendente
 
 Cinco etapas concluídas; Test/manual humano Luis43 aprovados e revisão final por
 Luis confirmada, substituindo Waheed. Commits/integração/push main e fecho
 explicitamente autorizados. Bolt ainda in-progress/completed=null até integração
 comprovada. D22 parcial só por integração. Nenhum outro IMP iniciado.
+
+
+## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
+
+Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
+iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
+humano Luis conferidos no commit, sem overlay do diretório de trabalho.
+Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
+substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
+Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
+25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
+006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
+Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
+preexistente e target gerado fora dos commits. Publicação main autorizada,
+resultado só será declarado após push efetivo; nenhum force push.
+
+[Fecho e prova](closure-walkthrough.md).

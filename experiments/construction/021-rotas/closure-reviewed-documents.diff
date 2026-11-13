@@ -1,0 +1,636 @@
+--- a/add.md
++++ b/add.md
+@@ -656,8 +656,9 @@
+ ADR-004/017/018/024, sem nova ADR ou alteração wire. Revisão ADR aprovada;
+ [Implement aprovado](memory-bank/bolts/021-rotas/implementation-walkthrough.md);
+ [Test técnico executado](memory-bank/bolts/021-rotas/ddd-03-test-report.md), manual
+-humano/Test e revisão final Luis aprovados. D22 parcial só até integração;
+-commits/push main e fecho autorizados, sem integração presumida.
++humano/Test e revisão final Luis aprovados; integração em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f
++comprovada. D22 cumprido; [fecho](memory-bank/bolts/021-rotas/closure-walkthrough.md).
++Unidade/fase de rotas continuam em progresso; nenhum outro IMP iniciado.
+ 
+ ### 6.2. Interfaces e formato de erros
+ 
+@@ -1043,10 +1044,10 @@
+ - **Gates:** nenhum externo adicional.
+ - **Critérios de aceitação:**
+ 
+-  - [ ] Cada fluxo tem custo, origem, destinos e estado.
+-  - [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
+-  - [ ] Expirar um candidato não apaga alternativas válidas.
+-  - [ ] Validação V-011 executada e evidência ligada no progresso.
++  - [x] Cada fluxo tem custo, origem, destinos e estado.
++  - [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
++  - [x] Expirar um candidato não apaga alternativas válidas.
++  - [x] Validação V-011 executada e evidência ligada no progresso.
+ 
+ <a id="imp-009"></a>
+ ### IMP-009 — Difundir anúncios e catálogo
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -12,8 +12,8 @@
+ | [RF-002](02-REQUIREMENTS.md#rf-002) | Entrada e saída dinâmica de nós | bootstrap/overlay/routing | 02, 04 | [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md) | V-006, V-007, V-008, V-015, V-016 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE |
+ | [RF-003](02-REQUIREMENTS.md#rf-003) | Estabelecer e manter X vizinhos TCP ou UDP | transport/overlay/monitoring | 02, 03 | [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md) | V-005, V-006, V-007, V-010 | IN PROGRESS | [V-005: TCP real, 18 testes](../experiments/task-005-transport-validation.md); [V-006](../memory-bank/bolts/002-overlay/ddd-03-test-report.md), [V-007](../memory-bank/bolts/003-overlay/ddd-03-test-report.md); V-010 pendente |
+ | [RF-004](02-REQUIREMENTS.md#rf-004) | Descobrir vizinhos por contacto conhecido | config/bootstrap/overlay | 01, 02 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md) | V-003, V-006, V-007 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); [V-006](../memory-bank/bolts/002-overlay/ddd-03-test-report.md) e [V-007](../memory-bank/bolts/003-overlay/ddd-03-test-report.md) comprovam descoberta e vizinhança locais |
+-| [RF-005](02-REQUIREMENTS.md#rf-005) | Manter tabela por fluxo com custo, origem, destinos e estado | routing | 03, 04 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-011, V-012, V-014, V-015 | TODO | — |
+-| [RF-006](02-REQUIREMENTS.md#rf-006) | Suportar caminhos alternativos | routing/CORE | 03, 04, 06 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-011, V-012, V-016, V-026 | TODO | — |
++| [RF-005](02-REQUIREMENTS.md#rf-005) | Manter tabela por fluxo com custo, origem, destinos e estado | routing | 03, 04 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-011, V-012, V-014, V-015 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes |
++| [RF-006](02-REQUIREMENTS.md#rf-006) | Suportar caminhos alternativos | routing/CORE | 03, 04, 06 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-011, V-012, V-016, V-026 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes |
+ | [RF-007](02-REQUIREMENTS.md#rf-007) | Servir vários clientes em simultâneo | routing/streaming/client | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-014, V-015, V-021, V-024, V-027 | TODO | — |
+ | [RF-008](02-REQUIREMENTS.md#rf-008) | Monitorizar a rede overlay | monitoring/experiments | 03, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-010, V-028 | TODO | — |
+ | [RF-009](02-REQUIREMENTS.md#rf-009) | Atualizar rotas perante entradas, saídas e condições de rede | routing/monitoring | 03, 04, 06 | [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-012, V-015, V-016, V-017, V-026 | TODO | — |
+@@ -21,7 +21,7 @@
+ | [RF-011](02-REQUIREMENTS.md#rf-011) | Partilhar segmentos comuns e replicar nos pontos de ramificação | routing/streaming/experiments | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-014, V-015, V-021, V-025, V-028 | TODO | — |
+ | [RF-012](02-REQUIREMENTS.md#rf-012) | Disponibilizar pelo menos dois servidores de conteúdos | config/server/app | 01, 03, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-012, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes |
+ | [RF-013](02-REQUIREMENTS.md#rf-013) | Cada servidor oferece pelo menos dois vídeos distintos | config/server/media | 01, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes |
+-| [RF-014](02-REQUIREMENTS.md#rf-014) | Usar métricas de rede para construir rotas | monitoring/routing | 03, 04, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-010, V-011, V-012, V-017, V-026 | TODO | — |
++| [RF-014](02-REQUIREMENTS.md#rf-014) | Usar métricas de rede para construir rotas | monitoring/routing | 03, 04, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-010, V-011, V-012, V-017, V-026 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes |
+ | [RF-015](02-REQUIREMENTS.md#rf-015) | Entregar e reproduzir vídeo com objetivo de tempo real | server/streaming/client | 05 | [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md) | V-019, V-020, V-021, V-022, V-023, V-024 | TODO | — |
+ | [RNF-001](02-REQUIREMENTS.md#rnf-001) | Atraso baixo e utilização eficiente de largura de banda | routing/streaming/experiments | 04, 05, 06 | [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-017, V-019, V-020, V-021, V-022, V-028 | TODO | — |
+ | [RNF-002](02-REQUIREMENTS.md#rnf-002) | Escalabilidade para N clientes | streaming/CORE/experiments | 05, 06 | [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-027](tasks/PHASE-06/TASK-027.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-021, V-027, V-028 | TODO | — |
+@@ -318,3 +318,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,12 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS, Test/revisão final Luis aceites e integração pendente; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 com Test/revisão final Luis aceites; integração autorizada e pendente.
++**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso; outro IMP não iniciado.
++
++**Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -105,7 +107,7 @@
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+-| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Test1211/0/0/0/manual Luis43/revisão final aceites; integração pendente |
++| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+@@ -1048,3 +1050,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/docs/tasks/PHASE-03/TASK-011.md
++++ b/docs/tasks/PHASE-03/TASK-011.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-011
+ - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Fillmore](../../team/FILLMORE.md).
+ - Revisor final: Luis, substituindo Waheed por confirmação explícita do utilizador; revisão final aceite antes da integração.
+ - Dependências: [TASK-003](../PHASE-01/TASK-003.md), [TASK-010](../PHASE-03/TASK-010.md).
+@@ -37,10 +37,10 @@
+ 
+ ## 7. Passos de implementação
+ 
+-- [ ] Criar modelos tipados e validar invariantes.
+-- [ ] Implementar insert/update/expire/remove por candidato.
+-- [ ] Selecionar melhor candidato e manter alternativas válidas.
+-- [ ] Produzir snapshot de custo, origem, destinos vazios e estado INACTIVE/UNAVAILABLE.
++- [x] Criar modelos tipados e validar invariantes.
++- [x] Implementar insert/update/expire/remove por candidato.
++- [x] Selecionar melhor candidato e manter alternativas válidas.
++- [x] Produzir snapshot de custo, origem, destinos vazios e estado INACTIVE/UNAVAILABLE.
+ 
+ ## 8. Regras e restrições
+ 
+@@ -58,10 +58,10 @@
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Cada fluxo tem custo, origem, destinos e estado.
+-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
+-- [ ] Expirar um candidato não apaga alternativas válidas.
+-- [ ] Validação V-011 executada e evidência ligada no progresso.
++- [x] Cada fluxo tem custo, origem, destinos e estado.
++- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
++- [x] Expirar um candidato não apaga alternativas válidas.
++- [x] Validação V-011 executada e evidência ligada no progresso.
+ 
+ ## 12. Definition of Done
+ 
+@@ -163,3 +163,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/docs/team/00-COORDINATION.md
++++ b/docs/team/00-COORDINATION.md
+@@ -32,7 +32,7 @@
+ | [TASK-008](../tasks/PHASE-02/TASK-008.md) — Compor o processo overlay e encerrar de forma previsível | 02 | [Denji](DENJI.md) | [Waheed](WAHEED.md) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-006](../tasks/PHASE-02/TASK-006.md) (Fillmore), [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed) | TODO |
+ | [TASK-009](../tasks/PHASE-02/TASK-009.md) — Preparar evidência do primeiro marco intermédio | 02 | [Denji](DENJI.md) | [Fillmore](FILLMORE.md) | [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji) | TODO |
+ | [TASK-010](../tasks/PHASE-03/TASK-010.md) — Medir RTT e publicar falhas de vizinhança | 03 | [Waheed](WAHEED.md) | [Fillmore](FILLMORE.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed), [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji), [TASK-009](../tasks/PHASE-02/TASK-009.md) (Denji) | TODO |
+-| [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | 03 | [Fillmore](FILLMORE.md) | Luis (substitui Waheed; revisão final confirmada) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | IN PROGRESS |
++| [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | 03 | [Fillmore](FILLMORE.md) | Luis (substitui Waheed; revisão final confirmada) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | DONE |
+ | [TASK-012](../tasks/PHASE-03/TASK-012.md) — Difundir anúncios e construir catálogo e rotas | 03 | [Fillmore](FILLMORE.md) | [Denji](DENJI.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed), [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore) | TODO |
+ | [TASK-013](../tasks/PHASE-03/TASK-013.md) — Diagnosticar percursos pela tabela de rotas | 03 | [Denji](DENJI.md) | [Fillmore](FILLMORE.md) | [TASK-008](../tasks/PHASE-02/TASK-008.md) (Denji), [TASK-012](../tasks/PHASE-03/TASK-012.md) (Fillmore) | TODO |
+ | [TASK-014](../tasks/PHASE-04/TASK-014.md) — Ativar árvores com ACK e procura agregada | 04 | [Fillmore](FILLMORE.md) | [Waheed](WAHEED.md) | [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore), [TASK-012](../tasks/PHASE-03/TASK-012.md) (Fillmore), [TASK-013](../tasks/PHASE-03/TASK-013.md) (Denji) | TODO |
+@@ -214,3 +214,19 @@
+ substituindo Waheed». Autor efetivo da implementação: Codex; responsável previsto
+ Fillmore preservado como proveniência. Test/manual Luis43 aceites; integração
+ pendente nesta preparação. Nenhuma revisão de Waheed é inventada.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/experiments/construction/021-rotas/closure-v-add.md
++++ b/experiments/construction/021-rotas/closure-v-add.md
+@@ -0,0 +1,22 @@
++# Validação do ADD e planeamento Construction
++
++Execução: 2026-11-13T18:09:38Z. Base: 85e1b33ff0a1de69116dfdf3e7ee2d2352cbf936.
++Comando: python3 scripts/validate-planning.py --report experiments/construction/021-rotas/closure-v-add.md
++
++## Resultado
++
++- Requisitos/constraints/intents: 41; 35 aliases e critérios legados preservados.
++- ADD: 13 secções; 29 ADR com driver/alternativa; matriz 41/41 sem órfãos.
++- Unidades: 7; histórias/IMP/bolts: 35/35/35; TASK pai: 34.
++- DAG sem ciclos; dependências de todas as partes e gates de fase preservados; nenhum IMP L.
++- Protocolo operacional: 62 fixtures TCP v2 independentes (19 tipos), 16 UDP OTT1 intactas face à base; arquivos TCP v1 retirados por decisão explícita Q-C-19.
++- Fixtures verificadas: 78; XML CORE analisáveis: 3 (sem execução).
++- Referências locais/âncoras verificadas: 4653.
++- Erros encontrados: 0.
++
++## Alcance
++
++Validação estrutural/documental e de bytes de referência. Não executa Maven,
++testes Java, rede entre processos, GUI, CORE ou submissão. Os 149 testes
++continuam a ser evidência histórica, não resultado desta execução.
++A validação não substitui a aprovação humana dos artefactos/tarefas; não executa bolts.
+--- a/memory-bank/bolts/006-rotas/bolt.md
++++ b/memory-bank/bolts/006-rotas/bolt.md
+@@ -14,7 +14,7 @@
+ requires_bolts: ["004-overlay", "021-rotas"]
+ enables_bolts: ["022-rotas"]
+ requires_units: ["002-overlay"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+--- a/memory-bank/bolts/021-rotas/bolt.md
++++ b/memory-bank/bolts/021-rotas/bolt.md
+@@ -3,12 +3,12 @@
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["002-modelar-candidatos-custos-e-snapshots-por-stream"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-13T17:59:03Z"
++updated: "2026-11-13T18:09:37Z"
+ started: "2026-11-13T16:04:28Z"
+-completed: null
++completed: "2026-11-13T18:09:37Z"
+ current_stage: "test"
+ stages_completed: ["model", "design", "adr", "implement", "test"]
+ requires_bolts: ["004-overlay", "005-rotas"]
+@@ -41,7 +41,7 @@
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](../../intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
++- [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](../../intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+ - Dependências: [004-overlay](../004-overlay/bolt.md), [005-rotas](../005-rotas/bolt.md).
+ - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -58,10 +58,10 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Cada fluxo tem custo, origem, destinos e estado.
+-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
+-- [ ] Expirar um candidato não apaga alternativas válidas.
+-- [ ] Validação V-011 executada e evidência ligada no progresso.
++- [x] Cada fluxo tem custo, origem, destinos e estado.
++- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
++- [x] Expirar um candidato não apaga alternativas válidas.
++- [x] Validação V-011 executada e evidência ligada no progresso.
+ 
+ ## Evidência e fecho
+ 
+@@ -128,9 +128,27 @@
+ Fonte aprovada intacta, delta Java deste Test0; target separado. Sem fecho,
+ commits/push ou outro IMP. Sem gates externos adicionais.
+ 
+-## Estado atual — Test e revisão final aprovados; integração pendente
++## Histórico — Test e revisão final aprovados; integração pendente
+ 
+ Cinco etapas concluídas; Test/manual humano Luis43 aprovados e revisão final por
+ Luis confirmada, substituindo Waheed. Commits/integração/push main e fecho
+ explicitamente autorizados. Bolt ainda in-progress/completed=null até integração
+ comprovada. D22 parcial só por integração. Nenhum outro IMP iniciado.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
++
++[Fecho e prova](closure-walkthrough.md).
+--- a/memory-bank/bolts/021-rotas/closure-walkthrough.md
++++ b/memory-bank/bolts/021-rotas/closure-walkthrough.md
+@@ -0,0 +1,50 @@
++# IMP-008 / 021-rotas / TASK-011 — fecho autorizado
++
++Registo 2026-11-13T18:09:37Z. Implementação revista integrada em main:
++`3b7aa745cac62b71ac8ce7e036656bf7ab21692f`. Prova de192 ficheiros/hashes, árvore
++`7788f5229bc8d98fb12a6c78d0b99ab9be684557` e V-ADD0/78 sobre a cópia extraída desse commit.
++[Prova estruturada](../../../experiments/construction/021-rotas/integration-proof.json)
++e [log V-ADD do commit](../../../experiments/construction/021-rotas/integration-commit-v-add.log).
++
++## Critérios cumpridos
++
++- V-011/D01–D21:35 casos de domínio, custos/desempate conhecidos, quatro streams,
++  alternativas e snapshots imutáveis; fonte/epoch/sessão/TTL/limites/overflow.
++- Clean verify JDK21:1211/0falhas/0erros/0ignorados,14XML,saída0;
++  [resultado](../../../experiments/construction/021-rotas/test-build-01/result.json).
++- JAR364704bytes,SHA256366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee.
++- Manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0,passed=true,JVM terminada,
++  fontes/JAR iguais. [Report original preservado](../../../experiments/construction/021-rotas/test-manual-runs/20261113T174838Z-y23kpe_b/report.json),
++  SHA25647b712bb518ddc2fb5f975f8af218fd9b76987cfd174d5a3c238bcc5ea11a9d1.
++- Test aprovado e revisão final Luis confirmada, substituindo Waheed. Não se
++  inventa revisão de Waheed. [Aceitação](../../../experiments/construction/021-rotas/test-acceptance.json),
++  [revisão](../../../experiments/construction/021-rotas/luis-final-review-confirmation.json),
++  [autorização de fecho/commits/push](../../../experiments/construction/021-rotas/closure-authorization.json).
++- Integração da versão revista comprovada; D22 cumprido. Não se repetiu build/manual
++  porque os fontes/JAR/relatório humano no commit são os mesmos validados e revistos.
++
++## Cascata de fecho
++
++Cinco etapas aceites, bolt complete/completed real; história complete/implemented=true;
++TASK-011 DONE. Índices, progresso e unidade atualizados. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas e PHASE-03 continuam in-progress.
++006-rotas apenas blocks=false por dependências completas; permanece planned,
++started/current_stage/completed null, sem iniciar outro IMP.
++
++## Preservação e publicação
++
++Seis caminhos de código +851/−0; nenhum teste anterior enfraquecido ou fonte mudado
++após Implement. Raw logs/XML/ZIPs de fontes e manual humano preservados. Atributos
++locais da pasta de evidência mantêm os espaços exigidos por patches/logs brutos;
++a verificação normal de whitespace continua nos fontes/Markdown/auxiliares.
++Tentativas de preparação malsucedidas preservadas, sem ocultar ou normalizar bytes.
++
++Target gerado, backup pré-clean e classes temporárias dos manuais não integram
++os commits. JAR validado é evidência explícita fora de target. EXTRA-02 preexistente
++permanece no disco e fora da integração: quatro caminhos e dois blocos partilhados.
++Sem dependência, wire/cap, transporte, CLI, rede integrada ou vídeo novos por efeito
++deste fecho. Sem alegação de GUI/CORE, entrega ou submissão.
++
++Commit de implementação acima já criado; este documento integra o commit de fecho
++posterior. O seu hash e resultado do push main só serão apresentados depois da
++execução efetiva, sem hash autorreferente ou force push.
+--- a/memory-bank/bolts/021-rotas/ddd-03-test-report.md
++++ b/memory-bank/bolts/021-rotas/ddd-03-test-report.md
+@@ -9,9 +9,9 @@
+ 
+ ✅ Test e manual humano de Luis aprovados explicitamente pelo utilizador.
+ Registo 2026-11-13T17:59:03Z. Cinco etapas concluídas; revisão final por Luis confirmada,
+-substituindo Waheed. D22 fica parcial só até integração comprovada; bolt/história/
+-TASK/unidade continuam em progresso nesta preparação. Fecho/commits/push para main
+-autorizados, ainda sem integração realizada. Outro IMP não iniciado.
++substituindo Waheed. D22 cumprido após integração em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;
++bolt/história complete e TASK-011 DONE no fecho autorizado. Unidade/PHASE-03
++continuam em progresso. Outro IMP não iniciado.
+ 
+ ## 1. Versão, autorização e preservação
+ 
+@@ -73,10 +73,10 @@
+ | Manual técnico offline | ✅Codex,43 CHECK_PASS/MANUAL_PASS/Java0, mesmo JAR |
+ | Repetição humana antes de aprovar Test | ✅Luis,43 checks/MANUAL_PASS/Java0, relatório original preservado |
+ | Aprovação de Test | ✅Recebida explicitamente do utilizador |
+-| Revisão humana final e integração | ✅Revisão final Luis confirmada, substituindo Waheed; ⏳integração ainda pendente |
++| Revisão humana final e integração | ✅Revisão final Luis confirmada, substituindo Waheed; ✅integração em main3b7aa74 comprovada |
+ 
+-D22 continua **PARCIAL** até à integração. V-011/Test e manual humano estão
+-aprovados, sem promover requisito global, fase ou bolt a DONE antes da integração.
++D22 está **CUMPRIDO** após integração comprovada. V-011/Test, manual humano e
++revisão final aceites; bolt/história fechados, sem promover requisito global/fase.
+ Sem gates externos adicionais.
+ 
+ ## 4. Manual offline reproduzível
+@@ -128,8 +128,24 @@
+ runtime novas, JaCoCo, limiar de cobertura, CI ou linter (ADR-026).
+ 
+ 1 - ✅ Manual humano/Test/revisão final Luis aceites.
+-2 - ⏳ Integração e prova antes do fecho documental autorizado.
++2 - ✅ Integração e prova concluídas; fecho documental autorizado aplicado.
+ 
+ Fecho/commits/integração/push main autorizados pelo utilizador. Este relatório
+ não os presume executados. Registos de pendências anteriores são históricos;
+ cinco etapas concluídas, bolt ainda aberto até integração. Nenhum outro IMP iniciado.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/bolts/021-rotas/final-review-summary.md
++++ b/memory-bank/bolts/021-rotas/final-review-summary.md
+@@ -24,3 +24,19 @@
+ 
+ Remoto main/Denji consultado e igual à base cc952c5; sem divergência observada.
+ Push será sem force. Os hashes dos commits serão registados só depois de criados.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -238,3 +238,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
+@@ -2,10 +2,12 @@
+ id: "002-modelar-candidatos-custos-e-snapshots-por-stream"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ started: "2026-11-13T16:04:28Z"
+-updated: "2026-11-13T17:59:03Z"
++updated: "2026-11-13T18:09:37Z"
++completed: "2026-11-13T18:09:37Z"
++implemented: true
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-011"]
+ implementation_tasks: ["IMP-008"]
+@@ -24,10 +26,10 @@
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Cada fluxo tem custo, origem, destinos e estado.
+-- [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
+-- [ ] Expirar um candidato não apaga alternativas válidas.
+-- [ ] Validação V-011 executada e evidência ligada no progresso.
++- [x] Cada fluxo tem custo, origem, destinos e estado.
++- [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
++- [x] Expirar um candidato não apaga alternativas válidas.
++- [x] Validação V-011 executada e evidência ligada no progresso.
+ 
+ ## Testes
+ 
+@@ -120,3 +122,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-13T17:59:03Z"
++updated: "2026-11-13T18:09:37Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -27,7 +27,7 @@
+ ## Histórias e bolts
+ 
+ - [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
+-- [ ] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
++- [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
+ - [ ] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
+ - [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
+ 
+@@ -269,3 +269,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,8 +17,8 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "021-rotas (in-progress; Test and final review approved; integration authorized and pending)"
++next_bolt: "006-rotas (planned; not started; requires explicit authorization)"
+ 
+-last_completed_bolt: "005-rotas"
+-last_integrated_commit: "f9905038c614612b6f2798d4eca46dd72934743f"
++last_completed_bolt: "021-rotas"
++last_integrated_commit: "3b7aa745cac62b71ac8ce7e036656bf7ab21692f"
+ phase_03_status: "in-progress"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -374,3 +374,19 @@
+ clean verify JDK21:1211/0/0/0,14 XML,JAR novo e manual técnico Codex43checks/Java0.
+ A repetição humana não foi recebida. Test/D22/revisão final/integração pendentes;
+ sem fecho, commits/push ou outro IMP. EXTRA-02 preexistente não implementado aqui.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 com Test/revisão final aceites, integração pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e25 planned; nenhum incremento em execução; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -66,7 +66,7 @@
+ 
+ ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-008. **Estado:** in-progress (Test/revisão final Luis aceites; integração pendente). **Bolt:** 021-rotas.
++**Tarefa:** IMP-008. **Estado:** complete/implemented=true; TASK-011 DONE, integração3b7aa74. **Bolt:** 021-rotas.
+ **Ficheiro:** [002-modelar-candidatos-custos-e-snapshots-por-stream](intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+@@ -524,3 +524,19 @@
+ revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+ concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+ D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.
++
++
++## IMP-008 / 021-rotas / TASK-011 — fecho após integração comprovada
++
++Registo 2026-11-13T18:09:37Z. Versão revista integrada em main: 3b7aa745cac62b71ac8ce7e036656bf7ab21692f;192 caminhos/hashes
++iguais ao pacote, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR e relatório
++humano Luis conferidos no commit, sem overlay do diretório de trabalho.
++Test1211/0/0/0,JDK21/14XML; manual humano Luis43 CHECK_PASS/MANUAL_PASS/Java0/
++passed=true/JVM terminada aceites. Revisão final Luis confirmada pelo utilizador,
++substituindo Waheed. D22 cumprido; fecho explicitamente autorizado.
++Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
++25 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam em progresso;
++006-rotas apenas desimpedido, sem início ou autorização para outro IMP.
++Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
++preexistente e target gerado fora dos commits. Publicação main autorizada,
++resultado só será declarado após push efetivo; nenhum force push.

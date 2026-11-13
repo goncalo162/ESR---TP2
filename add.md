@@ -656,8 +656,9 @@ UNAVAILABLE não autoriza dados, não confirma upstream nem cria destinos.
 ADR-004/017/018/024, sem nova ADR ou alteração wire. Revisão ADR aprovada;
 [Implement aprovado](memory-bank/bolts/021-rotas/implementation-walkthrough.md);
 [Test técnico executado](memory-bank/bolts/021-rotas/ddd-03-test-report.md), manual
-humano/Test e revisão final Luis aprovados. D22 parcial só até integração;
-commits/push main e fecho autorizados, sem integração presumida.
+humano/Test e revisão final Luis aprovados; integração em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f
+comprovada. D22 cumprido; [fecho](memory-bank/bolts/021-rotas/closure-walkthrough.md).
+Unidade/fase de rotas continuam em progresso; nenhum outro IMP iniciado.
 
 ### 6.2. Interfaces e formato de erros
 
@@ -1043,10 +1044,10 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Cada fluxo tem custo, origem, destinos e estado.
-  - [ ] Empates são reproduzíveis e caminhos inválidos rejeitados.
-  - [ ] Expirar um candidato não apaga alternativas válidas.
-  - [ ] Validação V-011 executada e evidência ligada no progresso.
+  - [x] Cada fluxo tem custo, origem, destinos e estado.
+  - [x] Empates são reproduzíveis e caminhos inválidos rejeitados.
+  - [x] Expirar um candidato não apaga alternativas válidas.
+  - [x] Validação V-011 executada e evidência ligada no progresso.
 
 <a id="imp-009"></a>
 ### IMP-009 — Difundir anúncios e catálogo
