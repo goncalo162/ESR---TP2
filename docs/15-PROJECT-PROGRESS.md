@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011–013 TODO; PHASE-04–07 e TASK-011–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS, Test/revisão final Luis aceites e integração pendente; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Nenhum outro IMP iniciado.
+**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 com Test/revisão final Luis aceites; integração autorizada e pendente.
 
 Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
 
@@ -105,7 +105,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
 | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
-| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | TODO | V-011: NÃO EXECUTADO |
+| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Test1211/0/0/0/manual Luis43/revisão final aceites; integração pendente |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
@@ -957,3 +957,94 @@ intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
 Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
 neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
 ou o manual. Commit local limitado a documentação e evidência autorizadas.
+
+
+## IMP-008 / 021-rotas — Model para aprovação
+
+Registo 2026-11-13T16:04:28Z. Opção1 do utilizador autoriza apenas Model. Base limpa
+cc952c5f558930f2c67e7dea8fe92612cd8cc705 no ramo Denji, igual a main.
+Dependências004-overlay/005-rotas e unidade002-overlay complete; f990503
+é ancestral de main, seis hashes de código e JAR de IMP-007 conferidos.
+Modelo e M01–M18/V-011 planeados; Q-C-26 proposta para validade/épocas/limites.
+current_stage=model, stages_completed=[], completed=null; história/TASK-011
+em progresso, sem implemented=true. Model aguarda aprovação antes de Design.
+Nenhum Java/teste/config/POM/fixture alterado; apenas inventário/hashes, sem
+análise de código, Maven, sockets, commits/push ou outro IMP. V-011/regressão/
+manual/revisão final Waheed/integração pendentes; sem gates externos adicionais.
+Artefacto: memory-bank/bolts/021-rotas/ddd-01-domain-model.md; evidência em
+experiments/construction/021-rotas/. PHASE-03/unidade003-rotas mantêm in-progress.
+
+
+## IMP-008 / 021-rotas — Model aprovado; Design para revisão
+
+Registo 2026-11-13T16:19:45Z. Utilizador aprovou Model e os três princípios de Q-C-26;
+autorizou apenas Design. APIs/tipos imutáveis, limites exatos propostos, retenção,
+transição atómica de época, snapshots sem upstream confirmado e D01–D22 descritos
+em memory-bank/bolts/021-rotas/ddd-02-technical-design.md. Q-C-26 conserva valores
+e horizonte pendentes de revisão; não são ADR aceite nem implementação.
+current_stage=design, stages_completed=[model], completed=null; critérios funcionais
+por cumprir. Seis caminhos mantidos, nenhum Java/Maven/socket/commit/push/outro IMP.
+V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+Registos de Model para aprovação acima são históricos; só Model está concluído.
+
+
+## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
+
+Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
+Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
+APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
+estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
+contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
+Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
+nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
+completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
+Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+
+
+## IMP-008 / 021-rotas — Implement para aprovação
+
+Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
+nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
+cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
+33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
+72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
+da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
+Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
+D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
+pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
+current_stage=implement, stages_completed=[model,design,adr], completed=null;
+Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+commits/push ou outro IMP. Target gerado inventariado separadamente.
+
+
+## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
+
+Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
+clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
+JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
+cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
+intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
+Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
+MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
+Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
+execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
+aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
+current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
+bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
+Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
+Sem gates externos adicionais, commits/push ou início de outro IMP.
+
+
+## IMP-008 — Test/manual Luis e revisão final aceites; integração autorizada
+
+Registo 2026-11-13T17:59:03Z. Test aprovado incluindo manual humano Luis em
+20261113T174838Z-y23kpe_b:43 CHECK_PASS/MANUAL_PASS/Java0/passed=true/JVM terminada,
+mesmo JAR e fontes do clean verify1211/0/0/0. Original preservado por hash.
+Utilizador confirmou revisão final por Luis substituindo Waheed; não se presume
+revisão de Waheed. Commits, integração e push main/fecho autorizados. Cinco etapas
+concluídas; bolt/história/TASK ainda em progresso até integração comprovada;
+D22 parcial só por integração. Sem novo Java/build/manual ou outro IMP.

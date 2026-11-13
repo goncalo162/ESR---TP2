@@ -1,0 +1,900 @@
+--- a/add.md
++++ b/add.md
+@@ -654,8 +654,9 @@
+ [Design aprovado](memory-bank/bolts/021-rotas/ddd-02-technical-design.md) e
+ [revisão ADR aprovada](memory-bank/bolts/021-rotas/adr-review.md); reutiliza
+ ADR-004/017/018/024, sem nova ADR ou alteração wire. Revisão ADR aprovada;
+-[Implement para revisão](memory-bank/bolts/021-rotas/implementation-walkthrough.md),
+-Test/fecho não iniciados. Os critérios do IMP-008 continuam por aceitar.
++[Implement aprovado](memory-bank/bolts/021-rotas/implementation-walkthrough.md);
++[Test técnico executado](memory-bank/bolts/021-rotas/ddd-03-test-report.md), manual
++humano e aprovação de Test pendentes. D22 parcial; sem fecho ou integração deste IMP.
+ 
+ ### 6.2. Interfaces e formato de erros
+ 
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -103,3 +103,13 @@
+ 35 testes novos e regressão incremental1211/0/0/0 com JDK21; execução restrita
+ anterior preservada. Test/clean verify/manual humano/revisão final/integração
+ pendentes. RoutingService/OverlayNode e bytes operacionais preservados.
++
++
++## IMP-008 — Test técnico, manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. [Relatório](../memory-bank/bolts/021-rotas/ddd-03-test-report.md):
++clean verify JDK21:1211/0/0/0; novo JAR e35 testes do domínio confirmados, sem
++alteração de fonte nesta etapa. Manual Codex43checks passou contra esse JAR;
++[roteiro offline humano](../experiments/construction/021-rotas/manual-instructions.md)
++preparado, execução humana não recebida. D22 parcial/Test por aprovar, revisão
++final e integração pendentes. Sem composição de rede ou autorização de dados nova.
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -645,3 +645,13 @@
+ 35 testes novos e regressão incremental1211/0/0/0 com JDK21; execução restrita
+ anterior preservada. Test/clean verify/manual humano/revisão final/integração
+ pendentes. RoutingService/OverlayNode e bytes operacionais preservados.
++
++
++## IMP-008 — Test técnico, manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. [Relatório](../memory-bank/bolts/021-rotas/ddd-03-test-report.md):
++clean verify JDK21:1211/0/0/0; novo JAR e35 testes do domínio confirmados, sem
++alteração de fonte nesta etapa. Manual Codex43checks passou contra esse JAR;
++[roteiro offline humano](../experiments/construction/021-rotas/manual-instructions.md)
++preparado, execução humana não recebida. D22 parcial/Test por aprovar, revisão
++final e integração pendentes. Sem composição de rede ou autorização de dados nova.
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -289,3 +289,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em Implement para revisão; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em Test, manual humano pendente; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em Implement para revisão, Model/Design/ADR aprovados.
++**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em Test; Implement aprovado, manual humano pendente.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -105,7 +105,7 @@
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+-| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Implement para revisão; V-011 técnico35; regressão incremental1211/0/0/0; Test/manual pendentes |
++| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Test:clean verify1211/0/0/0; manual Codex43; manual humano/aprovação pendentes |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+@@ -1019,3 +1019,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/docs/tasks/PHASE-03/TASK-011.md
++++ b/docs/tasks/PHASE-03/TASK-011.md
+@@ -134,3 +134,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/memory-bank/bolts/021-rotas/bolt.md
++++ b/memory-bank/bolts/021-rotas/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["002-modelar-candidatos-custos-e-snapshots-por-stream"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-13T17:18:48Z"
++updated: "2026-11-13T17:43:51Z"
+ started: "2026-11-13T16:04:28Z"
+ completed: null
+-current_stage: "implement"
+-stages_completed: ["model", "design", "adr"]
++current_stage: "test"
++stages_completed: ["model", "design", "adr", "implement"]
+ requires_bolts: ["004-overlay", "005-rotas"]
+ enables_bolts: ["006-rotas"]
+ requires_units: ["002-overlay"]
+@@ -51,7 +51,7 @@
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+-4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-008 e as ADR do ADD.
++4. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 
+ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+@@ -108,7 +108,7 @@
+ Revisão ADR aprovada explicitamente; apenas Implement nos seis caminhos e
+ testes incrementais autorizado. Test/fecho, commits/push e outro IMP não autorizados.
+ 
+-## Checkpoint atual — Implement para aprovação
++## Histórico — Implement para aprovação
+ 
+ ✅ Model/Design/ADR aprovados; ⏳ Implement preparado para revisão, não aprovado.
+ [Walkthrough](implementation-walkthrough.md), D01–D22 e evidência real em
+@@ -116,3 +116,14 @@
+ regressão incremental08:1211/0/0/0,JDK21; execução07 restrita preservada.
+ D22 parcial: clean verify, JAR/manual humano, revisão final e integração pendentes.
+ Test/fecho não iniciados; nenhum commit/push ou outro IMP. Sem gates adicionais.
++
++## Checkpoint atual — Test técnico executado, manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. ✅ Model/Design/ADR/Implement aprovados; ⏳ Test em progresso.
++[Relatório](ddd-03-test-report.md): clean verify JDK21,1211/0/0/0,14 XML;
++novo JAR364704 bytes/SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee.
++Manual técnico Codex43 CHECK_PASS/MANUAL_PASS/Java0; execução humana não recebida.
++[Roteiro para Luis](../../../experiments/construction/021-rotas/manual-instructions.md).
++D22 parcial até manual humano, aprovação de Test, revisão final e integração.
++Fonte aprovada intacta, delta Java deste Test0; target separado. Sem fecho,
++commits/push ou outro IMP. Sem gates externos adicionais.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -209,3 +209,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ started: "2026-11-13T16:04:28Z"
+-updated: "2026-11-13T17:18:48Z"
++updated: "2026-11-13T17:43:51Z"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-011"]
+ implementation_tasks: ["IMP-008"]
+@@ -91,3 +91,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-13T17:18:48Z"
++updated: "2026-11-13T17:43:51Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -240,3 +240,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "021-rotas (in-progress; Implement ready for review; Model/Design/ADR approved; Test not started)"
++next_bolt: "021-rotas (in-progress; Test technical complete; human offline manual pending; D22 partial)"
+ 
+ last_completed_bolt: "005-rotas"
+ last_integrated_commit: "f9905038c614612b6f2798d4eca46dd72934743f"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -365,3 +365,12 @@
+ Execução restrita anterior com72erros de socket preservada, sem código alterado
+ entre repetições. Q-C-26 implementada; composição futura não antecipada.
+ Implement por aprovar; Test/manual/revisão final/integração pendentes.
++
++
++## IMP-008 — Implement aprovado; Test aguarda manual humano
++
++Registo 2026-11-13T17:43:51Z. Nenhuma decisão arquitetural nova ou substituição. Código
++aprovado preservado; [relatório Test](../bolts/021-rotas/ddd-03-test-report.md):
++clean verify JDK21:1211/0/0/0,14 XML,JAR novo e manual técnico Codex43checks/Java0.
++A repetição humana não foi recebida. Test/D22/revisão final/integração pendentes;
++sem fecho, commits/push ou outro IMP. EXTRA-02 preexistente não implementado aqui.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em Implement para revisão; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em Test, manual humano pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -66,7 +66,7 @@
+ 
+ ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-008. **Estado:** in-progress (Model/Design/ADR aprovados; Implement para revisão). **Bolt:** 021-rotas.
++**Tarefa:** IMP-008. **Estado:** in-progress (Implement aprovado; Test/manual humano pendentes). **Bolt:** 021-rotas.
+ **Ficheiro:** [002-modelar-candidatos-custos-e-snapshots-por-stream](intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+@@ -495,3 +495,21 @@
+ Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
+ progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
+ commits/push ou outro IMP. Target gerado inventariado separadamente.
++
++
++## IMP-008 / 021-rotas — Test técnico executado; manual humano pendente
++
++Registo 2026-11-13T17:43:51Z. Utilizador aprovou Implement e autorizou apenas Test. Novo
++clean verify com JDK21:1211 testes/0falhas/0erros/0ignorados,14 XML,exit0.
++JAR novo364704 bytes,SHA256 366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee,
++cópia em experiments/construction/021-rotas/test-build-01/. Fontes aprovados
++intactos antes/depois; nenhum Java ou teste do projeto alterado nesta etapa.
++Manual técnico Codex em test-manual-runs/20261113T173843Z-92dfcjfm:43 CHECK_PASS,
++MANUAL_PASS,compile0,Java0,passed=true,hashes/JAR corretos,JVM terminada.
++Não conta como humano. Roteiro guiado para Luis em manual-instructions.md;
++execução humana ainda inexistente/pendente. D22 parcial: manual humano antes de
++aprovar Test, aprovação de Test, revisão final Waheed e integração pendentes.
++current_stage=test, stages_completed=[model,design,adr,implement], completed=null;
++bolt/história/TASK/unidade/PHASE-03 em progresso, sem implemented=true ou fecho.
++Planeamento EXTRA-02 preexistente preservado; diff separado do Test e de target.
++Sem gates externos adicionais, commits/push ou início de outro IMP.
+--- a/memory-bank/bolts/021-rotas/ddd-03-test-report.md
++++ b/memory-bank/bolts/021-rotas/ddd-03-test-report.md
+@@ -0,0 +1,123 @@
++---
++unit: "003-rotas"
++bolt: "021-rotas"
++stage: "test"
++status: "awaiting-human-manual"
++created: "2026-11-13T17:42:46Z"
++---
++# IMP-008 — Test técnico executado; repetição humana pendente
++
++✅ Implement aprovado pelo utilizador. Test técnico executado, **Test ainda não
++aprovado**. D22 parcial; bolt/história/TASK/unidade continuam em progresso, sem
++fecho, commits, push ou outro IMP. Apenas Model/Design/ADR/Implement concluídos.
++
++## 1. Versão, autorização e preservação
++
++Base HEAD/main/Denji cc952c5f558930f2c67e7dea8fe92612cd8cc705. Os seis hashes
++aprovados em Implement conferidos antes/depois do build e do manual; nenhum
++fonte Java ou teste de Projeto alterado nesta etapa.
++[Autorização](../../../experiments/construction/021-rotas/implement-approval.json)
++e [entrada](../../../experiments/construction/021-rotas/test-entry.json).
++
++Havia alterações documentais preexistentes de EXTRA-02 em specs/docs/bolt014 e
++em documentos partilhados; preservadas e separadas do diff deste checkpoint.
++A prévia árvore target (708 ficheiros) foi arquivada com hashes antes de clean;
++resultados históricos de Implement não foram sobrescritos. Target novo fica em
++inventário separado e não é conteúdo aprovado para commit.
++
++## 2. Clean verify real com JDK21
++
++Comando em Projeto: `mvn -B -ntp clean verify`, JAVA_HOME/PATH apontados para
++/usr/lib/jvm/java-21-openjdk-amd64. Execução fora da sandbox com autorização para
++TCP local, pois o bloqueio de sockets já foi comprovado em Implement. Não foi
++criada uma falha de sandbox nova para repetir essa limitação conhecida.
++
++- Início:2026-11-13T17:33:26.358693+00:00; fim:2026-11-13T17:33:45.053337+00:00.
++- Saída0, **1211 testes/0falhas/0erros/0ignorados**,14 XML Surefire.
++- 35 testes RoutingTableTest+1176 anteriores, com os mesmos fontes aprovados.
++- Provider real: org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.
++- [Resultado e comandos](../../../experiments/construction/021-rotas/test-build-01/result.json),
++  [log](../../../experiments/construction/021-rotas/test-build-01/maven.log),
++  [ambiente](../../../experiments/construction/021-rotas/test-build-01/environment.json),
++  [Surefire](../../../experiments/construction/021-rotas/test-build-01/surefire/).
++
++JAR **novo**: [ott-streaming-1.0-SNAPSHOT.jar](../../../experiments/construction/021-rotas/test-build-01/ott-streaming-1.0-SNAPSHOT.jar),
++364704 bytes. SHA-256:
++
++```text
++366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee
++```
++
++A cópia de evidência está fora de target e é o JAR usado pelo manual. Auditoria
++confirma os cinco tipos principais de routing com class major65 (Java21) e sem
++RoutingTableTest empacotado. Não é o JAR anterior nem uma alegação de integração.
++[Auditoria](../../../experiments/construction/021-rotas/test-build-01/jar-audit.json).
++
++## 3. V-011 e D01–D22
++
++Os35 nomes/mapeamento de D01–D21 preservados em
++[implement-oracles.json](../../../experiments/construction/021-rotas/implement-oracles.json)
++foram conferidos nos XML novos, não contados por presença de relatório antigo.
++Custos e desempate usam esperados literais; quatro streams isoladas, alternativas,
++paths, seq/TTL, epoch, saturação, sessão, overflow e snapshots exercitados. D20
++confere leitura única do relógio, fronteiras, ticks negativos/wrap e regressão.
++D21 testa limite de revisão no helper e rejeições transacionais na API; não se
++alegam bilhões de revisões nem alocação máxima de um milhão de slots.
++
++| Obrigação D22 | Estado/evidência real |
++|---|---|
++| Mapa V-011/D01–D21 e regressão nova | ✅35 testes de domínio+1176 anteriores;14 XML, clean verify0 |
++| JAR identificado e fontes aprovados | ✅Hash acima e conferência antes/depois; sem Java alterado |
++| Manual técnico offline | ✅Codex,43 CHECK_PASS/MANUAL_PASS/Java0, mesmo JAR |
++| Repetição humana antes de aprovar Test | ⏳Não executada/confirmada nesta etapa |
++| Aprovação de Test | ⏳Não recebida |
++| Revisão humana final e integração | ⏳Pendentes; revisor atribuído Waheed, sem revisão final presumida |
++
++D22 continua **PARCIAL**. Critérios técnicos de V-011 foram exercitados, sem
++promover a validação/fecho global a aprovados. Nenhum requisito global ou fase
++passa a DONE por este relatório. Sem gates externos adicionais.
++
++## 4. Manual offline reproduzível
++
++[Roteiro/comando para Luis](../../../experiments/construction/021-rotas/manual-instructions.md),
++[manifesto](../../../experiments/construction/021-rotas/test-manual-manifest.json).
++Auxiliares fora de Projeto (evidência autorizada, não composição do produto):
++ManualRouting.java e run-manual.py, congelados por hash. Compilam exclusivamente
++contra o JAR fixo, sem JUnit, rede, sockets ou relógio civil para expiração.
++O modo humano pede Enter em oito etapas e cria diretório novo com operador e logs.
++
++Execução técnica real em
++[test-manual-runs/20261113T173843Z-92dfcjfm](../../../experiments/construction/021-rotas/test-manual-runs/20261113T173843Z-92dfcjfm/report.json):
++operator_declared=Codex/kind=agent,43 CHECK_PASS, MANUAL_PASS, compile_exit0,
++JAVA_EXIT0, passed=true, frozen_hashes_match=true, code_source_matches_jar=true e
++java_process_terminated=true. É só a JVM do ensaio que foi verificada terminada;
++não se presume o estado de processos alheios. Não há identidade humana inventada.
++
++Não existe relatório de Luis nesta execução. Não criar execução humana por cópia
++ou renomear a execução do agente. Aguarda-se o caminho real e a confirmação humana.
++
++## 5. Validação documental e preservação
++
++[V-ADD desta etapa](../../../experiments/construction/021-rotas/test-v-add.md):
++saída0, zero erros e78 fixtures verificadas; não executa CORE nem substitui a
++repetição humana. git diff --check passou; fontes e evidências anteriores
++conferidos por SHA256. Nenhum limite ou contrato operacional mudou nesta etapa.
++
++## 6. Alcance, diff e checkpoint
++
++Não há alteração da produção ou dos testes aprovados em Implement. Diff de
++Projeto/src contra a base permanece **+851/−0 em seis caminhos**; delta de fonte
++neste Test é zero. Documentação/auxiliares/evidência deste checkpoint são separados
++do estado preexistente e do target recompilado. Nenhum teste existente enfraquecido.
++O enunciado/bytes/UDP/TCP/caps e a separação seleção/autorização mantêm-se.
++
++Este é um domínio offline: não demonstra catálogo de rede, routing integrado,
++ativação, vídeo, GUI, CORE, sincronização horária entre máquinas ou entrega. Custos
++e tempo do manual são controlados; não são medições de rede. Sem dependências
++runtime novas, JaCoCo, limiar de cobertura, CI ou linter (ADR-026).
++
++1 - ⏳ Aguardar repetição humana do manual, antes de pedir aprovação de Test.
++2 - [ ] Aprovação de Test, revisão final e integração antes de qualquer fecho.
++
++Sem fecho, commits, push ou início de outro IMP. Registos de pendências anteriores
++referem os checkpoints históricos; o estado atual é Test em progresso, D22 parcial.
+--- a/memory-bank/bolts/021-rotas/implementation-walkthrough.md
++++ b/memory-bank/bolts/021-rotas/implementation-walkthrough.md
+@@ -2,13 +2,14 @@
+ unit: "003-rotas"
+ bolt: "021-rotas"
+ stage: "implement"
+-status: "ready-for-review"
++status: "complete"
+ created: "2026-11-13T17:17:41Z"
+ ---
+ # IMP-008 — Implementation walkthrough para revisão
+ 
+-✅ Model/Design/Q-C-26 e revisão ADR aprovados pelo utilizador. ⏳ Implement para
+-aprovação; Test não iniciado. Só os seis caminhos autorizados foram alterados
++✅ Model/Design/Q-C-26/ADR/Implement aprovados pelo utilizador. Test técnico
++executado; manual humano e aprovação de Test pendentes. O corpo abaixo conserva
++o walkthrough apresentado em Implement. Só os seis caminhos autorizados foram alterados
+ em Projeto/src. Sem composição RoutingService/OverlayNode, commits/push ou outro IMP.
+ 
+ ## 1. Base, aprovação e âmbito
+@@ -153,3 +154,6 @@
+ Sem gates externos adicionais. Sem autorização de Test/fecho, commits/push ou
+ outro IMP. A atribuição do revisor não prova revisão efetuada. A composição de
+ métricas/rotas e o encaminhamento de vídeo continuam nos seus checkpoints futuros.
++
++Registo 2026-11-13T17:43:51Z: Implement aprovado explicitamente; resultados atuais em
++[ddd-03-test-report.md](ddd-03-test-report.md). Test continua em progresso, sem fecho.
+--- a/experiments/construction/021-rotas/manual-instructions.md
++++ b/experiments/construction/021-rotas/manual-instructions.md
+@@ -0,0 +1,64 @@
++# IMP-008 / V-011 — manual offline para repetição humana
++
++Preparado em 2026-11-13T17:42:46Z. **Execução humana pendente**. Test e D22 continuam por
++concluir. Este roteiro usa só as APIs públicas do novo JAR: não é CLI do produto,
++não abre sockets, não reproduz vídeo e não demonstra CORE. Tempo e custos são
++entradas controladas; os segundos das etapas são simulados, não esperas reais.
++
++## Artefacto fixo e preparação
++
++- JAR: [ott-streaming-1.0-SNAPSHOT.jar](test-build-01/ott-streaming-1.0-SNAPSHOT.jar), 364704 bytes.
++- SHA-256: `366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee`.
++- JDK21 com java/javac; caminho local confirmado: `/usr/lib/jvm/java-21-openjdk-amd64`.
++- Manifesto: [test-manual-manifest.json](test-manual-manifest.json). O wrapper
++  confere JAR, seis fontes aprovados e os próprios auxiliares antes/depois.
++  Não usa os classfiles mutáveis de Projeto/target nem JUnit.
++
++A partir da raiz do repositório:
++
++```bash
++python3 -B experiments/construction/021-rotas/test-manual-tools/run-manual.py --operator Luis --kind human --java-home /usr/lib/jvm/java-21-openjdk-amd64
++```
++
++O comando cria e apresenta um diretório **novo** em test-manual-runs/. Não reutiliza
++ou sobrescreve o ensaio do agente. Compila ManualRouting.java contra o JAR fixo,
++guarda compile.log e usa o mesmo JAR como origem real de RoutingTable em runtime.
++Prima Enter antes de cada uma das oito etapas. Leia os resultados e compare com
++o ESPERADO; Ctrl+C interrompe e guarda falha/saída, sem aprovação automática.
++EOF antes de uma confirmação de etapa não conta como execução completa.
++
++## Resultados a conferir
++
++| Etapa | Resultado esperado |
++|---|---|
++| 1 — Quatro streams | S1/A=130 porR2 (alternativa140 porR1), S1/B=240, S2/C=340, S2/D=450; snapshots imutáveis e sem autorização de dados |
++| 2 — Empates e TTL | NodeId desempata; depois menos saltos vence. Melhoria aos7s mantém início0; aos8s expira e volta à alternativa130. Aos9s mesma geração é recusada pelo watermark |
++| 3 — Retirada e sessão | Retirada deR2 preservaR1=140; geração retirada não regressa. Conexão nova na mesma instância começa sem RTT; custo novo produz11; callbacks antigos não alteram snapshot |
++| 4 — Época | Mudança explícita deS1 invalida juntas A/B; snapshots deS2 ficam iguais; época retirada e anúncio antigo não revertem |
++| 5 — Histórico | Oito épocas protegidas; nona retirada recusa sem apagar A=6/B=7; aos24999ms ainda recusa, aos25000ms permite por expiração dos históricos de9s |
++| 6 — Capacidades | Limits pequenos saturam origens/streams/sessões sem evicção; atualizar slot existente continua possível |
++| 7 — Fonte local | Custo0 sem parent/dados; época nova retira ambas as ofertas locais |
++| 8 — Overflow | Soma até Long.MAX_VALUE aceite; anúncio com overflow não substitui saudável; métrica impossível conserva anúncio inelegível e recuperação preserva início |
++
++Condições finais esperadas: **43 CHECK_PASS**, `CHECK_COUNT=43`, `MANUAL_PASS`,
++`JAVA_EXIT=0` e `PASSED=true`. Não aceitar sucesso parcial ou erro de hash.
++
++O diretório novo contém entry.json, compile.log, manual.log, java-pid.json,
++classes auxiliares e **report.json** com operador/tipo declarados, comandos,
++hashes, origem de classe, saída e terminação da JVM criada. O wrapper não
++comprova a identidade da pessoa: a confirmação humana é registada só depois
++por resposta do utilizador, associada a esse relatório e ao JAR validado.
++
++Quando terminares, envia o caminho do report.json e confirma o resultado e
++qualquer divergência observada. Não existe ainda um caminho de execução humana
++para registar: só será criado quando executares o comando.
++
++## Ensaio técnico do agente — separado
++
++[Relatório Codex](test-manual-runs/20261113T173843Z-92dfcjfm/report.json) e
++[log](test-manual-runs/20261113T173843Z-92dfcjfm/manual.log):43 CHECK_PASS, MANUAL_PASS,
++JAVA_EXIT0, passed=true; hashes e origem do JAR conferidos e JVM terminada.
++kind_declared=agent. Não é a execução humana nem aprovação de Test.
++
++Fecho continua dependente de V-011/consolidação, manual humano antes de aprovar
++Test, revisão final e integração. Não foi autorizado commit, push ou outro IMP.
+--- a/experiments/construction/021-rotas/test-manual-tools/ManualRouting.java
++++ b/experiments/construction/021-rotas/test-manual-tools/ManualRouting.java
+@@ -0,0 +1,198 @@
++import java.io.BufferedReader;
++import java.io.InputStreamReader;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++import java.util.function.LongSupplier;
++import pt.uminho.esr.ott.routing.*;
++import pt.uminho.esr.ott.routing.RoutingTable.*;
++
++/** Offline, independent demonstration against the verified JAR, not product CLI or JUnit. */
++public final class ManualRouting {
++    private static final UUID A = uuid("manual-S1-A"), B = uuid("manual-S1-B");
++    private static final UUID C = uuid("manual-S2-C"), D = uuid("manual-S2-D");
++    private static final UUID E1 = uuid("manual-S1-epoch"), E2 = uuid("manual-S2-epoch");
++    private static int checks;
++    private static boolean interactive;
++    private static final BufferedReader INPUT = new BufferedReader(new InputStreamReader(System.in));
++
++    private static final class Clock implements LongSupplier {
++        long nanos;
++        public long getAsLong() { return nanos; }
++        void millis(long ms) { nanos = Math.multiplyExact(ms, 1_000_000L); System.out.println("SIMULATED_TIME_MS=" + ms); }
++    }
++    private static UUID uuid(String name) { return UUID.nameUUIDFromBytes(name.getBytes(StandardCharsets.UTF_8)); }
++    private static void check(boolean value, String description) {
++        if (!value) throw new AssertionError("CHECK_FAIL " + description);
++        checks++; System.out.println("CHECK_PASS " + checks + " " + description);
++    }
++    private static void step(String title, String expected) throws Exception {
++        System.out.println("\nSTEP " + title + "\nESPERADO: " + expected);
++        if (interactive) {
++            System.out.println("Prima Enter para executar esta etapa (Ctrl+C para interromper)."); System.out.flush();
++            if (INPUT.readLine() == null) throw new IllegalStateException("EOF before manual step confirmation");
++        }
++    }
++    private static void apply(Outcome result) {
++        if (result.status() != Status.APPLIED) throw new AssertionError("Unexpected setup/operation result: " + result);
++    }
++    private static SessionKey session(String node, String connection) { return new SessionKey(node, uuid(node), uuid(connection)); }
++    private static void announce(RoutingTable table, UUID stream, String server, UUID epoch,
++            SessionKey sender, long seq, long cost, String... path) {
++        apply(table.announce(new Advertisement(stream, server, epoch, sender, seq, cost, List.of(path))));
++    }
++    private static Route view(RoutingTable table, UUID stream) { return table.snapshot(stream).orElseThrow(); }
++    private static long cost(RoutingTable table, UUID stream) { return view(table, stream).selectedMetric().orElseThrow().costMicros(); }
++    private static boolean blocked(Runnable operation) {
++        try { operation.run(); return false; } catch (UnsupportedOperationException expected) { return true; }
++    }
++    private static boolean dataDisabled(Route route) {
++        return route.activeUpstream().isEmpty() && route.pendingUpstream().isEmpty()
++                && route.downstreams().isEmpty() && route.state() != RouteState.ACTIVE;
++    }
++    private static void show(String label, Route route) {
++        System.out.println(label + " stream=" + route.streamId() + " state=" + route.state()
++                + " server=" + route.serverId() + " epoch=" + route.serverEpoch()
++                + " knownUpstream=" + route.knownUpstream().map(SessionKey::nodeId).orElse("none")
++                + " costMicros=" + route.selectedMetric().map(m -> Long.toString(m.costMicros())).orElse("none")
++                + " candidates=" + route.candidates().size() + " dataAuthorized=false");
++    }
++
++    public static void main(String[] args) throws Exception {
++        if (args.length != 1 || !Set.of("--interactive", "--automatic").contains(args[0]))
++            throw new IllegalArgumentException("Select --interactive or --automatic");
++        interactive = args[0].equals("--interactive");
++        System.out.println("CODE_SOURCE=" + RoutingTable.class.getProtectionDomain().getCodeSource().getLocation());
++        System.out.println("OFFLINE_ONLY; costs and time are controlled inputs, not network measurements.");
++        var clock = new Clock(); var limits = Limits.forNode(64);
++        var table = new RoutingTable("Client", limits, 8000, 16000, clock);
++
++        step("1 — Quatro streams e seleção", "S1/A=130 por R2; S1/B=240; S2/C=340; S2/D=450. Nenhum dado autorizado.");
++        apply(table.bindStream(A, "S1")); apply(table.bindStream(B, "S1"));
++        apply(table.bindStream(C, "S2")); apply(table.bindStream(D, "S2"));
++        apply(table.confirmEpoch("S1", Optional.empty(), E1)); apply(table.confirmEpoch("S2", Optional.empty(), E2));
++        var r1 = session("R1", "first-R1"); var r2 = session("R2", "first-R2");
++        apply(table.replaceSession(Optional.empty(), r1)); apply(table.replaceSession(Optional.empty(), r2));
++        apply(table.setLinkCost(r1, OptionalLong.of(40))); apply(table.setLinkCost(r2, OptionalLong.of(50)));
++        announce(table, A, "S1", E1, r1, 1, 100, "S1", "R1");
++        announce(table, A, "S1", E1, r2, 1, 80, "S1", "R2");
++        announce(table, B, "S1", E1, r1, 1, 200, "S1", "R1");
++        announce(table, C, "S2", E2, r1, 1, 300, "S2", "R1");
++        announce(table, D, "S2", E2, r2, 1, 400, "S2", "R2");
++        check(limits.origins() == 64 && limits.streamsPerOrigin() == 256 && limits.neighbors() == 63
++                && limits.retiredEpochsPerOrigin() == 8 && limits.slotCapacity() == 1_032_192, "approved budgets; no maximum allocation required");
++        check(cost(table, A) == 130 && view(table, A).knownUpstream().orElseThrow().equals(r2), "100+40=140 loses to 80+50=130");
++        check(cost(table, B) == 240 && cost(table, C) == 340 && cost(table, D) == 450, "four stream costs remain independent");
++        check(view(table, A).candidates().size() == 2, "alternative retained");
++        check(view(table, A).serverEpoch().equals(view(table, B).serverEpoch())
++                && !view(table, A).serverEpoch().equals(view(table, C).serverEpoch()), "epoch shared only within origin");
++        var initial = view(table, A);
++        check(dataDisabled(initial) && initial.state() == RouteState.INACTIVE, "selected route is not data authorization");
++        check(blocked(() -> initial.candidates().clear()), "candidate list immutable");
++        check(blocked(() -> initial.selectedCandidate().orElseThrow().path().clear()), "nested path immutable");
++        show("S1/A", initial); show("S1/B", view(table, B)); show("S2/C", view(table, C)); show("S2/D", view(table, D));
++
++        step("2 — Empates e TTL", "Empate por nodeId; depois menos saltos. Melhoria aos7s não prolonga prazo de8s.");
++        announce(table, A, "S1", E1, r1, 2, 90, "S1", "R1");
++        check(view(table, A).knownUpstream().orElseThrow().equals(r1) && cost(table, A) == 130, "equal cost/hops chooses R1 before R2");
++        announce(table, A, "S1", E1, r1, 3, 90, "S1", "X", "R1");
++        check(view(table, A).knownUpstream().orElseThrow().equals(r2), "equal cost chooses fewer hops");
++        clock.millis(7000);
++        announce(table, A, "S1", E1, r2, 2, 80, "S1", "R2");
++        announce(table, B, "S1", E1, r1, 2, 200, "S1", "R1");
++        announce(table, C, "S2", E2, r1, 2, 300, "S2", "R1");
++        announce(table, D, "S2", E2, r2, 2, 400, "S2", "R2");
++        announce(table, A, "S1", E1, r1, 3, 70, "S1", "R1");
++        var improved = view(table, A); var others = List.of(view(table, B), view(table, C), view(table, D));
++        check(cost(table, A) == 110 && improved.selectedCandidate().orElseThrow().generationStartedAtNanos() == 0, "same generation improves without resetting start");
++        clock.millis(8000);
++        check(cost(table, A) == 130 && view(table, A).knownUpstream().orElseThrow().equals(r2), "expired best falls back to refreshed alternative");
++        check(view(table, A).candidates().size() == 1, "expired candidate filtered before physical cleanup");
++        check(others.equals(List.of(view(table, B), view(table, C), view(table, D))), "other refreshed streams unchanged");
++        check(improved.selectedMetric().orElseThrow().costMicros() == 110 && initial.selectedMetric().orElseThrow().costMicros() == 130, "previous snapshots remain stable");
++        clock.millis(9000);
++        var stale = table.announce(new Advertisement(A, "S1", E1, r1, 3, 60, List.of("S1", "R1")));
++        check(stale.reason() == Reason.GENERATION_EXPIRED && cost(table, A) == 130, "retained watermark prevents resurrection");
++        show("S1/A", view(table, A));
++
++        step("3 — Retirada e sessão", "Retirada afeta só o emissor; conexão nova não herda medição; callbacks antigos são ignorados.");
++        announce(table, A, "S1", E1, r1, 4, 100, "S1", "R1");
++        apply(table.withdraw(A, E1, r2, 2));
++        check(cost(table, A) == 140 && view(table, A).knownUpstream().orElseThrow().equals(r1), "withdraw keeps valid alternative");
++        check(table.announce(new Advertisement(A, "S1", E1, r2, 2, 1, List.of("S1", "R2"))).reason()
++                == Reason.WITHDRAWN_GENERATION, "withdrawn generation cannot return");
++        var next = new SessionKey("R1", r1.instanceId(), uuid("replacement-R1"));
++        apply(table.replaceSession(Optional.of(r1), next));
++        announce(table, A, "S1", E1, next, 1, 10, "S1", "R1");
++        check(view(table, A).state() == RouteState.UNAVAILABLE && view(table, A).candidates().size() == 1, "new connection candidate waits for new measurement");
++        apply(table.setLinkCost(next, OptionalLong.of(1)));
++        check(cost(table, A) == 11 && r1.instanceId().equals(next.instanceId()) && !r1.connectionId().equals(next.connectionId()), "same instance, new connection and measured cost");
++        var healthy = view(table, A);
++        check(table.setLinkCost(r1, OptionalLong.of(99)).reason() == Reason.STALE_SESSION
++                && table.withdraw(A, E1, r1, 99).reason() == Reason.STALE_SESSION
++                && table.removeSession(r1).reason() == Reason.STALE_SESSION, "old callbacks rejected by full session");
++        check(healthy.equals(view(table, A)), "old callbacks preserve replacement snapshot");
++
++        step("4 — Mudança de época", "S1/A e S1/B mudam juntos; S2/C e S2/D permanecem. UUID antigo protegido não pode regressar.");
++        announce(table, C, "S2", E2, next, 1, 300, "S2", "R1");
++        var secondOrigin = List.of(view(table, C), view(table, D)); UUID current = uuid("replacement-epoch-1");
++        var changed = table.confirmEpoch("S1", Optional.of(E1), current); apply(changed);
++        check(changed.changedStreams().equals(Set.of(A, B)), "epoch change affects exactly both streams of S1");
++        check(view(table, A).state() == RouteState.UNAVAILABLE && view(table, B).state() == RouteState.UNAVAILABLE
++                && view(table, A).serverEpoch().equals(Optional.of(current)), "new epoch published without old candidates");
++        check(secondOrigin.equals(List.of(view(table, C), view(table, D))), "other origin snapshots preserved atomically");
++        check(table.confirmEpoch("S1", Optional.of(current), E1).reason() == Reason.RETIRED_EPOCH, "retired epoch cannot revert current origin");
++        check(table.announce(new Advertisement(A, "S1", E1, next, 99, 1, List.of("S1", "R1"))).reason() == Reason.STALE_EPOCH, "old announcement never changes epoch implicitly");
++        show("S1/A", view(table, A)); show("S1/B", view(table, B)); show("S2/C", view(table, C)); show("S2/D", view(table, D));
++
++        step("5 — Oito épocas protegidas", "Nona retirada recusa sem apagar candidatos; aos25s simulados expiram os históricos iniciados aos9s.");
++        for (int i = 2; i <= 8; i++) {
++            UUID replacement = uuid("replacement-epoch-" + i);
++            apply(table.confirmEpoch("S1", Optional.of(current), replacement)); current = replacement;
++        }
++        announce(table, A, "S1", current, next, 1, 5, "S1", "R1");
++        announce(table, B, "S1", current, next, 1, 6, "S1", "R1");
++        var protectedViews = List.of(view(table, A), view(table, B)); UUID ninth = uuid("replacement-epoch-9");
++        check(table.confirmEpoch("S1", Optional.of(current), ninth).reason() == Reason.CAPACITY_EXCEEDED, "ninth protected retirement rejected");
++        check(protectedViews.equals(List.of(view(table, A), view(table, B))) && cost(table, A) == 6 && cost(table, B) == 7, "capacity rejection preserves both healthy streams");
++        check(table.confirmEpoch("S1", Optional.of(current), E1).reason() == Reason.RETIRED_EPOCH, "protected oldest epoch not evicted");
++        clock.millis(24999);
++        check(table.confirmEpoch("S1", Optional.of(current), ninth).reason() == Reason.CAPACITY_EXCEEDED, "history protected before exact deadline");
++        clock.millis(25000); apply(table.confirmEpoch("S1", Optional.of(current), ninth)); current = ninth;
++        check(view(table, A).serverEpoch().equals(Optional.of(ninth)) && view(table, A).state() == RouteState.UNAVAILABLE, "history capacity released only after horizon");
++
++        step("6 — Capacidades pequenas", "Saturar bindings/sessões não expulsa estado; atualizar slot existente continua permitido.");
++        var small = new RoutingTable("Client", new Limits(1, 1, 1, 1), 8000, 16000, clock);
++        apply(small.bindStream(A, "S1")); apply(small.confirmEpoch("S1", Optional.empty(), E1));
++        apply(small.replaceSession(Optional.empty(), r2)); apply(small.setLinkCost(r2, OptionalLong.of(1)));
++        announce(small, A, "S1", E1, r2, 1, 5, "S1", "R2"); var smallBefore = view(small, A);
++        check(small.bindStream(B, "S1").reason() == Reason.CAPACITY_EXCEEDED
++                && small.bindStream(C, "S2").reason() == Reason.CAPACITY_EXCEEDED, "stream and origin limits reject explicitly");
++        check(small.replaceSession(Optional.empty(), next).reason() == Reason.CAPACITY_EXCEEDED
++                && smallBefore.equals(view(small, A)), "session saturation preserves candidate and binding");
++        announce(small, A, "S1", E1, r2, 2, 4, "S1", "R2");
++        check(cost(small, A) == 5 && view(small, A).candidates().size() == 1, "update reuses existing bounded slot");
++
++        step("7 — Fonte local", "Custo zero sem parent/dados; nova época retira ambas as ofertas locais.");
++        var source = new RoutingTable("S1", Limits.forNode(64), 8000, 16000, clock);
++        apply(source.bindStream(A, "S1")); apply(source.bindStream(B, "S1"));
++        apply(source.confirmEpoch("S1", Optional.empty(), E1)); apply(source.offerLocal(A, E1)); apply(source.offerLocal(B, E1));
++        check(cost(source, A) == 0 && view(source, A).localSource() && view(source, A).knownUpstream().isEmpty(), "local source cost is zero with no parent");
++        check(dataDisabled(view(source, A)) && dataDisabled(view(source, B)), "local planning offers still authorize no data");
++        apply(source.confirmEpoch("S1", Optional.of(E1), current));
++        check(!view(source, A).localSource() && !view(source, B).localSource(), "epoch invalidates local offers together");
++
++        step("8 — Overflow e imutabilidade", "Soma exata aceita Long.MAX_VALUE; overflow recusa sem substituir candidato; medição impossível não renova TTL.");
++        announce(table, A, "S1", current, next, 1, Long.MAX_VALUE - 1, "S1", "R1");
++        check(cost(table, A) == Long.MAX_VALUE, "representable accumulated cost accepted");
++        var exact = view(table, A);
++        check(table.announce(new Advertisement(A, "S1", current, next, 2, Long.MAX_VALUE, List.of("S1", "R1"))).reason()
++                == Reason.INVALID_INPUT && exact.equals(view(table, A)), "overflowing update rejected atomically");
++        apply(table.setLinkCost(next, OptionalLong.of(2)));
++        check(view(table, A).state() == RouteState.UNAVAILABLE && view(table, A).candidates().size() == 1, "later metric overflow keeps announcement but removes eligibility");
++        apply(table.setLinkCost(next, OptionalLong.of(1)));
++        check(cost(table, A) == Long.MAX_VALUE && view(table, A).selectedCandidate().orElseThrow().generationStartedAtNanos() == 25_000_000_000L, "measurement recovery preserves original generation start");
++        check(dataDisabled(view(table, A)) && exact.selectedMetric().orElseThrow().costMicros() == Long.MAX_VALUE, "data remains disabled and old snapshot unchanged");
++        System.out.println("CHECK_COUNT=" + checks);
++        System.out.println("MANUAL_PASS");
++    }
++}
+--- a/experiments/construction/021-rotas/test-manual-tools/run-manual.py
++++ b/experiments/construction/021-rotas/test-manual-tools/run-manual.py
+@@ -0,0 +1,128 @@
++#!/usr/bin/env python3
++"""Repeatable offline public-API manual against the frozen IMP-008 JAR."""
++import argparse
++from datetime import datetime, timezone
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++import tempfile
++from urllib.parse import unquote, urlsplit
++
++HERE = Path(__file__).resolve().parent
++BOLT = HERE.parent
++ROOT = HERE.parents[3]
++
++
++def sha(path):
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def stamp():
++    return datetime.now(timezone.utc).isoformat()
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('--operator', required=True)
++    parser.add_argument('--kind', required=True, choices=('human', 'agent'))
++    parser.add_argument('--java-home', default='/usr/lib/jvm/java-21-openjdk-amd64')
++    args = parser.parse_args()
++    if not args.operator.strip():
++        parser.error('operator cannot be empty')
++    manifest_path = BOLT / 'test-manual-manifest.json'
++    manifest = json.loads(manifest_path.read_text())
++    jar = ROOT / manifest['jar']['path']
++    protected = dict(manifest['source_sha256'], **manifest['manual_tool_sha256'])
++    protected[manifest['jar']['path']] = manifest['jar']['sha256']
++    for name, expected in protected.items():
++        path = ROOT / name
++        if not path.is_file() or sha(path) != expected:
++            raise RuntimeError('Frozen file changed: ' + name)
++    java_home = Path(args.java_home).resolve()
++    java, javac = java_home / 'bin/java', java_home / 'bin/javac'
++    version = subprocess.run([str(java), '-version'], capture_output=True, text=True, timeout=10)
++    if version.returncode != 0 or not re.search(r'version "21[.]', version.stderr + version.stdout):
++        raise RuntimeError('This manual requires JDK 21: ' + version.stderr + version.stdout)
++    parent = BOLT / 'test-manual-runs'
++    parent.mkdir(exist_ok=True)
++    run = Path(tempfile.mkdtemp(prefix=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ-'), dir=parent))
++    print(str(run), flush=True)
++    classes = run / 'classes'
++    classes.mkdir()
++    compile_command = [str(javac), '-encoding', 'UTF-8', '--release', '21', '-cp', str(jar),
++                       '-d', str(classes), str(HERE / 'ManualRouting.java')]
++    java_command = [str(java), '-cp', str(jar) + os.pathsep + str(classes), 'ManualRouting',
++                    '--interactive' if args.kind == 'human' else '--automatic']
++    metadata = dict(started_at=stamp(), operator_declared=args.operator, kind_declared=args.kind,
++                    human_identity_independently_verified=False, manifest_sha256=sha(manifest_path),
++                    jar=manifest['jar'], java_home=str(java_home), java_version=version.stderr + version.stdout,
++                    compile_command=compile_command, java_command=java_command,
++                    source_sha256=manifest['source_sha256'], manual_tool_sha256=manifest['manual_tool_sha256'])
++    (run / 'entry.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
++    child = None
++    java_exit = None
++    compile_exit = None
++    problem = None
++    try:
++        with (run / 'compile.log').open('w') as log:
++            compiled = subprocess.run(compile_command, stdout=log, stderr=subprocess.STDOUT, timeout=30)
++        compile_exit = compiled.returncode
++        if compile_exit != 0:
++            raise RuntimeError('Compilation failed; see compile.log')
++        child = subprocess.Popen(java_command, stdin=None if args.kind == 'human' else subprocess.DEVNULL,
++                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
++        (run / 'java-pid.json').write_text(json.dumps({'pid': child.pid, 'started_at': stamp()}) + '\n')
++        with (run / 'manual.log').open('w') as log:
++            if args.kind == 'agent':
++                output, _ = child.communicate(timeout=30)
++                log.write(output)
++                print(output, end='', flush=True)
++            else:
++                for line in child.stdout:
++                    log.write(line)
++                    log.flush()
++                    print(line, end='', flush=True)
++                child.wait()
++        java_exit = child.returncode
++    except BaseException as error:
++        problem = type(error).__name__ + ': ' + str(error)
++    finally:
++        if child is not None:
++            if child.poll() is None:
++                child.terminate()
++                try:
++                    child.wait(timeout=3)
++                except subprocess.TimeoutExpired:
++                    child.kill()
++                    child.wait(timeout=3)
++            java_exit = child.returncode
++            child.stdout.close()
++    text = (run / 'manual.log').read_text() if (run / 'manual.log').exists() else ''
++    checks = len(re.findall(r'^CHECK_PASS ', text, re.M))
++    declared = re.findall(r'^CHECK_COUNT=(\d+)$', text, re.M)
++    source = re.findall(r'^CODE_SOURCE=(.+)$', text, re.M)
++    location_matches = bool(source) and Path(unquote(urlsplit(source[0]).path)).resolve() == jar.resolve()
++    frozen_match = all((ROOT / p).is_file() and sha(ROOT / p) == h for p, h in protected.items())
++    terminated = child is not None and child.poll() is not None
++    passed = (problem is None and compile_exit == 0 and java_exit == 0 and terminated
++              and checks == manifest['expected_checks'] and declared == [str(checks)]
++              and 'MANUAL_PASS' in text.splitlines() and 'CHECK_FAIL' not in text
++              and frozen_match and location_matches)
++    report = dict(metadata, finished_at=stamp(), compile_exit=compile_exit, JAVA_EXIT=java_exit,
++                  check_count=checks, expected_checks=manifest['expected_checks'], MANUAL_PASS='MANUAL_PASS' in text.splitlines(),
++                  passed=passed, frozen_hashes_match=frozen_match, code_source_matches_jar=location_matches,
++                  java_process_terminated=terminated, error=problem, scope='offline public API, no sockets or project CLI')
++    report['evidence_sha256'] = {p.name: sha(p) for p in run.iterdir() if p.is_file()}
++    (run / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
++    print('REPORT=' + str(run / 'report.json'))
++    print('JAVA_EXIT=' + str(java_exit))
++    print('PASSED=' + str(passed).lower())
++    return 0 if passed else 1
++
++
++if __name__ == '__main__':
++    sys.exit(main())

@@ -74,3 +74,42 @@ protocol.ControlMessage contém o envelope e payloads imutáveis associados aos 
 ## Transporte disponível desde TASK-005
 
 Connection possui UUID por ligação, endpoint remoto, fila limitada e razão terminal (primeira razão vence). UUID de conexão não autentica nodeId. Eventos ordenados open → mensagens → closed, sendo closed único; slots de admissão incluem dials e permanecem ocupados até os dois workers I/O terminarem. Shutdown fecha também tentativas pendentes. A associação a Neighbor pertence à TASK-007. [API](07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005).
+
+
+## IMP-008 — Design aprovado e checkpoint ADR
+
+Registo 2026-11-13T16:41:04Z. Q-C-26 aprovada integralmente: capacidades e retenção no
+[ADD6.1](../add.md#61-entidades-e-invariantes) e
+[Design](../memory-bank/bolts/021-rotas/ddd-02-technical-design.md).
+[Revisão ADR](../memory-bank/bolts/021-rotas/adr-review.md) preparada, para aprovação.
+LinkMetrics.costMicros() fornece o custo opcional em µs já arredondado pelo monitor;
+projetar nodeId/instanceId/connectionId para SessionKey e consumir o valor diretamente.
+SUSPECT com amostra mantém o custo; ausência não é zero. O domínio não recalcula RTT.
+Tabela cresce por admissão, sem máximos pré-alocados, cacheCapacity reutilizada ou
+evição de histórico protegido. Snapshot de seleção não é forwarding confirmado.
+A ponte de eventos de métricas para routing ainda não existe em OverlayNode;
+composição futura requer checkpoint/âmbito próprio. Só Model/Design concluídos;
+Implement/Test, V-011, regressão atual, manual offline, revisão final e integração
+pendentes. Nenhuma alteração Java, teste executado ou ADR nova neste checkpoint.
+
+
+## IMP-008 — domínio implementado para revisão, sem composição de rede
+
+Registo 2026-11-13T17:18:48Z. [Walkthrough](../memory-bank/bolts/021-rotas/implementation-walkthrough.md):
+RouteMetric/RouteCandidate/RouteState/Route/RoutingTable disponíveis nos seis
+caminhos do IMP-008, conforme Design e Q-C-26 aprovados. Snapshot só de seleção,
+sem parent confirmado ou destinos. Todos os métodos da tabela exigem o owner
+serial do chamador; nenhuma thread, socket ou timer criado pelo domínio.
+35 testes novos e regressão incremental1211/0/0/0 com JDK21; execução restrita
+anterior preservada. Test/clean verify/manual humano/revisão final/integração
+pendentes. RoutingService/OverlayNode e bytes operacionais preservados.
+
+
+## IMP-008 — Test técnico, manual humano pendente
+
+Registo 2026-11-13T17:43:51Z. [Relatório](../memory-bank/bolts/021-rotas/ddd-03-test-report.md):
+clean verify JDK21:1211/0/0/0; novo JAR e35 testes do domínio confirmados, sem
+alteração de fonte nesta etapa. Manual Codex43checks passou contra esse JAR;
+[roteiro offline humano](../experiments/construction/021-rotas/manual-instructions.md)
+preparado, execução humana não recebida. D22 parcial/Test por aprovar, revisão
+final e integração pendentes. Sem composição de rede ou autorização de dados nova.

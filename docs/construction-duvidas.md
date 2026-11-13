@@ -933,3 +933,87 @@ q-c-25-application.json e q-c-25-discovery-application.json. Regressão04 execut
 1176 testes,0falhas/0erros/0ignorados,exit0. XML/log preservados em experiments/
 construction/005-rotas. Resolve-se a questão de adaptação do peer controlado;
 não se promove Implement/Test, fecho, manual ou revisão final a aprovados.
+
+
+## Q-C-26 — IMP-008: validade, épocas e limites do agregado
+
+- **Registo:** 2026-11-13T16:04:28Z; estado **PROPOSTA/PENDENTE DE DECISÃO**, apenas Model autorizado.
+- **Fontes:** ADD 6.1/6.3/IMP-008, ADR-004/017/018/024, docs06/07 e TASK-011.
+- **Dúvida:** as fontes exigem validade, melhoria tardia, proteção contra épocas
+  retiradas e recursos limitados, mas não fixam todas as regras de retenção da
+  tabela. O limite4096 é da cache de flooding, não um orçamento aprovado de rotas.
+- **Propostas para revisão do Model:**
+  1. Dentro da mesma sessão/época e slot vizinho/stream, sequência mais recente
+     substitui o anúncio anterior e inicia nova validade; duplicado ou sequência
+     antiga não renovam TTL. Uma melhoria estrita da mesma geração é admitida,
+     preservando o prazo dessa geração em vez de o prolongar. Uma mensagem
+     obsoleta não retira um candidato válido. Separar estas operações da futura
+     deduplicação/flooding de IMP-009; não prometer proteção de replay ilimitada
+     depois de eliminado todo o histórico. O Design deve definir a retenção
+     limitada necessária para a janela local e testar a fronteira da expiração.
+  2. A mudança de época é um evento explícito validado pelo owner futuro, nunca
+     uma comparação de UUIDs. Aplicá-la atomicamente a todas as streams daquela
+     fonte; conservar épocas retiradas no horizonte existente de anúncios/cache,
+     com prazo monotónico e orçamento finito. Se não houver espaço para a proteção
+     necessária, rejeitar atomicamente a transição com resultado explícito, sem
+     eliminar tombstones ainda válidos para abrir espaço.
+  3. Definir em Design limites finitos explícitos para streams, candidatos,
+     gerações retidas e épocas, respeitando os caps existentes e sem acrescentar
+     parâmetros de configuração. A cache4096 não é reutilizada silenciosamente
+     como limite de rotas. Validar capacidade antes de inserir e devolver
+     saturação explícita, preservando sessões, alternativas e snapshots saudáveis.
+     Os valores e as formas Java ainda não estão escolhidos neste Model.
+- **Impacto/âmbito:** somente os seis caminhos de IMP-008; sem RoutingService,
+  protocolo, novos timers, executores ou configuração. O transporte e a reparação
+  concluídos não são reabertos. Estas concretizações não são ADR aceite.
+- **Decisão humana:** não recebida. Se alguma proposta contrariar uma decisão
+  aceite, interromper a parte afetada e apresentar ADR de substituição antes de código.
+- **Oráculos propostos:** M09–M11/M15; V-011 ainda NÃO EXECUTADO.
+
+
+### Q-C-26 — princípios aprovados; valores de Design para revisão
+
+Registo 2026-11-13T16:19:45Z. O utilizador aprovou expressamente Model e os três princípios:
+renovação só por sequência mais recente, melhoria na mesma geração sem extensão
+do prazo; mudança de época explícita/atómica com proteção limitada; capacidades
+finitas com saturação explícita, sem expulsar estado saudável. Apenas Design foi
+autorizado. As menções anteriores a proposta não aprovada são histórico.
+
+Proposta concreta no [Design](../memory-bank/bolts/021-rotas/ddd-02-technical-design.md),
+ainda **PENDENTE DE APROVAÇÃO**:
+
+- 64 origens ×256 streams=16384 linhas; N=min(control.max.connections,63)
+  sessões/slots por stream, no máximo16384×N slots/candidatos/watermarks.
+- Um watermark por slot corrente, retido durante routing.cache.ttl.ms (default16s)
+  desde a admissão de sequência nova; candidato durante candidate.ttl (default8s).
+  Nenhuma melhoria/duplicado/métrica renova. Slot logicamente expirado pode ser
+  reutilizado atomicamente; proteção não é ilimitada depois do horizonte.
+- Oito épocas retiradas por origem/512 totais, protegidas por cache.ttl desde a
+  retirada; nona retirada ainda dentro do horizonte é recusada atomicamente,
+  preservando época, candidatos e tombstones vivos. UUID nunca ordenado por tempo.
+- Linhas UUID→origem persistem na execução e contam mesmo sem candidatos; não
+  reutilizar routing.cache.capacity4096. Sem nova chave de configuração ou hard cap
+  de deployment. Limits pequenos só para testes; produção64/256/N/8.
+
+Estes números e horizonte não são decisões aceites por efeito da aprovação dos
+princípios. Design requer revisão; ADR/Implement/Test não autorizados. D09–D13,
+D17/D20/D21 cobrem fronteiras, saturação e retenção; nenhum teste Java executado.
+
+
+### Q-C-26 — valores e horizontes aprovados integralmente
+
+Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e valores/horizontes concretos:
+64 origens,256 streams/origem, N=min(C,63) slots/stream, oito épocas retiradas por
+origem; candidato por candidateTtl e históricos por cacheTtl. Exigiu alocação por
+necessidade, sem prealocar máximos; saturação atómica sem expulsão protegida.
+Q-C-26 fica **DECIDIDA/APROVADA**; as pendências anteriores são históricas.
+
+A revisão ADR inspecionou as APIs reais: LinkMetrics.costMicros() já é OptionalLong
+com ceil da EWMA em µs; encaminhar diretamente, preservando Session completa e
+sem reinterpretar SUSPECT como ausência. RuntimeConfiguration valida Duration em
+ms inteiros e cacheTtl≥candidateTtl. Nenhum Java alterado ou teste executado.
+
+Só revisão ADR autorizada. A [análise](../memory-bank/bolts/021-rotas/adr-review.md)
+está para aprovação; não há autorização de Implement, commits ou push. A futura
+ponte de métricas/owner não existe na composição atual e terá de ser definida no
+checkpoint respetivo, sem alargar os seis caminhos deste IMP por inferência.

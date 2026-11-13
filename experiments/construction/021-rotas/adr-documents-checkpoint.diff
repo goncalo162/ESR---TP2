@@ -1,0 +1,637 @@
+--- a/add.md
++++ b/add.md
+@@ -636,6 +636,24 @@
+ min(pedido, máximo local); renovar a cada min(período configurado, grantedLease/3),
+ com precisão monotónica sem arredondar para zero. Lease nulo é inválido. V-015
+ testa esta regra de negociação para não ignorar um lease concedido menor.
++
++**Detalhe aprovado de IMP-008/Q-C-26:** tabela por stream, limitada a64 origens
++×256 streams=16384 bindings que persistem na execução; N=min(control.maxConnections,63)
++sessões/slots por stream, um watermark por slot, até16384×N slots. Oito épocas
++retiradas por origem/512 totais. Mapas alocados por necessidade, sem prealocação
++máxima ou evicção de estado protegido. Saturação rejeita atomicamente, preservando
++estado saudável. routing.cache.capacity4096 continua a limitar flooding, não rotas.
++Candidato vive candidateTtl; watermark vive cacheTtl desde sequência mais recente;
++melhoria da mesma geração/duplicado/métrica não renova os prazos. Época retirada
++fica protegida por cacheTtl desde a retirada; mudança explícita com CAS invalida
++atomicamente só as streams daquela fonte, recusando se faltar histórico protegido.
++Proteção termina no horizonte, sem ordenar UUIDs ou prometer memória infinita.
++O custo do link vem diretamente de LinkMetrics.costMicros(), já ceil da EWMA em µs,
++sem segunda conversão; soma acumulada verificada. Snapshot de seleção INACTIVE/
++UNAVAILABLE não autoriza dados, não confirma upstream nem cria destinos.
++[Design aprovado](memory-bank/bolts/021-rotas/ddd-02-technical-design.md) e
++[revisão ADR para aprovação](memory-bank/bolts/021-rotas/adr-review.md); reutiliza
++ADR-004/017/018/024, sem nova ADR ou alteração wire. Implement não autorizado.
+ 
+ ### 6.2. Interfaces e formato de erros
+ 
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -74,3 +74,20 @@
+ ## Transporte disponível desde TASK-005
+ 
+ Connection possui UUID por ligação, endpoint remoto, fila limitada e razão terminal (primeira razão vence). UUID de conexão não autentica nodeId. Eventos ordenados open → mensagens → closed, sendo closed único; slots de admissão incluem dials e permanecem ocupados até os dois workers I/O terminarem. Shutdown fecha também tentativas pendentes. A associação a Neighbor pertence à TASK-007. [API](07-API-AND-INTERFACES.md#api-de-transporte-implementada-na-task-005).
++
++
++## IMP-008 — Design aprovado e checkpoint ADR
++
++Registo 2026-11-13T16:41:04Z. Q-C-26 aprovada integralmente: capacidades e retenção no
++[ADD6.1](../add.md#61-entidades-e-invariantes) e
++[Design](../memory-bank/bolts/021-rotas/ddd-02-technical-design.md).
++[Revisão ADR](../memory-bank/bolts/021-rotas/adr-review.md) preparada, para aprovação.
++LinkMetrics.costMicros() fornece o custo opcional em µs já arredondado pelo monitor;
++projetar nodeId/instanceId/connectionId para SessionKey e consumir o valor diretamente.
++SUSPECT com amostra mantém o custo; ausência não é zero. O domínio não recalcula RTT.
++Tabela cresce por admissão, sem máximos pré-alocados, cacheCapacity reutilizada ou
++evição de histórico protegido. Snapshot de seleção não é forwarding confirmado.
++A ponte de eventos de métricas para routing ainda não existe em OverlayNode;
++composição futura requer checkpoint/âmbito próprio. Só Model/Design concluídos;
++Implement/Test, V-011, regressão atual, manual offline, revisão final e integração
++pendentes. Nenhuma alteração Java, teste executado ou ADR nova neste checkpoint.
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -616,3 +616,20 @@
+ 8frames/2500ms e as restantes exigências, sem aceitar mensagens arbitrárias.
+ Regressão04:1176/0falhas/0erros/0ignorados,exit0. Q-C-25 resolvida neste âmbito;
+ Implement/Test ainda por aprovar.
++
++
++## IMP-008 — Design aprovado e checkpoint ADR
++
++Registo 2026-11-13T16:41:04Z. Q-C-26 aprovada integralmente: capacidades e retenção no
++[ADD6.1](../add.md#61-entidades-e-invariantes) e
++[Design](../memory-bank/bolts/021-rotas/ddd-02-technical-design.md).
++[Revisão ADR](../memory-bank/bolts/021-rotas/adr-review.md) preparada, para aprovação.
++LinkMetrics.costMicros() fornece o custo opcional em µs já arredondado pelo monitor;
++projetar nodeId/instanceId/connectionId para SessionKey e consumir o valor diretamente.
++SUSPECT com amostra mantém o custo; ausência não é zero. O domínio não recalcula RTT.
++Tabela cresce por admissão, sem máximos pré-alocados, cacheCapacity reutilizada ou
++evição de histórico protegido. Snapshot de seleção não é forwarding confirmado.
++A ponte de eventos de métricas para routing ainda não existe em OverlayNode;
++composição futura requer checkpoint/âmbito próprio. Só Model/Design concluídos;
++Implement/Test, V-011, regressão atual, manual offline, revisão final e integração
++pendentes. Nenhuma alteração Java, teste executado ou ADR nova neste checkpoint.
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -257,3 +257,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em Design (Model aprovado); TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em ADR (Model/Design aprovados); TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em Design para revisão, Model aprovado.
++**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em revisão ADR, Model/Design aprovados.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -105,7 +105,7 @@
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+-| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Model aprovado; Design para revisão; V-011: NÃO EXECUTADO |
++| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Model/Design aprovados; ADR para aprovação; V-011: NÃO EXECUTADO |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+@@ -987,3 +987,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -998,3 +998,22 @@
+ Estes números e horizonte não são decisões aceites por efeito da aprovação dos
+ princípios. Design requer revisão; ADR/Implement/Test não autorizados. D09–D13,
+ D17/D20/D21 cobrem fronteiras, saturação e retenção; nenhum teste Java executado.
++
++
++### Q-C-26 — valores e horizontes aprovados integralmente
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e valores/horizontes concretos:
++64 origens,256 streams/origem, N=min(C,63) slots/stream, oito épocas retiradas por
++origem; candidato por candidateTtl e históricos por cacheTtl. Exigiu alocação por
++necessidade, sem prealocar máximos; saturação atómica sem expulsão protegida.
++Q-C-26 fica **DECIDIDA/APROVADA**; as pendências anteriores são históricas.
++
++A revisão ADR inspecionou as APIs reais: LinkMetrics.costMicros() já é OptionalLong
++com ceil da EWMA em µs; encaminhar diretamente, preservando Session completa e
++sem reinterpretar SUSPECT como ausência. RuntimeConfiguration valida Duration em
++ms inteiros e cacheTtl≥candidateTtl. Nenhum Java alterado ou teste executado.
++
++Só revisão ADR autorizada. A [análise](../memory-bank/bolts/021-rotas/adr-review.md)
++está para aprovação; não há autorização de Implement, commits ou push. A futura
++ponte de métricas/owner não existe na composição atual e terá de ser definida no
++checkpoint respetivo, sem alargar os seis caminhos deste IMP por inferência.
+--- a/docs/tasks/PHASE-03/TASK-011.md
++++ b/docs/tasks/PHASE-03/TASK-011.md
+@@ -102,3 +102,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/memory-bank/bolts/021-rotas/bolt.md
++++ b/memory-bank/bolts/021-rotas/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["002-modelar-candidatos-custos-e-snapshots-por-stream"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-13T16:19:45Z"
++updated: "2026-11-13T16:41:04Z"
+ started: "2026-11-13T16:04:28Z"
+ completed: null
+-current_stage: "design"
+-stages_completed: ["model"]
++current_stage: "adr"
++stages_completed: ["model", "design"]
+ requires_bolts: ["004-overlay", "005-rotas"]
+ enables_bolts: ["006-rotas"]
+ requires_units: ["002-overlay"]
+@@ -49,7 +49,7 @@
+ ## Etapas e validação
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+-2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-008 e as ADR do ADD.
++2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+@@ -81,7 +81,7 @@
+ semântica ou alteração Java, Maven, sockets, commits/push ou outro IMP.
+ Evidência: [entrada](../../../experiments/construction/021-rotas/model-entry.json).
+ 
+-## Checkpoint atual — Design para revisão
++## Histórico — Design para revisão
+ 
+ Registo 2026-11-13T16:19:45Z: ✅ Model e os três princípios de Q-C-26 aprovados pelo utilizador.
+ ⏳ [Design](ddd-02-technical-design.md) preparado, incluindo APIs/tipos, capacidades
+@@ -91,3 +91,14 @@
+ outro IMP. V-011/regressão atual/manual offline antes de aprovar Test/revisão final
+ Waheed/integração pendentes. Sem gates externos adicionais. Prova da aprovação em
+ [model-approval.json](../../../experiments/construction/021-rotas/model-approval.json).
++
++## Checkpoint atual — revisão ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. ✅ Model/Design e Q-C-26 integralmente aprovados.
++⏳ [Revisão ADR](adr-review.md) preparada; só Model/Design concluídos. APIs reais,
++custo já convertido pelo monitor, limites/horizontes e consumidores futuros
++conferidos estaticamente. Sem divergência arquitetural identificada; sem ADR nova.
++Futura composição requer checkpoint próprio. Seis caminhos preservados; sem
++Java alterado, Maven, commits/push ou outro IMP. V-011/regressão/manual offline
++antes de aprovar Test/revisão final Waheed/integração continuam pendentes.
++Sem gates externos adicionais; parar antes de Implement.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -177,3 +177,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ started: "2026-11-13T16:04:28Z"
+-updated: "2026-11-13T16:19:45Z"
++updated: "2026-11-13T16:41:04Z"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-011"]
+ implementation_tasks: ["IMP-008"]
+@@ -59,3 +59,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-13T16:19:45Z"
++updated: "2026-11-13T16:41:04Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -208,3 +208,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "021-rotas (in-progress; Model approved; Design ready for review; Q-C-26 values pending)"
++next_bolt: "021-rotas (in-progress; Model/Design and Q-C-26 approved; ADR review ready for approval)"
+ 
+ last_completed_bolt: "005-rotas"
+ last_integrated_commit: "f9905038c614612b6f2798d4eca46dd72934743f"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -344,3 +344,14 @@
+ executados, regressão04:1176/0/0/0. Q-C-25 limita-se aos dois patches de peer de
+ teste aprovados, sem alteração arquitetural ou estado das decisões aceites.
+ Implement para aprovação; Test/fecho pendentes. Revisão Fillmore continua só Design.
++
++
++## IMP-008 — reutilização ADR e Q-C-26 aprovada
++
++Registo 2026-11-13T16:41:04Z. Model/Design e valores/horizontes de Q-C-26 aprovados;
++[revisão para aprovação](../bolts/021-rotas/adr-review.md) de ADR-004/017/018/024,
++com transversais005/016/020/021/025/026 e contrato operacional atual preservados.
++Nenhuma nova ADR, substituição ou promoção de estado; catálogo existente intacto.
++Capacidades/horizontes e alocação por necessidade incorporados no ADD6.1.
++APIs reais de LinkMetrics/monitor/config/sessão inspecionadas estaticamente;
++composição futura explícita, sem Java alterado. Parar antes de Implement.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em Design para revisão; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em revisão ADR; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -66,7 +66,7 @@
+ 
+ ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-008. **Estado:** in-progress (Model aprovado; Design para revisão). **Bolt:** 021-rotas.
++**Tarefa:** IMP-008. **Estado:** in-progress (Model/Design aprovados; ADR para aprovação). **Bolt:** 021-rotas.
+ **Ficheiro:** [002-modelar-candidatos-custos-e-snapshots-por-stream](intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+@@ -463,3 +463,18 @@
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+ Registos de Model para aprovação acima são históricos; só Model está concluído.
++
++
++## IMP-008 / 021-rotas — Design aprovado; ADR para aprovação
++
++Registo 2026-11-13T16:41:04Z. Utilizador aprovou Design e limites/horizontes concretos de
++Q-C-26, exigindo alocação por necessidade. Apenas revisão ADR autorizada.
++APIs reais de LinkMetrics/NetworkMonitor/Neighbor/config e DTOs inspecionadas
++estaticamente; custo já fornecido em µs/ceil, sem segunda conversão. ADD6.1,
++contratos e índice recebem detalhe aprovado, sem ADR nova ou substituição.
++Futura ponte de eventos/owner ainda não existe; não se presume integração pronta
++nem se alarga âmbito. current_stage=adr, stages_completed=[model,design],
++completed=null; revisão ADR para aprovação, Implement/Test não iniciados.
++Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
++V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
++integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
+--- a/memory-bank/bolts/021-rotas/ddd-02-technical-design.md
++++ b/memory-bank/bolts/021-rotas/ddd-02-technical-design.md
+@@ -2,14 +2,16 @@
+ unit: "003-rotas"
+ bolt: "021-rotas"
+ stage: "design"
+-status: "ready-for-review"
++status: "complete"
+ created: "2026-11-13T16:14:58Z"
+ ---
+ # IMP-008 — Design de candidatos e snapshots
+ 
+ ✅ Model e os três princípios de Q-C-26 aprovados pelo utilizador.
+-⏳ Apenas Design autorizado; capacidades e retenção abaixo são propostas para
+-revisão. ADR/Implement/Test não iniciados. Nenhum código Java lido ou alterado.
++✅ Design, capacidades e horizontes aprovados pelo utilizador, com registo em
++2026-11-13T16:41:04Z. Revisão ADR autorizada e preparada; aprovação dessa etapa pendente.
++Implement/Test não iniciados. Nenhum Java alterado. A proibição de leitura de
++fontes desta etapa foi respeitada; a inspeção das APIs reais ocorreu só em ADR.
+ 
+ ## 1. Base, arquitetura e fronteira
+ 
+@@ -176,7 +178,7 @@
+ forwardingSnapshot que autorize dados. Leitura futura de dados depende de upstream
+ confirmado/época e é um contrato de incrementos posteriores.
+ 
+-## 4. Capacidades exatas propostas — Q-C-26, revisão pendente
++## 4. Capacidades exatas aprovadas — Q-C-26
+ 
+ Não se altera qualquer hard cap do deployment ou propriedade de configuração.
+ `Limits.forNode(C)` recebe o maxConnections validado já existente (1..64).
+@@ -202,7 +204,7 @@
+ de entradas. Não prealocar matrizes/produtos máximos: mapas crescem só com admissões.
+ O limite é finito, mas o extremo pode consumir memória substancial; não é uma
+ medição ou garantia de adequação a qualquer heap. O orçamento8 e o horizonte
+-abaixo precisam de aprovação deste Design antes de implementação.
++abaixo foram aprovados no Design; Implement ainda requer o checkpoint ADR.
+ 
+ Não usar4096 para limitar rotas ou slots. routing.cache.capacity permanece dedicado
+ ao flooding futuro. Cada linha sem candidatos continua a contar para as256/16384;
+@@ -299,9 +301,9 @@
+ 
+ setLinkCost recebe custo medido já convertido em µs pelo contrato do monitor,
+ não reaplica EWMA. OptionalLong vazio é ausência de amostra; presente exige≥1.
+-A tabela não aceita zero como medida confiável. A conversão do EWMA para custo
+-inteiro (ceil, mínimo1, finito/representável) continua no adaptador/contrato de
+-monitorização, não cria um segundo cálculo de RTT neste bolt.
++A tabela não aceita zero como medida confiável. A inspeção posterior em ADR confirmou que LinkMetrics.costMicros() já fornece
++o custo inteiro (ceil, mínimo1, finito/representável). O adaptador futuro passa
++esse OptionalLong diretamente, sem segundo arredondamento ou cálculo de RTT.
+ 
+ Anúncio recebido `[S,...,P]` exige origemS, últimoP=session.nodeId, IDs únicos e
+ local ausente. Lista de entrada é limitada a31 IDs para acrescentar local dentro
+@@ -370,13 +372,16 @@
+ 
+ ADR-004/017/018/024 continuam a fundamentar seleção, owner, identidades e âmbito.
+ Não há nova ADR aceite ou revisão ADR concluída por efeito deste Design. Os
+-princípios de Q-C-26 foram aprovados; números e retenção concretos desta proposta
+-continuam para revisão, incluindo orçamento8 e historyTtl=cache.ttl.
+-
+-1 - ⏳ Aprovar/ajustar Design e os limites/horizontes concretos.
+-2 - [ ] Revisão ADR, só após autorização; apresentar divergências antes de código.
++princípios, números e retenção de Q-C-26 foram aprovados, incluindo orçamento8
++e historyTtl=cache.ttl; o checkpoint ADR continua para aprovação.
++
++1 - ✅ Design e limites/horizontes aprovados pelo utilizador.
++2 - ⏳ Revisão ADR preparada para aprovação; apresentar divergências antes de código.
+ 3 - [ ] Implement nos seis caminhos, com falhas reais e incrementais.
+ 4 - [ ] Test: V-011, regressão atual e manual offline antes de aprovação.
+ 5 - [ ] Revisão final Waheed e integração antes do fecho; atribuição não é evidência de revisão.
+ 
+ Sem gates externos adicionais; sem Implement, Maven, commits, push ou outro IMP.
++
++Registo da aprovação: [design-approval.json](../../../experiments/construction/021-rotas/design-approval.json).
++Inspeção de APIs e fronteiras futuras: [revisão ADR](adr-review.md).
+--- a/memory-bank/bolts/021-rotas/adr-review.md
++++ b/memory-bank/bolts/021-rotas/adr-review.md
+@@ -0,0 +1,178 @@
++---
++unit: "003-rotas"
++bolt: "021-rotas"
++stage: "adr"
++status: "ready-for-review"
++created: "2026-11-13T16:37:24Z"
++---
++# IMP-008 — revisão ADR para aprovação
++
++✅ Model, Design e valores/horizontes de Q-C-26 aprovados explicitamente pelo
++utilizador. ⏳ Revisão ADR preparada, ainda não aprovada; Implement/Test não
++iniciados. Esta aprovação de Design não é revisão final de código inexistente.
++
++## 1. Base, fontes e método
++
++HEAD/main/Denji: `cc952c5f558930f2c67e7dea8fe92612cd8cc705`. Dependências
++004-overlay/005-rotas e unidade002-overlay complete; integração f990503 é ancestral
++de main. Estados de dependências e testes anteriores são evidência histórica.
++
++Consultados ADD2/5/6/8–12, specs/intents e standards, Model/Design aprovados,
++Q-C-26, docs06/07/09/14/15 e APIs reais de monitorização, configuração,
++Neighbor/owner, composição e DTOs de controlo. A leitura de fontes é agora uma
++inspeção estática autorizada para esta revisão, não uma análise Java executada.
++Não houve compilação, testes, sockets ou alteração Java. Inventário/hashes na
++[entrada ADR](../../../experiments/construction/021-rotas/adr-entry.json).
++
++## 2. Decisões reutilizadas
++
++| ADR | Conformidade verificada | Prova futura |
++|---|---|---|
++| 004 | Um candidato por vizinho/stream; soma do custo RTT já medido; desempate custo/saltos/nodeId; melhoria tardia não suprimida por seen booleano | D01/D03–D10/D19, V-011 |
++| 017 | Tabela mutável só no owner serial existente; snapshots imutáveis; nenhuma thread/timer/I/O próprio | D14/D15/D18/D21 e integração futura |
++| 018 | UUID da stream fixa a origem; época comum por fonte; instanceId/connectionId isolam callbacks; estado só em memória | D01/D11–D14/D16 |
++| 024 | Um IMP; os mesmos seis caminhos; revisão de contratos sem implementar consumidores posteriores | auditoria de hashes/diff e V-ADD |
++| 016 | candidateTtl/cacheTtl/maxConnections efetivos; capacidades da tabela próprias; nenhuma nova propriedade ou override de wire/política | D17/D20 |
++| 020/021 | Validação antes de retenção; saturação atómica/local; entrada inválida não apaga estado saudável nem fecha pares válidos | D05/D06/D12/D13/D16/D17/D21 |
++| 005 | Selecionado não é confirmado para dados; nenhum ACK/ativação/lease neste incremento | D02/D18; ativação futura em IMP-011 |
++| 025 | Métrica/invalidade pelo plano TCP; não concluir saúde UDP ou implementar watchdog/rerouting | V-011 não demonstra vídeo ou recuperação UDP |
++| 001/007/026 | Java21/JDK, records/cópias defensivas, sem runtime novo/CI/linter/JaCoCo/cobertura percentual | compilação/regressão futuras, D15/D22 |
++| 002/012/013/034/035 | Controlo v2/19 tipos,3 rejeitado; único TCP e bootstrap inicial; UDP OTT1 e reparação/discovery intactos | fixtures/regressão anteriores preservadas, sem novo wire |
++
++Q-C-26 concretiza ADR-004/018 com aprovação humana, sem substituir as suas
++decisões. Não se cria ADR-036 ou se altera o estado de uma ADR por inferência.
++
++## 3. APIs reais e conversão do custo
++
++1 - **Contrato de entrada existente:**
++    [LinkMetrics.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java)
++    é record com session, state, ewmaMicros OptionalDouble, costMicros OptionalLong,
++    sampleCount, lastSampleAtNanos e contadores. Com sampleCount0, os opcionais de
++    amostra/custo estão vazios; não há zero confiável. Com amostra, o construtor
++    exige EWMA finita, ≥1 e <2^63, e custo exatamente `(long)Math.ceil(ewma)`.
++2 - **Cálculo existente:**
++    [NetworkMonitor.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java)
++    calcula amostra como max(1, elapsedNanos/1000.0); a primeira inicia EWMA e as
++    seguintes aplicam alpha. Link.metrics publica o custo ceil. Portanto a futura
++    ponte deve passar **metrics.costMicros() diretamente** para setLinkCost;
++    não usar sampleCount como custo, dividir por1000 outra vez, recalcular alpha
++    ou fazer novo ceil/cast de ewmaMicros. Math.addExact verifica apenas a soma
++    custo anunciado+link em RoutingTable/RouteMetric.
++3 - **SUSPECT não é ausência de amostra:** se já existia medição, o monitor mantém
++    costMicros presente quando conta falhas abaixo do limiar. A tabela recebe esse
++    valor, não zero ou OptionalLong.empty por dedução do enum. Invalidated significa
++    retirar a sessão esperada; UNMEASURED significa custo vazio. O domínio admite
++    setLinkCost vazio como entrada explícita; não se inventa esse evento no monitor.
++4 - **Proveniência exata:**
++    [Neighbor.Session](../../../Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java)
++    tem nodeId, instanceId, connectionId e endpoint validado. A projeção SessionKey
++    usa os três primeiros, preservando ambos os UUIDs. Snapshot.links é indexado
++    por nodeId, mas isso não autoriza ignorar metrics.session. Reconexão na mesma
++    instância exige novo token e reset de amostra/candidatos antigos.
++5 - **Eventos disponíveis:** NetworkMonitor.Observer.onEvent recebe Updated,
++    Invalidated e LocalFailure. Updated contém LinkMetrics; Invalidated contém
++    Session/Reason. Futura ponte no owner: conferir token corrente, mapear Updated
++    para setLinkCost e Invalidated para removeSession da sessão exata. NeighborDown
++    posterior é idempotente; LocalFailure segue o lifecycle do nó, não é inventado
++    como nova época de servidor ou nova mensagem de rede.
++
++Estes são mapeamentos estáticos verificáveis, não integração já implementada.
++Os casos D07/D14/D19 cobrem o domínio injetando valores equivalentes; integração
++dos eventos reais não é declarada concluída por esses testes offline futuros.
++
++## 4. Horizonte temporal, dimensões e alocação
++
++[RuntimeConfiguration.Routing](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java)
++expõe candidateTtl()/cacheTtl() como Duration e cacheCapacity() como int separado.
++Os defaults reais são8000ms/16000ms/4096. Validação existente exige duração inteira
++em ms, entre1 e Integer.MAX_VALUE; cacheTtl≥candidateTtl e candidateTtl>announceInterval.
++Logo `.toMillis()` é exato nesse contrato e o produto por1000000 cabe em long;
++a tabela ainda verifica entrada/produto no construtor. Control.maxConnections()
++já valida1..64. Nenhuma alteração ao loader/configuração é necessária aqui.
++
++Valores aprovados:64 origens,256 streams/origem,16384 linhas; N=min(C,63)
++sessões/slots por stream; até16384×N slots, um watermark por slot; oito épocas
++retiradas por origem/512 totais. **Mapas crescem por admissão, sem prealocação dos
++produtos máximos.** Testes com Limits menores exercitam a mesma política.
++Um slot com watermark continua a contar mesmo sem candidato; bindings continuam
++a contar sem rotas disponíveis. Não há LRU de estado protegido ou orçamento4096
++reinterpretado como linhas. Não é medição de consumo nem garantia para qualquer heap.
++
++candidateTtl parte da sequência nova. A melhoria na mesma geração preserva início
++e prazo; duplicado, métrica, retirada de sequência igual e callbacks antigos não
++os renovam. Watermark retém a maior sequência por cacheTtl desde essa admissão;
++candidato expirado não ressuscita dentro desse horizonte. Após historyTtl a
++proteção termina, inclusive se a limpeza física ocorrer depois: é memória limitada,
++não promessa de replay protection infinito. Usa-se cacheTtl como **duração aprovada**,
++nunca cacheCapacity como dimensão da tabela.
++
++Época retirada fica protegida por cacheTtl desde a retirada. Antes de E1→E2,
++confirmEpoch valida CAS e capacidade; depois aplica a todas as streams da fonte
++num único commit serial. Nona retirada ainda protegida recusa a transição inteira.
++Limpeza de épocas expiradas pode abrir espaço; não se expulsa uma ainda válida.
++UUID não tem ordenação temporal. Anúncio não chama automaticamente confirmEpoch;
++o futuro owner valida contexto e faz comando explícito, dentro da mesma execução
++serial antes de admitir o anúncio correspondente.
++
++Instantes seguem a mesma aritmética monotónica local do monitor: diferença de
++ticks long, incluindo negativos/wrap válido, intervalos <2^63ns. now é lido uma
++vez por operação; age≥duration expira. Nem publishedAtNanos do snapshot do monitor,
++nem timestamp civil/remoto, nem um zero de snapshot NEW iniciam o TTL de rotas.
++
++## 5. Compatibilidade com consumidores seguintes e limites da prova
++
++| Consumidor | Contrato preparado pelo IMP-008 | O que permanece futuro |
++|---|---|---|
++| IMP-009 / RoutingService e catálogo | bindStream fixa UUID/origem; confirmEpoch explícito; announce/withdraw e expire; Outcome com alterações; snapshots por fluxo | Validar anúncios, catálogo, flooding, dedup e composição no owner |
++| IMP-010 / trace/CLI | selectedCandidate/path/knownUpstream permitem trace sem ativação | Encaminhar trace/TTL/NO_ROUTE e expor comandos |
++| IMP-011/012 / ativação e procura | Route separa selectedCandidate de activeUpstream/pendingUpstream/downstreams | ACK, revisões de subscrição, leases e estados ativos; só aqui pode surgir autorização de dados |
++| IMP-013/014 / falha e histerese | Alternativas preservadas, remoção correlacionada e custo/saltos determinísticos | Escolher parent confirmado, troca com ACK/histerese e recuperação da árvore |
++| Forwarding UDP | Nunca deriva autorização de selectedCandidate ou INACTIVE | Snapshot confirmado, publicação segura e leitura atómica não bloqueante |
++
++DTOs reais em
++[ControlMessage.java](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java):
++Announcement.stream() fornece StreamInfo.streamId()/serverId()/serverEpoch();
++announceSeq()/costMicros()/path() correspondem aos campos do Design. Withdrawal
++fornece streamId()/serverEpoch()/announceSeq(). Session vem do canal confirmado,
++não do payload; **serverEpoch não é instanceId do relay emissor**. Não converter
++metadados recebidos em oferta local, nem contornar a validação de caminhos/caps.
++
++RoutingService e StreamForwarder existem vazios; Route/RouteMetric/RouteState/
++RoutingTable também. Não existem consumidores implementados cuja assinatura seja
++quebrada pelos seis novos modelos. Isso não prova integração executada nem fecha
++os contratos futuros. O conceptual forwardingSnapshot de docs07 pertence ao plano
++de dados; o snapshot do IMP-008 é de seleção e não o substitui.
++
++[OverlayNode](../../../Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java)
++expõe monitoringSnapshot(). Atualmente o observer interno do monitor trata falha
++fatal; não encaminha Updated/Invalidated para routing. O observer de vizinhança
++recebe eventos no owner, mas não é por isso um observer de métricas. Não presumir
++uma API de subscrição de métricas ou acesso público ao owner do OverlayNode.
++NetworkMonitor dispõe de Observer na construção; a futura composição deve definir
++como partilhar o owner e entregar eventos, com âmbito aprovado no seu checkpoint.
++Se exigir OverlayNode fora da allowlist de um IMP futuro, apresentar a lacuna e
++pedir extensão antes de editar. Não antecipar essa integração ou alargar os seis
++caminhos deste IMP por inferência.
++
++## 6. Conclusão da análise e checkpoint
++
++Não identificada divergência entre o domínio do Design aprovado e as ADR aceites,
++nem incompatibilidade concreta com as APIs de entrada verificadas. Há uma fronteira
++de composição futura explícita, não uma ligação atual alegadamente funcional.
++O custo opcional e a projeção SessionKey correspondem às APIs reais sem alterar
++monitor, configuração ou transporte. O detalhe de consumo direto de costMicros
++esclarece o Design; não muda a política aprovada.
++
++Reutilizam-se ADR-004/017/018/024 e transversais acima; nenhuma ADR nova ou
++substituição necessária nesta análise. Q-C-26 está decidida quanto a princípios,
++valores e horizonte; não significa V-011 executado. ADD/contratos/índice recebem
++o detalhe aprovado e a ligação a esta revisão, sem promover a revisão a aprovada.
++
++1 - ✅ Model e Design concluídos; Q-C-26 aprovada integralmente.
++2 - ⏳ Aprovação humana desta revisão ADR pendente; parar antes de Implement.
++3 - [ ] V-011/D01–D22, regressão atual e manual offline antes de aprovar Test.
++4 - [ ] Revisão final Waheed e integração antes de DONE; nenhuma revisão final presumida.
++
++Sem gates externos adicionais, Java alterado, Maven, commits, push ou outro IMP.
++Se a implementação revelar decisão aceite inviável, parar a parte afetada,
++preservar evidência/impacto e propor substituição pelo ADD11 antes de continuar.

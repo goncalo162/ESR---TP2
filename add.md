@@ -637,6 +637,28 @@ min(pedido, máximo local); renovar a cada min(período configurado, grantedLeas
 com precisão monotónica sem arredondar para zero. Lease nulo é inválido. V-015
 testa esta regra de negociação para não ignorar um lease concedido menor.
 
+**Detalhe aprovado de IMP-008/Q-C-26:** tabela por stream, limitada a64 origens
+×256 streams=16384 bindings que persistem na execução; N=min(control.maxConnections,63)
+sessões/slots por stream, um watermark por slot, até16384×N slots. Oito épocas
+retiradas por origem/512 totais. Mapas alocados por necessidade, sem prealocação
+máxima ou evicção de estado protegido. Saturação rejeita atomicamente, preservando
+estado saudável. routing.cache.capacity4096 continua a limitar flooding, não rotas.
+Candidato vive candidateTtl; watermark vive cacheTtl desde sequência mais recente;
+melhoria da mesma geração/duplicado/métrica não renova os prazos. Época retirada
+fica protegida por cacheTtl desde a retirada; mudança explícita com CAS invalida
+atomicamente só as streams daquela fonte, recusando se faltar histórico protegido.
+Proteção termina no horizonte, sem ordenar UUIDs ou prometer memória infinita.
+O custo do link vem diretamente de LinkMetrics.costMicros(), já ceil da EWMA em µs,
+sem segunda conversão; soma acumulada verificada. Snapshot de seleção INACTIVE/
+UNAVAILABLE não autoriza dados, não confirma upstream nem cria destinos.
+[Design aprovado](memory-bank/bolts/021-rotas/ddd-02-technical-design.md) e
+[revisão ADR aprovada](memory-bank/bolts/021-rotas/adr-review.md); reutiliza
+ADR-004/017/018/024, sem nova ADR ou alteração wire. Revisão ADR aprovada;
+[Implement aprovado](memory-bank/bolts/021-rotas/implementation-walkthrough.md);
+[Test técnico executado](memory-bank/bolts/021-rotas/ddd-03-test-report.md), manual
+humano/Test e revisão final Luis aprovados. D22 parcial só até integração;
+commits/push main e fecho autorizados, sem integração presumida.
+
 ### 6.2. Interfaces e formato de erros
 
 Não há HTTP. CLI: --role/--config, papel coerente e opções estritas; comandos finais

@@ -1,0 +1,93 @@
+CODE_SOURCE=file:/home/luis/ESR/ESR---TP2/experiments/construction/021-rotas/test-build-01/ott-streaming-1.0-SNAPSHOT.jar
+OFFLINE_ONLY; costs and time are controlled inputs, not network measurements.
+
+STEP 1 — Quatro streams e seleção
+ESPERADO: S1/A=130 por R2; S1/B=240; S2/C=340; S2/D=450. Nenhum dado autorizado.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 1 approved budgets; no maximum allocation required
+CHECK_PASS 2 100+40=140 loses to 80+50=130
+CHECK_PASS 3 four stream costs remain independent
+CHECK_PASS 4 alternative retained
+CHECK_PASS 5 epoch shared only within origin
+CHECK_PASS 6 selected route is not data authorization
+CHECK_PASS 7 candidate list immutable
+CHECK_PASS 8 nested path immutable
+S1/A stream=d3576acf-13af-342e-83c9-97c83337d9db state=INACTIVE server=S1 epoch=Optional[24fb4fcd-e122-30eb-ab6f-86b029e246e7] knownUpstream=R2 costMicros=130 candidates=2 dataAuthorized=false
+S1/B stream=6bbd3a11-8779-37dc-9c9f-f0b4662f5380 state=INACTIVE server=S1 epoch=Optional[24fb4fcd-e122-30eb-ab6f-86b029e246e7] knownUpstream=R1 costMicros=240 candidates=1 dataAuthorized=false
+S2/C stream=18494471-47ae-3fef-89ec-a8fcbba37118 state=INACTIVE server=S2 epoch=Optional[6c2b0595-4cde-30d1-8dc1-a10199318d85] knownUpstream=R1 costMicros=340 candidates=1 dataAuthorized=false
+S2/D stream=360b76ec-5df0-3f48-8701-e40b1856fe68 state=INACTIVE server=S2 epoch=Optional[6c2b0595-4cde-30d1-8dc1-a10199318d85] knownUpstream=R2 costMicros=450 candidates=1 dataAuthorized=false
+
+STEP 2 — Empates e TTL
+ESPERADO: Empate por nodeId; depois menos saltos. Melhoria aos7s não prolonga prazo de8s.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 9 equal cost/hops chooses R1 before R2
+CHECK_PASS 10 equal cost chooses fewer hops
+SIMULATED_TIME_MS=7000
+CHECK_PASS 11 same generation improves without resetting start
+SIMULATED_TIME_MS=8000
+CHECK_PASS 12 expired best falls back to refreshed alternative
+CHECK_PASS 13 expired candidate filtered before physical cleanup
+CHECK_PASS 14 other refreshed streams unchanged
+CHECK_PASS 15 previous snapshots remain stable
+SIMULATED_TIME_MS=9000
+CHECK_PASS 16 retained watermark prevents resurrection
+S1/A stream=d3576acf-13af-342e-83c9-97c83337d9db state=INACTIVE server=S1 epoch=Optional[24fb4fcd-e122-30eb-ab6f-86b029e246e7] knownUpstream=R2 costMicros=130 candidates=1 dataAuthorized=false
+
+STEP 3 — Retirada e sessão
+ESPERADO: Retirada afeta só o emissor; conexão nova não herda medição; callbacks antigos são ignorados.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 17 withdraw keeps valid alternative
+CHECK_PASS 18 withdrawn generation cannot return
+CHECK_PASS 19 new connection candidate waits for new measurement
+CHECK_PASS 20 same instance, new connection and measured cost
+CHECK_PASS 21 old callbacks rejected by full session
+CHECK_PASS 22 old callbacks preserve replacement snapshot
+
+STEP 4 — Mudança de época
+ESPERADO: S1/A e S1/B mudam juntos; S2/C e S2/D permanecem. UUID antigo protegido não pode regressar.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 23 epoch change affects exactly both streams of S1
+CHECK_PASS 24 new epoch published without old candidates
+CHECK_PASS 25 other origin snapshots preserved atomically
+CHECK_PASS 26 retired epoch cannot revert current origin
+CHECK_PASS 27 old announcement never changes epoch implicitly
+S1/A stream=d3576acf-13af-342e-83c9-97c83337d9db state=UNAVAILABLE server=S1 epoch=Optional[7e8b3c8f-8588-3f21-9bce-6860e71f42c5] knownUpstream=none costMicros=none candidates=0 dataAuthorized=false
+S1/B stream=6bbd3a11-8779-37dc-9c9f-f0b4662f5380 state=UNAVAILABLE server=S1 epoch=Optional[7e8b3c8f-8588-3f21-9bce-6860e71f42c5] knownUpstream=none costMicros=none candidates=0 dataAuthorized=false
+S2/C stream=18494471-47ae-3fef-89ec-a8fcbba37118 state=INACTIVE server=S2 epoch=Optional[6c2b0595-4cde-30d1-8dc1-a10199318d85] knownUpstream=R1 costMicros=301 candidates=1 dataAuthorized=false
+S2/D stream=360b76ec-5df0-3f48-8701-e40b1856fe68 state=INACTIVE server=S2 epoch=Optional[6c2b0595-4cde-30d1-8dc1-a10199318d85] knownUpstream=R2 costMicros=450 candidates=1 dataAuthorized=false
+
+STEP 5 — Oito épocas protegidas
+ESPERADO: Nona retirada recusa sem apagar candidatos; aos25s simulados expiram os históricos iniciados aos9s.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 28 ninth protected retirement rejected
+CHECK_PASS 29 capacity rejection preserves both healthy streams
+CHECK_PASS 30 protected oldest epoch not evicted
+SIMULATED_TIME_MS=24999
+CHECK_PASS 31 history protected before exact deadline
+SIMULATED_TIME_MS=25000
+CHECK_PASS 32 history capacity released only after horizon
+
+STEP 6 — Capacidades pequenas
+ESPERADO: Saturar bindings/sessões não expulsa estado; atualizar slot existente continua permitido.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 33 stream and origin limits reject explicitly
+CHECK_PASS 34 session saturation preserves candidate and binding
+CHECK_PASS 35 update reuses existing bounded slot
+
+STEP 7 — Fonte local
+ESPERADO: Custo zero sem parent/dados; nova época retira ambas as ofertas locais.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 36 local source cost is zero with no parent
+CHECK_PASS 37 local planning offers still authorize no data
+CHECK_PASS 38 epoch invalidates local offers together
+
+STEP 8 — Overflow e imutabilidade
+ESPERADO: Soma exata aceita Long.MAX_VALUE; overflow recusa sem substituir candidato; medição impossível não renova TTL.
+Prima Enter para executar esta etapa (Ctrl+C para interromper).
+CHECK_PASS 39 representable accumulated cost accepted
+CHECK_PASS 40 overflowing update rejected atomically
+CHECK_PASS 41 later metric overflow keeps announcement but removes eligibility
+CHECK_PASS 42 measurement recovery preserves original generation start
+CHECK_PASS 43 data remains disabled and old snapshot unchanged
+CHECK_COUNT=43
+MANUAL_PASS

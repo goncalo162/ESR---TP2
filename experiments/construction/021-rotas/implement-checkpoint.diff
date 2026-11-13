@@ -1,0 +1,1405 @@
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
+@@ -0,0 +1,48 @@
++package pt.uminho.esr.ott.routing;
++
++import java.util.List;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.Set;
++import java.util.UUID;
++import pt.uminho.esr.ott.routing.RoutingTable.SessionKey;
++
++/** Planning snapshot; selection alone never authorizes data transmission. */
++public record Route(UUID streamId, String serverId, Optional<UUID> serverEpoch,
++        boolean localSource, Optional<RouteCandidate> selectedCandidate,
++        Optional<RouteMetric> selectedMetric, Optional<SessionKey> knownUpstream,
++        Optional<SessionKey> activeUpstream, Optional<SessionKey> pendingUpstream,
++        Set<String> downstreams, List<RouteCandidate> candidates, RouteState state, long revision) {
++    public Route {
++        Objects.requireNonNull(streamId); RoutingTable.nodeId(serverId);
++        Objects.requireNonNull(serverEpoch); Objects.requireNonNull(selectedCandidate);
++        Objects.requireNonNull(selectedMetric); Objects.requireNonNull(knownUpstream);
++        Objects.requireNonNull(activeUpstream); Objects.requireNonNull(pendingUpstream);
++        Objects.requireNonNull(downstreams); Objects.requireNonNull(candidates); Objects.requireNonNull(state);
++        if (revision < 0 || candidates.size() > 63 || activeUpstream.isPresent()
++                || pendingUpstream.isPresent() || !downstreams.isEmpty())
++            throw new IllegalArgumentException("No data authorization in a planning route");
++        candidates = List.copyOf(candidates); downstreams = Set.copyOf(downstreams);
++        var neighbors = new java.util.HashSet<String>();
++        for (var c : candidates) {
++            if (!streamId.equals(c.streamId()) || !serverId.equals(c.serverId())
++                    || !serverEpoch.equals(Optional.of(c.serverEpoch())) || !neighbors.add(c.upstream().nodeId()))
++                throw new IllegalArgumentException("Inconsistent route candidates");
++        }
++        if (localSource) {
++            if (serverEpoch.isEmpty() || selectedCandidate.isPresent() || knownUpstream.isPresent()
++                    || !selectedMetric.equals(Optional.of(new RouteMetric(0, 0))))
++                throw new IllegalArgumentException("Inconsistent local source");
++        } else if (selectedCandidate.isPresent()) {
++            var selected = selectedCandidate.orElseThrow();
++            if (!candidates.contains(selected) || selected.metric().isEmpty()
++                    || !selectedMetric.equals(selected.metric())
++                    || !knownUpstream.equals(Optional.of(selected.upstream())))
++                throw new IllegalArgumentException("Inconsistent selection");
++        } else if (selectedMetric.isPresent() || knownUpstream.isPresent()) {
++            throw new IllegalArgumentException("Metric without a selected route");
++        }
++        if (state != (selectedMetric.isPresent() ? RouteState.INACTIVE : RouteState.UNAVAILABLE))
++            throw new IllegalArgumentException("Planning state does not match availability");
++    }
++}
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java
+@@ -0,0 +1,20 @@
++package pt.uminho.esr.ott.routing;
++
++/** Local microsecond cost; this value is never a control-wire ordinal or RTT estimator. */
++public record RouteMetric(long costMicros, int hopCount) implements Comparable<RouteMetric> {
++    public RouteMetric {
++        if (costMicros < 0 || hopCount < 0 || hopCount > 31 || (costMicros == 0) != (hopCount == 0))
++            throw new IllegalArgumentException("Invalid route metric");
++    }
++
++    public static RouteMetric accumulate(long advertisedCostMicros, long linkCostMicros, int hopCount) {
++        if (advertisedCostMicros < 0 || linkCostMicros < 1 || hopCount < 1)
++            throw new IllegalArgumentException("Invalid remote cost");
++        return new RouteMetric(Math.addExact(advertisedCostMicros, linkCostMicros), hopCount);
++    }
++
++    @Override public int compareTo(RouteMetric other) {
++        int cost = Long.compare(costMicros, other.costMicros);
++        return cost != 0 ? cost : Integer.compare(hopCount, other.hopCount);
++    }
++}
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteState.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteState.java
+@@ -0,0 +1,4 @@
++package pt.uminho.esr.ott.routing;
++
++/** Local domain state, not a wire code. IMP-008 produces only the first two values. */
++public enum RouteState { UNAVAILABLE, INACTIVE, ACTIVATING, ACTIVE, SWITCHING }
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java
+@@ -0,0 +1,361 @@
++package pt.uminho.esr.ott.routing;
++
++import java.util.*;
++import java.util.function.LongSupplier;
++import java.util.function.Function;
++
++/** In-memory planning domain. All methods must run on the node's existing serial owner. */
++public final class RoutingTable {
++    public record SessionKey(String nodeId, UUID instanceId, UUID connectionId) {
++        public SessionKey {
++            RoutingTable.nodeId(nodeId); Objects.requireNonNull(instanceId); Objects.requireNonNull(connectionId);
++            if (instanceId.equals(new UUID(0, 0))) throw new IllegalArgumentException("Nonzero instance required");
++        }
++    }
++    public record Advertisement(UUID streamId, String serverId, UUID serverEpoch, SessionKey session,
++            long announceSeq, long advertisedCostMicros, List<String> advertisedPath) {
++        public Advertisement {
++            Objects.requireNonNull(streamId); nodeId(serverId); Objects.requireNonNull(serverEpoch);
++            Objects.requireNonNull(session); Objects.requireNonNull(advertisedPath);
++            if (announceSeq < 0 || advertisedCostMicros < 0 || advertisedPath.isEmpty() || advertisedPath.size() > 31)
++                throw new IllegalArgumentException("Invalid advertisement bounds");
++            for (String id : advertisedPath) nodeId(id);
++            advertisedPath = List.copyOf(advertisedPath);
++        }
++    }
++    public record Limits(int origins, int streamsPerOrigin, int neighbors, int retiredEpochsPerOrigin) {
++        public Limits {
++            if (origins < 1 || origins > 64 || streamsPerOrigin < 1 || streamsPerOrigin > 256
++                    || neighbors < 1 || neighbors > 63 || retiredEpochsPerOrigin < 1 || retiredEpochsPerOrigin > 8)
++                throw new IllegalArgumentException("Invalid table limits");
++            Math.multiplyExact(Math.multiplyExact(origins, streamsPerOrigin), neighbors);
++        }
++        public static Limits forNode(int maxConnections) {
++            if (maxConnections < 1 || maxConnections > 64) throw new IllegalArgumentException("Invalid connection limit");
++            return new Limits(64, 256, Math.min(maxConnections, 63), 8);
++        }
++        public int streamCapacity() { return Math.multiplyExact(origins, streamsPerOrigin); }
++        public int slotCapacity() { return Math.multiplyExact(streamCapacity(), neighbors); }
++    }
++    public enum Status { APPLIED, IGNORED, REJECTED }
++    public enum Reason {
++        NONE, DUPLICATE, STALE_SEQUENCE, GENERATION_EXPIRED, WITHDRAWN_GENERATION,
++        STALE_SESSION, STALE_EPOCH, RETIRED_EPOCH, UNKNOWN_STREAM, ORIGIN_CONFLICT,
++        INVALID_INPUT, CAPACITY_EXCEEDED, REVISION_EXHAUSTED
++    }
++    public record Outcome(Status status, Reason reason, Set<UUID> changedStreams) {
++        public Outcome {
++            Objects.requireNonNull(status); Objects.requireNonNull(reason); Objects.requireNonNull(changedStreams);
++            if (changedStreams.size() > 16_384) throw new IllegalArgumentException("Too many changed streams");
++            changedStreams = Set.copyOf(changedStreams);
++        }
++    }
++    static void nodeId(String value) {
++        Objects.requireNonNull(value);
++        if (!value.matches("[A-Za-z0-9_-]{1,32}")) throw new IllegalArgumentException("Invalid node ID");
++    }
++    static long nextRevision(long current) {
++        if (current < 0) throw new IllegalArgumentException("Negative revision");
++        return Math.incrementExact(current);
++    }
++
++    private record Origin(Optional<UUID> epoch, Map<UUID, Long> retired, int streams) {}
++    private record Link(SessionKey session, OptionalLong cost) {}
++    private record Slot(long sequence, long began, boolean withdrawn, Advertisement advertisement) {}
++    private record Row(UUID streamId, String serverId, Map<String, Slot> slots, boolean localOffer, Route view) {}
++    private record State(Map<String, Origin> origins, Map<String, Link> links, Map<UUID, Row> rows) {}
++    private record Decision(Status status, Reason reason) {}
++    private final String local;
++    private final Limits limits;
++    private final long candidateTtl, historyTtl;
++    private final LongSupplier clock;
++    private State state = new State(Map.of(), Map.of(), Map.of());
++    private boolean observed;
++    private long lastObserved;
++
++    public RoutingTable(String localNodeId, Limits limits, long candidateTtlMillis,
++            long historyTtlMillis, LongSupplier nanoTime) {
++        nodeId(localNodeId); this.local = localNodeId;
++        this.limits = Objects.requireNonNull(limits); this.clock = Objects.requireNonNull(nanoTime);
++        if (candidateTtlMillis < 1 || historyTtlMillis < candidateTtlMillis || historyTtlMillis > Integer.MAX_VALUE)
++            throw new IllegalArgumentException("Invalid history horizons");
++        candidateTtl = Math.multiplyExact(candidateTtlMillis, 1_000_000L);
++        historyTtl = Math.multiplyExact(historyTtlMillis, 1_000_000L);
++    }
++
++    private long now() {
++        long value = clock.getAsLong();
++        if (observed && value - lastObserved < 0) throw new IllegalStateException("Monotonic clock regressed");
++        lastObserved = value; observed = true; return value;
++    }
++    private static long age(long now, long began) {
++        long age = now - began;
++        if (age < 0) throw new IllegalStateException("Monotonic horizon exceeded");
++        return age;
++    }
++    private static Decision apply() { return new Decision(Status.APPLIED, Reason.NONE); }
++    private static Decision ignore(Reason reason) { return new Decision(Status.IGNORED, reason); }
++    private static Decision reject(Reason reason) { return new Decision(Status.REJECTED, reason); }
++    private static Outcome unchanged(Decision decision) { return new Outcome(decision.status(), decision.reason(), Set.of()); }
++
++    /** A private draft: failed validation/revision checks never publish a partially changed source. */
++    private final class Change {
++        final long time;
++        final Map<String, Origin> origins = new LinkedHashMap<>(state.origins());
++        final Map<String, Link> links = new LinkedHashMap<>(state.links());
++        final Map<UUID, Row> rows = new LinkedHashMap<>(state.rows());
++        final Set<UUID> touched = new LinkedHashSet<>();
++        Change(long time) { this.time = time; }
++        void row(Row row) { rows.put(row.streamId(), row); touched.add(row.streamId()); }
++        void slots(Row row, Map<String, Slot> slots) {
++            row(new Row(row.streamId(), row.serverId(), Map.copyOf(slots), row.localOffer(), row.view()));
++        }
++        boolean current(SessionKey session) {
++            var link = links.get(session.nodeId()); return link != null && link.session().equals(session);
++        }
++        void removeSlots(String neighbor) {
++            for (var row : List.copyOf(rows.values())) {
++                if (row.slots().containsKey(neighbor)) {
++                    var slots = new LinkedHashMap<>(row.slots()); slots.remove(neighbor); slots(row, slots);
++                }
++            }
++        }
++        Outcome commit() {
++            var changed = new LinkedHashSet<UUID>();
++            for (UUID id : touched) {
++                var row = rows.get(id); var previous = state.rows().get(id);
++                var old = previous == null ? null : previous.view();
++                long revision = old == null ? 0 : old.revision();
++                Route view = project(row, origins, links, time, revision);
++                if (!view.equals(old)) {
++                    if (old != null) {
++                        try { revision = nextRevision(revision); }
++                        catch (ArithmeticException exhausted) { return unchanged(reject(Reason.REVISION_EXHAUSTED)); }
++                        view = project(row, origins, links, time, revision);
++                    }
++                    changed.add(id);
++                }
++                rows.put(id, new Row(id, row.serverId(), row.slots(), row.localOffer(), view));
++            }
++            State published = new State(Map.copyOf(origins), Map.copyOf(links), Map.copyOf(rows));
++            Outcome outcome = new Outcome(Status.APPLIED, Reason.NONE, changed);
++            state = published;
++            return outcome;
++        }
++    }
++
++    private Outcome change(Function<Change, Decision> operation) {
++        var draft = new Change(now()); var decision = operation.apply(draft);
++        return decision.status() == Status.APPLIED ? draft.commit() : unchanged(decision);
++    }
++
++    private Route project(Row row, Map<String, Origin> origins, Map<String, Link> links, long time, long revision) {
++        var epoch = origins.get(row.serverId()).epoch();
++        var candidates = new ArrayList<RouteCandidate>();
++        for (Slot slot : row.slots().values()) {
++            var ad = slot.advertisement();
++            if (ad == null || slot.withdrawn() || age(time, slot.began()) >= candidateTtl) continue;
++            var link = links.get(ad.session().nodeId());
++            if (link == null || !link.session().equals(ad.session()) || !epoch.equals(Optional.of(ad.serverEpoch()))) continue;
++            var path = new ArrayList<>(ad.advertisedPath()); path.add(local);
++            Optional<RouteMetric> metric = Optional.empty();
++            if (link.cost().isPresent()) {
++                try { metric = Optional.of(RouteMetric.accumulate(ad.advertisedCostMicros(), link.cost().orElseThrow(), path.size() - 1)); }
++                catch (ArithmeticException overflow) { /* Keep provenance and original TTL, but do not rank an impossible sum. */ }
++            }
++            candidates.add(new RouteCandidate(row.streamId(), row.serverId(), ad.serverEpoch(), ad.session(), path,
++                    ad.announceSeq(), ad.advertisedCostMicros(), metric, slot.began(), candidateTtl));
++        }
++        candidates.sort((a, b) -> {
++            int order = Boolean.compare(b.metric().isPresent(), a.metric().isPresent());
++            if (order == 0 && a.metric().isPresent()) order = a.metric().orElseThrow().compareTo(b.metric().orElseThrow());
++            return order != 0 ? order : a.upstream().nodeId().compareTo(b.upstream().nodeId());
++        });
++        Optional<RouteCandidate> selected = row.localOffer() ? Optional.empty()
++                : candidates.stream().filter(c -> c.metric().isPresent()).findFirst();
++        Optional<RouteMetric> metric = row.localOffer() ? Optional.of(new RouteMetric(0, 0)) : selected.flatMap(RouteCandidate::metric);
++        return new Route(row.streamId(), row.serverId(), epoch, row.localOffer(), selected, metric,
++                selected.map(RouteCandidate::upstream), Optional.empty(), Optional.empty(), Set.of(), candidates,
++                metric.isPresent() ? RouteState.INACTIVE : RouteState.UNAVAILABLE, revision);
++    }
++
++    public Outcome bindStream(UUID streamId, String expectedServerId) {
++        Objects.requireNonNull(streamId); nodeId(expectedServerId);
++        return change(d -> {
++            var old = d.rows.get(streamId);
++            if (old != null) return old.serverId().equals(expectedServerId) ? ignore(Reason.DUPLICATE) : reject(Reason.ORIGIN_CONFLICT);
++            var origin = d.origins.get(expectedServerId);
++            if (origin == null) {
++                if (d.origins.size() == limits.origins()) return reject(Reason.CAPACITY_EXCEEDED);
++                origin = new Origin(Optional.empty(), Map.of(), 0);
++            }
++            if (origin.streams() == limits.streamsPerOrigin()) return reject(Reason.CAPACITY_EXCEEDED);
++            d.origins.put(expectedServerId, new Origin(origin.epoch(), origin.retired(), origin.streams() + 1));
++            d.row(new Row(streamId, expectedServerId, Map.of(), false, null)); return apply();
++        });
++    }
++    public Outcome replaceSession(Optional<SessionKey> expected, SessionKey replacement) {
++        Objects.requireNonNull(expected); Objects.requireNonNull(replacement);
++        return change(d -> {
++            if (replacement.nodeId().equals(local) || expected.isPresent() && !expected.orElseThrow().nodeId().equals(replacement.nodeId()))
++                return reject(Reason.INVALID_INPUT);
++            var old = d.links.get(replacement.nodeId());
++            if (old != null && old.session().equals(replacement)) return ignore(Reason.DUPLICATE);
++            if (!expected.equals(Optional.ofNullable(old).map(Link::session))) return ignore(Reason.STALE_SESSION);
++            if (old == null && d.links.size() == limits.neighbors()) return reject(Reason.CAPACITY_EXCEEDED);
++            d.removeSlots(replacement.nodeId()); d.links.put(replacement.nodeId(), new Link(replacement, OptionalLong.empty()));
++            return apply();
++        });
++    }
++    public Outcome removeSession(SessionKey session) {
++        Objects.requireNonNull(session);
++        return change(d -> {
++            if (!d.current(session)) return ignore(Reason.STALE_SESSION);
++            d.removeSlots(session.nodeId()); d.links.remove(session.nodeId()); return apply();
++        });
++    }
++    public Outcome setLinkCost(SessionKey session, OptionalLong costMicros) {
++        Objects.requireNonNull(session); Objects.requireNonNull(costMicros);
++        if (costMicros.isPresent() && costMicros.orElseThrow() < 1) throw new IllegalArgumentException("Positive measured cost required");
++        return change(d -> {
++            if (!d.current(session)) return ignore(Reason.STALE_SESSION);
++            d.links.put(session.nodeId(), new Link(session, costMicros));
++            for (var row : d.rows.values()) if (row.slots().containsKey(session.nodeId())) d.touched.add(row.streamId());
++            return apply();
++        });
++    }
++    public Outcome confirmEpoch(String serverId, Optional<UUID> expectedCurrent, UUID replacement) {
++        nodeId(serverId); Objects.requireNonNull(expectedCurrent); Objects.requireNonNull(replacement);
++        return change(d -> {
++            var origin = d.origins.get(serverId);
++            if (origin == null) return reject(Reason.UNKNOWN_STREAM);
++            if (origin.epoch().equals(Optional.of(replacement))) return ignore(Reason.DUPLICATE);
++            if (!origin.epoch().equals(expectedCurrent)) return ignore(Reason.STALE_EPOCH);
++            var retired = new LinkedHashMap<UUID, Long>();
++            origin.retired().forEach((epoch, began) -> { if (age(d.time, began) < historyTtl) retired.put(epoch, began); });
++            if (retired.containsKey(replacement)) return reject(Reason.RETIRED_EPOCH);
++            if (origin.epoch().isPresent()) {
++                if (retired.size() == limits.retiredEpochsPerOrigin()) return reject(Reason.CAPACITY_EXCEEDED);
++                retired.put(origin.epoch().orElseThrow(), d.time);
++            }
++            d.origins.put(serverId, new Origin(Optional.of(replacement), Map.copyOf(retired), origin.streams()));
++            for (var row : List.copyOf(d.rows.values()))
++                if (row.serverId().equals(serverId)) d.row(new Row(row.streamId(), serverId, Map.of(), false, row.view()));
++            return apply();
++        });
++    }
++    private Decision context(Change d, UUID stream, UUID epoch, SessionKey session) {
++        var row = d.rows.get(stream);
++        if (row == null) return reject(Reason.UNKNOWN_STREAM);
++        if (!d.current(session)) return ignore(Reason.STALE_SESSION);
++        if (!d.origins.get(row.serverId()).epoch().equals(Optional.of(epoch))) return ignore(Reason.STALE_EPOCH);
++        return apply();
++    }
++    public Outcome offerLocal(UUID streamId, UUID epoch) { return localOffer(streamId, epoch, true); }
++    public Outcome removeLocalOffer(UUID streamId, UUID epoch) { return localOffer(streamId, epoch, false); }
++    private Outcome localOffer(UUID streamId, UUID epoch, boolean present) {
++        Objects.requireNonNull(streamId); Objects.requireNonNull(epoch);
++        return change(d -> {
++            var row = d.rows.get(streamId);
++            if (row == null) return reject(Reason.UNKNOWN_STREAM);
++            if (!row.serverId().equals(local)) return reject(Reason.INVALID_INPUT);
++            if (!d.origins.get(local).epoch().equals(Optional.of(epoch))) return ignore(Reason.STALE_EPOCH);
++            if (row.localOffer() == present) return ignore(Reason.DUPLICATE);
++            d.row(new Row(streamId, local, row.slots(), present, row.view())); return apply();
++        });
++    }
++    private Slot currentSlot(Change draft, Row row, String neighbor) {
++        var slot = row.slots().get(neighbor);
++        return slot != null && age(draft.time, slot.began()) < historyTtl ? slot : null;
++    }
++    private Decision store(Change draft, Row row, String neighbor, Slot slot) {
++        if (!row.slots().containsKey(neighbor) && row.slots().size() == limits.neighbors())
++            return reject(Reason.CAPACITY_EXCEEDED);
++        var slots = new LinkedHashMap<>(row.slots()); slots.put(neighbor, slot); draft.slots(row, slots); return apply();
++    }
++    public Outcome announce(Advertisement advertisement) {
++        var ad = Objects.requireNonNull(advertisement);
++        return change(d -> {
++            var row = d.rows.get(ad.streamId());
++            if (row == null) return reject(Reason.UNKNOWN_STREAM);
++            if (!row.serverId().equals(ad.serverId())) return reject(Reason.ORIGIN_CONFLICT);
++            var context = context(d, ad.streamId(), ad.serverEpoch(), ad.session());
++            if (context.status() != Status.APPLIED) return context;
++            var path = ad.advertisedPath();
++            if (!path.getFirst().equals(ad.serverId()) || !path.getLast().equals(ad.session().nodeId())
++                    || path.contains(local) || new HashSet<>(path).size() != path.size()
++                    || (ad.advertisedCostMicros() == 0) != (path.size() == 1))
++                return reject(Reason.INVALID_INPUT);
++            var old = currentSlot(d, row, ad.session().nodeId());
++            long began = d.time;
++            if (old != null) {
++                int order = Long.compare(ad.announceSeq(), old.sequence());
++                if (order < 0) return ignore(Reason.STALE_SEQUENCE);
++                if (order == 0) {
++                    if (old.withdrawn()) return ignore(Reason.WITHDRAWN_GENERATION);
++                    if (old.advertisement() == null || age(d.time, old.began()) >= candidateTtl)
++                        return ignore(Reason.GENERATION_EXPIRED);
++                    var previous = old.advertisement();
++                    int improvement = Long.compare(ad.advertisedCostMicros(), previous.advertisedCostMicros());
++                    if (improvement == 0) improvement = Integer.compare(path.size(), previous.advertisedPath().size());
++                    if (improvement >= 0) return ignore(Reason.DUPLICATE);
++                    began = old.began();
++                }
++            }
++            var link = d.links.get(ad.session().nodeId());
++            if (link.cost().isPresent()) {
++                try { RouteMetric.accumulate(ad.advertisedCostMicros(), link.cost().orElseThrow(), path.size()); }
++                catch (ArithmeticException overflow) { return reject(Reason.INVALID_INPUT); }
++            }
++            return store(d, row, ad.session().nodeId(), new Slot(ad.announceSeq(), began, false, ad));
++        });
++    }
++    public Outcome withdraw(UUID streamId, UUID epoch, SessionKey session, long sequence) {
++        Objects.requireNonNull(streamId); Objects.requireNonNull(epoch); Objects.requireNonNull(session);
++        if (sequence < 0) throw new IllegalArgumentException("Negative sequence");
++        return change(d -> {
++            var context = context(d, streamId, epoch, session);
++            if (context.status() != Status.APPLIED) return context;
++            var row = d.rows.get(streamId); var old = currentSlot(d, row, session.nodeId());
++            long began = d.time;
++            if (old != null) {
++                if (sequence < old.sequence()) return ignore(Reason.STALE_SEQUENCE);
++                if (sequence == old.sequence()) {
++                    if (old.withdrawn()) return ignore(Reason.DUPLICATE);
++                    began = old.began();
++                }
++            }
++            return store(d, row, session.nodeId(), new Slot(sequence, began, true, null));
++        });
++    }
++    public Outcome expire() {
++        return change(d -> {
++            for (var entry : List.copyOf(d.origins.entrySet())) {
++                var origin = entry.getValue(); var retired = new LinkedHashMap<UUID, Long>();
++                origin.retired().forEach((epoch, began) -> { if (age(d.time, began) < historyTtl) retired.put(epoch, began); });
++                if (retired.size() != origin.retired().size())
++                    d.origins.put(entry.getKey(), new Origin(origin.epoch(), Map.copyOf(retired), origin.streams()));
++            }
++            for (var row : List.copyOf(d.rows.values())) {
++                var slots = new LinkedHashMap<String, Slot>(); boolean cleaned = false;
++                for (var entry : row.slots().entrySet()) {
++                    var slot = entry.getValue(); long elapsed = age(d.time, slot.began());
++                    if (elapsed >= historyTtl) { cleaned = true; continue; }
++                    if (elapsed >= candidateTtl && slot.advertisement() != null) {
++                        slot = new Slot(slot.sequence(), slot.began(), slot.withdrawn(), null); cleaned = true;
++                    }
++                    slots.put(entry.getKey(), slot);
++                }
++                if (cleaned) d.slots(row, slots);
++            }
++            return apply();
++        });
++    }
++    public Optional<Route> snapshot(UUID streamId) {
++        Objects.requireNonNull(streamId); var draft = new Change(now());
++        if (!draft.rows.containsKey(streamId)) return Optional.empty();
++        draft.touched.add(streamId);
++        if (draft.commit().status() == Status.REJECTED) throw new IllegalStateException("Route revision exhausted");
++        return Optional.of(state.rows().get(streamId).view());
++    }
++}
+--- a/add.md
++++ b/add.md
+@@ -652,8 +652,10 @@
+ sem segunda conversão; soma acumulada verificada. Snapshot de seleção INACTIVE/
+ UNAVAILABLE não autoriza dados, não confirma upstream nem cria destinos.
+ [Design aprovado](memory-bank/bolts/021-rotas/ddd-02-technical-design.md) e
+-[revisão ADR para aprovação](memory-bank/bolts/021-rotas/adr-review.md); reutiliza
+-ADR-004/017/018/024, sem nova ADR ou alteração wire. Implement não autorizado.
++[revisão ADR aprovada](memory-bank/bolts/021-rotas/adr-review.md); reutiliza
++ADR-004/017/018/024, sem nova ADR ou alteração wire. Revisão ADR aprovada;
++[Implement para revisão](memory-bank/bolts/021-rotas/implementation-walkthrough.md),
++Test/fecho não iniciados. Os critérios do IMP-008 continuam por aceitar.
+ 
+ ### 6.2. Interfaces e formato de erros
+ 
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -91,3 +91,15 @@
+ composição futura requer checkpoint/âmbito próprio. Só Model/Design concluídos;
+ Implement/Test, V-011, regressão atual, manual offline, revisão final e integração
+ pendentes. Nenhuma alteração Java, teste executado ou ADR nova neste checkpoint.
++
++
++## IMP-008 — domínio implementado para revisão, sem composição de rede
++
++Registo 2026-11-13T17:18:48Z. [Walkthrough](../memory-bank/bolts/021-rotas/implementation-walkthrough.md):
++RouteMetric/RouteCandidate/RouteState/Route/RoutingTable disponíveis nos seis
++caminhos do IMP-008, conforme Design e Q-C-26 aprovados. Snapshot só de seleção,
++sem parent confirmado ou destinos. Todos os métodos da tabela exigem o owner
++serial do chamador; nenhuma thread, socket ou timer criado pelo domínio.
++35 testes novos e regressão incremental1211/0/0/0 com JDK21; execução restrita
++anterior preservada. Test/clean verify/manual humano/revisão final/integração
++pendentes. RoutingService/OverlayNode e bytes operacionais preservados.
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -633,3 +633,15 @@
+ composição futura requer checkpoint/âmbito próprio. Só Model/Design concluídos;
+ Implement/Test, V-011, regressão atual, manual offline, revisão final e integração
+ pendentes. Nenhuma alteração Java, teste executado ou ADR nova neste checkpoint.
++
++
++## IMP-008 — domínio implementado para revisão, sem composição de rede
++
++Registo 2026-11-13T17:18:48Z. [Walkthrough](../memory-bank/bolts/021-rotas/implementation-walkthrough.md):
++RouteMetric/RouteCandidate/RouteState/Route/RoutingTable disponíveis nos seis
++caminhos do IMP-008, conforme Design e Q-C-26 aprovados. Snapshot só de seleção,
++sem parent confirmado ou destinos. Todos os métodos da tabela exigem o owner
++serial do chamador; nenhuma thread, socket ou timer criado pelo domínio.
++35 testes novos e regressão incremental1211/0/0/0 com JDK21; execução restrita
++anterior preservada. Test/clean verify/manual humano/revisão final/integração
++pendentes. RoutingService/OverlayNode e bytes operacionais preservados.
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -272,3 +272,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em ADR (Model/Design aprovados); TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010 DONE; TASK-011 IN PROGRESS em Implement para revisão; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em revisão ADR, Model/Design aprovados.
++**Última tarefa concluída:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 em Implement para revisão, Model/Design/ADR aprovados.
+ 
+ Histórico anterior à TASK-005 — revisão de prontidão em 27-10-2026: [implementação, build repetido e pendências](../experiments/phase-01-readiness-review.md). Os 131 testes voltaram a passar e não foi identificado bloqueio ao início de TASK-005; PHASE-02 permanece TODO.
+ 
+@@ -105,7 +105,7 @@
+ | [TASK-033 — Extra A](tasks/PHASE-02/TASK-033.md) | Aprender candidatos através dos vizinhos | TASK-009 | DONE | V-033: 1065 testes; manual Luis/53 checks; Test e revisão técnica aceites; integração em main local f650be0 |
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+-| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Model/Design aprovados; ADR para aprovação; V-011: NÃO EXECUTADO |
++| [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | IN PROGRESS | Implement para revisão; V-011 técnico35; regressão incremental1211/0/0/0; Test/manual pendentes |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+@@ -1002,3 +1002,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/docs/tasks/PHASE-03/TASK-011.md
++++ b/docs/tasks/PHASE-03/TASK-011.md
+@@ -117,3 +117,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/memory-bank/bolts/021-rotas/bolt.md
++++ b/memory-bank/bolts/021-rotas/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["002-modelar-candidatos-custos-e-snapshots-por-stream"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-13T16:41:04Z"
++updated: "2026-11-13T17:18:48Z"
+ started: "2026-11-13T16:04:28Z"
+ completed: null
+-current_stage: "adr"
+-stages_completed: ["model", "design"]
++current_stage: "implement"
++stages_completed: ["model", "design", "adr"]
+ requires_bolts: ["004-overlay", "005-rotas"]
+ enables_bolts: ["006-rotas"]
+ requires_units: ["002-overlay"]
+@@ -50,7 +50,7 @@
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+-3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-008 e as ADR do ADD.
++3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-008 e as ADR do ADD.
+ 
+@@ -92,7 +92,7 @@
+ Waheed/integração pendentes. Sem gates externos adicionais. Prova da aprovação em
+ [model-approval.json](../../../experiments/construction/021-rotas/model-approval.json).
+ 
+-## Checkpoint atual — revisão ADR para aprovação
++## Histórico — revisão ADR para aprovação
+ 
+ Registo 2026-11-13T16:41:04Z. ✅ Model/Design e Q-C-26 integralmente aprovados.
+ ⏳ [Revisão ADR](adr-review.md) preparada; só Model/Design concluídos. APIs reais,
+@@ -102,3 +102,17 @@
+ Java alterado, Maven, commits/push ou outro IMP. V-011/regressão/manual offline
+ antes de aprovar Test/revisão final Waheed/integração continuam pendentes.
+ Sem gates externos adicionais; parar antes de Implement.
++
++## Implement autorizado
++
++Revisão ADR aprovada explicitamente; apenas Implement nos seis caminhos e
++testes incrementais autorizado. Test/fecho, commits/push e outro IMP não autorizados.
++
++## Checkpoint atual — Implement para aprovação
++
++✅ Model/Design/ADR aprovados; ⏳ Implement preparado para revisão, não aprovado.
++[Walkthrough](implementation-walkthrough.md), D01–D22 e evidência real em
++experiments/construction/021-rotas/. Seis caminhos +851/−0,35 testes novos e
++regressão incremental08:1211/0/0/0,JDK21; execução07 restrita preservada.
++D22 parcial: clean verify, JAR/manual humano, revisão final e integração pendentes.
++Test/fecho não iniciados; nenhum commit/push ou outro IMP. Sem gates adicionais.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -192,3 +192,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ started: "2026-11-13T16:04:28Z"
+-updated: "2026-11-13T16:41:04Z"
++updated: "2026-11-13T17:18:48Z"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-011"]
+ implementation_tasks: ["IMP-008"]
+@@ -74,3 +74,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-13T16:41:04Z"
++updated: "2026-11-13T17:18:48Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -223,3 +223,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "021-rotas (in-progress; Model/Design and Q-C-26 approved; ADR review ready for approval)"
++next_bolt: "021-rotas (in-progress; Implement ready for review; Model/Design/ADR approved; Test not started)"
+ 
+ last_completed_bolt: "005-rotas"
+ last_integrated_commit: "f9905038c614612b6f2798d4eca46dd72934743f"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -355,3 +355,13 @@
+ Capacidades/horizontes e alocação por necessidade incorporados no ADD6.1.
+ APIs reais de LinkMetrics/monitor/config/sessão inspecionadas estaticamente;
+ composição futura explícita, sem Java alterado. Parar antes de Implement.
++
++
++## IMP-008 — revisão ADR aprovada; Implement para revisão
++
++Registo 2026-11-13T17:18:48Z. Reutilização ADR aprovada pelo utilizador, sem ADR nova ou
++substituição. [Walkthrough](../bolts/021-rotas/implementation-walkthrough.md):
++seis caminhos +851/−0,35 testes novos e regressão incremental1211/0/0/0,JDK21.
++Execução restrita anterior com72erros de socket preservada, sem código alterado
++entre repetições. Q-C-26 implementada; composição futura não antecipada.
++Implement por aprovar; Test/manual/revisão final/integração pendentes.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em revisão ADR; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: nove histórias/bolts complete, incluindo005-rotas/IMP-007, e25 planned;021-rotas/IMP-008 em Implement para revisão; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -66,7 +66,7 @@
+ 
+ ## 003-rotas/002-modelar-candidatos-custos-e-snapshots-por-stream.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-008. **Estado:** in-progress (Model/Design aprovados; ADR para aprovação). **Bolt:** 021-rotas.
++**Tarefa:** IMP-008. **Estado:** in-progress (Model/Design/ADR aprovados; Implement para revisão). **Bolt:** 021-rotas.
+ **Ficheiro:** [002-modelar-candidatos-custos-e-snapshots-por-stream](intents/001-ott-streaming/units/003-rotas/stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md).
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+@@ -478,3 +478,20 @@
+ Seis caminhos preservados; nenhum Java alterado/Maven/commit/push/outro IMP.
+ V-011/regressão atual/manual offline antes de aprovar Test/revisão final Waheed/
+ integração pendentes; sem gates externos adicionais. Unidade/PHASE-03 em progresso.
++
++
++## IMP-008 / 021-rotas — Implement para aprovação
++
++Registo 2026-11-13T17:18:48Z. Revisão ADR aprovada pelo utilizador; Implement autorizado só
++nos seis caminhos. Dados/custos/tabela implementados aditivamente, +851/−0 contra
++cc952c5; nenhum teste anterior alterado. Incrementais novos:33/30falhas→33/27→
++33/10→33/0; revisão de record:35/1→35/0. Regressão incremental07:1211/0falhas/
++72erros de SocketException por sandbox; preservada. Repetição08 autorizada fora
++da sandbox, mesmo código/JDK21:1211/0/0/0,14 XML,35 novos+1176 anteriores.
++Walkthrough e D01–D22 em memory-bank/bolts/021-rotas/implementation-walkthrough.md.
++D22 parcial: clean verify/JAR/manual offline humano/revisão final Waheed/integração
++pendentes. Sem composição RoutingService/OverlayNode ou alteração de wire/caps.
++current_stage=implement, stages_completed=[model,design,adr], completed=null;
++Implement para revisão, Test não iniciado. História/unidade/TASK/PHASE-03 em
++progresso, sem implemented=true ou fecho. Sem gates externos adicionais,
++commits/push ou outro IMP. Target gerado inventariado separadamente.
+--- a/memory-bank/bolts/021-rotas/adr-review.md
++++ b/memory-bank/bolts/021-rotas/adr-review.md
+@@ -2,14 +2,15 @@
+ unit: "003-rotas"
+ bolt: "021-rotas"
+ stage: "adr"
+-status: "ready-for-review"
++status: "complete"
+ created: "2026-11-13T16:37:24Z"
+ ---
+ # IMP-008 — revisão ADR para aprovação
+ 
+ ✅ Model, Design e valores/horizontes de Q-C-26 aprovados explicitamente pelo
+-utilizador. ⏳ Revisão ADR preparada, ainda não aprovada; Implement/Test não
+-iniciados. Esta aprovação de Design não é revisão final de código inexistente.
++utilizador. ✅ Revisão ADR aprovada pelo utilizador; Implement autorizado e
++preparado para revisão. Test não iniciado. A aprovação ADR não é revisão final
++da implementação; as pendências na análise original abaixo são históricas.
+ 
+ ## 1. Base, fontes e método
+ 
+@@ -176,3 +177,6 @@
+ Sem gates externos adicionais, Java alterado, Maven, commits, push ou outro IMP.
+ Se a implementação revelar decisão aceite inviável, parar a parte afetada,
+ preservar evidência/impacto e propor substituição pelo ADD11 antes de continuar.
++
++Aprovação explícita da revisão ADR registada em 2026-11-13T17:01:29Z. Apenas Implement autorizado;
++pendências de aprovação anteriores são históricas. Test/fecho continuam não autorizados.
+--- a/memory-bank/bolts/021-rotas/implementation-walkthrough.md
++++ b/memory-bank/bolts/021-rotas/implementation-walkthrough.md
+@@ -0,0 +1,155 @@
++---
++unit: "003-rotas"
++bolt: "021-rotas"
++stage: "implement"
++status: "ready-for-review"
++created: "2026-11-13T17:17:41Z"
++---
++# IMP-008 — Implementation walkthrough para revisão
++
++✅ Model/Design/Q-C-26 e revisão ADR aprovados pelo utilizador. ⏳ Implement para
++aprovação; Test não iniciado. Só os seis caminhos autorizados foram alterados
++em Projeto/src. Sem composição RoutingService/OverlayNode, commits/push ou outro IMP.
++
++## 1. Base, aprovação e âmbito
++
++Base HEAD/main/Denji cc952c5f558930f2c67e7dea8fe92612cd8cc705. Entrada suja apenas
++com documentos/evidência dos checkpoints anteriores, preservada no
++[manifesto de entrada](../../../experiments/construction/021-rotas/implement-entry.json).
++[Autorização](../../../experiments/construction/021-rotas/adr-approval.json): Implement
++nos seis caminhos e testes incrementais. Apenas Model/Design/ADR concluídos.
++
++| Ficheiro | Linhas adicionadas/removidas contra a base | Entrega |
++|---|---:|---|
++| routing/RouteMetric.java | +20/−0 | Valor de custo/saltos e soma verificada |
++| routing/RouteState.java | +4/−0 | Enum local; só INACTIVE/UNAVAILABLE produzidos |
++| routing/Route.java | +48/−0 | Snapshot defensivo, sem autorização de dados |
++| routing/RouteCandidate.java | +33/−0, novo | Candidato remoto, proveniência/path/validade |
++| routing/RoutingTable.java | +361/−0 | Agregado, transações, retenção, limites e seleção |
++| routing/RoutingTableTest.java | +385/−0, novo | 35 testes determinísticos de domínio |
++
++Total **+851/−0**, seis caminhos main/test conforme ADD. Os quatro ficheiros
++existiam vazios; os outros dois não existiam. **Nenhuma linha das fundações foi
++removida ou substituída; nenhum teste anterior foi apagado, alterado ou enfraquecido.**
++Os diffs completos e numstat são arquivados na evidência desta etapa; target fica
++num inventário separado e não conta como alteração de fonte ou conteúdo aprovado.
++
++## 2. Comportamentos implementados
++
++1 - **Dados e seleção:** bindings UUID→origem persistem durante a execução;
++    fonte local tem custo0 e upstream ausente. Candidatos por vizinho/stream,
++    path simples fonte→emissor→local, limite32 já com local. Soma em µs por
++    Math.addExact, ordenação custo/saltos/nodeId. Alternativas não são apagadas
++    ao selecionar, retirar ou expirar o melhor.
++2 - **Custo direto:** setLinkCost recebe OptionalLong, não EWMA. Teste com LinkMetrics
++    real SUSPECT/EWMA1.2/cost2 demonstra consumo direto: anúncio10 produz12.
++    Custo vazio mantém candidato pendente; atualização que cause overflow conserva
++    proveniência/TTL mas não permite selecionar a soma impossível. Não cria ponte
++    de eventos ou altera o monitor existente.
++3 - **Sequência e tempo:** uma leitura monotónica por operação; ms→ns verificado,
++    ticks negativos/wrap e fronteira age≥TTL. Só sequência nova renova o início.
++    Melhoria de mesma geração, inclusive sem RTT, conserva prazo; watermark único
++    por slot bloqueia ressurreição até cacheTtl. Retirada igual não renova; a nova
++    instala watermark sem candidato. A proteção termina no horizonte aprovado.
++4 - **Identidade:** CAS de sessão e época; callbacks de connectionId/instanceId
++    antigos não afetam a nova. Substituição limpa amostra e candidatos antigos,
++    repetição da sessão corrente não os reinicia. Sessão reparada confirmada é
++    elegível sem consultar aresta inicial, endpoint/IP ou bootstrap.
++5 - **Época por fonte:** mudança explícita, nunca inferida de UUID ordenável ou
++    anúncio isolado. Invalida juntas todas as streams da fonte e ofertas locais,
++    preservando outras fontes. Oito épocas retiradas protegidas por origem;
++    nona mudança sem espaço recusa tudo, sem evicção protegida.
++6 - **Limites e atomicidade:**64 origens×256 streams, N=min(C,63) sessões/slots por
++    stream e um watermark por slot. Mapas crescem com entradas reais; não se
++    prealocam produtos máximos. Cada operação prepara mapas/snapshots/revisões
++    num draft privado e publica um único State só após todas as verificações.
++    Rejeição não altera estado saudável. cacheCapacity4096 não é limite de rotas.
++7 - **Leitura e ownership:** snapshots/paths/coleções/Outcome imutáveis, incluindo
++    vista antiga após atualização. snapshot é chamado pelo owner e filtra expirados
++    mesmo antes de expire físico. Não existe executor/timer/socket ou I/O novo.
++    A classe exige confinamento pelo executor serial do chamador, sem criar outro.
++    activeUpstream/pendingUpstream/downstreams ficam vazios; seleção não autoriza dados.
++
++## 3. Execuções reais em Implement
++
++JDK executado: /usr/lib/jvm/java-21-openjdk-amd64, OpenJDK21.0.13.0.3. O default
++local era Java25; JAVA_HOME/PATH foram fixados no runner. POM sem alteração.
++Comando de domínio: `mvn -o -B -ntp -Dtest=RoutingTableTest test`, em Projeto.
++Regressão incremental: `mvn -o -B -ntp test`. Não foi executado clean verify,
++package, manual offline ou etapa Test. Cada diretório contém comando/ambiente,
++log, XML novos, contagens, hashes e ZIP dos seis fontes daquela execução.
++
++| Execução | Testes/falhas/erros/skips | Resultado e alcance |
++|---|---|---|
++| implement-red-01 | 33/30/0/0 | Interfaces compilam; tabela ainda ausente. Três testes de valores/limites passam; restantes falham na preparação de bindings, não provam isoladamente todos os algoritmos |
++| implement-state-02 | 33/27/0/0 | Bindings/sessões/épocas/ofertas reais; admissão/retirada/expiry ainda ausentes |
++| implement-candidates-03 | 33/10/0/0 | Custos/seleção/correlação/TTL passam; dez falhas específicas nas operações withdraw/expire ainda ausentes |
++| implement-green-04 | 33/0/0/0 | Núcleo completo aprovado pelos 33 casos iniciais |
++| implement-record-red-05 | 35/1/0/0 | Novo negativo reproduz RouteCandidate direto aceitando custo anunciado positivo na origem; teste de leitura única passa |
++| implement-green-06 | 35/0/0/0 | Invariante do record corrigido, sem enfraquecer teste |
++| implement-regression-07 | 1211/0/72/0 | Sandbox:72 SocketException «Operação não permitida» em testes anteriores de rede; preservado, não declarado verde |
++| implement-regression-08 | 1211/0/0/0 | Repetição autorizada fora da sandbox, mesmo código;14 XML, saída0 |
++
++[Última regressão](../../../experiments/construction/021-rotas/implement-regression-08/result.json)
++e [log](../../../experiments/construction/021-rotas/implement-regression-08/maven.log).
++Regressão08 inclui35 novos+1176 anteriores. Não se somam execuções repetidas como
++se fossem testes únicos. A mensagem de falha controlada do bootstrap no log
++pertence aos testes negativos; o resultado final real é1211/0/0/0.
++
++## 4. Correspondência D01–D22/V-011
++
++Os métodos abaixo estão no XML de RoutingTableTest da execução08; prefixos D
++são correspondência de Design, não identificadores de testes históricos.
++
++| Design | Métodos de teste (prefixo) | Prova |
++|---|---|---|
++| D01 | d01FourStreams | Quatro UUIDs, mesma época por fonte e isolamento |
++| D02 | d02LocalSource, d02RemoteNode | Custo local0, remoção correlacionada e nenhuma autorização de dados |
++| D03 | d03KnownCosts | Fixtures literais140/130, ambas as ordens |
++| D04 | d04Ties | Saltos/nodeId e alternativas preservadas |
++| D05 | d05InvalidPaths, d05ThirtyOne | Caminhos inválidos, limite31+local/32+local |
++| D06 | d06MetricArithmetic, d06Overflowing | Long.MAX_VALUE e rejeição atómica de overflow/negativos |
++| D07 | d07Unmeasured, d07MeasuredSuspect | Custo opcional e consumo direto de LinkMetrics.costMicros |
++| D08 | d08Expiry | Alternativa após expiry/remoção |
++| D09 | d09SameGeneration, d09ImprovedPending, d09OnlyNewer | Só seq nova renova; melhoria sem amostra não estende TTL |
++| D10 | d10ExpiredWatermark | Retenção após expiry, fronteira16s e reutilização limitada |
++| D11 | d11Withdrawal, d11NewerWithdrawal | Retiradas iguais/novas/antigas, com e sem candidato |
++| D12 | d12EpochChange, d12LocalOffers | Mudança explícita por fonte, CAS, isolamento e oferta local |
++| D13 | d13EightRetired | Saturação sem invalidação parcial; proteção e expiração sem renovação por duplicado |
++| D14 | d14OldCallbacks | Sessão nova na mesma instância; callbacks antigos ignorados e custo resetado |
++| D15 | d15InputsNested | Cópias defensivas transitivas, outcomes e vista anterior |
++| D16 | d16Bindings | UUID/origem persistente, stream desconhecida e conflito |
++| D17 | d17ExactProduction, d17SmallBudgets | Valores/produtos exatos, limites pequenos, saturação, slots/watermarks e atualização sem evicção |
++| D18 | d18ConfirmedRepair | Não exige grafo inicial; ACTIVE/parent confirmado impossível neste snapshot |
++| D19 | d19MetricOverflow | Anúncio retido sem custo elegível e recuperação dentro do mesmo TTL |
++| D20 | d20TickWrap, d20ClockRegression, d20Durations, d20EachOperation | Unidades, wrap/ticks negativos, relógio regressivo e leitura única |
++| D21 | d21RevisionBounds, d21InvalidDomain, d21SourceCandidate | Revisões verificadas, rejeições e custo0 da origem |
++| D22 | **PARCIAL** | Mapa/XML/regressão incremental feitos; clean verify, manual humano, revisão final e integração ainda futuros |
++
++V-011 técnico exercitado nos35 testes: custos conhecidos/desempate, quatro streams,
++alternativas e snapshots. Consolidação/aprovação de Test ainda pendentes. Não se
++simularam bilhões de revisões: fronteira Long.MAX_VALUE é testada pelo helper
++nextRevision aprovado; rollback por saturação/identidade/entrada é testado na API.
++Os caps/produtos de produção são verificados sem alocar um milhão de slots;
++Limits pequenos comprovam as mesmas guardas. Não há medição de memória máxima.
++
++## 5. Preservação, limites e checkpoint
++
++Código final corresponde aos seis hashes da execução08 e ao
++[manifesto para revisão](../../../experiments/construction/021-rotas/implement-review-source-sha256.json),
++que identifica o candidato, **não aprovação humana já recebida**.
++Baseline tinha234 ficheiros fora de target: quatro vazios implementados,
++230 preservados, dois caminhos novos autorizados. POM, configuração, monitor,
++overlay, protocolo/fixtures e testes anteriores permanecem intactos.
++As3392 evidências anteriores e os artefactos dos checkpoints deste bolt são
++conferidos separadamente; target compilado/gerado não é evidência de integração.
++O JAR anterior não foi reconstruído por `test` nem validado como este incremento.
++
++1 - ⏳ Aprovação de Implement pendente; current_stage=implement.
++2 - [ ] Test: clean verify JDK21 novo, XML/JAR/hash e V-011 consolidado.
++3 - [ ] Manual offline preparado/executado tecnicamente e repetido pelo humano antes de aprovar Test.
++4 - [ ] Revisão final atribuída a Waheed e integração antes de DONE.
++
++Sem gates externos adicionais. Sem autorização de Test/fecho, commits/push ou
++outro IMP. A atribuição do revisor não prova revisão efetuada. A composição de
++métricas/rotas e o encaminhamento de vídeo continuam nos seus checkpoints futuros.
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java
+@@ -0,0 +1,33 @@
++package pt.uminho.esr.ott.routing;
++
++import java.util.HashSet;
++import java.util.List;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.UUID;
++import pt.uminho.esr.ott.routing.RoutingTable.SessionKey;
++
++/** Immutable remote candidate. Path includes the local receiver as its last ID. */
++public record RouteCandidate(UUID streamId, String serverId, UUID serverEpoch,
++        SessionKey upstream, List<String> path, long announceSeq, long advertisedCostMicros,
++        Optional<RouteMetric> metric, long generationStartedAtNanos, long candidateTtlNanos) {
++    public RouteCandidate {
++        Objects.requireNonNull(streamId); RoutingTable.nodeId(serverId);
++        Objects.requireNonNull(serverEpoch); Objects.requireNonNull(upstream);
++        Objects.requireNonNull(path); Objects.requireNonNull(metric);
++        if (path.size() < 2 || path.size() > 32 || announceSeq < 0 || advertisedCostMicros < 0
++                || candidateTtlNanos < 1 || candidateTtlNanos > Integer.MAX_VALUE * 1_000_000L)
++            throw new IllegalArgumentException("Invalid candidate bounds");
++        var ids = new HashSet<String>();
++        for (String id : path) {
++            RoutingTable.nodeId(id);
++            if (!ids.add(id)) throw new IllegalArgumentException("Repeated path ID");
++        }
++        if (!path.getFirst().equals(serverId) || !path.get(path.size() - 2).equals(upstream.nodeId())
++                || (advertisedCostMicros == 0) != (path.size() == 2)
++                || metric.isPresent() && (metric.orElseThrow().hopCount() != path.size() - 1
++                    || metric.orElseThrow().costMicros() <= advertisedCostMicros))
++            throw new IllegalArgumentException("Inconsistent candidate");
++        path = List.copyOf(path);
++    }
++}
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingTableTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingTableTest.java
+@@ -0,0 +1,385 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++import java.util.function.LongSupplier;
++import pt.uminho.esr.ott.monitoring.LinkMetrics;
++import pt.uminho.esr.ott.overlay.Neighbor;
++import pt.uminho.esr.ott.overlay.NodeRole;
++import pt.uminho.esr.ott.protocol.ControlMessage;
++import pt.uminho.esr.ott.routing.RoutingTable.*;
++import static org.junit.jupiter.api.Assertions.*;
++
++class RoutingTableTest {
++    static final UUID A = id("A"), A2 = id("A2"), B = id("B"), B2 = id("B2");
++    static final UUID ES = id("epoch-S"), ET = id("epoch-T");
++    static UUID id(String name) { return UUID.nameUUIDFromBytes(name.getBytes(StandardCharsets.UTF_8)); }
++    static final class Clock implements LongSupplier {
++        long now;
++        public long getAsLong() { return now; }
++        void ms(long value) { now = value * 1_000_000L; }
++    }
++    static void applied(Outcome result) { assertEquals(Status.APPLIED, result.status(), result.toString()); }
++    static void reason(Reason reason, Outcome result) { assertEquals(reason, result.reason(), result.toString()); }
++    static SessionKey key(String node, String connection) { return new SessionKey(node, id(node), id(connection)); }
++    static final class F {
++        final Clock clock = new Clock();
++        final RoutingTable t;
++        F() { this("C", new Limits(64, 256, 63, 8)); }
++        F(String local, Limits limits) {
++            t = new RoutingTable(local, limits, 8000, 16000, clock);
++            applied(t.bindStream(A, "S")); applied(t.bindStream(A2, "S"));
++            applied(t.bindStream(B, "T")); applied(t.bindStream(B2, "T"));
++            applied(t.confirmEpoch("S", Optional.empty(), ES));
++            applied(t.confirmEpoch("T", Optional.empty(), ET));
++        }
++        SessionKey link(String node, long cost) {
++            var s = key(node, node + "-1"); applied(t.replaceSession(Optional.empty(), s));
++            applied(t.setLinkCost(s, OptionalLong.of(cost))); return s;
++        }
++        Advertisement ad(UUID stream, SessionKey s, long seq, long cost, String... path) {
++            boolean first = stream.equals(A) || stream.equals(A2);
++            return new Advertisement(stream, first ? "S" : "T", first ? ES : ET, s, seq, cost, List.of(path));
++        }
++        void announce(UUID stream, SessionKey s, long seq, long cost, String... path) {
++            applied(t.announce(ad(stream, s, seq, cost, path)));
++        }
++        Route route(UUID stream) { return t.snapshot(stream).orElseThrow(); }
++        long cost(UUID stream) { return route(stream).selectedMetric().orElseThrow().costMicros(); }
++    }
++
++    @Test void d01FourStreamsHaveIndependentCandidatesAndWithdrawals() {
++        var f = new F(); var r = f.link("R", 10);
++        f.announce(A, r, 1, 100, "S", "R"); f.announce(A2, r, 1, 200, "S", "R");
++        f.announce(B, r, 1, 300, "T", "R"); f.announce(B2, r, 1, 400, "T", "R");
++        var untouched = List.of(f.route(A2), f.route(B), f.route(B2));
++        applied(f.t.withdraw(A, ES, r, 2));
++        assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++        assertEquals(untouched, List.of(f.route(A2), f.route(B), f.route(B2)));
++        assertEquals(List.of(210L, 310L, 410L), List.of(f.cost(A2), f.cost(B), f.cost(B2)));
++    }
++    @Test void d02LocalSourceHasZeroCostButNoDataAuthorization() {
++        var f = new F("S", Limits.forNode(64)); applied(f.t.offerLocal(A, ES));
++        Route view = f.route(A);
++        assertEquals(new RouteMetric(0, 0), view.selectedMetric().orElseThrow());
++        assertTrue(view.localSource()); assertTrue(view.selectedCandidate().isEmpty());
++        assertTrue(view.knownUpstream().isEmpty()); assertTrue(view.activeUpstream().isEmpty());
++        assertTrue(view.pendingUpstream().isEmpty()); assertTrue(view.downstreams().isEmpty());
++        assertEquals(RouteState.INACTIVE, view.state()); f.clock.ms(1_000_000);
++        assertTrue(f.route(A).localSource());
++        reason(Reason.STALE_EPOCH, f.t.removeLocalOffer(A, id("old")));
++        applied(f.t.removeLocalOffer(A, ES)); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++        reason(Reason.DUPLICATE, f.t.removeLocalOffer(A, ES));
++    }
++    @Test void d02RemoteNodeCannotOfferAnotherServersStream() {
++        var f = new F(); reason(Reason.INVALID_INPUT, f.t.offerLocal(A, ES));
++        assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d03KnownCostsWinInBothArrivalOrders() {
++        for (boolean reverse : List.of(false, true)) {
++            var f = new F(); var r1 = f.link("R1", 40); var r2 = f.link("R2", 50);
++            var one = f.ad(A, r1, 1, 100, "S", "R1"); var two = f.ad(A, r2, 1, 80, "S", "R2");
++            applied(f.t.announce(reverse ? two : one)); applied(f.t.announce(reverse ? one : two));
++            assertEquals(130, f.cost(A)); assertEquals(r2, f.route(A).knownUpstream().orElseThrow());
++            assertEquals(2, f.route(A).candidates().size());
++        }
++    }
++    @Test void d04TiesUseHopsThenAsciiNodeIdAndKeepAlternatives() {
++        var f = new F(); var r1 = f.link("R1", 40); var r2 = f.link("R2", 50);
++        f.announce(A, r1, 1, 100, "S", "X", "R1"); f.announce(A, r2, 1, 90, "S", "R2");
++        assertEquals(r2, f.route(A).knownUpstream().orElseThrow());
++        f.announce(A, r1, 1, 100, "S", "R1");
++        assertEquals(r1, f.route(A).knownUpstream().orElseThrow());
++        assertEquals(2, f.route(A).selectedMetric().orElseThrow().hopCount());
++        assertEquals(2, f.route(A).candidates().size());
++    }
++    @Test void d05InvalidPathsLeaveHealthyRouteUnchanged() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 1, 10, "S", "R");
++        var healthy = f.route(A);
++        for (var path : List.of(List.of("S", "C", "R"), List.of("S", "X", "X", "R"),
++                List.of("T", "R"), List.of("S", "X"))) {
++            reason(Reason.INVALID_INPUT, f.t.announce(new Advertisement(A, "S", ES, r, 2, 1, path)));
++            assertEquals(healthy, f.route(A));
++        }
++    }
++    @Test void d05ThirtyOneAdvertisedIdsPlusLocalFitButThirtyTwoDoNot() {
++        var f = new F(); var r = f.link("R", 1); var path = new ArrayList<String>();
++        path.add("S"); for (int i = 0; i < 29; i++) path.add("N" + i); path.add("R");
++        applied(f.t.announce(new Advertisement(A, "S", ES, r, 1, 1, path)));
++        assertEquals(32, f.route(A).selectedCandidate().orElseThrow().path().size());
++        path.add(1, "extra");
++        assertThrows(IllegalArgumentException.class, () -> new Advertisement(A, "S", ES, r, 2, 1, path));
++    }
++    @Test void d06MetricArithmeticChecksExactLongBoundary() {
++        assertEquals(new RouteMetric(Long.MAX_VALUE, 2), RouteMetric.accumulate(Long.MAX_VALUE - 1, 1, 2));
++        assertThrows(ArithmeticException.class, () -> RouteMetric.accumulate(Long.MAX_VALUE - 1, 2, 2));
++        assertThrows(IllegalArgumentException.class, () -> new RouteMetric(-1, 1));
++        assertThrows(IllegalArgumentException.class, () -> RouteMetric.accumulate(1, 0, 2));
++        assertThrows(IllegalArgumentException.class, () -> new RouteMetric(0, 1));
++        assertThrows(IllegalArgumentException.class, () -> new RouteMetric(1, 0));
++    }
++    @Test void d06OverflowingAnnouncementCannotReplaceHealthyCandidate() {
++        var f = new F(); var r = f.link("R", 2); f.announce(A, r, 1, 10, "S", "R");
++        var healthy = f.route(A);
++        reason(Reason.INVALID_INPUT, f.t.announce(f.ad(A, r, 2, Long.MAX_VALUE - 1, "S", "R")));
++        assertEquals(healthy, f.route(A));
++        reason(Reason.INVALID_INPUT, f.t.announce(f.ad(A, r, 2, 0, "S", "R")));
++        assertThrows(IllegalArgumentException.class, () -> f.ad(A, r, 2, -1, "S", "R"));
++        var source = f.link("S", 1); f.announce(A, source, 1, 0, "S"); assertEquals(1, f.cost(A));
++    }
++    @Test void d07UnmeasuredCandidateWaitsForCostWithoutRenewal() {
++        var f = new F(); var r = key("R", "conn"); applied(f.t.replaceSession(Optional.empty(), r));
++        f.announce(A, r, 1, 10, "S", "R"); var pending = f.route(A);
++        assertEquals(RouteState.UNAVAILABLE, pending.state()); assertEquals(1, pending.candidates().size());
++        assertTrue(pending.candidates().getFirst().metric().isEmpty());
++        f.clock.ms(7000); applied(f.t.setLinkCost(r, OptionalLong.of(3))); assertEquals(13, f.cost(A));
++        f.clock.ms(8000); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d07MeasuredSuspectCostIsConsumedDirectlyFromRealDto() {
++        var f = new F(); var r = f.link("R", 9);
++        var endpoint = new ControlMessage.Endpoint("R", r.instanceId(), "127.0.0.1", 9001, 9002, NodeRole.RELAY);
++        var session = new Neighbor.Session("R", r.instanceId(), r.connectionId(), endpoint);
++        var metrics = new LinkMetrics(session, LinkMetrics.State.SUSPECT, OptionalDouble.of(1.2),
++                OptionalLong.of(2), 1, false, OptionalLong.of(0), 1);
++        applied(f.t.setLinkCost(r, metrics.costMicros())); f.announce(A, r, 1, 10, "S", "R");
++        assertEquals(12, f.cost(A));
++        applied(f.t.setLinkCost(r, OptionalLong.empty()));
++        assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++        assertThrows(IllegalArgumentException.class, () -> f.t.setLinkCost(r, OptionalLong.of(0)));
++    }
++    @Test void d08ExpiryAndRemovalRetainValidAlternative() {
++        var f = new F(); var r1 = f.link("R1", 1); var r2 = f.link("R2", 10);
++        f.announce(A, r1, 1, 1, "S", "R1"); f.clock.ms(2000); f.announce(A, r2, 1, 2, "S", "R2");
++        f.clock.ms(7999); assertEquals(2, f.cost(A));
++        f.clock.ms(8000); applied(f.t.expire()); assertEquals(12, f.cost(A));
++        assertEquals(1, f.route(A).candidates().size());
++        applied(f.t.removeSession(r2)); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d09SameGenerationImprovementKeepsOriginalDeadlineAndHistory() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 1, 100, "S", "R");
++        f.clock.ms(7000); f.announce(A, r, 1, 50, "S", "R"); assertEquals(51, f.cost(A));
++        assertEquals(0, f.route(A).selectedCandidate().orElseThrow().generationStartedAtNanos());
++        f.clock.ms(8000); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++        f.clock.ms(15000); reason(Reason.GENERATION_EXPIRED, f.t.announce(f.ad(A, r, 1, 20, "S", "R")));
++        f.clock.ms(16000); f.announce(A, r, 1, 20, "S", "R"); assertEquals(21, f.cost(A));
++    }
++    @Test void d09ImprovedPendingAdvertisementDoesNotNeedAnRttToCompareSameLink() {
++        var f = new F(); var r = key("R", "c"); applied(f.t.replaceSession(Optional.empty(), r));
++        f.announce(A, r, 1, 100, "S", "R"); f.clock.ms(7000); f.announce(A, r, 1, 50, "S", "R");
++        assertTrue(f.route(A).selectedCandidate().isEmpty());
++        applied(f.t.setLinkCost(r, OptionalLong.of(1))); assertEquals(51, f.cost(A));
++        f.clock.ms(8000); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d09OnlyNewerSequenceRenewsEvenWhenItsCostIsWorse() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 10, 10, "S", "R");
++        f.clock.ms(7000); reason(Reason.DUPLICATE, f.t.announce(f.ad(A, r, 10, 10, "S", "R")));
++        reason(Reason.DUPLICATE, f.t.announce(f.ad(A, r, 10, 20, "S", "R")));
++        reason(Reason.STALE_SEQUENCE, f.t.announce(f.ad(A, r, 9, 1, "S", "R")));
++        f.announce(A, r, 11, 30, "S", "R"); f.clock.ms(8000); assertEquals(31, f.cost(A));
++        f.clock.ms(15000); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d10ExpiredWatermarkCannotKeepRejectingAfterItsHorizon() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 100, 10, "S", "R");
++        f.clock.ms(9000); applied(f.t.expire());
++        reason(Reason.GENERATION_EXPIRED, f.t.announce(f.ad(A, r, 100, 1, "S", "R")));
++        reason(Reason.STALE_SEQUENCE, f.t.announce(f.ad(A, r, 99, 1, "S", "R")));
++        f.clock.ms(16000); f.announce(A, r, 1, 2, "S", "R"); assertEquals(3, f.cost(A));
++    }
++    @Test void d11WithdrawalWatermarkPreventsEqualGenerationResurrection() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 10, 10, "S", "R");
++        f.clock.ms(7000); applied(f.t.withdraw(A, ES, r, 10));
++        reason(Reason.WITHDRAWN_GENERATION, f.t.announce(f.ad(A, r, 10, 1, "S", "R")));
++        reason(Reason.DUPLICATE, f.t.withdraw(A, ES, r, 10));
++        reason(Reason.STALE_SEQUENCE, f.t.withdraw(A, ES, r, 9));
++        f.clock.ms(16000); f.announce(A, r, 10, 1, "S", "R"); assertEquals(2, f.cost(A));
++    }
++    @Test void d11NewerWithdrawalWithoutCandidateUsesBoundedSlotAndNewHorizon() {
++        var f = new F(); var r = f.link("R", 1); applied(f.t.withdraw(A, ES, r, 20));
++        assertTrue(f.route(A).candidates().isEmpty());
++        reason(Reason.WITHDRAWN_GENERATION, f.t.announce(f.ad(A, r, 20, 1, "S", "R")));
++        f.clock.ms(7000); applied(f.t.withdraw(A, ES, r, 21));
++        f.clock.ms(22000); reason(Reason.WITHDRAWN_GENERATION, f.t.announce(f.ad(A, r, 21, 1, "S", "R")));
++        f.clock.ms(23000); applied(f.t.expire()); f.announce(A, r, 1, 1, "S", "R");
++    }
++    @Test void d12EpochChangeIsExplicitAtomicAndIsolatedByOrigin() {
++        var f = new F(); var r = f.link("R", 1);
++        f.announce(A, r, 1, 10, "S", "R"); f.announce(A2, r, 1, 20, "S", "R");
++        f.announce(B, r, 1, 30, "T", "R"); f.announce(B2, r, 1, 40, "T", "R");
++        var other = List.of(f.route(B), f.route(B2)); var epoch = id("unordered-new");
++        var newAd = new Advertisement(A, "S", epoch, r, 0, 1, List.of("S", "R"));
++        reason(Reason.STALE_EPOCH, f.t.announce(newAd));
++        var changed = f.t.confirmEpoch("S", Optional.of(ES), epoch); applied(changed);
++        assertEquals(Set.of(A, A2), changed.changedStreams());
++        for (UUID stream : List.of(A, A2)) {
++            assertEquals(Optional.of(epoch), f.route(stream).serverEpoch());
++            assertEquals(RouteState.UNAVAILABLE, f.route(stream).state()); assertTrue(f.route(stream).candidates().isEmpty());
++        }
++        assertEquals(other, List.of(f.route(B), f.route(B2)));
++        reason(Reason.RETIRED_EPOCH, f.t.confirmEpoch("S", Optional.of(epoch), ES));
++        reason(Reason.STALE_EPOCH, f.t.confirmEpoch("S", Optional.of(ES), id("wrong")));
++        applied(f.t.announce(newAd)); assertEquals(2, f.cost(A));
++    }
++    @Test void d12LocalOffersAreInvalidatedTogetherOnEpochChange() {
++        var f = new F("S", Limits.forNode(64)); applied(f.t.offerLocal(A, ES)); applied(f.t.offerLocal(A2, ES));
++        var next = id("next"); applied(f.t.confirmEpoch("S", Optional.of(ES), next));
++        assertFalse(f.route(A).localSource()); assertFalse(f.route(A2).localSource());
++        reason(Reason.STALE_EPOCH, f.t.offerLocal(A, ES)); applied(f.t.offerLocal(A, next));
++    }
++    @Test void d13EightRetiredEpochsSaturateWithoutPartialInvalidation() {
++        var f = new F(); var r = f.link("R", 1); UUID current = ES;
++        for (int i = 0; i < 8; i++) {
++            UUID next = id("e" + i); applied(f.t.confirmEpoch("S", Optional.of(current), next)); current = next;
++        }
++        var ad = new Advertisement(A, "S", current, r, 1, 10, List.of("S", "R")); applied(f.t.announce(ad));
++        var healthy = List.of(f.route(A), f.route(A2)); UUID full = current;
++        reason(Reason.CAPACITY_EXCEEDED, f.t.confirmEpoch("S", Optional.of(current), id("ninth")));
++        assertEquals(healthy, List.of(f.route(A), f.route(A2)));
++        reason(Reason.RETIRED_EPOCH, f.t.confirmEpoch("S", Optional.of(current), ES));
++        f.clock.ms(15000); reason(Reason.DUPLICATE, f.t.confirmEpoch("S", Optional.of(full), full));
++        f.clock.ms(16000); applied(f.t.confirmEpoch("S", Optional.of(full), ES));
++        assertEquals(Optional.of(ES), f.route(A).serverEpoch());
++    }
++    @Test void d14OldCallbacksCannotChangeReplacementEvenInSameInstance() {
++        var f = new F(); var old = f.link("R", 1); f.announce(A, old, 1, 10, "S", "R");
++        var next = new SessionKey("R", old.instanceId(), id("next-connection"));
++        applied(f.t.replaceSession(Optional.of(old), next));
++        f.announce(A, next, 1, 10, "S", "R"); assertTrue(f.route(A).selectedCandidate().isEmpty());
++        var healthy = f.route(A);
++        reason(Reason.STALE_SESSION, f.t.setLinkCost(old, OptionalLong.of(1)));
++        reason(Reason.STALE_SESSION, f.t.removeSession(old));
++        reason(Reason.STALE_SESSION, f.t.announce(f.ad(A, old, 2, 1, "S", "R")));
++        reason(Reason.STALE_SESSION, f.t.withdraw(A, ES, old, 3));
++        reason(Reason.STALE_SESSION, f.t.replaceSession(Optional.of(old), key("R", "third")));
++        assertEquals(healthy, f.route(A));
++        applied(f.t.setLinkCost(next, OptionalLong.of(3))); assertEquals(13, f.cost(A));
++        reason(Reason.DUPLICATE, f.t.replaceSession(Optional.empty(), next)); assertEquals(13, f.cost(A));
++    }
++    @Test void d15InputsNestedSnapshotsAndOutcomesAreDefensive() {
++        var f = new F(); var r = f.link("R", 1); var path = new ArrayList<>(List.of("S", "R"));
++        var ad = new Advertisement(A, "S", ES, r, 1, 10, path); path.clear();
++        var changed = f.t.announce(ad); applied(changed); var old = f.route(A);
++        assertThrows(UnsupportedOperationException.class, () -> ad.advertisedPath().clear());
++        assertThrows(UnsupportedOperationException.class, () -> old.candidates().clear());
++        assertThrows(UnsupportedOperationException.class, () -> old.selectedCandidate().orElseThrow().path().clear());
++        assertThrows(UnsupportedOperationException.class, () -> old.downstreams().add("X"));
++        assertThrows(UnsupportedOperationException.class, () -> changed.changedStreams().clear());
++        f.announce(A, r, 2, 20, "S", "R"); assertEquals(11, old.selectedMetric().orElseThrow().costMicros());
++        assertEquals(List.of("S", "R", "C"), old.selectedCandidate().orElseThrow().path());
++        assertEquals(21, f.cost(A));
++    }
++    @Test void d16BindingsPersistAndUnknownOrConflictingStreamsAreRejected() {
++        var f = new F(); var r = f.link("R", 1); var old = f.route(A);
++        reason(Reason.DUPLICATE, f.t.bindStream(A, "S")); reason(Reason.ORIGIN_CONFLICT, f.t.bindStream(A, "T"));
++        reason(Reason.UNKNOWN_STREAM, f.t.announce(f.ad(id("unknown"), r, 1, 1, "T", "R")));
++        reason(Reason.UNKNOWN_STREAM, f.t.withdraw(id("unknown"), ES, r, 1));
++        reason(Reason.ORIGIN_CONFLICT, f.t.announce(new Advertisement(A, "T", ET, r, 1, 1, List.of("T", "R"))));
++        assertEquals(old, f.route(A)); assertTrue(f.t.snapshot(id("missing")).isEmpty());
++        f.clock.ms(100_000); applied(f.t.expire()); reason(Reason.ORIGIN_CONFLICT, f.t.bindStream(A, "T"));
++    }
++    @Test void d17ExactProductionLimitsAreIndependentOfFloodingCapacity() {
++        var limits = Limits.forNode(64); assertEquals(new Limits(64, 256, 63, 8), limits);
++        assertEquals(16_384, limits.streamCapacity()); assertEquals(1_032_192, limits.slotCapacity());
++        assertEquals(1, Limits.forNode(1).neighbors());
++        for (int c : List.of(0, 65, -1)) assertThrows(IllegalArgumentException.class, () -> Limits.forNode(c));
++        assertThrows(IllegalArgumentException.class, () -> new Limits(65, 256, 63, 8));
++        assertThrows(IllegalArgumentException.class, () -> new Limits(64, 257, 63, 8));
++        assertThrows(IllegalArgumentException.class, () -> new Limits(64, 256, 64, 8));
++        assertThrows(IllegalArgumentException.class, () -> new Limits(64, 256, 63, 9));
++    }
++    @Test void d17SmallBudgetsRejectWithoutEvictingBindingsOrSessions() {
++        var clock = new Clock(); var t = new RoutingTable("C", new Limits(1, 1, 1, 1), 8000, 16000, clock);
++        applied(t.bindStream(A, "S")); applied(t.confirmEpoch("S", Optional.empty(), ES));
++        var r = key("R", "one"); applied(t.replaceSession(Optional.empty(), r)); applied(t.setLinkCost(r, OptionalLong.of(1)));
++        applied(t.announce(new Advertisement(A, "S", ES, r, 1, 1, List.of("S", "R")))); var old = t.snapshot(A);
++        reason(Reason.CAPACITY_EXCEEDED, t.bindStream(A2, "S"));
++        reason(Reason.CAPACITY_EXCEEDED, t.bindStream(B, "T"));
++        reason(Reason.CAPACITY_EXCEEDED, t.replaceSession(Optional.empty(), key("X", "x")));
++        assertEquals(old, t.snapshot(A));
++        applied(t.announce(new Advertisement(A, "S", ES, r, 2, 2, List.of("S", "R"))));
++        applied(t.withdraw(A, ES, r, 2)); reason(Reason.WITHDRAWN_GENERATION,
++                t.announce(new Advertisement(A, "S", ES, r, 2, 1, List.of("S", "R"))));
++        clock.ms(16000); applied(t.expire());
++        applied(t.announce(new Advertisement(A, "S", ES, r, 1, 1, List.of("S", "R"))));
++        assertEquals(1, t.snapshot(A).orElseThrow().candidates().size());
++    }
++    @Test void d18ConfirmedRepairSessionNeedsNoConfiguredGraphEdge() {
++        var f = new F(); var repair = f.link("LearnedPeer", 2);
++        f.announce(A, repair, 1, 3, "S", "LearnedPeer"); var route = f.route(A);
++        assertEquals(RouteState.INACTIVE, route.state()); assertEquals(5, f.cost(A));
++        assertTrue(route.activeUpstream().isEmpty()); assertTrue(route.pendingUpstream().isEmpty());
++        assertTrue(route.downstreams().isEmpty());
++        assertThrows(IllegalArgumentException.class, () -> new Route(A, "S", Optional.of(ES), false,
++                route.selectedCandidate(), route.selectedMetric(), route.knownUpstream(), Optional.of(repair),
++                Optional.empty(), Set.of(), route.candidates(), RouteState.ACTIVE, 1));
++    }
++    @Test void d19MetricOverflowRetainsAnnouncementAndCanRecoverWithinSameTtl() {
++        var f = new F(); var r = f.link("R", 1); var alt = f.link("X", 100);
++        f.announce(A, r, 1, Long.MAX_VALUE - 1, "S", "R");
++        f.announce(A, alt, 1, 10, "S", "X");
++        f.clock.ms(7000); applied(f.t.setLinkCost(r, OptionalLong.of(2)));
++        var blocked = f.route(A).candidates().stream().filter(c -> c.upstream().equals(r)).findFirst().orElseThrow();
++        assertTrue(blocked.metric().isEmpty()); assertEquals(110, f.cost(A));
++        applied(f.t.setLinkCost(r, OptionalLong.of(1)));
++        assertTrue(f.route(A).candidates().stream().filter(c -> c.upstream().equals(r)).findFirst().orElseThrow().metric().isPresent());
++        f.clock.ms(8000); assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d20TickWrapAndExactNanosecondBoundaryAreValid() {
++        var f = new F(); f.clock.now = Long.MAX_VALUE - 4_000_000_000L; var r = f.link("R", 1);
++        f.announce(A, r, 1, 1, "S", "R"); long began = f.clock.now;
++        f.clock.now = began + 7_999_999_999L; assertEquals(2, f.cost(A));
++        f.clock.now = began + 8_000_000_000L; assertEquals(RouteState.UNAVAILABLE, f.route(A).state());
++    }
++    @Test void d20ClockRegressionRejectsBeforeDomainMutation() {
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 1, 1, "S", "R"); var old = f.route(A);
++        f.clock.now = -1; assertThrows(IllegalStateException.class, () -> f.t.withdraw(A, ES, r, 2));
++        f.clock.now = 0; assertEquals(old, f.route(A));
++    }
++    @Test void d20DurationsAreCheckedBeforeConvertingAndNegativeTicksAreAllowed() {
++        var clock = new Clock(); clock.now = -9_000_000_000L;
++        var t = new RoutingTable("C", Limits.forNode(64), 1, Integer.MAX_VALUE, clock);
++        applied(t.bindStream(A, "S")); applied(t.confirmEpoch("S", Optional.empty(), ES));
++        var r = key("S", "s"); applied(t.replaceSession(Optional.empty(), r)); applied(t.setLinkCost(r, OptionalLong.of(1)));
++        applied(t.announce(new Advertisement(A, "S", ES, r, 0, 0, List.of("S"))));
++        clock.now += 999_999; assertEquals(RouteState.INACTIVE, t.snapshot(A).orElseThrow().state());
++        clock.now++; assertEquals(RouteState.UNAVAILABLE, t.snapshot(A).orElseThrow().state());
++        assertThrows(IllegalArgumentException.class, () -> new RoutingTable("C", Limits.forNode(64), 0, 1, clock));
++        assertThrows(IllegalArgumentException.class, () -> new RoutingTable("C", Limits.forNode(64), 2, 1, clock));
++        assertThrows(IllegalArgumentException.class, () -> new RoutingTable("C", Limits.forNode(64), 1, Long.MAX_VALUE, clock));
++    }
++    @Test void d21RevisionBoundsAndRejectedTransactionsPreservePublishedViews() {
++        assertEquals(Long.MAX_VALUE, RoutingTable.nextRevision(Long.MAX_VALUE - 1));
++        assertThrows(ArithmeticException.class, () -> RoutingTable.nextRevision(Long.MAX_VALUE));
++        var f = new F(); var r = f.link("R", 1); f.announce(A, r, 1, 1, "S", "R");
++        var old = f.route(A); reason(Reason.STALE_SEQUENCE, f.t.withdraw(A, ES, r, 0));
++        assertEquals(old, f.route(A)); f.announce(A, r, 2, 2, "S", "R");
++        assertEquals(old.revision() + 1, f.route(A).revision());
++        assertEquals(2, old.selectedMetric().orElseThrow().costMicros());
++    }
++    @Test void d21InvalidDomainObjectsAreRejectedBeforeRetention() {
++        assertThrows(IllegalArgumentException.class, () -> key("bad.id", "c"));
++        assertThrows(IllegalArgumentException.class, () -> new SessionKey("R", new UUID(0, 0), id("c")));
++        assertThrows(IllegalArgumentException.class, () -> new Advertisement(A, "S", ES, key("R", "c"), -1, 1, List.of("S", "R")));
++        assertThrows(IllegalArgumentException.class, () -> new RouteCandidate(A, "S", ES, key("R", "c"),
++                List.of("S", "R", "R"), 1, 1, Optional.empty(), 0, 1));
++    }
++    @Test void d21SourceCandidateCannotClaimPositiveAdvertisedCost() {
++        assertThrows(IllegalArgumentException.class, () -> new RouteCandidate(A, "S", ES, key("S", "source"),
++                List.of("S", "C"), 1, 1, Optional.of(new RouteMetric(2, 1)), 0, 1));
++        var f = new F(); var s = f.link("S", 2);
++        reason(Reason.INVALID_INPUT, f.t.announce(f.ad(A, s, 1, 1, "S")));
++        f.announce(A, s, 1, 0, "S"); assertEquals(2, f.cost(A));
++    }
++    @Test void d20EachOperationObservesTimeExactlyOnce() {
++        int[] reads = {0};
++        var t = new RoutingTable("C", Limits.forNode(64), 8000, 16000, () -> { reads[0]++; return 0; });
++        assertEquals(0, reads[0]); applied(t.bindStream(A, "S")); assertEquals(1, reads[0]);
++        applied(t.confirmEpoch("S", Optional.empty(), ES)); assertEquals(2, reads[0]);
++        var s = key("S", "source"); applied(t.replaceSession(Optional.empty(), s)); assertEquals(3, reads[0]);
++        applied(t.setLinkCost(s, OptionalLong.of(1))); assertEquals(4, reads[0]);
++        applied(t.announce(new Advertisement(A, "S", ES, s, 1, 0, List.of("S")))); assertEquals(5, reads[0]);
++        assertTrue(t.snapshot(A).isPresent()); assertEquals(6, reads[0]);
++        applied(t.withdraw(A, ES, s, 2)); assertEquals(7, reads[0]);
++        applied(t.expire()); assertEquals(8, reads[0]);
++    }
++}

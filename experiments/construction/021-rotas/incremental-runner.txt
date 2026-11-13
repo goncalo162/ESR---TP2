@@ -1,0 +1,20 @@
+from pathlib import Path
+import subprocess,os,time,json,sys,shutil,datetime,hashlib,zipfile,xml.etree.ElementTree as ET
+label=sys.argv[1]; selected=sys.argv[2] if len(sys.argv)>2 else 'RoutingTableTest'
+assert label.replace('-','').isalnum()
+root=Path('/home/luis/ESR/ESR---TP2'); dest=root/'experiments/construction/021-rotas'/label
+assert not dest.exists();dest.mkdir()
+env=dict(os.environ);env['JAVA_HOME']='/usr/lib/jvm/java-21-openjdk-amd64';env['PATH']=env['JAVA_HOME']+'/bin:'+env['PATH']
+cmd=['mvn','-o','-B','-ntp']+([] if selected=='all' else ['-Dtest='+selected])+['test']
+start=time.time_ns(); began=datetime.datetime.now(datetime.timezone.utc).isoformat();timer=time.monotonic()
+with (dest/'maven.log').open('w') as log:r=subprocess.run(cmd,cwd=root/'Projeto',env=env,stdout=log,stderr=subprocess.STDOUT)
+xml=[];counts=dict(tests=0,failures=0,errors=0,skipped=0)
+for p in (root/'Projeto/target/surefire-reports').glob('TEST-*.xml'):
+ if p.stat().st_mtime_ns>=start:
+  shutil.copy2(p,dest/p.name);suite=ET.parse(p).getroot();xml.append(p.name)
+  for k in counts:counts[k]+=int(suite.attrib.get(k,0))
+source={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for tree in ['main','test'] for p in (root/f'Projeto/src/{tree}/java/pt/uminho/esr/ott/routing').glob('*.java') if p.name in ['Route.java','RouteCandidate.java','RouteMetric.java','RouteState.java','RoutingTable.java','RoutingTableTest.java']}
+data={'started_at':began,'elapsed_seconds':time.monotonic()-timer,'command':cmd,'cwd':str(root/'Projeto'),'JAVA_HOME':env['JAVA_HOME'],'exit':r.returncode,'counts':counts,'xml':xml,'source_sha256':source,'scope':'incremental Implement; not Test stage or clean verify'}
+with zipfile.ZipFile(dest/'source-snapshot.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+ for p in source:z.write(root/p,p)
+(dest/'result.json').write_text(json.dumps(data,indent=2)+'\n');print(json.dumps(data,indent=2));print('\nLOG TAIL\n'+'\n'.join((dest/'maven.log').read_text().splitlines()[-14:]))

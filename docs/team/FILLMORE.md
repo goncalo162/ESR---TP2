@@ -25,7 +25,7 @@ A evidência anterior da fase 1 é [131 testes aprovados](../../experiments/boot
 | Ordem própria | Tarefa | Fase | Dependências a integrar antes | Revisor principal |
 |---:|---|---|---|---|
 | 1 | [TASK-006](../tasks/PHASE-02/TASK-006.md) — Fornecer localização inicial dos vizinhos configurados | [PHASE-02](../phases/PHASE-02-OVERLAY.md) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-005](../tasks/PHASE-02/TASK-005.md) (Waheed) | [Waheed](WAHEED.md) |
-| 2 | [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | [PHASE-03](../phases/PHASE-03-ROUTING.md) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | [Waheed](WAHEED.md) |
+| 2 | [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | [PHASE-03](../phases/PHASE-03-ROUTING.md) | [TASK-003](../tasks/PHASE-01/TASK-003.md) (base concluída), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed) | Luis (substitui Waheed) |
 | 3 | [TASK-012](../tasks/PHASE-03/TASK-012.md) — Difundir anúncios e construir catálogo e rotas | [PHASE-03](../phases/PHASE-03-ROUTING.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md) (Waheed), [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed), [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore) | [Denji](DENJI.md) |
 | 4 | [TASK-014](../tasks/PHASE-04/TASK-014.md) — Ativar árvores com ACK e procura agregada | [PHASE-04](../phases/PHASE-04-FLOW-MANAGEMENT.md) | [TASK-011](../tasks/PHASE-03/TASK-011.md) (Fillmore), [TASK-012](../tasks/PHASE-03/TASK-012.md) (Fillmore), [TASK-013](../tasks/PHASE-03/TASK-013.md) (Denji) | [Waheed](WAHEED.md) |
 | 5 | [TASK-015](../tasks/PHASE-04/TASK-015.md) — Podar ramos, renovar leases e remover procura abandonada | [PHASE-04](../phases/PHASE-04-FLOW-MANAGEMENT.md) | [TASK-010](../tasks/PHASE-03/TASK-010.md) (Waheed), [TASK-014](../tasks/PHASE-04/TASK-014.md) (Fillmore) | [Denji](DENJI.md) |
@@ -61,7 +61,7 @@ A ordem acima é uma fila pessoal; entre duas tarefas próprias podem existir ta
 - **Atenção principal:** Modelar candidatos isolados por stream e ordenar por custo RTT, saltos e nodeId. Guardar path/época/validade; publicar snapshots imutáveis. A existência de rota não ativa vídeo.
 - **Validação obrigatória:** V-011: custos e desempate calculados com fixtures de resultados conhecidos; quatro streams não interferem; alternativa é preservada e snapshot não pode ser alterado por consumidor.
 - **Revisão inicial de contrato:** antes de alterar APIs partilhadas, rever com [Waheed](WAHEED.md) e o consumidor afetado; registar decisão em 07/12 se mudar o contrato.
-- **Revisão final:** pedir a [Waheed](WAHEED.md) após testes/evidência e antes de integrar, marcar DONE ou desbloquear: [TASK-012](../tasks/PHASE-03/TASK-012.md), [TASK-014](../tasks/PHASE-04/TASK-014.md), [TASK-019](../tasks/PHASE-05/TASK-019.md).
+- **Revisão final:** Luis reviu e aprovou a versão final, substituindo Waheed por confirmação explícita do utilizador. Integrar antes de marcar DONE ou desbloquear: [TASK-012](../tasks/PHASE-03/TASK-012.md), [TASK-014](../tasks/PHASE-04/TASK-014.md), [TASK-019](../tasks/PHASE-05/TASK-019.md).
 - **Pontos que o revisor deve comprovar:**
   - Empates, custo positivo, overflow, expiração e alternativas produzem seleção determinística.
   - Uma stream não altera rotas/snapshots de outra; snapshots não expõem mutação.

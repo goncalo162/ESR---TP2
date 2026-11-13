@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-11-13T16:41:04Z",
+  "source": "user message in this session",
+  "approved": [
+    "Design IMP-008 / 021-rotas",
+    "Q-C-26 exact capacities and temporal horizons"
+  ],
+  "authorized": "ADR review only",
+  "user_decision": "Aprovo Design e os limites/horizontes concretos de Q-C-26. Avança apenas para a revisão ADR.",
+  "capacities": {
+    "origins": 64,
+    "streams_per_origin": 256,
+    "total_streams": 16384,
+    "slots_per_stream": "min(control.maxConnections,63)",
+    "retired_epochs_per_origin": 8,
+    "retired_epochs_total": 512,
+    "allocation": "on demand; no maximum preallocation"
+  },
+  "horizons": {
+    "candidate": "routing.candidate.ttl.ms",
+    "generation_history_and_retired_epochs": "routing.cache.ttl.ms"
+  },
+  "not_approved": [
+    "ADR checkpoint",
+    "Implement",
+    "Test",
+    "closure",
+    "commits",
+    "push"
+  ],
+  "review_requirements": [
+    "real monitor APIs and cost conversion",
+    "temporal horizon",
+    "future consumer compatibility",
+    "six source paths preserved",
+    "selection is not data authorization"
+  ]
+}

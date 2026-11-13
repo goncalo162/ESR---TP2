@@ -1,0 +1,449 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 41 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 16 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.routing.RoutingTableTest
+[ERROR] Tests run: 33, Failures: 27, Errors: 0, Skipped: 0, Time elapsed: 0.121 s <<< FAILURE! -- in pt.uminho.esr.ott.routing.RoutingTableTest
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d21RevisionBoundsAndRejectedTransactionsPreservePublishedViews -- Time elapsed: 0.031 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d21RevisionBoundsAndRejectedTransactionsPreservePublishedViews(RoutingTableTest.java:353)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d15InputsNestedSnapshotsAndOutcomesAreDefensive -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d15InputsNestedSnapshotsAndOutcomesAreDefensive(RoutingTableTest.java:261)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d18ConfirmedRepairSessionNeedsNoConfiguredGraphEdge -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d18ConfirmedRepairSessionNeedsNoConfiguredGraphEdge(RoutingTableTest.java:308)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d20TickWrapAndExactNanosecondBoundaryAreValid -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d20TickWrapAndExactNanosecondBoundaryAreValid(RoutingTableTest.java:329)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d09SameGenerationImprovementKeepsOriginalDeadlineAndHistory -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d09SameGenerationImprovementKeepsOriginalDeadlineAndHistory(RoutingTableTest.java:160)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d06OverflowingAnnouncementCannotReplaceHealthyCandidate -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d06OverflowingAnnouncementCannotReplaceHealthyCandidate(RoutingTableTest.java:123)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d16BindingsPersistAndUnknownOrConflictingStreamsAreRejected -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <UNKNOWN_STREAM> but was: <NONE>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.reason(RoutingTableTest.java:24)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d16BindingsPersistAndUnknownOrConflictingStreamsAreRejected(RoutingTableTest.java:274)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d19MetricOverflowRetainsAnnouncementAndCanRecoverWithinSameTtl -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d19MetricOverflowRetainsAnnouncementAndCanRecoverWithinSameTtl(RoutingTableTest.java:318)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d13EightRetiredEpochsSaturateWithoutPartialInvalidation -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d13EightRetiredEpochsSaturateWithoutPartialInvalidation(RoutingTableTest.java:234)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d11NewerWithdrawalWithoutCandidateUsesBoundedSlotAndNewHorizon -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d11NewerWithdrawalWithoutCandidateUsesBoundedSlotAndNewHorizon(RoutingTableTest.java:198)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d20DurationsAreCheckedBeforeConvertingAndNegativeTicksAreAllowed -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d20DurationsAreCheckedBeforeConvertingAndNegativeTicksAreAllowed(RoutingTableTest.java:343)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d05ThirtyOneAdvertisedIdsPlusLocalFitButThirtyTwoDoNot -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d05ThirtyOneAdvertisedIdsPlusLocalFitButThirtyTwoDoNot(RoutingTableTest.java:109)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d01FourStreamsHaveIndependentCandidatesAndWithdrawals -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d01FourStreamsHaveIndependentCandidatesAndWithdrawals(RoutingTableTest.java:54)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d03KnownCostsWinInBothArrivalOrders -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d03KnownCostsWinInBothArrivalOrders(RoutingTableTest.java:83)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d08ExpiryAndRemovalRetainValidAlternative -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d08ExpiryAndRemovalRetainValidAlternative(RoutingTableTest.java:153)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d09OnlyNewerSequenceRenewsEvenWhenItsCostIsWorse -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d09OnlyNewerSequenceRenewsEvenWhenItsCostIsWorse(RoutingTableTest.java:175)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d11WithdrawalWatermarkPreventsEqualGenerationResurrection -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d11WithdrawalWatermarkPreventsEqualGenerationResurrection(RoutingTableTest.java:190)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d14OldCallbacksCannotChangeReplacementEvenInSameInstance -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d14OldCallbacksCannotChangeReplacementEvenInSameInstance(RoutingTableTest.java:244)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d09ImprovedPendingAdvertisementDoesNotNeedAnRttToCompareSameLink -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d09ImprovedPendingAdvertisementDoesNotNeedAnRttToCompareSameLink(RoutingTableTest.java:169)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d07MeasuredSuspectCostIsConsumedDirectlyFromRealDto -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d07MeasuredSuspectCostIsConsumedDirectlyFromRealDto(RoutingTableTest.java:145)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d04TiesUseHopsThenAsciiNodeIdAndKeepAlternatives -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d04TiesUseHopsThenAsciiNodeIdAndKeepAlternatives(RoutingTableTest.java:90)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d12EpochChangeIsExplicitAtomicAndIsolatedByOrigin -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d12EpochChangeIsExplicitAtomicAndIsolatedByOrigin(RoutingTableTest.java:207)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d20ClockRegressionRejectsBeforeDomainMutation -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d20ClockRegressionRejectsBeforeDomainMutation(RoutingTableTest.java:334)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d17SmallBudgetsRejectWithoutEvictingBindingsOrSessions -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d17SmallBudgetsRejectWithoutEvictingBindingsOrSessions(RoutingTableTest.java:294)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d05InvalidPathsLeaveHealthyRouteUnchanged -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d05InvalidPathsLeaveHealthyRouteUnchanged(RoutingTableTest.java:98)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d07UnmeasuredCandidateWaitsForCostWithoutRenewal -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d07UnmeasuredCandidateWaitsForCostWithoutRenewal(RoutingTableTest.java:133)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.RoutingTableTest.d10ExpiredWatermarkCannotKeepRejectingAfterItsHorizon -- Time elapsed: 0 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.applied(RoutingTableTest.java:23)
+	at pt.uminho.esr.ott.routing.RoutingTableTest$F.announce(RoutingTableTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingTableTest.d10ExpiredWatermarkCannotKeepRejectingAfterItsHorizon(RoutingTableTest.java:183)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   RoutingTableTest.d01FourStreamsHaveIndependentCandidatesAndWithdrawals:54->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d03KnownCostsWinInBothArrivalOrders:83->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d04TiesUseHopsThenAsciiNodeIdAndKeepAlternatives:90->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d05InvalidPathsLeaveHealthyRouteUnchanged:98->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d05ThirtyOneAdvertisedIdsPlusLocalFitButThirtyTwoDoNot:109->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d06OverflowingAnnouncementCannotReplaceHealthyCandidate:123->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d07MeasuredSuspectCostIsConsumedDirectlyFromRealDto:145->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d07UnmeasuredCandidateWaitsForCostWithoutRenewal:133->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d08ExpiryAndRemovalRetainValidAlternative:153->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d09ImprovedPendingAdvertisementDoesNotNeedAnRttToCompareSameLink:169->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d09OnlyNewerSequenceRenewsEvenWhenItsCostIsWorse:175->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d09SameGenerationImprovementKeepsOriginalDeadlineAndHistory:160->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d10ExpiredWatermarkCannotKeepRejectingAfterItsHorizon:183->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d11NewerWithdrawalWithoutCandidateUsesBoundedSlotAndNewHorizon:198->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d11WithdrawalWatermarkPreventsEqualGenerationResurrection:190->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d12EpochChangeIsExplicitAtomicAndIsolatedByOrigin:207->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d13EightRetiredEpochsSaturateWithoutPartialInvalidation:234->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d14OldCallbacksCannotChangeReplacementEvenInSameInstance:244->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d15InputsNestedSnapshotsAndOutcomesAreDefensive:261->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d16BindingsPersistAndUnknownOrConflictingStreamsAreRejected:274->reason:24 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <UNKNOWN_STREAM> but was: <NONE>
+[ERROR]   RoutingTableTest.d17SmallBudgetsRejectWithoutEvictingBindingsOrSessions:294->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d18ConfirmedRepairSessionNeedsNoConfiguredGraphEdge:308->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d19MetricOverflowRetainsAnnouncementAndCanRecoverWithinSameTtl:318->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d20ClockRegressionRejectsBeforeDomainMutation:334->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d20DurationsAreCheckedBeforeConvertingAndNegativeTicksAreAllowed:343->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d20TickWrapAndExactNanosecondBoundaryAreValid:329->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[ERROR]   RoutingTableTest.d21RevisionBoundsAndRejectedTransactionsPreservePublishedViews:353->applied:23 Outcome[status=REJECTED, reason=NONE, changedStreams=[]] ==> expected: <APPLIED> but was: <REJECTED>
+[INFO] 
+[ERROR] Tests run: 33, Failures: 27, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.378 s
+[INFO] Finished at: 2026-11-13T17:09:23Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

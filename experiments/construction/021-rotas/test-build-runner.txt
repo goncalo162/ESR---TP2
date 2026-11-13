@@ -1,0 +1,29 @@
+from pathlib import Path
+from datetime import datetime,timezone
+import os,subprocess,json,time,hashlib,shutil,xml.etree.ElementTree as E,zipfile
+root=Path('/home/luis/ESR/ESR---TP2');out=root/'experiments/construction/021-rotas/test-build-01';assert not out.exists();out.mkdir()
+entry=json.loads((out.parent/'test-entry.json').read_text());approved=entry['source_sha256']
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+assert all(digest(root/p)==h for p,h in approved.items())
+env=dict(os.environ);env['JAVA_HOME']='/usr/lib/jvm/java-21-openjdk-amd64';env['PATH']=env['JAVA_HOME']+'/bin:'+env['PATH']
+cmd=['mvn','-B','-ntp','clean','verify']; started=datetime.now(timezone.utc).isoformat();timer=time.monotonic()
+versions={}
+for name,c in [('java',[env['JAVA_HOME']+'/bin/java','-version']),('maven',['mvn','-version'])]:
+ r=subprocess.run(c,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT);versions[name]={'exit':r.returncode,'output':r.stdout}
+(out/'environment.json').write_text(json.dumps(versions,indent=2)+'\n')
+with (out/'maven.log').open('w') as log:run=subprocess.run(cmd,cwd=root/'Projeto',env=env,stdout=log,stderr=subprocess.STDOUT)
+counts={k:0 for k in ['tests','failures','errors','skipped']};xml=[];reports=out/'surefire';reports.mkdir()
+for p in (root/'Projeto/target/surefire-reports').glob('*'):
+ if p.is_file():
+  shutil.copy2(p,reports/p.name)
+  if p.name.startswith('TEST-') and p.suffix=='.xml':
+   suite=E.parse(p).getroot();xml.append(p.name)
+   for k in counts:counts[k]+=int(suite.attrib.get(k,0))
+jar=None
+if run.returncode==0:
+ p=root/'Projeto/target/ott-streaming-1.0-SNAPSHOT.jar';assert p.is_file();shutil.copy2(p,out/p.name);jar={'path':str((out/p.name).relative_to(root)),'bytes':p.stat().st_size,'sha256':digest(p)}
+assert all(digest(root/p)==h for p,h in approved.items())
+with zipfile.ZipFile(out/'source-snapshot.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+ for p in approved:z.write(root/p,p)
+r={'started_at':started,'finished_at':datetime.now(timezone.utc).isoformat(),'elapsed_seconds':time.monotonic()-timer,'command':cmd,'cwd':str(root/'Projeto'),'JAVA_HOME':env['JAVA_HOME'],'exit':run.returncode,'counts':counts,'xml_count':len(xml),'xml':xml,'jar':jar,'source_sha256':approved,'source_matches_approved_before_and_after':True,'scope':'Test technical execution; human manual and Test approval pending; D22 partial'}
+(out/'result.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n');print(json.dumps({k:v for k,v in r.items() if k not in ['source_sha256','xml']},ensure_ascii=False,indent=2));print('\nLOG TAIL\n'+'\n'.join((out/'maven.log').read_text().splitlines()[-14:]))

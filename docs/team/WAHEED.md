@@ -155,7 +155,6 @@ Iniciar a revisão de interface antes do código consumidor e a revisão final q
 |---|---|---|
 | [TASK-006](../tasks/PHASE-02/TASK-006.md) — Fornecer localização inicial dos vizinhos configurados | [Fillmore](FILLMORE.md) | [TASK-007](../tasks/PHASE-02/TASK-007.md), [TASK-008](../tasks/PHASE-02/TASK-008.md) |
 | [TASK-008](../tasks/PHASE-02/TASK-008.md) — Compor o processo overlay e encerrar de forma previsível | [Denji](DENJI.md) | [TASK-009](../tasks/PHASE-02/TASK-009.md), [TASK-010](../tasks/PHASE-03/TASK-010.md), [TASK-013](../tasks/PHASE-03/TASK-013.md), [TASK-024](../tasks/PHASE-05/TASK-024.md) |
-| [TASK-011](../tasks/PHASE-03/TASK-011.md) — Modelar candidatos, custos e snapshots por stream | [Fillmore](FILLMORE.md) | [TASK-012](../tasks/PHASE-03/TASK-012.md), [TASK-014](../tasks/PHASE-04/TASK-014.md), [TASK-019](../tasks/PHASE-05/TASK-019.md) |
 | [TASK-014](../tasks/PHASE-04/TASK-014.md) — Ativar árvores com ACK e procura agregada | [Fillmore](FILLMORE.md) | [TASK-015](../tasks/PHASE-04/TASK-015.md), [TASK-016](../tasks/PHASE-04/TASK-016.md), [TASK-021](../tasks/PHASE-05/TASK-021.md) |
 | [TASK-017](../tasks/PHASE-04/TASK-017.md) — Adaptar rota por RTT com histerese e troca confirmada | [Fillmore](FILLMORE.md) | [TASK-018](../tasks/PHASE-04/TASK-018.md), [TASK-021](../tasks/PHASE-05/TASK-021.md) |
 | [TASK-018](../tasks/PHASE-04/TASK-018.md) — Preparar o segundo marco com árvores e adaptação | [Denji](DENJI.md) | [TASK-019](../tasks/PHASE-05/TASK-019.md), [TASK-024](../tasks/PHASE-05/TASK-024.md), [TASK-031](../tasks/PHASE-07/TASK-031.md) |
@@ -188,3 +187,8 @@ Regista comandos/resultados reais e prepara o diff/handoff para o revisor atribu
 Mantém IN PROGRESS enquanto revisão ou integração estiverem pendentes.
 Não avances automaticamente para outras tarefas nem submetas artefactos externamente.
 ```
+
+
+Registo 2026-11-13T17:59:03Z: revisão final de TASK-011/IMP-008 transferida para Luis por
+confirmação explícita do utilizador; Luis reviu e aprovou a versão final. Removida
+apenas essa entrada da fila de revisões de Waheed; restantes atribuições preservadas.

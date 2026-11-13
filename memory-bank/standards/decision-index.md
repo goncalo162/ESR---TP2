@@ -344,3 +344,33 @@ ADR/reutilização aprovadas pelo utilizador; sem ADR nova. Comportamentos e tes
 executados, regressão04:1176/0/0/0. Q-C-25 limita-se aos dois patches de peer de
 teste aprovados, sem alteração arquitetural ou estado das decisões aceites.
 Implement para aprovação; Test/fecho pendentes. Revisão Fillmore continua só Design.
+
+
+## IMP-008 — reutilização ADR e Q-C-26 aprovada
+
+Registo 2026-11-13T16:41:04Z. Model/Design e valores/horizontes de Q-C-26 aprovados;
+[revisão para aprovação](../bolts/021-rotas/adr-review.md) de ADR-004/017/018/024,
+com transversais005/016/020/021/025/026 e contrato operacional atual preservados.
+Nenhuma nova ADR, substituição ou promoção de estado; catálogo existente intacto.
+Capacidades/horizontes e alocação por necessidade incorporados no ADD6.1.
+APIs reais de LinkMetrics/monitor/config/sessão inspecionadas estaticamente;
+composição futura explícita, sem Java alterado. Parar antes de Implement.
+
+
+## IMP-008 — revisão ADR aprovada; Implement para revisão
+
+Registo 2026-11-13T17:18:48Z. Reutilização ADR aprovada pelo utilizador, sem ADR nova ou
+substituição. [Walkthrough](../bolts/021-rotas/implementation-walkthrough.md):
+seis caminhos +851/−0,35 testes novos e regressão incremental1211/0/0/0,JDK21.
+Execução restrita anterior com72erros de socket preservada, sem código alterado
+entre repetições. Q-C-26 implementada; composição futura não antecipada.
+Implement por aprovar; Test/manual/revisão final/integração pendentes.
+
+
+## IMP-008 — Implement aprovado; Test aguarda manual humano
+
+Registo 2026-11-13T17:43:51Z. Nenhuma decisão arquitetural nova ou substituição. Código
+aprovado preservado; [relatório Test](../bolts/021-rotas/ddd-03-test-report.md):
+clean verify JDK21:1211/0/0/0,14 XML,JAR novo e manual técnico Codex43checks/Java0.
+A repetição humana não foi recebida. Test/D22/revisão final/integração pendentes;
+sem fecho, commits/push ou outro IMP. EXTRA-02 preexistente não implementado aqui.
