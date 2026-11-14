@@ -708,3 +708,11 @@ bootstrap encerrado e terminação. O auxiliar captura snapshots que satisfazem
 conjuntamente condições, sem presumir estabilidade entre duas leituras vivas.
 Nenhuma API/byte/propriedade alterada nesta etapa. Manual humano e aprovação Test
 não recebidos; revisão final Denji/integração pendentes, sem nova CLI/GUI/vídeo.
+
+## IMP-009 — aceite e integrado localmente
+
+Registo 2026-11-14T15:43:38Z. V-012/Test1256/0/0/0, manual humano Luis53 e revisão final Denji
+confirmada aceites. Versão b7d74be5d9bad9fe7f598f29fa17188037647cf2 integrada em main; D32 cumprido e bolt006
+complete. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md).
+Sem alteração de contrato/código após Test; CLI/trace/ativação de dados permanecem
+nos próximos IMP, não iniciados. Unidade003-rotas/PHASE-03 continuam em progresso.

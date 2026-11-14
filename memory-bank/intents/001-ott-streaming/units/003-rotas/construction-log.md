@@ -362,3 +362,20 @@ Clean verify1256/0/0/0 e JAR1a1beb8b... intactos. Fecho e commit para main
 autorizados. Integração será comprovada antes de DONE; bolt/história/TASK ainda
 em progresso, D32 parcial apenas até integração. Sem push/novo IMP.
 Artefactos de aprovação em experiments/construction/006-rotas/closure/.
+
+## IMP-009 / 006-rotas / TASK-012 — fecho após integração comprovada
+
+Registo 2026-11-14T15:43:38Z. Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+268 caminhos e267 hashes do pacote conferidos,237 hashes de Projeto/ iguais ao
+Test, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR/manual humano imutáveis.
+Clean verify JDK21:1256/0/0/0,16 XML; manual Luis53 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true e recursos terminados. Test aprovado; revisão final atribuída a Denji
+confirmada pelo utilizador. D32 cumprido após integração; cinco etapas completas.
+Bolt/história complete, implemented=true,TASK-012 DONE. Onze bolts complete,
+24 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam in-progress;
+022-rotas apenas desimpedido,planned/não iniciado. Nenhum push solicitado.
+Fontes/logs/XML/report humano originais preservados; target/classes/backups
+transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+nenhum hash autorreferente ou resultado de publicação inventado.
+Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+Prova: experiments/construction/006-rotas/closure/integration-proof.json.

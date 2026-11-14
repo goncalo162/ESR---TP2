@@ -87,3 +87,9 @@ no_resources_pending=true. O utilizador aprovou Test e confirmou revisão final
 concluída, autorizando fecho/commit local para main. Report/log humano original
 preservados byte a byte; não são o ensaio Codex. Integração e fecho registados
 no walkthrough de fecho, só após execução real. Nenhum push solicitado.
+
+## Fecho posterior após integração
+
+Registo 2026-11-14T15:43:38Z. Revisão final Denji confirmada e versão revista integrada
+localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; D32 e bolt concluídos. O relatório humano e os
+ensaios Codex continuam separados e intactos. Nenhum push ou outro IMP iniciado.

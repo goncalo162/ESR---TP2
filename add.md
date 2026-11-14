@@ -1066,10 +1066,10 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Catálogo inclui origem e validade dos quatro fluxos.
-  - [ ] Melhores caminhos e alternativas ficam disponíveis.
-  - [ ] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
-  - [ ] Validação V-012 executada e evidência ligada no progresso.
+  - [x] Catálogo inclui origem e validade dos quatro fluxos.
+  - [x] Melhores caminhos e alternativas ficam disponíveis.
+  - [x] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
+  - [x] Validação V-012 executada e evidência ligada no progresso.
 
 <a id="imp-010"></a>
 ### IMP-010 — Diagnosticar percursos pela CLI

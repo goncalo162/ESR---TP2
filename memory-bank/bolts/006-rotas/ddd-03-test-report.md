@@ -5,12 +5,12 @@ stage: "test"
 status: "complete"
 created: "2026-11-14T15:23:45Z"
 ---
-# IMP-009 — Test e manual humano aprovados; integração para fecho
+# IMP-009 — Test/manual humano aprovados e fecho após integração
 
 ✅ Test e manual humano de Luis aprovados explicitamente; registo 2026-11-14T15:35:23Z.
 Revisão final atribuída a Denji confirmada concluída pelo utilizador. Fecho e
-commit para main autorizados. Integração ainda por comprovar neste registo;
-D32 só termina após essa prova. Estados anteriores de pendência são histórico.
+commit para main autorizados. Integração posteriormente comprovada em main b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+D32 cumprido no fecho. Estados anteriores de pendência são histórico.
 Sem pedido de push ou outro IMP. Gates externos adicionais: nenhum.
 
 ## 1. Versão e preservação
@@ -76,10 +76,11 @@ aprovado, não uma garantia de disponibilidade contínua do catálogo.
 | Manual técnico contra JAR | ✅Codex,53 CHECK_PASS/MANUAL_PASS/Java0, hashes/origem/JVM/recursos conferidos |
 | Repetição humana antes de aprovar Test | ✅Luis, execução20261114T152915Z-8s1k6ruu,53 checks/MANUAL_PASS/Java0 |
 | Aprovação de Test | ✅recebida explicitamente do utilizador, incluindo manual humano |
-| Revisão final Denji e integração | ✅revisão atribuída confirmada concluída pelo utilizador; ⏳integração antes de DONE |
+| Revisão final Denji e integração | ✅revisão atribuída confirmada concluída pelo utilizador; ✅integração local em mainb7d74be5d9bad9fe7f598f29fa17188037647cf2 |
 
-D32 continua **PARCIAL**. Critérios/bolt/história/TASK/unidade/fase não são marcados
-DONE por uma execução técnica ou por mera preparação deste relatório.
+D32 está **CUMPRIDO** após a integração comprovada e autorização de fecho.
+Bolt/história/TASK-012 completos; unidade/fase continuam em progresso. As
+pendências no relato histórico de preparação não são o estado atual.
 
 ## 4. Manual reproduzível e observação corrigida
 
@@ -141,3 +142,13 @@ A revisão atribuída a Denji foi confirmada pelo utilizador, sem alegar contact
 independente. Integração local em main será comprovada antes de DONE; este
 registo não inventa hash ou integração futura. Não repetir build/manual sem
 alteração das fontes aprovadas. Sem push ou início de outro IMP.
+
+## Integração e fecho efetivos
+
+Registo 2026-11-14T15:43:38Z. Main contém a versão revista b7d74be5d9bad9fe7f598f29fa17188037647cf2.
+[Prova de integração](../../../experiments/construction/006-rotas/closure/integration-proof.json)
+e [V-ADD do commit](../../../experiments/construction/006-rotas/closure/integration-commit-v-add.log):
+268 caminhos iguais à allowlist,267 hashes do pacote e237 de Projeto/ conferidos;
+JAR/report humano iguais ao Test. Revisão final Denji confirmada pelo utilizador.
+D32 cumprido; [fecho](closure-walkthrough.md) autorizado. Sem push solicitado ou
+novo IMP. Nenhum build/manual repetido sem alteração de fonte.

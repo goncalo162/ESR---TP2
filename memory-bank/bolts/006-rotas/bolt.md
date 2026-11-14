@@ -3,12 +3,12 @@ id: "006-rotas"
 unit: "003-rotas"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["003-difundir-anuncios-e-construir-catalogo-e-rotas"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-14T15:35:23Z"
+updated: "2026-11-14T15:43:38Z"
 started: "2026-11-14T11:47:13Z"
-completed: null
+completed: "2026-11-14T15:43:38Z"
 current_stage: "test"
 stages_completed: ["model", "design", "adr", "implement", "test"]
 requires_bolts: ["004-overlay", "021-rotas"]
@@ -41,7 +41,7 @@ Ler [IMP-009](../../../add.md#imp-009) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [003-difundir-anuncios-e-construir-catalogo-e-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md).
+- [x] [003-difundir-anuncios-e-construir-catalogo-e-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md).
 - Dependências: [004-overlay](../004-overlay/bolt.md), [021-rotas](../021-rotas/bolt.md).
 - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
 - Gates: nenhum adicional.
@@ -58,10 +58,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Catálogo inclui origem e validade dos quatro fluxos.
-- [ ] Melhores caminhos e alternativas ficam disponíveis.
-- [ ] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
-- [ ] Validação V-012 executada e evidência ligada no progresso.
+- [x] Catálogo inclui origem e validade dos quatro fluxos.
+- [x] Melhores caminhos e alternativas ficam disponíveis.
+- [x] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
+- [x] Validação V-012 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -179,10 +179,22 @@ Denji e integração pendentes. current_stage=test; só Model/Design/ADR/Impleme
 concluídos, completed=null. Sem gates externos adicionais. Sem fecho/commits/push
 ou outro IMP. Código e testes de Projeto/ não alterados nesta etapa.
 
-## Preparação de fecho — Test e revisão final aceites
+## Histórico — preparação de fecho antes da prova de integração
 
 Registo 2026-11-14T15:35:23Z. Test aprovado com manual Luis53/Java0 e revisão final atribuída
 a Denji confirmada pelo utilizador. Cinco etapas aceites; integração local em
 main ainda por comprovar antes de complete/DONE. D32 pendente só dessa prova.
 Fontes/JAR validados preservados. Fecho/commits para main autorizados, sem push
 ou novo IMP. Estado do bolt ainda in-progress nesta preparação.
+
+## Fecho concluído após integração real
+
+Registo 2026-11-14T15:43:38Z. Cinco etapas completas; Test/manual humano Luis53/Java0 e
+revisão final atribuída a Denji aceites por confirmação do utilizador.
+Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2.
+[Fecho e prova](closure-walkthrough.md).237 hashes de Projeto/,JAR/manual iguais
+ao Test;268 caminhos do commit conferidos, V-ADD extraído0/78. D32 cumprido.
+Bolt complete; história complete/implemented=true; TASK-012 DONE. Unidade003-rotas/
+PHASE-03 continuam in-progress por TASK-013/022-rotas, apenas desimpedido/planned.
+Sem outro IMP iniciado. Commit de fecho documental posterior; nenhum push pedido.
+Registos de pendência anteriores são histórico, não o estado atual.

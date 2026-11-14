@@ -5,7 +5,7 @@
 - ID: TASK-012
 - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-007](../PHASE-02/TASK-007.md), [TASK-010](../PHASE-03/TASK-010.md), [TASK-011](../PHASE-03/TASK-011.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Gerar anúncios periódicos para dois fluxos por origem.
-- [ ] Validar, somar custo local e guardar candidato por vizinho.
-- [ ] Reenviar primeira chegada e melhorias com rate limit.
-- [ ] Tratar expiração, retirada, epoch novo e catálogo consultável.
+- [x] Gerar anúncios periódicos para dois fluxos por origem.
+- [x] Validar, somar custo local e guardar candidato por vizinho.
+- [x] Reenviar primeira chegada e melhorias com rate limit.
+- [x] Tratar expiração, retirada, epoch novo e catálogo consultável.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Catálogo inclui origem e validade dos quatro fluxos.
-- [ ] Melhores caminhos e alternativas ficam disponíveis.
-- [ ] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
-- [ ] Validação V-012 executada e evidência ligada no progresso.
+- [x] Catálogo inclui origem e validade dos quatro fluxos.
+- [x] Melhores caminhos e alternativas ficam disponíveis.
+- [x] Cache, seq, epoch e path impedem tempestade e regressão a época retirada.
+- [x] Validação V-012 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -166,3 +166,20 @@ Clean verify1256/0/0/0 e JAR1a1beb8b... intactos. Fecho e commit para main
 autorizados. Integração será comprovada antes de DONE; bolt/história/TASK ainda
 em progresso, D32 parcial apenas até integração. Sem push/novo IMP.
 Artefactos de aprovação em experiments/construction/006-rotas/closure/.
+
+## IMP-009 / 006-rotas / TASK-012 — fecho após integração comprovada
+
+Registo 2026-11-14T15:43:38Z. Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+268 caminhos e267 hashes do pacote conferidos,237 hashes de Projeto/ iguais ao
+Test, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR/manual humano imutáveis.
+Clean verify JDK21:1256/0/0/0,16 XML; manual Luis53 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true e recursos terminados. Test aprovado; revisão final atribuída a Denji
+confirmada pelo utilizador. D32 cumprido após integração; cinco etapas completas.
+Bolt/história complete, implemented=true,TASK-012 DONE. Onze bolts complete,
+24 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam in-progress;
+022-rotas apenas desimpedido,planned/não iniciado. Nenhum push solicitado.
+Fontes/logs/XML/report humano originais preservados; target/classes/backups
+transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+nenhum hash autorreferente ou resultado de publicação inventado.
+Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+Prova: experiments/construction/006-rotas/closure/integration-proof.json.

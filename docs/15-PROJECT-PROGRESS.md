@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em Test, manual humano pendente; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Test; clean verify1256/0/0/0 e manual Codex53; repetição humana/aprovação Test pendentes.
+**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 apenas planned/desimpedido, não iniciado.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -108,7 +108,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
-| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Test técnico: clean verify1256/0/0/0; manual Codex53; humano/aprovação Test pendentes |
+| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
@@ -1174,3 +1174,20 @@ Clean verify1256/0/0/0 e JAR1a1beb8b... intactos. Fecho e commit para main
 autorizados. Integração será comprovada antes de DONE; bolt/história/TASK ainda
 em progresso, D32 parcial apenas até integração. Sem push/novo IMP.
 Artefactos de aprovação em experiments/construction/006-rotas/closure/.
+
+## IMP-009 / 006-rotas / TASK-012 — fecho após integração comprovada
+
+Registo 2026-11-14T15:43:38Z. Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+268 caminhos e267 hashes do pacote conferidos,237 hashes de Projeto/ iguais ao
+Test, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR/manual humano imutáveis.
+Clean verify JDK21:1256/0/0/0,16 XML; manual Luis53 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true e recursos terminados. Test aprovado; revisão final atribuída a Denji
+confirmada pelo utilizador. D32 cumprido após integração; cinco etapas completas.
+Bolt/história complete, implemented=true,TASK-012 DONE. Onze bolts complete,
+24 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam in-progress;
+022-rotas apenas desimpedido,planned/não iniciado. Nenhum push solicitado.
+Fontes/logs/XML/report humano originais preservados; target/classes/backups
+transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+nenhum hash autorreferente ou resultado de publicação inventado.
+Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+Prova: experiments/construction/006-rotas/closure/integration-proof.json.

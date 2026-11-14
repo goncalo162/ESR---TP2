@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e24 planned;006-rotas/IMP-009 em Test, manual humano pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: onze histórias/bolts complete, incluindo006-rotas/IMP-009, e24 planned; nenhum em execução; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -71,7 +71,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
 
 ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
 
-**Tarefa:** IMP-009. **Estado:** in-progress (Test técnico executado; repetição humana/aprovação Test pendentes). **Bolt:** 006-rotas.
+**Tarefa:** IMP-009. **Estado:** complete/implemented=true; TASK-012 DONE, integraçãob7d74be5d9bad9fe7f598f29fa17188037647cf2. **Bolt:** 006-rotas.
 **Ficheiro:** [003-difundir-anuncios-e-construir-catalogo-e-rotas](intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md).
 
 ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
@@ -634,3 +634,20 @@ Clean verify1256/0/0/0 e JAR1a1beb8b... intactos. Fecho e commit para main
 autorizados. Integração será comprovada antes de DONE; bolt/história/TASK ainda
 em progresso, D32 parcial apenas até integração. Sem push/novo IMP.
 Artefactos de aprovação em experiments/construction/006-rotas/closure/.
+
+## IMP-009 / 006-rotas / TASK-012 — fecho após integração comprovada
+
+Registo 2026-11-14T15:43:38Z. Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+268 caminhos e267 hashes do pacote conferidos,237 hashes de Projeto/ iguais ao
+Test, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR/manual humano imutáveis.
+Clean verify JDK21:1256/0/0/0,16 XML; manual Luis53 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true e recursos terminados. Test aprovado; revisão final atribuída a Denji
+confirmada pelo utilizador. D32 cumprido após integração; cinco etapas completas.
+Bolt/história complete, implemented=true,TASK-012 DONE. Onze bolts complete,
+24 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam in-progress;
+022-rotas apenas desimpedido,planned/não iniciado. Nenhum push solicitado.
+Fontes/logs/XML/report humano originais preservados; target/classes/backups
+transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+nenhum hash autorreferente ou resultado de publicação inventado.
+Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+Prova: experiments/construction/006-rotas/closure/integration-proof.json.

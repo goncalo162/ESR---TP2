@@ -429,3 +429,20 @@ mantidas, nenhuma ADR nova ou substituição. [Test](../bolts/006-rotas/ddd-03-t
 com clean verify1256/0/0/0 e manual Codex53 no JAR novo passou tecnicamente.
 Manual humano antes da aprovação Test, revisão final Denji/integração e D32
 continuam pendentes. Sem fecho/commit/push ou outro IMP, sem gate externo novo.
+
+## IMP-009 / 006-rotas / TASK-012 — fecho após integração comprovada
+
+Registo 2026-11-14T15:43:38Z. Versão revista integrada localmente em main: b7d74be5d9bad9fe7f598f29fa17188037647cf2;
+268 caminhos e267 hashes do pacote conferidos,237 hashes de Projeto/ iguais ao
+Test, V-ADD0/78 numa cópia extraída do commit. Fontes/JAR/manual humano imutáveis.
+Clean verify JDK21:1256/0/0/0,16 XML; manual Luis53 CHECK_PASS/MANUAL_PASS/Java0/
+passed=true e recursos terminados. Test aprovado; revisão final atribuída a Denji
+confirmada pelo utilizador. D32 cumprido após integração; cinco etapas completas.
+Bolt/história complete, implemented=true,TASK-012 DONE. Onze bolts complete,
+24 planned, nenhum em execução. Unidade003-rotas/PHASE-03 continuam in-progress;
+022-rotas apenas desimpedido,planned/não iniciado. Nenhum push solicitado.
+Fontes/logs/XML/report humano originais preservados; target/classes/backups
+transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+nenhum hash autorreferente ou resultado de publicação inventado.
+Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+Prova: experiments/construction/006-rotas/closure/integration-proof.json.

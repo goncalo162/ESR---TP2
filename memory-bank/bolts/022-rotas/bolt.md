@@ -6,7 +6,7 @@ type: "simple-construction-bolt"
 status: "planned"
 stories: ["004-diagnosticar-percursos-pela-tabela-de-rotas"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-14T15:43:38Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["004-overlay", "006-rotas", "020-overlay"]
 enables_bolts: ["007-arvores", "008-arvores", "009-arvores", "023-arvores", "024-arvores"]
 requires_units: ["002-overlay"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 2
   avg_uncertainty: 1
@@ -68,3 +68,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 - Prova futura: `experiments/construction/022-rotas/` e relatório local do bolt.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+
+
+## Dependência concluída, sem iniciar execução
+
+Registo 2026-11-14T15:43:38Z.006-rotas/IMP-009 complete e integrado em main b7d74be5d9bad9fe7f598f29fa17188037647cf2.
+Apenas blocks=false; status=planned, started/completed/current_stage=null e
+stages_completed=[] preservados. Não houve autorização de iniciar IMP-010.
