@@ -113,3 +113,58 @@ alteração de fonte nesta etapa. Manual Codex43checks passou contra esse JAR;
 [roteiro offline humano](../experiments/construction/021-rotas/manual-instructions.md)
 preparado, execução humana não recebida. D22 parcial/Test por aprovar, revisão
 final e integração pendentes. Sem composição de rede ou autorização de dados nova.
+
+## IMP-009 — projeções propostas em Design, não implementadas
+
+Registo 2026-11-14T12:31:20Z. Model e Q-C-28/princípios Q-C-29 aprovados; [Design para revisão](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md).
+StreamInfo imutável converte explicitamente metadados do wire; StreamCatalog e
+RoutingService.Snapshot publicam catálogo/rotas no mesmo instante do owner.
+Validade remanescente é as-of capturedAtNanos; projeção pura pode ocultar expirados,
+sem mutar Root. Candidato sem RTT fica conhecido/UNAVAILABLE; seleção não autoriza
+dados. UUID/origem ficam fixos e limitados por Q-C-26, não pela cache de flooding.
+Propostas Q-C-29 separam K cache, ledger S×N, P=min(K,E), quotas por stream/nodeId
+e B=min(E,2N) reservas físicas. Dívida W e recibo antigo nunca renovam TTL ou
+restauram época. Valores/ordens e APIs concretos ainda pendentes de revisão Design;
+nenhum Java ou resultado V-012 novo.
+
+## IMP-009 — Design e metadados aprovados; revisão ADR pendente
+
+Registo 2026-11-14T12:53:08Z. Design completo e Q-C-29/30 aprovados explicitamente. Referência
+de title/codec/FPS por UUID/origem/época fixada pela oferta local ou primeiro
+candidato admitido; comparação exata e conflito rejeitado antes de mutar Root/
+watermark/TTL/cache/catálogo. Persiste após expiração total, uma por binding na
+época corrente≤S=16384; mudança só por confirmEpoch aceite/reinício, sem ampliar
+históricos Q-C-26. Catálogo visível continua dependente de oferta/candidato vivo.
+Root real não guarda esses metadados; RoutingService fará a referência no owner.
+[Revisão estática das APIs](../memory-bank/bolts/006-rotas/adr-review.md) preparada;
+nenhum código implementado ou teste executado. Seleção continua sem autorizar dados.
+
+## IMP-009 — catálogo/routing implementados para revisão
+
+Registo 2026-11-14T14:36:19Z. [Walkthrough](../memory-bank/bolts/006-rotas/implementation-walkthrough.md):
+StreamInfo/StreamCatalog e RoutingService publicados pelo owner do OverlayNode,
+com referências Q-C-30 persistentes por época e snapshots as-of imutáveis. Seleção
+continua sem upstream ativo/destinos ou autorização de dados. Contagens limitadas
+Q-C-26/29 e recusas reais Q-C-31 implementadas; sem alteração ao domínio anterior.
+1254 testes incrementais aprovados, incluindo43 novos; Test/clean verify/JAR novo/
+manual humano/revisão final Denji/integração pendentes. Sem conclusão de fase.
+
+## IMP-009 — validade de metadados distinta da validade de seleção
+
+Registo 2026-11-14T15:00:17Z. Correção do checkpoint Implement: remainingNanos de catálogo é
+máximo de validade dos candidatos. visibleAt não pode usá-lo como validade de
+custo/upstream selecionados. Ao avançar capturedAtNanos de entrada remota sem
+informação para recalcular, conserva metadados válidos e projeta UNAVAILABLE com
+métrica/upstream vazios, sem mutar original/Root. Ao mesmo instante conserva
+seleção; oferta local sem TTL conserva custo0. Esta projeção é conservadora para
+qualquer avanço positivo de instante; não equivale a declaração de ausência de
+rota no owner. [Walkthrough revisto](../memory-bank/bolts/006-rotas/implementation-walkthrough.md).
+Regressão incremental1256/0/0/0; Test/D32/manual/revisão final/integração pendentes.
+
+## IMP-009 — Test técnico sem alteração do domínio
+
+Registo 2026-11-14T15:24:36Z. Clean verify1256/0/0/0 e manual Codex53 no novo JAR passaram;
+referência/TTL/projeção foram conferidos sem editar Java. Snapshot envelhecido
+conserva metadados válidos e não afirma custo/upstream que não pode recalcular.
+[Relatório Test](../memory-bank/bolts/006-rotas/ddd-03-test-report.md).
+Manual humano, aprovação Test, revisão final Denji/integração e D32 pendentes.

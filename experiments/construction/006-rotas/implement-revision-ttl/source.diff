@@ -1,0 +1,144 @@
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -350,20 +350,62 @@
+         if(q==null){if(quotas.size()==limits.slotCapacity()){note(Reason.CAPACITY,false);return false;}q=new ArrayDeque<>();quotas.put(key,q);quotaSweep.addLast(key);}
+         purgeQuota(q,t);if(q.size()==flood)return false;q.addLast(t);return true;
+     }
+-    private boolean attempt(Ledger l,long t){
+-        if(!l.cell||busy(l.key.session))return false;
+-        Publication p=l.debt!=null?l.debt:l.want;boolean withdrawal=l.debt!=null;if(p==null)return false;
++    private boolean currentAnnouncement(Ledger ledger,Publication publication,long at){
++        if(stopping.get()||!current(ledger.key.session))return false;
++        var row=rows.get(ledger.key.stream);
++        if(row==null||!publication.equals(selected(row,ledger.key.session)))return false;
++        if(row.offered)return true;
++        var candidate=row.route.selectedCandidate().orElseThrow();
++        long age=at-candidate.generationStartedAtNanos();
++        return age>=0&&age<candidate.candidateTtlNanos();
++    }
++    private boolean attempt(Ledger l){
++        if(stopping.get()||!current(l.key.session)||!l.cell||busy(l.key.session))return false;
++        if(l.debt==null&&l.want!=null){
++            // Previous sends in this same turn may have consumed the remaining TTL.
++            // Refresh selection/expiry without renewing a generation or manufacturing seq.
++            long at=now();applied(root.expire());
++            var row=rows.get(l.key.stream);
++            if(l.seenVersion!=row.version||l.review){
++                l.seenVersion=row.version;l.review=false;reconsider(l,row);
++            }
++            publish(at);
++        }
++        Publication p=l.debt!=null?l.debt:l.want;boolean withdrawal=l.debt!=null;
++        if(stopping.get()||p==null)return false;
++        ControlMessage message=new ControlMessage(withdrawal?MessageType.STREAM_WITHDRAW:MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),config.nodeId(),instance,
++            withdrawal?new ControlMessage.Withdrawal(p.info.streamId(),p.info.serverEpoch(),p.sequence):new ControlMessage.Announcement(p.info.toWire(),p.sequence,p.cost,p.path));
++        // Check at the port boundary, after message preparation; do not reuse turn time.
++        long attemptAt=now();
++        if(!withdrawal&&!currentAnnouncement(l,p,attemptAt)){
++            applied(root.expire());var row=rows.get(l.key.stream);
++            l.seenVersion=row.version;l.review=false;reconsider(l,row);publish(attemptAt);
++            return false; // no physical ticket or rate token was consumed by this stale intent
++        }
+         Admission ticket;
+         synchronized(resources){if(admissions.size()==maxTickets)return false;ticket=new Admission(l.key,p,withdrawal);admissions.add(ticket);}
+-        if(!quota(l,t)){synchronized(resources){admissions.remove(ticket);}return false;}
+-        ControlMessage message=new ControlMessage(withdrawal?MessageType.STREAM_WITHDRAW:MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),config.nodeId(),instance,
+-            withdrawal?new ControlMessage.Withdrawal(p.info.streamId(),p.info.serverEpoch(),p.sequence):new ControlMessage.Announcement(p.info.toWire(),p.sequence,p.cost,p.path));
++        if(!quota(l,attemptAt)){discardUnsent(ticket);return false;}
++        try {
++            // Physical/quota reservation can take time too. This is the last clock
++            // check before the port call; an already charged attempt is not refunded.
++            long dispatchAt=now();
++            if(!withdrawal&&!currentAnnouncement(l,p,dispatchAt)){
++                discardUnsent(ticket);applied(root.expire());
++                var row=rows.get(l.key.stream);l.seenVersion=row.version;l.review=false;
++                reconsider(l,row);publish(dispatchAt);return false;
++            }
++        } catch(RuntimeException e){discardUnsent(ticket);throw e;}
+         if(!withdrawal){l.want=null;if(l.debt==null)freeCell(l);}
+         try{Objects.requireNonNull(control.send(l.key.session,message)).whenComplete(ticket::complete);}
+         catch(RuntimeException e){ticket.complete(null,e);}
+         return true;
+     }
+-    private void scan(long t,int budget){
++    private void discardUnsent(Admission ticket){
++        // No port call/future/callback exists yet, so this reservation has no
++        // outstanding physical work. In-flight admissions still use release().
++        synchronized(resources){admissions.remove(ticket);resources.notifyAll();}
++    }
++    private void scan(int budget){
+         int sends=0;
+         while(scanRemaining>0&&budget-->0&&!stopping.get()){
+             if(streamIndex.isEmpty()||peerIndex.isEmpty()){scanRemaining=0;break;}
+@@ -377,7 +419,7 @@
+             if(ledger.seenVersion!=row.version||ledger.review||ledger.debt!=null&&!ledger.cell){
+                 ledger.seenVersion=row.version;ledger.review=false;reconsider(ledger,row);
+             }
+-            if(sends<16&&attempt(ledger,t))sends++;
++            if(sends<16&&attempt(ledger))sends++;
+         }
+     }
+     private void drive(){
+@@ -391,9 +433,11 @@
+                 row.nextAt=t+period;dirty();
+             }
+             // All owner projections precede the resulting send attempts.
+-            publish(t);int swept=sweepQuotas(t);scan(t,64-swept);publish(t);
++            publish(t);int swept=sweepQuotas(t);scan(64-swept);
++            // A slow/control-port callback may also advance time during this turn.
++            long finished=now();applied(root.expire());publish(finished);
+             if(scanRemaining>0)wake();
+-            schedule(t);
++            schedule(finished);
+         }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
+         finally{driving=false;}
+     }
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java
+@@ -29,9 +29,15 @@
+             var visible = new LinkedHashMap<UUID, Entry>();
+             entries.forEach((id, e) -> {
+                 if (e.localOffer()) visible.put(id, e);
+-                else if (e.remainingNanos().orElseThrow() > age)
+-                    visible.put(id, new Entry(e.info(), e.state(), e.metric(), e.knownUpstream(), false,
++                else if (e.remainingNanos().orElseThrow() > age) {
++                    // Remaining metadata validity is the maximum over all candidates, not
++                    // the selected route's lifetime. This projection has no candidate set
++                    // with which to reselect: never relabel an older cost/upstream as current.
++                    visible.put(id, new Entry(e.info(), age == 0 ? e.state() : RouteState.UNAVAILABLE,
++                            age == 0 ? e.metric() : Optional.empty(),
++                            age == 0 ? e.knownUpstream() : Optional.empty(), false,
+                             OptionalLong.of(e.remainingNanos().orElseThrow() - age)));
++                }
+             });
+             return new Snapshot(now, visible);
+         }
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java
+@@ -274,4 +274,26 @@
+         }finally{owner.hooks.clear();timers.requestClose();owner.close();}
+     }
+ 
++    @Test void d08AnnounceRevalidatesExpiryBetweenTwoSendsInOneTurn(){try(var r=new Rig()){
++        var a=session("A");var d=session("D");var e=session("E");for(var p:List.of(a,d,e))r.up(p);r.metric(a,10);r.hold=true;
++        var announcements=new java.util.concurrent.atomic.AtomicInteger();
++        r.delivery=(peer,message)->{if(message.type()==MessageType.STREAM_ANNOUNCE&&announcements.getAndIncrement()==0)r.clock.addAndGet(8_000_000_000L);};
++        r.ad(a,1,100);
++        assertEquals(1,announcements.get(),"second send in the same owner turn used an expired candidate");
++        assertEquals(8_000_000_000L,r.router.snapshot().capturedAtNanos());assertTrue(r.router.snapshot().catalog().entries().isEmpty());
++        assertEquals(1,r.router.snapshot().diagnostics().sendTickets());assertEquals(1,r.router.snapshot().diagnostics().quotas());
++        assertTrue(r.route().selectedCandidate().isEmpty());assertEquals(3,r.router.snapshot().diagnostics().sessions());
++    }}
++    @Test void d22VisibleAtNeverRelabelsExpiredSelectionAsCurrentWhileAlternativeLives(){try(var r=new Rig()){
++        var a=session("A");var b=session("B");r.up(a);r.up(b);r.metric(a,10);r.metric(b,20);r.ad(a,1,100);r.tick(1000);r.ad(b,1,200);
++        var old=r.router.snapshot();var entry=old.catalog().entries().get(STREAM);assertEquals("A",entry.knownUpstream().orElseThrow().nodeId());assertEquals(110,entry.metric().orElseThrow().costMicros());
++        assertEquals(old.catalog(),old.catalog().visibleAt(old.capturedAtNanos()));
++        // A expires at 8s; B remains alive until 9s. The pure catalog lacks B's route details.
++        var later=old.catalog().visibleAt(8_000_000_000L);var visible=later.entries().get(STREAM);
++        assertNotNull(visible);assertEquals("Video A",visible.info().title());assertEquals(1_000_000_000L,visible.remainingNanos().orElseThrow());
++        assertTrue(visible.metric().isEmpty(),"snapshot dated now still exposes expired selected cost");assertTrue(visible.knownUpstream().isEmpty());assertEquals(RouteState.UNAVAILABLE,visible.state());
++        assertEquals(500_000_000L,later.visibleAt(8_500_000_000L).entries().get(STREAM).remainingNanos().orElseThrow());assertTrue(later.visibleAt(9_000_000_000L).entries().isEmpty());
++        assertSame(old,r.router.snapshot());assertEquals(110,entry.metric().orElseThrow().costMicros());assertEquals("A",old.routes().get(STREAM).knownUpstream().orElseThrow().nodeId());assertEquals(1_000_000_000L,r.clock.get());
++    }}
++
+ }

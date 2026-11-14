@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-11-14T12:53:08Z",
+  "method": "static inspection only; zero Java edits/build/runtime",
+  "authorized_mutation_scope": "six approved Java paths, no mutation authorized in this stage",
+  "source_sha256": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java": "795a12e3d7ac5b680c76db28d04dd2a28a40e4e21026b31b294771ab0baebafa",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamInfo.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java": "47b044f2313d805f99e253b843367d4d4eb6c5b0c05953e4ae9c0396ad9ec45b",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java": "0a6918fdfe2349bd0083973776b36192e8e9f5ce3cd5a4f998f6816d2d339a5b",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java": "397ff382088bc771246586f251425c5fc7aa675d4e5150d41df5dd5418e041fb",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java": "4d91fc4d0bda61392b49ed2780566c15b0881de2e8777f733d0d78949cad0830",
+    "Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java": "d7ab1173ca418589d731923e2deaf08c8a1d142687127761252b2ed6c1f7f350",
+    "Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java": "7c9b14efefa27355885614257e9802e5cfd7eeb639053c8e0b6c84f04f86b996",
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java": "7e4024a77ecf332e64addd40693199869d991829bb4dd14de908c0941bcb2429",
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java": "5aebcc159facfe94297a8283124255de67c589d088808564322bba9bd148b58d",
+    "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java": "f3d84d147d1a289f3fc4b6eedc9ef9460d4be9f786e718b4eca72bac79df8005",
+    "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68",
+    "Projeto/src/main/java/pt/uminho/esr/ott/config/StreamConfiguration.java": "cfe159a59593e131aa227beb641fa48c573fac601c45fb048930dd9627f59689",
+    "Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java": "3f4884acfc8224fbb0f186e15bef8562e5d05d78197bb41489fcb43a2b1857d1",
+    "Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java": "9959f7f8c48982ad35de46dc031cb25e0f5a9eecc638faea5c0d7cf45efe2e85",
+    "Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java": "1c070252738adc1fb80edcd0da974e40505bdc519ac3dcbeb5e8a03abd2fe255",
+    "Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java": "2a4279fd6e0baa9ab672b034e9a7c94bffa736f89f3d8b4a3e7c4ed004200a79",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java": "cc7d557fac277945012671d99e5aa32f75f9c030758997d04b5bf5200c9ab225",
+    "Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java": "ad6f5a56bec40f85ab680e20270a8f1bf8626f181786c10dfb983f7f70717fc9",
+    "Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java": "25169d4c68bcef6add543e2052c52c76376adbb23fcfd90445be1af802a81f50"
+  },
+  "new_source_path_absent": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeRoutingTest.java",
+  "findings": {
+    "four_empty_files": true,
+    "existing_OverlayNode_preserved": true,
+    "owner_offer_full": "returns false after fail/requestClose",
+    "connection_send_overflow": "returns OVERFLOW after marking/closing affected connection",
+    "manager_send": "async owner command; ACCEPTED only queued; command capacity shared E+1",
+    "monitor_metric": "costMicros OptionalLong already ceil(EWMA micros)",
+    "local_stream_codec": "StreamConfiguration has no codec field; contract fixes MJPEG1",
+    "new_ADR_required": false,
+    "Q-C-31_approved": false
+  },
+  "no_Java_test_results": true
+}

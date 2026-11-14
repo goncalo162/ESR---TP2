@@ -1,0 +1,717 @@
+--- a/add.md
++++ b/add.md
+@@ -1057,7 +1057,8 @@
+ - **Bolt/origem:** [006-rotas](memory-bank/bolts/006-rotas/bolt.md); TASK-012.
+ - **Ficheiros:** `routing/RoutingService.java`, `streaming/StreamInfo.java`, `streaming/StreamCatalog.java`, `routing/RoutingServiceTest.java`, `overlay/OverlayNode.java`, `overlay/OverlayNodeRoutingTest.java`.
+ - **Revisão de âmbito aprovada — Q-C-28 Opção1:** composição de routing no owner e lifecycle existentes de OverlayNode; conservar APIs, observadores e testes anteriores. Os caminhos de teste usam src/test/java e os restantes src/main/java. Sem CLI de catálogo/trace neste IMP.
+-- **Política aprovada em princípio — Q-C-29:** fonte é dona de epoch/seq; relay publica a geração do candidato selecionado, sem fabricar seq ou renovar TTL por melhoria. Retirada precede reposição de geração nova quando a publicidade já não pode ser substituída legitimamente. Saturação preserva candidatos/estado saudável. Limites e ordens concretos no [Design para revisão](memory-bank/bolts/006-rotas/ddd-02-technical-design.md), ainda não aprovados.
++- **Política aprovada integralmente — Q-C-29:** fonte é dona de epoch/seq; relay publica a geração do candidato selecionado, sem fabricar seq ou renovar TTL por melhoria. W pendente precede ANN novo; alternativa pior ou path diferente com custo/saltos iguais exige retirada e geração nova. K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N); quota F/janela1s por stream/nodeId conservada após Down, timers2/turnos64/16. Saturação local preserva candidatos/estado saudável e os recibos antigos não alteram Root/TTL. [Design aprovado](memory-bank/bolts/006-rotas/ddd-02-technical-design.md); revisão ADR e clarificação Q-C-31 das recusas reais ainda para aprovação.
++- **Metadados aprovados — Q-C-30:** oferta local/primeiro candidato remoto admitido fixa title/codec/FPS por UUID/origem/época; conflito rejeitado inteiro sem consumir seq/renovar TTL ou alterar candidato saudável. Referência persiste após expiração total, uma por binding na época corrente≤16384, sem TTL próprio; só confirmEpoch aceite/reinício permite mudança, respeitando Q-C-26.
+ - **Dependências:** IMP-006 (004-overlay), IMP-008 (021-rotas).
+ - **ADR:** ADR-004, ADR-016, ADR-017, ADR-018, ADR-020, ADR-024.
+ - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-005, REQ-006, REQ-009, REQ-012, REQ-014, REQ-016.
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -126,3 +126,15 @@
+ e B=min(E,2N) reservas físicas. Dívida W e recibo antigo nunca renovam TTL ou
+ restauram época. Valores/ordens e APIs concretos ainda pendentes de revisão Design;
+ nenhum Java ou resultado V-012 novo.
++
++## IMP-009 — Design e metadados aprovados; revisão ADR pendente
++
++Registo 2026-11-14T12:53:08Z. Design completo e Q-C-29/30 aprovados explicitamente. Referência
++de title/codec/FPS por UUID/origem/época fixada pela oferta local ou primeiro
++candidato admitido; comparação exata e conflito rejeitado antes de mutar Root/
++watermark/TTL/cache/catálogo. Persiste após expiração total, uma por binding na
++época corrente≤S=16384; mudança só por confirmEpoch aceite/reinício, sem ampliar
++históricos Q-C-26. Catálogo visível continua dependente de oferta/candidato vivo.
++Root real não guarda esses metadados; RoutingService fará a referência no owner.
++[Revisão estática das APIs](../memory-bank/bolts/006-rotas/adr-review.md) preparada;
++nenhum código implementado ou teste executado. Seleção continua sem autorizar dados.
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -671,3 +671,16 @@
+ recibo de admissão velha na sessão corrente pode exigir W antigo, sem mudar Root.
+ Q-C-29 concreta ainda para revisão; nenhum contrato operacional implementado ou
+ ADR nova aceite por esta proposta. CLI/trace/dados permanecem nos IMP seguintes.
++
++## IMP-009 — Design aprovado e contratos reais conferidos na revisão ADR
++
++Registo 2026-11-14T12:53:08Z. Q-C-29/30 aprovadas integralmente. [Revisão de assinaturas](../memory-bank/bolts/006-rotas/adr-review.md)
++confirma NeighborManager.SerialOwner emprestado, send(Session,ControlMessage)
++assíncrono, eventos de monitor e RoutingTable existentes. RoutingService,
++StreamInfo/StreamCatalog de domínio e APIs novas do nó ainda não implementados.
++StreamConfiguration não tem codec: oferta usa1/MJPEG, validado sem ler média.
++Q-C-31 proposta: offer(false) por fila cheia inicia fecho real do owner;
++Connection.send OVERFLOW já fecha a ligação afetada. Distinguir da recusa local
++não terminal K/P/quota. Não prometer wake/retry numa execução/ligação encerrada
++nem mudar contratos atuais por inferência. Estado lógico não prova terminação
++física. Revisão ADR e Q-C-31 por aprovar;32 oráculos por executar, sem Implement.
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -367,3 +367,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em Design para revisão; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em revisão ADR; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Design para revisão após aprovação de Model/Q-C-28 e princípios Q-C-29.
++**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em revisão ADR após aprovação integral de Design/Q-C-29/30; Q-C-31 pendente.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -108,7 +108,7 @@
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+-| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Design para revisão; Model aprovado; V-012: NÃO EXECUTADO |
++| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Revisão ADR; Model/Design aprovados; V-012: NÃO EXECUTADO |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+@@ -1099,3 +1099,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1048,7 +1048,7 @@
+ 
+ ## Q-C-29 — IMP-009: geração, retirada, publicidade e saturação
+ 
+-- **Registo:** 2026-11-14T11:54:45Z; estado inicial PROPOSTA; **PRINCÍPIOS APROVADOS / Design concreto para revisão**.
++- **Registo:** 2026-11-14T11:54:45Z; estado inicial PROPOSTA; **DECIDIDA/APROVADA INTEGRALMENTE — limites e ordens incluídos**.
+ - **Fontes:** ADR-004/018, docs07 ANNOUNCE9/WITHDRAW10, TASK-012 e Q-C-26 aprovada.
+   Root/table aceita só melhoria na mesma geração sem renovar prazo; retirada
+   instala watermark que impede repor ANNOUNCE dessa geração no mesmo slot.
+@@ -1081,9 +1081,18 @@
+ - **Concretização pendente de revisão:** [Design secções5–8](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md): ledger S×N, K chaves de flooding/H=cacheTtl, P=min(K,E) coalescers com W+ANN, B=min(E,2N) tickets físicos; quota F numa janela deslizante1s por stream/nodeId conservada após Down; timers2/turnos64/16. W pendente não é apagado por geração nova. Igual custo/saltos com troca de path também exige W+geração nova. ACCEPTED tardio da sessão corrente gera recibo limitado/retirada antiga sem restaurar Root/TTL; sessão antiga só liberta ticket. Nenhum destes valores é aprovado por inferência; D01–D32 planeados, não executados.
+ 
+ 
++### Q-C-29 — aprovação integral posterior
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou o Design completo e os limites/ordens
++concretos: K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N), janela1s
++por stream/nodeId conservada após Down, timers2/turnos64/16, W antes de ANN
++novo quando há dívida, floor por peer e recibos antigos sem renovar TTL.
++As pendências de aprovação acima são histórico. Só revisão ADR autorizada.
++
++
+ ## Q-C-30 — IMP-009: referência de metadados e retenção após expiração
+ 
+-- **Registo:** 2026-11-14T12:42:45Z; estado **PROPOSTA/PENDENTE DE APROVAÇÃO de Design**.
++- **Registo:** 2026-11-14T12:42:45Z; estado **DECIDIDA/APROVADA INTEGRALMENTE**.
+ - **Motivo:** Model exige metadados coerentes por UUID/época e proíbe escolher o
+   último anúncio contraditório; faltava decidir a referência e a sua retenção
+   quando deixa de haver candidatos. Este pedido autoriza concretizar a proposta,
+@@ -1115,3 +1124,41 @@
+   Sem gates externos adicionais. V-012, regressão atual, manual humano antes de
+   aprovar Test, revisão final Denji e integração continuam obrigatórios.
+   Nenhuma ADR nova aceite, Java, commit/push ou outro IMP.
++
++### Q-C-30 — aprovação integral posterior
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou a política completa: referência pelo primeiro
++candidato admitido/oferta local, igualdade exata, retenção sem TTL na época
++corrente≤S, mudança só por confirmEpoch aceite/reinício, conflito rejeitado sem
++consumir seq ou alterar estado saudável. D07/D08, incluindo conflito após
++expiração, continuam planeados, não executados. Pendências anteriores de Design
++são histórico; apenas revisão ADR autorizada, não Implement.
++
++## Q-C-31 — IMP-009: semântica real de recusa de owner e OVERFLOW
++
++- **Registo:** 2026-11-14T12:53:08Z; **PROPOSTA/PENDENTE DE APROVAÇÃO na revisão ADR**.
++- **Evidência de fonte:** NeighborManager.Owner.offer chama fail quando a fila
++  está cheia e devolve false; requestClose do owner inicia terminação. Em
++  Connection.send, queue cheia executa markClosed(OUTPUT_OVERFLOW)/finishClose
++  antes de devolver OVERFLOW. Não são recusas com promessa de retoma na mesma
++  execução/ligação. [Revisão e assinaturas](../memory-bank/bolts/006-rotas/adr-review.md).
++- **Ambiguidade:** Design6 menciona retomar por wake após recusa do owner e7
++  pendência limitada após OVERFLOW; falta distinguir essas hipóteses da recusa
++  local não terminal em cache/coalescer/quota. Não esconder a diferença nem
++  alterar o comportamento real por inferência, depois de o Design ser aprovado.
++- **Proposta recomendada:** preservar contratos atuais/ADR-017/020. Recusa de
++  owner por fila cheia encaminha cleanup pelo hook de terminação; ticket guarda
++  resultado até a conclusão física/callback/continuação terminarem, sem aguardar
++  um wake que o owner já não admite. OVERFLOW encerra só a ligação afetada;
++  diagnosticar, invalidar pendências correntes pela Session exata e acompanhar
++  NeighborDown, sem retry nessa conexão. Recusa local de K/P/quota mantém as
++  regras não terminais aprovadas em Q-C-29. Nenhum recurso é declarado terminado
++  apenas por cancelamento lógico; outras sessões saudáveis são preservadas.
++- **Impacto proposto:** clarificar redação de Design6/7 e expectativas D14/D15/D29
++  ao aprovar esta revisão; não criar D33, aumentar âmbito ou editar owner/
++  transporte. No momento só registo e revisão, sem aplicar alteração Java.
++- **ADR:** não exige substituir decisão aceite se a proposta de preservação for
++  aprovada; não foi provada inviabilidade da ADR-017/020. Sem ADR nova por inferência.
++- **Estado:** decisão pendente,32 oráculos por executar; sem gate externo novo.
++  Implement/Test, V-012/regressão/manual humano/revisão final Denji/integração
++  continuam pendentes. A aprovação de Q-C-29/30 não aprova Q-C-31 automaticamente.
+--- a/docs/tasks/PHASE-03/TASK-012.md
++++ b/docs/tasks/PHASE-03/TASK-012.md
+@@ -105,3 +105,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/memory-bank/bolts/006-rotas/adr-review.md
++++ b/memory-bank/bolts/006-rotas/adr-review.md
+@@ -0,0 +1,261 @@
++---
++unit: "003-rotas"
++bolt: "006-rotas"
++stage: "adr"
++status: "ready-for-review"
++---
++# IMP-009 — Revisão ADR e conferência dos contratos reais
++
++✅ Model e Design completos, incluindo Q-C-28 Opção1 e Q-C-29/30 integralmente
++aprovadas pelo utilizador. ⏳ Esta revisão ADR aguarda aprovação, incluindo a
++concretização Q-C-31 abaixo. Implement/Test não iniciados. D01–D32/V-012 por executar.
++Autorização e entrada: [design-approval.json](../../../experiments/construction/006-rotas/adr-review/design-approval.json)
++e [entry.json](../../../experiments/construction/006-rotas/adr-review/entry.json).
++
++## 1. Método e âmbito efetivamente conferido
++
++Base164ac0dc477c02bc7fde816c761d137ee18ea55d, ramo Denji. Conferência estática de
++fontes agora autorizada na etapa ADR; não confundir com a leitura documental
++anterior de Model/Design. Nenhuma compilação, teste Java, rede ou edição Java.
++
++1 - `routing/RoutingService.java`: existente,0 bytes; API do Design é nova, não
++    assinatura já implementada.
++2 - `streaming/StreamInfo.java`: existente,0 bytes; record de domínio proposto,
++    diferente de ControlMessage.StreamInfo já existente no wire.
++3 - `streaming/StreamCatalog.java`: existente,0 bytes; projeção nova.
++4 - `routing/RoutingServiceTest.java`: existente,0 bytes; D01–D32 por construir.
++5 - `overlay/OverlayNode.java`: existente,10648 bytes; owner, factory do monitor,
++    callback central e lifecycle reais permitem a composição aprovada Q-C-28.
++6 - `overlay/OverlayNodeRoutingTest.java`: ausente; teste novo dentro do âmbito.
++
++Dependências e testes antigos foram lidos apenas para conferir interfaces,
++sem os promover a caminhos autorizados para alteração. RoutingTable, Route,
++RouteCandidate, RouteMetric, NetworkMonitor, LinkMetrics, NeighborManager,
++Neighbor, configuração, protocolo e transporte permanecem intocados.
++
++## 2. Assinaturas reais e ligação às APIs propostas
++
++### 2.1. OverlayNode e owner
++
++[OverlayNode](../../../Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java)
++tem construtor público `(NodeConfiguration, UUID, NeighborManager.Observer)` e
++overload package-private com `NetworkMonitor.Factory`. Ambos permanecem.
++Já expõe start():CompletionStage<Void>, monitoringSnapshot(), snapshot(),
++diagnostics(), discoveryStatus(), candidates(), recoveryStatus(), failure(),
++requestShutdown(int,Duration), awaitTermination(Duration) e close(). RoutingSnapshot
++e overload com RoutingService.Factory são adições futuras, não APIs presentes.
++
++start cria uma única instância de NeighborManager.SerialOwner, empresta-a ao
++manager e ao monitor, agenda monitor.start antes do bind do manager e trata o
++resultado fora do lock do nó. onNeighborEvent já preserva observer.onEvent num
++finally. O observer interno do monitor trata LocalFailure fatal, mas não entrega
++Updated/Invalidated a routing: essa é precisamente a adição autorizada.
++
++`NeighborManager.SerialOwner` real declara:
++
++```java
++int capacity();
++boolean isOwnerThread();
++boolean offer(Runnable event);
++Registration onStop(Runnable cleanup);
++void fail(Throwable cause);
++void requestClose();
++boolean awaitTermination(Duration timeout);
++void close();
++```
++
++Registration tem remove(). O owner existente aceita até16 hooks; manager,
++monitor e routing ocupam três, sem exigir alteração do cap. Queue e stop são
++limitados; hooks de cleanup executam no owner ao terminar, mesmo após descartar
++eventos pendentes. O router precisa do seu hook, não depende da entrega de um
++último NeighborDown. await não pode bloquear esse mesmo owner.
++
++**Pormenor relevante Q-C-31:** offer(false) não representa fila temporariamente
++ocupada com garantia de retoma: fila cheia chama fail e inicia fecho do owner.
++Uma callback que guardou resultado deve permitir recolha pelo cleanup/hook e
++terminação física; não prometer que o wake seguinte executará depois dessa recusa.
++
++### 2.2. Vizinhança e controlo
++
++[NeighborManager](../../../Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java)
++aceita owner emprestado no construtor público; exige capacity igual a
++config.runtime().overlay().eventsCapacity(). As assinaturas são:
++
++```java
++CompletionStage<Connection.SendResult> send(Neighbor.Session expected, ControlMessage message);
++CompletionStage<Boolean> disconnect(Neighbor.Session expected);
++CompletionStage<Void> start();
++void requestClose();
++CompletionStage<NeighborManager.ShutdownReport> requestShutdown(int reason, Duration remainingBudget);
++boolean awaitTermination(Duration timeout);
++```
++
++Session real é `(String nodeId, UUID instanceId, UUID connectionId,
++ControlMessage.Endpoint endpoint)`, imutável e validada. Up/Down/Received incluem
++a Session completa; Received traz a mensagem original. Diagnostic e RepairStarted
++também existem e continuam a chegar ao observer anterior uma vez, sem alteração.
++
++send compara a Session corrente, valida identidade local e admite mensagens
++aplicacionais. Tipos9/10 são permitidos;18/19 têm outra admissão própria e não
++devem ser usados por routing. O comando é postado ao owner mesmo quando o
++chamador já está nele: nada de join/get à espera do resultado nesse owner.
++Manager reserva no máximo E+1 comandos partilhados; B do router não constitui
++reserva exclusiva dessa capacidade nem da queue do owner. Sob sobrecarga, os
++erros operacionais existentes permanecem observáveis, sem garantia de convergência.
++
++SendResult real tem ACCEPTED/CLOSED/OVERFLOW/INVALID_MESSAGE. ACCEPTED é apenas
++admissão. [Connection](../../../Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java)
++partilha FIFO/writer entre send e sendAndFlush; este IMP não precisa de nova porta
++de flush, nem muda a escrita NODE_LEAVE já existente.
++
++**Pormenor relevante Q-C-31:** Connection.send fecha essa ligação quando a queue
++de saída está cheia e devolve OVERFLOW. Router diagnostica e acompanha o Down da
++Session exata; não mantém uma tentativa reutilizável nessa conexão como se fosse
++BACKPRESSURED não terminal. Outras sessões saudáveis não são fechadas por routing.
++Recusa local de K/P/quota é distinta e continua não terminal, como Q-C-29 aprovada.
++
++### 2.3. Monitor, unidades e configuração
++
++[NetworkMonitor](../../../Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java)
++e sua Factory públicas recebem `(NodeConfiguration, UUID,
++NeighborManager.SerialOwner, NetworkMonitor.ControlPort, NetworkMonitor.Observer)`.
++onEvent(NeighborManager.Event) e start exigem owner; snapshot é imutável;
++requestClose devolve CompletionStage<Void> de cleanup lógico e awaitTermination
++confere scheduler e reservas físicas. Observer.onEvent recebe Updated(LinkMetrics),
++Invalidated(Session,Reason), LocalFailure(Optional<Session>,Reason,boolean).
++
++O overload avançado do monitor é package-private em monitoring e **não** será
++usado por RoutingServiceTest. Este injeta LinkMetrics/NetworkMonitor.Event no
++seu próprio router e usa as suas portas/relógio/scheduler públicos propostos.
++OverlayNodeRoutingTest está em overlay e usa o novo overload do nó e a factory
++pública proposta do router. Sem reflection de estado privado como API de produção.
++
++[LinkMetrics](../../../Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java)
++expõe costMicros():OptionalLong já coerente com ceil(ewmaMicros). Consumir esse
++campo diretamente; não calcular segunda EWMA, converter ms ou arredondar de novo.
++SUSPECT com amostra mantém custo; UNMEASURED deixa-o ausente.
++
++[RuntimeConfiguration](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java)
++expõe routing().announceInterval()/candidateTtl()/cacheCapacity()/cacheTtl()/
++floodMaxPerSecond(); overlay().eventsCapacity(); control().maxConnections()/
++shutdownTimeout(). Durations são ms inteiros positivos≤Integer.MAX_VALUE,
++candidateTtl>announceInterval e cacheTtl≥candidateTtl. Conversão exata para ns
++cabe em long. Nenhuma propriedade nova nem hard cap configurável.
++
++[StreamConfiguration](../../../Projeto/src/main/java/pt/uminho/esr/ott/config/StreamConfiguration.java)
++contém streamId/serverId/title/mediaFile/fps/loop, **sem campo codec**. Converter
++ofertas configuradas usando codec1/MJPEG do contrato existente, validar os campos
++antes de iniciar helper/sockets, não abrir mediaFile. Os construtores de config
++não substituem essa validação dos novos metadados de domínio. Non-SERVER não
++ganha ofertas locais. Normal funcionamento continua com descoberta obrigatória.
++
++### 2.4. RoutingTable e metadados
++
++[RoutingTable](../../../Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java)
++tem as assinaturas propostas no Design/IMP-008: bindStream, replaceSession,
++removeSession, setLinkCost, confirmEpoch, offerLocal/removeLocalOffer, announce,
++withdraw, expire e snapshot(UUID). Não tem snapshot global nem catálogo de títulos.
++Router guarda o índice limitado de bindings/referências e projeta snapshots no
++owner, sem ler tabela em threads externas ou pedir método novo à fundação.
++
++Advertisement real recebe UUID streamId, String serverId, UUID serverEpoch,
++SessionKey, long announceSeq, long advertisedCostMicros, List<String> advertisedPath.
++Receber path com≤31 IDs deixa espaço ao append local≤32; origem/último sender,
++unicidade e ausência local são conferidos. Custo0 só em path da fonte. Copies
++defensivas e overflow verificado permanecem.
++
++Status/Reason/changedStreams de Outcome distinguem APPLIED/IGNORED/REJECTED.
++IGNORED não equivale a admissão de candidato. Para Q-C-30, instalar referência
++somente com oferta/candidato efetivamente admitido; uma reserva bindStream não
++basta. Root não guarda title/codec/FPS: comparar a referência no router antes
++de qualquer mutação. Rejeição do conflito não consome seq nem renova prazo.
++
++confirmEpoch é CAS explícito com Optional<UUID> esperado e invalida todos os
++streams da fonte; respeita oito épocas retiradas/cacheTtl. UUID não é ordenado.
++Somente nova seq renova; melhoria de mesmo epoch/seq compara custo e comprimento,
++preserva began; retirada impede ressuscitar a geração enquanto protegida. Isto
++confirma a necessidade de W+geração nova para alternativa pior **ou path diferente
++com custo/saltos iguais**, e o floor persistente no ledger do router.
++
++RouteCandidate fornece path incluindo local, announceSeq, metric opcional,
++generationStartedAtNanos/candidateTtlNanos. Route separa selectedCandidate/
++selectedMetric/knownUpstream de activeUpstream/pendingUpstream/downstreams.
++Estes últimos são vazios por validação; estado INACTIVE/UNAVAILABLE não é vídeo ativo.
++
++### 2.5. Wire
++
++[ControlMessage](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java)
++tem construtor abreviado que usa version2. StreamInfo wire declara exatamente
++UUID streamId,String serverId,String title,int codec,int fps,UUID serverEpoch;
++Announcement contém info,seq,costMicros,path; Withdrawal contém UUID,epoch,seq.
++Usar nome qualificado para distinguir StreamInfo wire de streaming.StreamInfo.
++
++[MessageCodec](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java)
++valida versão2, framing37..65536, UTF-8/título, codec1 e fps1..60.
++[MessageType](../../../Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java)
++tem19 tipos explícitos1,2,4..20, sem3. Codec não valida referência de metadados por
++época: essa é política do router. Framing/identidade inválidos conservam política
++terminal atual; conflito de conteúdo contextual de ANN válido é rejeição local.
++Nenhum recurso/fixture/byte TCP ou UDP alterado por este incremento documental.
++
++## 3. Conformidade das decisões aceites
++
++1 - **ADR-004:** candidato por vizinho, RTT+saltos+ID; admite alternativa antes
++    de dedup, reenvia melhoria que o recetor realmente aceita. Q-C-29 conserva
++    geração de fonte e ordem W/ANN, sem exceção silenciosa a watermark.
++2 - **ADR-016:** usa valores centrais reais, K/P/B/F derivados; S/N/históricos
++    são Q-C-26, não routing.cache.capacity. Não enfraquece validações antes de sockets.
++3 - **ADR-017:** um owner existente; callbacks só depositam resultados físicos e
++    sinalizam trabalho limitado; mudanças de rede no owner. Q-C-31 explicita a
++    consequência real da fila cheia em vez de inventar backpressure recuperável.
++4 - **ADR-018:** dados voláteis, UUID/origem fixos, época por fonte e seq por
++    stream. Q-C-30 mantém referência por época mesmo sem candidatos, com limiteS,
++    sem persistência ou proteção eterna contra épocas antigas.
++5 - **ADR-020:** isolamento por Session/stream, prazo global e falhas tipadas;
++    preserva fecho de ligação por OUTPUT_OVERFLOW e de owner por saturação.
++    Não alegar terminação física pela conclusão lógica de future.
++6 - **ADR-024:** seis caminhos aprovados, documentação/índices alinhados, um IMP;
++    revisão não autoriza antecipar CLI/trace/ativação/vídeo ou alterar fundações.
++7 - **Transversais012/021/026 e034/035:** codec comum/contexto separados,
++    confiança de laboratório explícita, nenhuma dependência/coverage/CI nova;
++    TCP v2 e sessões de reparação são consumidos sem reabrir contratos do extra.
++
++Não foi identificada ADR aceite inviável ou necessidade de substituição/nova
++ADR nesta análise. Q-C-29/30 são concretizações aprovadas das decisões existentes.
++Q-C-31 propõe resolver a ambiguidade de redação contra APIs existentes; permanece
++para revisão antes de Implement, sem adaptar as APIs pela nossa conta.
++
++## 4. Alterações internas justificadas e preservação de testes
++
++OverlayNode terá adições localizadas nos construtores/start/onNeighborEvent/
++callback de monitor/stopImmediately/requestShutdown/awaitTermination e snapshot.
++Inserir composição e cleanup; preservar APIs e finally original. Não é mera
++concatenação no fim do ficheiro, mas está no âmbito explicitamente aprovado.
++Qualquer remoção futura tem de aparecer/ser justificada no walkthrough; aqui zero.
++
++Preservar start/rollback mesmo se factory falha a meio; pedir stop a todos os
++componentes sem short-circuit. requestShutdown mantém resultado/tipo/razões e
++NODE_LEAVE; router fecha gate antes de manager e joins usam prazo restante fora
++do owner/locks. Manager emprestado não fecha o owner por si; nó é o responsável.
++
++OverlayNodeMonitoringTest já verifica constructor/factory anteriores, owner
++partilhado, finally com erro, ERROR real, NODE_LEAVE, rollback e shutdown. Este
++IMP acrescenta OverlayNodeRoutingTest, sem editar/enfraquecer aqueles testes.
++Dados literais de grafos e auxiliares ficam nos dois ficheiros de teste autorizados.
++
++D01–D32 cobrem as obrigações; D07/D08 incluem conflito após expiração total e
++aceitação posterior coerente. D15/D20/D21 cobrem reservas/recibos tardios;
++D25–D29 cobrem composição/API/falhas/recurso. Q-C-31 pede que D29 espere fecho
++do owner em oferta recusada, e D14/D15 distingam recusa local de OVERFLOW terminal.
++Não criar D33 nem contar teste planeado como executado.
++
++## 5. Checkpoint
++
++1 - ✅ Model e Design/Q-C-29/30 aprovados, ADD/índices registados.
++2 - ⏳ Revisão ADR e concretização Q-C-31 para aprovação; sem Implement autorizado.
++3 - [ ] V-012/D01–D32, regressão atual, manual humano antes de aprovar Test.
++4 - [ ] Revisão final atribuída a Denji e integração; nenhum gate externo adicional.
++
++Sem Maven/testes, sockets, alterações Java, commits/push ou outro IMP.
++Se Implement revelar outra incompatibilidade real, parar a parte afetada e
++aplicar ADD11; esta análise não constitui aprovação antecipada de código.
+--- a/memory-bank/bolts/006-rotas/bolt.md
++++ b/memory-bank/bolts/006-rotas/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["003-difundir-anuncios-e-construir-catalogo-e-rotas"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-14T12:31:20Z"
++updated: "2026-11-14T12:53:08Z"
+ started: "2026-11-14T11:47:13Z"
+ completed: null
+-current_stage: "design"
+-stages_completed: ["model"]
++current_stage: "adr"
++stages_completed: ["model", "design"]
+ requires_bolts: ["004-overlay", "021-rotas"]
+ enables_bolts: ["022-rotas"]
+ requires_units: ["002-overlay"]
+@@ -49,7 +49,7 @@
+ ## Etapas e validação
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+-2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-009 e as ADR do ADD.
++2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+@@ -82,7 +82,7 @@
+ Revisão final atribuída a Denji e integração continuam futuras; sem gates externos.
+ Evidência em [model-entry.json](../../../experiments/construction/006-rotas/model-entry.json).
+ 
+-## Checkpoint atual — Design para revisão
++## Histórico — Design apresentado antes da aprovação
+ 
+ Registo 2026-11-14T12:31:20Z. Model aprovado; Q-C-28 Opção1 decidida, ADD ampliado para seis
+ caminhos incluindo OverlayNode e OverlayNodeRoutingTest. Q-C-29 princípios
+@@ -102,3 +102,18 @@
+ O relatório inicial com duas divergências de metadados foi preservado; índice
+ de arquitetura sincronizado sem alterar o validador. [Diff incremental de Design](../../../experiments/construction/006-rotas/design-documents.diff)
+ separado do [acumulado](../../../experiments/construction/006-rotas/design-cumulative-documents.diff).
++
++## Checkpoint atual — revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Design completo, Q-C-29 limites/ordens e Q-C-30 aprovados.
++✅ Model/Design concluídos. ⏳ [Revisão ADR](adr-review.md) preparada, incluindo
++Q-C-31 pendente: preservar owner.offer fatal por fila cheia e ligação fechada
++por OVERFLOW, sem interpretar ambos como backpressure recuperável.
++Seis caminhos mantidos; quatro vazios, OverlayNode existente e novo teste do nó.
++APIs reais/dependências conferidas sem alteração Java. Nenhuma ADR nova aceite
++ou substituição necessária identificada; ADR-004/016/017/018/020/024 reutilizadas.
++D01–D32/V-012 por executar. Implement/Test não iniciados, completed=null.
++Sem gates externos adicionais. Regressão atual, manual humano antes de aprovar
++Test, revisão final Denji e integração continuam obrigatórios.
++Apenas revisão ADR autorizada; sem Maven/sockets/commits/push ou outro IMP.
++[Entrada e aprovação](../../../experiments/construction/006-rotas/adr-review/entry.json).
+--- a/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
++++ b/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
+@@ -2,13 +2,15 @@
+ unit: "003-rotas"
+ bolt: "006-rotas"
+ stage: "design"
+-status: "ready-for-review"
++status: "complete"
+ ---
+ # IMP-009 — Design: anúncios, catálogo e composição no nó
+ 
+-✅ Model aprovado; Q-C-28 Opção1 e princípios Q-C-29 aprovados pelo utilizador.
+-⏳ Design proposto para revisão. Os valores e ordens concretos abaixo ainda
+-requerem aprovação. ADR/Implement/Test não iniciados; V-012 não executado.
++✅ Model e Design completo aprovados pelo utilizador; registo 2026-11-14T12:53:08Z.
++Q-C-28 Opção1 e Q-C-29/30, incluindo limites, ordens e política de metadados,
++aprovados integralmente. Apenas revisão ADR autorizada; Implement/Test não
++iniciados. V-012/D01–D32 não executados. As formulações de proposta no corpo
++seguinte são histórico do documento aprovado; ver registo final e revisão ADR.
+ Registo real e autorização: [model-approval.json](../../../experiments/construction/006-rotas/model-approval.json).
+ 
+ ## 1. Autoridade, âmbito e garantias
+@@ -429,3 +431,16 @@
+ V-012, regressão atual, manual humano antes de Test aprovado, revisão final
+ atribuída a Denji e integração permanecem obrigatórios. Nenhum fecho, Java, Maven,
+ socket, commit/push ou início de outro IMP nesta etapa.
++
++## Aprovação integral e revisão ADR — estado atual
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou expressamente todo o Design, limites/ordens
++Q-C-29 e política Q-C-30. Apenas revisão ADR autorizada. Nenhum Java alterado.
++A [revisão dos contratos reais](adr-review.md) está para aprovação; assinala em
++Q-C-31 que o owner.offer recusa por fila cheia iniciando fecho, e send devolve
++OVERFLOW depois de fechar a ligação. Clarificação proposta contra essas APIs,
++sem alterar por inferência a política aprovada ou as fundações. Restantes
++limites/ordens/metadados aprovados mantidos. Nenhuma proposta Q-C-31 aprovada
++por esta transição. Os32 oráculos continuam por executar, sem gates externos.
++V-012, regressão atual, manual humano antes de aprovar Test, revisão final Denji
++e integração mantêm-se obrigatórios; sem Implement, commits/push ou outro IMP.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -287,3 +287,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ started: "2026-11-14T11:47:13Z"
+-updated: "2026-11-14T12:31:20Z"
++updated: "2026-11-14T12:53:08Z"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-012"]
+ implementation_tasks: ["IMP-009"]
+@@ -72,3 +72,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -318,3 +318,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "006-rotas (in-progress; Design ready for review; Model/Q-C-28 approved, Q-C-29 concrete design pending)"
++next_bolt: "006-rotas (in-progress; ADR review ready; Model/Design/Q-C-29/30 approved; Q-C-31 pending)"
+ 
+ last_completed_bolt: "021-rotas"
+ last_integrated_commit: "3b7aa745cac62b71ac8ce7e036656bf7ab21692f"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -400,3 +400,14 @@
+ ADR-004/016/017/018/020/024 existentes mantêm estado Aceite; revisão de conformidade
+ específica deste IMP ainda não iniciada. Nenhuma ADR nova/substituição aprovada.
+ V-012/regressão/manual humano/revisão final Denji/integração pendentes.
++
++## IMP-009 — Design/Q-C-29/30 aprovados; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Design aprovado integralmente: limites/ordens Q-C-29 e referência
++persistente por UUID/época Q-C-30. ADR-004/016/017/018/020/024 e transversais
++reutilizadas, sem nova ADR/substituição identificada. [Revisão de contratos reais](../bolts/006-rotas/adr-review.md)
++preparada; Q-C-31 propõe esclarecer owner.offer fatal em fila cheia e OVERFLOW
++terminal só na ligação, preservando os contratos existentes. Q-C-31/revisão ADR
++aguardam aprovação; não foram convertidas em decisão aceite. Só Model/Design
++concluídos; Implement/Test e evidências funcionais por executar. Revisão final
++Denji/integração pendentes, sem gate externo adicional.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e24 planned;006-rotas/IMP-009 em Design para revisão; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e24 planned;006-rotas/IMP-009 em revisão ADR; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -71,7 +71,7 @@
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-009. **Estado:** in-progress (Design para revisão; Model aprovado). **Bolt:** 006-rotas.
++**Tarefa:** IMP-009. **Estado:** in-progress (revisão ADR; Model/Design aprovados). **Bolt:** 006-rotas.
+ **Ficheiro:** [003-difundir-anuncios-e-construir-catalogo-e-rotas](intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md).
+ 
+ ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
+@@ -573,3 +573,20 @@
+ Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+ Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+ experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
++
++## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
++
++Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
++metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
++reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
++existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
++Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
++real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
++alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
++current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
++continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
++de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
++adicionais, commits/push ou outro IMP. Parar na revisão ADR.
++Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
++experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
++pendente são histórico e não anulam esta aprovação explícita.

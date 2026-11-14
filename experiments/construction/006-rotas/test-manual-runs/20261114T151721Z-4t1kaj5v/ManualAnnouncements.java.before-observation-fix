@@ -1,0 +1,241 @@
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
+import pt.uminho.esr.ott.bootstrap.BootstrapServer;
+import pt.uminho.esr.ott.config.*;
+import pt.uminho.esr.ott.monitoring.*;
+import pt.uminho.esr.ott.overlay.*;
+import pt.uminho.esr.ott.protocol.*;
+import pt.uminho.esr.ott.routing.*;
+import pt.uminho.esr.ott.streaming.StreamCatalog;
+import pt.uminho.esr.ott.transport.Connection;
+
+/** Interactive public-API acceptance helper; compiled outside the production JAR. */
+public final class ManualAnnouncements {
+    static final UUID A=new UUID(101,1),B=new UUID(101,2),C=new UUID(102,1),D=new UUID(102,2),EPOCH=new UUID(103,1);
+    static final int EXPECTED=53;
+    static final AtomicReference<RealGroup> LIVE=new AtomicReference<>();
+    static final BufferedReader INPUT=new BufferedReader(new InputStreamReader(System.in,StandardCharsets.UTF_8));
+    static boolean interactive;static int checks;
+    static void check(String name,boolean passed){
+        if(Integer.parseInt(name.substring(0,2))!=checks+1)throw new AssertionError("check order: "+name);
+        if(!passed)throw new AssertionError(name);checks++;System.out.println("CHECK_PASS "+name);
+    }
+    static void stage(int number,String description)throws Exception{
+        System.out.println("STAGE "+number+" — "+description);
+        if(interactive){System.out.println("Leia o ESPERADO. Prima Enter para executar; EOF aborta.");if(INPUT.readLine()==null)throw new EOFException("Manual interrompido antes da etapa "+number);}
+    }
+    static UUID instance(String id){return UUID.nameUUIDFromBytes((id+"-manual-instance").getBytes(StandardCharsets.UTF_8));}
+    static List<StreamConfiguration> streams(String id){
+        UUID first=id.equals("S1")?A:C,second=id.equals("S1")?B:D;
+        return List.of(new StreamConfiguration(Path.of("manual-streams"),first,id,"Video A",Path.of("not-read-a.mjpeg"),25,false),
+                new StreamConfiguration(Path.of("manual-streams"),second,id,"Video B",Path.of("not-read-b.mjpeg"),30,false));
+    }
+    static NodeConfiguration config(String id,NodeRole role,int control,int data,int bootstrap){
+        return new NodeConfiguration(Path.of("manual-"+id),id,role,"127.0.0.1","127.0.0.1",control,data,
+                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1",bootstrap)),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),role==NodeRole.SERVER?streams(id):List.of(),RuntimeConfiguration.defaults());
+    }
+    static final class Owner implements NeighborManager.SerialOwner {
+        final ArrayDeque<Runnable> events=new ArrayDeque<>();final List<Runnable> hooks=new ArrayList<>();boolean inside,stopped;
+        public int capacity(){return 4096;}public boolean isOwnerThread(){return inside;}
+        public boolean offer(Runnable r){if(stopped)return false;if(events.size()==capacity()){fail(new IllegalStateException("manual owner full"));return false;}events.addLast(r);return true;}
+        public NeighborManager.Registration onStop(Runnable r){hooks.add(r);return ()->hooks.remove(r);}
+        public void fail(Throwable error){requestClose();}
+        public void requestClose(){if(stopped)return;stopped=true;events.clear();run(()->{for(var r:List.copyOf(hooks))r.run();});}
+        public boolean awaitTermination(Duration d){return stopped;}public void close(){requestClose();}
+        void run(Runnable r){boolean old=inside;inside=true;try{r.run();}finally{inside=old;}}
+        void drain(){int budget=50000;while(!events.isEmpty()){if(--budget==0)throw new AssertionError("owner flood");run(events.removeFirst());}}
+    }
+    static final class Scheduler implements RoutingService.Scheduler {
+        final AtomicLong time;final List<Job> jobs=new ArrayList<>();boolean stopped;
+        final class Job implements RoutingService.Ticket {final Runnable action;final long at;Job(Runnable a,long delay){action=a;at=time.get()+delay;}public void cancel(){jobs.remove(this);}}
+        Scheduler(AtomicLong time){this.time=time;}
+        public RoutingService.Ticket schedule(Runnable r,long delay){if(stopped||jobs.size()>=2)throw new RejectedExecutionException("manual timers");var job=new Job(r,delay);jobs.add(job);return job;}
+        public void requestClose(){stopped=true;jobs.clear();}public boolean awaitTermination(Duration d){return jobs.isEmpty();}public int physicalJobs(){return jobs.size();}
+        boolean fire(){for(var job:List.copyOf(jobs))if(time.get()-job.at>=0){jobs.remove(job);job.action.run();return true;}return false;}
+    }
+    record Sent(Neighbor.Session peer,ControlMessage message){}
+    static final class ModelNode implements AutoCloseable {
+        final String id;final UUID identity;final AtomicLong clock;final Owner owner=new Owner();final Scheduler scheduler;final RoutingService router;
+        final Map<String,Neighbor.Session> peers=new HashMap<>();final List<Sent> sent=new ArrayList<>();BiConsumer<Neighbor.Session,ControlMessage> delivery;
+        ModelNode(String id,boolean source,AtomicLong clock){
+            this.id=id;identity=instance(id);this.clock=clock;scheduler=new Scheduler(clock);
+            router=new RoutingService(config(id,source?NodeRole.SERVER:NodeRole.RELAY,19001,19101,19000),identity,owner,(peer,message)->{
+                sent.add(new Sent(peer,message));if(delivery!=null)delivery.accept(peer,message);return CompletableFuture.completedStage(Connection.SendResult.ACCEPTED);
+            },event->{if(event.fatal())throw new AssertionError("routing local failure: "+event.reason());},clock::get,scheduler);
+            act(router::start);
+        }
+        void act(Runnable action){owner.run(action);owner.drain();}
+        Neighbor.Session up(String peer,UUID peerInstance,long cost){
+            var s=new Neighbor.Session(peer,peerInstance,UUID.randomUUID(),new ControlMessage.Endpoint(peer,peerInstance,"127.0.0.1",19002,19102,NodeRole.RELAY));peers.put(peer,s);
+            act(()->router.onNeighborEvent(new NeighborManager.NeighborUp(s)));
+            act(()->router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(s,LinkMetrics.State.MEASURED,OptionalDouble.of(cost),OptionalLong.of(cost),1,false,OptionalLong.of(clock.get()),0))));return s;
+        }
+        void receive(String peer,ControlMessage message){act(()->router.onNeighborEvent(new NeighborManager.Received(peers.get(peer),message)));}
+        void ad(String peer,UUID epoch,long seq,long cost,String title){
+            var s=peers.get(peer);receive(peer,new ControlMessage(MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),peer,s.instanceId(),new ControlMessage.Announcement(new ControlMessage.StreamInfo(A,"S1",title,1,25,epoch),seq,cost,List.of("S1",peer))));
+        }
+        Route route(UUID stream){return router.snapshot().routes().get(stream);}
+        void expireTimers(){int budget=50000;while(scheduler.fire()){if(--budget==0)throw new AssertionError("timer flood");owner.drain();}owner.drain();}
+        public void close(){router.requestClose();owner.drain();if(!router.awaitTermination(Duration.ofSeconds(1)))throw new AssertionError("model cleanup");owner.close();}
+    }
+    record Frame(String from,String to,ControlMessage message){}
+    static final class Graph implements AutoCloseable {
+        final AtomicLong clock=new AtomicLong();final Map<String,ModelNode> nodes=new LinkedHashMap<>();final ArrayDeque<Frame> wire=new ArrayDeque<>();final List<Long> arrivals=new ArrayList<>();int messages;
+        Graph(){for(String id:List.of("S1","S2","R1","R2","C")){
+            var node=new ModelNode(id,id.startsWith("S"),clock);nodes.put(id,node);node.delivery=(peer,message)->{messages++;wire.addLast(new Frame(id,peer.nodeId(),message));};
+        }}
+        void edge(String a,String b,long cost){var x=nodes.get(a);var y=nodes.get(b);x.up(b,y.identity,cost);y.up(a,x.identity,cost);}
+        void pump(){int budget=50000;while(!wire.isEmpty()){
+            if(--budget==0)throw new AssertionError("wire flood");var frame=wire.removeFirst();var target=nodes.get(frame.to);target.receive(frame.from,frame.message);
+            if(frame.to.equals("C")&&frame.message.payload() instanceof ControlMessage.Announcement ann&&ann.stream().streamId().equals(A)){
+                var route=target.route(A);if(route!=null&&route.selectedMetric().isPresent())arrivals.add(route.selectedMetric().orElseThrow().costMicros());
+            }
+        }}
+        void tick(long ms){clock.addAndGet(ms*1_000_000);for(var n:nodes.values())n.expireTimers();pump();}
+        public void close(){for(var node:nodes.values())node.close();}
+        boolean closed(){return nodes.values().stream().allMatch(n->n.router.snapshot().diagnostics().phase()==RoutingService.Phase.STOPPED&&n.scheduler.physicalJobs()==0);}
+    }
+    static long cost(ModelNode node,UUID stream){return node.route(stream).selectedMetric().orElseThrow().costMicros();}
+    static boolean immutable(Map<?,?> map){try{map.clear();return false;}catch(UnsupportedOperationException expected){return true;}}
+    static void until(BooleanSupplier p,String condition)throws Exception{
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(15);
+        while(!p.getAsBoolean()){if(System.nanoTime()-deadline>=0)throw new AssertionError("deadline: "+condition);Thread.sleep(10);}
+    }
+    static final class RealGroup implements AutoCloseable {
+        final Map<String,OverlayNode> nodes=new LinkedHashMap<>();final List<Integer> controls=new ArrayList<>(),data=new ArrayList<>();
+        final ConcurrentHashMap<UUID,Long> sequences=new ConcurrentHashMap<>();final AtomicReference<ControlMessage> firstAnnounce=new AtomicReference<>();
+        BootstrapServer bootstrap;int bootstrapPort;boolean closed,terminated;
+        RealGroup()throws Exception{
+            LIVE.set(this);var reserved=new ArrayList<ServerSocket>();
+            try{
+                for(int i=0;i<11;i++)reserved.add(new ServerSocket(0,1,InetAddress.getByName("127.0.0.1")));
+                bootstrapPort=reserved.get(0).getLocalPort();for(int i=1;i<=5;i++)controls.add(reserved.get(i).getLocalPort());for(int i=6;i<=10;i++)data.add(reserved.get(i).getLocalPort());
+            }finally{for(var socket:reserved)socket.close();}
+            var ids=List.of("S1","S2","R1","R2","C");var graph=new LinkedHashMap<String,TopologyConfiguration.Node>();
+            for(int i=0;i<ids.size();i++){
+                String id=ids.get(i);Set<String> neighbors=id.startsWith("R")?Set.of("S1","S2","C"):Set.of("R1","R2");
+                graph.put(id,new TopologyConfiguration.Node(id,"127.0.0.1",controls.get(i),data.get(i),role(id),neighbors));
+            }
+            bootstrap=new BootstrapServer(new NodeConfiguration(Path.of("manual-BOOT"),"BOOT",NodeRole.BOOTSTRAP,"127.0.0.1","127.0.0.1",bootstrapPort,0,Optional.empty(),Optional.of(Path.of("manual-graph")),Optional.empty(),Optional.empty(),Optional.of(new TopologyConfiguration(Path.of("manual-graph"),graph)),List.of(),RuntimeConfiguration.defaults()));
+            for(int i=0;i<ids.size();i++){
+                String id=ids.get(i);nodes.put(id,new OverlayNode(config(id,role(id),controls.get(i),data.get(i),bootstrapPort),UUID.randomUUID(),event->{
+                    if(id.equals("C")&&event instanceof NeighborManager.Received received&&received.message().payload() instanceof ControlMessage.Announcement ann){
+                        firstAnnounce.compareAndSet(null,received.message());sequences.merge(ann.stream().streamId(),ann.announceSeq(),Math::max);
+                    }
+                }));
+            }
+        }
+        static NodeRole role(String id){return id.startsWith("S")?NodeRole.SERVER:id.equals("C")?NodeRole.CLIENT:NodeRole.RELAY;}
+        void start()throws Exception{
+            for(var n:nodes.values())n.start().toCompletableFuture().get(6,TimeUnit.SECONDS);
+            until(()->nodes.get("C").routingSnapshot().catalog().entries().size()==4,"four real streams");
+            until(()->nodes.get("C").routingSnapshot().routes().values().stream().filter(r->r.selectedMetric().isPresent()).count()==4,"four real costs");
+        }
+        Map<String,Map<String,Neighbor.Session>> sessions(){var copy=new LinkedHashMap<String,Map<String,Neighbor.Session>>();nodes.forEach((id,node)->copy.put(id,node.snapshot()));return Map.copyOf(copy);}
+        boolean healthy(){return nodes.values().stream().allMatch(n->n.failure().isEmpty());}
+        public synchronized void close(){
+            if(closed)return;closed=true;boolean done=true;
+            for(var node:nodes.values())try{node.requestShutdown(0,Duration.ofSeconds(3));}catch(RuntimeException e){done=false;}
+            for(var node:nodes.values())try{done&=node.awaitTermination(Duration.ofSeconds(3));}catch(RuntimeException e){done=false;}
+            if(bootstrap!=null)try{bootstrap.close();}catch(RuntimeException e){done=false;}
+            terminated=done;
+        }
+        boolean portsFree(){
+            for(int port:controls)try(var s=new ServerSocket()){s.setReuseAddress(true);s.bind(new InetSocketAddress("127.0.0.1",port));}catch(IOException e){return false;}
+            for(int port:data)try(var s=new DatagramSocket(null)){s.setReuseAddress(false);s.bind(new InetSocketAddress("127.0.0.1",port));}catch(IOException e){return false;}
+            try(var s=new ServerSocket()){s.setReuseAddress(true);s.bind(new InetSocketAddress("127.0.0.1",bootstrapPort));}catch(IOException e){return false;}return true;
+        }
+    }
+    static void run(Path jar)throws Exception{
+        stage(1,"ESPERADO: dois servidores/quatro streams; primeira chegada140, depois130 porR2; alternativa140.");
+        check("01-routing-from-frozen-jar",Path.of(RoutingService.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toRealPath().equals(jar));
+        check("02-overlay-from-frozen-jar",Path.of(OverlayNode.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toRealPath().equals(jar));
+        boolean graphClosed,ttlClosed,viewsClosed;
+        try(var graph=new Graph()){
+            graph.edge("S1","R1",40);graph.edge("S1","R2",30);graph.edge("S2","R1",70);graph.edge("S2","R2",90);graph.edge("R1","C",100);graph.edge("R2","C",100);graph.pump();var c=graph.nodes.get("C");
+            check("03-four-controlled-streams",c.router.snapshot().catalog().entries().size()==4);
+            check("04-source1-a-cost130-viaR2",cost(c,A)==130&&c.route(A).knownUpstream().orElseThrow().nodeId().equals("R2"));
+            check("05-source1-b-cost130",cost(c,B)==130);check("06-source2-c-cost170",cost(c,C)==170);check("07-source2-d-cost170",cost(c,D)==170);
+            check("08-alternative140-retained",c.route(A).candidates().stream().anyMatch(x->x.metric().isPresent()&&x.metric().orElseThrow().costMicros()==140));
+            check("09-later-better-arrival",graph.arrivals.indexOf(140L)>=0&&graph.arrivals.indexOf(130L)>graph.arrivals.indexOf(140L));
+            check("10-selection-never-authorizes-data",c.router.snapshot().routes().values().stream().allMatch(r->r.activeUpstream().isEmpty()&&r.pendingUpstream().isEmpty()&&r.downstreams().isEmpty()));
+            check("11-defensive-catalog-and-routes",immutable(c.router.snapshot().catalog().entries())&&immutable(c.router.snapshot().routes()));
+            stage(2,"ESPERADO: ciclo com arestaR1-R2=200 conserva130; paths únicos, geração estabiliza; seq nova aos2s simulados.");
+            graph.edge("R1","R2",200);graph.pump();check("12-cycle-keeps-best130",cost(c,A)==130);
+            check("13-no-repeated-path-id",graph.nodes.values().stream().flatMap(n->n.router.snapshot().routes().values().stream()).flatMap(r->r.candidates().stream()).allMatch(x->new HashSet<>(x.path()).size()==x.path().size()));
+            int messages=graph.messages;graph.pump();check("14-fixed-generation-quiescence",graph.messages==messages&&graph.wire.isEmpty());
+            var original=graph.nodes.get("R1").sent.stream().filter(s->s.peer().nodeId().equals("C")&&s.message().payload() instanceof ControlMessage.Announcement a&&a.stream().streamId().equals(A)).findFirst().orElseThrow().message();
+            long began=c.route(A).selectedCandidate().orElseThrow().generationStartedAtNanos();c.receive("R1",original);graph.pump();check("15-duplicate-no-flood-or-ttl-renewal",messages==graph.messages&&c.route(A).selectedCandidate().orElseThrow().generationStartedAtNanos()==began);
+            graph.tick(2000);check("16-genuine-source-generation",c.route(A).selectedCandidate().orElseThrow().announceSeq()==1);
+            check("17-cycle-keeps-four-streams",c.router.snapshot().catalog().entries().size()==4);
+            stage(3,"ESPERADO: retirar S1 elimina apenas A/B; S2 mantém C/D=170; retomarS1 cria geração nova.");
+            var old=c.router.snapshot();var s1=graph.nodes.get("S1");s1.act(()->{s1.router.setLocalAvailable(A,false);s1.router.setLocalAvailable(B,false);});graph.pump();
+            check("18-previous-snapshot-immutable",old.catalog().entries().size()==4);check("19-source1-withdraw-leaves-two",c.router.snapshot().catalog().entries().size()==2);
+            check("20-source2-c-preserved",cost(c,C)==170);check("21-source2-d-preserved",cost(c,D)==170);
+            check("22-only-source2-visible",c.router.snapshot().catalog().entries().values().stream().allMatch(e->e.info().serverId().equals("S2")));
+            s1.act(()->{s1.router.setLocalAvailable(A,true);s1.router.setLocalAvailable(B,true);});graph.pump();check("23-resume-four-streams",c.router.snapshot().catalog().entries().size()==4);
+            check("24-resume-new-sequence",c.route(A).selectedCandidate().orElseThrow().announceSeq()>1);
+            graph.close();graphClosed=graph.closed();
+        }
+        stage(4,"ESPERADO: relógio avança8s dentro do primeiro envio; só1 ANNOUNCE, candidato expira sem desligar3 sessões.");
+        try(var receiver=new ModelNode("C",false,new AtomicLong())){
+            receiver.up("A",instance("A"),10);receiver.up("D",instance("D"),20);receiver.up("E",instance("E"),30);
+            var count=new AtomicInteger();receiver.delivery=(p,m)->{if(m.type()==MessageType.STREAM_ANNOUNCE&&count.getAndIncrement()==0)receiver.clock.addAndGet(8_000_000_000L);};receiver.ad("A",EPOCH,1,100,"Video A");
+            check("25-only-first-announce-before-expiry",count.get()==1);check("26-selected-candidate-expired",receiver.route(A).selectedCandidate().isEmpty());
+            check("27-expired-catalog-empty",receiver.router.snapshot().catalog().entries().isEmpty());check("28-sessions-survive-expiry",receiver.router.snapshot().diagnostics().sessions()==3);
+            check("29-reference-not-renewed-as-candidate",receiver.router.snapshot().diagnostics().references()==1&&receiver.router.snapshot().capturedAtNanos()==8_000_000_000L);
+            receiver.close();ttlClosed=receiver.scheduler.physicalJobs()==0;
+        }
+        stage(5,"ESPERADO: aos8s metadados ainda1s, custo/upstream ausentes; conflito após17s não altera referência; época nova pode mudar título.");
+        try(var receiver=new ModelNode("C",false,new AtomicLong())){
+            receiver.up("A",instance("A"),10);receiver.up("B",instance("B"),20);receiver.ad("A",EPOCH,1,100,"Video A");receiver.clock.set(1_000_000_000L);receiver.ad("B",EPOCH,1,200,"Video A");
+            var old=receiver.router.snapshot();check("30-original-selection-a110",old.catalog().entries().get(A).metric().orElseThrow().costMicros()==110);
+            var projected=old.catalog().visibleAt(8_000_000_000L);var e=projected.entries().get(A);check("31-metadata-valid-until9s",e!=null&&e.remainingNanos().orElseThrow()==1_000_000_000L);
+            check("32-no-expired-selection-dated-now",e.metric().isEmpty()&&e.knownUpstream().isEmpty()&&e.state()==RouteState.UNAVAILABLE);
+            check("33-projection-expires-at9s",projected.visibleAt(9_000_000_000L).entries().isEmpty());
+            check("34-projection-pure-and-old-view-unchanged",receiver.router.snapshot()==old&&receiver.clock.get()==1_000_000_000L&&old.catalog().entries().get(A).metric().orElseThrow().costMicros()==110);
+            receiver.clock.set(17_000_000_000L);receiver.expireTimers();check("35-reference-survives-all-expiry",receiver.router.snapshot().catalog().entries().isEmpty()&&receiver.router.snapshot().diagnostics().references()==1);
+            receiver.ad("A",EPOCH,100,100,"Contradictory");check("36-late-conflict-rejected",receiver.router.snapshot().catalog().entries().isEmpty());
+            receiver.ad("A",EPOCH,100,100,"Video A");check("37-same-rejected-sequence-can-be-valid",cost(receiver,A)==110&&receiver.router.snapshot().catalog().entries().get(A).info().title().equals("Video A"));
+            var epoch2=new UUID(103,2);receiver.ad("A",epoch2,0,100,"New epoch");check("38-confirmed-new-epoch-can-change-title",receiver.route(A).serverEpoch().orElseThrow().equals(epoch2)&&receiver.router.snapshot().catalog().entries().get(A).info().title().equals("New epoch"));
+            var current=receiver.route(A);receiver.ad("A",EPOCH,101,100,"Video A");check("39-retired-epoch-cannot-return",current.equals(receiver.route(A)));
+            receiver.close();viewsClosed=receiver.scheduler.physicalJobs()==0;
+        }
+        stage(6,"ESPERADO TCP REAL: cinco nós/dois servidores/quatro streams; bootstrap parado; gerações continuam; saídaS1 preservaS2.");
+        try(var group=new RealGroup()){
+            group.start();var c=group.nodes.get("C");check("40-real-four-streams",c.routingSnapshot().catalog().entries().size()==4);
+            check("41-real-neighbors-present",group.nodes.entrySet().stream().allMatch(x->x.getValue().snapshot().keySet().containsAll(x.getKey().startsWith("R")?Set.of("S1","S2","C"):Set.of("R1","R2"))));
+            check("42-real-costs-without-data-activation",c.routingSnapshot().routes().values().stream().filter(r->r.selectedMetric().isPresent()&&r.activeUpstream().isEmpty()&&r.downstreams().isEmpty()).count()==4);
+            var frame=group.firstAnnounce.get();check("43-real-tcp-v2-existing-codec",frame!=null&&frame.version()==2&&MessageCodec.decode(MessageCodec.encode(frame)).equals(frame));
+            check("44-real-monitor-measured",c.monitoringSnapshot().links().values().stream().anyMatch(m->m.sampleCount()>0&&m.costMicros().isPresent()));
+            var connections=group.sessions();long sequence=group.sequences.getOrDefault(A,-1L);group.bootstrap.close();boolean refused=false;
+            try(var socket=new Socket()){socket.connect(new InetSocketAddress("127.0.0.1",group.bootstrapPort),300);}catch(IOException expected){refused=true;}
+            check("45-bootstrap-listener-stopped",refused);until(()->group.sequences.getOrDefault(A,-1L)>sequence,"generation after bootstrap stop");
+            check("46-announcements-continue-without-bootstrap",c.routingSnapshot().catalog().entries().size()==4&&group.sequences.get(A)>sequence);
+            check("47-same-physical-sessions-after-bootstrap-stop",connections.equals(group.sessions()));
+            var notification=group.nodes.get("S1").requestShutdown(0,Duration.ofSeconds(3)).toCompletableFuture().get(3,TimeUnit.SECONDS);
+            boolean sourceTerminated=group.nodes.get("S1").awaitTermination(Duration.ofSeconds(3));
+            until(()->c.routingSnapshot().catalog().entries().size()==2&&c.routingSnapshot().catalog().entries().values().stream().allMatch(x->x.info().serverId().equals("S2")),"only S2 remains");
+            check("48-source1-exit-preserves-source2",c.routingSnapshot().catalog().entries().size()==2&&c.routingSnapshot().catalog().entries().containsKey(C)&&c.routingSnapshot().catalog().entries().containsKey(D));
+            check("49-healthy-survivors",group.healthy()&&c.snapshot().keySet().containsAll(Set.of("R1","R2")));
+            stage(7,"ESPERADO: NODE_LEAVE confirmado, todos os owners/helpers terminados, portas libertadas; MANUAL_PASS só após53 checks.");
+            check("50-source1-graceful-notification",sourceTerminated&&notification.attempts().size()==2&&notification.attempts().stream().allMatch(a->a.outcome()==NeighborManager.LeaveOutcome.LOCAL_WRITE_CONFIRMED));
+            group.close();check("51-all-real-components-terminated",group.terminated&&group.healthy());check("52-real-test-ports-reusable",group.portsFree());
+        }finally{LIVE.set(null);}
+        check("53-controlled-schedulers-terminated",graphClosed&&ttlClosed&&viewsClosed);System.out.println("NO_RESOURCES_PENDING");
+    }
+    public static void main(String[] args)throws Exception{
+        interactive=args.length>0&&args[0].equals("--interactive");Path jar=Path.of(args[1]).toRealPath();
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{var group=LIVE.get();if(group!=null)group.close();},"manual-cleanup"));
+        System.out.println("CODE_SOURCE="+RoutingService.class.getProtectionDomain().getCodeSource().getLocation());
+        try{run(jar);if(checks!=EXPECTED)throw new AssertionError("check count");System.out.println("CHECK_COUNT="+checks);System.out.println("MANUAL_PASS");}
+        catch(Throwable error){var group=LIVE.getAndSet(null);if(group!=null)group.close();System.out.println("CHECK_FAIL "+error);error.printStackTrace(System.out);System.out.println("CHECK_COUNT="+checks);System.out.println("MANUAL_FAIL");System.exit(1);}
+    }
+}

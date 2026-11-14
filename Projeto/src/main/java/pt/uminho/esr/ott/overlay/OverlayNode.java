@@ -2,6 +2,7 @@ package pt.uminho.esr.ott.overlay;
 
 import pt.uminho.esr.ott.config.NodeConfiguration;
 import pt.uminho.esr.ott.monitoring.NetworkMonitor;
+import pt.uminho.esr.ott.routing.RoutingService;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,8 @@ public final class OverlayNode implements AutoCloseable {
     private final NeighborManager.Observer observer;
     private final NetworkMonitor.Factory monitorFactory;
     private volatile NetworkMonitor monitor;
+    private final RoutingService.Factory routingFactory;
+    private volatile RoutingService routing;
     private final AtomicReference<Throwable> failure = new AtomicReference<>();
     private final CompletableFuture<Void> started = new CompletableFuture<>();
     private NeighborManager.SerialOwner owner;
@@ -30,10 +33,19 @@ public final class OverlayNode implements AutoCloseable {
     }
     OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
             NetworkMonitor.Factory monitorFactory) {
+        this(configuration, instanceId, observer, monitorFactory, RoutingService::new);
+    }
+    OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
+            NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory) {
         this.configuration = Objects.requireNonNull(configuration);
         instance = Objects.requireNonNull(instanceId); this.observer = Objects.requireNonNull(observer);
         this.monitorFactory = Objects.requireNonNull(monitorFactory);
+        this.routingFactory = Objects.requireNonNull(routingFactory);
+        RoutingService.validateConfiguration(configuration, instanceId);
         new NeighborManager(configuration, instance, observer);
+    }
+    public RoutingService.Snapshot routingSnapshot() {
+        var r = routing; return r == null ? RoutingService.emptySnapshot() : r.snapshot();
     }
     public NetworkMonitor.Snapshot monitoringSnapshot() {
         var m = monitor;
@@ -54,11 +66,16 @@ public final class OverlayNode implements AutoCloseable {
                             pt.uminho.esr.ott.protocol.ControlMessage message) { return service.send(session, message); }
                     public CompletionStage<Boolean> disconnect(Neighbor.Session session) { return service.disconnect(session); }
                 }, event -> {
-                    if (event instanceof NetworkMonitor.LocalFailure f && f.fatal())
-                        failMonitoring(new IllegalStateException("Network monitor: " + f.reason()));
+                    try { var r = routing; if (r != null) r.onMetrics(event); }
+                    finally {
+                        if (event instanceof NetworkMonitor.LocalFailure f && f.fatal())
+                            failMonitoring(new IllegalStateException("Network monitor: " + f.reason()));
+                    }
                 }));
+                routing = Objects.requireNonNull(routingFactory.create(configuration, instance, owner, service::send,
+                        event -> { if (event.fatal()) failMonitoring(new IllegalStateException("Routing: " + event.reason())); }));
                 if (!owner.offer(() -> {
-                    try { monitor.start(); }
+                    try { monitor.start(); routing.start(); }
                     catch (RuntimeException e) { failMonitoring(e); }
                 })) throw new RejectedExecutionException("Node start owner rejected");
                 // Register the manager's rollback hook before close can acquire the node lock.
@@ -82,7 +99,8 @@ public final class OverlayNode implements AutoCloseable {
                     || d.phase() == NeighborManager.Phase.CLOSED && (d.reason() == NeighborManager.Reason.RESOURCE_LIMIT
                     || d.reason() == NeighborManager.Reason.CONSUMER_FAILURE)))
                 failure.compareAndSet(null, new IllegalStateException("Neighbor service: " + d.reason()));
-            var m = monitor; if (m != null) m.onEvent(event);
+            try { var m = monitor; if (m != null) m.onEvent(event); }
+            finally { var r = routing; if (r != null) r.onNeighborEvent(event); }
         } catch (RuntimeException e) { failMonitoring(e); }
         finally { observer.onEvent(event); }
     }
@@ -94,9 +112,14 @@ public final class OverlayNode implements AutoCloseable {
             if (!closed) { closed = true; stopStarted = System.nanoTime(); stopBudget = configuration.runtime().control().shutdownTimeout().toNanos(); }
         }
         started.completeExceptionally(new IllegalStateException("Node closed"));
-        var mon = monitor; if (mon != null) mon.requestClose();
-        var service = manager; if (service != null) service.requestClose();
-        var serial = owner; if (serial != null) serial.requestClose();
+        try { var r = routing; if (r != null) r.requestClose(); }
+        finally {
+            try { var mon = monitor; if (mon != null) mon.requestClose(); }
+            finally {
+                try { var service = manager; if (service != null) service.requestClose(); }
+                finally { var serial = owner; if (serial != null) serial.requestClose(); }
+            }
+        }
     }
     public Map<String, Neighbor.Session> snapshot() { var m = manager; return m == null ? Map.of() : m.snapshot(); }
     public Map<String, Neighbor> diagnostics() { var m = manager; return m == null ? Map.of() : m.diagnostics(); }
@@ -118,6 +141,9 @@ public final class OverlayNode implements AutoCloseable {
             result = new CompletableFuture<>(); shutdown = result.minimalCompletionStage();
         }
         started.completeExceptionally(new IllegalStateException("Node shutting down"));
+        CompletionStage<Void> routeCleanup;
+        try { var r = routing; routeCleanup = r == null ? CompletableFuture.completedStage(null) : r.requestClose(); }
+        catch (RuntimeException e) { routeCleanup = CompletableFuture.failedStage(e); }
         CompletionStage<Void> monitoring;
         try { var mon = monitor; monitoring = mon == null ? CompletableFuture.completedStage(null) : mon.requestClose(); }
         catch (RuntimeException e) { monitoring = CompletableFuture.failedStage(e); }
@@ -128,7 +154,7 @@ public final class OverlayNode implements AutoCloseable {
                     : service.requestShutdown(reason, Duration.ofNanos(left(stopBudget, stopStarted)));
         } catch (RuntimeException e) { leaving = CompletableFuture.failedStage(e); }
         var leave = leaving;
-        CompletableFuture.allOf(monitoring.toCompletableFuture(), leave.toCompletableFuture()).whenComplete((v, error) -> {
+        CompletableFuture.allOf(routeCleanup.toCompletableFuture(), monitoring.toCompletableFuture(), leave.toCompletableFuture()).whenComplete((v, error) -> {
             if (error != null) result.completeExceptionally(error); else result.complete(leave.toCompletableFuture().join());
         });
         return shutdown;
@@ -153,6 +179,11 @@ public final class OverlayNode implements AutoCloseable {
         if (mon != null) {
             if (!done) mon.requestClose();
             done &= mon.awaitTermination(Duration.ofNanos(left(nanos, began)));
+        }
+        var r = routing;
+        if (r != null) {
+            if (!done) r.requestClose();
+            done &= r.awaitTermination(Duration.ofNanos(left(nanos, began)));
         }
         if (serial != null) {
             serial.requestClose(); done &= serial.awaitTermination(Duration.ofNanos(left(nanos, began)));

@@ -1055,9 +1055,12 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Descrição/entrega:** Difundir anúncios e catálogo. Produzir este incremento e a sua prova, preservando os restantes componentes.
 - **Fase/unidade/tamanho:** PHASE-03 / 003-rotas / M.
 - **Bolt/origem:** [006-rotas](memory-bank/bolts/006-rotas/bolt.md); TASK-012.
-- **Ficheiros:** `routing/RoutingService.java`, `streaming/StreamInfo.java`, `streaming/StreamCatalog.java`, `routing/RoutingServiceTest.java`.
+- **Ficheiros:** `routing/RoutingService.java`, `streaming/StreamInfo.java`, `streaming/StreamCatalog.java`, `routing/RoutingServiceTest.java`, `overlay/OverlayNode.java`, `overlay/OverlayNodeRoutingTest.java`.
+- **Revisão de âmbito aprovada — Q-C-28 Opção1:** composição de routing no owner e lifecycle existentes de OverlayNode; conservar APIs, observadores e testes anteriores. Os caminhos de teste usam src/test/java e os restantes src/main/java. Sem CLI de catálogo/trace neste IMP.
+- **Política aprovada integralmente — Q-C-29:** fonte é dona de epoch/seq; relay publica a geração do candidato selecionado, sem fabricar seq ou renovar TTL por melhoria. W pendente precede ANN novo; alternativa pior ou path diferente com custo/saltos iguais exige retirada e geração nova. K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N); quota F/janela1s por stream/nodeId conservada após Down, timers2/turnos64/16. Saturação local preserva candidatos/estado saudável e os recibos antigos não alteram Root/TTL. [Design aprovado](memory-bank/bolts/006-rotas/ddd-02-technical-design.md); revisão ADR e Q-C-31 aprovadas: recusa local recuperável, OVERFLOW terminal na ligação, owner saturado limpa pelos hooks sem aguardar novo wake.
+- **Metadados aprovados — Q-C-30:** oferta local/primeiro candidato remoto admitido fixa title/codec/FPS por UUID/origem/época; conflito rejeitado inteiro sem consumir seq/renovar TTL ou alterar candidato saudável. Referência persiste após expiração total, uma por binding na época corrente≤16384, sem TTL próprio; só confirmEpoch aceite/reinício permite mudança, respeitando Q-C-26.
 - **Dependências:** IMP-006 (004-overlay), IMP-008 (021-rotas).
-- **ADR:** ADR-004, ADR-018, ADR-024.
+- **ADR:** ADR-004, ADR-016, ADR-017, ADR-018, ADR-020, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-005, REQ-006, REQ-009, REQ-012, REQ-014, REQ-016.
 - **Testes exigidos:** V-012. V-012: grafo em losango e grafo cíclico convergem para custo esperado; segunda chegada melhor é aceite; quatro streams aparecem; retirar uma origem não remove streams da outra; flooding estabiliza.
 - **Gates:** nenhum externo adicional.

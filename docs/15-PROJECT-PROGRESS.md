@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012–013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em Test, manual humano pendente; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso; outro IMP não iniciado.
+**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Test; clean verify1256/0/0/0 e manual Codex53; repetição humana/aprovação Test pendentes.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -108,7 +108,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
-| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | TODO | V-012: NÃO EXECUTADO |
+| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Test técnico: clean verify1256/0/0/0; manual Codex53; humano/aprovação Test pendentes |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
@@ -699,7 +699,7 @@ necessários para fecho. Sem commits/push ou outro IMP; IMP-035 continua planead
 ## IMP-034 — correção de correlação D07e
 
 Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
-e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
+e de geração antiga, preservando a sessão e a consulta corrente. 143 testes
 incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
 anterior ficam como histórico. [Walkthrough, red/green e evidência](../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
 Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
@@ -1066,3 +1066,111 @@ Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
 Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
 preexistente e target gerado fora dos commits. Publicação main autorizada,
 resultado só será declarado após push efetivo; nenhum force push.
+
+
+## IMP-009 / 006-rotas — Model iniciado, para revisão
+
+Registo 2026-11-14T11:54:45Z. Opção1 do utilizador autoriza apenas Model. Base limpa
+164ac0dc477c02bc7fde816c761d137ee18ea55d, Denji/main alinhados; dependências
+004-overlay/021-rotas e unidade002-overlay complete, IMP-007 transitivo complete.
+JAR e seis hashes revistos do IMP-008 conferidos. Modelo de anúncios/catálogo,
+validação/path, gerações, cache/quotas, épocas, callbacks e M01–M22/V-012 preparados.
+Q-C-28 propõe composição em OverlayNode/OverlayNodeRoutingTest além dos quatro
+caminhos; Q-C-29 propõe concretização de geração/retirada/publicidade/saturação.
+Ambas pendentes, sem ADD/ADR/âmbito alterado por inferência. current_stage=model,
+stages_completed=[],completed=null; critérios funcionais por cumprir. V-012,
+regressão/manual atuais, revisão final Denji e integração pendentes. Sem gates
+externos adicionais. Sem análise/alteração Java, Maven, sockets, commits/push
+ou outro IMP. Unidade003-rotas/PHASE-03 permanecem em progresso.
+Artefacto: memory-bank/bolts/006-rotas/ddd-01-domain-model.md; evidência em
+experiments/construction/006-rotas/. Parar antes de Design.
+
+## IMP-009 / 006-rotas — Model aprovado; Design para revisão
+
+Registo 2026-11-14T12:31:20Z. Utilizador aprovou Model, Q-C-28 Opção1 e princípios Q-C-29.
+ADD/IMP-009 agora explicita seis caminhos: os quatro originais mais OverlayNode
+java e OverlayNodeRoutingTest java, compondo routing no owner/lifecycle existentes.
+Design propõe limites de cache/pendências/quotas/tickets, ordens de retirada e
+publicação por geração, preservação de TTL e tratamento de callbacks antigos.
+D01–D32/V-012 planeados, nenhum executado. Só Model concluído; current_stage=design,
+stages_completed=[model], completed=null. ADR/Implement/Test não iniciados.
+V-012, regressão atual, manual humano antes de aprovar Test, revisão final atribuída
+a Denji e integração pendentes; sem gates externos adicionais. Nenhum Java,
+Maven, sockets, commit/push ou início de outro IMP. Parar antes de ADR.
+Artefacto: memory-bank/bolts/006-rotas/ddd-02-technical-design.md; evidência em
+experiments/construction/006-rotas/. Registos anteriores de Model pendente são histórico.
+
+## IMP-009 / 006-rotas — Design aprovado; revisão ADR para aprovação
+
+Registo 2026-11-14T12:53:08Z. Utilizador aprovou Design completo, limites/ordens Q-C-29 e
+metadados Q-C-30. ADD e decisões registados; seis caminhos mantidos. Assinaturas
+reais conferidas: quatro ficheiros vazios, OverlayNode com owner/monitor/lifecycle
+existentes, OverlayNodeRoutingTest novo; dependências apenas lidas.
+Revisão ADR preparada, incluindo Q-C-31 proposta para explicitar recusa fatal
+real do owner.offer e OVERFLOW terminal só na ligação. Não inventar retoma nem
+alterar fundações. Sem nova ADR/substituição aceite, sem Java/Maven/socket.
+current_stage=adr; stages_completed=[model,design]; completed=null;32 oráculos
+continuam por executar. Implement/Test/V-012/regressão atual/manual humano antes
+de Test aprovado/revisão final Denji/integração pendentes. Sem gates externos
+adicionais, commits/push ou outro IMP. Parar na revisão ADR.
+Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+pendente são histórico e não anulam esta aprovação explícita.
+
+## IMP-009 / 006-rotas — Implement para revisão antes de Test
+
+Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
+D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
+RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
+testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
+transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
+Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
+anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
+V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
+aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
+estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
+current_stage=implement; stages_completed=[model,design,adr]; completed=null.
+Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
+Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
+Evidência: experiments/construction/006-rotas/implement/.
+
+## IMP-009 — Implement reapresentado após correção TTL/visibleAt
+
+Registo 2026-11-14T15:00:17Z. Dois desvios reproduzidos em39 testes/2 falhas antes da correção;
+ANNOUNCE revalida publicação/Session/TTL na fronteira da porta com tempo novo.
+visibleAt remoto avançado preserva metadados válidos e deixa custo/upstream
+explicitamente ausentes porque o snapshot não contém candidatos para recalcular;
+projeção pura, conservadora, snapshots anteriores intactos. Regressão final15
+JDK21:1256/0/0/0,16 XML. Só três Java dentro dos seis caminhos alterados nesta
+revisão; evidências anteriores preservadas. Implement para revisão,32 oráculos
+mantidos/D32 parcial, sem Test/fecho/commits/push ou outro IMP. Clean verify,
+JAR novo, manual humano, revisão final Denji e integração pendentes.
+Walkthrough: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
+Evidência: experiments/construction/006-rotas/implement-revision-ttl/.
+
+## IMP-009 / 006-rotas — Test técnico, repetição humana pendente
+
+Registo 2026-11-14T15:24:36Z. Implement e correções TTL/visibleAt aprovados explicitamente;
+Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
+Clean verify JDK21:1256 testes/0 falhas/0 erros/0 skips,16 XML,45 testes
+novos e1211 anteriores. JAR novo411736bytes/SHA256
+1a1beb8b849ccf505e4266dda199fe439f93e2a54e2297058a2d43eb2265af93.
+237 hashes de Projeto/ preservados, nenhum Java/teste alterado nesta etapa.
+Manual Codex53 checks/MANUAL_PASS/Java0/recursos terminados passou; ensaio inicial
+falhado e ajuste de observação do auxiliar preservados, sem alterar JAR/fontes.
+Roteiro humano pronto; nenhuma execução humana ou aprovação Test presumida.
+D32 parcial; revisão final atribuída a Denji e integração pendentes. Sem gates
+externos adicionais; sem fecho/commits/push ou início de outro IMP.
+Relatório: memory-bank/bolts/006-rotas/ddd-03-test-report.md.
+Manual: experiments/construction/006-rotas/manual-instructions.md.
+
+## IMP-009 — Test/manual humano/revisão final aceites; integração pendente
+
+Registo 2026-11-14T15:35:23Z. Utilizador aprovou Test, incluindo manual Luis da execução
+20261114T152915Z-8s1k6ruu:53 CHECK_PASS/MANUAL_PASS/Java0,passed=true,
+hashes corretos e recursos terminados. Report original preservado. Revisão final
+atribuída a Denji confirmada concluída pelo utilizador; sem contacto inferido.
+Clean verify1256/0/0/0 e JAR1a1beb8b... intactos. Fecho e commit para main
+autorizados. Integração será comprovada antes de DONE; bolt/história/TASK ainda
+em progresso, D32 parcial apenas até integração. Sem push/novo IMP.
+Artefactos de aprovação em experiments/construction/006-rotas/closure/.

@@ -1017,3 +1017,156 @@ Só revisão ADR autorizada. A [análise](../memory-bank/bolts/021-rotas/adr-rev
 está para aprovação; não há autorização de Implement, commits ou push. A futura
 ponte de métricas/owner não existe na composição atual e terá de ser definida no
 checkpoint respetivo, sem alargar os seis caminhos deste IMP por inferência.
+
+
+## Q-C-28 — IMP-009: composição operacional fora dos quatro caminhos
+
+- **Registo:** 2026-11-14T11:54:45Z; estado inicial PROPOSTA; **DECIDIDA/APROVADA — Opção1**, só Design agora autorizado.
+- **Evidência documental:** [revisão ADR do IMP-008](../memory-bank/bolts/021-rotas/adr-review.md)
+  documenta que OverlayNode publica monitoringSnapshot mas não encaminha
+  Updated/Invalidated para routing nem expõe subscrição/owner público. Não é
+  resultado de uma análise nova de Java em Model.
+- **Lacuna:** ADD/IMP-009 só autoriza RoutingService.java, StreamInfo.java,
+  StreamCatalog.java e RoutingServiceTest.java. Definir o serviço não o compõe
+  automaticamente no programa; não há autorização de alterar OverlayNode.
+- **Opção1 recomendada:** ampliar explicitamente o âmbito para seis caminhos,
+  acrescentando Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java e
+  Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeRoutingTest.java.
+  Compor início/eventos de vizinhança+métricas/portas de controlo/snapshots e
+  shutdown/rollback no owner existente, preservando observadores e testes anteriores.
+  CLI de catálogo/trace continua no IMP-010; sem antecipar vídeo ou tipos wire.
+- **Opção2:** conservar quatro caminhos, declarar apenas núcleo com portas
+  controladas, e planear/autorizar composição operacional noutra tarefa antes de
+  alegar anúncios/catálogo na aplicação. Exige ajustar a entrega/rastreabilidade
+  de forma explícita; não usar uma bancada isolada como prova do programa integrado.
+- **Impacto:** Design precisa de verificar APIs/lifecycle reais na etapa própria.
+  Se forem precisos outros ficheiros ou decisão aceite inviável, apresentar antes
+  de editar. ADD/interfaces não foram alterados por esta proposta.
+- **Oráculos:** M18/M19/M20/V-012; nenhum executado.
+- **Decisão humana registada em 2026-11-14T12:31:20Z:** Opção1 expressamente aprovada; ADD/IMP-009 ampliado para seis caminhos. Compor routing no owner/lifecycle existentes, preservando APIs/observadores. Aprovação autoriza apenas Design, sem edição Java. As descrições acima da lacuna e das opções são histórico anterior à decisão.
+
+
+## Q-C-29 — IMP-009: geração, retirada, publicidade e saturação
+
+- **Registo:** 2026-11-14T11:54:45Z; estado inicial PROPOSTA; **DECIDIDA/APROVADA INTEGRALMENTE — limites e ordens incluídos**.
+- **Fontes:** ADR-004/018, docs07 ANNOUNCE9/WITHDRAW10, TASK-012 e Q-C-26 aprovada.
+  Root/table aceita só melhoria na mesma geração sem renovar prazo; retirada
+  instala watermark que impede repor ANNOUNCE dessa geração no mesmo slot.
+- **Propostas de concretização para revisão do Model:**
+  1. A fonte gera a sequência por stream/epoch; relays conservam a geração.
+     Publicidade usa path/custo selecionados e sequência desse candidato, sem
+     copiar a seq de outra alternativa nem inventar uma seq superior no relay.
+     Admissão de candidatos e decisão de reenvio são separadas; seen não elimina
+     alternativa nem segunda chegada melhor.
+  2. Se o anúncio que o relay publicou perdeu validade ou tem de ser substituído
+     por informação pior na mesma geração, retirar essa publicidade com a sua
+     correlação/seq. A reposição naquele peer aguarda geração mais recente da
+     fonte, respeitando o watermark. As alternativas permanecem na tabela local;
+     não se acrescenta exceção à Q-C-26, não se forja geração nem se ativa dados.
+     Design deve provar este percurso também quando uma alternativa mais recente
+     ainda não é a selecionada, sem emprestar a sua sequência ao path antigo.
+  3. Cache de flooding cheia: remover só expirados e recusar reserva nova com
+     diagnóstico limitado, preservando rotas/catálogo válidos. Rate limit pode
+     coalescer uma publicidade corrente dentro de orçamento finito; sem reserva
+     não enfileirar trabalho ilimitado, descartar a tentativa e registar o motivo.
+     Geração nova pode voltar a tentar; não prometer convergência em overload ou
+     criar retry imediato infinito. A fila física segue os contratos já aceites.
+- **Decisões ainda de Design:** capacidade das pendências/tickets, horizonte de
+  comparações/quotas por destinatário/sessão, consumo de quota e ordenação das
+  transições/futures. Valores de configuração e hard caps existentes não mudam.
+- **Oráculos:** M03/M04/M06/M09/M10/M12–M15. Estabilização de uma geração não é
+  ausência de anúncios periódicos futuros. Nenhuma execução ou aprovação inferida.
+- **ADR:** revisão antes de Implement; eventual divergência aplica ADD11.
+- **Decisão humana registada em 2026-11-14T12:31:20Z:** princípios aprovados; concretizar limites e ordens em Design, sem forjar sequências ou renovar TTL indevidamente. Q-C-26 mantém-se aceite e inalterada.
+- **Concretização pendente de revisão:** [Design secções5–8](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md): ledger S×N, K chaves de flooding/H=cacheTtl, P=min(K,E) coalescers com W+ANN, B=min(E,2N) tickets físicos; quota F numa janela deslizante1s por stream/nodeId conservada após Down; timers2/turnos64/16. W pendente não é apagado por geração nova. Igual custo/saltos com troca de path também exige W+geração nova. ACCEPTED tardio da sessão corrente gera recibo limitado/retirada antiga sem restaurar Root/TTL; sessão antiga só liberta ticket. Nenhum destes valores é aprovado por inferência; D01–D32 planeados, não executados.
+
+
+### Q-C-29 — aprovação integral posterior
+
+Registo 2026-11-14T12:53:08Z. Utilizador aprovou o Design completo e os limites/ordens
+concretos: K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N), janela1s
+por stream/nodeId conservada após Down, timers2/turnos64/16, W antes de ANN
+novo quando há dívida, floor por peer e recibos antigos sem renovar TTL.
+As pendências de aprovação acima são histórico. Só revisão ADR autorizada.
+
+
+## Q-C-30 — IMP-009: referência de metadados e retenção após expiração
+
+- **Registo:** 2026-11-14T12:42:45Z; estado **DECIDIDA/APROVADA INTEGRALMENTE**.
+- **Motivo:** Model exige metadados coerentes por UUID/época e proíbe escolher o
+  último anúncio contraditório; faltava decidir a referência e a sua retenção
+  quando deixa de haver candidatos. Este pedido autoriza concretizar a proposta,
+  não presume a sua aprovação nem passagem a ADR/Implement.
+- **Proposta:** [Design secção3.1](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md).
+  Oferta local configurada ou primeiro ANNOUNCE remoto validado e efetivamente
+  admitido como candidato vivo fixa title/codec/FPS para UUID/origem/época.
+  Sem RTT também pode fixar; mensagem rejeitada ou mera reserva de binding não.
+  Igualdade exata dos campos, sem normalização implícita do título. Contradição
+  é rejeitada inteira antes de qualquer mutação, sem renovar TTL, consumir seq,
+  retirar candidato saudável ou fechar sessão; apenas diagnóstico limitado.
+- **Retenção/limite:** uma referência imutável por binding na época corrente,
+  até256/origem×64=16384, lazy e sem TTL próprio. Persiste após expirarem todos os
+  candidatos/cache/watermarks ou após Down/WITHDRAW; catálogo visível desaparece.
+  Não guardar tuplos históricos nem reutilizar cache.capacity como este limite.
+  Saturação recusa nova admissão sem expulsão ou candidato sem referência.
+- **Mudança:** só confirmEpoch aceite elimina referências anteriores dessa fonte
+  e permite estabelecer novo tuplo; rejeição preserva tudo. Reinício elimina o
+  estado volátil. Sequência maior, reconexão ou expiração na mesma época não
+  autorizam alteração. Proteção limitada das épocas retiradas segue Q-C-26,
+  sem ampliar oito/cacheTtl ou inventar autenticação/consenso.
+- **Oráculos:** D07 fixa M por primeira admissão, rejeita contradição em outro
+  caminho e no sender saudável, preservando estado; anúncio coerente posterior
+  pode usar a mesma seq rejeitada. D08 avança além dos prazos de candidato/cache/
+  watermark, conserva referência com catálogo vazio, rejeita conflito tardio,
+  aceita seq100 coerente e só muda tuplo após época nova confirmada. Inclui
+  saturação e cardinalidade; permanecem32 oráculos, nenhum executado.
+- **Estado da etapa:** só Design para revisão; restantes propostas preservadas.
+  Sem gates externos adicionais. V-012, regressão atual, manual humano antes de
+  aprovar Test, revisão final Denji e integração continuam obrigatórios.
+  Nenhuma ADR nova aceite, Java, commit/push ou outro IMP.
+
+### Q-C-30 — aprovação integral posterior
+
+Registo 2026-11-14T12:53:08Z. Utilizador aprovou a política completa: referência pelo primeiro
+candidato admitido/oferta local, igualdade exata, retenção sem TTL na época
+corrente≤S, mudança só por confirmEpoch aceite/reinício, conflito rejeitado sem
+consumir seq ou alterar estado saudável. D07/D08, incluindo conflito após
+expiração, continuam planeados, não executados. Pendências anteriores de Design
+são histórico; apenas revisão ADR autorizada, não Implement.
+
+## Q-C-31 — IMP-009: semântica real de recusa de owner e OVERFLOW
+
+- **Registo:** 2026-11-14T12:53:08Z; **DECIDIDA/APROVADA na revisão ADR**.
+- **Evidência de fonte:** NeighborManager.Owner.offer chama fail quando a fila
+  está cheia e devolve false; requestClose do owner inicia terminação. Em
+  Connection.send, queue cheia executa markClosed(OUTPUT_OVERFLOW)/finishClose
+  antes de devolver OVERFLOW. Não são recusas com promessa de retoma na mesma
+  execução/ligação. [Revisão e assinaturas](../memory-bank/bolts/006-rotas/adr-review.md).
+- **Ambiguidade:** Design6 menciona retomar por wake após recusa do owner e7
+  pendência limitada após OVERFLOW; falta distinguir essas hipóteses da recusa
+  local não terminal em cache/coalescer/quota. Não esconder a diferença nem
+  alterar o comportamento real por inferência, depois de o Design ser aprovado.
+- **Proposta recomendada:** preservar contratos atuais/ADR-017/020. Recusa de
+  owner por fila cheia encaminha cleanup pelo hook de terminação; ticket guarda
+  resultado até a conclusão física/callback/continuação terminarem, sem aguardar
+  um wake que o owner já não admite. OVERFLOW encerra só a ligação afetada;
+  diagnosticar, invalidar pendências correntes pela Session exata e acompanhar
+  NeighborDown, sem retry nessa conexão. Recusa local de K/P/quota mantém as
+  regras não terminais aprovadas em Q-C-29. Nenhum recurso é declarado terminado
+  apenas por cancelamento lógico; outras sessões saudáveis são preservadas.
+- **Impacto proposto:** clarificar redação de Design6/7 e expectativas D14/D15/D29
+  ao aprovar esta revisão; não criar D33, aumentar âmbito ou editar owner/
+  transporte. No momento só registo e revisão, sem aplicar alteração Java.
+- **ADR:** não exige substituir decisão aceite se a proposta de preservação for
+  aprovada; não foi provada inviabilidade da ADR-017/020. Sem ADR nova por inferência.
+- **Estado:** decisão pendente,32 oráculos por executar; sem gate externo novo.
+  Implement/Test, V-012/regressão/manual humano/revisão final Denji/integração
+  continuam pendentes. A aprovação de Q-C-29/30 não aprova Q-C-31 automaticamente.
+
+
+### Q-C-31 — aprovação explícita e aplicação documental
+
+Registo 2026-11-14T12:58:05Z. Utilizador aprovou revisão ADR/Q-C-31. Design6/7 e D14/D15/D29
+clarificados: recusa local recuperável, OVERFLOW terminal na ligação e saturação
+do owner com cleanup pelos hooks sem depender de wake futuro. Só Implement
+autorizado nos seis caminhos. Aprovações pendentes acima são histórico.

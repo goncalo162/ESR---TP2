@@ -1,0 +1,72 @@
+CODE_SOURCE=file:/home/luis/ESR/ESR---TP2/experiments/construction/006-rotas/test-build-01/ott-streaming-1.0-SNAPSHOT.jar
+STAGE 1 — ESPERADO: dois servidores/quatro streams; primeira chegada140, depois130 porR2; alternativa140.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 01-routing-from-frozen-jar
+CHECK_PASS 02-overlay-from-frozen-jar
+CHECK_PASS 03-four-controlled-streams
+CHECK_PASS 04-source1-a-cost130-viaR2
+CHECK_PASS 05-source1-b-cost130
+CHECK_PASS 06-source2-c-cost170
+CHECK_PASS 07-source2-d-cost170
+CHECK_PASS 08-alternative140-retained
+CHECK_PASS 09-later-better-arrival
+CHECK_PASS 10-selection-never-authorizes-data
+CHECK_PASS 11-defensive-catalog-and-routes
+STAGE 2 — ESPERADO: ciclo com arestaR1-R2=200 conserva130; paths únicos, geração estabiliza; seq nova aos2s simulados.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 12-cycle-keeps-best130
+CHECK_PASS 13-no-repeated-path-id
+CHECK_PASS 14-fixed-generation-quiescence
+CHECK_PASS 15-duplicate-no-flood-or-ttl-renewal
+CHECK_PASS 16-genuine-source-generation
+CHECK_PASS 17-cycle-keeps-four-streams
+STAGE 3 — ESPERADO: retirar S1 elimina apenas A/B; S2 mantém C/D=170; retomarS1 cria geração nova.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 18-previous-snapshot-immutable
+CHECK_PASS 19-source1-withdraw-leaves-two
+CHECK_PASS 20-source2-c-preserved
+CHECK_PASS 21-source2-d-preserved
+CHECK_PASS 22-only-source2-visible
+CHECK_PASS 23-resume-four-streams
+CHECK_PASS 24-resume-new-sequence
+STAGE 4 — ESPERADO: relógio avança8s dentro do primeiro envio; só1 ANNOUNCE, candidato expira sem desligar3 sessões.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 25-only-first-announce-before-expiry
+CHECK_PASS 26-selected-candidate-expired
+CHECK_PASS 27-expired-catalog-empty
+CHECK_PASS 28-sessions-survive-expiry
+CHECK_PASS 29-reference-not-renewed-as-candidate
+STAGE 5 — ESPERADO: aos8s metadados ainda1s, custo/upstream ausentes; conflito após17s não altera referência; época nova pode mudar título.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 30-original-selection-a110
+CHECK_PASS 31-metadata-valid-until9s
+CHECK_PASS 32-no-expired-selection-dated-now
+CHECK_PASS 33-projection-expires-at9s
+CHECK_PASS 34-projection-pure-and-old-view-unchanged
+CHECK_PASS 35-reference-survives-all-expiry
+CHECK_PASS 36-late-conflict-rejected
+CHECK_PASS 37-same-rejected-sequence-can-be-valid
+CHECK_PASS 38-confirmed-new-epoch-can-change-title
+CHECK_PASS 39-retired-epoch-cannot-return
+STAGE 6 — ESPERADO TCP REAL: cinco nós/dois servidores/quatro streams; bootstrap parado; gerações continuam; saídaS1 preservaS2.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 40-real-four-streams
+CHECK_PASS 41-real-neighbors-present
+CHECK_PASS 42-real-costs-without-data-activation
+CHECK_PASS 43-real-tcp-v2-existing-codec
+CHECK_PASS 44-real-monitor-measured
+CHECK_PASS 45-bootstrap-listener-stopped
+OBSERVED_AFTER_BOOTSTRAP catalog=4 seq=1 previous=0
+CHECK_PASS 46-announcements-continue-without-bootstrap
+CHECK_PASS 47-same-physical-sessions-after-bootstrap-stop
+CHECK_PASS 48-source1-exit-preserves-source2
+CHECK_PASS 49-healthy-survivors
+STAGE 7 — ESPERADO: NODE_LEAVE confirmado, todos os owners/helpers terminados, portas libertadas; MANUAL_PASS só após53 checks.
+Leia o ESPERADO. Prima Enter para executar; EOF aborta.
+CHECK_PASS 50-source1-graceful-notification
+CHECK_PASS 51-all-real-components-terminated
+CHECK_PASS 52-real-test-ports-reusable
+CHECK_PASS 53-controlled-schedulers-terminated
+NO_RESOURCES_PENDING
+CHECK_COUNT=53
+MANUAL_PASS

@@ -1,0 +1,657 @@
+--- a/add.md
++++ b/add.md
+@@ -1057,7 +1057,7 @@
+ - **Bolt/origem:** [006-rotas](memory-bank/bolts/006-rotas/bolt.md); TASK-012.
+ - **Ficheiros:** `routing/RoutingService.java`, `streaming/StreamInfo.java`, `streaming/StreamCatalog.java`, `routing/RoutingServiceTest.java`, `overlay/OverlayNode.java`, `overlay/OverlayNodeRoutingTest.java`.
+ - **Revisão de âmbito aprovada — Q-C-28 Opção1:** composição de routing no owner e lifecycle existentes de OverlayNode; conservar APIs, observadores e testes anteriores. Os caminhos de teste usam src/test/java e os restantes src/main/java. Sem CLI de catálogo/trace neste IMP.
+-- **Política aprovada integralmente — Q-C-29:** fonte é dona de epoch/seq; relay publica a geração do candidato selecionado, sem fabricar seq ou renovar TTL por melhoria. W pendente precede ANN novo; alternativa pior ou path diferente com custo/saltos iguais exige retirada e geração nova. K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N); quota F/janela1s por stream/nodeId conservada após Down, timers2/turnos64/16. Saturação local preserva candidatos/estado saudável e os recibos antigos não alteram Root/TTL. [Design aprovado](memory-bank/bolts/006-rotas/ddd-02-technical-design.md); revisão ADR e clarificação Q-C-31 das recusas reais ainda para aprovação.
++- **Política aprovada integralmente — Q-C-29:** fonte é dona de epoch/seq; relay publica a geração do candidato selecionado, sem fabricar seq ou renovar TTL por melhoria. W pendente precede ANN novo; alternativa pior ou path diferente com custo/saltos iguais exige retirada e geração nova. K cache/H=cacheTtl, ledger S×N, P=min(K,E), B=min(E,2N); quota F/janela1s por stream/nodeId conservada após Down, timers2/turnos64/16. Saturação local preserva candidatos/estado saudável e os recibos antigos não alteram Root/TTL. [Design aprovado](memory-bank/bolts/006-rotas/ddd-02-technical-design.md); revisão ADR e Q-C-31 aprovadas: recusa local recuperável, OVERFLOW terminal na ligação, owner saturado limpa pelos hooks sem aguardar novo wake.
+ - **Metadados aprovados — Q-C-30:** oferta local/primeiro candidato remoto admitido fixa title/codec/FPS por UUID/origem/época; conflito rejeitado inteiro sem consumir seq/renovar TTL ou alterar candidato saudável. Referência persiste após expiração total, uma por binding na época corrente≤16384, sem TTL próprio; só confirmEpoch aceite/reinício permite mudança, respeitando Q-C-26.
+ - **Dependências:** IMP-006 (004-overlay), IMP-008 (021-rotas).
+ - **ADR:** ADR-004, ADR-016, ADR-017, ADR-018, ADR-020, ADR-024.
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -138,3 +138,13 @@
+ Root real não guarda esses metadados; RoutingService fará a referência no owner.
+ [Revisão estática das APIs](../memory-bank/bolts/006-rotas/adr-review.md) preparada;
+ nenhum código implementado ou teste executado. Seleção continua sem autorizar dados.
++
++## IMP-009 — catálogo/routing implementados para revisão
++
++Registo 2026-11-14T14:36:19Z. [Walkthrough](../memory-bank/bolts/006-rotas/implementation-walkthrough.md):
++StreamInfo/StreamCatalog e RoutingService publicados pelo owner do OverlayNode,
++com referências Q-C-30 persistentes por época e snapshots as-of imutáveis. Seleção
++continua sem upstream ativo/destinos ou autorização de dados. Contagens limitadas
++Q-C-26/29 e recusas reais Q-C-31 implementadas; sem alteração ao domínio anterior.
++1254 testes incrementais aprovados, incluindo43 novos; Test/clean verify/JAR novo/
++manual humano/revisão final Denji/integração pendentes. Sem conclusão de fase.
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -684,3 +684,17 @@
+ não terminal K/P/quota. Não prometer wake/retry numa execução/ligação encerrada
+ nem mudar contratos atuais por inferência. Estado lógico não prova terminação
+ física. Revisão ADR e Q-C-31 por aprovar;32 oráculos por executar, sem Implement.
++
++## IMP-009 — APIs disponíveis no checkpoint Implement, Test pendente
++
++Registo 2026-11-14T14:36:19Z. [Walkthrough e mapa de casos](../memory-bank/bolts/006-rotas/implementation-walkthrough.md).
++RoutingService recebe owner/ControlPort/Observer e overload de relógio/Scheduler;
++start/onNeighborEvent/onMetrics/setLocalAvailable são do owner. snapshot é imutável;
++requestClose é lógico e awaitTermination aguarda físicos no orçamento. OverlayNode
++preserva construtores anteriores, acrescenta factory de routing/routingSnapshot e
++compõe eventos/métricas/fecho. STREAM_ANNOUNCE9/WITHDRAW10 mantêm codec/bytes TCPv2.
++Q-C-31 aprovada: K/P/quota recusam localmente, OVERFLOW retira só a Session e
++saturação do owner limpa por hooks. Callback antigo não renova TTL nem restaura
++estado; admissão antiga ainda efetiva gera recibo/retirada limitada. Regressão
++incremental1254/0/0/0,16 XML; não é clean verify nem aprovação Test. CLI/trace/dados
++não foram antecipados; sem JAR novo ou manual humano deste incremento.
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -384,3 +384,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em revisão ADR; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–011 DONE; TASK-012 IN PROGRESS em Implement para revisão; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em revisão ADR após aprovação integral de Design/Q-C-29/30; Q-C-31 pendente.
++**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Implement para revisão; ADR/Q-C-31 aprovadas; regressão incremental1254/0/0/0, Test pendente.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -108,7 +108,7 @@
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+-| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Revisão ADR; Model/Design aprovados; V-012: NÃO EXECUTADO |
++| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Implement para revisão; V-012 incremental/regressão1254/0/0/0; Test/manual pendentes |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+@@ -699,7 +699,7 @@
+ ## IMP-034 — correção de correlação D07e
+ 
+ Registo de 2026-11-11T19:18:38Z. Corrigidos o descarte de token HELLO antigo
+-e de geração antiga, preservando a sessão e a consulta corrente. 142 testes
++e de geração antiga, preservando a sessão e a consulta corrente. 143 testes
+ incrementais afetados passaram com JDK 21/TCP local; os 1062 da apresentação
+ anterior ficam como histórico. [Walkthrough, red/green e evidência](../memory-bank/bolts/034-overlay-extra/implementation-walkthrough.md).
+ Implement aguarda revisão. Test/clean verify/manual humano/revisão final/integração
+@@ -1116,3 +1116,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1136,7 +1136,7 @@
+ 
+ ## Q-C-31 — IMP-009: semântica real de recusa de owner e OVERFLOW
+ 
+-- **Registo:** 2026-11-14T12:53:08Z; **PROPOSTA/PENDENTE DE APROVAÇÃO na revisão ADR**.
++- **Registo:** 2026-11-14T12:53:08Z; **DECIDIDA/APROVADA na revisão ADR**.
+ - **Evidência de fonte:** NeighborManager.Owner.offer chama fail quando a fila
+   está cheia e devolve false; requestClose do owner inicia terminação. Em
+   Connection.send, queue cheia executa markClosed(OUTPUT_OVERFLOW)/finishClose
+@@ -1162,3 +1162,11 @@
+ - **Estado:** decisão pendente,32 oráculos por executar; sem gate externo novo.
+   Implement/Test, V-012/regressão/manual humano/revisão final Denji/integração
+   continuam pendentes. A aprovação de Q-C-29/30 não aprova Q-C-31 automaticamente.
++
++
++### Q-C-31 — aprovação explícita e aplicação documental
++
++Registo 2026-11-14T12:58:05Z. Utilizador aprovou revisão ADR/Q-C-31. Design6/7 e D14/D15/D29
++clarificados: recusa local recuperável, OVERFLOW terminal na ligação e saturação
++do owner com cleanup pelos hooks sem depender de wake futuro. Só Implement
++autorizado nos seis caminhos. Aprovações pendentes acima são histórico.
+--- a/docs/tasks/PHASE-03/TASK-012.md
++++ b/docs/tasks/PHASE-03/TASK-012.md
+@@ -122,3 +122,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/memory-bank/bolts/006-rotas/adr-review.md
++++ b/memory-bank/bolts/006-rotas/adr-review.md
+@@ -2,7 +2,7 @@
+ unit: "003-rotas"
+ bolt: "006-rotas"
+ stage: "adr"
+-status: "ready-for-review"
++status: "complete"
+ ---
+ # IMP-009 — Revisão ADR e conferência dos contratos reais
+ 
+@@ -259,3 +259,9 @@
+ Sem Maven/testes, sockets, alterações Java, commits/push ou outro IMP.
+ Se Implement revelar outra incompatibilidade real, parar a parte afetada e
+ aplicar ADD11; esta análise não constitui aprovação antecipada de código.
++
++
++## Aprovação posterior
++
++Registo 2026-11-14T12:58:05Z. Utilizador aprovou esta revisão e Q-C-31; Design6/7 e
++D14/D15/D29 clarificados. Apenas Implement autorizado, sem Test ou fecho.
+--- a/memory-bank/bolts/006-rotas/bolt.md
++++ b/memory-bank/bolts/006-rotas/bolt.md
+@@ -6,11 +6,11 @@
+ status: "in-progress"
+ stories: ["003-difundir-anuncios-e-construir-catalogo-e-rotas"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-14T12:53:08Z"
++updated: "2026-11-14T14:36:19Z"
+ started: "2026-11-14T11:47:13Z"
+ completed: null
+-current_stage: "adr"
+-stages_completed: ["model", "design"]
++current_stage: "implement"
++stages_completed: ["model", "design", "adr"]
+ requires_bolts: ["004-overlay", "021-rotas"]
+ enables_bolts: ["022-rotas"]
+ requires_units: ["002-overlay"]
+@@ -50,7 +50,7 @@
+ 
+ 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+-3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-009 e as ADR do ADD.
++3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-009 e as ADR do ADD.
+ 
+@@ -103,7 +103,7 @@
+ de arquitetura sincronizado sem alterar o validador. [Diff incremental de Design](../../../experiments/construction/006-rotas/design-documents.diff)
+ separado do [acumulado](../../../experiments/construction/006-rotas/design-cumulative-documents.diff).
+ 
+-## Checkpoint atual — revisão ADR para aprovação
++## Histórico — revisão ADR apresentada antes da aprovação
+ 
+ Registo 2026-11-14T12:53:08Z. Design completo, Q-C-29 limites/ordens e Q-C-30 aprovados.
+ ✅ Model/Design concluídos. ⏳ [Revisão ADR](adr-review.md) preparada, incluindo
+@@ -117,3 +117,32 @@
+ Test, revisão final Denji e integração continuam obrigatórios.
+ Apenas revisão ADR autorizada; sem Maven/sockets/commits/push ou outro IMP.
+ [Entrada e aprovação](../../../experiments/construction/006-rotas/adr-review/entry.json).
++
++
++## Entrada — Implement autorizado
++
++Registo 2026-11-14T12:58:05Z. Revisão ADR/Q-C-31 aprovadas explicitamente. Apenas Implement
++nos seis caminhos autorizado; preservar APIs/testes e reservas físicas. Sem
++Test/fecho/commits/push.32 oráculos por executar à entrada; resultado só após
++execução real. V-012/regressão/manual humano/revisão Denji/integração pendentes.
++
++## Checkpoint atual — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas; Model/Design/ADR concluídos.
++[Walkthrough e D01–D32](implementation-walkthrough.md) preparados nos seis caminhos.
++Regressão incremental JDK21:1254 testes/0 falhas/0 erros/0 skips,16 XML,43 testes
++novos e1211 anteriores intactos. Red inicial, falhas de fronteira/correções,
++restrição de sockets e erro de compilação do teste novo preservados. Nenhum
++resultado de XML antigo conta como execução nova (correção documentada).
++Implement por aprovar; Test não iniciado. D32 parcial; D29/D31 incluem verificação
++estática de limites, sem alegar ensaio exaustivo/desempenho. V-012 tem prova
++incremental, consolidação formal pendente com clean verify/JAR novo/manual humano.
++Revisão final Denji e integração pendentes. Sem gates externos adicionais.
++Fontes só nos seis caminhos; listas target geradas separadas. Sem commits/push
++ou outro IMP; completed=null e critérios de fecho por cumprir.
++Evidência em experiments/construction/006-rotas/implement/.
++
++
++[Resultados/hashes atuais](../../../experiments/construction/006-rotas/implement/results.json),
++[diff de fonte](../../../experiments/construction/006-rotas/implement/source.diff) e
++[V-ADD](../../../experiments/construction/006-rotas/implement/v-add.md) ligados ao walkthrough.
+--- a/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
++++ b/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
+@@ -299,9 +299,11 @@
+ retiradas é justo e não fica atrás de anúncios sempre novos. Prazo do próximo wake
+ é o mínimo de publicação de fonte, expiração e disponibilidade de quota. Não
+ agendar wake imediato repetido quando a causa é port/owner saturado: manter sinal
+-limitado e retomar por conclusão ou próximo prazo útil. Uma callback não pode
+-alocar continuations ilimitadas quando owner.offer recusa; o ticket conserva o
+-resultado e o único wake recolhe-o. Falha persistente do owner é explícita.
++limitado e retomar por conclusão ou próximo prazo útil apenas na recusa local
++recuperável K/P/quota. owner.offer(false) em fila cheia inicia fecho: não esperar
++outro wake. Guardar resultados físicos limitados e recolhê-los pelo cleanup/hook
++de terminação do owner, sem libertar reservas antes de callback/continuação
++terminarem. Saturação do owner é falha operacional explícita (Q-C-31 aprovada).
+ 
+ Monotonia/deadlines usam diferenças verificadas de nanoTime e ms→ns exatos;
+ valores máximos validados cabem em long. Sem wall clock para TTL. Clock que viola
+@@ -327,8 +329,11 @@
+ 3 - Exemplo: A(E1,7) recebe ACCEPTED depois da mudança paraE2. Root/catálogo ficam
+     emE2; sessão corrente em RUNNING envia W(E1,7), depois A(E2,q). Callback do
+     connectionId anterior só liberta ticket, sem W na conexão nova.
+-4 - CLOSED afeta só contexto da Session exata; OVERFLOW é diagnosticado e deixa
+-    pendência limitada, sem loop imediato. INVALID_MESSAGE interno, exceção de
++4 - CLOSED afeta só contexto da Session exata; OVERFLOW já fecha a ligação afetada,
++    diagnostica e invalida as suas pendências, acompanhando NeighborDown sem retry
++    nessa conexão. Não confundir com recusa local recuperável K/P/quota; sessões
++    saudáveis ficam preservadas. owner saturado limpa pelos hooks, não por wake
++    futuro. INVALID_MESSAGE interno, exceção de
+     codec para mensagem construída localmente ou invariante quebrada são falha
+     local tipada, com cleanup coordenado, não acusação genérica ao peer.
+ 5 - ANN/W inválido no contexto é rejeitado atomicamente com diagnóstico limitado;
+@@ -389,8 +394,8 @@
+ 11 - **D11 / M12:** old Session/instance/connectionId, Down e métricas atrasadas não afetam nova sessão/TTL; reservas antigas continuam físicas.
+ 12 - **D12 / M13:** F tentativas em qualquer janela deslizante de1s, ANN+W, fronteira exata, erros sem refund e reconexão sem reset.
+ 13 - **D13 / M14:** K cheio só expurga expirados, recusa explícita preservando Root/catálogo; expiração não apaga floor por peer.
+-14 - **D14 / M14:** P cheio, no máximo2P intenções; W preservado no ledger e retomado justamente, anúncio recusado sem fila oculta.
+-15 - **D15 / M14/M18:** B físico inclui retirados; future bloqueado impede reserva extra e produz timeout explícito de fecho.
++14 - **D14 / M14:** P cheio, no máximo2P intenções; recusa local recuperável não fecha sessões; W preservado no ledger e retomado justamente, anúncio recusado sem fila oculta.
++15 - **D15 / M14/M18:** B físico inclui retirados; future bloqueado impede reserva extra e produz timeout explícito de fecho. OVERFLOW termina só a ligação afetada, limpa pendências da Session e não tenta de novo nessa conexão.
+ 16 - **D16 / M15:** alternativa pior E/7→W(E,7); melhoria E/7 posterior não ressuscita; E/8 selecionado permite publicar.
+ 17 - **D17 / M03/M15:** troca apenas de path/nextHop com igual custo/saltos exige W+geração nova, sem falsa melhoria no recetor.
+ 18 - **D18 / M15:** alternativa E/8 não selecionada não empresta seq ao path E/7; candidato selecionado de geração anterior à publicada não regride ledger; retirar e esperar seq>floor.
+@@ -404,7 +409,7 @@
+ 26 - **D26 / M20:** factories recebem mesmo owner; monitor Updated chega a routing, vizinho TCP real recebe ANN/W pelo manager atual.
+ 27 - **D27 / M20:** API antiga de OverlayNode e constructor de monitor preservados; observer original recebe evento mesmo perante exceção.
+ 28 - **D28 / M21:** S/N/64/256/8, ledger/quota em fronteiras pequenas injetadas, saturação atómica, alocação lazy e sem expulsar protegido.
+-29 - **D29 / M13/M18:** máximo2 timers físicos, wake coalescido, turnos64/16, owner.offer cheio sem continuations ilimitadas ou busy-loop.
++29 - **D29 / M13/M18:** máximo2 timers físicos, wake coalescido, turnos64/16; owner.offer cheio inicia fecho e cleanup pelos hooks, sem depender de outro wake, sem continuations ilimitadas/busy-loop nem libertação física antecipada.
+ 30 - **D30 / M01/M09:** atraso em vários períodos produz só geração nova útil; source withdraw/resume aumenta seq real, sem wrap.
+ 31 - **D31 / M16/M21:** snapshot puro envelhece sem mutar Root; título UTF-8/codec/fps válidos e fronteiras, diagnóstico limitado.
+ 32 - **D32 / M22:** V-012 completo, regressão JDK21/log/XML/JAR atual, manual humano reproduzido antes de aprovar Test, revisão final Denji e integração.
+@@ -444,3 +449,11 @@
+ por esta transição. Os32 oráculos continuam por executar, sem gates externos.
+ V-012, regressão atual, manual humano antes de aprovar Test, revisão final Denji
+ e integração mantêm-se obrigatórios; sem Implement, commits/push ou outro IMP.
++
++
++## Aprovação ADR/Q-C-31 e início apenas de Implement
++
++Registo 2026-11-14T12:58:05Z. Revisão ADR/Q-C-31 explicitamente aprovadas; secções6/7 e
++D14/D15/D29 clarificadas conforme contratos reais. Apenas Implement nos seis
++caminhos autorizado; testes incrementais/evidências, sem avançar a Test/fecho,
++commits ou push. Os32 oráculos estavam por executar à entrada desta etapa.
+--- a/memory-bank/bolts/006-rotas/implementation-walkthrough.md
++++ b/memory-bank/bolts/006-rotas/implementation-walkthrough.md
+@@ -0,0 +1,186 @@
++---
++unit: "003-rotas"
++bolt: "006-rotas"
++stage: "implement"
++status: "ready-for-review"
++---
++# IMP-009 — Implement para revisão
++
++✅ Model/Design/ADR e Q-C-28/29/30/31 aprovados. ⏳ Implement preparado para
++revisão; não aprovado por este documento. Test não iniciado, bolt não fechado.
++Base de comparação164ac0dc477c02bc7fde816c761d137ee18ea55d, ramo Denji.
++[Autorização/estado de entrada](../../../experiments/construction/006-rotas/implement/entry.json).
++Nenhum commit, staging, push ou outro IMP.
++
++## 1. Comportamento implementado nos seis caminhos
++
++1 - **streaming/StreamInfo:** record validado, tuplo imutável por UUID/origem/época,
++    conversão explícita para StreamInfo wire atual. Título UTF-8 estrito sem NUL/
++    surrogate isolado, codec1 e FPS1..60; não lê vídeo.
++2 - **streaming/StreamCatalog:** Entry/Snapshot imutáveis com custo/upstream
++    opcionais e validade no instante da captura; visibleAt puro não altera Root
++    ou renova TTL. Capacidade própria derivada de Q-C-26, não de flooding.
++3 - **routing/RoutingService:** reutiliza RoutingTable no owner emprestado;
++    ofertas configuradas periódicas, admissão por vizinho, referência de metadados
++    persistente por época, cache K, coalescer P, quota deslizante por stream/nodeId,
++    ledger por stream/Session e tickets físicos B. Sem nova ligação ou codec.
++4 - **overlay/OverlayNode:** compõe factory/eventos de routing e métricas no owner
++    existente, preservando APIs e observadores; routingSnapshot novo e fecho/
++    rollback no prazo global anterior, sem alterar o resultado NODE_LEAVE.
++5 - **routing/RoutingServiceTest:**37 testes determinísticos com relógio,
++    scheduler, owner e futuras admissões controlados, mais grafos literais.
++6 - **overlay/OverlayNodeRoutingTest:**6 testes novos de integração/lifecycle,
++    incluindo TCP real ANNOUNCE/WITHDRAW/ERROR, bootstrap desligado após início,
++    codec existente, mesmo owner, rollback e deadline partilhado.
++
++Recusa local K/P/quota é recuperável. OVERFLOW termina apenas a Session afetada;
++sem retry nessa conexão. owner.offer recusado inicia stop: cleanup por hook, sem
++esperar wake novo. Callback/continuação mantêm reserva física até ambos terminarem.
++A libertação final sinaliza trabalho ainda pendente quando o owner continua vivo.
++
++Metadados são fixados pela oferta local ou primeiro candidato admitido, incluindo
++sem RTT; mensagem inválida/recusada não fixa referência. Contradição na mesma
++época é rejeitada sem consumir seq, alterar candidatos saudáveis ou renovar TTL.
++Referência persiste sem candidato e só muda após época confirmada/reinício.
++
++Publicação usa seq/path/custo do candidato selecionado. Alternativa pior, troca
++igual de custo/saltos ou geração selecionada anterior à já publicada exigem W e
++aguardam geração suficiente. W pendente não é coalescido por ANN novo; ACCEPTED
++antigo na sessão corrente gera recibo/retirada coerente, sem restaurar Root antigo.
++Callback de sessão antiga só termina a sua reserva. Seleção não autoriza dados.
++
++## 2. Evidência incremental preservada
++
++Os comandos usam JDK21 via JAVA_HOME, Maven sem mudar POM/dependências. O helper
++[run-incremental.py](../../../experiments/construction/006-rotas/implement/run-incremental.py)
++regista comando, instantes reais, exit, hashes da versão e copia os XML atuais.
++Cada diretório é novo; não substituir resultados anteriores por uma repetição.
++
++1 - **red-01:**17 testes,16 erros UnsupportedOperationException nos comportamentos
++    ausentes,1 teste de metadados passou. Scaffold compilável; falhas reais de
++    execução e XML preservados, sem provocar falhas de fundações já completas.
++2 - **green-01:**17 testes,1 falha no gatilho da bancada de saturação: nó vazio
++    não tinha timer para provocar a recusa. Corrigido o cenário para fonte com
++    publicação agendada; oráculo de cleanup não foi removido/enfraquecido.
++3 - **green-02:**17 testes novos passaram;9 erros de abertura de sockets em testes
++    anteriores de monitor, por sandbox. Execução restrita preservada.
++4 - **green-03:** repetição autorizada com TCP loopback,28 testes passaram,
++    incluindo os11 anteriores de OverlayNodeMonitoringTest intactos.
++5 - **incremental-04:**30 testes determinísticos passaram, incluindo ciclos,
++    duas fontes/quatro streams, saturação e gerações/callbacks antigos.
++6 - **incremental-05:** falhou a compilação do teste novo: BootstrapServer já
++    inicia no construtor, não existe start(). Nenhum teste executado nessa
++    tentativa. O primeiro helper copiou XML antigos de30 testes; o
++    [result-correction.json](../../../experiments/construction/006-rotas/implement/incremental-05/result-correction.json)
++    corrige explicitamente essa contagem, preservando log/JSON/XML brutos.
++    O helper passou a filtrar XML pelo instante de início da execução.
++7 - **incremental-06:**47 testes passaram:30 routing+6 integração nova+11 monitor.
++8 - **red-07:**35 testes,1 falha real: anúncio de UUID novo em capacidade cheia
++    podia confirmar época antes de recusar o binding, invalidando estado saudável.
++9 - **red-08:**36 testes,2 falhas reais: a anterior e uma corrida em que a
++    continuação do owner acabava antes do callback, faltando sinalizar trabalho
++    pendente ao libertar o último ticket físico.
++10 - **green-09:**36 testes determinísticos passaram após pré-validar capacidade
++     antes da mudança de época e sinalizar libertação física fora do lock.
++11 - **incremental-regression-10:** `mvn -B -ntp '-Dtest=*' test`, JDK21,
++     **1253 testes,0 falhas,0 erros,0 skips,16 XML**. Inclui42 novos e1211 anteriores.
++     [Comando, instantes e hashes](../../../experiments/construction/006-rotas/implement/incremental-regression-10/result.json),
++     [log](../../../experiments/construction/006-rotas/implement/incremental-regression-10/maven.log).
++
++12 - **red-11:**37 testes,1 falha real no cleanup do construtor se o relógio
++     injetado lança exceção. A leitura inicial foi movida para antes do helper/hook;
++     falha posterior à inscrição remove o hook e pede fecho ao scheduler.
++13 - **incremental-regression-12:** regressão final da versão atual, mesmo comando
++     JDK21, **1254 testes,0 falhas,0 erros,0 skips,16 XML** (43 novos/1211 anteriores).
++     [Resultado/hash da versão final](../../../experiments/construction/006-rotas/implement/incremental-regression-12/result.json),
++     [log final](../../../experiments/construction/006-rotas/implement/incremental-regression-12/maven.log).
++
++A regressão incremental é real, mas não substitui clean verify/Test. Nenhum JAR
++novo foi produzido neste checkpoint; o JAR histórico de IMP-008 permanece
++preservado e não representa o código novo. Sem manual humano desta versão.
++
++## 3. Correspondência D01–D32
++
++Os nomes são prefixos de métodos nos testes autorizados; detalhes dos contratos
++herdados também são exercitados pelos35 testes anteriores de RoutingTableTest,
++inalterados e incluídos na regressão1254. Não transformar estes casos planeados
++em aprovação formal de Test ou conclusão de V-012.
++
++| Oráculo | Evidência incremental / limite |
++|---|---|
++| D01 | d01SourcePublishes...: duas ofertas sem consumidores, seq0/época da fonte, geração periódica sem catch-up; d05TwoOrigins...: quatro streams |
++| D02 | d02D03Diamond...:140→130µs; d04CyclicDiamond... convergência do grafo |
++| D03 | d02D03Diamond...: alternativa apesar de cache hit; d17EqualCostPath... protege desempate visto pelo recetor |
++| D04 | d04CyclicDiamond...: ciclo, path único e estabilização da geração; gerações periódicas normais |
++| D05 | d05TwoOrigins... e d09Withdrawal...: origem/stream independente e retirada por sender |
++| D06 | d06Unmeasured...: ausência de RTT, custo direto, SUSPECT e prazo original; contratos de Invalidated também pela regressão monitor/tabela |
++| D07 | d07ConflictingMetadata..., d07InvalidBeforeFirst..., d07IdentityAndCostOverflow...; domínio UTF-8/codecs em d31 |
++| D08 | d08ReferenceSurvives...: além de candidate/cache/watermark TTL, conflito tardio, seq rejeitada reutilizável e época nova; referências não expulsas em d28 |
++| D09 | d09Withdrawal... mais testes anteriores d11* de RoutingTableTest para watermarks/seq antiga e nova |
++| D10 | d08D10EpochChange... mais testes anteriores d12*/d13* da tabela para atomicidade por fonte e oitava/nona retirada |
++| D11 | d11OldSession...: Down, métricas e anúncio antigo não alteram substituta |
++| D12 | d12SlidingWindow... e d12ClosedAttempt...: fronteira1s, reconexão, sem refund de tentativa CLOSED |
++| D13 | d13FullFloodCache... e d16Worse...: recusa de cache conserva candidato, floor impede reposição da geração |
++| D14 | d14LocalPending...: P limitado, dívida W sem célula preservada, retoma justa e peers saudáveis |
++| D15 | d15BlockedPhysical..., d15OutputOverflow..., d15PhysicalRelease...: físicos retirados, timeout, isolamento e corrida callback/continuação |
++| D16 | d16WorseSameGeneration...: W/espera/geração nova, sem ressuscitar melhoria tardia |
++| D17 | d17EqualCostPath...: path diferente com igual custo/saltos não é melhoria para recetor |
++| D18 | d18SelectedGeneration...: não empresta seq de alternativa nem regride face à publicada |
++| D19 | d19WithdrawalCannot...: W antes de ANN novo, futures/quota controlados |
++| D20 | d20LateAccepted...: E2 permanece no domínio e recibo E1 ordena W antigo/ANN novo |
++| D21 | d21LateRevision...: admissão antiga não confirma payload novo; sessão antiga não afeta nova |
++| D22 | d22ImmutableSnapshots...: mapas defensivos, validade pura e nenhuma autorização de dados |
++| D23 | d23NewRepairPeer...; testes anteriores de reparação/tabela/monitor: NeighborUp de nova aresta é consumido sem bootstrap periódico |
++| D24 | d24ClockFailureDuringConstruction..., d24CloseBeforeStart..., d24StopBeforeStart..., d24RoutingFactoryFailure..., d24SharedDeadline... e11 testes anteriores do nó |
++| D25 | d25UnrelatedEvents... e d27OriginalObserver...: ERROR intacto/uma vez; codec/fixtures preservados e reexecutados na regressão |
++| D26 | d26RealTcpSharesOwner...: owner idêntico, monitor→routing, TCP/codec atuais, W com bootstrap parado |
++| D27 | d27OldConstructor..., d27OriginalObserver... e testes anteriores de finally/erro do monitor |
++| D28 | d28BindingSaturation..., d28NewStreamAtCapacity...; limites exatos Q-C-26 e alocação lazy nos testes anteriores d17* da tabela |
++| D29 | d29RunningTimer... e d29RejectedCompletionWake...: cancelamento não prova fim físico, hook sem wake novo; turnos64/16 e timers2 explícitos no código, prova mais ampla fica na revisão/validação |
++| D30 | d01SourcePublishes... e d30SourceSequenceExhaustion...: atraso, withdraw/resume, saturação sem wrap |
++| D31 | d31MetadataUnicode..., d31InvalidSource... e snapshots puros; diagnósticos saturantes por implementação, sem medição de heap |
++| D32 | **PARCIAL:** regressão incremental/log/XML/hashes disponíveis; clean verify, novo JAR, manual humano, aprovação Test, revisão Denji e integração pendentes |
++
++V-012 tem ensaios técnicos incrementais em losango/ciclo/quatro streams/retirada;
++consolidação de V-012 e decisão de aprovação pertencem à etapa Test futura.
++D29/D31 incluem detalhes verificados estaticamente, sem alegar ensaio exaustivo
++em todos os máximos ou resultados de desempenho/heap/CORE/GUI/vídeo.
++
++## 4. Oito linhas substituídas na fundação OverlayNode
++
++Somente OverlayNode tinha implementação anterior nos seis caminhos. Nenhum teste
++anterior foi apagado/modificado. As oito linhas removidas no diff têm substituição
++que mantém o comportamento anterior e acrescenta a composição autorizada:
++
++1 - **2 linhas** do observer de LocalFailure do monitor: preservadas dentro de
++    finally depois da entrega de métricas ao routing.
++2 - **1 linha** monitor.start: mantém a chamada e acrescenta routing.start no owner.
++3 - **1 linha** m.onEvent: mantém chamada em try/finally com routing, sem perder o
++    finally exterior que entrega o evento original ao consumidor.
++4 - **3 linhas** stop de monitor/manager/owner: mantidas em finally encadeados,
++    acrescentando o gate de routing e garantindo pedidos de cleanup a todos.
++5 - **1 linha** allOf da notificação: conserva monitoring/leave e inclui o future
++    de cleanup lógico de routing; tipo/resultado de ShutdownReport intactos.
++
++As restantes mudanças são adições. Nenhum codec, transporte, POM, configuração,
++RoutingTable, NetworkMonitor ou NeighborManager foi editado. Nenhuma ampliação de
++âmbito necessária. Listas geradas em target/ aparecem separadas no pacote de diff;
++não as tratar como alterações aprovadas de fonte.
++
++## 5. Checkpoint e pendências
++
++⏳ Implement para revisão; Model/Design/ADR concluídos. Sem avanço automático a
++Test. Não fechar bolt/TASK/unidade/fase nem marcar critérios finais cumpridos.
++Sem gates externos adicionais. Antes de fecho: V-012 consolidado, clean verify
++JDK21 com log/XML/JAR novo, manual humano antes de aprovar Test, revisão final
++atribuída a Denji e integração. Sem commits/push ou início de outro IMP.
++
++
++## Pacote de revisão e verificações documentais
++
++[Diff de fonte contra a base](../../../experiments/construction/006-rotas/implement/source.diff),
++[diff documental desta etapa](../../../experiments/construction/006-rotas/implement/documents.diff)
++e [acumulado documental](../../../experiments/construction/006-rotas/implement/cumulative-documents.diff).
++[Listas target geradas separadas](../../../experiments/construction/006-rotas/implement/target-generated.numstat).
++[V-ADD](../../../experiments/construction/006-rotas/implement/v-add.md) com zero erros/78 fixtures;
++[resultados/hashes e preservação](../../../experiments/construction/006-rotas/implement/results.json).
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -304,3 +304,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md
+@@ -5,7 +5,7 @@
+ status: "in-progress"
+ priority: "Must"
+ started: "2026-11-14T11:47:13Z"
+-updated: "2026-11-14T12:53:08Z"
++updated: "2026-11-14T14:36:19Z"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-012"]
+ implementation_tasks: ["IMP-009"]
+@@ -89,3 +89,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -335,3 +335,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "006-rotas (in-progress; ADR review ready; Model/Design/Q-C-29/30 approved; Q-C-31 pending)"
++next_bolt: "006-rotas (in-progress; Implement ready for review; Model/Design/ADR/Q-C-31 approved; Test pending)"
+ 
+ last_completed_bolt: "021-rotas"
+ last_integrated_commit: "3b7aa745cac62b71ac8ce7e036656bf7ab21692f"
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -411,3 +411,13 @@
+ aguardam aprovação; não foram convertidas em decisão aceite. Só Model/Design
+ concluídos; Implement/Test e evidências funcionais por executar. Revisão final
+ Denji/integração pendentes, sem gate externo adicional.
++
++## IMP-009 — ADR/Q-C-31 aprovadas; Implement para revisão
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR e Q-C-31 aprovadas; Design6/7/D14/D15/D29 clarificados.
++Mantêm-se ADR-004/016/017/018/020/024 e transversais, sem ADR nova/substituição.
++[Implement](../bolts/006-rotas/implementation-walkthrough.md) nos seis caminhos,
++regressão incremental1254/0/0/0 e43 testes novos. Não marcar Test/D32 concluídos:
++clean verify/JAR novo/manual humano/revisão final Denji/integração pendentes.
++Sem gates externos adicionais, commits/push ou novo IMP. Q-C-31 pendente nos
++registos anteriores é histórico, não o estado atual.
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e24 planned;006-rotas/IMP-009 em revisão ADR; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: dez histórias/bolts complete, incluindo021-rotas/IMP-008, e24 planned;006-rotas/IMP-009 em Implement para revisão; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -71,7 +71,7 @@
+ 
+ ## 003-rotas/003-difundir-anuncios-e-construir-catalogo-e-rotas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-009. **Estado:** in-progress (revisão ADR; Model/Design aprovados). **Bolt:** 006-rotas.
++**Tarefa:** IMP-009. **Estado:** in-progress (Implement para revisão; Model/Design/ADR aprovados). **Bolt:** 006-rotas.
+ **Ficheiro:** [003-difundir-anuncios-e-construir-catalogo-e-rotas](intents/001-ott-streaming/units/003-rotas/stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md).
+ 
+ ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
+@@ -590,3 +590,20 @@
+ Artefacto: memory-bank/bolts/006-rotas/adr-review.md; evidência em
+ experiments/construction/006-rotas/adr-review/. Estados anteriores de Design
+ pendente são histórico e não anulam esta aprovação explícita.
++
++## IMP-009 / 006-rotas — Implement para revisão antes de Test
++
++Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas explicitamente; Design6/7 e
++D14/D15/D29 clarificados conforme contratos reais. Código nos seis caminhos:
++RoutingService/StreamInfo/StreamCatalog, composição aditiva OverlayNode e dois
++testes autorizados. APIs/testes antigos preservados, sem alterações a codec/
++transporte/manager/monitor/tabela/config/POM/fixtures. Sem ampliar âmbito.
++Regressão incremental JDK21:1254/0/0/0 em16 XML,43 testes novos. Falhas reais
++anteriores e restrições/erro da bancada preservados no walkthrough. D32 parcial;
++V-012 com prova incremental, Test/clean verify/JAR novo/manual humano antes da
++aprovação Test/revisão final Denji/integração pendentes. D29/D31 incluem detalhes
++estáticos ainda sujeitos à revisão; não alegar prova exaustiva em todos os caps.
++current_stage=implement; stages_completed=[model,design,adr]; completed=null.
++Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
++Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement/.

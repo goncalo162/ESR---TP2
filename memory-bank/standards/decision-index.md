@@ -390,3 +390,42 @@ Bolt/história complete, implemented=true, TASK-011 DONE. Dez bolts complete,
 Código/JAR/logs originais preservados, sem repetição de build/manual. EXTRA-02
 preexistente e target gerado fora dos commits. Publicação main autorizada,
 resultado só será declarado após push efetivo; nenhum force push.
+
+## IMP-009 — Q-C-28 decidida; Q-C-29 em Design
+
+Registo 2026-11-14T12:31:20Z. Model aprovado; Q-C-28 Opção1 amplia ADD/IMP-009 para seis
+caminhos, incluindo OverlayNode.java/OverlayNodeRoutingTest.java no owner/lifecycle
+existentes. Princípios Q-C-29 aprovados, valores/ordens concretos no
+[Design para revisão](../bolts/006-rotas/ddd-02-technical-design.md).
+ADR-004/016/017/018/020/024 existentes mantêm estado Aceite; revisão de conformidade
+específica deste IMP ainda não iniciada. Nenhuma ADR nova/substituição aprovada.
+V-012/regressão/manual humano/revisão final Denji/integração pendentes.
+
+## IMP-009 — Design/Q-C-29/30 aprovados; revisão ADR para aprovação
+
+Registo 2026-11-14T12:53:08Z. Design aprovado integralmente: limites/ordens Q-C-29 e referência
+persistente por UUID/época Q-C-30. ADR-004/016/017/018/020/024 e transversais
+reutilizadas, sem nova ADR/substituição identificada. [Revisão de contratos reais](../bolts/006-rotas/adr-review.md)
+preparada; Q-C-31 propõe esclarecer owner.offer fatal em fila cheia e OVERFLOW
+terminal só na ligação, preservando os contratos existentes. Q-C-31/revisão ADR
+aguardam aprovação; não foram convertidas em decisão aceite. Só Model/Design
+concluídos; Implement/Test e evidências funcionais por executar. Revisão final
+Denji/integração pendentes, sem gate externo adicional.
+
+## IMP-009 — ADR/Q-C-31 aprovadas; Implement para revisão
+
+Registo 2026-11-14T14:36:19Z. Revisão ADR e Q-C-31 aprovadas; Design6/7/D14/D15/D29 clarificados.
+Mantêm-se ADR-004/016/017/018/020/024 e transversais, sem ADR nova/substituição.
+[Implement](../bolts/006-rotas/implementation-walkthrough.md) nos seis caminhos,
+regressão incremental1254/0/0/0 e43 testes novos. Não marcar Test/D32 concluídos:
+clean verify/JAR novo/manual humano/revisão final Denji/integração pendentes.
+Sem gates externos adicionais, commits/push ou novo IMP. Q-C-31 pendente nos
+registos anteriores é histórico, não o estado atual.
+
+## IMP-009 — Implement aprovado; Test técnico aguarda manual humano
+
+Registo 2026-11-14T15:24:36Z. Aprovação de Implement/TTL/visibleAt recebida; decisões aceites
+mantidas, nenhuma ADR nova ou substituição. [Test](../bolts/006-rotas/ddd-03-test-report.md)
+com clean verify1256/0/0/0 e manual Codex53 no JAR novo passou tecnicamente.
+Manual humano antes da aprovação Test, revisão final Denji/integração e D32
+continuam pendentes. Sem fecho/commit/push ou outro IMP, sem gate externo novo.

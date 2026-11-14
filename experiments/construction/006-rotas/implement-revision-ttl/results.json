@@ -1,0 +1,158 @@
+{
+  "recorded_at": "2026-11-14T15:02:41Z",
+  "base": "164ac0dc477c02bc7fde816c761d137ee18ea55d",
+  "stage": "implement",
+  "status": "ready-for-review",
+  "requested_corrections": [
+    "fresh publication and TTL checks per ANNOUNCE at send boundary",
+    "pure visibleAt keeps metadata but clears unprovable remote selection on time advance"
+  ],
+  "six_path_scope_unchanged": true,
+  "changed_Java_paths": [
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+    "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java"
+  ],
+  "source_delta": {
+    "files": 3,
+    "added": 84,
+    "removed": 12,
+    "paths": [
+      {
+        "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+        "added": 54,
+        "removed": 10
+      },
+      {
+        "path": "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java",
+        "added": 8,
+        "removed": 2
+      },
+      {
+        "path": "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java",
+        "added": 22,
+        "removed": 0
+      }
+    ],
+    "diff": "experiments/construction/006-rotas/implement-revision-ttl/source.diff"
+  },
+  "documents_delta": {
+    "files": 5,
+    "added": 119,
+    "removed": 8,
+    "paths": [
+      {
+        "path": "docs/06-DATA-MODEL.md",
+        "added": 12,
+        "removed": 0
+      },
+      {
+        "path": "docs/15-PROJECT-PROGRESS.md",
+        "added": 16,
+        "removed": 2
+      },
+      {
+        "path": "memory-bank/bolts/006-rotas/bolt.md",
+        "added": 13,
+        "removed": 2
+      },
+      {
+        "path": "memory-bank/bolts/006-rotas/implementation-walkthrough.md",
+        "added": 64,
+        "removed": 4
+      },
+      {
+        "path": "memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md",
+        "added": 14,
+        "removed": 0
+      }
+    ],
+    "diff": "experiments/construction/006-rotas/implement-revision-ttl/documents.diff"
+  },
+  "cumulative_source": {
+    "files": 6,
+    "added": 1080,
+    "removed": 8,
+    "diff": "experiments/construction/006-rotas/implement-revision-ttl/cumulative-source.diff"
+  },
+  "generated_target_separate": "experiments/construction/006-rotas/implement-revision-ttl/target-generated.numstat",
+  "preserved": {
+    "Project_files_unchanged_since_revision_entry": 234,
+    "prior_current_bolt_evidence": 119,
+    "pre_Model_experiments": 3567,
+    "historical_jar_sha256": "366210cf8c7656ad2948ae1c842796632085aaa4f09afcedcd00a49db0a0ecee"
+  },
+  "current_source_sha256": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java": "badc1cfb82aaa264aefb048cabbd42cfa1c1f4f667eeecb83a98822499e3d567",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": "6db167ee40f6457f4803fbacdc50f9ea74e7fb0a1aedf4e8540b746bad2e9faf",
+    "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java": "2d74f1693dcd4b685d2a096ff8b19583611d9fd55423e4b29081caab64b3f8a3",
+    "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamInfo.java": "4de8cc0df948ed8dff40a400fb76b26d17e888b293e2b789a7c0b2a0fb7920d0",
+    "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeRoutingTest.java": "f640255cba2f43b797114c2ae88a53979f4b35d075cc67699a56904263f96fdd",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java": "b19d73e562dfcd42fbae82354405d2b1d936b7b69011a01d5bf94f741a57f2df"
+  },
+  "red": {
+    "tests": 39,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "failed_cases": [
+      "d22VisibleAtNeverRelabelsExpiredSelectionAsCurrentWhileAlternativeLives",
+      "d08AnnounceRevalidatesExpiryBetweenTwoSendsInOneTurn"
+    ],
+    "result": "experiments/construction/006-rotas/implement-revision-ttl/red-13/result.json"
+  },
+  "green_targeted": {
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "result": "experiments/construction/006-rotas/implement-revision-ttl/green-14/result.json"
+  },
+  "incremental_regression": {
+    "command": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-Dtest=*",
+      "test"
+    ],
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "counts": {
+      "tests": 1256,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "XML_suites": 16,
+    "new_tests": 45,
+    "previous_tests": 1211,
+    "all_previous_1254_case_names_retained": true,
+    "all_hashes_match_execution": true,
+    "result": "experiments/construction/006-rotas/implement-revision-ttl/incremental-regression-15/result.json"
+  },
+  "v_add": {
+    "exit": 0,
+    "errors": 0,
+    "fixtures": 78,
+    "report": "experiments/construction/006-rotas/implement-revision-ttl/v-add.md"
+  },
+  "git_diff_check_exit": 0,
+  "D32": "partial",
+  "Test_stage_started": false,
+  "clean_verify_executed": false,
+  "new_JAR_built": false,
+  "human_manual_executed": false,
+  "commits": false,
+  "push": false,
+  "external_gates": [],
+  "pending": [
+    "Implement review",
+    "Test authorization",
+    "V-012 consolidation",
+    "clean verify",
+    "new JAR",
+    "human manual before approving Test",
+    "Denji final review",
+    "integration"
+  ]
+}

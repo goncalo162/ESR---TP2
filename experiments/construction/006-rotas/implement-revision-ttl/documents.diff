@@ -1,0 +1,213 @@
+--- a/docs/06-DATA-MODEL.md
++++ b/docs/06-DATA-MODEL.md
+@@ -148,3 +148,15 @@
+ Q-C-26/29 e recusas reais Q-C-31 implementadas; sem alteração ao domínio anterior.
+ 1254 testes incrementais aprovados, incluindo43 novos; Test/clean verify/JAR novo/
+ manual humano/revisão final Denji/integração pendentes. Sem conclusão de fase.
++
++## IMP-009 — validade de metadados distinta da validade de seleção
++
++Registo 2026-11-14T15:00:17Z. Correção do checkpoint Implement: remainingNanos de catálogo é
++máximo de validade dos candidatos. visibleAt não pode usá-lo como validade de
++custo/upstream selecionados. Ao avançar capturedAtNanos de entrada remota sem
++informação para recalcular, conserva metadados válidos e projeta UNAVAILABLE com
++métrica/upstream vazios, sem mutar original/Root. Ao mesmo instante conserva
++seleção; oferta local sem TTL conserva custo0. Esta projeção é conservadora para
++qualquer avanço positivo de instante; não equivale a declaração de ausência de
++rota no owner. [Walkthrough revisto](../memory-bank/bolts/006-rotas/implementation-walkthrough.md).
++Regressão incremental1256/0/0/0; Test/D32/manual/revisão final/integração pendentes.
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -4,7 +4,7 @@
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Implement para revisão; ADR/Q-C-31 aprovadas; regressão incremental1254/0/0/0, Test pendente.
++**Última tarefa concluída:** [TASK-011](tasks/PHASE-03/TASK-011.md), DONE. IMP-008/021-rotas integrado em main 3b7aa745cac62b71ac8ce7e036656bf7ab21692f; Test1211/0/0/0, manual Luis43 e revisão final Luis aceites. [Fecho](../memory-bank/bolts/021-rotas/closure-walkthrough.md). PHASE-03 continua em progresso;006-rotas/IMP-009 em Implement para revisão; ADR/Q-C-31 aprovadas; regressão incremental1256/0/0/0 após correção TTL/visibleAt, Test pendente.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -108,7 +108,7 @@
+ | [TASK-034 — Extra B](tasks/PHASE-02/TASK-034.md) | Reparar ligações com a cache aprendida | TASK-033 | DONE | V-034/1113 testes; manual Luis66/SIGKILL real; Test/aceitação final e integração em main comprovados |
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+-| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Implement para revisão; V-012 incremental/regressão1254/0/0/0; Test/manual pendentes |
++| [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | IN PROGRESS | Implement revisto TTL/visibleAt; regressão1256/0/0/0; Test/manual pendentes |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+@@ -1133,3 +1133,17 @@
+ Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
+ Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
+ Evidência: experiments/construction/006-rotas/implement/.
++
++## IMP-009 — Implement reapresentado após correção TTL/visibleAt
++
++Registo 2026-11-14T15:00:17Z. Dois desvios reproduzidos em39 testes/2 falhas antes da correção;
++ANNOUNCE revalida publicação/Session/TTL na fronteira da porta com tempo novo.
++visibleAt remoto avançado preserva metadados válidos e deixa custo/upstream
++explicitamente ausentes porque o snapshot não contém candidatos para recalcular;
++projeção pura, conservadora, snapshots anteriores intactos. Regressão final15
++JDK21:1256/0/0/0,16 XML. Só três Java dentro dos seis caminhos alterados nesta
++revisão; evidências anteriores preservadas. Implement para revisão,32 oráculos
++mantidos/D32 parcial, sem Test/fecho/commits/push ou outro IMP. Clean verify,
++JAR novo, manual humano, revisão final Denji e integração pendentes.
++Walkthrough: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement-revision-ttl/.
+--- a/memory-bank/bolts/006-rotas/bolt.md
++++ b/memory-bank/bolts/006-rotas/bolt.md
+@@ -6,7 +6,7 @@
+ status: "in-progress"
+ stories: ["003-difundir-anuncios-e-construir-catalogo-e-rotas"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-14T14:36:19Z"
++updated: "2026-11-14T15:00:17Z"
+ started: "2026-11-14T11:47:13Z"
+ completed: null
+ current_stage: "implement"
+@@ -126,7 +126,7 @@
+ Test/fecho/commits/push.32 oráculos por executar à entrada; resultado só após
+ execução real. V-012/regressão/manual humano/revisão Denji/integração pendentes.
+ 
+-## Checkpoint atual — Implement para revisão antes de Test
++## Histórico — Implement apresentado antes da correção TTL
+ 
+ Registo 2026-11-14T14:36:19Z. Revisão ADR/Q-C-31 aprovadas; Model/Design/ADR concluídos.
+ [Walkthrough e D01–D32](implementation-walkthrough.md) preparados nos seis caminhos.
+@@ -146,3 +146,14 @@
+ [Resultados/hashes atuais](../../../experiments/construction/006-rotas/implement/results.json),
+ [diff de fonte](../../../experiments/construction/006-rotas/implement/source.diff) e
+ [V-ADD](../../../experiments/construction/006-rotas/implement/v-add.md) ligados ao walkthrough.
++
++## Checkpoint atual — Implement revisto: TTL e projeção pura
++
++Registo 2026-11-14T15:00:17Z. Desvios TTL/visibleAt reproduzidos em red-13 (39 testes,2 falhas),
++corrigidos nos três caminhos autorizados e reapresentados no walkthrough.
++Regressão incremental final15/JDK21:1256/0/0/0,16 XML,45 testes novos/1211
++anteriores. Evidências1254 e anteriores preservadas; não confundir hashes.
++current_stage=implement, só Model/Design/ADR concluídos. Implement por aprovar;
++D32 parcial, sem Test/fecho/commits/push. Clean verify/JAR novo/manual humano/
++revisão final Denji/integração pendentes, sem gates externos adicionais.
++Evidência em experiments/construction/006-rotas/implement-revision-ttl/.
+--- a/memory-bank/bolts/006-rotas/implementation-walkthrough.md
++++ b/memory-bank/bolts/006-rotas/implementation-walkthrough.md
+@@ -27,7 +27,7 @@
+ 4 - **overlay/OverlayNode:** compõe factory/eventos de routing e métricas no owner
+     existente, preservando APIs e observadores; routingSnapshot novo e fecho/
+     rollback no prazo global anterior, sem alterar o resultado NODE_LEAVE.
+-5 - **routing/RoutingServiceTest:**37 testes determinísticos com relógio,
++5 - **routing/RoutingServiceTest:**39 testes determinísticos com relógio,
+     scheduler, owner e futuras admissões controlados, mais grafos literais.
+ 6 - **overlay/OverlayNodeRoutingTest:**6 testes novos de integração/lifecycle,
+     incluindo TCP real ANNOUNCE/WITHDRAW/ERROR, bootstrap desligado após início,
+@@ -115,7 +115,7 @@
+ | D05 | d05TwoOrigins... e d09Withdrawal...: origem/stream independente e retirada por sender |
+ | D06 | d06Unmeasured...: ausência de RTT, custo direto, SUSPECT e prazo original; contratos de Invalidated também pela regressão monitor/tabela |
+ | D07 | d07ConflictingMetadata..., d07InvalidBeforeFirst..., d07IdentityAndCostOverflow...; domínio UTF-8/codecs em d31 |
+-| D08 | d08ReferenceSurvives...: além de candidate/cache/watermark TTL, conflito tardio, seq rejeitada reutilizável e época nova; referências não expulsas em d28 |
++| D08 | d08AnnounceRevalidatesExpiryBetweenTwoSendsInOneTurn e d08ReferenceSurvives...: além de candidate/cache/watermark TTL, conflito tardio, seq rejeitada reutilizável e época nova; referências não expulsas em d28 |
+ | D09 | d09Withdrawal... mais testes anteriores d11* de RoutingTableTest para watermarks/seq antiga e nova |
+ | D10 | d08D10EpochChange... mais testes anteriores d12*/d13* da tabela para atomicidade por fonte e oitava/nona retirada |
+ | D11 | d11OldSession...: Down, métricas e anúncio antigo não alteram substituta |
+@@ -129,7 +129,7 @@
+ | D19 | d19WithdrawalCannot...: W antes de ANN novo, futures/quota controlados |
+ | D20 | d20LateAccepted...: E2 permanece no domínio e recibo E1 ordena W antigo/ANN novo |
+ | D21 | d21LateRevision...: admissão antiga não confirma payload novo; sessão antiga não afeta nova |
+-| D22 | d22ImmutableSnapshots...: mapas defensivos, validade pura e nenhuma autorização de dados |
++| D22 | d22VisibleAtNeverRelabelsExpiredSelectionAsCurrentWhileAlternativeLives e d22ImmutableSnapshots...: mapas defensivos, validade pura e nenhuma autorização de dados |
+ | D23 | d23NewRepairPeer...; testes anteriores de reparação/tabela/monitor: NeighborUp de nova aresta é consumido sem bootstrap periódico |
+ | D24 | d24ClockFailureDuringConstruction..., d24CloseBeforeStart..., d24StopBeforeStart..., d24RoutingFactoryFailure..., d24SharedDeadline... e11 testes anteriores do nó |
+ | D25 | d25UnrelatedEvents... e d27OriginalObserver...: ERROR intacto/uma vez; codec/fixtures preservados e reexecutados na regressão |
+@@ -176,7 +176,7 @@
+ atribuída a Denji e integração. Sem commits/push ou início de outro IMP.
+ 
+ 
+-## Pacote de revisão e verificações documentais
++## Pacote anterior de revisão preservado (1254 testes)
+ 
+ [Diff de fonte contra a base](../../../experiments/construction/006-rotas/implement/source.diff),
+ [diff documental desta etapa](../../../experiments/construction/006-rotas/implement/documents.diff)
+@@ -184,3 +184,63 @@
+ [Listas target geradas separadas](../../../experiments/construction/006-rotas/implement/target-generated.numstat).
+ [V-ADD](../../../experiments/construction/006-rotas/implement/v-add.md) com zero erros/78 fixtures;
+ [resultados/hashes e preservação](../../../experiments/construction/006-rotas/implement/results.json).
++
++## Correção TTL/visibleAt — Implement reapresentado para revisão
++
++Registo 2026-11-14T15:00:17Z. Pedido explícito do utilizador: corrigir dois desvios e repetir
++regressão incremental, sem avançar a Test/fecho. O pacote1254 acima é histórico,
++preservado byte a byte nas evidências; não representa os hashes da versão atual.
++
++1 - **Antes de cada ANNOUNCE:** attempt já não recebe o instante do início do
++    turno. Lê now(), aplica expiração e reavalia seleção/intenção quando a versão
++    muda; valida conteúdo, Session e TTL com tempo atual depois de preparar a
++    mensagem e novamente após reservar ticket/quota, imediatamente antes da porta.
++    Uma intenção já expirada não chega à porta. Reservas sem chamada/future são
++    descartadas com sinalização; uma tentativa já debitada não recebe refund de
++    quota. Tickets com trabalho efetivamente iniciado continuam sujeitos à
++    terminação física de callback+continuação. Não alterar seq/TTL para enviar.
++    O fim do turno também expira/publica/agenda usando um instante novo, sem
++    voltar a publicar o instante antigo depois de um envio que demorou.
++2 - **visibleAt puro:** remainingNanos protege os metadados enquanto há algum
++    candidato válido; não representa o prazo do upstream selecionado. Como Entry
++    não transporta o conjunto de candidatos nem o prazo específico da seleção,
++    não é possível recalcular uma alternativa a partir deste snapshot. Mantém-se
++    a API: ao avançar o instante de uma entrada remota, projetar UNAVAILABLE com
++    metric/knownUpstream ausentes. Aos mesmos capturedAtNanos conserva a seleção;
++    ofertas locais sem TTL conservam custo0. Isto é deliberadamente conservador,
++    inclusive quando a seleção poderia ainda estar viva. Não consulta nem altera
++    Root, relógio, catálogo original ou snapshots anteriores; não estende prazo.
++3 - **Sem ampliação de âmbito:** só RoutingService.java, StreamCatalog.java e
++    RoutingServiceTest.java mudaram nesta revisão; os outros três caminhos e
++    todos os testes anteriores desta implementação estão preservados. A opção de
++    projeção sem custo foi expressamente autorizada no pedido, sem nova ADR/Q.
++
++**Reprodução determinística:** red-13,39 testes,2 falhas/0 erros/0 skips. O
++primeiro teste avança8s dentro da porta do primeiro ANNOUNCE, antes do segundo
++envio do mesmo turno: antes saíam2 anúncios, após a correção só1, sem segundo
++consumo de quota/ticket para a intenção que já está expirada. Mantém3 sessões;
++a projeção final do turno já tem instante8s e catálogo vazio. O segundo teste
++captura A selecionado com custo110 expirando aos8s e B válido até9s; visibleAt(8s)
++conservava o custo/upstream de A. Agora preserva metadados por mais1s com ambos
++os campos ausentes; projeção encadeada reduz prazo e desaparece aos9s, sem mudar
++o snapshot original nem o relógio do domínio.
++
++**Resultados preservados:**
++
++- [red-13](../../../experiments/construction/006-rotas/implement-revision-ttl/red-13/result.json):39 testes,2 falhas reais.
++- [green-14](../../../experiments/construction/006-rotas/implement-revision-ttl/green-14/result.json):39/0/0/0 após correção inicial.
++- [Regressão final15](../../../experiments/construction/006-rotas/implement-revision-ttl/incremental-regression-15/result.json):
++  `mvn -B -ntp '-Dtest=*' test`, JDK21, **1256/0/0/0 em16 XML**,45 testes novos e1211
++  anteriores; fonte final identificada por hashes, sem reutilizar XML antigos.
++  [Log](../../../experiments/construction/006-rotas/implement-revision-ttl/incremental-regression-15/maven.log).
++
++D08/D22 reforçados sem alterar os32 IDs de oráculo. D32 permanece parcial;
++clean verify, novo JAR, manual humano, revisão final Denji e integração pendentes.
++Sem Test/fecho/commits/push ou outro IMP. Implement continua para revisão.
++
++
++Pacote atual: [diff desta correção](../../../experiments/construction/006-rotas/implement-revision-ttl/source.diff),
++[fonte acumulada contra a base](../../../experiments/construction/006-rotas/implement-revision-ttl/cumulative-source.diff),
++[verificações/hashes](../../../experiments/construction/006-rotas/implement-revision-ttl/results.json)
++e [V-ADD](../../../experiments/construction/006-rotas/implement-revision-ttl/v-add.md).
++Listas geradas em target continuam separadas e não fazem parte da fonte aprovada.
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -321,3 +321,17 @@
+ Implement por aprovar; nenhum fecho/commit/push ou outro IMP, sem gates externos.
+ Artefacto: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
+ Evidência: experiments/construction/006-rotas/implement/.
++
++## IMP-009 — Implement reapresentado após correção TTL/visibleAt
++
++Registo 2026-11-14T15:00:17Z. Dois desvios reproduzidos em39 testes/2 falhas antes da correção;
++ANNOUNCE revalida publicação/Session/TTL na fronteira da porta com tempo novo.
++visibleAt remoto avançado preserva metadados válidos e deixa custo/upstream
++explicitamente ausentes porque o snapshot não contém candidatos para recalcular;
++projeção pura, conservadora, snapshots anteriores intactos. Regressão final15
++JDK21:1256/0/0/0,16 XML. Só três Java dentro dos seis caminhos alterados nesta
++revisão; evidências anteriores preservadas. Implement para revisão,32 oráculos
++mantidos/D32 parcial, sem Test/fecho/commits/push ou outro IMP. Clean verify,
++JAR novo, manual humano, revisão final Denji e integração pendentes.
++Walkthrough: memory-bank/bolts/006-rotas/implementation-walkthrough.md.
++Evidência: experiments/construction/006-rotas/implement-revision-ttl/.

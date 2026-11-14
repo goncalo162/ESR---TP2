@@ -655,3 +655,56 @@ alteração de fonte nesta etapa. Manual Codex43checks passou contra esse JAR;
 [roteiro offline humano](../experiments/construction/021-rotas/manual-instructions.md)
 preparado, execução humana não recebida. D22 parcial/Test por aprovar, revisão
 final e integração pendentes. Sem composição de rede ou autorização de dados nova.
+
+## IMP-009 — composição/API propostas, Design para revisão
+
+Registo 2026-11-14T12:31:20Z. Q-C-28 Opção1 aprovada: ADD inclui OverlayNode.java e
+OverlayNodeRoutingTest.java além dos quatro caminhos de routing/catálogo.
+[Design secções2/5–8](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md)
+define assinaturas propostas: RoutingService partilha NeighborManager.SerialOwner,
+recebe eventos de vizinhança e monitor, delega ControlPort.send no manager e
+publica snapshot imutável. OverlayNode acrescenta routingSnapshot e factory de
+teste, preservando construtores/observadores existentes. Não expor owner mutável.
+requestClose não espera; awaitTermination exige terminação física no prazo global.
+ANNOUNCE9/WITHDRAW10 mantêm codec/TCP v2/FIFO atuais. ACCEPTED só admite em fila;
+retirada pendente precede anúncio novo. Callback antigo não confirma intenção nova;
+recibo de admissão velha na sessão corrente pode exigir W antigo, sem mudar Root.
+Q-C-29 concreta ainda para revisão; nenhum contrato operacional implementado ou
+ADR nova aceite por esta proposta. CLI/trace/dados permanecem nos IMP seguintes.
+
+## IMP-009 — Design aprovado e contratos reais conferidos na revisão ADR
+
+Registo 2026-11-14T12:53:08Z. Q-C-29/30 aprovadas integralmente. [Revisão de assinaturas](../memory-bank/bolts/006-rotas/adr-review.md)
+confirma NeighborManager.SerialOwner emprestado, send(Session,ControlMessage)
+assíncrono, eventos de monitor e RoutingTable existentes. RoutingService,
+StreamInfo/StreamCatalog de domínio e APIs novas do nó ainda não implementados.
+StreamConfiguration não tem codec: oferta usa1/MJPEG, validado sem ler média.
+Q-C-31 proposta: offer(false) por fila cheia inicia fecho real do owner;
+Connection.send OVERFLOW já fecha a ligação afetada. Distinguir da recusa local
+não terminal K/P/quota. Não prometer wake/retry numa execução/ligação encerrada
+nem mudar contratos atuais por inferência. Estado lógico não prova terminação
+física. Revisão ADR e Q-C-31 por aprovar;32 oráculos por executar, sem Implement.
+
+## IMP-009 — APIs disponíveis no checkpoint Implement, Test pendente
+
+Registo 2026-11-14T14:36:19Z. [Walkthrough e mapa de casos](../memory-bank/bolts/006-rotas/implementation-walkthrough.md).
+RoutingService recebe owner/ControlPort/Observer e overload de relógio/Scheduler;
+start/onNeighborEvent/onMetrics/setLocalAvailable são do owner. snapshot é imutável;
+requestClose é lógico e awaitTermination aguarda físicos no orçamento. OverlayNode
+preserva construtores anteriores, acrescenta factory de routing/routingSnapshot e
+compõe eventos/métricas/fecho. STREAM_ANNOUNCE9/WITHDRAW10 mantêm codec/bytes TCPv2.
+Q-C-31 aprovada: K/P/quota recusam localmente, OVERFLOW retira só a Session e
+saturação do owner limpa por hooks. Callback antigo não renova TTL nem restaura
+estado; admissão antiga ainda efetiva gera recibo/retirada limitada. Regressão
+incremental1254/0/0/0,16 XML; não é clean verify nem aprovação Test. CLI/trace/dados
+não foram antecipados; sem JAR novo ou manual humano deste incremento.
+
+## IMP-009 — contratos validados tecnicamente, aceitação Test pendente
+
+Registo 2026-11-14T15:24:36Z. [Test](../memory-bank/bolts/006-rotas/ddd-03-test-report.md):
+clean verify JDK21:1256/0/0/0,16 XML; novo JAR/hash e manual público53 checks.
+Inclui grafos controlados e cinco OverlayNode normais via TCP, fontes independentes,
+bootstrap encerrado e terminação. O auxiliar captura snapshots que satisfazem
+conjuntamente condições, sem presumir estabilidade entre duas leituras vivas.
+Nenhuma API/byte/propriedade alterada nesta etapa. Manual humano e aprovação Test
+não recebidos; revisão final Denji/integração pendentes, sem nova CLI/GUI/vídeo.

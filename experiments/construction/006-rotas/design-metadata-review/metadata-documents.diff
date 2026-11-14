@@ -1,0 +1,126 @@
+--- a/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
++++ b/memory-bank/bolts/006-rotas/ddd-02-technical-design.md
+@@ -116,6 +116,60 @@
+     invalida todos os streams dessa fonte na mesma transação do owner, limpa
+     metadados/intenções antigos e prepara retiradas de publicidade efetiva antiga;
+     outras fontes não mudam. Não ordenar UUIDs para inferir época mais recente.
++
++### 3.1. Referência de metadados por UUID/época — Q-C-30 proposta
++
++A referência é o tuplo imutável `(title, codec, fps)` associado ao binding
++`(streamId, serverId)` e à época corrente dessa fonte. Não se deduz do candidato
++selecionado nem se escolhe novamente quando muda o melhor caminho.
++
++1 - **Estabelecimento local:** a configuração validada da oferta SERVER fixa o
++    tuplo quando essa oferta é instalada na época local. Suspender/retomar a
++    oferta na mesma época não permite alterar o tuplo; não há reload neste IMP.
++2 - **Estabelecimento remoto:** sem referência nessa época, o primeiro ANNOUNCE
++    que passa validação completa de sessão/identidade/origem/path/conteúdo e é
++    efetivamente admitido pelo Root como candidato vivo fixa o tuplo no mesmo
++    turno do owner, antes de publicar o snapshot. Candidato sem RTT também pode
++    fixá-lo: é conhecido e válido, apesar de ainda UNAVAILABLE para seleção.
++    Mensagem rejeitada, época não confirmada ou candidato não admitido não fixa
++    referência. Reservar capacidade antes da admissão; um binding eventualmente
++    reservado sem candidato não é, por si só, referência de metadados.
++3 - **Comparação:** exigir igualdade exata dos três campos em todos os anúncios
++    seguintes desse UUID/época, qualquer que seja o caminho ou a sequência.
++    Título compara a sequência Unicode validada, sem trim, case-fold ou
++    normalização implícita; codec/FPS comparam os valores numéricos. No protocolo
++    atual só codec1 é válido; outro codec já falha a validação estrutural.
++4 - **Contradição:** rejeitar o anúncio inteiro antes de alterar Root, watermarks,
++    referência, cache, ledger ou catálogo. Não instalar/remover candidatos,
++    renovar TTL, retirar publicidade saudável ou encerrar a sessão por esse
++    conflito de conteúdo; apenas diagnóstico limitado. Inclui contradição no
++    mesmo sender de um candidato saudável. Seq maior não autoriza mudar título/
++    codec/FPS. Anúncio coerente posterior é avaliado normalmente, inclusive com a
++    mesma seq rejeitada: o conflito não consumiu geração nem instalou watermark.
++5 - **Retenção e limite:** a referência permanece mesmo após WITHDRAW, NeighborDown
++    ou expiração de **todos** os candidatos, watermarks e cache de flooding.
++    Catálogo visível fica vazio, mas a referência não é TTL de rota nem oferta.
++    Há no máximo uma referência da época corrente por binding: 256 por origem,
++    64 origens, total S=16384, alocadas por necessidade. Não há referência por
++    candidato/seq/caminho, arquivo de tuplos de épocas antigas, LRU ou novo limite
++    baseado em routing.cache.capacity. Saturação recusa novo binding/referência
++    explicitamente, sem expulsar os existentes ou deixar candidato sem a sua
++    referência. Não se liberta uma referência só para aceitar conteúdo diferente.
++6 - **Mudança permitida:** só a transação confirmEpoch aceite pelas regras Q-C-26
++    elimina as referências da época anterior dessa fonte, juntamente com a
++    invalidação dos seus candidatos. O primeiro candidato admitido na nova época
++    estabelece o novo tuplo; mudança de época rejeitada preserva tudo. Outras
++    fontes não mudam. Reiniciar o processo também elimina este estado volátil.
++    Uma nova seq, expiry ou reconexão na mesma época nunca bastam. Épocas retiradas
++    continuam protegidas apenas pelo histórico limitado Q-C-26 (oito/cacheTtl);
++    esta política não acrescenta proteção eterna nem ordenação temporal de UUID.
++
++É confiança de laboratório na primeira oferta/admissão validada, não autenticação
++criptográfica dos metadados da fonte nem consenso entre caminhos. Não votar,
++misturar campos ou substituir a referência pelo último anúncio recebido.
++O catálogo usa sempre esse tuplo enquanto há oferta/candidato vivo coerente.
++A retenção sem TTL e o critério de primeira admissão são proposta nova Q-C-30,
++pendente desta revisão; não alteram as restantes propostas de Design/Q-C-29.
+ 
+ Cada operação Root preserva a atomicidade já contratada. Reservar recursos de
+ metadados antes de mutar; não prometer transação distribuída entre métodos Root.
+@@ -326,8 +380,8 @@
+ 4 - **D04 / M04:** ciclo rejeita path com repetição/local, orçamento finito por geração; convergência com gerações periódicas e carga controlada.
+ 5 - **D05 / M05:** retirar um stream/origem preserva os dois streams da outra; só remove candidato do sender correto.
+ 6 - **D06 / M07:** UNMEASURED não custa0; Updated usa costMicros direto; SUSPECT conserva amostra; Invalidated sem renovar TTL.
+-7 - **D07 / M08:** origem/UUID/metadados/path/overflow inválidos não deixam mutação parcial ou cache nova.
+-8 - **D08 / M09:** sequência nova renova; duplicado/melhoria/quotas/callbacks não renovam; catálogo desaparece sem candidato vivo.
++7 - **D07 / M08:** origem/UUID/path/overflow inválidos não deixam mutação parcial ou cache nova. Antes da primeira referência, anúncio inválido não a fixa; o primeiro admitido, incluindo sem RTT, fixa M=("Video A",1,25). Outro caminho anuncia o mesmo UUID/época com título diferente ou FPS30, mesmo com seq maior/custo melhor: rejeição integral conserva referência, candidatos saudáveis, seleção, projeção de catálogo/rotas, watermarks e prazos; sem W/NeighborDown. Repetir pelo sender do candidato saudável, e com codec inválido. Anúncio posterior coerente com a mesma seq rejeitada é admitido normalmente; oferta local usa o tuplo configurado, não o de outro caminho.
++8 - **D08 / M09:** sequência nova renova; duplicado/melhoria/quotas/callbacks não renovam. Com relógio controlado, estabelecer M na épocaE1, expirar todos os candidatos e avançar além de cacheTtl para expirar também cache/watermarks: catálogo vazio, referência M ainda reservada. Outro caminho com seq100/título ou FPS contraditório é rejeitado sem repor catálogo/candidato nem renovar prazo; o anúncio seq100 coerente é depois admitido e repõe M com prazo apenas dessa admissão. Reconexão/retirada não libertam M. Mudança E1→E2 aceite permite M2 novo; mudança rejeitada preserva M; E1 reaparecida dentro do histórico é rejeitada. Verificar limite de uma referência por binding, sem crescer por seq/caminho nem expulsar referências na saturação.
+ 9 - **D09 / M10:** WITHDRAW seq antiga/futura/contexto errado conforme Root; nunca elimina candidatos de outros senders.
+ 10 - **D10 / M11:** mudança E1→E2 atómica por fonte, outras preservadas, época retirada rejeitada, oitava/nona fronteiras de Q-C-26.
+ 11 - **D11 / M12:** old Session/instance/connectionId, Down e métricas atrasadas não afetam nova sessão/TTL; reservas antigas continuam físicas.
+@@ -364,6 +418,9 @@
+ com retenção após Down, ledger S×N, timers2/turnos64/16, ordens W/ANN e recibos
+ antigos. Estes valores e o uso de instanceId como época local aguardam esta revisão.
+ Q-C-28 já aprovada autoriza o âmbito documental de seis caminhos, não código agora.
++Q-C-30 propõe a referência de metadados da secção3.1: primeira admissão/oferta,
++retenção na época corrente mesmo após expiração total e rejeição atómica de
++contradições. D07/D08 concretizados; continuam 32 oráculos, todos por executar.
+ 
+ Após aprovação de Design, avançar **apenas para ADR**, conferir contratos/APIs e
+ conformidade ADR-004/016/017/018/020/024. Divergência aceite inviável aplica ADD11.
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1079,3 +1079,39 @@
+ - **ADR:** revisão antes de Implement; eventual divergência aplica ADD11.
+ - **Decisão humana registada em 2026-11-14T12:31:20Z:** princípios aprovados; concretizar limites e ordens em Design, sem forjar sequências ou renovar TTL indevidamente. Q-C-26 mantém-se aceite e inalterada.
+ - **Concretização pendente de revisão:** [Design secções5–8](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md): ledger S×N, K chaves de flooding/H=cacheTtl, P=min(K,E) coalescers com W+ANN, B=min(E,2N) tickets físicos; quota F numa janela deslizante1s por stream/nodeId conservada após Down; timers2/turnos64/16. W pendente não é apagado por geração nova. Igual custo/saltos com troca de path também exige W+geração nova. ACCEPTED tardio da sessão corrente gera recibo limitado/retirada antiga sem restaurar Root/TTL; sessão antiga só liberta ticket. Nenhum destes valores é aprovado por inferência; D01–D32 planeados, não executados.
++
++
++## Q-C-30 — IMP-009: referência de metadados e retenção após expiração
++
++- **Registo:** 2026-11-14T12:42:45Z; estado **PROPOSTA/PENDENTE DE APROVAÇÃO de Design**.
++- **Motivo:** Model exige metadados coerentes por UUID/época e proíbe escolher o
++  último anúncio contraditório; faltava decidir a referência e a sua retenção
++  quando deixa de haver candidatos. Este pedido autoriza concretizar a proposta,
++  não presume a sua aprovação nem passagem a ADR/Implement.
++- **Proposta:** [Design secção3.1](../memory-bank/bolts/006-rotas/ddd-02-technical-design.md).
++  Oferta local configurada ou primeiro ANNOUNCE remoto validado e efetivamente
++  admitido como candidato vivo fixa title/codec/FPS para UUID/origem/época.
++  Sem RTT também pode fixar; mensagem rejeitada ou mera reserva de binding não.
++  Igualdade exata dos campos, sem normalização implícita do título. Contradição
++  é rejeitada inteira antes de qualquer mutação, sem renovar TTL, consumir seq,
++  retirar candidato saudável ou fechar sessão; apenas diagnóstico limitado.
++- **Retenção/limite:** uma referência imutável por binding na época corrente,
++  até256/origem×64=16384, lazy e sem TTL próprio. Persiste após expirarem todos os
++  candidatos/cache/watermarks ou após Down/WITHDRAW; catálogo visível desaparece.
++  Não guardar tuplos históricos nem reutilizar cache.capacity como este limite.
++  Saturação recusa nova admissão sem expulsão ou candidato sem referência.
++- **Mudança:** só confirmEpoch aceite elimina referências anteriores dessa fonte
++  e permite estabelecer novo tuplo; rejeição preserva tudo. Reinício elimina o
++  estado volátil. Sequência maior, reconexão ou expiração na mesma época não
++  autorizam alteração. Proteção limitada das épocas retiradas segue Q-C-26,
++  sem ampliar oito/cacheTtl ou inventar autenticação/consenso.
++- **Oráculos:** D07 fixa M por primeira admissão, rejeita contradição em outro
++  caminho e no sender saudável, preservando estado; anúncio coerente posterior
++  pode usar a mesma seq rejeitada. D08 avança além dos prazos de candidato/cache/
++  watermark, conserva referência com catálogo vazio, rejeita conflito tardio,
++  aceita seq100 coerente e só muda tuplo após época nova confirmada. Inclui
++  saturação e cardinalidade; permanecem32 oráculos, nenhum executado.
++- **Estado da etapa:** só Design para revisão; restantes propostas preservadas.
++  Sem gates externos adicionais. V-012, regressão atual, manual humano antes de
++  aprovar Test, revisão final Denji e integração continuam obrigatórios.
++  Nenhuma ADR nova aceite, Java, commit/push ou outro IMP.
