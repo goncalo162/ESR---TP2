@@ -1077,7 +1077,7 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Descrição/entrega:** Diagnosticar percursos pela CLI. Produzir este incremento e a sua prova, preservando os restantes componentes.
 - **Fase/unidade/tamanho:** PHASE-03 / 003-rotas / S.
 - **Bolt/origem:** [022-rotas](memory-bank/bolts/022-rotas/bolt.md); TASK-013.
-- **Ficheiros:** `routing/RoutingService.java`, `app/OttApplication.java`, `routing/RouteTraceTest.java`.
+- **Ficheiros:** `routing/RoutingService.java`, `app/OttApplication.java`, `routing/RouteTraceTest.java`, `overlay/OverlayNode.java`.
 - **Dependências:** IMP-006 (004-overlay), IMP-009 (006-rotas), IMP-005 (020-overlay).
 - **ADR:** ADR-004, ADR-022, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-010, REQ-019, REQ-023.
@@ -1089,6 +1089,24 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
   - [ ] Falhas terminam por erro/timeout em prazo.
   - [ ] Diagnóstico não altera subscrições.
   - [ ] Validação V-013 executada e evidência ligada no progresso.
+
+**Concretizações aprovadas Q-C-32/33 — 2026-11-14T16:24:54Z:** OverlayNode apenas
+expõe requestTrace(UUID), delegando ao RoutingService existente sem revelar
+owner/manager/mapas. Mesmas Sessions, eventos e shutdown global; fechos anteriores
+preservados. TRACE usa requestId=traceId, Sessions completas de entrada/saída e
+retorno pelo contexto guardado; TraceTicket consultável sem callbacks cliente no
+owner. TTL inicial32 conta iniciador; TTL0 falha antes de admitir nó, via
+ERROR TIMEOUT10/relatedType15/detail TTL_EXHAUSTED. Prazo local3000ms desde
+admissão antes da fila, sem renovação. T=min(E,64) contextos,4 locais/4 por Session;
+S=min(E,64) reservas físicas trace adicionais, até2 por contexto até callback real.
+Uma intenção de resposta/contexto, até16 ações/turno, scheduler existente com
+até2 jobs físicos e wake coalescido; sem timer por pedido. CLI até4 tickets,
+1 cursor, até16 linhas/turno e4096 caracteres/linha. Sem subscrição/vídeo,
+sem mudança de tipos/códigos/bytes/caps, sem novo transporte ou executor de estado.
+Detalhes completos no [Plan aprovado](memory-bank/bolts/022-rotas/implementation-plan.md).
+Histórico: autorização inicial apenas de interfaces/testes vermelhos; autorização
+posterior de comportamentos registada no walkthrough IMP-010. Implement preparado
+para aprovação; Test e fecho não autorizados.
 
 <a id="imp-011"></a>
 ### IMP-011 — Ativar procura com confirmação

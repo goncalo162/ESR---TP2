@@ -3,6 +3,7 @@ package pt.uminho.esr.ott.app;
 import pt.uminho.esr.ott.bootstrap.BootstrapServer;
 import pt.uminho.esr.ott.config.*;
 import pt.uminho.esr.ott.overlay.*;
+import pt.uminho.esr.ott.routing.*;
 import java.io.*;
 import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,17 @@ public final class OttApplication {
     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
     interface RunningService extends AutoCloseable {
         Map<String, Neighbor> neighbors();
+        default pt.uminho.esr.ott.routing.RoutingService.Snapshot routingSnapshot() {
+            return pt.uminho.esr.ott.routing.RoutingService.emptySnapshot();
+        }
+        default Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() {
+            return Optional.empty();
+        }
+        default pt.uminho.esr.ott.routing.RoutingService.TraceTicket requestTrace(UUID streamId) {
+            Objects.requireNonNull(streamId);
+            return RoutingService.unavailableTrace(streamId);
+        }
+
         default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
         void requestShutdown(int reason, Duration remainingBudget);
         boolean awaitTermination(Duration remainingBudget);
@@ -79,7 +91,7 @@ public final class OttApplication {
         final NodeConfiguration config;
         try {
             invocation = parse(arguments);
-            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, quit"); return new ExecutionResult(0, true, true, true); }
+            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, routes, catalog, metrics, trace UUID, quit"); return new ExecutionResult(0, true, true, true); }
             config = ConfigurationLoader.load(invocation.config().orElseThrow(), invocation.role().orElseThrow());
         } catch (ConfigurationException | IllegalArgumentException e) { error.println(bounded("CONFIG_ERROR " + e.getMessage())); return new ExecutionResult(2, true, true, true); }
         var console = new Console(input, output, error, config, clock);
@@ -89,6 +101,7 @@ public final class OttApplication {
             catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }, "ott-shutdown-hook");
         RunningService service = null;
+        var diagnostic = new DiagnosticConsole(console, clock);
         boolean interrupted = false;
         boolean inputDone = true, outputDone = true, serviceDone = true;
         try {
@@ -98,6 +111,7 @@ public final class OttApplication {
             console.log("STARTED node=" + config.nodeId() + " role=" + config.role() + " pid=" + ProcessHandle.current().pid(), false);
             console.reader.start();
             while (!console.stopped.get()) {
+                diagnostic.poll();
                 var failure = service.failure();
                 if (failure.isPresent()) { console.log("FATAL " + failure.orElseThrow(), true); console.stop(true); break; }
                 var command = console.commands.poll(20, TimeUnit.MILLISECONDS);
@@ -114,7 +128,11 @@ public final class OttApplication {
                 } else if(line.equals("recovery")) {
                     var status=service.recoveryStatus();
                     console.log("RECOVERY node="+config.nodeId()+" "+status.map(Object::toString).orElse("NOT_APPLICABLE"),false);
-                } else if (line.equals("catalog") || line.equals("play") || line.startsWith("play "))
+                } else if (line.equals("trace") || line.startsWith("trace ")) {
+                    diagnostic.trace(line, service);
+                } else if (line.equals("routes") || line.equals("catalog") || line.equals("metrics")) {
+                    diagnostic.list(line, service);
+                } else if (line.equals("play") || line.startsWith("play "))
                     console.log("NOT_IMPLEMENTED " + line.split(" ", 2)[0], false);
                 else console.log("COMMAND_ERROR unknown command", true);
             }
@@ -122,6 +140,7 @@ public final class OttApplication {
         catch (Exception e) { console.log("FATAL " + bounded(e.getMessage()), true); console.stop(true); }
         finally {
             console.stop(false);
+            diagnostic.cancel();
             // Close/cancel the owned input before waiting on the network budget.
             console.reader.interrupt(); closeInput.run();
             if (service != null) {
@@ -135,6 +154,7 @@ public final class OttApplication {
                     try { service.close(); } catch (RuntimeException ignored) { /* Preserve the first cleanup failure. */ }
                 }
             }
+            diagnostic.poll();
             inputDone = join(console.reader, console.left());
             if (!inputDone) console.failed.set(true);
             // This record precedes the writer's final drain/join, so it cannot announce a final status.
@@ -171,19 +191,127 @@ public final class OttApplication {
             };
         }
         UUID instance = UUID.randomUUID();
-        var node = new OverlayNode(config, instance, event -> console.log("EVENT node=" + config.nodeId()
-                + " instance=" + instance + " " + event, event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR));
+        var reference = new AtomicReference<OverlayNode>();
+        var node = new OverlayNode(config, instance, event -> {
+            console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
+                    event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
+            if (event instanceof NeighborManager.Received received) {
+                var m=received.message(); UUID stream = m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.Trace t ? t.streamId()
+                        : m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.TraceResult t ? t.streamId() : null;
+                var n=reference.get();
+                if(stream!=null && n!=null) {
+                    var snapshot=n.routingSnapshot(); var route=snapshot.routes().get(stream);
+                    console.log("TRACE_HOP node="+config.nodeId()+" instance="+instance+" stream="+stream
+                            +" request="+m.requestId()+" direction="+(m.type()==pt.uminho.esr.ott.protocol.MessageType.ROUTE_TRACE?"request":"response")
+                            +" session="+received.session()+" capturedAt="+snapshot.capturedAtNanos()+" costMicros="
+                            +(route==null?"UNAVAILABLE":route.selectedMetric().map(x->Long.toString(x.costMicros())).orElse("UNAVAILABLE")),false);
+                }
+            }
+        });
+        reference.set(node);
         node.start().whenComplete((v, error) -> {
             if (error == null) console.log("READY node=" + config.nodeId() + " instance=" + instance, false);
         });
         return new RunningService() {
             public Map<String, Neighbor> neighbors() { return node.diagnostics(); }
+            public RoutingService.Snapshot routingSnapshot() { return node.routingSnapshot(); }
+            public Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() { return Optional.of(node.monitoringSnapshot()); }
+            public RoutingService.TraceTicket requestTrace(UUID streamId) { return node.requestTrace(streamId); }
             public Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.of(node.recoveryStatus());}
             public void requestShutdown(int reason, Duration budget) { node.requestShutdown(reason, budget); }
             public boolean awaitTermination(Duration budget) { return node.awaitTermination(budget); }
             public Optional<Throwable> failure() { return node.failure(); }
             public void close() { node.close(); }
         };
+    }
+    /** CLI-owned tickets/cursor. Never runs on the node owner or waits for a network future. */
+    private static final class DiagnosticConsole {
+        final Console console; final LongSupplier clock;
+        final LinkedHashMap<UUID,RoutingService.TraceTicket> tickets=new LinkedHashMap<>();
+        Listing listing;
+        DiagnosticConsole(Console console,LongSupplier clock){this.console=console;this.clock=clock;}
+        void trace(String command,RunningService service) {
+            String[] parts=command.split(" ",-1);
+            final UUID stream;
+            try {
+                if(parts.length!=2 || parts[1].length()!=36)throw new IllegalArgumentException();
+                stream=UUID.fromString(parts[1]);
+                if(!stream.toString().equalsIgnoreCase(parts[1]))throw new IllegalArgumentException();
+            }catch(IllegalArgumentException e){console.log("COMMAND_ERROR trace requires one canonical UUID",true);return;}
+            if(tickets.size()==4){console.log("TRACE_ERROR stream="+stream+" reason=CLI_BUSY",false);return;}
+            var ticket=service.requestTrace(stream);tickets.put(ticket.traceId(),ticket);
+            console.log("TRACE_STARTED stream="+stream+" trace="+ticket.traceId(),false);
+        }
+        void list(String kind,RunningService service) {
+            if(listing!=null){console.log("COMMAND_ERROR diagnostic listing BUSY",true);return;}
+            listing=new Listing(kind,service,clock);
+        }
+        void poll() {
+            var it=tickets.values().iterator();
+            while(it.hasNext() && console.outputs.remainingCapacity()>0) {
+                var result=it.next().result();
+                if(result.isPresent()) {
+                    var r=result.orElseThrow();console.log((r.state()==RoutingService.TraceState.SUCCESS?"TRACE_RESULT":"TRACE_ERROR")
+                            +" stream="+r.streamId()+" trace="+r.traceId()+" state="+r.state()+" code="+r.errorCode()
+                            +" reason="+escape(r.detail())+" visited="+r.visited()+" elapsedNanos="+r.elapsedNanos(),false);it.remove();
+                }
+            }
+            for(int i=0;i<16 && listing!=null && console.outputs.remainingCapacity()>0;i++) {
+                console.log(listing.next(),false);if(listing.done)listing=null;
+            }
+        }
+        void cancel(){listing=null;for(var ticket:tickets.values())ticket.cancel();}
+    }
+    private static String escape(String value) {
+        StringBuilder text=new StringBuilder();
+        for(int i=0;i<value.length() && text.length()<MAX_LOG_CHARS-8;i++) {
+            char c=value.charAt(i);
+            if(c=='\n')text.append("\\n");else if(c=='\r')text.append("\\r");
+            else if(c=='\t')text.append("\\t");else if(c=='\\')text.append("\\\\");
+            else if(Character.isISOControl(c))text.append('?');else text.append(c);
+        }return text.toString();
+    }
+    private static final class Listing {
+        final String kind; final long at,captured;
+        final Iterator<? extends Map.Entry<?,?>> entries;
+        Iterator<RouteCandidate> candidates=Collections.emptyIterator();UUID routeId;
+        boolean header=true,done;
+        Listing(String kind,RunningService service,LongSupplier clock) {
+            this.kind=kind;
+            if(kind.equals("metrics")) {
+                var snapshot=service.monitoringSnapshot();at=clock.getAsLong();captured=snapshot.map(x->x.publishedAtNanos()).orElse(at);
+                entries=snapshot.map(x->x.links().entrySet().iterator()).orElseGet(()->Collections.emptyIterator());
+            }else {
+                var snapshot=service.routingSnapshot();at=clock.getAsLong();captured=snapshot.capturedAtNanos();
+                // One reference to immutable data; no eager formatting/sort of a whole table.
+                entries=kind.equals("routes")?snapshot.routes().entrySet().iterator():snapshot.catalog().visibleAt(at).entries().entrySet().iterator();
+            }
+        }
+        String next() {
+            String prefix=kind.toUpperCase(Locale.ROOT);
+            if(header){header=false;return prefix+" capturedAt="+captured+" ageNanos="+Math.max(0,at-captured)+" count=snapshot";}
+            if(candidates.hasNext()) {
+                var c=candidates.next();long remaining=c.candidateTtlNanos()-(at-c.generationStartedAtNanos());
+                return "ROUTE_CANDIDATE stream="+routeId+" session="+c.upstream()+" path="+c.path()
+                        +" costMicros="+c.metric().map(m->Long.toString(m.costMicros())).orElse("UNMEASURED")
+                        +" remainingNanos="+Math.max(0,remaining)+" expired="+(remaining<=0);
+            }
+            if(!entries.hasNext()){done=true;return prefix+"_END";}
+            var entry=entries.next();
+            if(entry.getValue() instanceof Route route) {
+                routeId=route.streamId();candidates=route.candidates().iterator();
+                return "ROUTE stream="+routeId+" origin="+route.serverId()+" epoch="+route.serverEpoch()
+                        +" selected="+route.knownUpstream()+" state="+route.state()+" revision="+route.revision()
+                        +" snapshotOnly=true costMicros="+route.selectedMetric().map(m->Long.toString(m.costMicros())).orElse("UNAVAILABLE");
+            }
+            if(entry.getValue() instanceof pt.uminho.esr.ott.streaming.StreamCatalog.Entry stream)
+                return "CATALOG_STREAM stream="+stream.info().streamId()+" origin="+stream.info().serverId()
+                        +" title="+escape(stream.info().title())+" epoch="+stream.info().serverEpoch()+" state="+stream.state()
+                        +" remainingNanos="+stream.remainingNanos()+" local="+stream.localOffer();
+            var link=(pt.uminho.esr.ott.monitoring.LinkMetrics)entry.getValue();
+            return "METRIC node="+entry.getKey()+" session="+link.session()+" state="+link.state()
+                    +" ewmaMicros="+link.ewmaMicros()+" costMicros="+link.costMicros()+" sampleAgeNanos="+link.sampleAgeNanos(at);
+        }
     }
     private static boolean join(Thread thread, Duration budget) {
         if (thread.getState() == Thread.State.NEW) return true;
@@ -195,6 +323,18 @@ public final class OttApplication {
         if (text == null) return "unspecified";
         String marker = "...[truncated]";
         return text.length() <= MAX_LOG_CHARS ? text : text.substring(0, MAX_LOG_CHARS - marker.length()) + marker;
+    }
+    /** Bound before copying; one event stays one physical log line, including hostile titles. */
+    private static String oneLine(String value) {
+        if(value==null)return "unspecified";
+        var text=new StringBuilder();int i=0;
+        while(i<value.length() && text.length()<=MAX_LOG_CHARS) {
+            char c=value.charAt(i++);
+            if(c=='\n')text.append("\\n");else if(c=='\r')text.append("\\r");else if(c=='\t')text.append("\\t");
+            else if(Character.isISOControl(c)||c=='\u2028'||c=='\u2029')text.append('?');else text.append(c);
+        }
+        if(i<value.length())text.append("...[truncated]");
+        return bounded(text.toString());
     }
     private static final class Console {
         final ArrayBlockingQueue<InputEvent> commands;
@@ -218,7 +358,7 @@ public final class OttApplication {
         }
         Duration left() { return Duration.ofNanos(Math.max(0, budget - (clock.getAsLong() - stopAt))); }
         void log(String text, boolean error) {
-            if (!outputs.offer(new OutputEvent(bounded(text), error))) stop(true);
+            if (!outputs.offer(new OutputEvent(oneLine(text), error))) stop(true);
         }
         void command(InputEvent event) { if (!stopped.get() && !commands.offer(event)) { log("COMMAND_OVERFLOW", true); stop(true); } }
         void read(InputStream input) {

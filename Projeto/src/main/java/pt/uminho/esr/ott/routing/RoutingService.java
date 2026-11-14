@@ -23,6 +23,67 @@ public final class RoutingService implements AutoCloseable {
         Ticket schedule(Runnable task, long delayNanos);
         void requestClose(); boolean awaitTermination(Duration budget); int physicalJobs();
     }
+    /** Approved local diagnostic contract; not a wire enum. */
+    public enum TraceState { SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING }
+    public static final int TRACE_INITIAL_TTL = 32;
+    public static final Duration TRACE_TIMEOUT = Duration.ofMillis(3000);
+    /** Polling never invokes caller continuations on the node owner. */
+    public interface TraceTicket {
+        UUID traceId();
+        Optional<TraceOutcome> result();
+        void cancel();
+    }
+    public record TraceOutcome(UUID streamId, UUID traceId, Optional<UUID> serverEpoch,
+            TraceState state, Optional<ErrorCode> errorCode, String detail,
+            List<String> visited, long elapsedNanos) {
+        public TraceOutcome {
+            Objects.requireNonNull(streamId); Objects.requireNonNull(traceId);
+            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(state);
+            Objects.requireNonNull(errorCode); Objects.requireNonNull(detail);
+            Objects.requireNonNull(visited);
+            if (!tracePath(visited, true) || !traceText(detail, 256) || elapsedNanos < 0)
+                throw new IllegalArgumentException("Trace outcome bounds");
+            visited = List.copyOf(visited);
+        }
+    }
+    /** Admission is bounded before publishing to the borrowed owner. No user continuations. */
+    public TraceTicket requestTrace(UUID streamId) {
+        Objects.requireNonNull(streamId);
+        if (stopping.get() || view.diagnostics().phase() != Phase.RUNNING) return unavailableTrace(streamId);
+        long began = clock.getAsLong();
+        var ticket = new LocalTrace(streamId, UUID.randomUUID(), began);
+        synchronized (resources) {
+            if (stopping.get()) return unavailableTrace(streamId);
+            if (traceReservations >= traceLimit || localTraces.size() >= 4) {
+                ticket.outcome = traceValue(ticket, null, TraceState.RESOURCE_LIMIT, ErrorCode.RESOURCE_LIMIT,
+                        "TRACE_CAPACITY", List.of(), began); return ticket;
+            }
+            traceReservations++; localTraces.add(ticket);
+        }
+        if (!owner.offer(() -> {
+            try { admitTrace(ticket); }
+            catch (RuntimeException failure) { note(Reason.CLOCK_ERROR,true); }
+        })) {
+            // The real owner rejects by initiating stop; its hook also resolves queued tickets.
+            synchronized (resources) {
+                if (localTraces.remove(ticket)) traceReservations--;
+                if (ticket.outcome == null) ticket.outcome = traceValue(ticket, null, TraceState.CLOSED,
+                        null, "OWNER_REJECTED", List.of(), began);
+            }
+        }
+        return ticket;
+    }
+    public static TraceTicket unavailableTrace(UUID streamId) {
+        Objects.requireNonNull(streamId);
+        UUID id = UUID.randomUUID();
+        var value = new TraceOutcome(streamId,id,Optional.empty(),TraceState.NOT_RUNNING,
+                Optional.empty(),"NOT_RUNNING",List.of(),0);
+        return new TraceTicket() {
+            public UUID traceId() { return id; }
+            public Optional<TraceOutcome> result() { return Optional.of(value); }
+            public void cancel() { }
+        };
+    }
     public enum Phase { NEW, RUNNING, STOPPED }
     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
@@ -61,6 +122,14 @@ public final class RoutingService implements AutoCloseable {
     // These locks/flags cover physical work only; all routing state above belongs to owner.
     private final Object resources=new Object();
     private final Set<Admission> admissions=new HashSet<>();
+    // Physical reservations/command cancellation may be touched off owner, routing contexts may not.
+    private final Set<LocalTrace> localTraces = new HashSet<>();
+    private final Set<TraceSend> traceSends = new HashSet<>();
+    private final Map<UUID,TraceContext> traces = new HashMap<>();
+    private final ArrayDeque<TraceContext> traceOrder = new ArrayDeque<>();
+    private final int traceLimit;
+    private int traceReservations, traceSweep;
+
     private final AtomicBoolean stopping=new AtomicBoolean(),wakeQueued=new AtomicBoolean();
     private final AtomicReference<Long> firstStop=new AtomicReference<>();
     private final CompletableFuture<Void> cleaned=new CompletableFuture<>();
@@ -128,6 +197,7 @@ public final class RoutingService implements AutoCloseable {
         validateConfiguration(c,id);
         if(c.streams().size()>limits.streamsPerOrigin())throw new IllegalArgumentException("Source capacity");
         var r=c.runtime().routing();period=r.announceInterval().toNanos();history=r.cacheTtl().toNanos();
+        traceLimit=Math.min(o.capacity(),64);
         maxCache=r.cacheCapacity();maxPending=Math.min(maxCache,o.capacity());maxTickets=Math.min(o.capacity(),2*limits.neighbors());
         flood=r.floodMaxPerSecond();shutdownNanos=c.runtime().control().shutdownTimeout().toNanos();
         root=new RoutingTable(c.nodeId(),limits,r.candidateTtl().toMillis(),r.cacheTtl().toMillis(),clock);
@@ -196,6 +266,7 @@ public final class RoutingService implements AutoCloseable {
     public void onNeighborEvent(NeighborManager.Event event){
         requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
         try{
+            traceSweep=traceOrder.size();
             if(event instanceof NeighborManager.NeighborUp e){
                 var s=e.session();var old=sessions.get(s.nodeId());
                 if(!s.equals(old)){
@@ -206,6 +277,11 @@ public final class RoutingService implements AutoCloseable {
             }else if(event instanceof NeighborManager.NeighborDown e){if(current(e.session()))remove(e.session());}
             else if(event instanceof NeighborManager.Received e){
                 var m=e.message();if(!current(e.session()))return;
+                if (m.type()==MessageType.ROUTE_TRACE || m.type()==MessageType.TRACE_RESULT || m.type()==MessageType.ERROR) {
+                    if (m.version()==2 && m.requestId()!=null && e.session().nodeId().equals(m.senderId())
+                            && e.session().instanceId().equals(m.senderInstance())) onTrace(e.session(),m);
+                    drive(); return;
+                }
                 if(m.type()!=MessageType.STREAM_ANNOUNCE&&m.type()!=MessageType.STREAM_WITHDRAW)return;
                 if(m.version()!=2||m.requestId()==null||!e.session().nodeId().equals(m.senderId())||!e.session().instanceId().equals(m.senderInstance())){note(Reason.INVALID_INPUT,false);return;}
                 if(m.type()==MessageType.STREAM_ANNOUNCE&&m.payload() instanceof ControlMessage.Announcement a)announce(e.session(),a);
@@ -252,7 +328,7 @@ public final class RoutingService implements AutoCloseable {
             if(event instanceof NetworkMonitor.Updated e){session=e.metrics().session();cost=e.metrics().costMicros();}
             else if(event instanceof NetworkMonitor.Invalidated e){session=e.session();cost=OptionalLong.empty();}
             else return;
-            if(!current(session))return;costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
+            if(!current(session))return;traceSweep=traceOrder.size();costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
         }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
     }
     public void setLocalAvailable(UUID id,boolean available){
@@ -433,7 +509,7 @@ public final class RoutingService implements AutoCloseable {
                 row.nextAt=t+period;dirty();
             }
             // All owner projections precede the resulting send attempts.
-            publish(t);int swept=sweepQuotas(t);scan(64-swept);
+            publish(t); traceDrive(); int swept=sweepQuotas(t);scan(64-swept);
             // A slow/control-port callback may also advance time during this turn.
             long finished=now();applied(root.expire());publish(finished);
             if(scanRemaining>0)wake();
@@ -444,6 +520,7 @@ public final class RoutingService implements AutoCloseable {
     private void schedule(long t){
         if(stopping.get())return;
         long delay=Long.MAX_VALUE;
+        for (var context : traces.values()) delay=Math.min(delay,Math.max(1,TRACE_TIMEOUT.toNanos()-(t-context.began)));
         for(var row:rows.values()){
             if(row.offered)delay=Math.min(delay,Math.max(1,row.nextAt-t));
             if(row.route!=null)for(var c:row.route.candidates())delay=Math.min(delay,Math.max(1,c.candidateTtlNanos()-(t-c.generationStartedAtNanos())));
@@ -460,6 +537,7 @@ public final class RoutingService implements AutoCloseable {
         if(stopping.get()||!wakeQueued.compareAndSet(false,true))return;
         if(!owner.offer(()->{wakeQueued.set(false);if(stopping.get())return;
             // A timer wake starts another bounded fair pass, never an unbounded retry loop.
+            if (traceSweep==0) traceSweep=traceOrder.size();
             if(scanRemaining==0)dirty();drive();
         })){
             wakeQueued.set(false);stopping.set(true);firstStop.compareAndSet(null,System.nanoTime());scheduler.requestClose();
@@ -481,6 +559,240 @@ public final class RoutingService implements AutoCloseable {
         int physical;synchronized(resources){physical=admissions.size();}
         view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason));
     }
+    private static boolean traceText(String text,int maximum) {
+        if (text==null || text.length()>maximum) return false;
+        int bytes=0;
+        for (int i=0;i<text.length();i++) {
+            char c=text.charAt(i); if(c==0)return false;
+            if (Character.isHighSurrogate(c)) {
+                if(++i==text.length() || !Character.isLowSurrogate(text.charAt(i)))return false;
+                bytes+=4;
+            } else if(Character.isLowSurrogate(c))return false;
+            else bytes+=c<128?1:c<2048?2:3;
+            if(bytes>maximum)return false;
+        } return true;
+    }
+    private static boolean tracePath(List<String> path,boolean empty) { return tracePath(path,empty,true); }
+    private static boolean tracePath(List<String> path,boolean empty,boolean unique) {
+        if(path==null || path.size()>32 || !empty && path.isEmpty())return false;
+        for(int i=0;i<path.size();i++) {
+            String id=path.get(i);
+            if(id==null || id.length()<1 || id.length()>32)return false;
+            for(int j=0;j<id.length();j++) {
+                char c=id.charAt(j); if(!(c>='A'&&c<='Z'||c>='a'&&c<='z'||c>='0'&&c<='9'||c=='_'||c=='-'))return false;
+            }
+            if(unique)for(int j=0;j<i;j++)if(id.equals(path.get(j)))return false;
+        } return true;
+    }
+    private final class LocalTrace implements TraceTicket {
+        final UUID stream,id; final long began;
+        final AtomicBoolean cancelled=new AtomicBoolean(); volatile TraceOutcome outcome;
+        LocalTrace(UUID stream,UUID id,long began){this.stream=stream;this.id=id;this.began=began;}
+        public UUID traceId(){return id;}
+        public Optional<TraceOutcome> result(){return Optional.ofNullable(outcome);}
+        public void cancel(){if(outcome==null && cancelled.compareAndSet(false,true))wake();}
+    }
+    private static final class TraceContext {
+        final UUID id,stream; final long began; final Neighbor.Session incoming;
+        final LocalTrace local; final List<String> prefix;
+        UUID epoch; String origin; Neighbor.Session upstream;
+        boolean terminal; ControlMessage response;
+        TraceContext(UUID id,UUID stream,long began,Neighbor.Session incoming,LocalTrace local,List<String> prefix) {
+            this.id=id;this.stream=stream;this.began=began;this.incoming=incoming;this.local=local;this.prefix=prefix;
+        }
+    }
+    private TraceOutcome traceValue(LocalTrace ticket,UUID epoch,TraceState state,ErrorCode code,
+            String detail,List<String> path,long at) {
+        return new TraceOutcome(ticket.stream,ticket.id,Optional.ofNullable(epoch),state,
+                Optional.ofNullable(code),detail,path,Math.max(0,at-ticket.began));
+    }
+    private void admitTrace(LocalTrace ticket) {
+        requireOwner();
+        if(stopping.get())return; // onStop/cleanup owns every reserved local ticket
+        var c=new TraceContext(ticket.id,ticket.stream,ticket.began,null,ticket,List.of(config.nodeId()));
+        traces.put(c.id,c);traceOrder.add(c);traceSweep=traceOrder.size();
+        long at=now();
+        if(ticket.cancelled.get())finishTrace(c,TraceState.CANCELLED,null,"CANCELLED",c.prefix,at);
+        else if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
+        else forwardTrace(c,TRACE_INITIAL_TTL-1);
+        drive();
+    }
+    private void finishTrace(TraceContext c,TraceState state,ErrorCode code,String detail,List<String> path,long at) {
+        if(c.terminal)return;c.terminal=true;
+        if(c.local!=null)c.local.outcome=traceValue(c.local,c.epoch,state,code,detail,path,at);
+        else if(c.incoming!=null && current(c.incoming) && at-c.began<TRACE_TIMEOUT.toNanos()) {
+            c.response=new ControlMessage(state==TraceState.SUCCESS?MessageType.TRACE_RESULT:MessageType.ERROR,
+                    c.id,config.nodeId(),instance,state==TraceState.SUCCESS?
+                    new ControlMessage.TraceResult(c.stream,c.id,path):
+                    new ControlMessage.ErrorPayload(code==null?ErrorCode.NO_ROUTE:code,15,detail));
+        }
+        traceSweep=traceOrder.size();
+    }
+    private void forwardTrace(TraceContext c,int remaining) {
+        long at=now();applied(root.expire());
+        if(at-c.began>=TRACE_TIMEOUT.toNanos()){finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);return;}
+        var row=rows.get(c.stream);
+        if(row==null){finishTrace(c,TraceState.ERROR,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM",c.prefix,at);return;}
+        refresh(row);var route=row.route;
+        if(c.epoch!=null && !route.serverEpoch().equals(Optional.of(c.epoch))) {
+            finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);return;
+        }
+        c.epoch=route.serverEpoch().orElse(null);c.origin=route.serverId();
+        if(route.localSource()){finishTrace(c,TraceState.SUCCESS,null,"",c.prefix,at);return;}
+        if(route.selectedCandidate().isEmpty()){finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"NO_ROUTE",c.prefix,at);return;}
+        if(remaining==0){finishTrace(c,TraceState.ERROR,ErrorCode.TIMEOUT,"TTL_EXHAUSTED",c.prefix,at);return;}
+        var selected=route.selectedCandidate().orElseThrow();
+        var session=sessions.get(selected.upstream().nodeId());
+        if(session==null || !key(session).equals(selected.upstream())){finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"NO_ROUTE",c.prefix,at);return;}
+        if(c.prefix.contains(session.nodeId())){finishTrace(c,TraceState.ERROR,ErrorCode.LOOP_DETECTED,"LOOP_DETECTED",c.prefix,at);return;}
+        c.upstream=session;
+        var request=new ControlMessage(MessageType.ROUTE_TRACE,c.id,config.nodeId(),instance,
+                new ControlMessage.Trace(c.stream,c.epoch,c.id,remaining,c.prefix));
+        if(!sendTrace(c,session,request,true)) {
+            long failedAt=now();
+            if(failedAt-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,failedAt);
+            else finishTrace(c,TraceState.RESOURCE_LIMIT,ErrorCode.RESOURCE_LIMIT,"TRACE_SEND_CAPACITY",c.prefix,failedAt);
+        }
+    }
+    private void onTrace(Neighbor.Session session,ControlMessage message) {
+        requireOwner();long at=now();
+        if(message.type()==MessageType.ROUTE_TRACE && message.payload() instanceof ControlMessage.Trace p) {
+            // Bound before copying, allocating a context, or responding from unsafe content.
+            if(p.streamId()==null || p.serverEpoch()==null || p.traceId()==null || !p.traceId().equals(message.requestId())
+                    || p.ttl()<0 || p.ttl()>255 || !tracePath(p.visited(),false,false)
+                    || !p.visited().getLast().equals(session.nodeId()))return;
+            var duplicate=traces.get(p.traceId());
+            if(duplicate!=null)return; // includes protected terminal contexts; never refresh deadline
+            if(p.ttl()==0){traceError(session,p.traceId(),ErrorCode.TIMEOUT,"TTL_EXHAUSTED");return;}
+            if(!tracePath(p.visited(),false) || p.visited().contains(config.nodeId())){traceError(session,p.traceId(),ErrorCode.LOOP_DETECTED,"LOOP_DETECTED");return;}
+            if(p.visited().size()==32){traceError(session,p.traceId(),ErrorCode.RESOURCE_LIMIT,"TRACE_PATH_LIMIT");return;}
+            synchronized(resources) {
+                long peer=traces.values().stream().filter(c->session.equals(c.incoming)).count();
+                if(traceReservations>=traceLimit || peer>=4){traceError(session,p.traceId(),ErrorCode.RESOURCE_LIMIT,"TRACE_CAPACITY");return;}
+                traceReservations++;
+            }
+            var prefix=new ArrayList<String>(p.visited().size()+1);prefix.addAll(p.visited());prefix.add(config.nodeId());
+            var c=new TraceContext(p.traceId(),p.streamId(),at,session,null,List.copyOf(prefix));c.epoch=p.serverEpoch();
+            traces.put(c.id,c);traceOrder.add(c);traceSweep=traceOrder.size();forwardTrace(c,p.ttl()-1);
+        } else {
+            var c=traces.get(message.requestId());
+            if(c==null || c.terminal || c.upstream==null || !c.upstream.equals(session))return;
+            if(at-c.began>=TRACE_TIMEOUT.toNanos()){finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);return;}
+            if(message.payload() instanceof ControlMessage.TraceResult p && message.type()==MessageType.TRACE_RESULT) {
+                if(!c.id.equals(p.traceId()) || !c.stream.equals(p.streamId()) || !tracePath(p.visited(),false)
+                        || p.visited().size()<=c.prefix.size() || !p.visited().subList(0,c.prefix.size()).equals(c.prefix)
+                        || !p.visited().get(c.prefix.size()).equals(c.upstream.nodeId())
+                        || !p.visited().getLast().equals(c.origin))return;
+                var row=rows.get(c.stream);
+                if(row==null || !row.route.serverEpoch().equals(Optional.ofNullable(c.epoch)))
+                    finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
+                else finishTrace(c,TraceState.SUCCESS,null,"",p.visited(),at);
+            } else if(message.type()==MessageType.ERROR && message.payload() instanceof ControlMessage.ErrorPayload p
+                    && p.relatedType()==15 && p.code()!=null && traceText(p.detail(),256))
+                finishTrace(c,p.code()==ErrorCode.TIMEOUT?TraceState.TIMEOUT:TraceState.ERROR,p.code(),p.detail(),c.prefix,at);
+        }
+    }
+    private final class TraceSend {
+        final TraceContext context; final Neighbor.Session session; final boolean request;
+        Connection.SendResult result;Throwable error;boolean ready,callbackDone,continuationDone;
+        TraceSend(TraceContext c,Neighbor.Session s,boolean request){context=c;session=s;this.request=request;}
+        void complete(Connection.SendResult value,Throwable error) {
+            synchronized(resources){this.result=value;this.error=error;ready=true;}
+            try{if(!stopping.get())wake();}
+            finally{boolean freed;synchronized(resources){callbackDone=true;freed=releaseTraceSend(this);}if(freed&&!stopping.get())wake();}
+        }
+    }
+    private boolean releaseTraceSend(TraceSend send) {
+        if(send.callbackDone && send.continuationDone && traceSends.remove(send)){resources.notifyAll();return true;}return false;
+    }
+    private boolean sendTrace(TraceContext c,Neighbor.Session session,ControlMessage message,boolean request) {
+        requireOwner();
+        if(stopping.get() || !current(session) || c!=null && now()-c.began>=TRACE_TIMEOUT.toNanos())return false;
+        final TraceSend send;
+        synchronized(resources) {
+            if(traceSends.size()>=traceLimit || c!=null && traceSends.stream().filter(t->t.context==c).count()>=2)return false;
+            send=new TraceSend(c,session,request);traceSends.add(send);
+        }
+        boolean submitted=false;
+        try {
+            // Reservation/validation can consume time; failures before the port own no callback.
+            long at=now();
+            boolean valid=!stopping.get() && current(session) && (c==null || at-c.began<TRACE_TIMEOUT.toNanos());
+            if(valid && request) {
+                applied(root.expire());var row=rows.get(c.stream);
+                valid=row!=null && row.route.serverEpoch().equals(Optional.ofNullable(c.epoch))
+                        && row.route.knownUpstream().equals(Optional.of(key(session)));
+                if(!valid)finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
+            }
+            if(!valid)return false;
+            submitted=true;
+            try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
+            catch(RuntimeException failure){send.complete(null,failure);}
+            return true;
+        } finally {
+            if(!submitted)synchronized(resources){traceSends.remove(send);resources.notifyAll();}
+        }
+    }
+    private void traceError(Neighbor.Session s,UUID id,ErrorCode error,String detail) {
+        sendTrace(null,s,new ControlMessage(MessageType.ERROR,id,config.nodeId(),instance,
+                new ControlMessage.ErrorPayload(error,15,detail)),false);
+    }
+    private void traceDrive() {
+        requireOwner();
+        List<TraceSend> completed;
+        synchronized(resources){completed=traceSends.stream().filter(t->t.ready&&!t.continuationDone).limit(16).toList();}
+        for(var send:completed) {
+            try {
+                var c=send.context;
+                if(c!=null && !c.terminal && send.request && traces.get(c.id)==c
+                        && (send.error!=null || send.result!=Connection.SendResult.ACCEPTED))
+                {
+                    long at=now();
+                    if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
+                    else finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"SEND_"+(send.result==null?"FAILED":send.result),c.prefix,at);
+                }
+            }finally{synchronized(resources){send.continuationDone=true;releaseTraceSend(send);}}
+        }
+        synchronized(resources){if(traceSends.stream().anyMatch(t->t.ready&&!t.continuationDone))wake();}
+        int count=Math.min(16-completed.size(),traceSweep);
+        while(count-->0 && !traceOrder.isEmpty()) {
+            var c=traceOrder.removeFirst();traceSweep--;
+            long at=now();
+            if(!c.terminal) {
+                if(c.local!=null && c.local.cancelled.get())finishTrace(c,TraceState.CANCELLED,null,"CANCELLED",c.prefix,at);
+                else if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
+                else if(c.upstream!=null && !current(c.upstream))finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"SESSION_CLOSED",c.prefix,at);
+                else if(c.incoming!=null && !current(c.incoming))finishTrace(c,TraceState.CLOSED,null,"SESSION_CLOSED",c.prefix,at);
+                else if(c.epoch!=null && rows.containsKey(c.stream) && !rows.get(c.stream).route.serverEpoch().equals(Optional.of(c.epoch)))
+                    finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
+            }
+            if(c.response!=null) {
+                if(!current(c.incoming) || at-c.began>=TRACE_TIMEOUT.toNanos())c.response=null;
+                else if(sendTrace(c,c.incoming,c.response,false))c.response=null;
+            }
+            if(at-c.began>=TRACE_TIMEOUT.toNanos()) {
+                traces.remove(c.id);
+                synchronized(resources){traceReservations--;if(c.local!=null)localTraces.remove(c.local);}
+            }else traceOrder.addLast(c);
+        }
+        if(traceSweep>0)wake();
+    }
+    record TraceLoad(int contexts,int reservations,int locals,int sends,int responseIntents,int timers) { }
+    TraceLoad traceLoad() {
+        requireOwner();
+        synchronized(resources) { return new TraceLoad(traces.size(),traceReservations,localTraces.size(),traceSends.size(),
+                (int)traces.values().stream().filter(c->c.response!=null).count(),scheduler.physicalJobs()); }
+    }
+    private void closeTraces() {
+        long at=clock.getAsLong();
+        for(var c:traces.values())if(!c.terminal)finishTrace(c,TraceState.CLOSED,null,"CLOSED",c.prefix,at);
+        traces.clear();traceOrder.clear();traceSweep=0;
+        synchronized(resources) {
+            for(var ticket:localTraces)if(ticket.outcome==null)ticket.outcome=traceValue(ticket,null,TraceState.CLOSED,null,"CLOSED",List.of(),at);
+            localTraces.clear();traceReservations=0;
+            for(var send:List.copyOf(traceSends)){send.continuationDone=true;releaseTraceSend(send);}
+        }
+    }
     private void note(Reason reason,boolean fatal){
         lastReason=reason;if(failures==Long.MAX_VALUE)countersSaturated=true;else failures++;
         if(fatal)requestClose();
@@ -495,6 +807,7 @@ public final class RoutingService implements AutoCloseable {
     }
     private void cleanup(){
         requireOwner();if(cleaned.isDone())return;stopping.set(true);scheduler.requestClose();if(alarm!=null)alarm.cancel();alarm=null;
+        closeTraces();
         rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
         publish(clock.getAsLong());cleaned.complete(null);
@@ -507,7 +820,7 @@ public final class RoutingService implements AutoCloseable {
         budget=Math.min(budget,left(shutdownNanos,firstStop.get()));
         try{cleaned.get(left(budget,began),TimeUnit.NANOSECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}catch(ExecutionException|TimeoutException e){return false;}
         if(!scheduler.awaitTermination(Duration.ofNanos(left(budget,began))))return false;
-        synchronized(resources){while(!admissions.isEmpty()){
+        synchronized(resources){while(!admissions.isEmpty() || !traceSends.isEmpty()){
             long rest=left(budget,began);if(rest==0)return false;
             try{TimeUnit.NANOSECONDS.timedWait(resources,rest);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}
         }}return true;

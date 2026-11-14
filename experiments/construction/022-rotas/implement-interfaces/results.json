@@ -1,0 +1,93 @@
+{
+  "recorded_at": "2026-11-14T16:29:16Z",
+  "command": "mvn -B -ntp -f Projeto/pom.xml -Dtest=RouteTraceTest test",
+  "exit_code": 1,
+  "java": "Temurin21.0.13+9",
+  "maven": "3.9.9",
+  "tests": 13,
+  "failures": 11,
+  "errors": 0,
+  "skipped": 0,
+  "passed": 2,
+  "scope": "selected initial red tests only; not regression, V-013 complete or Test approval",
+  "cases": [
+    {
+      "name": "t04UnknownStreamHasExplicitErrorWithoutNetwork",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "facadeBeforeStartHasTerminalNotRunningWithoutCreatingOwner",
+      "status": "assertion-failure",
+      "reason": "Unstarted facade needs bounded terminal value ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 delegation not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t07ResultCanArriveBeforeAdmissionFutureCompletes",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t05TtlZeroIsExplicitTimeOutWithoutForwarding",
+      "status": "assertion-failure",
+      "reason": "TTL0 needs an explicit correlated ERROR, not silence ==> expected: <1> but was: <0>",
+      "limitation": null
+    },
+    {
+      "name": "outcomeOwnsItsVisitedAndKeepsOpaqueIds",
+      "status": "passed",
+      "reason": null,
+      "limitation": null
+    },
+    {
+      "name": "t11FifthLocalRequestIsRejectedBeforeOwnerAdmission",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t01LocalSourceReturnsSingletonWithoutDemandOrControlSend",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "outcomeRejectsOverlongVisitedUtf8AndNegativeDuration",
+      "status": "passed",
+      "reason": null,
+      "limitation": null
+    },
+    {
+      "name": "t08OldConnectionCannotCompleteOperationOnReplacementSession",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t14PublicCliHelpAdvertisesApprovedTraceAndSnapshotCommands",
+      "status": "assertion-failure",
+      "reason": "Missing CLI diagnostic command: trace ==> expected: <true> but was: <false>",
+      "limitation": null
+    },
+    {
+      "name": "t06TimeInAdmissionQueueConsumesEntireGlobalTraceDeadline",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t02InitialRequestUsesSelectedSessionAndTtlCountsInitiator",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    },
+    {
+      "name": "t10CancellationHasOneTerminalValueAndDoesNotSendFromQueue",
+      "status": "assertion-failure",
+      "reason": "requestTrace must admit or return a terminal ticket, never a placeholder exception ==> Unexpected exception thrown: java.lang.UnsupportedOperationException: IMP-010 behavior not implemented at interface checkpoint",
+      "limitation": "Assertions after requestTrace admission are not reached while the stub throws."
+    }
+  ]
+}

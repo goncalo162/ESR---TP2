@@ -716,3 +716,56 @@ confirmada aceites. Versão b7d74be5d9bad9fe7f598f29fa17188037647cf2 integrada e
 complete. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md).
 Sem alteração de contrato/código após Test; CLI/trace/ativação de dados permanecem
 nos próximos IMP, não iniciados. Unidade003-rotas/PHASE-03 continuam em progresso.
+
+
+## IMP-010 — Plan/Q-C-32/33 aprovados; interfaces em Implement
+
+Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
+Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
+TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
+prazo local3000ms; correlação/retorno por Sessions completas guardadas;
+TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
+locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
+Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
+ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
+V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
+e integração continuam pendentes; sem gates externos adicionais.
+
+API: RoutingService.requestTrace(UUID) → TraceTicket(traceId(), result(), cancel());
+TraceOutcome imutável com stream/trace/época, estado/erro/detalhe, visited e tempo
+local. OverlayNode.requestTrace(UUID) é exclusivamente fachada mínima.
+Estado esperado antes de start/após stop: ticket terminal NOT_RUNNING, sem helper.
+T=min(E,64),4 locais/4 por Session; S=min(E,64) físico adicional até callback real,
+até2 sends por contexto; uma intenção/contexto,16 ações/turno, até2 jobs no
+scheduler existente e um wake. CLI4 tickets/1 cursor/16 linhas/turno/4096 caracteres.
+Tempo na fila conta para3000ms; sem renovação. requestId=traceId preservado;
+respostas pela Session de entrada guardada, nunca pela nova conexão do mesmo ID.
+Resultado antes de ACCEPTED permitido; callback antigo só termina reserva física.
+TIMEOUT10/relatedType15/detail TTL_EXHAUSTED distingue TTL de prazo expirado.
+Custos são locais/log, nenhum campo novo em15/16. TCPv2/19 tipos/código3 rejeitado,
+framing37..65536 e UDP OTT1/caps intactos. Implementação de comportamento pendente;
+nenhuma execução V-013 integral, regressão ou aceitação Test presumida.
+
+
+## IMP-010 — APIs implementadas para revisão, Test não iniciado
+
+Registo 2026-11-14T17:19:49Z. RoutingService.requestTrace(UUID) devolve TraceTicket consultável/
+cancelável sem callback cliente no owner; OverlayNode delega exclusivamente ao
+serviço existente ou devolve NOT_RUNNING. CLI trace/routes/catalog/metrics usa
+snapshots,4 tickets/1 cursor/16 linhas e logger limitado de uma linha. Q-C-32/33
+integrais preservadas; prazo3000ms inclui fila, TTL32 conta iniciador, retorno por
+Sessions completas guardadas, callback antigo apenas liberta quota física.
+Falha antes de chamar port faz rollback da reserva sem callback.
+Regressão incremental1296/0/0/0 e40 oráculos novos; XML/logs/provas reais preservados.
+Sem clean verify/JAR novo, manual humano, Test/revisão final Fillmore/integração
+aprovados. Nenhum wire/cap/NeighborManager/send() alterado ou gate externo novo.
+
+
+## IMP-010 — Implement aprovado e Test técnico, manual pendente
+
+Registo 2026-11-14T17:45:23Z. Interfaces/código de Implement preservados por hash. clean verify
+1296/0/0/0 e novo JAR fixo,17XML,CLI/TCP/clock/limites/shutdown consolidados.
+A reparação IMP-035 pode criar C–S após perder ambos os relays: esse trace
+continua correto; o manual retira S antes do último relay para observar NO_ROUTE.
+Não se muda política/wire/caps/API por causa da cena de teste. Roteiro/ensaio
+agent34checks não substituem manual humano; Test/revisão final/integração pendentes.

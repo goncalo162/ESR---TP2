@@ -1,0 +1,35 @@
+CHECK_PASS one intentionally killed relay
+CHECK_PASS BOOT reaped without forced wrapper cleanup
+CHECK_PASS BOOT expected Java exit or intentional signal9
+CHECK_PASS S reaped without forced wrapper cleanup
+CHECK_PASS S expected Java exit or intentional signal9
+CHECK_PASS R1 reaped without forced wrapper cleanup
+CHECK_PASS R1 expected Java exit or intentional signal9
+CHECK_PASS R2 reaped without forced wrapper cleanup
+CHECK_PASS R2 expected Java exit or intentional signal9
+CHECK_PASS C reaped without forced wrapper cleanup
+CHECK_PASS C expected Java exit or intentional signal9
+CHECK_PASS source local trace
+CHECK_PASS observed successful path via R1
+CHECK_PASS observed successful path via R2
+CHECK_PASS CLI observed CATALOG_STREAM
+CHECK_PASS CLI observed ROUTE_CANDIDATE
+CHECK_PASS CLI observed METRIC 
+CHECK_PASS CLI observed UNKNOWN_STREAM
+CHECK_PASS CLI observed NO_ROUTE
+CHECK_PASS invalid UUID diagnosed locally
+CHECK_PASS BOOT no fatal logger/cleanup error
+CHECK_PASS BOOT no subscription messages observed
+CHECK_PASS S no fatal logger/cleanup error
+CHECK_PASS S no subscription messages observed
+CHECK_PASS R1 no fatal logger/cleanup error
+CHECK_PASS R1 no subscription messages observed
+CHECK_PASS R2 no fatal logger/cleanup error
+CHECK_PASS R2 no subscription messages observed
+CHECK_PASS C no fatal logger/cleanup error
+CHECK_PASS C no subscription messages observed
+CHECK_PASS UDP watcher covers traces through process termination
+CHECK_PASS zero datagrams in observed interval; watcher ports closed
+CHECK_PASS all five TCP and four UDP ports available after cleanup
+CHECK_PASS JAR profiles source and helper hashes unchanged
+MANUAL_PASS

@@ -1,0 +1,186 @@
+{
+  "regression": "regression-03/result.json",
+  "T01_T18": [
+    {
+      "id": "T01",
+      "meaning": "source, singleton visited, no demand",
+      "current_trace_tests": [
+        "t01LocalSourceReturnsSingletonWithoutDemandOrControlSend"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T02",
+      "meaning": "selected alternative and each hop consults its own table",
+      "current_trace_tests": [
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo",
+        "t02EveryHopReadsItsOwnTableInsteadOfReversingOriginalAdvertisement",
+        "t02InitialRequestUsesSelectedSessionAndTtlCountsInitiator"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T03",
+      "meaning": "inverse return through saved session, never mutable table",
+      "current_trace_tests": [
+        "t03ReturnUsesStoredDownstreamAndNeverAnAlternativeRoute",
+        "t08ReconnectedDownstreamCannotReceiveAnOldResult"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T04",
+      "meaning": "unknown versus known/unmeasured/expired route",
+      "current_trace_tests": [
+        "t04UnknownStreamHasExplicitErrorWithoutNetwork",
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo",
+        "t04KnownButUnmeasuredAndExpiredIsNoRouteNotUnknown"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T05",
+      "meaning": "TTL0/1/32, path bounds, loops and malformed prefix",
+      "current_trace_tests": [
+        "t05TtlZeroIsExplicitTimeOutWithoutForwarding",
+        "t05SourceAtLastAllowedNodeWorksButNextNodeIsNeverAdmitted",
+        "t05RepeatedOwnIdAndUnsafeVisitedCannotForward"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T06",
+      "meaning": "queue admission clock and exact deadline boundary",
+      "current_trace_tests": [
+        "t06Boundary2999Then3000ExpiresWithoutNewAttempt",
+        "t06TimeInAdmissionQueueConsumesEntireGlobalTraceDeadline"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T07",
+      "meaning": "early response, ACCEPTED not ACK, null/throw/closed/overflow",
+      "current_trace_tests": [
+        "t07SendFailuresAreExplicitWithoutAckOrSubscription",
+        "t07ResultCanArriveBeforeAdmissionFutureCompletes",
+        "t07ThrownAndNullPortResultsFailOnlyTheDiagnostic"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T08",
+      "meaning": "connectionId/instanceId/epoch isolation and saved downstream",
+      "current_trace_tests": [
+        "t08EpochChangeAndExactSessionDownHaveExplicitTerminalErrors",
+        "t08OldConnectionCannotCompleteOperationOnReplacementSession",
+        "t08ReconnectedDownstreamCannotReceiveAnOldResult",
+        "t08NewInstanceClosesOldTicketAndCannotInheritItsReply"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T09",
+      "meaning": "stream/trace/request/prefix/sender correlation; unrelated ERROR preserved",
+      "current_trace_tests": [
+        "t09WrongIdentityStreamPrefixAndUnrelatedErrorNeverCompleteTicket"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T10",
+      "meaning": "duplicate/cancel/timeout no renewed deadline or retry",
+      "current_trace_tests": [
+        "t10DuplicateDoesNotExtendLifetimeOrForwardTwice",
+        "t10CancellationHasOneTerminalValueAndDoesNotSendFromQueue"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T11",
+      "meaning": "local/peer/global caps and physical reservations/response intents",
+      "current_trace_tests": [
+        "t11GlobalContextCapAndFiniteFairSweepAcrossSixtyFourContexts",
+        "t11PerSessionQuotaIncludesTerminalTombstones",
+        "t11FifthLocalRequestIsRejectedBeforeOwnerAdmission",
+        "t11PhysicalSendCapacitySurvivesTimeAndReleasesOnlyAfterCallback",
+        "t11BlockedResponseIntentRemainsBoundedUntilPhysicalQuotaFrees"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T12",
+      "meaning": "owner rejection and finite scheduler/wake",
+      "current_trace_tests": [
+        "t11GlobalContextCapAndFiniteFairSweepAcrossSixtyFourContexts",
+        "t12OwnerRejectionResolvesReservedTicketAndRunsCleanup",
+        "t17RunningTimerAndPhysicalCallbackMustBothFinish"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T13",
+      "meaning": "metadata/selection validity/demand unchanged; other events preserved",
+      "current_trace_tests": [
+        "t13TracePreservesGenerationValidityMetricAndDemandSnapshots",
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo",
+        "t16RealTcpEofDuringPendingTraceTerminatesWithoutWaitingForOrigin"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T14",
+      "meaning": "CLI grammar, snapshots, escaping, bounds, cursor yielding",
+      "current_trace_tests": [
+        "t14OversizedOutcomeIsRejectedBeforeReadingOrCopyingList",
+        "t14PublicCliHelpAdvertisesApprovedTraceAndSnapshotCommands",
+        "t14LargeRealCliListingEscapesTitlesYieldsToQuitAndRejectsSecondCursor"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T15",
+      "meaning": "real JVM CLI/loopback TCP diamond and alternative",
+      "current_trace_tests": [
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T16",
+      "meaning": "pending trace under real TCP loss plus session reconnection fakes",
+      "current_trace_tests": [
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo",
+        "t16RealTcpEofDuringPendingTraceTerminatesWithoutWaitingForOrigin",
+        "t08EpochChangeAndExactSessionDownHaveExplicitTerminalErrors",
+        "t08OldConnectionCannotCompleteOperationOnReplacementSession",
+        "t08ReconnectedDownstreamCannotReceiveAnOldResult",
+        "t08NewInstanceClosesOldTicketAndCannotInheritItsReply"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T17",
+      "meaning": "physical shutdown, live callbacks/jobs and injected clock faults",
+      "current_trace_tests": [
+        "t15T16RealCliTcpDiamondAlternativeEofAndNoVideo",
+        "t17PendingPhysicalAdmissionCannotBeDeclaredTerminatedOnLogicalClose",
+        "t16RealTcpEofDuringPendingTraceTerminatesWithoutWaitingForOrigin",
+        "t17RunningTimerAndPhysicalCallbackMustBothFinish",
+        "t17ClockFailuresAtAdmissionAndDispatchCannotLeakUnsentReservations",
+        "t17ExecutingCallbackRetainsPhysicalReservationAcrossCleanup"
+      ],
+      "status": "incremental proof; formal Test not approved"
+    },
+    {
+      "id": "T18",
+      "meaning": "fresh incremental regression; formal clean verify/JAR/manual still pending",
+      "current_trace_tests": [],
+      "status": "incremental regression passed; clean verify/JAR/hash/manual pending"
+    }
+  ],
+  "additional_regression_proofs": {
+    "T09_T13": "OverlayNodeRoutingTest.d27OriginalObserverGetsSameErrorExactlyOnceAndRoutingDoesNotReply; other historical tests rerun unchanged",
+    "T16": "TransportTest checks PEER_EOF explicitly. CLI SIGKILL demonstrates NeighborDown TRANSPORT; no FIN/RST classification claimed."
+  },
+  "limits": "No CORE/GUI/manual/latency benchmark executed; UDP sentinel observes only the test interval."
+}

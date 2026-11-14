@@ -1170,3 +1170,72 @@ Registo 2026-11-14T12:58:05Z. Utilizador aprovou revisão ADR/Q-C-31. Design6/7 
 clarificados: recusa local recuperável, OVERFLOW terminal na ligação e saturação
 do owner com cleanup pelos hooks sem depender de wake futuro. Só Implement
 autorizado nos seis caminhos. Aprovações pendentes acima são histórico.
+
+
+## Q-C-32 — IMP-010: porta de composição do trace fora dos três caminhos
+
+- **Estado atual:** DECIDIDA/APROVADA, opção1 pelo utilizador; proposta original registada em Plan; registo 2026-11-14T16:16:15Z.
+- **Base:**9144707, IMP-006/009/005 completos. ADD8/IMP-010 prevê só
+  RoutingService.java, OttApplication.java e RouteTraceTest.java.
+- **Evidência concreta:** OverlayNode guarda RoutingService privado, expõe
+  routingSnapshot()/monitoringSnapshot(), mas não operação para iniciar trace.
+  O construtor com Factory é package-private; OttApplication cria o nó público.
+  Um snapshot não autoriza enviar nem oferece owner. Manager/send já suportam15–17.
+- **Impacto:** impossível ligar CLI→serviço real só por acréscimo nos três
+  caminhos sem contornar encapsulamento ou duplicar estado/transporte.
+1. **Recomendada:** autorizar quarto caminho OverlayNode.java para uma delegação
+   pública mínima requestTrace(UUID), com resposta limitada antes de start/após
+   stop; operação e tipos no RoutingService. Testes próprios em RouteTraceTest.java
+   e subprocessos CLI reais, sem alterar testes históricos. Reutilizar owner,
+   manager/sessões, eventos e shutdown global; manter send() inalterado.
+   Após aprovação documentar exceção no ADD/contratos/índice derivado aplicável;
+   não reabrir IMP-009 nem criar ADR automaticamente.
+2. **Manter três caminhos:** preparar motor e contratos internos, adiar ligação
+   operacional da CLI até extensão explicitamente autorizada; entrega/V-013
+   de CLI e fecho permanecem incompletos. Não usar reflexão, registry global,
+   segundo serviço ou transporte como contorno.
+- **Decisão solicitada:** opção1 ou manutenção explícita da integração pendente.
+  Nenhuma extensão de código/ADD aplicada neste Plan.
+
+## Q-C-33 — IMP-010: TTL, correlação, API e limites do diagnóstico
+
+- **Estado atual:** DECIDIDA/APROVADA, opção1 pelo utilizador; concretizações de Plan, não prescrições do PDF;
+  registo 2026-11-14T16:16:15Z. Fontes: ADD6/IMP-010/ADR-004/014/017/018/020/022,
+  docs07(15/16/17), TASK-013 e API real. Não alterar wire/caps/Q-C-26–31.
+- **Lacunas:** TTL é u8 mas não tem código TTL_EXCEEDED; não há configuração
+  de prazo/cap de trace, nem operação pública. TRACE_RESULT não contém epoch
+  ou custos. Futuro completo no owner pode executar callbacks do chamador.
+1. **Recomendada:** aprovar conjuntamente o detalhe do
+   [Plan](../memory-bank/bolts/022-rotas/implementation-plan.md): TTL inicial32
+   como orçamento de nós incluindo iniciador, ttl0 falha antes de admitir nó;
+   ERROR TIMEOUT10/relatedType15/detail TTL_EXHAUSTED distinto de timeout local;
+   requestId=traceId preservado, prefixo/stream/epoch e ambas Sessions completas
+   guardadas; época divergente PATH_CHANGED e nenhuma escolha arbitrária entre
+   alternativas. Prazo local3000ms desde admissão antes da fila, sem renovação,
+   retorno pela Session guardada. T=min(E,64) contextos,4 locais/4 por Session;
+   S=min(E,64) sends físicos adicionais, no máximo2 por contexto, retidos até
+   callback real; intenção limitada ao contexto, sem fila de erros ilimitada.
+   Um alarme existente/até2 jobs físicos, wake coalescido e até16 ações/turno.
+   TraceTicket com resultado imutável consultável/cancelamento, sem callback
+   cliente no owner; até4 tickets CLI e1 cursor de listagem limitada. Custos só
+   em logs/snapshots, não no wire. Owner cheio continua fatal(Q-C-31), shutdown
+   no budget global, sem novo transporte/executor de estado/comando fora do pedido.
+2. **Alternativa:** indicar valores/semântica/API diferentes para rever o Plan
+   antes de Java; código de erro novo ou campos wire exigiriam revisão ADR
+   explícita de compatibilidade, não uma propriedade de configuração.
+- **Decisão solicitada:** aprovar ou ajustar os detalhes; nenhuma ADR aceite
+  considerada inviável nesta inspeção, nenhuma decisão nova já aprovada.
+
+
+### Q-C-32/33 — aprovação explícita e primeiro passo de Implement
+
+Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
+Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
+TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
+prazo local3000ms; correlação/retorno por Sessions completas guardadas;
+TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
+locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
+Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
+ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
+V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
+e integração continuam pendentes; sem gates externos adicionais.

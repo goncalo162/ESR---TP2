@@ -1,0 +1,1325 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index 9052188..7e0d03c 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -3,6 +3,7 @@ package pt.uminho.esr.ott.app;
+ import pt.uminho.esr.ott.bootstrap.BootstrapServer;
+ import pt.uminho.esr.ott.config.*;
+ import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.routing.*;
+ import java.io.*;
+ import java.nio.channels.*;
+ import java.nio.charset.StandardCharsets;
+@@ -23,6 +24,17 @@ public final class OttApplication {
+     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
+     interface RunningService extends AutoCloseable {
+         Map<String, Neighbor> neighbors();
++        default pt.uminho.esr.ott.routing.RoutingService.Snapshot routingSnapshot() {
++            return pt.uminho.esr.ott.routing.RoutingService.emptySnapshot();
++        }
++        default Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() {
++            return Optional.empty();
++        }
++        default pt.uminho.esr.ott.routing.RoutingService.TraceTicket requestTrace(UUID streamId) {
++            Objects.requireNonNull(streamId);
++            return RoutingService.unavailableTrace(streamId);
++        }
++
+         default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
+         void requestShutdown(int reason, Duration remainingBudget);
+         boolean awaitTermination(Duration remainingBudget);
+@@ -79,7 +91,7 @@ public final class OttApplication {
+         final NodeConfiguration config;
+         try {
+             invocation = parse(arguments);
+-            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, quit"); return new ExecutionResult(0, true, true, true); }
++            if (invocation.help()) { output.println("Usage: --role BOOTSTRAP|SERVER|RELAY|CLIENT --config <file>; commands: neighbors, recovery, routes, catalog, metrics, trace UUID, quit"); return new ExecutionResult(0, true, true, true); }
+             config = ConfigurationLoader.load(invocation.config().orElseThrow(), invocation.role().orElseThrow());
+         } catch (ConfigurationException | IllegalArgumentException e) { error.println(bounded("CONFIG_ERROR " + e.getMessage())); return new ExecutionResult(2, true, true, true); }
+         var console = new Console(input, output, error, config, clock);
+@@ -89,6 +101,7 @@ public final class OttApplication {
+             catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+         }, "ott-shutdown-hook");
+         RunningService service = null;
++        var diagnostic = new DiagnosticConsole(console, clock);
+         boolean interrupted = false;
+         boolean inputDone = true, outputDone = true, serviceDone = true;
+         try {
+@@ -98,6 +111,7 @@ public final class OttApplication {
+             console.log("STARTED node=" + config.nodeId() + " role=" + config.role() + " pid=" + ProcessHandle.current().pid(), false);
+             console.reader.start();
+             while (!console.stopped.get()) {
++                diagnostic.poll();
+                 var failure = service.failure();
+                 if (failure.isPresent()) { console.log("FATAL " + failure.orElseThrow(), true); console.stop(true); break; }
+                 var command = console.commands.poll(20, TimeUnit.MILLISECONDS);
+@@ -114,7 +128,11 @@ public final class OttApplication {
+                 } else if(line.equals("recovery")) {
+                     var status=service.recoveryStatus();
+                     console.log("RECOVERY node="+config.nodeId()+" "+status.map(Object::toString).orElse("NOT_APPLICABLE"),false);
+-                } else if (line.equals("catalog") || line.equals("play") || line.startsWith("play "))
++                } else if (line.equals("trace") || line.startsWith("trace ")) {
++                    diagnostic.trace(line, service);
++                } else if (line.equals("routes") || line.equals("catalog") || line.equals("metrics")) {
++                    diagnostic.list(line, service);
++                } else if (line.equals("play") || line.startsWith("play "))
+                     console.log("NOT_IMPLEMENTED " + line.split(" ", 2)[0], false);
+                 else console.log("COMMAND_ERROR unknown command", true);
+             }
+@@ -122,6 +140,7 @@ public final class OttApplication {
+         catch (Exception e) { console.log("FATAL " + bounded(e.getMessage()), true); console.stop(true); }
+         finally {
+             console.stop(false);
++            diagnostic.cancel();
+             // Close/cancel the owned input before waiting on the network budget.
+             console.reader.interrupt(); closeInput.run();
+             if (service != null) {
+@@ -135,6 +154,7 @@ public final class OttApplication {
+                     try { service.close(); } catch (RuntimeException ignored) { /* Preserve the first cleanup failure. */ }
+                 }
+             }
++            diagnostic.poll();
+             inputDone = join(console.reader, console.left());
+             if (!inputDone) console.failed.set(true);
+             // This record precedes the writer's final drain/join, so it cannot announce a final status.
+@@ -171,13 +191,32 @@ public final class OttApplication {
+             };
+         }
+         UUID instance = UUID.randomUUID();
+-        var node = new OverlayNode(config, instance, event -> console.log("EVENT node=" + config.nodeId()
+-                + " instance=" + instance + " " + event, event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR));
++        var reference = new AtomicReference<OverlayNode>();
++        var node = new OverlayNode(config, instance, event -> {
++            console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
++                    event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
++            if (event instanceof NeighborManager.Received received) {
++                var m=received.message(); UUID stream = m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.Trace t ? t.streamId()
++                        : m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.TraceResult t ? t.streamId() : null;
++                var n=reference.get();
++                if(stream!=null && n!=null) {
++                    var snapshot=n.routingSnapshot(); var route=snapshot.routes().get(stream);
++                    console.log("TRACE_HOP node="+config.nodeId()+" instance="+instance+" stream="+stream
++                            +" request="+m.requestId()+" direction="+(m.type()==pt.uminho.esr.ott.protocol.MessageType.ROUTE_TRACE?"request":"response")
++                            +" session="+received.session()+" capturedAt="+snapshot.capturedAtNanos()+" costMicros="
++                            +(route==null?"UNAVAILABLE":route.selectedMetric().map(x->Long.toString(x.costMicros())).orElse("UNAVAILABLE")),false);
++                }
++            }
++        });
++        reference.set(node);
+         node.start().whenComplete((v, error) -> {
+             if (error == null) console.log("READY node=" + config.nodeId() + " instance=" + instance, false);
+         });
+         return new RunningService() {
+             public Map<String, Neighbor> neighbors() { return node.diagnostics(); }
++            public RoutingService.Snapshot routingSnapshot() { return node.routingSnapshot(); }
++            public Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() { return Optional.of(node.monitoringSnapshot()); }
++            public RoutingService.TraceTicket requestTrace(UUID streamId) { return node.requestTrace(streamId); }
+             public Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.of(node.recoveryStatus());}
+             public void requestShutdown(int reason, Duration budget) { node.requestShutdown(reason, budget); }
+             public boolean awaitTermination(Duration budget) { return node.awaitTermination(budget); }
+@@ -185,6 +224,95 @@ public final class OttApplication {
+             public void close() { node.close(); }
+         };
+     }
++    /** CLI-owned tickets/cursor. Never runs on the node owner or waits for a network future. */
++    private static final class DiagnosticConsole {
++        final Console console; final LongSupplier clock;
++        final LinkedHashMap<UUID,RoutingService.TraceTicket> tickets=new LinkedHashMap<>();
++        Listing listing;
++        DiagnosticConsole(Console console,LongSupplier clock){this.console=console;this.clock=clock;}
++        void trace(String command,RunningService service) {
++            String[] parts=command.split(" ",-1);
++            final UUID stream;
++            try {
++                if(parts.length!=2 || parts[1].length()!=36)throw new IllegalArgumentException();
++                stream=UUID.fromString(parts[1]);
++                if(!stream.toString().equalsIgnoreCase(parts[1]))throw new IllegalArgumentException();
++            }catch(IllegalArgumentException e){console.log("COMMAND_ERROR trace requires one canonical UUID",true);return;}
++            if(tickets.size()==4){console.log("TRACE_ERROR stream="+stream+" reason=CLI_BUSY",false);return;}
++            var ticket=service.requestTrace(stream);tickets.put(ticket.traceId(),ticket);
++            console.log("TRACE_STARTED stream="+stream+" trace="+ticket.traceId(),false);
++        }
++        void list(String kind,RunningService service) {
++            if(listing!=null){console.log("COMMAND_ERROR diagnostic listing BUSY",true);return;}
++            listing=new Listing(kind,service,clock);
++        }
++        void poll() {
++            var it=tickets.values().iterator();
++            while(it.hasNext() && console.outputs.remainingCapacity()>0) {
++                var result=it.next().result();
++                if(result.isPresent()) {
++                    var r=result.orElseThrow();console.log((r.state()==RoutingService.TraceState.SUCCESS?"TRACE_RESULT":"TRACE_ERROR")
++                            +" stream="+r.streamId()+" trace="+r.traceId()+" state="+r.state()+" code="+r.errorCode()
++                            +" reason="+escape(r.detail())+" visited="+r.visited()+" elapsedNanos="+r.elapsedNanos(),false);it.remove();
++                }
++            }
++            for(int i=0;i<16 && listing!=null && console.outputs.remainingCapacity()>0;i++) {
++                console.log(listing.next(),false);if(listing.done)listing=null;
++            }
++        }
++        void cancel(){listing=null;for(var ticket:tickets.values())ticket.cancel();}
++    }
++    private static String escape(String value) {
++        StringBuilder text=new StringBuilder();
++        for(int i=0;i<value.length() && text.length()<MAX_LOG_CHARS-8;i++) {
++            char c=value.charAt(i);
++            if(c=='\n')text.append("\\n");else if(c=='\r')text.append("\\r");
++            else if(c=='\t')text.append("\\t");else if(c=='\\')text.append("\\\\");
++            else if(Character.isISOControl(c))text.append('?');else text.append(c);
++        }return text.toString();
++    }
++    private static final class Listing {
++        final String kind; final long at,captured;
++        final Iterator<? extends Map.Entry<?,?>> entries;
++        Iterator<RouteCandidate> candidates=Collections.emptyIterator();UUID routeId;
++        boolean header=true,done;
++        Listing(String kind,RunningService service,LongSupplier clock) {
++            this.kind=kind;
++            if(kind.equals("metrics")) {
++                var snapshot=service.monitoringSnapshot();at=clock.getAsLong();captured=snapshot.map(x->x.publishedAtNanos()).orElse(at);
++                entries=snapshot.map(x->x.links().entrySet().iterator()).orElseGet(()->Collections.emptyIterator());
++            }else {
++                var snapshot=service.routingSnapshot();at=clock.getAsLong();captured=snapshot.capturedAtNanos();
++                // One reference to immutable data; no eager formatting/sort of a whole table.
++                entries=kind.equals("routes")?snapshot.routes().entrySet().iterator():snapshot.catalog().visibleAt(at).entries().entrySet().iterator();
++            }
++        }
++        String next() {
++            String prefix=kind.toUpperCase(Locale.ROOT);
++            if(header){header=false;return prefix+" capturedAt="+captured+" ageNanos="+Math.max(0,at-captured)+" count=snapshot";}
++            if(candidates.hasNext()) {
++                var c=candidates.next();long remaining=c.candidateTtlNanos()-(at-c.generationStartedAtNanos());
++                return "ROUTE_CANDIDATE stream="+routeId+" session="+c.upstream()+" path="+c.path()
++                        +" costMicros="+c.metric().map(m->Long.toString(m.costMicros())).orElse("UNMEASURED")
++                        +" remainingNanos="+Math.max(0,remaining)+" expired="+(remaining<=0);
++            }
++            if(!entries.hasNext()){done=true;return prefix+"_END";}
++            var entry=entries.next();
++            if(entry.getValue() instanceof Route route) {
++                routeId=route.streamId();candidates=route.candidates().iterator();
++                return "ROUTE stream="+routeId+" origin="+route.serverId()+" epoch="+route.serverEpoch()
++                        +" selected="+route.knownUpstream()+" state="+route.state()+" revision="+route.revision()
++                        +" snapshotOnly=true costMicros="+route.selectedMetric().map(m->Long.toString(m.costMicros())).orElse("UNAVAILABLE");
++            }
++            if(entry.getValue() instanceof pt.uminho.esr.ott.streaming.StreamCatalog.Entry stream)
++                return "CATALOG_STREAM stream="+stream.info().streamId()+" origin="+stream.info().serverId()
++                        +" title="+escape(stream.info().title())+" epoch="+stream.info().serverEpoch()+" state="+stream.state()
++                        +" remainingNanos="+stream.remainingNanos()+" local="+stream.localOffer();
++            var link=(pt.uminho.esr.ott.monitoring.LinkMetrics)entry.getValue();
++            return "METRIC node="+entry.getKey()+" session="+link.session()+" state="+link.state()
++                    +" ewmaMicros="+link.ewmaMicros()+" costMicros="+link.costMicros()+" sampleAgeNanos="+link.sampleAgeNanos(at);
++        }
++    }
+     private static boolean join(Thread thread, Duration budget) {
+         if (thread.getState() == Thread.State.NEW) return true;
+         if (thread == Thread.currentThread()) return false;
+@@ -196,6 +324,18 @@ public final class OttApplication {
+         String marker = "...[truncated]";
+         return text.length() <= MAX_LOG_CHARS ? text : text.substring(0, MAX_LOG_CHARS - marker.length()) + marker;
+     }
++    /** Bound before copying; one event stays one physical log line, including hostile titles. */
++    private static String oneLine(String value) {
++        if(value==null)return "unspecified";
++        var text=new StringBuilder();int i=0;
++        while(i<value.length() && text.length()<=MAX_LOG_CHARS) {
++            char c=value.charAt(i++);
++            if(c=='\n')text.append("\\n");else if(c=='\r')text.append("\\r");else if(c=='\t')text.append("\\t");
++            else if(Character.isISOControl(c)||c=='\u2028'||c=='\u2029')text.append('?');else text.append(c);
++        }
++        if(i<value.length())text.append("...[truncated]");
++        return bounded(text.toString());
++    }
+     private static final class Console {
+         final ArrayBlockingQueue<InputEvent> commands;
+         final ArrayBlockingQueue<OutputEvent> outputs;
+@@ -218,7 +358,7 @@ public final class OttApplication {
+         }
+         Duration left() { return Duration.ofNanos(Math.max(0, budget - (clock.getAsLong() - stopAt))); }
+         void log(String text, boolean error) {
+-            if (!outputs.offer(new OutputEvent(bounded(text), error))) stop(true);
++            if (!outputs.offer(new OutputEvent(oneLine(text), error))) stop(true);
+         }
+         void command(InputEvent event) { if (!stopped.get() && !commands.offer(event)) { log("COMMAND_OVERFLOW", true); stop(true); } }
+         void read(InputStream input) {
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+index 1111966..57b68a9 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -44,6 +44,12 @@ public final class OverlayNode implements AutoCloseable {
+         RoutingService.validateConfiguration(configuration, instanceId);
+         new NeighborManager(configuration, instance, observer);
+     }
++    /** Q-C-32: diagnostic delegation only, no new owner or transport. */
++    public RoutingService.TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        var r = routing;
++        return r == null ? RoutingService.unavailableTrace(streamId) : r.requestTrace(streamId);
++    }
+     public RoutingService.Snapshot routingSnapshot() {
+         var r = routing; return r == null ? RoutingService.emptySnapshot() : r.snapshot();
+     }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index 3ac0bfc..69e9e75 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -23,6 +23,67 @@ public final class RoutingService implements AutoCloseable {
+         Ticket schedule(Runnable task, long delayNanos);
+         void requestClose(); boolean awaitTermination(Duration budget); int physicalJobs();
+     }
++    /** Approved local diagnostic contract; not a wire enum. */
++    public enum TraceState { SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING }
++    public static final int TRACE_INITIAL_TTL = 32;
++    public static final Duration TRACE_TIMEOUT = Duration.ofMillis(3000);
++    /** Polling never invokes caller continuations on the node owner. */
++    public interface TraceTicket {
++        UUID traceId();
++        Optional<TraceOutcome> result();
++        void cancel();
++    }
++    public record TraceOutcome(UUID streamId, UUID traceId, Optional<UUID> serverEpoch,
++            TraceState state, Optional<ErrorCode> errorCode, String detail,
++            List<String> visited, long elapsedNanos) {
++        public TraceOutcome {
++            Objects.requireNonNull(streamId); Objects.requireNonNull(traceId);
++            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(state);
++            Objects.requireNonNull(errorCode); Objects.requireNonNull(detail);
++            Objects.requireNonNull(visited);
++            if (!tracePath(visited, true) || !traceText(detail, 256) || elapsedNanos < 0)
++                throw new IllegalArgumentException("Trace outcome bounds");
++            visited = List.copyOf(visited);
++        }
++    }
++    /** Admission is bounded before publishing to the borrowed owner. No user continuations. */
++    public TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        if (stopping.get() || view.diagnostics().phase() != Phase.RUNNING) return unavailableTrace(streamId);
++        long began = clock.getAsLong();
++        var ticket = new LocalTrace(streamId, UUID.randomUUID(), began);
++        synchronized (resources) {
++            if (stopping.get()) return unavailableTrace(streamId);
++            if (traceReservations >= traceLimit || localTraces.size() >= 4) {
++                ticket.outcome = traceValue(ticket, null, TraceState.RESOURCE_LIMIT, ErrorCode.RESOURCE_LIMIT,
++                        "TRACE_CAPACITY", List.of(), began); return ticket;
++            }
++            traceReservations++; localTraces.add(ticket);
++        }
++        if (!owner.offer(() -> {
++            try { admitTrace(ticket); }
++            catch (RuntimeException failure) { note(Reason.CLOCK_ERROR,true); }
++        })) {
++            // The real owner rejects by initiating stop; its hook also resolves queued tickets.
++            synchronized (resources) {
++                if (localTraces.remove(ticket)) traceReservations--;
++                if (ticket.outcome == null) ticket.outcome = traceValue(ticket, null, TraceState.CLOSED,
++                        null, "OWNER_REJECTED", List.of(), began);
++            }
++        }
++        return ticket;
++    }
++    public static TraceTicket unavailableTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        UUID id = UUID.randomUUID();
++        var value = new TraceOutcome(streamId,id,Optional.empty(),TraceState.NOT_RUNNING,
++                Optional.empty(),"NOT_RUNNING",List.of(),0);
++        return new TraceTicket() {
++            public UUID traceId() { return id; }
++            public Optional<TraceOutcome> result() { return Optional.of(value); }
++            public void cancel() { }
++        };
++    }
+     public enum Phase { NEW, RUNNING, STOPPED }
+     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
+         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
+@@ -61,6 +122,14 @@ public final class RoutingService implements AutoCloseable {
+     // These locks/flags cover physical work only; all routing state above belongs to owner.
+     private final Object resources=new Object();
+     private final Set<Admission> admissions=new HashSet<>();
++    // Physical reservations/command cancellation may be touched off owner, routing contexts may not.
++    private final Set<LocalTrace> localTraces = new HashSet<>();
++    private final Set<TraceSend> traceSends = new HashSet<>();
++    private final Map<UUID,TraceContext> traces = new HashMap<>();
++    private final ArrayDeque<TraceContext> traceOrder = new ArrayDeque<>();
++    private final int traceLimit;
++    private int traceReservations, traceSweep;
++
+     private final AtomicBoolean stopping=new AtomicBoolean(),wakeQueued=new AtomicBoolean();
+     private final AtomicReference<Long> firstStop=new AtomicReference<>();
+     private final CompletableFuture<Void> cleaned=new CompletableFuture<>();
+@@ -128,6 +197,7 @@ public final class RoutingService implements AutoCloseable {
+         validateConfiguration(c,id);
+         if(c.streams().size()>limits.streamsPerOrigin())throw new IllegalArgumentException("Source capacity");
+         var r=c.runtime().routing();period=r.announceInterval().toNanos();history=r.cacheTtl().toNanos();
++        traceLimit=Math.min(o.capacity(),64);
+         maxCache=r.cacheCapacity();maxPending=Math.min(maxCache,o.capacity());maxTickets=Math.min(o.capacity(),2*limits.neighbors());
+         flood=r.floodMaxPerSecond();shutdownNanos=c.runtime().control().shutdownTimeout().toNanos();
+         root=new RoutingTable(c.nodeId(),limits,r.candidateTtl().toMillis(),r.cacheTtl().toMillis(),clock);
+@@ -196,6 +266,7 @@ public final class RoutingService implements AutoCloseable {
+     public void onNeighborEvent(NeighborManager.Event event){
+         requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
+         try{
++            traceSweep=traceOrder.size();
+             if(event instanceof NeighborManager.NeighborUp e){
+                 var s=e.session();var old=sessions.get(s.nodeId());
+                 if(!s.equals(old)){
+@@ -206,6 +277,11 @@ public final class RoutingService implements AutoCloseable {
+             }else if(event instanceof NeighborManager.NeighborDown e){if(current(e.session()))remove(e.session());}
+             else if(event instanceof NeighborManager.Received e){
+                 var m=e.message();if(!current(e.session()))return;
++                if (m.type()==MessageType.ROUTE_TRACE || m.type()==MessageType.TRACE_RESULT || m.type()==MessageType.ERROR) {
++                    if (m.version()==2 && m.requestId()!=null && e.session().nodeId().equals(m.senderId())
++                            && e.session().instanceId().equals(m.senderInstance())) onTrace(e.session(),m);
++                    drive(); return;
++                }
+                 if(m.type()!=MessageType.STREAM_ANNOUNCE&&m.type()!=MessageType.STREAM_WITHDRAW)return;
+                 if(m.version()!=2||m.requestId()==null||!e.session().nodeId().equals(m.senderId())||!e.session().instanceId().equals(m.senderInstance())){note(Reason.INVALID_INPUT,false);return;}
+                 if(m.type()==MessageType.STREAM_ANNOUNCE&&m.payload() instanceof ControlMessage.Announcement a)announce(e.session(),a);
+@@ -252,7 +328,7 @@ public final class RoutingService implements AutoCloseable {
+             if(event instanceof NetworkMonitor.Updated e){session=e.metrics().session();cost=e.metrics().costMicros();}
+             else if(event instanceof NetworkMonitor.Invalidated e){session=e.session();cost=OptionalLong.empty();}
+             else return;
+-            if(!current(session))return;costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
++            if(!current(session))return;traceSweep=traceOrder.size();costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
+         }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
+     }
+     public void setLocalAvailable(UUID id,boolean available){
+@@ -433,7 +509,7 @@ public final class RoutingService implements AutoCloseable {
+                 row.nextAt=t+period;dirty();
+             }
+             // All owner projections precede the resulting send attempts.
+-            publish(t);int swept=sweepQuotas(t);scan(64-swept);
++            publish(t); traceDrive(); int swept=sweepQuotas(t);scan(64-swept);
+             // A slow/control-port callback may also advance time during this turn.
+             long finished=now();applied(root.expire());publish(finished);
+             if(scanRemaining>0)wake();
+@@ -444,6 +520,7 @@ public final class RoutingService implements AutoCloseable {
+     private void schedule(long t){
+         if(stopping.get())return;
+         long delay=Long.MAX_VALUE;
++        for (var context : traces.values()) delay=Math.min(delay,Math.max(1,TRACE_TIMEOUT.toNanos()-(t-context.began)));
+         for(var row:rows.values()){
+             if(row.offered)delay=Math.min(delay,Math.max(1,row.nextAt-t));
+             if(row.route!=null)for(var c:row.route.candidates())delay=Math.min(delay,Math.max(1,c.candidateTtlNanos()-(t-c.generationStartedAtNanos())));
+@@ -460,6 +537,7 @@ public final class RoutingService implements AutoCloseable {
+         if(stopping.get()||!wakeQueued.compareAndSet(false,true))return;
+         if(!owner.offer(()->{wakeQueued.set(false);if(stopping.get())return;
+             // A timer wake starts another bounded fair pass, never an unbounded retry loop.
++            if (traceSweep==0) traceSweep=traceOrder.size();
+             if(scanRemaining==0)dirty();drive();
+         })){
+             wakeQueued.set(false);stopping.set(true);firstStop.compareAndSet(null,System.nanoTime());scheduler.requestClose();
+@@ -481,6 +559,240 @@ public final class RoutingService implements AutoCloseable {
+         int physical;synchronized(resources){physical=admissions.size();}
+         view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason));
+     }
++    private static boolean traceText(String text,int maximum) {
++        if (text==null || text.length()>maximum) return false;
++        int bytes=0;
++        for (int i=0;i<text.length();i++) {
++            char c=text.charAt(i); if(c==0)return false;
++            if (Character.isHighSurrogate(c)) {
++                if(++i==text.length() || !Character.isLowSurrogate(text.charAt(i)))return false;
++                bytes+=4;
++            } else if(Character.isLowSurrogate(c))return false;
++            else bytes+=c<128?1:c<2048?2:3;
++            if(bytes>maximum)return false;
++        } return true;
++    }
++    private static boolean tracePath(List<String> path,boolean empty) { return tracePath(path,empty,true); }
++    private static boolean tracePath(List<String> path,boolean empty,boolean unique) {
++        if(path==null || path.size()>32 || !empty && path.isEmpty())return false;
++        for(int i=0;i<path.size();i++) {
++            String id=path.get(i);
++            if(id==null || id.length()<1 || id.length()>32)return false;
++            for(int j=0;j<id.length();j++) {
++                char c=id.charAt(j); if(!(c>='A'&&c<='Z'||c>='a'&&c<='z'||c>='0'&&c<='9'||c=='_'||c=='-'))return false;
++            }
++            if(unique)for(int j=0;j<i;j++)if(id.equals(path.get(j)))return false;
++        } return true;
++    }
++    private final class LocalTrace implements TraceTicket {
++        final UUID stream,id; final long began;
++        final AtomicBoolean cancelled=new AtomicBoolean(); volatile TraceOutcome outcome;
++        LocalTrace(UUID stream,UUID id,long began){this.stream=stream;this.id=id;this.began=began;}
++        public UUID traceId(){return id;}
++        public Optional<TraceOutcome> result(){return Optional.ofNullable(outcome);}
++        public void cancel(){if(outcome==null && cancelled.compareAndSet(false,true))wake();}
++    }
++    private static final class TraceContext {
++        final UUID id,stream; final long began; final Neighbor.Session incoming;
++        final LocalTrace local; final List<String> prefix;
++        UUID epoch; String origin; Neighbor.Session upstream;
++        boolean terminal; ControlMessage response;
++        TraceContext(UUID id,UUID stream,long began,Neighbor.Session incoming,LocalTrace local,List<String> prefix) {
++            this.id=id;this.stream=stream;this.began=began;this.incoming=incoming;this.local=local;this.prefix=prefix;
++        }
++    }
++    private TraceOutcome traceValue(LocalTrace ticket,UUID epoch,TraceState state,ErrorCode code,
++            String detail,List<String> path,long at) {
++        return new TraceOutcome(ticket.stream,ticket.id,Optional.ofNullable(epoch),state,
++                Optional.ofNullable(code),detail,path,Math.max(0,at-ticket.began));
++    }
++    private void admitTrace(LocalTrace ticket) {
++        requireOwner();
++        if(stopping.get())return; // onStop/cleanup owns every reserved local ticket
++        var c=new TraceContext(ticket.id,ticket.stream,ticket.began,null,ticket,List.of(config.nodeId()));
++        traces.put(c.id,c);traceOrder.add(c);traceSweep=traceOrder.size();
++        long at=now();
++        if(ticket.cancelled.get())finishTrace(c,TraceState.CANCELLED,null,"CANCELLED",c.prefix,at);
++        else if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
++        else forwardTrace(c,TRACE_INITIAL_TTL-1);
++        drive();
++    }
++    private void finishTrace(TraceContext c,TraceState state,ErrorCode code,String detail,List<String> path,long at) {
++        if(c.terminal)return;c.terminal=true;
++        if(c.local!=null)c.local.outcome=traceValue(c.local,c.epoch,state,code,detail,path,at);
++        else if(c.incoming!=null && current(c.incoming) && at-c.began<TRACE_TIMEOUT.toNanos()) {
++            c.response=new ControlMessage(state==TraceState.SUCCESS?MessageType.TRACE_RESULT:MessageType.ERROR,
++                    c.id,config.nodeId(),instance,state==TraceState.SUCCESS?
++                    new ControlMessage.TraceResult(c.stream,c.id,path):
++                    new ControlMessage.ErrorPayload(code==null?ErrorCode.NO_ROUTE:code,15,detail));
++        }
++        traceSweep=traceOrder.size();
++    }
++    private void forwardTrace(TraceContext c,int remaining) {
++        long at=now();applied(root.expire());
++        if(at-c.began>=TRACE_TIMEOUT.toNanos()){finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);return;}
++        var row=rows.get(c.stream);
++        if(row==null){finishTrace(c,TraceState.ERROR,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM",c.prefix,at);return;}
++        refresh(row);var route=row.route;
++        if(c.epoch!=null && !route.serverEpoch().equals(Optional.of(c.epoch))) {
++            finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);return;
++        }
++        c.epoch=route.serverEpoch().orElse(null);c.origin=route.serverId();
++        if(route.localSource()){finishTrace(c,TraceState.SUCCESS,null,"",c.prefix,at);return;}
++        if(route.selectedCandidate().isEmpty()){finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"NO_ROUTE",c.prefix,at);return;}
++        if(remaining==0){finishTrace(c,TraceState.ERROR,ErrorCode.TIMEOUT,"TTL_EXHAUSTED",c.prefix,at);return;}
++        var selected=route.selectedCandidate().orElseThrow();
++        var session=sessions.get(selected.upstream().nodeId());
++        if(session==null || !key(session).equals(selected.upstream())){finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"NO_ROUTE",c.prefix,at);return;}
++        if(c.prefix.contains(session.nodeId())){finishTrace(c,TraceState.ERROR,ErrorCode.LOOP_DETECTED,"LOOP_DETECTED",c.prefix,at);return;}
++        c.upstream=session;
++        var request=new ControlMessage(MessageType.ROUTE_TRACE,c.id,config.nodeId(),instance,
++                new ControlMessage.Trace(c.stream,c.epoch,c.id,remaining,c.prefix));
++        if(!sendTrace(c,session,request,true)) {
++            long failedAt=now();
++            if(failedAt-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,failedAt);
++            else finishTrace(c,TraceState.RESOURCE_LIMIT,ErrorCode.RESOURCE_LIMIT,"TRACE_SEND_CAPACITY",c.prefix,failedAt);
++        }
++    }
++    private void onTrace(Neighbor.Session session,ControlMessage message) {
++        requireOwner();long at=now();
++        if(message.type()==MessageType.ROUTE_TRACE && message.payload() instanceof ControlMessage.Trace p) {
++            // Bound before copying, allocating a context, or responding from unsafe content.
++            if(p.streamId()==null || p.serverEpoch()==null || p.traceId()==null || !p.traceId().equals(message.requestId())
++                    || p.ttl()<0 || p.ttl()>255 || !tracePath(p.visited(),false,false)
++                    || !p.visited().getLast().equals(session.nodeId()))return;
++            var duplicate=traces.get(p.traceId());
++            if(duplicate!=null)return; // includes protected terminal contexts; never refresh deadline
++            if(p.ttl()==0){traceError(session,p.traceId(),ErrorCode.TIMEOUT,"TTL_EXHAUSTED");return;}
++            if(!tracePath(p.visited(),false) || p.visited().contains(config.nodeId())){traceError(session,p.traceId(),ErrorCode.LOOP_DETECTED,"LOOP_DETECTED");return;}
++            if(p.visited().size()==32){traceError(session,p.traceId(),ErrorCode.RESOURCE_LIMIT,"TRACE_PATH_LIMIT");return;}
++            synchronized(resources) {
++                long peer=traces.values().stream().filter(c->session.equals(c.incoming)).count();
++                if(traceReservations>=traceLimit || peer>=4){traceError(session,p.traceId(),ErrorCode.RESOURCE_LIMIT,"TRACE_CAPACITY");return;}
++                traceReservations++;
++            }
++            var prefix=new ArrayList<String>(p.visited().size()+1);prefix.addAll(p.visited());prefix.add(config.nodeId());
++            var c=new TraceContext(p.traceId(),p.streamId(),at,session,null,List.copyOf(prefix));c.epoch=p.serverEpoch();
++            traces.put(c.id,c);traceOrder.add(c);traceSweep=traceOrder.size();forwardTrace(c,p.ttl()-1);
++        } else {
++            var c=traces.get(message.requestId());
++            if(c==null || c.terminal || c.upstream==null || !c.upstream.equals(session))return;
++            if(at-c.began>=TRACE_TIMEOUT.toNanos()){finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);return;}
++            if(message.payload() instanceof ControlMessage.TraceResult p && message.type()==MessageType.TRACE_RESULT) {
++                if(!c.id.equals(p.traceId()) || !c.stream.equals(p.streamId()) || !tracePath(p.visited(),false)
++                        || p.visited().size()<=c.prefix.size() || !p.visited().subList(0,c.prefix.size()).equals(c.prefix)
++                        || !p.visited().get(c.prefix.size()).equals(c.upstream.nodeId())
++                        || !p.visited().getLast().equals(c.origin))return;
++                var row=rows.get(c.stream);
++                if(row==null || !row.route.serverEpoch().equals(Optional.ofNullable(c.epoch)))
++                    finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
++                else finishTrace(c,TraceState.SUCCESS,null,"",p.visited(),at);
++            } else if(message.type()==MessageType.ERROR && message.payload() instanceof ControlMessage.ErrorPayload p
++                    && p.relatedType()==15 && p.code()!=null && traceText(p.detail(),256))
++                finishTrace(c,p.code()==ErrorCode.TIMEOUT?TraceState.TIMEOUT:TraceState.ERROR,p.code(),p.detail(),c.prefix,at);
++        }
++    }
++    private final class TraceSend {
++        final TraceContext context; final Neighbor.Session session; final boolean request;
++        Connection.SendResult result;Throwable error;boolean ready,callbackDone,continuationDone;
++        TraceSend(TraceContext c,Neighbor.Session s,boolean request){context=c;session=s;this.request=request;}
++        void complete(Connection.SendResult value,Throwable error) {
++            synchronized(resources){this.result=value;this.error=error;ready=true;}
++            try{if(!stopping.get())wake();}
++            finally{boolean freed;synchronized(resources){callbackDone=true;freed=releaseTraceSend(this);}if(freed&&!stopping.get())wake();}
++        }
++    }
++    private boolean releaseTraceSend(TraceSend send) {
++        if(send.callbackDone && send.continuationDone && traceSends.remove(send)){resources.notifyAll();return true;}return false;
++    }
++    private boolean sendTrace(TraceContext c,Neighbor.Session session,ControlMessage message,boolean request) {
++        requireOwner();
++        if(stopping.get() || !current(session) || c!=null && now()-c.began>=TRACE_TIMEOUT.toNanos())return false;
++        final TraceSend send;
++        synchronized(resources) {
++            if(traceSends.size()>=traceLimit || c!=null && traceSends.stream().filter(t->t.context==c).count()>=2)return false;
++            send=new TraceSend(c,session,request);traceSends.add(send);
++        }
++        boolean submitted=false;
++        try {
++            // Reservation/validation can consume time; failures before the port own no callback.
++            long at=now();
++            boolean valid=!stopping.get() && current(session) && (c==null || at-c.began<TRACE_TIMEOUT.toNanos());
++            if(valid && request) {
++                applied(root.expire());var row=rows.get(c.stream);
++                valid=row!=null && row.route.serverEpoch().equals(Optional.ofNullable(c.epoch))
++                        && row.route.knownUpstream().equals(Optional.of(key(session)));
++                if(!valid)finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
++            }
++            if(!valid)return false;
++            submitted=true;
++            try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
++            catch(RuntimeException failure){send.complete(null,failure);}
++            return true;
++        } finally {
++            if(!submitted)synchronized(resources){traceSends.remove(send);resources.notifyAll();}
++        }
++    }
++    private void traceError(Neighbor.Session s,UUID id,ErrorCode error,String detail) {
++        sendTrace(null,s,new ControlMessage(MessageType.ERROR,id,config.nodeId(),instance,
++                new ControlMessage.ErrorPayload(error,15,detail)),false);
++    }
++    private void traceDrive() {
++        requireOwner();
++        List<TraceSend> completed;
++        synchronized(resources){completed=traceSends.stream().filter(t->t.ready&&!t.continuationDone).limit(16).toList();}
++        for(var send:completed) {
++            try {
++                var c=send.context;
++                if(c!=null && !c.terminal && send.request && traces.get(c.id)==c
++                        && (send.error!=null || send.result!=Connection.SendResult.ACCEPTED))
++                {
++                    long at=now();
++                    if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
++                    else finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"SEND_"+(send.result==null?"FAILED":send.result),c.prefix,at);
++                }
++            }finally{synchronized(resources){send.continuationDone=true;releaseTraceSend(send);}}
++        }
++        synchronized(resources){if(traceSends.stream().anyMatch(t->t.ready&&!t.continuationDone))wake();}
++        int count=Math.min(16-completed.size(),traceSweep);
++        while(count-->0 && !traceOrder.isEmpty()) {
++            var c=traceOrder.removeFirst();traceSweep--;
++            long at=now();
++            if(!c.terminal) {
++                if(c.local!=null && c.local.cancelled.get())finishTrace(c,TraceState.CANCELLED,null,"CANCELLED",c.prefix,at);
++                else if(at-c.began>=TRACE_TIMEOUT.toNanos())finishTrace(c,TraceState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT",c.prefix,at);
++                else if(c.upstream!=null && !current(c.upstream))finishTrace(c,TraceState.ERROR,ErrorCode.NO_ROUTE,"SESSION_CLOSED",c.prefix,at);
++                else if(c.incoming!=null && !current(c.incoming))finishTrace(c,TraceState.CLOSED,null,"SESSION_CLOSED",c.prefix,at);
++                else if(c.epoch!=null && rows.containsKey(c.stream) && !rows.get(c.stream).route.serverEpoch().equals(Optional.of(c.epoch)))
++                    finishTrace(c,TraceState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED",c.prefix,at);
++            }
++            if(c.response!=null) {
++                if(!current(c.incoming) || at-c.began>=TRACE_TIMEOUT.toNanos())c.response=null;
++                else if(sendTrace(c,c.incoming,c.response,false))c.response=null;
++            }
++            if(at-c.began>=TRACE_TIMEOUT.toNanos()) {
++                traces.remove(c.id);
++                synchronized(resources){traceReservations--;if(c.local!=null)localTraces.remove(c.local);}
++            }else traceOrder.addLast(c);
++        }
++        if(traceSweep>0)wake();
++    }
++    record TraceLoad(int contexts,int reservations,int locals,int sends,int responseIntents,int timers) { }
++    TraceLoad traceLoad() {
++        requireOwner();
++        synchronized(resources) { return new TraceLoad(traces.size(),traceReservations,localTraces.size(),traceSends.size(),
++                (int)traces.values().stream().filter(c->c.response!=null).count(),scheduler.physicalJobs()); }
++    }
++    private void closeTraces() {
++        long at=clock.getAsLong();
++        for(var c:traces.values())if(!c.terminal)finishTrace(c,TraceState.CLOSED,null,"CLOSED",c.prefix,at);
++        traces.clear();traceOrder.clear();traceSweep=0;
++        synchronized(resources) {
++            for(var ticket:localTraces)if(ticket.outcome==null)ticket.outcome=traceValue(ticket,null,TraceState.CLOSED,null,"CLOSED",List.of(),at);
++            localTraces.clear();traceReservations=0;
++            for(var send:List.copyOf(traceSends)){send.continuationDone=true;releaseTraceSend(send);}
++        }
++    }
+     private void note(Reason reason,boolean fatal){
+         lastReason=reason;if(failures==Long.MAX_VALUE)countersSaturated=true;else failures++;
+         if(fatal)requestClose();
+@@ -495,6 +807,7 @@ public final class RoutingService implements AutoCloseable {
+     }
+     private void cleanup(){
+         requireOwner();if(cleaned.isDone())return;stopping.set(true);scheduler.requestClose();if(alarm!=null)alarm.cancel();alarm=null;
++        closeTraces();
+         rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
+         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
+         publish(clock.getAsLong());cleaned.complete(null);
+@@ -507,7 +820,7 @@ public final class RoutingService implements AutoCloseable {
+         budget=Math.min(budget,left(shutdownNanos,firstStop.get()));
+         try{cleaned.get(left(budget,began),TimeUnit.NANOSECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}catch(ExecutionException|TimeoutException e){return false;}
+         if(!scheduler.awaitTermination(Duration.ofNanos(left(budget,began))))return false;
+-        synchronized(resources){while(!admissions.isEmpty()){
++        synchronized(resources){while(!admissions.isEmpty() || !traceSends.isEmpty()){
+             long rest=left(budget,began);if(rest==0)return false;
+             try{TimeUnit.NANOSECONDS.timedWait(resources,rest);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}
+         }}return true;
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteTraceTest.java
+@@ -0,0 +1,655 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import static org.junit.jupiter.api.Assertions.*;
++import java.io.*;
++import java.nio.charset.StandardCharsets;
++import java.time.Duration;
++import java.util.*;
++import pt.uminho.esr.ott.app.OttApplication;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.routing.RoutingService.*;
++
++/** Incremental V-013 oracles with deterministic fakes and real CLI/TCP; formal Test remains pending. */
++@Timeout(10)
++class RouteTraceTest {
++    // Reuse the existing fake owner/clock/scheduler/control port without changing its tests.
++    private static final UUID STREAM = RoutingServiceTest.STREAM;
++    private static final UUID EPOCH = RoutingServiceTest.EPOCH;
++    private static TraceTicket request(RoutingServiceTest.Rig r) {
++        return assertDoesNotThrow(() -> r.router.requestTrace(STREAM),
++                "requestTrace must admit or return a terminal ticket, never a placeholder exception");
++    }
++    private static TraceOutcome terminal(TraceTicket ticket) {
++        return ticket.result().orElseGet(() -> fail("Expected an explicit terminal diagnostic outcome"));
++    }
++    private static List<ControlMessage> traces(RoutingServiceTest.Rig r) {
++        return r.sent.stream().map(RoutingServiceTest.Sent::message)
++                .filter(m -> m.type() == MessageType.ROUTE_TRACE).toList();
++    }
++    private static void receive(RoutingServiceTest.Rig r, Neighbor.Session peer, ControlMessage m) {
++        r.act(() -> r.router.onNeighborEvent(new NeighborManager.Received(peer, m)));
++    }
++    @Test void outcomeOwnsItsVisitedAndKeepsOpaqueIds() {
++        var path = new ArrayList<>(List.of("C", "S"));
++        UUID id = new UUID(-1, -2);
++        var value = new TraceOutcome(STREAM, id, Optional.of(EPOCH), TraceState.SUCCESS,
++                Optional.empty(), "", path, 17);
++        path.clear();
++        assertEquals(List.of("C", "S"), value.visited());
++        assertEquals(id, value.traceId());
++        assertThrows(UnsupportedOperationException.class, () -> value.visited().add("X"));
++    }
++    @Test void outcomeRejectsOverlongVisitedUtf8AndNegativeDuration() {
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.of(ErrorCode.TIMEOUT), "é".repeat(129), List.of(), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", Collections.nCopies(33, "X"), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", List.of(), -1));
++    }
++    @Test void t01LocalSourceReturnsSingletonWithoutDemandOrControlSend() {
++        try (var r = new RoutingServiceTest.Rig("S", true, 4096, 4096, 10,
++                new RoutingTable.Limits(64, 256, 63, 8))) {
++            var before = r.router.snapshot();
++            var ticket = request(r); r.owner.drain();
++            var result = terminal(ticket);
++            assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("S"), result.visited());
++            assertEquals(before.routes(), r.router.snapshot().routes());
++            assertTrue(r.sent.isEmpty(), "Local diagnostic cannot emit activation or video control");
++        }
++    }
++    @Test void t04UnknownStreamHasExplicitErrorWithoutNetwork() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); r.owner.drain();
++            assertEquals(Optional.of(ErrorCode.UNKNOWN_STREAM), terminal(ticket).errorCode());
++            assertTrue(r.sent.isEmpty());
++        }
++    }
++    @Test void t02InitialRequestUsesSelectedSessionAndTtlCountsInitiator() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); var b = RoutingServiceTest.session("B");
++            r.up(a); r.up(b); r.metric(a, 40); r.metric(b, 10); r.ad(a, 1, 100); r.ad(b, 1, 100);
++            assertEquals("B", r.route().knownUpstream().orElseThrow().nodeId());
++            var ticket = request(r); r.owner.drain();
++            var sent = r.sent.stream().filter(x -> x.message().type() == MessageType.ROUTE_TRACE).toList();
++            assertEquals(1, sent.size()); assertEquals(b, sent.getFirst().peer());
++            var m = sent.getFirst().message(); var p = assertInstanceOf(ControlMessage.Trace.class, m.payload());
++            assertEquals(ticket.traceId(), m.requestId()); assertEquals(ticket.traceId(), p.traceId());
++            assertEquals(List.of("C"), p.visited()); assertEquals(31, p.ttl());
++            assertEquals(EPOCH, p.serverEpoch()); assertTrue(ticket.result().isEmpty(), "ACCEPTED is not a result");
++        }
++    }
++    @Test void t05TtlZeroIsExplicitTimeOutWithoutForwarding() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var c = RoutingServiceTest.session("D"); r.up(c); UUID id = UUID.randomUUID();
++            receive(r, c, new ControlMessage(MessageType.ROUTE_TRACE, id, c.nodeId(), c.instanceId(),
++                    new ControlMessage.Trace(STREAM, EPOCH, id, 0, List.of("D"))));
++            var errors = r.to(c).stream().filter(m -> m.type() == MessageType.ERROR).toList();
++            assertEquals(1, errors.size(), "TTL0 needs an explicit correlated ERROR, not silence");
++            assertEquals(id, errors.getFirst().requestId());
++            var p = assertInstanceOf(ControlMessage.ErrorPayload.class, errors.getFirst().payload());
++            assertEquals(ErrorCode.TIMEOUT, p.code()); assertEquals(15, p.relatedType());
++            assertEquals("TTL_EXHAUSTED", p.detail()); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t06TimeInAdmissionQueueConsumesEntireGlobalTraceDeadline() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var ticket = request(r);
++            r.clock.addAndGet(Duration.ofMillis(3000).toNanos()); r.owner.drain();
++            assertEquals(TraceState.TIMEOUT, terminal(ticket).state());
++            assertTrue(traces(r).isEmpty(), "Expired admission cannot send a new trace");
++        }
++    }
++    @Test void t07ResultCanArriveBeforeAdmissionFutureCompletes() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            r.hold = true; var ticket = request(r); r.owner.drain();
++            assertEquals(1, traces(r).size());
++            receive(r, a, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), a.nodeId(), a.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            var result = terminal(ticket); assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("C", "A", "S"), result.visited());
++            r.sent.stream().filter(s -> s.message().type() == MessageType.ROUTE_TRACE)
++                    .forEach(s -> s.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED));
++            r.owner.drain(); assertEquals(result, terminal(ticket), "Late callback must not replace success");
++        }
++    }
++    @Test void t08OldConnectionCannotCompleteOperationOnReplacementSession() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var old = RoutingServiceTest.session("A"); r.up(old); r.metric(old, 10); r.ad(old, 1, 100);
++            var fresh = new Neighbor.Session(old.nodeId(), old.instanceId(), UUID.randomUUID(), old.endpoint());
++            r.up(fresh); r.metric(fresh, 10); r.ad(fresh, 1, 100);
++            var ticket = request(r); r.owner.drain();
++            receive(r, old, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), old.nodeId(), old.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertTrue(ticket.result().isEmpty(), "Same instanceId does not make an old connection current");
++            receive(r, fresh, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), fresh.nodeId(), fresh.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertEquals(TraceState.SUCCESS, terminal(ticket).state());
++        }
++    }
++    @Test void t10CancellationHasOneTerminalValueAndDoesNotSendFromQueue() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); ticket.cancel(); ticket.cancel(); r.owner.drain();
++            var result = terminal(ticket); assertEquals(TraceState.CANCELLED, result.state());
++            r.tick(3001); assertEquals(result, terminal(ticket)); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t11FifthLocalRequestIsRejectedBeforeOwnerAdmission() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var admitted = new ArrayList<TraceTicket>();
++            for (int i = 0; i < 4; i++) admitted.add(request(r));
++            assertEquals(4, r.owner.queue.size());
++            var excess = request(r);
++            assertEquals(TraceState.RESOURCE_LIMIT, terminal(excess).state());
++            assertEquals(4, r.owner.queue.size(), "Rejected command must not occupy owner queue");
++        }
++    }
++    @Test void facadeBeforeStartHasTerminalNotRunningWithoutCreatingOwner() {
++        var node = new OverlayNode(RoutingServiceTest.config("C", false, 4096, 4096, 10),
++                UUID.randomUUID(), event -> fail("No events before start"));
++        var ticket = assertDoesNotThrow(() -> node.requestTrace(STREAM), "Unstarted facade needs bounded terminal value");
++        assertEquals(TraceState.NOT_RUNNING, terminal(ticket).state());
++        assertEquals(RoutingService.Phase.NEW, node.routingSnapshot().diagnostics().phase());
++    }
++    @Test void t14PublicCliHelpAdvertisesApprovedTraceAndSnapshotCommands() {
++        var output = new ByteArrayOutputStream(); var errors = new ByteArrayOutputStream();
++        assertEquals(0, OttApplication.run(new String[]{"--help"}, InputStream.nullInputStream(),
++                new PrintStream(output, true, StandardCharsets.UTF_8), new PrintStream(errors)));
++        String help = output.toString(StandardCharsets.UTF_8);
++        for (String command : List.of("trace", "routes", "catalog", "metrics"))
++            assertTrue(help.contains(command), "Missing CLI diagnostic command: " + command);
++        assertEquals("", errors.toString(StandardCharsets.UTF_8));
++    }
++    private static RoutingService.TraceLoad load(RoutingServiceTest.Rig r) {
++        var value=new java.util.concurrent.atomic.AtomicReference<RoutingService.TraceLoad>();
++        r.owner.run(()->value.set(r.router.traceLoad()));return value.get();
++    }
++    private static void pingTrace(RoutingServiceTest.Rig r,Neighbor.Session peer,UUID id,int ttl,List<String> path) {
++        receive(r,peer,new ControlMessage(MessageType.ROUTE_TRACE,id,peer.nodeId(),peer.instanceId(),
++                new ControlMessage.Trace(STREAM,EPOCH,id,ttl,path)));
++    }
++    @Test void t06Boundary2999Then3000ExpiresWithoutNewAttempt() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);
++            var ticket=request(r);r.owner.drain();assertEquals(1,traces(r).size());
++            r.tick(2999);assertTrue(ticket.result().isEmpty());r.tick(1);
++            assertEquals(TraceState.TIMEOUT,terminal(ticket).state());assertEquals(1,traces(r).size());
++            assertEquals(0,load(r).contexts());assertEquals(0,load(r).reservations());
++        }
++    }
++    @Test void t03ReturnUsesStoredDownstreamAndNeverAnAlternativeRoute() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var down=RoutingServiceTest.session("D");var a=RoutingServiceTest.session("A");var b=RoutingServiceTest.session("B");
++            for(var s:List.of(down,a,b))r.up(s);r.metric(a,10);r.metric(b,20);r.ad(a,1,100);r.ad(b,1,100);
++            UUID id=UUID.randomUUID();pingTrace(r,down,id,31,List.of("D"));
++            var sent=r.sent.stream().filter(x->x.message().type()==MessageType.ROUTE_TRACE).findFirst().orElseThrow();assertEquals(a,sent.peer());
++            r.metric(b,1);assertEquals(b.nodeId(),r.route().knownUpstream().orElseThrow().nodeId());
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,id,a.nodeId(),a.instanceId(),
++                    new ControlMessage.TraceResult(STREAM,id,List.of("D","C","A","S"))));
++            var reply=r.sent.stream().filter(x->x.message().type()==MessageType.TRACE_RESULT).toList();
++            assertEquals(1,reply.size());assertEquals(down,reply.getFirst().peer());
++            assertEquals(List.of("D","C","A","S"),((ControlMessage.TraceResult)reply.getFirst().message().payload()).visited());
++            assertEquals(id,reply.getFirst().message().requestId());
++        }
++    }
++    @Test void t04KnownButUnmeasuredAndExpiredIsNoRouteNotUnknown() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.ad(a,1,100);
++            var first=request(r);r.owner.drain();assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(first).errorCode());
++            r.metric(a,10);r.tick(8000);var second=request(r);r.owner.drain();
++            assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(second).errorCode());assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t05SourceAtLastAllowedNodeWorksButNextNodeIsNeverAdmitted() {
++        try(var r=new RoutingServiceTest.Rig("S",true,4096,4096,10,new RoutingTable.Limits(64,256,63,8))) {
++            var peer=RoutingServiceTest.session("D");r.up(peer);
++            var path=new ArrayList<String>();for(int i=0;i<30;i++)path.add("V"+i);path.add("D");
++            UUID id=UUID.randomUUID();receive(r,peer,new ControlMessage(MessageType.ROUTE_TRACE,id,"D",peer.instanceId(),
++                    new ControlMessage.Trace(STREAM,RoutingServiceTest.LOCAL,id,1,path)));
++            var result=r.to(peer).stream().filter(m->m.type()==MessageType.TRACE_RESULT).findFirst().orElseThrow();
++            assertEquals(32,((ControlMessage.TraceResult)result.payload()).visited().size());
++            var full=new ArrayList<String>(path);full.add(0,"EXTRA");UUID rejected=UUID.randomUUID();
++            receive(r,peer,new ControlMessage(MessageType.ROUTE_TRACE,rejected,"D",peer.instanceId(),
++                    new ControlMessage.Trace(STREAM,RoutingServiceTest.LOCAL,rejected,1,full)));
++            assertTrue(r.to(peer).stream().anyMatch(m->m.requestId().equals(rejected)&&m.payload() instanceof ControlMessage.ErrorPayload e&&e.code()==ErrorCode.RESOURCE_LIMIT));
++        }
++    }
++    @Test void t05RepeatedOwnIdAndUnsafeVisitedCannotForward() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var peer=RoutingServiceTest.session("D");r.up(peer);
++            UUID loop=UUID.randomUUID();pingTrace(r,peer,loop,20,List.of("C","D"));
++            assertTrue(r.to(peer).stream().anyMatch(m->m.requestId().equals(loop)&&m.payload() instanceof ControlMessage.ErrorPayload e&&e.code()==ErrorCode.LOOP_DETECTED));
++            UUID repeated=UUID.randomUUID();pingTrace(r,peer,repeated,20,List.of("D","D"));
++            assertTrue(r.to(peer).stream().anyMatch(m->m.requestId().equals(repeated)&&m.payload() instanceof ControlMessage.ErrorPayload e&&e.code()==ErrorCode.LOOP_DETECTED));
++            int count=r.sent.size();
++            for(var path:List.of(List.of("X"),List.of("bad!","D"),Collections.nCopies(33,"D")))
++                pingTrace(r,peer,UUID.randomUUID(),20,path);
++            assertEquals(count,r.sent.size());assertEquals(0,load(r).contexts());
++        }
++    }
++    @Test void t09WrongIdentityStreamPrefixAndUnrelatedErrorNeverCompleteTicket() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);
++            var ticket=request(r);r.owner.drain();UUID id=ticket.traceId();
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,id,"A",UUID.randomUUID(),new ControlMessage.TraceResult(STREAM,id,List.of("C","A","S"))));
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,id,"A",a.instanceId(),new ControlMessage.TraceResult(RoutingServiceTest.OTHER,id,List.of("C","A","S"))));
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,id,"A",a.instanceId(),new ControlMessage.TraceResult(STREAM,id,List.of("OTHER","A","S"))));
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,id,"A",a.instanceId(),new ControlMessage.TraceResult(STREAM,UUID.randomUUID(),List.of("C","A","S"))));
++            receive(r,a,new ControlMessage(MessageType.ERROR,id,"A",a.instanceId(),new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE,9,"unrelated")));
++            assertTrue(ticket.result().isEmpty());
++            receive(r,a,new ControlMessage(MessageType.ERROR,id,"A",a.instanceId(),new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE,15,"NO_ROUTE")));
++            assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(ticket).errorCode());
++        }
++    }
++    @Test void t08EpochChangeAndExactSessionDownHaveExplicitTerminalErrors() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);
++            var ticket=request(r);r.owner.drain();
++            r.ad(a,STREAM,new UUID(9,9),0,100,List.of("S","A"),"Video A",25);
++            assertEquals(Optional.of(ErrorCode.PATH_CHANGED),terminal(ticket).errorCode());
++            var next=request(r);r.owner.drain();r.down(a);
++            assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(next).errorCode());
++        }
++    }
++    @Test void t10DuplicateDoesNotExtendLifetimeOrForwardTwice() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var d=RoutingServiceTest.session("D");var a=RoutingServiceTest.session("A");r.up(d);r.up(a);r.metric(a,10);r.ad(a,1,100);
++            UUID id=UUID.randomUUID();pingTrace(r,d,id,31,List.of("D"));assertEquals(1,traces(r).size());
++            r.tick(2999);pingTrace(r,d,id,31,List.of("D"));assertEquals(1,traces(r).size());
++            r.tick(1);assertEquals(0,load(r).contexts());
++        }
++    }
++    @Test void t11PerSessionQuotaIncludesTerminalTombstones() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var d=RoutingServiceTest.session("D");r.up(d);
++            for(int i=0;i<5;i++)pingTrace(r,d,UUID.randomUUID(),31,List.of("D"));
++            assertEquals(4,load(r).contexts());assertEquals(4,load(r).reservations());
++            assertTrue(r.to(d).getLast().payload() instanceof ControlMessage.ErrorPayload e&&e.code()==ErrorCode.RESOURCE_LIMIT);
++            r.tick(3000);assertEquals(0,load(r).reservations());
++        }
++    }
++    @Test void t11GlobalContextCapAndFiniteFairSweepAcrossSixtyFourContexts() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            for(int n=0;n<17;n++) {
++                var peer=RoutingServiceTest.session("D"+n);r.up(peer);
++                for(int k=0;k<4;k++)pingTrace(r,peer,UUID.randomUUID(),31,List.of(peer.nodeId()));
++            }
++            assertEquals(64,load(r).contexts());assertEquals(64,load(r).reservations());
++            assertTrue(load(r).timers()<=2);r.tick(3000);assertEquals(0,load(r).contexts());
++        }
++    }
++    @Test void t11PhysicalSendCapacitySurvivesTimeAndReleasesOnlyAfterCallback() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var d=RoutingServiceTest.session("D");r.up(d);r.hold=true;
++            for(int i=0;i<65;i++)pingTrace(r,d,UUID.randomUUID(),0,List.of("D"));
++            assertEquals(64,r.sent.size());assertEquals(64,load(r).sends());r.tick(3001);
++            assertEquals(64,load(r).sends());
++            for(var send:r.sent)send.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED);
++            r.owner.drain();assertEquals(0,load(r).sends());
++            pingTrace(r,d,UUID.randomUUID(),0,List.of("D"));assertEquals(65,r.sent.size());
++        }
++    }
++    @Test void t07SendFailuresAreExplicitWithoutAckOrSubscription() {
++        for(var value:pt.uminho.esr.ott.transport.Connection.SendResult.values()) {
++            if(value==pt.uminho.esr.ott.transport.Connection.SendResult.ACCEPTED)continue;
++            try(var r=new RoutingServiceTest.Rig()) {
++                var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);r.next=value;
++                var ticket=request(r);r.owner.drain();assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(ticket).errorCode());
++                assertTrue(r.route().activeUpstream().isEmpty());assertTrue(r.route().downstreams().isEmpty());
++                assertTrue(r.sent.stream().noneMatch(x->x.message().type().code()>=11&&x.message().type().code()<=14));
++            }
++        }
++    }
++    @Test void t17PendingPhysicalAdmissionCannotBeDeclaredTerminatedOnLogicalClose() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);r.hold=true;
++            var ticket=request(r);r.owner.drain();r.router.requestClose();r.owner.drain();
++            assertEquals(TraceState.CLOSED,terminal(ticket).state());
++            assertFalse(r.router.awaitTermination(Duration.ZERO),"Live callback keeps physical reservation");
++            for(var send:r.sent)send.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED);
++            r.owner.drain();assertTrue(r.router.awaitTermination(Duration.ofMillis(20)));
++        }
++    }
++    @Test void t12OwnerRejectionResolvesReservedTicketAndRunsCleanup() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            r.owner.reject=true;var ticket=r.router.requestTrace(STREAM);
++            assertEquals(TraceState.CLOSED,terminal(ticket).state());assertNotNull(r.owner.failure);
++            assertEquals(RoutingService.Phase.STOPPED,r.router.snapshot().diagnostics().phase());
++            assertEquals(0,load(r).reservations());
++        }
++    }
++    @Test void t13TracePreservesGenerationValidityMetricAndDemandSnapshots() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);
++            var before=r.route();var ticket=request(r);r.owner.drain();
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,ticket.traceId(),"A",a.instanceId(),new ControlMessage.TraceResult(STREAM,ticket.traceId(),List.of("C","A","S"))));
++            assertEquals(before,r.route());assertEquals(TraceState.SUCCESS,terminal(ticket).state());
++            assertTrue(r.sent.stream().noneMatch(x->x.message().type().code()>=11&&x.message().type().code()<=14));
++        }
++    }
++    static final class CliProcess implements AutoCloseable {
++        final Process process;final java.nio.file.Path log;final BufferedWriter input;
++        CliProcess(java.nio.file.Path profile,String role,java.nio.file.Path log)throws Exception {
++            this.log=log;
++            var command=List.of(java.nio.file.Path.of(System.getProperty("java.home"),"bin","java").toString(),"-cp",
++                    System.getProperty("surefire.test.class.path",System.getProperty("java.class.path")),
++                    OttApplication.class.getName(),"--role",role,"--config",profile.toString());
++            process=new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log.toFile()).start();
++            input=new BufferedWriter(new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8));
++        }
++        void send(String text)throws Exception{input.write(text);input.newLine();input.flush();}
++        String text()throws Exception{return java.nio.file.Files.exists(log)?java.nio.file.Files.readString(log):"";}
++        void until(java.util.function.Predicate<String> condition)throws Exception {
++            long began=System.nanoTime();while(!condition.test(text())) {
++                assertTrue(process.isAlive(),"Unexpected child exit: "+text());
++                assertTrue(System.nanoTime()-began<java.util.concurrent.TimeUnit.SECONDS.toNanos(10),"CLI condition deadline: "+text());
++                Thread.sleep(10);
++            }
++        }
++        int exited()throws Exception{
++            assertTrue(process.waitFor(5,java.util.concurrent.TimeUnit.SECONDS),"child exit deadline: "+text());
++            int value=process.exitValue();java.nio.file.Files.writeString(log.resolveSibling(log.getFileName()+".exit"),Integer.toString(value));return value;
++        }
++        public void close()throws Exception {
++            if(process.isAlive())process.destroy();
++            if(!process.waitFor(3,java.util.concurrent.TimeUnit.SECONDS))process.destroyForcibly();
++            assertTrue(process.waitFor(3,java.util.concurrent.TimeUnit.SECONDS));input.close();
++        }
++    }
++    static final class CliGraph implements AutoCloseable {
++        final java.nio.file.Path directory;
++        final int[] ports=new int[9];
++        final Map<String,java.nio.file.Path> profiles=new LinkedHashMap<>();
++        final Map<String,CliProcess> children=new LinkedHashMap<>();
++        final List<java.net.DatagramSocket> data=new ArrayList<>();
++        static final String[] IDS={"S","R1","R2","C"};
++        static final UUID VIDEO=new UUID(0x4000,1);
++        CliGraph()throws Exception { this(2); }
++        CliGraph(int streamCount)throws Exception {
++            directory=java.nio.file.Path.of(System.getProperty("ott.trace.evidence","target/imp010-evidence"))
++                    .toAbsolutePath().resolve("cli-"+UUID.randomUUID());java.nio.file.Files.createDirectories(directory);
++            var reserved=new ArrayList<java.net.ServerSocket>();
++            try {
++                for(int i=0;i<ports.length;i++){var socket=new java.net.ServerSocket(0,1,java.net.InetAddress.getLoopbackAddress());reserved.add(socket);ports[i]=socket.getLocalPort();}
++                StringBuilder topology=new StringBuilder("node.ids=S,R1,R2,C\n");
++                for(int i=0;i<IDS.length;i++) {
++                    String id=IDS[i],role=i==0?"SERVER":i==3?"CLIENT":"RELAY";
++                    topology.append("node.").append(id).append(".host=127.0.0.1\nnode.").append(id).append(".controlPort=").append(ports[1+i])
++                            .append("\nnode.").append(id).append(".dataPort=").append(ports[5+i])
++                            .append("\nnode.").append(id).append(".role=").append(role)
++                            .append("\nnode.").append(id).append(".neighbors=").append(i==0||i==3?"R1,R2":"S,C").append('\n');
++                    var file=directory.resolve(id+".properties");profiles.put(id,file);
++                    java.nio.file.Files.writeString(file,"node.id="+id+"\nnode.role="+role+"\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="+ports[1+i]
++                            +"\ndata.port="+ports[5+i]+"\nbootstrap.host=127.0.0.1\nbootstrap.port="+ports[0]
++                            +"\ncontrol.shutdown.timeout.ms=1500\ncontrol.connect.timeout.ms=300\noverlay.retry.initial.ms=50\noverlay.retry.max.ms=200\noverlay.retry.jitter.percent=0\n"
++                            +(i==0?"streams.file=streams.properties\nmedia.base="+directory+"\n":""));
++                }
++                java.nio.file.Files.writeString(directory.resolve("topology.properties"),topology.toString());
++                StringBuilder streams=new StringBuilder("stream.ids=");
++                for(int i=1;i<=streamCount;i++){if(i>1)streams.append(',');streams.append(new UUID(0x4000,i));}streams.append('\n');
++                for(int i=1;i<=streamCount;i++)streams.append("stream.").append(new UUID(0x4000,i)).append(".title=Live \\nINJECT ").append(i)
++                        .append("\nstream.").append(new UUID(0x4000,i)).append(".file=missing").append(i).append(".Mjpeg\nstream.")
++                        .append(new UUID(0x4000,i)).append(".fps=25\nstream.").append(new UUID(0x4000,i)).append(".loop=false\n");
++                java.nio.file.Files.writeString(directory.resolve("streams.properties"),streams.toString());
++                var bootstrap=directory.resolve("BOOT.properties");profiles.put("BOOT",bootstrap);
++                java.nio.file.Files.writeString(bootstrap,"node.id=BOOT\nnode.role=BOOTSTRAP\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="+ports[0]+"\ntopology.file=topology.properties\ncontrol.shutdown.timeout.ms=1500\n");
++            }finally{for(var socket:reserved)socket.close();}
++            for(int i=5;i<9;i++){var socket=new java.net.DatagramSocket(ports[i],java.net.InetAddress.getLoopbackAddress());socket.setSoTimeout(80);data.add(socket);}
++        }
++        CliProcess start(String id)throws Exception {
++            var child=new CliProcess(profiles.get(id),id.equals("BOOT")?"BOOTSTRAP":id.equals("S")?"SERVER":id.equals("C")?"CLIENT":"RELAY",directory.resolve(id+".log"));
++            children.put(id,child);child.until(t->t.contains("READY"));return child;
++        }
++        void assertNoVideo()throws Exception {
++            for(var socket:data)assertThrows(java.net.SocketTimeoutException.class,()->socket.receive(new java.net.DatagramPacket(new byte[1200],1200)),"No video datagram in observed diagnostic interval");
++            for(var child:children.values()) {
++                String text=child.text();
++                for(String type:List.of("type=ACTIVATE,","type=ACTIVATE_ACK,","type=DEACTIVATE,","type=SUBSCRIPTION_RENEW,"))assertFalse(text.contains(type),text);
++                assertFalse(text.lines().anyMatch(line->line.startsWith("INJECT")),"Titles must not inject an event/log line: "+text);
++                assertFalse(text.contains("FATAL"),text);assertFalse(text.contains("OUTPUT_ERROR"),text);
++            }
++        }
++        public void close()throws Exception {
++            Exception failure=null;
++            for(var child:children.values())try{child.close();}catch(Exception e){failure=e;}
++            for(var socket:data)socket.close();
++            for(int port:ports)try(var socket=new java.net.ServerSocket()) {socket.setReuseAddress(true);socket.bind(new java.net.InetSocketAddress("127.0.0.1",port));assertTrue(socket.isBound());}
++            if(failure!=null)throw failure;
++        }
++    }
++    @Test @Timeout(60) void t15T16RealCliTcpDiamondAlternativeEofAndNoVideo()throws Exception {
++        try(var graph=new CliGraph()) {
++            var boot=graph.start("BOOT");var source=graph.start("S");var r1=graph.start("R1");var r2=graph.start("R2");var client=graph.start("C");
++            for(var child:List.of(source,r1,r2,client))child.until(t->t.lines().filter(l->l.contains("NeighborUp[")).count()>=2);
++            client.until(t->t.contains("type=STREAM_ANNOUNCE")&&t.contains("type=PROBE_PONG"));
++            long began=System.nanoTime();String rows="";
++            do {
++                int length=client.text().length();client.send("routes");client.until(t->t.substring(Math.min(length,t.length())).contains("ROUTES_END"));
++                rows=client.text().substring(length);
++                if(rows.contains("stream="+CliGraph.VIDEO)&&rows.contains("state=INACTIVE"))break;
++                assertTrue(System.nanoTime()-began<java.util.concurrent.TimeUnit.SECONDS.toNanos(8));Thread.sleep(50);
++            }while(true);
++            client.send("catalog");client.until(t->t.contains("CATALOG_END"));client.send("metrics");client.until(t->t.contains("METRICS_END"));
++            client.send("trace "+CliGraph.VIDEO);client.until(t->t.contains("TRACE_RESULT stream="+CliGraph.VIDEO));
++            var match=java.util.regex.Pattern.compile("TRACE_RESULT stream="+CliGraph.VIDEO+".*visited=\\[C, (R[12]), S\\]").matcher(client.text());
++            assertTrue(match.find(),client.text());String chosen=match.group(1);String other=chosen.equals("R1")?"R2":"R1";
++            boot.send("quit");assertEquals(0,boot.exited());
++            graph.children.get(chosen).process.destroyForcibly();int killed=graph.children.get(chosen).exited();assertNotEquals(0,killed);
++            client.until(t->t.contains("NeighborDown[session=Session[nodeId="+chosen));
++            Thread.sleep(150);int previous=client.text().length();client.send("trace "+CliGraph.VIDEO);
++            client.until(t->t.substring(Math.min(previous,t.length())).contains("TRACE_RESULT stream="+CliGraph.VIDEO));
++            assertTrue(client.text().substring(previous).contains("visited=[C, "+other+", S]"),client.text());
++            int errorAt=client.text().length();client.send("trace "+UUID.randomUUID());
++            client.until(t->t.substring(Math.min(errorAt,t.length())).contains("UNKNOWN_STREAM"));
++            client.send("trace bad");client.until(t->t.contains("COMMAND_ERROR trace requires"));
++            graph.assertNoVideo();
++            for(var entry:graph.children.entrySet())if(entry.getValue().process.isAlive()){entry.getValue().send("quit");assertEquals(0,entry.getValue().exited(),entry.getValue().text());}
++            java.nio.file.Files.writeString(graph.directory.resolve("result.json"),"{\"real_cli_tcp\":true,\"first_hop\":\""+chosen+"\",\"alternative\":\""+other+"\",\"killed_exit\":"+killed+",\"all_processes_terminated\":true,\"udp_observed\":0}\n");
++        }
++    }
++    @Test void t02EveryHopReadsItsOwnTableInsteadOfReversingOriginalAdvertisement() {
++        try(var client=new RoutingServiceTest.Rig();
++            var relay=new RoutingServiceTest.Rig("A",false,4096,4096,10,new RoutingTable.Limits(64,256,63,8));
++            var source=new RoutingServiceTest.Rig("S",true,4096,4096,10,new RoutingTable.Limits(64,256,63,8))) {
++            var a=liveSession("A",NodeRole.RELAY);var c=liveSession("C",NodeRole.CLIENT);var s=liveSession("S",NodeRole.SERVER);
++            client.up(a);client.metric(a,10);client.ad(a,STREAM,RoutingServiceTest.LOCAL,1,20,List.of("S","X","A"),"Video A",25);
++            relay.up(c);relay.up(s);relay.metric(s,10);relay.ad(s,STREAM,RoutingServiceTest.LOCAL,1,0,List.of("S"),"Video A",25);source.up(a);
++            assertEquals(List.of("S","X","A","C"),client.route().selectedCandidate().orElseThrow().path());
++            client.delivery=(p,m)->{if(m.type()==MessageType.ROUTE_TRACE)receive(relay,c,m);};
++            relay.delivery=(p,m)->{if(m.type()==MessageType.ROUTE_TRACE)receive(source,a,m);else if(m.type()==MessageType.TRACE_RESULT)receive(client,a,m);};
++            source.delivery=(p,m)->{if(m.type()==MessageType.TRACE_RESULT)receive(relay,s,m);};
++            var ticket=request(client);client.owner.drain();
++            assertEquals(TraceState.SUCCESS,terminal(ticket).state());assertEquals(List.of("C","A","S"),terminal(ticket).visited());
++            assertEquals(s,relay.sent.stream().filter(x->x.message().type()==MessageType.ROUTE_TRACE).findFirst().orElseThrow().peer());
++        }
++    }
++    private static Neighbor.Session liveSession(String id,NodeRole role) {
++        return new Neighbor.Session(id,RoutingServiceTest.LOCAL,UUID.randomUUID(),
++                new ControlMessage.Endpoint(id,RoutingServiceTest.LOCAL,"127.0.0.1",19001,19101,role));
++    }
++    @Test void t07ThrownAndNullPortResultsFailOnlyTheDiagnostic() {
++        for(boolean throwsFailure:List.of(false,true))try(var fixture=new RoutingServiceTest.Rig()) {
++            var router=new RoutingService(RoutingServiceTest.config("C",false,4096,4096,10),RoutingServiceTest.LOCAL,fixture.owner,
++                    (p,m)->{if(throwsFailure)throw new IllegalStateException("injected send failure");return null;},event->{},fixture.clock::get,fixture.timer);
++            try {
++                fixture.owner.run(router::start);var a=RoutingServiceTest.session("A");
++                fixture.owner.run(()->{
++                    router.onNeighborEvent(new NeighborManager.NeighborUp(a));
++                    router.onMetrics(new pt.uminho.esr.ott.monitoring.NetworkMonitor.Updated(new pt.uminho.esr.ott.monitoring.LinkMetrics(a,
++                            pt.uminho.esr.ott.monitoring.LinkMetrics.State.MEASURED,OptionalDouble.of(10),OptionalLong.of(10),1,false,OptionalLong.of(0),0)));
++                    router.onNeighborEvent(new NeighborManager.Received(a,new ControlMessage(MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),"A",a.instanceId(),
++                            new ControlMessage.Announcement(new ControlMessage.StreamInfo(STREAM,"S","Video A",1,25,EPOCH),1,100,List.of("S","A")))));
++                });
++                var ticket=router.requestTrace(STREAM);fixture.owner.drain();assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(ticket).errorCode());
++                assertEquals(RoutingService.Phase.RUNNING,router.snapshot().diagnostics().phase());
++            }finally{fixture.owner.run(router::requestClose);}
++        }
++    }
++    @Test void t11BlockedResponseIntentRemainsBoundedUntilPhysicalQuotaFrees() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var d=RoutingServiceTest.session("D");r.up(d);r.hold=true;
++            for(int i=0;i<64;i++)pingTrace(r,d,UUID.randomUUID(),0,List.of("D"));
++            UUID request=UUID.randomUUID();pingTrace(r,d,request,31,List.of("D"));
++            assertEquals(1,load(r).responseIntents());assertEquals(64,r.sent.size());
++            r.sent.getFirst().result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.ACCEPTED);r.owner.drain();
++            assertEquals(0,load(r).responseIntents());assertEquals(65,r.sent.size());
++            assertEquals(request,r.sent.getLast().message().requestId());assertEquals(64,load(r).sends());
++            pingTrace(r,d,request,31,List.of("D"));assertEquals(65,r.sent.size());
++        }
++    }
++    @Test void t17RunningTimerAndPhysicalCallbackMustBothFinish() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var a=RoutingServiceTest.session("A");r.up(a);r.metric(a,10);r.ad(a,1,100);r.hold=true;
++            var ticket=request(r);r.owner.drain();r.timer.pin=true;r.router.requestClose();r.owner.drain();
++            assertEquals(TraceState.CLOSED,terminal(ticket).state());assertFalse(r.router.awaitTermination(Duration.ZERO));
++            for(var send:r.sent)send.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED);
++            assertFalse(r.router.awaitTermination(Duration.ZERO),"Cancelled but physically live job still counts");
++            r.timer.pin=false;r.timer.requestClose();assertTrue(r.router.awaitTermination(Duration.ofMillis(20)));
++        }
++    }
++    @Test void t14OversizedOutcomeIsRejectedBeforeReadingOrCopyingList() {
++        List<String> adversarial=new AbstractList<>() {
++            public int size(){return 33;}
++            public String get(int index){throw new AssertionError("Must check size before copying oversized input");}
++        };
++        assertThrows(IllegalArgumentException.class,()->new TraceOutcome(STREAM,EPOCH,Optional.empty(),TraceState.ERROR,Optional.empty(),"",adversarial,0));
++    }
++    @Test @Timeout(30) void t14LargeRealCliListingEscapesTitlesYieldsToQuitAndRejectsSecondCursor()throws Exception {
++        try(var graph=new CliGraph(256)) {
++            var boot=graph.start("BOOT");var source=graph.start("S");
++            source.send("catalog");source.send("routes");source.send("quit");assertEquals(0,source.exited(),source.text());
++            String output=source.text();assertTrue(output.contains("diagnostic listing BUSY"),output);
++            assertTrue(output.contains("CATALOG_STREAM"),output);assertTrue(output.contains("title=Live \\nINJECT"),output);
++            assertTrue(output.lines().filter(l->l.startsWith("CATALOG_STREAM")).count()<256,"Listing must yield before eagerly formatting every row");
++            assertTrue(output.lines().allMatch(l->l.length()<=OttApplication.MAX_LOG_CHARS),output);
++            boot.send("quit");assertEquals(0,boot.exited());
++        }
++    }
++    @Test void t17ClockFailuresAtAdmissionAndDispatchCannotLeakUnsentReservations() {
++        // Inject at successive observations, rather than assuming a private number/order of reads.
++        for(int observation=2;observation<=20;observation++)try(var fixture=new RoutingServiceTest.Rig()) {
++            var remaining=new java.util.concurrent.atomic.AtomicInteger();
++            java.util.function.LongSupplier clock=()->{
++                if(remaining.get()>0 && remaining.decrementAndGet()==0)throw new IllegalStateException("injected clock failure");
++                return fixture.clock.get();
++            };
++            var router=new RoutingService(RoutingServiceTest.config("C",false,4096,4096,10),RoutingServiceTest.LOCAL,
++                    fixture.owner,(peer,message)->java.util.concurrent.CompletableFuture.completedFuture(pt.uminho.esr.ott.transport.Connection.SendResult.ACCEPTED),
++                    event->{},clock,fixture.timer);
++            try {
++                fixture.owner.run(router::start);var a=RoutingServiceTest.session("A");
++                fixture.owner.run(()->{
++                    router.onNeighborEvent(new NeighborManager.NeighborUp(a));
++                    router.onMetrics(new pt.uminho.esr.ott.monitoring.NetworkMonitor.Updated(new pt.uminho.esr.ott.monitoring.LinkMetrics(a,
++                            pt.uminho.esr.ott.monitoring.LinkMetrics.State.MEASURED,OptionalDouble.of(10),OptionalLong.of(10),1,false,OptionalLong.of(0),0)));
++                    router.onNeighborEvent(new NeighborManager.Received(a,new ControlMessage(MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),"A",a.instanceId(),
++                            new ControlMessage.Announcement(new ControlMessage.StreamInfo(STREAM,"S","Video A",1,25,EPOCH),1,100,List.of("S","A")))));
++                });
++                remaining.set(observation);var ticket=router.requestTrace(STREAM);
++                assertDoesNotThrow(fixture.owner::drain,"Clock failure must use bounded cleanup, never escape the owner command");
++                remaining.set(0);fixture.owner.run(router::requestClose);fixture.owner.drain();
++                assertTrue(ticket.result().isPresent());
++                assertTrue(router.awaitTermination(Duration.ofMillis(10)),"No future/callback was ever left unresolved by this port");
++            }finally{remaining.set(0);fixture.owner.run(router::requestClose);}
++        }
++    }
++    private static void signal(CliProcess child,String signal)throws Exception {
++        var command=new ProcessBuilder("/bin/kill","-"+signal,Long.toString(child.process.pid())).start();
++        assertTrue(command.waitFor(2,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,command.exitValue());
++    }
++    @Test @Timeout(50) void t16RealTcpEofDuringPendingTraceTerminatesWithoutWaitingForOrigin()throws Exception {
++        try(var graph=new CliGraph()) {
++            graph.start("BOOT");var source=graph.start("S");var a=graph.start("R1");var b=graph.start("R2");var client=graph.start("C");
++            for(var node:List.of(source,a,b,client))node.until(t->t.lines().filter(l->l.contains("NeighborUp[")).count()>=2);
++            client.until(t->t.contains("STREAM_ANNOUNCE")&&t.contains("PROBE_PONG"));
++            long began=System.nanoTime();
++            while(true) {
++                int offset=client.text().length();client.send("routes");client.until(t->t.substring(Math.min(offset,t.length())).contains("ROUTES_END"));
++                if(client.text().substring(offset).contains("state=INACTIVE"))break;
++                assertTrue(System.nanoTime()-began<java.util.concurrent.TimeUnit.SECONDS.toNanos(8));Thread.sleep(50);
++            }
++            signal(source,"STOP");
++            try {
++                int ao=a.text().length(),bo=b.text().length(),co=client.text().length();client.send("trace "+CliGraph.VIDEO);
++                long waiting=System.nanoTime();CliProcess selected=null;
++                while(selected==null) {
++                    if(a.text().substring(ao).contains("direction=request"))selected=a;
++                    else if(b.text().substring(bo).contains("direction=request"))selected=b;
++                    else {assertTrue(System.nanoTime()-waiting<java.util.concurrent.TimeUnit.SECONDS.toNanos(2),"Trace must reach a real relay");Thread.sleep(5);}
++                }
++                assertFalse(client.text().substring(co).contains("TRACE_RESULT stream="+CliGraph.VIDEO));
++                selected.process.destroyForcibly();assertNotEquals(0,selected.exited());
++                client.until(t->t.substring(Math.min(co,t.length())).contains("TRACE_ERROR stream="+CliGraph.VIDEO));
++                String error=client.text().substring(co);assertTrue(error.contains("NO_ROUTE"),error);
++                assertTrue(client.process.isAlive());
++            }finally{signal(source,"CONT");}
++            graph.assertNoVideo();
++            for(var child:graph.children.values())if(child.process.isAlive()){child.send("quit");assertEquals(0,child.exited(),child.text());}
++        }
++    }
++    @Test void t08ReconnectedDownstreamCannotReceiveAnOldResult() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var old=RoutingServiceTest.session("D");var a=RoutingServiceTest.session("A");r.up(old);r.up(a);r.metric(a,10);r.ad(a,1,100);
++            UUID first=UUID.randomUUID();pingTrace(r,old,first,31,List.of("D"));
++            var replacement=new Neighbor.Session("D",old.instanceId(),UUID.randomUUID(),old.endpoint());r.up(replacement);
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,first,"A",a.instanceId(),new ControlMessage.TraceResult(STREAM,first,List.of("D","C","A","S"))));
++            assertTrue(r.to(replacement).stream().noneMatch(m->m.type()==MessageType.TRACE_RESULT||m.type()==MessageType.ERROR));
++            UUID second=UUID.randomUUID();pingTrace(r,replacement,second,31,List.of("D"));
++            receive(r,a,new ControlMessage(MessageType.TRACE_RESULT,second,"A",a.instanceId(),new ControlMessage.TraceResult(STREAM,second,List.of("D","C","A","S"))));
++            assertTrue(r.to(replacement).stream().anyMatch(m->m.type()==MessageType.TRACE_RESULT&&m.requestId().equals(second)));
++        }
++    }
++    @Test void t08NewInstanceClosesOldTicketAndCannotInheritItsReply() {
++        try(var r=new RoutingServiceTest.Rig()) {
++            var old=RoutingServiceTest.session("A");r.up(old);r.metric(old,10);r.ad(old,1,100);
++            var first=request(r);r.owner.drain();var fresh=RoutingServiceTest.session("A");assertNotEquals(old.instanceId(),fresh.instanceId());
++            r.up(fresh);r.metric(fresh,10);r.ad(fresh,1,100);assertEquals(Optional.of(ErrorCode.NO_ROUTE),terminal(first).errorCode());
++            var next=request(r);r.owner.drain();
++            receive(r,old,new ControlMessage(MessageType.TRACE_RESULT,next.traceId(),"A",old.instanceId(),new ControlMessage.TraceResult(STREAM,next.traceId(),List.of("C","A","S"))));
++            assertTrue(next.result().isEmpty());
++            receive(r,fresh,new ControlMessage(MessageType.TRACE_RESULT,next.traceId(),"A",fresh.instanceId(),new ControlMessage.TraceResult(STREAM,next.traceId(),List.of("C","A","S"))));
++            assertEquals(TraceState.SUCCESS,terminal(next).state());assertEquals(TraceState.ERROR,terminal(first).state());
++        }
++    }
++    @Test void t17ExecutingCallbackRetainsPhysicalReservationAcrossCleanup()throws Exception {
++        try(var fixture=new RoutingServiceTest.Rig()) {
++            var inside=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);
++            var callback=new java.util.concurrent.atomic.AtomicReference<Thread>();
++            NeighborManager.SerialOwner owner=new NeighborManager.SerialOwner() {
++                public int capacity(){return fixture.owner.capacity();}public boolean isOwnerThread(){return fixture.owner.isOwnerThread();}
++                public boolean offer(Runnable task){boolean accepted=fixture.owner.offer(task);
++                    if(Thread.currentThread()==callback.get()){inside.countDown();try{release.await();}catch(InterruptedException e){Thread.currentThread().interrupt();}}return accepted;}
++                public NeighborManager.Registration onStop(Runnable cleanup){return fixture.owner.onStop(cleanup);}
++                public void fail(Throwable error){fixture.owner.fail(error);}public void requestClose(){fixture.owner.requestClose();}
++                public boolean awaitTermination(Duration budget){return fixture.owner.awaitTermination(budget);}public void close(){fixture.owner.close();}
++            };
++            var pending=new java.util.concurrent.CompletableFuture<pt.uminho.esr.ott.transport.Connection.SendResult>();
++            var router=new RoutingService(RoutingServiceTest.config("C",false,4096,4096,10),RoutingServiceTest.LOCAL,owner,
++                    (peer,message)->pending,event->{},fixture.clock::get,fixture.timer);
++            try {
++                fixture.owner.run(router::start);var a=RoutingServiceTest.session("A");
++                fixture.owner.run(()->{
++                    router.onNeighborEvent(new NeighborManager.NeighborUp(a));
++                    router.onMetrics(new pt.uminho.esr.ott.monitoring.NetworkMonitor.Updated(new pt.uminho.esr.ott.monitoring.LinkMetrics(a,
++                            pt.uminho.esr.ott.monitoring.LinkMetrics.State.MEASURED,OptionalDouble.of(10),OptionalLong.of(10),1,false,OptionalLong.of(0),0)));
++                    router.onNeighborEvent(new NeighborManager.Received(a,new ControlMessage(MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),"A",a.instanceId(),
++                            new ControlMessage.Announcement(new ControlMessage.StreamInfo(STREAM,"S","Video A",1,25,EPOCH),1,100,List.of("S","A")))));
++                });
++                var ticket=router.requestTrace(STREAM);fixture.owner.drain();
++                callback.set(Thread.ofVirtual().unstarted(()->pending.complete(pt.uminho.esr.ott.transport.Connection.SendResult.ACCEPTED)));callback.get().start();
++                assertTrue(inside.await(1,java.util.concurrent.TimeUnit.SECONDS));
++                router.requestClose();fixture.owner.drain();assertEquals(TraceState.CLOSED,terminal(ticket).state());
++                assertFalse(router.awaitTermination(Duration.ZERO),"A completed future is not a physically finished callback");
++                release.countDown();callback.get().join(Duration.ofSeconds(1));assertFalse(callback.get().isAlive());
++                assertTrue(router.awaitTermination(Duration.ofMillis(20)));
++            }finally{release.countDown();fixture.owner.run(router::requestClose);if(callback.get()!=null)callback.get().join(Duration.ofSeconds(1));}
++        }
++    }
++}

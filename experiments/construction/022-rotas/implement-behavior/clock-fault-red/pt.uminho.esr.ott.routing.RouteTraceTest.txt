@@ -1,0 +1,25 @@
+-------------------------------------------------------------------------------
+Test set: pt.uminho.esr.ott.routing.RouteTraceTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.410 s <<< FAILURE! -- in pt.uminho.esr.ott.routing.RouteTraceTest
+pt.uminho.esr.ott.routing.RouteTraceTest.t17ClockFailuresAtAdmissionAndDispatchCannotLeakUnsentReservations -- Time elapsed: 0.307 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Clock failure must use bounded cleanup, never escape the owner command ==> Unexpected exception thrown: java.lang.IllegalStateException: injected clock failure
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+	at org.junit.jupiter.api.AssertDoesNotThrow.createAssertionFailedError(AssertDoesNotThrow.java:84)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:53)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:40)
+	at org.junit.jupiter.api.Assertions.assertDoesNotThrow(Assertions.java:3218)
+	at pt.uminho.esr.ott.routing.RouteTraceTest.t17ClockFailuresAtAdmissionAndDispatchCannotLeakUnsentReservations(RouteTraceTest.java:553)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.IllegalStateException: injected clock failure
+	at pt.uminho.esr.ott.routing.RouteTraceTest.lambda$t17ClockFailuresAtAdmissionAndDispatchCannotLeakUnsentReservations$43(RouteTraceTest.java:537)
+	at pt.uminho.esr.ott.routing.RoutingService.now(RoutingService.java:225)
+	at pt.uminho.esr.ott.routing.RoutingService.admitTrace(RoutingService.java:610)
+	at pt.uminho.esr.ott.routing.RoutingService.lambda$requestTrace$0(RoutingService.java:63)
+	at pt.uminho.esr.ott.routing.RoutingServiceTest$Owner.run(RoutingServiceTest.java:46)
+	at pt.uminho.esr.ott.routing.RoutingServiceTest$Owner.drain(RoutingServiceTest.java:47)
+	at org.junit.jupiter.api.AssertDoesNotThrow.assertDoesNotThrow(AssertDoesNotThrow.java:49)
+	... 6 more
+

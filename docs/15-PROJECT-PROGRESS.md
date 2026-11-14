@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 IN PROGRESS (Test; manual humano pendente); PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 apenas planned/desimpedido, não iniciado.
+**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 em Test; manual humano pendente; Plan/Q-C-32/33 aprovados.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -109,7 +109,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
-| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
+| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | IN PROGRESS | Test técnico clean verify1296/0/0/0,JAR novo; manual humano/aprovação Test/revisão/integração pendentes |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
@@ -1191,3 +1191,82 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
 nenhum hash autorreferente ou resultado de publicação inventado.
 Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
 Prova: experiments/construction/006-rotas/closure/integration-proof.json.
+
+
+## IMP-010 — Plan preparado, aprovação pendente
+
+Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
+IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
+unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
+current_stage=plan, stages_completed=[], completed=null.
+Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
+visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
+Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
+nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
+nenhum Java/Maven/teste de rede/manual executado nesta etapa.
+Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
+Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
+Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
+sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
+
+
+## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
+
+Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
+OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
+13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
+compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
+pelo stub; V-013/T01–T18 integral e integração real não executados.
+current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
+Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
+sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
+Evidência: experiments/construction/022-rotas/implement-interfaces/.
+
+
+## IMP-010 — comportamentos de Implement para aprovação
+
+Registo 2026-11-14T17:19:49Z. Utilizador autorizou comportamentos nos quatro caminhos Q-C-32/33
+aprovados. Implement preparado; regressão final1296/0falhas/0erros/0ignorados,
+17 XML frescos,40 novos testes e1256 históricos byte preservados. CLI/TCP reais,
+limites/clock/callbacks/shutdown/ausência de subscrição e vídeo observados no
+âmbito dos testes. Falha transitória do teste histórico de saída bloqueada na
+regressão02 preservada; repetição isolada e regressão03 passaram sem alterações,
+causa não estabelecida. Sem clean verify/JAR novo/manual humano nesta etapa.
+current_stage=implement; só Plan concluído, Implement por aprovar, Test não iniciado.
+V-013/T01–T18 consolidação formal, clean verify/manual humano, revisão final
+Fillmore e integração pendentes; sem gates externos adicionais. target/ separado.
+Sem staging/commit/push/fecho ou outro IMP. Evidência:
+experiments/construction/022-rotas/implement-behavior/regression-03/result.json.
+Walkthrough: memory-bank/bolts/022-rotas/implementation-walkthrough.md.
+
+
+## IMP-010 — Test técnico executado, manual humano pendente
+
+Registo 2026-11-14T17:45:23Z. Implement aprovado pelo utilizador; apenas Test autorizado.
+clean verify em Projeto/:1296 testes/0falhas/0erros/0ignorados,17XML novos;
+JAR436556bytes,SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+40 oráculos de trace/1256 históricos executados; V-013/T01–T18 consolidados
+tecnicamente com CLI/TCP reais,limites,ausência de11–14/vídeo no intervalo
+observado e shutdown físico. Código/POM aprovados intactos; target/ separado.
+Falha histórica m13 em Implement preservada sem causa estabelecida; não
+reapareceu no clean verify,sem aumentar prazos ou enfraquecer testes.
+Roteiro humano pronto; ensaio kind=agent34checks separado e não conta como
+manual humano. Primeira cena do auxiliar corrigida após reparação legítima C–S,
+sem mudar código/JAR. current_stage=test; só Plan/Implement concluídos.
+Test por aprovar até manual humano; depois revisão final Fillmore/integração.
+Sem gates externos adicionais,staging/commits/push/fecho ou outro IMP.
+Relatório: memory-bank/bolts/022-rotas/test-walkthrough.md.
+Evidência: experiments/construction/022-rotas/test-build-01/result.json.
+
+
+## IMP-010 — pausa da validação e WIP autorizado
+
+Registo 2026-11-14T17:53:17Z. Utilizador interrompeu a validação e autorizou commit WIP local
+limitado ao incremento/documentação/evidência,sem target/ ou alterações alheias.
+Plan/Implement aprovados; Test técnico1296/0/0/0,JAR/hash preservados.
+Manual humano e aprovação Test pendentes; ensaios agent/parciais preservados e
+não substituem execução humana. Falha histórica sem causa estabelecida mantém-se.
+current_stage=test,status=in-progress,completed=null; só Plan/Implement concluídos.
+TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+experiments/construction/022-rotas/RESUME.md.

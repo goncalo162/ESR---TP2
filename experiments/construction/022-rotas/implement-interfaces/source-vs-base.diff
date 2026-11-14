@@ -1,0 +1,249 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index 9052188..58605ba 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -23,6 +23,17 @@ public final class OttApplication {
+     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
+     interface RunningService extends AutoCloseable {
+         Map<String, Neighbor> neighbors();
++        default pt.uminho.esr.ott.routing.RoutingService.Snapshot routingSnapshot() {
++            return pt.uminho.esr.ott.routing.RoutingService.emptySnapshot();
++        }
++        default Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() {
++            return Optional.empty();
++        }
++        default pt.uminho.esr.ott.routing.RoutingService.TraceTicket requestTrace(UUID streamId) {
++            Objects.requireNonNull(streamId);
++            throw new UnsupportedOperationException("IMP-010 CLI adapter not implemented at interface checkpoint");
++        }
++
+         default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
+         void requestShutdown(int reason, Duration remainingBudget);
+         boolean awaitTermination(Duration remainingBudget);
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+index 1111966..a1c4228 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -44,6 +44,11 @@ public final class OverlayNode implements AutoCloseable {
+         RoutingService.validateConfiguration(configuration, instanceId);
+         new NeighborManager(configuration, instance, observer);
+     }
++    /** Q-C-32 diagnostic facade; delegation is pending the behavior checkpoint. */
++    public RoutingService.TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        throw new UnsupportedOperationException("IMP-010 delegation not implemented at interface checkpoint");
++    }
+     public RoutingService.Snapshot routingSnapshot() {
+         var r = routing; return r == null ? RoutingService.emptySnapshot() : r.snapshot();
+     }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index 3ac0bfc..52ffa14 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -23,6 +23,33 @@ public final class RoutingService implements AutoCloseable {
+         Ticket schedule(Runnable task, long delayNanos);
+         void requestClose(); boolean awaitTermination(Duration budget); int physicalJobs();
+     }
++    /** Approved local diagnostic contract; not a wire enum. */
++    public enum TraceState { SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING }
++    public static final int TRACE_INITIAL_TTL = 32;
++    public static final Duration TRACE_TIMEOUT = Duration.ofMillis(3000);
++    /** Polling never invokes caller continuations on the node owner. */
++    public interface TraceTicket {
++        UUID traceId();
++        Optional<TraceOutcome> result();
++        void cancel();
++    }
++    public record TraceOutcome(UUID streamId, UUID traceId, Optional<UUID> serverEpoch,
++            TraceState state, Optional<ErrorCode> errorCode, String detail,
++            List<String> visited, long elapsedNanos) {
++        public TraceOutcome {
++            Objects.requireNonNull(streamId); Objects.requireNonNull(traceId);
++            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(state);
++            Objects.requireNonNull(errorCode); Objects.requireNonNull(detail);
++            visited = List.copyOf(visited);
++            if (visited.size() > 32 || detail.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 256
++                    || elapsedNanos < 0) throw new IllegalArgumentException("Trace outcome bounds");
++        }
++    }
++    /** Interface checkpoint only: admission/owner behavior awaits separate authorization. */
++    public TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        throw new UnsupportedOperationException("IMP-010 behavior not implemented at interface checkpoint");
++    }
+     public enum Phase { NEW, RUNNING, STOPPED }
+     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
+         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteTraceTest.java
+@@ -0,0 +1,170 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import static org.junit.jupiter.api.Assertions.*;
++import java.io.*;
++import java.nio.charset.StandardCharsets;
++import java.time.Duration;
++import java.util.*;
++import pt.uminho.esr.ott.app.OttApplication;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.routing.RoutingService.*;
++
++/** Initial red slice of V-013, not the complete T01–T18 oracle. */
++@Timeout(10)
++class RouteTraceTest {
++    // Reuse the existing fake owner/clock/scheduler/control port without changing its tests.
++    private static final UUID STREAM = RoutingServiceTest.STREAM;
++    private static final UUID EPOCH = RoutingServiceTest.EPOCH;
++    private static TraceTicket request(RoutingServiceTest.Rig r) {
++        return assertDoesNotThrow(() -> r.router.requestTrace(STREAM),
++                "requestTrace must admit or return a terminal ticket, never a placeholder exception");
++    }
++    private static TraceOutcome terminal(TraceTicket ticket) {
++        return ticket.result().orElseGet(() -> fail("Expected an explicit terminal diagnostic outcome"));
++    }
++    private static List<ControlMessage> traces(RoutingServiceTest.Rig r) {
++        return r.sent.stream().map(RoutingServiceTest.Sent::message)
++                .filter(m -> m.type() == MessageType.ROUTE_TRACE).toList();
++    }
++    private static void receive(RoutingServiceTest.Rig r, Neighbor.Session peer, ControlMessage m) {
++        r.act(() -> r.router.onNeighborEvent(new NeighborManager.Received(peer, m)));
++    }
++    @Test void outcomeOwnsItsVisitedAndKeepsOpaqueIds() {
++        var path = new ArrayList<>(List.of("C", "S"));
++        UUID id = new UUID(-1, -2);
++        var value = new TraceOutcome(STREAM, id, Optional.of(EPOCH), TraceState.SUCCESS,
++                Optional.empty(), "", path, 17);
++        path.clear();
++        assertEquals(List.of("C", "S"), value.visited());
++        assertEquals(id, value.traceId());
++        assertThrows(UnsupportedOperationException.class, () -> value.visited().add("X"));
++    }
++    @Test void outcomeRejectsOverlongVisitedUtf8AndNegativeDuration() {
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.of(ErrorCode.TIMEOUT), "é".repeat(129), List.of(), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", Collections.nCopies(33, "X"), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", List.of(), -1));
++    }
++    @Test void t01LocalSourceReturnsSingletonWithoutDemandOrControlSend() {
++        try (var r = new RoutingServiceTest.Rig("S", true, 4096, 4096, 10,
++                new RoutingTable.Limits(64, 256, 63, 8))) {
++            var before = r.router.snapshot();
++            var ticket = request(r); r.owner.drain();
++            var result = terminal(ticket);
++            assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("S"), result.visited());
++            assertEquals(before.routes(), r.router.snapshot().routes());
++            assertTrue(r.sent.isEmpty(), "Local diagnostic cannot emit activation or video control");
++        }
++    }
++    @Test void t04UnknownStreamHasExplicitErrorWithoutNetwork() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); r.owner.drain();
++            assertEquals(Optional.of(ErrorCode.UNKNOWN_STREAM), terminal(ticket).errorCode());
++            assertTrue(r.sent.isEmpty());
++        }
++    }
++    @Test void t02InitialRequestUsesSelectedSessionAndTtlCountsInitiator() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); var b = RoutingServiceTest.session("B");
++            r.up(a); r.up(b); r.metric(a, 40); r.metric(b, 10); r.ad(a, 1, 100); r.ad(b, 1, 100);
++            assertEquals("B", r.route().knownUpstream().orElseThrow().nodeId());
++            var ticket = request(r); r.owner.drain();
++            var sent = r.sent.stream().filter(x -> x.message().type() == MessageType.ROUTE_TRACE).toList();
++            assertEquals(1, sent.size()); assertEquals(b, sent.getFirst().peer());
++            var m = sent.getFirst().message(); var p = assertInstanceOf(ControlMessage.Trace.class, m.payload());
++            assertEquals(ticket.traceId(), m.requestId()); assertEquals(ticket.traceId(), p.traceId());
++            assertEquals(List.of("C"), p.visited()); assertEquals(31, p.ttl());
++            assertEquals(EPOCH, p.serverEpoch()); assertTrue(ticket.result().isEmpty(), "ACCEPTED is not a result");
++        }
++    }
++    @Test void t05TtlZeroIsExplicitTimeOutWithoutForwarding() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var c = RoutingServiceTest.session("D"); r.up(c); UUID id = UUID.randomUUID();
++            receive(r, c, new ControlMessage(MessageType.ROUTE_TRACE, id, c.nodeId(), c.instanceId(),
++                    new ControlMessage.Trace(STREAM, EPOCH, id, 0, List.of("D"))));
++            var errors = r.to(c).stream().filter(m -> m.type() == MessageType.ERROR).toList();
++            assertEquals(1, errors.size(), "TTL0 needs an explicit correlated ERROR, not silence");
++            assertEquals(id, errors.getFirst().requestId());
++            var p = assertInstanceOf(ControlMessage.ErrorPayload.class, errors.getFirst().payload());
++            assertEquals(ErrorCode.TIMEOUT, p.code()); assertEquals(15, p.relatedType());
++            assertEquals("TTL_EXHAUSTED", p.detail()); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t06TimeInAdmissionQueueConsumesEntireGlobalTraceDeadline() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var ticket = request(r);
++            r.clock.addAndGet(Duration.ofMillis(3000).toNanos()); r.owner.drain();
++            assertEquals(TraceState.TIMEOUT, terminal(ticket).state());
++            assertTrue(traces(r).isEmpty(), "Expired admission cannot send a new trace");
++        }
++    }
++    @Test void t07ResultCanArriveBeforeAdmissionFutureCompletes() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            r.hold = true; var ticket = request(r); r.owner.drain();
++            assertEquals(1, traces(r).size());
++            receive(r, a, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), a.nodeId(), a.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            var result = terminal(ticket); assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("C", "A", "S"), result.visited());
++            r.sent.stream().filter(s -> s.message().type() == MessageType.ROUTE_TRACE)
++                    .forEach(s -> s.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED));
++            r.owner.drain(); assertEquals(result, terminal(ticket), "Late callback must not replace success");
++        }
++    }
++    @Test void t08OldConnectionCannotCompleteOperationOnReplacementSession() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var old = RoutingServiceTest.session("A"); r.up(old); r.metric(old, 10); r.ad(old, 1, 100);
++            var fresh = new Neighbor.Session(old.nodeId(), old.instanceId(), UUID.randomUUID(), old.endpoint());
++            r.up(fresh); r.metric(fresh, 10); r.ad(fresh, 1, 100);
++            var ticket = request(r); r.owner.drain();
++            receive(r, old, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), old.nodeId(), old.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertTrue(ticket.result().isEmpty(), "Same instanceId does not make an old connection current");
++            receive(r, fresh, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), fresh.nodeId(), fresh.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertEquals(TraceState.SUCCESS, terminal(ticket).state());
++        }
++    }
++    @Test void t10CancellationHasOneTerminalValueAndDoesNotSendFromQueue() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); ticket.cancel(); ticket.cancel(); r.owner.drain();
++            var result = terminal(ticket); assertEquals(TraceState.CANCELLED, result.state());
++            r.tick(3001); assertEquals(result, terminal(ticket)); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t11FifthLocalRequestIsRejectedBeforeOwnerAdmission() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var admitted = new ArrayList<TraceTicket>();
++            for (int i = 0; i < 4; i++) admitted.add(request(r));
++            assertEquals(4, r.owner.queue.size());
++            var excess = request(r);
++            assertEquals(TraceState.RESOURCE_LIMIT, terminal(excess).state());
++            assertEquals(4, r.owner.queue.size(), "Rejected command must not occupy owner queue");
++        }
++    }
++    @Test void facadeBeforeStartHasTerminalNotRunningWithoutCreatingOwner() {
++        var node = new OverlayNode(RoutingServiceTest.config("C", false, 4096, 4096, 10),
++                UUID.randomUUID(), event -> fail("No events before start"));
++        var ticket = assertDoesNotThrow(() -> node.requestTrace(STREAM), "Unstarted facade needs bounded terminal value");
++        assertEquals(TraceState.NOT_RUNNING, terminal(ticket).state());
++        assertEquals(RoutingService.Phase.NEW, node.routingSnapshot().diagnostics().phase());
++    }
++    @Test void t14PublicCliHelpAdvertisesApprovedTraceAndSnapshotCommands() {
++        var output = new ByteArrayOutputStream(); var errors = new ByteArrayOutputStream();
++        assertEquals(0, OttApplication.run(new String[]{"--help"}, InputStream.nullInputStream(),
++                new PrintStream(output, true, StandardCharsets.UTF_8), new PrintStream(errors)));
++        String help = output.toString(StandardCharsets.UTF_8);
++        for (String command : List.of("trace", "routes", "catalog", "metrics"))
++            assertTrue(help.contains(command), "Missing CLI diagnostic command: " + command);
++        assertEquals("", errors.toString(StandardCharsets.UTF_8));
++    }
++}

@@ -1,0 +1,11 @@
+{
+  "recorded_at": "2026-11-14T17:41:44.352374+00:00",
+  "failed_agent_run": "experiments/construction/022-rotas/manual-runs/20261114T173427Z-ni76vufu",
+  "failure": "Helper driver expected NO_ROUTE with source alive after removing both relays. IMP-035 repair legally admitted direct C-S; trace returned SUCCESS.",
+  "observed_direct_results": [
+    "TRACE_RESULT stream=00000000-0000-4000-8000-000000000001 trace=de6e395a-b7a2-4b71-b246-387f96b87dda state=SUCCESS code=Optional.empty reason= visited=[C, S] elapsedNanos=2605220"
+  ],
+  "correction": "Stop S normally before stopping final relay; keep NO_ROUTE assertion and original timeouts. Do not disable repair or change Java/JAR/config.",
+  "code_or_jar_changed": false,
+  "human_manual": "not executed"
+}

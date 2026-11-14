@@ -1,0 +1,1527 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index 9052188..58605ba 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -23,6 +23,17 @@ public final class OttApplication {
+     interface ServiceFactory { RunningService open(NodeConfiguration configuration) throws Exception; }
+     interface RunningService extends AutoCloseable {
+         Map<String, Neighbor> neighbors();
++        default pt.uminho.esr.ott.routing.RoutingService.Snapshot routingSnapshot() {
++            return pt.uminho.esr.ott.routing.RoutingService.emptySnapshot();
++        }
++        default Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot() {
++            return Optional.empty();
++        }
++        default pt.uminho.esr.ott.routing.RoutingService.TraceTicket requestTrace(UUID streamId) {
++            Objects.requireNonNull(streamId);
++            throw new UnsupportedOperationException("IMP-010 CLI adapter not implemented at interface checkpoint");
++        }
++
+         default Optional<OverlayRecovery.RecoveryStatus> recoveryStatus(){return Optional.empty();}
+         void requestShutdown(int reason, Duration remainingBudget);
+         boolean awaitTermination(Duration remainingBudget);
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+index 1111966..a1c4228 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -44,6 +44,11 @@ public final class OverlayNode implements AutoCloseable {
+         RoutingService.validateConfiguration(configuration, instanceId);
+         new NeighborManager(configuration, instance, observer);
+     }
++    /** Q-C-32 diagnostic facade; delegation is pending the behavior checkpoint. */
++    public RoutingService.TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        throw new UnsupportedOperationException("IMP-010 delegation not implemented at interface checkpoint");
++    }
+     public RoutingService.Snapshot routingSnapshot() {
+         var r = routing; return r == null ? RoutingService.emptySnapshot() : r.snapshot();
+     }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index 3ac0bfc..52ffa14 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -23,6 +23,33 @@ public final class RoutingService implements AutoCloseable {
+         Ticket schedule(Runnable task, long delayNanos);
+         void requestClose(); boolean awaitTermination(Duration budget); int physicalJobs();
+     }
++    /** Approved local diagnostic contract; not a wire enum. */
++    public enum TraceState { SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING }
++    public static final int TRACE_INITIAL_TTL = 32;
++    public static final Duration TRACE_TIMEOUT = Duration.ofMillis(3000);
++    /** Polling never invokes caller continuations on the node owner. */
++    public interface TraceTicket {
++        UUID traceId();
++        Optional<TraceOutcome> result();
++        void cancel();
++    }
++    public record TraceOutcome(UUID streamId, UUID traceId, Optional<UUID> serverEpoch,
++            TraceState state, Optional<ErrorCode> errorCode, String detail,
++            List<String> visited, long elapsedNanos) {
++        public TraceOutcome {
++            Objects.requireNonNull(streamId); Objects.requireNonNull(traceId);
++            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(state);
++            Objects.requireNonNull(errorCode); Objects.requireNonNull(detail);
++            visited = List.copyOf(visited);
++            if (visited.size() > 32 || detail.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 256
++                    || elapsedNanos < 0) throw new IllegalArgumentException("Trace outcome bounds");
++        }
++    }
++    /** Interface checkpoint only: admission/owner behavior awaits separate authorization. */
++    public TraceTicket requestTrace(UUID streamId) {
++        Objects.requireNonNull(streamId);
++        throw new UnsupportedOperationException("IMP-010 behavior not implemented at interface checkpoint");
++    }
+     public enum Phase { NEW, RUNNING, STOPPED }
+     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
+         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
+diff --git a/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst b/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+index 3f4a324..14864e2 100644
+--- a/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
++++ b/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+@@ -1,21 +1,32 @@
+ pt/uminho/esr/ott/protocol/ControlMessage$TraceResult.class
++pt/uminho/esr/ott/streaming/StreamCatalog$Entry.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Direction.class
++pt/uminho/esr/ott/routing/RoutingService$Timers$Job.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$LocalFailure.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$EventLoop.class
+ pt/uminho/esr/ott/app/OttApplication$Invocation.class
++pt/uminho/esr/ott/routing/RoutingTable$Decision.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Pending.class
+ pt/uminho/esr/ott/overlay/NeighborManager$2.class
+ pt/uminho/esr/ott/protocol/MessageCodec$ContentRejection.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Slot.class
++pt/uminho/esr/ott/routing/RoutingService$Timers.class
+ pt/uminho/esr/ott/app/OttApplication$OutputEvent.class
++pt/uminho/esr/ott/routing/RoutingTable$Outcome.class
++pt/uminho/esr/ott/routing/RoutingTable$Reason.class
++pt/uminho/esr/ott/routing/RoutingService$TraceOutcome.class
+ pt/uminho/esr/ott/transport/Connection$ExtensionStatus.class
++pt/uminho/esr/ott/routing/RoutingService.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$TcpChannel.class
+ pt/uminho/esr/ott/protocol/MessageCodec$1.class
+ pt/uminho/esr/ott/protocol/MessageType.class
+ pt/uminho/esr/ott/transport/Transport$Options.class
++pt/uminho/esr/ott/routing/RoutingService$Ledger.class
+ pt/uminho/esr/ott/config/TopologyConfiguration$Node.class
+ pt/uminho/esr/ott/config/TopologyConfiguration.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RealDeadlines$TimerJob.class
++pt/uminho/esr/ott/streaming/StreamCatalog.class
++pt/uminho/esr/ott/routing/RoutingService$Diagnostics.class
+ pt/uminho/esr/ott/overlay/CandidateCache$CandidateView.class
+ pt/uminho/esr/ott/transport/Connection$SendResult.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$Channel.class
+@@ -25,15 +36,19 @@ pt/uminho/esr/ott/transport/Connection$1.class
+ pt/uminho/esr/ott/app/OttApplication$ServiceFactory.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Peer.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RealPorts.class
++pt/uminho/esr/ott/streaming/StreamCatalog$Snapshot.class
+ pt/uminho/esr/ott/overlay/Neighbor.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Sink.class
+ pt/uminho/esr/ott/monitoring/LinkMetrics$State.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RealIo$ResolveJob.class
+ pt/uminho/esr/ott/config/ConfigurationProblem.class
++pt/uminho/esr/ott/routing/RoutingService$Phase.class
++pt/uminho/esr/ott/routing/RoutingService$Event.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RealDeadlines.class
+ pt/uminho/esr/ott/overlay/NeighborDiscovery$Query.class
+ pt/uminho/esr/ott/protocol/ControlMessage$ActivationAck.class
+ pt/uminho/esr/ott/protocol/ControlMessage$Activation.class
++pt/uminho/esr/ott/routing/RoutingTable$Slot.class
+ pt/uminho/esr/ott/protocol/MessageCodec$VersionFailure.class
+ pt/uminho/esr/ott/protocol/MessageCodec$FrameRead.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Phase.class
+@@ -41,9 +56,12 @@ pt/uminho/esr/ott/overlay/NeighborManager$NeighborUp.class
+ pt/uminho/esr/ott/config/RuntimeConfiguration$Monitoring.class
+ pt/uminho/esr/ott/transport/Connection.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Context.class
++pt/uminho/esr/ott/routing/RoutingService$Observer.class
+ pt/uminho/esr/ott/protocol/ErrorCode.class
++pt/uminho/esr/ott/routing/RoutingService$CacheEntry.class
+ pt/uminho/esr/ott/overlay/OverlayNode$1.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Invalidated.class
++pt/uminho/esr/ott/routing/RoutingService$Scheduler.class
+ pt/uminho/esr/ott/overlay/NeighborManager$CapabilityState.class
+ pt/uminho/esr/ott/protocol/MessageCodec$RejectedExtraContent.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Jitter.class
+@@ -53,13 +71,17 @@ pt/uminho/esr/ott/overlay/NeighborManager$Deadlines.class
+ pt/uminho/esr/ott/protocol/ControlMessage$Payload.class
+ pt/uminho/esr/ott/protocol/ControlMessage$Withdrawal.class
+ pt/uminho/esr/ott/transport/Transport$Listener.class
++pt/uminho/esr/ott/routing/RoutingTable$Advertisement.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Received.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$1.class
+ pt/uminho/esr/ott/app/OttApplication$ExecutionResult.class
+ pt/uminho/esr/ott/protocol/ControlMessage$Deactivation.class
+ pt/uminho/esr/ott/overlay/CandidateCache$CandidateEndpoint.class
+ pt/uminho/esr/ott/config/RuntimeConfiguration.class
++pt/uminho/esr/ott/routing/RoutingTable$State.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Registration.class
++pt/uminho/esr/ott/routing/RouteState.class
++pt/uminho/esr/ott/routing/RoutingService$Ticket.class
+ pt/uminho/esr/ott/app/OttApplication$InputEvent.class
+ pt/uminho/esr/ott/protocol/ControlMessage$HelloOk.class
+ pt/uminho/esr/ott/overlay/CandidateCache$Claim.class
+@@ -80,22 +102,31 @@ pt/uminho/esr/ott/overlay/OverlayRecovery$Retry.class
+ pt/uminho/esr/ott/transport/Connection$CloseReason.class
+ pt/uminho/esr/ott/overlay/NeighborManager$SerialOwner.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Ticket.class
++pt/uminho/esr/ott/routing/RoutingService$Admission.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Owner.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Channel.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$EndpointKey.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Completion.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$Plan.class
++pt/uminho/esr/ott/routing/RoutingTable$Status.class
++pt/uminho/esr/ott/streaming/StreamInfo.class
+ pt/uminho/esr/ott/protocol/DiscoveryMessage.class
++pt/uminho/esr/ott/routing/RoutingTable$SessionKey.class
+ pt/uminho/esr/ott/overlay/Neighbor$State.class
+ pt/uminho/esr/ott/overlay/NeighborManager$1.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$1.class
+ pt/uminho/esr/ott/config/ConfigurationLoader$EndpointOwners.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Observer.class
+ pt/uminho/esr/ott/protocol/ControlMessage$EndpointPayload.class
++pt/uminho/esr/ott/routing/RoutingService$TraceState.class
+ pt/uminho/esr/ott/transport/Connection$WriteDriverFactory.class
+ pt/uminho/esr/ott/config/StreamConfiguration.class
++pt/uminho/esr/ott/routing/RouteMetric.class
+ pt/uminho/esr/ott/protocol/ControlMessage$Hello.class
+ pt/uminho/esr/ott/protocol/DiscoveryMessage$Snapshot.class
++pt/uminho/esr/ott/routing/RoutingService$Generation.class
++pt/uminho/esr/ott/routing/RoutingService$Snapshot.class
++pt/uminho/esr/ott/routing/RouteCandidate.class
+ pt/uminho/esr/ott/protocol/MessageCodec$BoundedBuffer.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Snapshot.class
+ pt/uminho/esr/ott/overlay/NeighborManager$AddressLookup.class
+@@ -112,16 +143,20 @@ pt/uminho/esr/ott/overlay/NeighborManager$Diagnostic.class
+ pt/uminho/esr/ott/overlay/OverlayRecovery$RecoveryPorts.class
+ pt/uminho/esr/ott/overlay/NeighborDiscovery$Peer.class
+ pt/uminho/esr/ott/app/OttApplication$Console.class
++pt/uminho/esr/ott/routing/RoutingService$Row.class
++pt/uminho/esr/ott/routing/RoutingTable$Limits.class
+ pt/uminho/esr/ott/overlay/CandidateCache.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RepairStarted.class
+ pt/uminho/esr/ott/overlay/OverlayRecovery$RepairAttempt.class
+ pt/uminho/esr/ott/protocol/MessageCodec$HandshakeFailure.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$Core.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Factory.class
++pt/uminho/esr/ott/routing/RoutingService$QuotaKey.class
+ pt/uminho/esr/ott/config/NodeConfiguration.class
+ pt/uminho/esr/ott/overlay/OverlayRecovery$Phase.class
+ pt/uminho/esr/ott/overlay/NeighborManager$IoServices.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer.class
++pt/uminho/esr/ott/routing/RoutingService$Publication.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$RealDeadlines.class
+ pt/uminho/esr/ott/config/RuntimeConfiguration$Routing.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$SerialEvents.class
+@@ -130,6 +165,8 @@ pt/uminho/esr/ott/protocol/ProtocolException.class
+ pt/uminho/esr/ott/protocol/MessageCodec$Decoded.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Phase.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Timers$Job.class
++pt/uminho/esr/ott/routing/RoutingService$ControlPort.class
++pt/uminho/esr/ott/routing/RoutingService$Key.class
+ pt/uminho/esr/ott/overlay/NeighborManager$LeaveOutcome.class
+ pt/uminho/esr/ott/overlay/NeighborDiscovery$Response.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$Core$Context.class
+@@ -138,10 +175,14 @@ pt/uminho/esr/ott/overlay/OverlayRecovery.class
+ pt/uminho/esr/ott/overlay/NodeRole.class
+ pt/uminho/esr/ott/overlay/NeighborDiscovery$Issue.class
+ pt/uminho/esr/ott/app/OttApplication$2.class
++pt/uminho/esr/ott/routing/RoutingTable$Row.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Scheduler.class
++pt/uminho/esr/ott/routing/RoutingTable$Origin.class
+ pt/uminho/esr/ott/transport/Connection$WriteDriver.class
+ pt/uminho/esr/ott/protocol/ControlMessage$ErrorPayload.class
+ pt/uminho/esr/ott/protocol/DiscoveryMessage$Query.class
++pt/uminho/esr/ott/routing/Route.class
++pt/uminho/esr/ott/routing/RoutingService$Factory.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Diagnostics.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Ports.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$ControlPort.class
+@@ -151,6 +192,7 @@ pt/uminho/esr/ott/overlay/NeighborManager$Reason.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Timers.class
+ pt/uminho/esr/ott/overlay/NeighborDiscovery$Host.class
+ pt/uminho/esr/ott/protocol/DiscoveryCodec.class
++pt/uminho/esr/ott/routing/RoutingTable$Link.class
+ pt/uminho/esr/ott/overlay/CandidateCache$Rejection.class
+ pt/uminho/esr/ott/overlay/NeighborManager$RealIo$1.class
+ pt/uminho/esr/ott/overlay/OverlayNode.class
+@@ -162,10 +204,12 @@ pt/uminho/esr/ott/overlay/NeighborManager$Plan.class
+ pt/uminho/esr/ott/monitoring/LinkMetrics.class
+ pt/uminho/esr/ott/overlay/Neighbor$Session.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor$Updated.class
++pt/uminho/esr/ott/routing/RoutingService$TraceTicket.class
+ pt/uminho/esr/ott/overlay/NeighborManager.class
+ pt/uminho/esr/ott/overlay/OverlayRecovery$RecoveryStatus.class
+ pt/uminho/esr/ott/overlay/NeighborManager$LeaveAttempt.class
+ pt/uminho/esr/ott/protocol/ControlMessage.class
++pt/uminho/esr/ott/routing/RoutingTable$Change.class
+ pt/uminho/esr/ott/protocol/MessageCodec.class
+ pt/uminho/esr/ott/config/ConfigurationLoader$1.class
+ pt/uminho/esr/ott/app/OttApplication$RunningService.class
+@@ -179,7 +223,9 @@ pt/uminho/esr/ott/monitoring/NetworkMonitor$Ticket.class
+ pt/uminho/esr/ott/monitoring/NetworkMonitor.class
+ pt/uminho/esr/ott/overlay/NeighborManager$Network.class
+ pt/uminho/esr/ott/overlay/NeighborManager$TcpChannel.class
++pt/uminho/esr/ott/routing/RoutingService$Reason.class
+ pt/uminho/esr/ott/protocol/MessageCodec$ExtraEnvelope.class
+ pt/uminho/esr/ott/bootstrap/BootstrapServer$TransportFactory.class
+ pt/uminho/esr/ott/config/ConfigurationException.class
++pt/uminho/esr/ott/routing/RoutingTable.class
+ pt/uminho/esr/ott/overlay/NeighborManager$DiscoveryRejected.class
+diff --git a/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst b/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+index 1ab0a3c..797d86f 100644
+--- a/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
++++ b/Projeto/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+@@ -26,6 +26,7 @@
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/protocol/ProtocolException.java
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
++/Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteState.java
+ /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+diff --git a/add.md b/add.md
+index 05e8c78..a04b400 100644
+--- a/add.md
++++ b/add.md
+@@ -1077,7 +1077,7 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
+ - **Descrição/entrega:** Diagnosticar percursos pela CLI. Produzir este incremento e a sua prova, preservando os restantes componentes.
+ - **Fase/unidade/tamanho:** PHASE-03 / 003-rotas / S.
+ - **Bolt/origem:** [022-rotas](memory-bank/bolts/022-rotas/bolt.md); TASK-013.
+-- **Ficheiros:** `routing/RoutingService.java`, `app/OttApplication.java`, `routing/RouteTraceTest.java`.
++- **Ficheiros:** `routing/RoutingService.java`, `app/OttApplication.java`, `routing/RouteTraceTest.java`, `overlay/OverlayNode.java`.
+ - **Dependências:** IMP-006 (004-overlay), IMP-009 (006-rotas), IMP-005 (020-overlay).
+ - **ADR:** ADR-004, ADR-022, ADR-024.
+ - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-010, REQ-019, REQ-023.
+@@ -1090,6 +1090,22 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
+   - [ ] Diagnóstico não altera subscrições.
+   - [ ] Validação V-013 executada e evidência ligada no progresso.
+ 
++**Concretizações aprovadas Q-C-32/33 — 2026-11-14T16:24:54Z:** OverlayNode apenas
++expõe requestTrace(UUID), delegando ao RoutingService existente sem revelar
++owner/manager/mapas. Mesmas Sessions, eventos e shutdown global; fechos anteriores
++preservados. TRACE usa requestId=traceId, Sessions completas de entrada/saída e
++retorno pelo contexto guardado; TraceTicket consultável sem callbacks cliente no
++owner. TTL inicial32 conta iniciador; TTL0 falha antes de admitir nó, via
++ERROR TIMEOUT10/relatedType15/detail TTL_EXHAUSTED. Prazo local3000ms desde
++admissão antes da fila, sem renovação. T=min(E,64) contextos,4 locais/4 por Session;
++S=min(E,64) reservas físicas trace adicionais, até2 por contexto até callback real.
++Uma intenção de resposta/contexto, até16 ações/turno, scheduler existente com
++até2 jobs físicos e wake coalescido; sem timer por pedido. CLI até4 tickets,
++1 cursor, até16 linhas/turno e4096 caracteres/linha. Sem subscrição/vídeo,
++sem mudança de tipos/códigos/bytes/caps, sem novo transporte ou executor de estado.
++Detalhes completos no [Plan aprovado](memory-bank/bolts/022-rotas/implementation-plan.md).
++Aprovação apenas de interfaces/testes vermelhos neste passo, não dos comportamentos.
++
+ <a id="imp-011"></a>
+ ### IMP-011 — Ativar procura com confirmação
+ 
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+index d4aca33..ce477ad 100644
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -716,3 +716,32 @@ confirmada aceites. Versão b7d74be5d9bad9fe7f598f29fa17188037647cf2 integrada e
+ complete. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md).
+ Sem alteração de contrato/código após Test; CLI/trace/ativação de dados permanecem
+ nos próximos IMP, não iniciados. Unidade003-rotas/PHASE-03 continuam em progresso.
++
++
++## IMP-010 — Plan/Q-C-32/33 aprovados; interfaces em Implement
++
++Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
++Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
++TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
++prazo local3000ms; correlação/retorno por Sessions completas guardadas;
++TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
++locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
++Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
++ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
++V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
++e integração continuam pendentes; sem gates externos adicionais.
++
++API: RoutingService.requestTrace(UUID) → TraceTicket(traceId(), result(), cancel());
++TraceOutcome imutável com stream/trace/época, estado/erro/detalhe, visited e tempo
++local. OverlayNode.requestTrace(UUID) é exclusivamente fachada mínima.
++Estado esperado antes de start/após stop: ticket terminal NOT_RUNNING, sem helper.
++T=min(E,64),4 locais/4 por Session; S=min(E,64) físico adicional até callback real,
++até2 sends por contexto; uma intenção/contexto,16 ações/turno, até2 jobs no
++scheduler existente e um wake. CLI4 tickets/1 cursor/16 linhas/turno/4096 caracteres.
++Tempo na fila conta para3000ms; sem renovação. requestId=traceId preservado;
++respostas pela Session de entrada guardada, nunca pela nova conexão do mesmo ID.
++Resultado antes de ACCEPTED permitido; callback antigo só termina reserva física.
++TIMEOUT10/relatedType15/detail TTL_EXHAUSTED distingue TTL de prazo expirado.
++Custos são locais/log, nenhum campo novo em15/16. TCPv2/19 tipos/código3 rejeitado,
++framing37..65536 e UDP OTT1/caps intactos. Implementação de comportamento pendente;
++nenhuma execução V-013 integral, regressão ou aceitação Test presumida.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index c7bdd6b..fc62d8c 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 TODO; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 IN PROGRESS (Implement/interfaces); PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 apenas planned/desimpedido, não iniciado.
++**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 em Implement/interfaces; Plan/Q-C-32/33 aprovados.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -109,7 +109,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
+-| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | TODO | V-013: NÃO EXECUTADO |
++| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | IN PROGRESS | Plan aprovado; interfaces/red13:2pass/11fail/0error/0skip; V-013 integral pendente |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
+@@ -1191,3 +1191,33 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+ nenhum hash autorreferente ou resultado de publicação inventado.
+ Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+ Prova: experiments/construction/006-rotas/closure/integration-proof.json.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index 2084281..58ce92d 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -1,6 +1,6 @@
+ # Bolts Construction alinhados com o ADD
+ 
+-**Estado atual:** IMP-007/005-rotas complete, TASK-010 DONE após Test1176/manual Francisco/revisão final Fillmore e integração local `f990503`. Unidade003-rotas e PHASE-03 continuam em progresso; outros incrementos não iniciados. [Fecho](../memory-bank/bolts/005-rotas/closure-walkthrough.md).
++**Estado atual:** IMP-010/022-rotas em Implement/interfaces; Plan/Q-C-32/33 aprovados. IMP-009/006-rotas complete; unidade003-rotas e PHASE-03 em progresso. Apenas interfaces/stubs e testes red13; comportamentos pendentes.
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
+@@ -297,3 +297,33 @@ intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+ Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+ neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ ou o manual. Commit local limitado a documentação e evidência autorizadas.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 8ede2de..c12fb52 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1170,3 +1170,72 @@ Registo 2026-11-14T12:58:05Z. Utilizador aprovou revisão ADR/Q-C-31. Design6/7
+ clarificados: recusa local recuperável, OVERFLOW terminal na ligação e saturação
+ do owner com cleanup pelos hooks sem depender de wake futuro. Só Implement
+ autorizado nos seis caminhos. Aprovações pendentes acima são histórico.
++
++
++## Q-C-32 — IMP-010: porta de composição do trace fora dos três caminhos
++
++- **Estado atual:** DECIDIDA/APROVADA, opção1 pelo utilizador; proposta original registada em Plan; registo 2026-11-14T16:16:15Z.
++- **Base:**9144707, IMP-006/009/005 completos. ADD8/IMP-010 prevê só
++  RoutingService.java, OttApplication.java e RouteTraceTest.java.
++- **Evidência concreta:** OverlayNode guarda RoutingService privado, expõe
++  routingSnapshot()/monitoringSnapshot(), mas não operação para iniciar trace.
++  O construtor com Factory é package-private; OttApplication cria o nó público.
++  Um snapshot não autoriza enviar nem oferece owner. Manager/send já suportam15–17.
++- **Impacto:** impossível ligar CLI→serviço real só por acréscimo nos três
++  caminhos sem contornar encapsulamento ou duplicar estado/transporte.
++1. **Recomendada:** autorizar quarto caminho OverlayNode.java para uma delegação
++   pública mínima requestTrace(UUID), com resposta limitada antes de start/após
++   stop; operação e tipos no RoutingService. Testes próprios em RouteTraceTest.java
++   e subprocessos CLI reais, sem alterar testes históricos. Reutilizar owner,
++   manager/sessões, eventos e shutdown global; manter send() inalterado.
++   Após aprovação documentar exceção no ADD/contratos/índice derivado aplicável;
++   não reabrir IMP-009 nem criar ADR automaticamente.
++2. **Manter três caminhos:** preparar motor e contratos internos, adiar ligação
++   operacional da CLI até extensão explicitamente autorizada; entrega/V-013
++   de CLI e fecho permanecem incompletos. Não usar reflexão, registry global,
++   segundo serviço ou transporte como contorno.
++- **Decisão solicitada:** opção1 ou manutenção explícita da integração pendente.
++  Nenhuma extensão de código/ADD aplicada neste Plan.
++
++## Q-C-33 — IMP-010: TTL, correlação, API e limites do diagnóstico
++
++- **Estado atual:** DECIDIDA/APROVADA, opção1 pelo utilizador; concretizações de Plan, não prescrições do PDF;
++  registo 2026-11-14T16:16:15Z. Fontes: ADD6/IMP-010/ADR-004/014/017/018/020/022,
++  docs07(15/16/17), TASK-013 e API real. Não alterar wire/caps/Q-C-26–31.
++- **Lacunas:** TTL é u8 mas não tem código TTL_EXCEEDED; não há configuração
++  de prazo/cap de trace, nem operação pública. TRACE_RESULT não contém epoch
++  ou custos. Futuro completo no owner pode executar callbacks do chamador.
++1. **Recomendada:** aprovar conjuntamente o detalhe do
++   [Plan](../memory-bank/bolts/022-rotas/implementation-plan.md): TTL inicial32
++   como orçamento de nós incluindo iniciador, ttl0 falha antes de admitir nó;
++   ERROR TIMEOUT10/relatedType15/detail TTL_EXHAUSTED distinto de timeout local;
++   requestId=traceId preservado, prefixo/stream/epoch e ambas Sessions completas
++   guardadas; época divergente PATH_CHANGED e nenhuma escolha arbitrária entre
++   alternativas. Prazo local3000ms desde admissão antes da fila, sem renovação,
++   retorno pela Session guardada. T=min(E,64) contextos,4 locais/4 por Session;
++   S=min(E,64) sends físicos adicionais, no máximo2 por contexto, retidos até
++   callback real; intenção limitada ao contexto, sem fila de erros ilimitada.
++   Um alarme existente/até2 jobs físicos, wake coalescido e até16 ações/turno.
++   TraceTicket com resultado imutável consultável/cancelamento, sem callback
++   cliente no owner; até4 tickets CLI e1 cursor de listagem limitada. Custos só
++   em logs/snapshots, não no wire. Owner cheio continua fatal(Q-C-31), shutdown
++   no budget global, sem novo transporte/executor de estado/comando fora do pedido.
++2. **Alternativa:** indicar valores/semântica/API diferentes para rever o Plan
++   antes de Java; código de erro novo ou campos wire exigiriam revisão ADR
++   explícita de compatibilidade, não uma propriedade de configuração.
++- **Decisão solicitada:** aprovar ou ajustar os detalhes; nenhuma ADR aceite
++  considerada inviável nesta inspeção, nenhuma decisão nova já aprovada.
++
++
++### Q-C-32/33 — aprovação explícita e primeiro passo de Implement
++
++Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
++Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
++TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
++prazo local3000ms; correlação/retorno por Sessions completas guardadas;
++TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
++locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
++Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
++ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
++V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
++e integração continuam pendentes; sem gates externos adicionais.
+diff --git a/docs/phases/PHASE-03-ROUTING.md b/docs/phases/PHASE-03-ROUTING.md
+index 4595ee5..6ca5f96 100644
+--- a/docs/phases/PHASE-03-ROUTING.md
++++ b/docs/phases/PHASE-03-ROUTING.md
+@@ -6,7 +6,7 @@ Construir catálogo e candidatos por fluxo usando RTT medido e comprovar percurs
+ 
+ ## 2. Contexto
+ 
+-Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-010 DONE; TASK-011–013 continuam TODO. O resultado global da fase ainda não foi demonstrado.
++Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-010–012 DONE; TASK-013 IN PROGRESS (Implement/interfaces). O resultado global da fase ainda não foi demonstrado.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -21,9 +21,9 @@ RF-003, RF-005, RF-006, RF-008, RF-009, RF-010, RF-012, RF-014, RP-001, RP-004,
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+ | [TASK-010](../tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | V-010 | DONE |
+-| [TASK-011](../tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | V-011 | TODO |
+-| [TASK-012](../tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | V-012 | TODO |
+-| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | TODO |
++| [TASK-011](../tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | V-011 | DONE |
++| [TASK-012](../tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | V-012 | DONE |
++| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | IN PROGRESS |
+ 
+ ## 6. Ordem de execução
+ 
+@@ -207,3 +207,33 @@ intactos; Q-C-23/24 e os dois patches Q-C-25 preservados. Sem Java/push/entrega.
+ Históricos de pendências acima descrevem os checkpoints anteriores; estado atual
+ neste fecho e em closure-walkthrough.md. V-ADD documental novo, sem repetir Maven
+ ou o manual. Commit local limitado a documentação e evidência autorizadas.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/docs/tasks/PHASE-03/TASK-013.md b/docs/tasks/PHASE-03/TASK-013.md
+index 0095307..64b66e4 100644
+--- a/docs/tasks/PHASE-03/TASK-013.md
++++ b/docs/tasks/PHASE-03/TASK-013.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-013
+ - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Denji](../../team/DENJI.md).
+ - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-008](../PHASE-02/TASK-008.md), [TASK-012](../PHASE-03/TASK-012.md).
+@@ -72,3 +72,33 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/memory-bank/architecture-traceability.json b/memory-bank/architecture-traceability.json
+index 7a1186f..d193243 100644
+--- a/memory-bank/architecture-traceability.json
++++ b/memory-bank/architecture-traceability.json
+@@ -2589,7 +2589,8 @@
+       "files": [
+         "routing/RoutingService.java",
+         "app/OttApplication.java",
+-        "routing/RouteTraceTest.java"
++        "routing/RouteTraceTest.java",
++        "overlay/OverlayNode.java"
+       ],
+       "size": "S",
+       "gates": [],
+diff --git a/memory-bank/bolts/022-rotas/bolt.md b/memory-bank/bolts/022-rotas/bolt.md
+index 5c3fb05..f738a33 100644
+--- a/memory-bank/bolts/022-rotas/bolt.md
++++ b/memory-bank/bolts/022-rotas/bolt.md
+@@ -3,14 +3,14 @@ id: "022-rotas"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["004-diagnosticar-percursos-pela-tabela-de-rotas"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-14T15:43:38Z"
+-started: null
++updated: "2026-11-14T16:16:15Z"
++started: "2026-11-14T16:16:15Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "implement"
++stages_completed: [{"name": "plan", "completed": "2026-11-14T16:24:54Z", "artifact": "implementation-plan.md"}]
+ requires_bolts: ["004-overlay", "006-rotas", "020-overlay"]
+ enables_bolts: ["007-arvores", "008-arvores", "009-arvores", "023-arvores", "024-arvores"]
+ requires_units: ["002-overlay"]
+@@ -48,7 +48,7 @@ Ler [IMP-010](../../../add.md#imp-010) e as ADR aí indicadas antes de qualquer
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **plan** → `implementation-plan.md`; validar a etapa contra IMP-010 e as ADR do ADD.
++1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-010 e as ADR do ADD.
+ 2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-010 e as ADR do ADD.
+ 3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-010 e as ADR do ADD.
+ 
+@@ -75,3 +75,47 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ Registo 2026-11-14T15:43:38Z.006-rotas/IMP-009 complete e integrado em main b7d74be5d9bad9fe7f598f29fa17188037647cf2.
+ Apenas blocks=false; status=planned, started/completed/current_stage=null e
+ stages_completed=[] preservados. Não houve autorização de iniciar IMP-010.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## Plan aprovado — interfaces e testes vermelhos autorizados
++
++Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
++Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
++TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
++prazo local3000ms; correlação/retorno por Sessions completas guardadas;
++TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
++locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
++Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
++ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
++V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
++e integração continuam pendentes; sem gates externos adicionais.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+index 79006e3..10bfbe0 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -379,3 +379,33 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+ nenhum hash autorreferente ou resultado de publicação inventado.
+ Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+ Prova: experiments/construction/006-rotas/closure/integration-proof.json.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
+index 638a862..4485471 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
+@@ -2,7 +2,7 @@
+ id: "004-diagnosticar-percursos-pela-tabela-de-rotas"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-013"]
+@@ -37,3 +37,33 @@ A tarefa normativa é [IMP-010](../../../../../../add.md#imp-010); o bolt só or
+ - Bolts anteriores: 004-overlay, 006-rotas, 020-overlay.
+ - Responsável de origem: Denji; revisor: Fillmore.
+ - Gates: nenhum específico adicional.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+index 714508b..7f794fa 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-03"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-14T15:43:38Z"
++updated: "2026-11-14T16:16:15Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+@@ -396,3 +396,33 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+ nenhum hash autorreferente ou resultado de publicação inventado.
+ Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+ Prova: experiments/construction/006-rotas/closure/integration-proof.json.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 835406b..4bceed4 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,7 +17,7 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "022-rotas (planned, dependencies complete; not started)"
++next_bolt: "022-rotas (in-progress, Implement interfaces/red tests only; Plan and Q-C-32/33 approved)"
+ 
+ last_completed_bolt: "006-rotas"
+ last_integrated_commit: "b7d74be5d9bad9fe7f598f29fa17188037647cf2"
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 460cf2d..3f3f10e 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: onze histórias/bolts complete, incluindo006-rotas/IMP-009, e24 planned; nenhum em execução; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: onze histórias/bolts complete, incluindo006-rotas/IMP-009, e23 planned;022-rotas em Implement/interfaces; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -76,7 +76,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
+ 
+ ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-010. **Estado:** planned. **Bolt:** 022-rotas.
++**Tarefa:** IMP-010. **Estado:** in-progress, Plan aprovado; Implement/interfaces. **Bolt:** 022-rotas.
+ **Ficheiro:** [004-diagnosticar-percursos-pela-tabela-de-rotas](intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
+ 
+ ## 004-arvores/001-ativar-arvores-com-ack-e-procura-agregada.md ✅ GENERATED
+@@ -651,3 +651,33 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+ nenhum hash autorreferente ou resultado de publicação inventado.
+ Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+ Prova: experiments/construction/006-rotas/closure/integration-proof.json.
++
++
++## IMP-010 — Plan preparado, aprovação pendente
++
++Registo 2026-11-14T16:16:15Z. Base operacional9144707, main, entrada limpa. Dependências
++IMP-006/004-overlay, IMP-009/006-rotas e IMP-005/020-overlay complete;
++unidade002-overlay complete. Apenas Plan do bolt Simple022-rotas iniciado,
++current_stage=plan, stages_completed=[], completed=null.
++Plan define APIs, consulta por salto/alternativas, correlação por Session completa,
++visited/TTL/erros/prazos, reservas físicas, ownership e shutdown global.
++Q-C-32(composição mínima em OverlayNode) e Q-C-33(detalhes/limites) abertas;
++nenhum alargamento ou nova decisão aprovado. V-013/T01–T18 apenas propostos;
++nenhum Java/Maven/teste de rede/manual executado nesta etapa.
++Plan por aprovar; Implement/Test não iniciados, sem staging/commits/push.
++Unidade003-rotas/PHASE-03 continuam em progresso; incrementos fechados intactos.
++Manual humano, regressão, revisão final atribuída a Fillmore e integração futuros;
++sem gates externos adicionais. Evidência em experiments/construction/022-rotas/.
++
++
++## IMP-010 — interfaces/tipos e testes inicialmente vermelhos
++
++Registo 2026-11-14T16:29:16Z. Plan e Q-C-32/33 opção1 aprovados; quatro caminhos autorizados,
++OverlayNode exclusivamente fachada mínima. Apenas interfaces/stubs/tipos/testes:
++13 selecionados,2 passam/11 falham por asserção/0 erros/0 ignorados, exit1 esperado;
++compilação concluída, sem comportamentos. Algumas asserções ainda bloqueadas
++pelo stub; V-013/T01–T18 integral e integração real não executados.
++current_stage=implement; só Plan concluído. Parar antes dos comportamentos.
++Test/regressão atual/manual humano/revisão final Fillmore/integração pendentes;
++sem gates externos adicionais. Nenhum staging/commit/push/fecho ou outro IMP.
++Evidência: experiments/construction/022-rotas/implement-interfaces/.
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteTraceTest.java
+@@ -0,0 +1,170 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import static org.junit.jupiter.api.Assertions.*;
++import java.io.*;
++import java.nio.charset.StandardCharsets;
++import java.time.Duration;
++import java.util.*;
++import pt.uminho.esr.ott.app.OttApplication;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.routing.RoutingService.*;
++
++/** Initial red slice of V-013, not the complete T01–T18 oracle. */
++@Timeout(10)
++class RouteTraceTest {
++    // Reuse the existing fake owner/clock/scheduler/control port without changing its tests.
++    private static final UUID STREAM = RoutingServiceTest.STREAM;
++    private static final UUID EPOCH = RoutingServiceTest.EPOCH;
++    private static TraceTicket request(RoutingServiceTest.Rig r) {
++        return assertDoesNotThrow(() -> r.router.requestTrace(STREAM),
++                "requestTrace must admit or return a terminal ticket, never a placeholder exception");
++    }
++    private static TraceOutcome terminal(TraceTicket ticket) {
++        return ticket.result().orElseGet(() -> fail("Expected an explicit terminal diagnostic outcome"));
++    }
++    private static List<ControlMessage> traces(RoutingServiceTest.Rig r) {
++        return r.sent.stream().map(RoutingServiceTest.Sent::message)
++                .filter(m -> m.type() == MessageType.ROUTE_TRACE).toList();
++    }
++    private static void receive(RoutingServiceTest.Rig r, Neighbor.Session peer, ControlMessage m) {
++        r.act(() -> r.router.onNeighborEvent(new NeighborManager.Received(peer, m)));
++    }
++    @Test void outcomeOwnsItsVisitedAndKeepsOpaqueIds() {
++        var path = new ArrayList<>(List.of("C", "S"));
++        UUID id = new UUID(-1, -2);
++        var value = new TraceOutcome(STREAM, id, Optional.of(EPOCH), TraceState.SUCCESS,
++                Optional.empty(), "", path, 17);
++        path.clear();
++        assertEquals(List.of("C", "S"), value.visited());
++        assertEquals(id, value.traceId());
++        assertThrows(UnsupportedOperationException.class, () -> value.visited().add("X"));
++    }
++    @Test void outcomeRejectsOverlongVisitedUtf8AndNegativeDuration() {
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.of(ErrorCode.TIMEOUT), "é".repeat(129), List.of(), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", Collections.nCopies(33, "X"), 0));
++        assertThrows(IllegalArgumentException.class, () -> new TraceOutcome(STREAM, EPOCH,
++                Optional.empty(), TraceState.ERROR, Optional.empty(), "", List.of(), -1));
++    }
++    @Test void t01LocalSourceReturnsSingletonWithoutDemandOrControlSend() {
++        try (var r = new RoutingServiceTest.Rig("S", true, 4096, 4096, 10,
++                new RoutingTable.Limits(64, 256, 63, 8))) {
++            var before = r.router.snapshot();
++            var ticket = request(r); r.owner.drain();
++            var result = terminal(ticket);
++            assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("S"), result.visited());
++            assertEquals(before.routes(), r.router.snapshot().routes());
++            assertTrue(r.sent.isEmpty(), "Local diagnostic cannot emit activation or video control");
++        }
++    }
++    @Test void t04UnknownStreamHasExplicitErrorWithoutNetwork() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); r.owner.drain();
++            assertEquals(Optional.of(ErrorCode.UNKNOWN_STREAM), terminal(ticket).errorCode());
++            assertTrue(r.sent.isEmpty());
++        }
++    }
++    @Test void t02InitialRequestUsesSelectedSessionAndTtlCountsInitiator() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); var b = RoutingServiceTest.session("B");
++            r.up(a); r.up(b); r.metric(a, 40); r.metric(b, 10); r.ad(a, 1, 100); r.ad(b, 1, 100);
++            assertEquals("B", r.route().knownUpstream().orElseThrow().nodeId());
++            var ticket = request(r); r.owner.drain();
++            var sent = r.sent.stream().filter(x -> x.message().type() == MessageType.ROUTE_TRACE).toList();
++            assertEquals(1, sent.size()); assertEquals(b, sent.getFirst().peer());
++            var m = sent.getFirst().message(); var p = assertInstanceOf(ControlMessage.Trace.class, m.payload());
++            assertEquals(ticket.traceId(), m.requestId()); assertEquals(ticket.traceId(), p.traceId());
++            assertEquals(List.of("C"), p.visited()); assertEquals(31, p.ttl());
++            assertEquals(EPOCH, p.serverEpoch()); assertTrue(ticket.result().isEmpty(), "ACCEPTED is not a result");
++        }
++    }
++    @Test void t05TtlZeroIsExplicitTimeOutWithoutForwarding() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var c = RoutingServiceTest.session("D"); r.up(c); UUID id = UUID.randomUUID();
++            receive(r, c, new ControlMessage(MessageType.ROUTE_TRACE, id, c.nodeId(), c.instanceId(),
++                    new ControlMessage.Trace(STREAM, EPOCH, id, 0, List.of("D"))));
++            var errors = r.to(c).stream().filter(m -> m.type() == MessageType.ERROR).toList();
++            assertEquals(1, errors.size(), "TTL0 needs an explicit correlated ERROR, not silence");
++            assertEquals(id, errors.getFirst().requestId());
++            var p = assertInstanceOf(ControlMessage.ErrorPayload.class, errors.getFirst().payload());
++            assertEquals(ErrorCode.TIMEOUT, p.code()); assertEquals(15, p.relatedType());
++            assertEquals("TTL_EXHAUSTED", p.detail()); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t06TimeInAdmissionQueueConsumesEntireGlobalTraceDeadline() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var ticket = request(r);
++            r.clock.addAndGet(Duration.ofMillis(3000).toNanos()); r.owner.drain();
++            assertEquals(TraceState.TIMEOUT, terminal(ticket).state());
++            assertTrue(traces(r).isEmpty(), "Expired admission cannot send a new trace");
++        }
++    }
++    @Test void t07ResultCanArriveBeforeAdmissionFutureCompletes() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            r.hold = true; var ticket = request(r); r.owner.drain();
++            assertEquals(1, traces(r).size());
++            receive(r, a, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), a.nodeId(), a.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            var result = terminal(ticket); assertEquals(TraceState.SUCCESS, result.state());
++            assertEquals(List.of("C", "A", "S"), result.visited());
++            r.sent.stream().filter(s -> s.message().type() == MessageType.ROUTE_TRACE)
++                    .forEach(s -> s.result().complete(pt.uminho.esr.ott.transport.Connection.SendResult.CLOSED));
++            r.owner.drain(); assertEquals(result, terminal(ticket), "Late callback must not replace success");
++        }
++    }
++    @Test void t08OldConnectionCannotCompleteOperationOnReplacementSession() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var old = RoutingServiceTest.session("A"); r.up(old); r.metric(old, 10); r.ad(old, 1, 100);
++            var fresh = new Neighbor.Session(old.nodeId(), old.instanceId(), UUID.randomUUID(), old.endpoint());
++            r.up(fresh); r.metric(fresh, 10); r.ad(fresh, 1, 100);
++            var ticket = request(r); r.owner.drain();
++            receive(r, old, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), old.nodeId(), old.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertTrue(ticket.result().isEmpty(), "Same instanceId does not make an old connection current");
++            receive(r, fresh, new ControlMessage(MessageType.TRACE_RESULT, ticket.traceId(), fresh.nodeId(), fresh.instanceId(),
++                    new ControlMessage.TraceResult(STREAM, ticket.traceId(), List.of("C", "A", "S"))));
++            assertEquals(TraceState.SUCCESS, terminal(ticket).state());
++        }
++    }
++    @Test void t10CancellationHasOneTerminalValueAndDoesNotSendFromQueue() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var ticket = request(r); ticket.cancel(); ticket.cancel(); r.owner.drain();
++            var result = terminal(ticket); assertEquals(TraceState.CANCELLED, result.state());
++            r.tick(3001); assertEquals(result, terminal(ticket)); assertTrue(traces(r).isEmpty());
++        }
++    }
++    @Test void t11FifthLocalRequestIsRejectedBeforeOwnerAdmission() {
++        try (var r = new RoutingServiceTest.Rig()) {
++            var a = RoutingServiceTest.session("A"); r.up(a); r.metric(a, 10); r.ad(a, 1, 100);
++            var admitted = new ArrayList<TraceTicket>();
++            for (int i = 0; i < 4; i++) admitted.add(request(r));
++            assertEquals(4, r.owner.queue.size());
++            var excess = request(r);
++            assertEquals(TraceState.RESOURCE_LIMIT, terminal(excess).state());
++            assertEquals(4, r.owner.queue.size(), "Rejected command must not occupy owner queue");
++        }
++    }
++    @Test void facadeBeforeStartHasTerminalNotRunningWithoutCreatingOwner() {
++        var node = new OverlayNode(RoutingServiceTest.config("C", false, 4096, 4096, 10),
++                UUID.randomUUID(), event -> fail("No events before start"));
++        var ticket = assertDoesNotThrow(() -> node.requestTrace(STREAM), "Unstarted facade needs bounded terminal value");
++        assertEquals(TraceState.NOT_RUNNING, terminal(ticket).state());
++        assertEquals(RoutingService.Phase.NEW, node.routingSnapshot().diagnostics().phase());
++    }
++    @Test void t14PublicCliHelpAdvertisesApprovedTraceAndSnapshotCommands() {
++        var output = new ByteArrayOutputStream(); var errors = new ByteArrayOutputStream();
++        assertEquals(0, OttApplication.run(new String[]{"--help"}, InputStream.nullInputStream(),
++                new PrintStream(output, true, StandardCharsets.UTF_8), new PrintStream(errors)));
++        String help = output.toString(StandardCharsets.UTF_8);
++        for (String command : List.of("trace", "routes", "catalog", "metrics"))
++            assertTrue(help.contains(command), "Missing CLI diagnostic command: " + command);
++        assertEquals("", errors.toString(StandardCharsets.UTF_8));
++    }
++}
+--- /dev/null
++++ b/memory-bank/bolts/022-rotas/implementation-plan.md
+@@ -0,0 +1,346 @@
++---
++stage: plan
++bolt: "022-rotas"
++implementation_task: "IMP-010"
++created: "2026-11-14T16:16:15Z"
++status: "approved"
++---
++# IMP-010 — Plan: diagnosticar percursos pela CLI
++
++✅ Plan aprovado em 2026-11-14T16:24:54Z. ⏳ Implement apenas interfaces/testes vermelhos. [ ] Test não iniciado.
++Tipo Simple: Plan → Implement → Test, com aprovação em cada checkpoint.
++Base operacional/HEAD: `9144707eb5622d9da43b3b07354bc838c2797ef8`, main;
++árvore limpa na entrada. Nenhum checkout/reset, alteração Java ou teste Java.
++
++## 1. Fontes, dependências e critérios
++
++[ADD](../../../add.md), secções2/5/6/8–12, em particular IMP-010;
++[specs](../../../specs.md), REQ-010/019/023 e INT-001/002;
++[intent](../../intents/001-ott-streaming/requirements.md),
++[unidade](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md),
++[história](../../intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md),
++[TASK-013](../../../docs/tasks/PHASE-03/TASK-013.md),
++[contratos07](../../../docs/07-API-AND-INTERFACES.md), secções3–7 e adendas v2/IMP-009,
++[testes09](../../../docs/09-TESTING-STRATEGY.md),
++[DoD14](../../../docs/14-DEFINITION-OF-DONE.md) e
++[progresso15](../../../docs/15-PROJECT-PROGRESS.md).
++Enunciado → specs → intent → documentação → código; o ADD rege decisões derivadas.
++
++✅ Dependências completas e presentes na base: IMP-006/004-overlay,
++IMP-009/006-rotas e IMP-005/020-overlay; unidade002-overlay complete.
++IMP-009 integrou routing em `b7d74be5d9bad9fe7f598f29fa17188037647cf2`,
++com fecho em9144707. Fechos anteriores são evidência de dependência, não
++resultados de execução deste Plan. Unidade003-rotas/PHASE-03 continuam in-progress.
++
++Critérios: consultar a seleção real em cada salto; terminar falhas em prazo;
++mostrar NO_ROUTE e TTL explicitamente; não criar procura/subscrições/vídeo;
++V-013 executado futuramente, com regressão, manual humano, revisão final e integração.
++Responsável atribuído Denji; revisor atribuído Fillmore. Atribuição não é revisão feita.
++Sem gates externos adicionais.
++
++## 2. Composição real e allowlist
++
++1. `Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java`:
++   existente, não vazio. Acrescentar operação, tipos internos de diagnóstico,
++   contextos limitados, handlers15/16/ERROR relacionado15, prazos e cleanup.
++2. `Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java`:
++   existente. Comandos trace UUID, routes/catalog/metrics exigidos por TASK-013,
++   ajuda, leitura de snapshots e apresentação limitada assíncrona ao owner.
++3. `Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteTraceTest.java`:
++   novo. Oráculos determinísticos, TCP real e subprocessos da CLI pública;
++   helpers/tipos de teste aninhados, sem alterar testes históricos.
++
++Esta é a allowlist do ADD, não autorização para implementar agora.
++**Lacuna Q-C-32:** OverlayNode tem routing privado e apenas routingSnapshot();
++não existe porta pública para iniciar operação no serviço. O construtor que
++injeta RoutingService.Factory é package-private e o construtor público cria o
++serviço internamente. Snapshot não contém owner/port nem permite enviar.
++Recomenda-se, apenas se aprovado, um quarto caminho:
++`Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java`,
++com uma delegação pública mínima e resposta NOT_RUNNING antes de start/após stop.
++Testar a delegação no próprio RouteTraceTest e pela CLI real. Não expor manager,
++owner, mapas internos ou serviço mutável; não criar registry, reflexão, outro
++RoutingService, transporte, executor de estado ou comando adicional.
++Sem Q-C-32 decidida, a composição/integração fica pendente; não é possível
++apresentar a entrega operacional completa dentro dos três caminhos por inferência.
++ADD/contratos não alterados para fingir esta aprovação.
++
++## 3. APIs propostas, ainda sem Java
++
++Dentro de RoutingService, nomes de detalhe propostos:
++
++- `public TraceTicket requestTrace(UUID streamId)`: não bloqueia; valida argumento,
++  reserva admissão local antes de oferecer evento ao owner e devolve ticket limitado.
++- `TraceTicket.traceId()`, `TraceTicket.result(): Optional<TraceOutcome>` e
++  `TraceTicket.cancel()`: consulta de valor imutável e pedido de cancelamento,
++  sem continuations arbitrárias executadas no owner. Resultado publicado uma vez.
++- `TraceOutcome`: streamId, traceId, Optional serverEpoch, estado local,
++  Optional ErrorCode, detalhe limitado, visited imutável e duração monotónica local.
++  Estados de diagnóstico locais com nomes explícitos, não códigos wire novos:
++  SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING.
++- Porta proposta no nó, condicionada a Q-C-32:
++  `public RoutingService.TraceTicket requestTrace(UUID streamId)`;
++  serviço ainda ausente devolve ticket terminal sem alocar helper.
++- RunningService (interface interna de OttApplication) recebe defaults de
++  snapshots de routing/métricas e requestTrace; adaptador overlay delega para node.
++  BOOTSTRAP devolve NOT_APPLICABLE/NOT_RUNNING, nunca envia15.
++
++Manter construtores/APIs, RoutingService.Factory/ControlPort/Scheduler, snapshots
++existentes, NeighborManager e send() de aplicação. A extensão não requer novas
++classes top-level ou mudanças no codec/config/monitor/tabela/transporte.
++Records/listas defensivos; enums Java existentes e números wire preservados.
++
++## 4. Tabela de cada salto e sentido dos percursos
++
++No owner, obter now monotónico, aplicar a projeção de expiração existente da
++tabela e consultar `root.snapshot(streamId)` antes de escolher. Não encaminhar
++pelo antigo snapshot volátil de UI nem apenas inverter o path do anúncio.
++A projeção pode retirar candidatos expirados, mas trace não insere anúncios,
++renova TTL/seq/epoch, altera custos ou seleciona um upstream de dados ativo.
++Preservar a publicação/flooding que o ciclo normal faria por expiração.
++
++Fonte válida: route.localSource da época pedida e oferta local disponível;
++terminar com sucesso local sem rede se o iniciador for a fonte.
++Remoto: usar selectedCandidate/knownUpstream da tabela, com custo conhecido,
++candidato ainda válido e Session atual completa. INACTIVE é elegível para
++trace; UNAVAILABLE não. Alternatives são mostradas em routes, mas o pedido
++segue só a seleção atual: não difundir por todos os candidatos nem fazer retry
++silencioso. Dois testes mudam a seleção entre pedidos e demonstram ambos os caminhos.
++Mudança de tabela durante o percurso pode produzir observações de instantes
++locais diferentes; não prometer snapshot global nem impor o path anunciado inteiro.
++
++Visited tem ordem iniciador→origem. Pedido inicial acrescenta o iniciador;
++cada recetor valida prefixo sem repetições, último ID igual ao sender imediato,
++IDs válidos, ausência do próprio ID e limite antes de copiar/acrescentar-se.
++Guardar o prefixo original e a Session de jusante; encaminhar uma única vez à
++Session de montante selecionada. Exemplo: C→R2→S produz [C,R2,S]; retorno de
++TRACE_RESULT passa S→R2→C mantendo a lista [C,R2,S], não a invertendo no payload.
++Logs locais identificam direction=request/response, nó, instância, stream,
++traceId/requestId, sessão e custo observado em µs; custo não existe no payload16
++nem permite inventar soma dos custos remotos ou atraso unidirecional.
++
++## 5. Correlação e corridas
++
++Proposta Q-C-33: requestId=traceId novo na origem e preservado por todos os saltos;
++envelope senderId/senderInstance refeito pelo emissor imediato. Guardar stream,
++época, traceId/requestId, prefixo, Session completa de entrada (ou LOCAL),
++Session completa de saída, deadline local e token único da admissão.
++Session=(nodeId,instanceId,connectionId); identidade do envelope e sessão têm de
++coincidir. Resultado16 exige requestId/traceId/stream e Session de montante
++esperada, prefixo guardado, ausência de ciclos e último ID igual ao serverId
++esperado. ERROR só é consumido quando relatedType=15 e requestId/Session
++correspondem. Restantes ERROR/eventos continuam observáveis por handlers anteriores.
++
++Reservar/publicar contexto antes de chamar ControlPort.send(): uma resposta
++válida pode chegar antes da continuation ACCEPTED. A resposta constitui decisão
++remota e conclui uma vez; callback tardio só liberta reserva física, nunca
++reescreve terminal nem contexto de outro pedido. Falha local anterior ao resultado
++termina o contexto; resposta subsequente é ignorada. Se ambos chegam antes do
++owner tratar, aplicar a ordem serial documentada no teste; nenhum falso sucesso
++é inferido só de ACCEPTED. Exceção/CLOSED/OVERFLOW/INVALID_MESSAGE não é ACK.
++
++Callbacks/timers apenas publicam resultado físico limitado/coalescem wake;
++nenhuma mutação de rede fora do owner e nenhuma chamada a código cliente nele.
++NeighborDown retira operações da Session exata; Up da mesma instanceId com nova
++connectionId não herda contextos. Token impede resultado antigo de afetar nova
++reserva; IDs terminais não são reutilizados. Epoch diferente cancela operação
++incompatível; não reenviar automaticamente pela nova geração.
++Duplicado em contexto vivo não renova deadline nem cria segundo envio; colisão
++incompatível é rejeitada. Estado terminal protegido só até deadline/cap existente,
++sem dedup infinito; qualquer replay posterior continua sujeito a TTL e limites.
++
++## 6. Erros, TTL e prazo — proposta Q-C-33
++
++Não existe código wire TTL_EXCEEDED. Propor usar ERROR TIMEOUT(10), relatedType15,
++detail=TTL_EXHAUSTED, e mostrar razão TTL distinta de timeout de espera na CLI.
++Visited wire admite lista até32; propor TTL inicial32 como orçamento de nós,
++consumindo1 ao admitir cada nó, incluindo o iniciador. Exemplo direto C→S:
++saída C leva31; S valida ttl>0, acrescenta-se e termina. TTL=0 termina antes de
++acrescentar/encaminhar, mesmo se o recetor for fonte. Fonte no32.º nó pode
++responder; um33.º nunca é admitido. Não criar flags/opções CLI para TTL neste IMP.
++Listas32 recebidas que exigem append excedem o limite e não são copiadas/reenviadas.
++
++- UUID sintaticamente inválido: COMMAND_ERROR local, sem ticket/rede.
++- Stream nunca conhecida: UNKNOWN_STREAM(5); binding conhecido sem candidato
++  atual/localOffer: NO_ROUTE(6), incluindo falta de RTT ou expiração.
++- Época divergente: PATH_CHANGED(7); ciclo: LOOP_DETECTED(8).
++- Prazo: TIMEOUT(10); saturação: RESOURCE_LIMIT(11).
++- Envelope/contexto inseguro: ignorar ou erro apenas com identidade segura;
++  nunca responder a ERROR nem criar erro recursivo.
++- Falha de envio/NeighborDown: resultado local explícito NO_ROUTE ou CLOSED
++  conforme origem/cleanup; tentar ERROR seguro a jusante sem criar retries.
++
++Cada salto guarda a Session de entrada e devolve sucesso/ERROR por ela, não
++consulta rotas para devolver resposta. Se essa Session já não existe, não envia
++à reconectada; origem termina no seu próprio prazo. Não prometer erro entregue
++se transporte/fila falhar. Falta de admissão para um ERROR permite descartar a
++resposta remota: o pedido original continua coberto pelo prazo local do iniciador.
++
++Propor prazo de3000ms por contexto e total no iniciador, desde a admissão local
++antes da fila até à decisão; sem renovação por duplicado/retry/resultado parcial.
++Sem relógio partilhado, deadlines locais por salto não prometem deadline global
++remoto, mas o ticket inicial termina até ao seu prazo quando owner progride.
++Verificar tempo antes de cada envio e de aceitar resultado; t>=deadline vence.
++Se evento de admissão já expirou, não enviar. Owner bloqueado/saturado é falha
++operacional, não garantia de tempo real: preservar owner.offer que é fatal por
++fila cheia (Q-C-31). Não reinterpretar como backpressure recuperável.
++Novos valores locais não são requisitos do PDF nem propriedades que mudem wire.
++
++## 7. Limites físicos e shutdown — proposta Q-C-33
++
++E=owner.capacity. Contextos diagnósticos globais T=min(E,64), incluindo terminais
++retidos/tombstones, máximos4 locais e4 por Session de entrada, sem prealocação
++máxima. Reservar local antes de offer, não alocar uma future/timer por tentativa
++recusada. CLI mantém até4 tickets, com polling no seu ciclo existente; sem espera
++por ACK nem threads/executores por pedido. Busy/erro imediato é valor terminal
++limitado, sem retenção pelo serviço. Não evictar contexto protegido para admitir outro.
++
++Reservas físicas de sends trace S=min(E,64), separadas e explicitamente limitadas,
++sem reduzir/alterar o limite aprovado das admissões9/10. Cada request/result/error
++reserva antes de port.send; callback ainda vivo mantém reserva mesmo após timeout
++lógico ou consumo do resultado. No máximo2 tickets de envio por contexto para
++corrida request/resposta; saturação não cria fila ilimitada de erros. Falta de
++reserva deixa no próprio contexto no máximo1 intenção de resposta até deadline;
++sem retry de pedido. Erros sem contexto só usam reserva livre, senão descarte.
++Tratar envio e liberação física sem que uma admissão antiga liberte a nova.
++Até16 ações de diagnóstico por passagem, cursor para progresso justo; não
++alterar quotas/fairness/caps de flooding aceites no IMP-009.
++
++Timers: integrar o próximo deadline no alarme existente de RoutingService;
++um scheduler, no máximo2 jobs físicos incluindo job em execução/cancelamento,
++um wake coalescido e fila owner E já limitada. Não criar um timer por contexto;
++S reservas com no máximoS callbacks vivos e dados imutáveis de tamanho limitado.
++Memória O(T×32 IDs + S×frame limitado), mais índices de tamanhoT/S e4 tickets
++CLI. Não reter snapshots de tabelas inteiras por pedido; só sessão/prefixo/custo
++observado/epoch. Não alegar máximo de bytes JVM medido neste Plan.
++
++requestClose existente impede novas admissões; no owner terminar/cancelar tickets,
++limpar contextos/intentos e cancelar alarme; hooks onStop cobrem recusa de owner.
++Cancelamento não prova terminação de callback físico. awaitTermination existente
++passa a incluir as reservas trace até callback/continuação realmente terminados,
++no mesmo budget global restante e sem novo prazo por pedido, peer ou helper.
++OverlayNode já solicita routing antes de parar manager/owner e espera routing no
++restante: conservar esta ordem. Nenhum join no owner. CLI quit/EOF/falha cancela
++tickets e usa cleanup e resultado terminal autoritativo do IMP-005; não voltar a
++anunciar código de saída final antes do writer terminar.
++
++## 8. CLI e snapshots sem efeitos de procura
++
++Gramática proposta: `trace UUID` (um UUID canónico, sem argumentos extra),
++`routes`, `catalog`, `metrics`; preservar neighbors/recovery/quit/ajuda e restantes
++comandos ainda não implementados. TRACE_STARTED com ID seguido exatamente de
++um TRACE_RESULT ou TRACE_ERROR terminal no ticket consumido. Incluir stream,
++traceId, visited/código/razão e duração local; não anunciar sucesso no enqueue.
++
++Snapshots de routing e monitoring já expostos pelo nó, imutáveis. routes mostra
++origem, época, seleção, candidatos/alternativas, custoµs, validade observada,
++estado/revisão; catalog mostra metadados e validade; metrics mostra Session,
++EWMA/custo/idade e estado monitor. Não renovar candidato por leitura.
++Rotular capturedAt/idade e observar validade local: não apresentar snapshot antigo
++como seleção atual, nem chamar root fora do owner. Usar projeção visibleAt do
++catálogo conservadora; routes rotula snapshot e candidato expirado, sem fingir
++reseleção global. Clock da CLI é do mesmo processo; testes injetam relógio comum.
++
++Saída até4096 caracteres/linha; título/strings escapados para não injetar linhas
++ou comandos. Uma listagem incremental por vez, um cursor e uma referência ao
++snapshot imutável; candidato por linha, sem concatenar16384 rotas/63 alternativas.
++Até16 linhas/iteração, apenas enquanto há espaço na fila de saída; manter
++COMMAND_OVERFLOW/OUTPUT_ERROR e política fatal de saturação histórica para eventos.
++Nova listagem quando existe uma devolve BUSY; quit/falha descarta cursor. Polling
++intercalado mantém comandos responsivos; não bloquear callbacks nem o owner.
++
++Trace apenas lê seleção e cria contextos diagnósticos. Proibidos ACTIVATE11,
++ACK12, DEACTIVATE13, RENEW14 como efeito de trace, registo de consumidor,
++downstream, active/pending upstream, sockets UDP, leitura de media ou emissão
++de vídeo. Anúncios/sondas/descoberta normais continuam independentes.
++
++## 9. V-013: mapa de oráculos propostos, todos NÃO EXECUTADOS
++
++1. T01 — Fonte local retorna [S], custo0, nenhum15/11–14/UDP.
++2. T02 — Grafo C–R1/R2–S: custos escolhidos levam [C,R1,S]; nova seleção
++   pela alternativa leva [C,R2,S]; tabela de cada relay pode divergir do path
++   originalmente anunciado, demonstrando consulta real por salto.
++3. T03 — Retorno inverso por Sessions guardadas com visited invariável; não
++   consultar tabela modificada para rotear resposta.
++4. T04 — UNKNOWN_STREAM e NO_ROUTE sem RTT, expirado ou retirado; sem envio15 indevido.
++5. T05 — TTL0,1 e32; origem no último salto, path32/33, repetição e sender incorreto;
++   TTL explícito separado do timeout sem novos códigos/bytes.
++6. T06 — Clock/scheduler falsos: admissão em fila já expirada, t=deadline−1/t=deadline,
++   resultado tardio e progresso da CLI sem sleeps de parede como oráculo.
++7. T07 — Resultado válido antes de ACCEPTED, conclusão síncrona/reentrante,
++   exceção/null, CLOSED/OVERFLOW/INVALID_MESSAGE; terminal único sem fuga física.
++8. T08 — Troca connectionId com instanceId igual; nova instanceId; Down/resultado/
++   callback antigo não altera contexto novo nem envia à Session substituta.
++9. T09 — traceId/requestId/stream/epoch/prefixo/sender incompatíveis e resultado
++   da Session errada; ERROR relatedType alheio preservado, sem erro sobre erro.
++10. T10 — Duplicado/cancelamento/timeout/fecho concorrentes, sem prazo renovado,
++    segunda resposta ou retry automático pela alternativa.
++11. T11 — T/S e quotas local/Session nos limites e limite+1; contexto protegido,
++    callback não resolvido após timeout conserva reserva física; capacidade
++    não é reposta prematuramente, intenção/erro limitado e falha isolada.
++12. T12 — Até2 jobs físicos, alarme compartilhado, wake coalescido e owner cheio
++    fatal/onStop, sem tentar mudar a semântica aprovada em Q-C-31.
++13. T13 — Eventos9/10/7/8/18/19/ERROR preservados, flooding/quotas/TTL/Q-C-26–31
++    intactos; nenhuma variação de procura/active/pending/downstream ou envio11–14.
++14. T14 — routes/catalog/metrics refletem snapshots, custo/idade/unavailable
++    honesto, linhas/título limitados e defensivos; listagem grande cede a quit.
++15. T15 — Processo CLI real (ProcessBuilder, sem acesso a interfaces package-private):
++    perfis temporários validados, bootstrap/servidor/relays/cliente e porta TCP
++    efémera/reservada com verificação de bind. Esperar readiness/convergência por
++    evidência, enviar trace UUID pelo stdin, exigir visited esperado e erros
++    explícitos, preservar stdout/stderr e exit. Alternativa real após retirar
++    relay/alterar seleção de forma observável; não alegar teste de custos exatos
++    com RTT de parede não controlado.
++16. T16 — TCP real multi-hop, reconexão/EOF no meio; request/result e retorno
++    pertencem às Sessions atuais e origem termina em prazo. UDP de dados ausente
++    comprovado por observador de controlo e captura/socket sentinela nas portas
++    de dados do perfil, separando controlo/perfis de media ainda não lida.
++17. T17 — Shutdown durante admissão/espera/resposta e callback bloqueado:
++    falha física explícita até callback libertado, budget único sem multiplicação;
++    no nominal todos os processos/threads/helpers/sockets terminam, portas libertas.
++18. T18 — Regressão completa futura `mvn -B -ntp clean verify`, XML/log/JAR/hash
++    novos; comparação literal de testes históricos/bytes wire/UDP e de caminhos
++    autorizados. Não usar1256/1211/1176 históricos como resultados atuais.
++
++Implement deverá começar com interfaces e testes significativos vermelhos se
++assim autorizado no checkpoint; evoluir por partes sem reduzir testes existentes.
++Test consolida execução V-013/T01–T18/regressão e prepara manual humano sobre
++JAR/hash novos; repetir por pessoa identificada antes de aprovar Test, sem
++atribuir execução ao utilizador por inferência. Revisão final de Fillmore e
++integração da versão revista antes de DONE; sem contacto/commit/push inferidos.
++
++## 10. Conformidade e checkpoint
++
++ADR-004/022/024 diretamente aplicáveis; ADR-014/017/018/020/021/026 e033–035
++preservadas. TCP exclusivamente v2,19 tipos1/2/4..20; código3 rejeitado,
++framing37..65536, UTF-8 estrito, listas/path/caps existentes. UDP OTT1 continua
++64/1200/1136. Nenhum campo novo nos payloads15/16/17; custos por salto só em log
++local e snapshots, não em TRACE_RESULT. Sem runtime dependency, CI, linter,
++JaCoCo ou percentagem de cobertura. Sem ADR nova/substituição por inferência.
++
++[Q-C-32/33](../../../docs/construction-duvidas.md) precisam de decisão humana:
++Q-C-32 sobre quarto caminho/porta; Q-C-33 sobre semântica TTL/prazos/recursos/API
++propostos. Nenhuma proposta está implicitamente aprovada pelo início de Plan.
++Se for identificado conflito inviável com decisão aceite, parar a parte afetada,
++recolher prova e propor substituição segundo ADD11, sem implementar contorno.
++
++⏳ Parar no checkpoint Plan. Plan por aprovar; Implement/Test não iniciados;
++bolt/história em progresso, implemented não true e TASK-013 não DONE.
++Validação desta etapa apenas documental, reportada em
++[plan-validation.md](../../../experiments/construction/022-rotas/plan-validation.md).
++
++
++## Decisão posterior — Plan aprovado
++
++Registo 2026-11-14T16:24:54Z. Plan e opções1 de Q-C-32/33 aprovados explicitamente pelo utilizador nesta sessão.
++Extensão exclusivamente a OverlayNode.java para delegação mínima requestTrace(UUID).
++TTL inicial32 incluindo iniciador; TTL_EXHAUSTED via TIMEOUT10/relatedType15;
++prazo local3000ms; correlação/retorno por Sessions completas guardadas;
++TraceTicket consultável, limites físicos/CLI do Plan aprovados. Concretizações
++locais aprovadas, não imposições do enunciado nem alteração de wire/hard caps.
++Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
++ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
++V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
++e integração continuam pendentes; sem gates externos adicionais.
++As expressões proposta/pendente acima conservam a redação do checkpoint original;
++esta decisão resolve Q-C-32/33 e aprova a allowlist de quatro caminhos.
+--- /dev/null
++++ b/memory-bank/bolts/022-rotas/implementation-walkthrough.md
+@@ -0,0 +1,59 @@
++# IMP-010 — Implement: checkpoint de interfaces/tipos e red tests
++
++✅ Plan e Q-C-32/33 opção1 aprovados pelo utilizador; ⏳ Implement limitado a
++interfaces/testes vermelhos, antes de comportamentos. [ ] Test não iniciado.
++
++## Alterações nos quatro caminhos autorizados
++
++- [x] RoutingService.java: tipos TraceTicket/TraceOutcome/TraceState, TTL32 e
++  prazo3000ms; record com cópia defensiva/limites. requestTrace é stub explícito.
++- [x] OverlayNode.java: só assinatura pública requestTrace(UUID) com stub;
++  delegação real, NOT_RUNNING e lifecycle ainda não implementados.
++- [x] OttApplication.java: apenas defaults de diagnóstico na interface interna
++  RunningService; sem handler/comando/ajuda/adaptador operacional introduzido.
++- [x] RouteTraceTest.java:13 casos iniciais, incluindo clock/owner/scheduler/
++  ControlPort falsos reutilizados dos helpers históricos, sem alterar os testes
++  originais. Não é implementação integral dos18 grupos de oráculos.
++
++Nenhuma linha Java preexistente removida/substituída. Nenhum comportamento de
++admissão, envio trace, callback, timer, CLI ou shutdown novo implementado.
++Validação intrínseca dos novos tipos faz parte do contrato de interfaces.
++Nenhuma alteração em NeighborManager/send(), codec, transporte, configuração,
++subscrições, vídeo ou wire; nenhum executor/sockets novo nesta fatia.
++
++## Execução atual e causas das falhas
++
++Comando selecionado: `mvn -B -ntp -f Projeto/pom.xml -Dtest=RouteTraceTest test`.
++Temurin21.0.13/Maven3.9.9. **13 testes:2 passam,11 falham,0 erros,0 ignorados;
++exit1 esperado.** Compilação dos41 fontes e18 fontes de teste concluída.
++Só RouteTraceTest foi executado; compilar testes históricos não os executa.
++
++1. Dois verdes: cópia defensiva/UUID opaco e limites de visited/UTF-8/duração.
++2. Oito vermelhos na operação requestTrace: fonte, desconhecida, seleção/TTL31,
++   deadline desde fila, resultado antes de ACCEPTED, conexão antiga, cancelamento
++   e quota4+1. assertDoesNotThrow deteta stub; verificações posteriores desses
++   casos ainda não são atingidas, não provam o comportamento nem cobertura total.
++3. Um vermelho na fachada pré-start: stub em vez de ticket NOT_RUNNING.
++4. Um vermelho TTL0: handler ignora15 e não emite ERROR TIMEOUT/TTL_EXHAUSTED.
++5. Um vermelho na ajuda pública CLI: ainda não anuncia trace/routes/catalog/metrics.
++
++Não se aceita a exceção do stub como sucesso do teste; nenhuma falha de compilação,
++infraestrutura/socket ou timeout foi usada como red funcional. Teste da ajuda usa
++API pública em processo, não CLI multi-processo. TCP real/T15–T17 completos e
++shutdown físico, V-013 integral/T01–T18, regressão/clean verify, JAR/hash novo,
++manual humano, revisão final Fillmore e integração continuam pendentes.
++Sem gates externos adicionais. Não foi executado clean verify nem empacotado JAR.
++
++## Evidência e checkpoint
++
++[Resultados](../../../experiments/construction/022-rotas/implement-interfaces/results.json),
++[log Maven](../../../experiments/construction/022-rotas/implement-interfaces/red-01.log),
++[XML preservado](../../../experiments/construction/022-rotas/implement-interfaces/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml),
++[V-ADD](../../../experiments/construction/022-rotas/implement-interfaces/v-add.md) e
++[preservação/diffs](../../../experiments/construction/022-rotas/implement-interfaces/preservation.json).
++Saída gerada target/ fica separada, sem staging/entrega; logs/XML copiados para
++experiments/. Código histórico e artefactos de fecho preservados por hashes.
++
++**Parar antes dos comportamentos.** Implement/Test não aprovados; bolt/história
++abertos, TASK-013 IN PROGRESS; unidade/fase em progresso. Sem staging, commits,
++push ou outro IMP. Não existe revisão final presumida por aprovação do Plan.

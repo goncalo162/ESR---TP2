@@ -44,6 +44,12 @@ public final class OverlayNode implements AutoCloseable {
         RoutingService.validateConfiguration(configuration, instanceId);
         new NeighborManager(configuration, instance, observer);
     }
+    /** Q-C-32: diagnostic delegation only, no new owner or transport. */
+    public RoutingService.TraceTicket requestTrace(UUID streamId) {
+        Objects.requireNonNull(streamId);
+        var r = routing;
+        return r == null ? RoutingService.unavailableTrace(streamId) : r.requestTrace(streamId);
+    }
     public RoutingService.Snapshot routingSnapshot() {
         var r = routing; return r == null ? RoutingService.emptySnapshot() : r.snapshot();
     }
