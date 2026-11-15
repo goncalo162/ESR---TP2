@@ -6,7 +6,10 @@ import java.util.Objects;
 /** Opções operacionais imutáveis e validadas, sem rede ou estado de execução. */
 public record RuntimeConfiguration(
         Control control, Overlay overlay, Monitoring monitoring, Routing routing,
-        Subscription subscription, Video video, Source source) {
+        Subscription subscription, Video video, Source source)
+{
+
+    //* === Atributos e Variáveis === *
 
     private static final Duration MIN_DURATION = Duration.ofMillis(1);
     private static final Duration MAX_DURATION = Duration.ofMillis(Integer.MAX_VALUE);
@@ -19,7 +22,12 @@ public record RuntimeConfiguration(
                 new Subscription(Duration.ofMillis(6000), Duration.ofMillis(2000)),
                 new Video(256, 8, Duration.ofMillis(250)), new Source(99999));
 
-    public RuntimeConfiguration {
+
+
+    //* === Construtor === *
+
+    public RuntimeConfiguration
+    {
         Objects.requireNonNull(control, "control");
         Objects.requireNonNull(overlay, "overlay");
         Objects.requireNonNull(monitoring, "monitoring");
@@ -29,11 +37,27 @@ public record RuntimeConfiguration(
         Objects.requireNonNull(source, "source");
     }
 
-    public static RuntimeConfiguration defaults() { return DEFAULTS; }
+
+
+    //* === Métodos Públicos === *
+
+    public static RuntimeConfiguration defaults()
+    {
+        return DEFAULTS;
+    }
+
+
+
+    //* === Control Record === *
 
     public record Control(Duration connectTimeout, Duration shutdownTimeout, int maxConnections,
-                          int queueCapacity, Duration bootstrapQueryTimeout) {
-        public Control {
+                          int queueCapacity, Duration bootstrapQueryTimeout)
+    {
+
+        //* === Construtor === *
+
+        public Control
+        {
             duration(connectTimeout, "connectTimeout");
             duration(shutdownTimeout, "shutdownTimeout");
             range(maxConnections, 1, 64, "maxConnections");
@@ -41,33 +65,65 @@ public record RuntimeConfiguration(
             duration(bootstrapQueryTimeout, "bootstrapQueryTimeout");
         }
     }
+
+
+
+    //* === Overlay Record === *
+
     public record Overlay(Duration helloTimeout, Duration retryInitial, Duration retryMax,
-                          int retryJitterPercent, int eventsCapacity) {
-        public Overlay {
+                          int retryJitterPercent, int eventsCapacity)
+    {
+
+        //* === Construtor === *
+
+        public Overlay
+        {
             duration(helloTimeout, "helloTimeout");
             duration(retryInitial, "retryInitial");
             duration(retryMax, "retryMax");
             range(retryJitterPercent, 0, 100, "retryJitterPercent");
             range(eventsCapacity, 1, 4096, "eventsCapacity");
-            if (retryInitial.compareTo(retryMax) > 0)
+
+            if(retryInitial.compareTo(retryMax) > 0)
                 throw new IllegalArgumentException("retryInitial must not exceed retryMax");
         }
     }
+
+
+
+    //* === Monitoring Record === *
+
     public record Monitoring(Duration probeInterval, Duration probeTimeout, int probeFailures,
-                             double ewmaAlpha) {
-        public Monitoring {
+                             double ewmaAlpha)
+    {
+
+        //* === Construtor === *
+
+        public Monitoring
+        {
             duration(probeInterval, "probeInterval");
             duration(probeTimeout, "probeTimeout");
             range(probeFailures, 1, Integer.MAX_VALUE, "probeFailures");
-            if (!Double.isFinite(ewmaAlpha) || ewmaAlpha <= 0 || ewmaAlpha > 1)
+
+            if(!Double.isFinite(ewmaAlpha) || ewmaAlpha <= 0 || ewmaAlpha > 1)
                 throw new IllegalArgumentException("ewmaAlpha must be finite and in (0,1]");
         }
     }
+
+
+
+    //* === Routing Record === *
+
     public record Routing(Duration announceInterval, Duration candidateTtl, int cacheCapacity,
                           Duration cacheTtl, int floodMaxPerSecond, Duration activateTimeout,
                           int activateAttempts, int switchImprovementPercent, int switchObservations,
-                          Duration switchMinDwell) {
-        public Routing {
+                          Duration switchMinDwell)
+    {
+
+        //* === Construtor === *
+
+        public Routing
+        {
             duration(announceInterval, "announceInterval");
             duration(candidateTtl, "candidateTtl");
             range(cacheCapacity, 1, 4096, "cacheCapacity");
@@ -78,40 +134,81 @@ public record RuntimeConfiguration(
             range(switchImprovementPercent, 0, 100, "switchImprovementPercent");
             range(switchObservations, 1, Integer.MAX_VALUE, "switchObservations");
             duration(switchMinDwell, "switchMinDwell");
-            if (candidateTtl.compareTo(announceInterval) <= 0)
+
+            if(candidateTtl.compareTo(announceInterval) <= 0)
                 throw new IllegalArgumentException("candidateTtl must exceed announceInterval");
-            if (cacheTtl.compareTo(candidateTtl) < 0)
+
+            if(cacheTtl.compareTo(candidateTtl) < 0)
                 throw new IllegalArgumentException("cacheTtl must not be less than candidateTtl");
         }
     }
-    public record Subscription(Duration lease, Duration renew) {
-        public Subscription {
+
+
+
+    //* === Subscription Record === *
+
+    public record Subscription(Duration lease, Duration renew)
+    {
+
+        //* === Construtor === *
+
+        public Subscription
+        {
             duration(lease, "lease");
             duration(renew, "renew");
-            if (renew.compareTo(lease) >= 0)
+
+            if(renew.compareTo(lease) >= 0)
                 throw new IllegalArgumentException("renew must be less than lease");
         }
     }
-    public record Video(int egressCapacity, int reassemblyMaxFrames, Duration reassemblyDeadline) {
-        public Video {
+
+
+
+    //* === Video Record === *
+
+    public record Video(int egressCapacity, int reassemblyMaxFrames, Duration reassemblyDeadline)
+    {
+
+        //* === Construtor === *
+
+        public Video
+        {
             range(egressCapacity, 1, 256, "egressCapacity");
             range(reassemblyMaxFrames, 1, 8, "reassemblyMaxFrames");
             duration(reassemblyDeadline, "reassemblyDeadline");
         }
     }
-    public record Source(int maxFrameBytes) {
-        public Source { range(maxFrameBytes, 1, 99999, "maxFrameBytes"); }
+
+
+
+    //* === Source Record === *
+
+    public record Source(int maxFrameBytes)
+    {
+
+        //* === Construtor === *
+
+        public Source
+        {
+            range(maxFrameBytes, 1, 99999, "maxFrameBytes");
+        }
     }
 
-    private static void range(int value, int min, int max, String name) {
-        if (value < min || value > max)
+
+
+    //* === Validation Methods === *
+
+    private static void range(int value, int min, int max, String name)
+    {
+        if(value < min || value > max)
             throw new IllegalArgumentException(name + " must be in " + min + ".." + max);
     }
 
-    private static void duration(Duration value, String name) {
+    private static void duration(Duration value, String name)
+    {
         Objects.requireNonNull(value, name);
         // Compare before converting: an arbitrary Duration can overflow toMillis/toNanos.
-        if (value.compareTo(MIN_DURATION) < 0 || value.compareTo(MAX_DURATION) > 0
+        if(value.compareTo(MIN_DURATION) < 0 || value.compareTo(MAX_DURATION) > 0
                 || value.getNano() % 1_000_000 != 0)
             throw new IllegalArgumentException(name + " must fit positive integer milliseconds");
     }

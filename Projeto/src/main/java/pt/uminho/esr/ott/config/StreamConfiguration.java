@@ -6,8 +6,13 @@ import java.util.UUID;
 
 /** Metadados locais: os bytes do vídeo só serão lidos na TASK-020. */
 public record StreamConfiguration(Path sourceFile, UUID streamId, String serverId,
-                                  String title, Path mediaFile, int fps, boolean loop) {
-    public StreamConfiguration {
+                                  String title, Path mediaFile, int fps, boolean loop)
+{
+
+    //* === Construtor === *
+
+    public StreamConfiguration
+    {
         Objects.requireNonNull(sourceFile);
         Objects.requireNonNull(streamId);
         Objects.requireNonNull(serverId);
