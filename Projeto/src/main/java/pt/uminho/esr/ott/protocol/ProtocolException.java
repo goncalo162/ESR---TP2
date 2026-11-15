@@ -4,20 +4,35 @@ import java.io.IOException;
 import java.util.Objects;
 
 /** Erro de formato; não envia mensagens nem decide a política de ligação. */
-public final class ProtocolException extends IOException {
+public final class ProtocolException extends IOException
+{
+
+    //* === Atributos e Variáveis === *
+
     private final ErrorCode errorCode;
 
-    public ProtocolException(ErrorCode errorCode, String message) {
+
+
+    //* === Construtores === *
+
+    public ProtocolException(ErrorCode errorCode, String message)
+    {
         super(message);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
 
-    public ProtocolException(ErrorCode errorCode, String message, Throwable cause) {
+    public ProtocolException(ErrorCode errorCode, String message, Throwable cause)
+    {
         super(message, cause);
         this.errorCode = Objects.requireNonNull(errorCode);
     }
 
-    public ErrorCode errorCode() {
+
+
+    //* === Métodos Públicos === *
+
+    public ErrorCode errorCode()
+    {
         return errorCode;
     }
 }

@@ -11,15 +11,29 @@ import java.util.Objects;
 import java.util.Set;
 
 /** Grafo permitido, independente dos nós que já estejam em execução. */
-public record TopologyConfiguration(Path sourceFile, Map<String, Node> nodes) {
-    public TopologyConfiguration {
+public record TopologyConfiguration(Path sourceFile, Map<String, Node> nodes)
+{
+
+    //* === Construtor === *
+
+    public TopologyConfiguration
+    {
         Objects.requireNonNull(sourceFile);
         nodes = Collections.unmodifiableMap(new LinkedHashMap<>(nodes));
     }
 
+
+
+    //* === Node Record === *
+
     public record Node(String nodeId, String host, int controlPort, int dataPort,
-                       NodeRole role, Set<String> neighbors) {
-        public Node {
+                       NodeRole role, Set<String> neighbors)
+    {
+
+        //* === Construtor === *
+
+        public Node
+        {
             Objects.requireNonNull(nodeId);
             Objects.requireNonNull(host);
             Objects.requireNonNull(role);
