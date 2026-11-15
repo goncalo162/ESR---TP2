@@ -6,11 +6,11 @@ type: "simple-construction-bolt"
 status: "in-progress"
 stories: ["004-diagnosticar-percursos-pela-tabela-de-rotas"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-14T17:53:17Z"
+updated: "2026-11-15T16:31:56Z"
 started: "2026-11-14T16:16:15Z"
 completed: null
 current_stage: "test"
-stages_completed: [{"name": "plan", "completed": "2026-11-14T16:24:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-14T17:24:31Z", "artifact": "implementation-walkthrough.md"}]
+stages_completed: [{"name": "plan", "completed": "2026-11-14T16:24:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-14T17:24:31Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-15T16:31:56Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["004-overlay", "006-rotas", "020-overlay"]
 enables_bolts: ["007-arvores", "008-arvores", "009-arvores", "023-arvores", "024-arvores"]
 requires_units: ["002-overlay"]
@@ -50,7 +50,7 @@ Ler [IMP-010](../../../add.md#imp-010) e as ADR aí indicadas antes de qualquer 
 
 1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-010 e as ADR do ADD.
 2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-010 e as ADR do ADD.
-3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-010 e as ADR do ADD.
+3. [x] **test** → `test-walkthrough.md`; validar a etapa contra IMP-010 e as ADR do ADD.
 
 Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
 
@@ -168,3 +168,21 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 — Test e revisão final aprovados; integração do fecho pendente
+
+Registo 2026-11-15T16:31:56Z. Utilizador aprovou Test, incluindo o manual humano de Luis
+20261115T160738Z-me3p9b08:34 CHECK_PASS,passed=true,quatro Java0 e um SIGKILL
+intencional; cinco JVM recolhidas sem cleanup forçado,zero UDP no intervalo,
+portas livres e233 hashes conferidos. Report original e todos os logs preservados.
+Luis confirmou revisão final e aprovação da versão, substituindo Fillmore,
+incluindo os NO_ROUTE anteriores às falhas e a falha histórica m13 de shutdown.
+Ambas as observações são preservadas; não se alega disponibilidade contínua nem
+causa exata de cada retirada ou da falha histórica. Clean verify1296/0/0/0 e JAR
+5f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52 mantêm-se
+inalterados; não houve nova execução Java. Test concluído,bolt ainda in-progress
+até integração desta evidência e cascata autorizada. Fecho de bolt/PHASE-03,
+commits e push autorizados; nenhum outro IMP iniciado.
+Aprovação: experiments/construction/022-rotas/closure/test-acceptance.json.
+Revisão: experiments/construction/022-rotas/closure/final-review-confirmation.json.

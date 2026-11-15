@@ -2,13 +2,13 @@
 stage: test
 bolt: "022-rotas"
 created: "2026-11-14T17:45:23Z"
-status: "technical-validation-complete-human-manual-pending"
+status: "approved-integration-pending"
 ---
-# IMP-010 — checkpoint Test aberto
+# IMP-010 — Test aprovado; fecho em preparação
 
-✅ Implement aprovado pelo utilizador. ⏳ Test técnico executado; **Test por
-aprovar até manual humano**. Bolt/história/TASK-013 continuam em progresso;
-unidade003-rotas/PHASE-03 não fechadas. Sem staging, commits/push ou fecho.
+✅ Plan/Implement/Test aprovados; manual humano Luis executado e revisão final
+Luis confirmada em substituição de Fillmore. Integração do fecho autorizada e
+ainda pendente. Os registos anteriores abaixo conservam o histórico das etapas.
 
 ## Construção e código aprovado
 
@@ -134,3 +134,30 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 — Test e revisão final aprovados; integração do fecho pendente
+
+Registo 2026-11-15T16:31:56Z. Utilizador aprovou Test, incluindo o manual humano de Luis
+20261115T160738Z-me3p9b08:34 CHECK_PASS,passed=true,quatro Java0 e um SIGKILL
+intencional; cinco JVM recolhidas sem cleanup forçado,zero UDP no intervalo,
+portas livres e233 hashes conferidos. Report original e todos os logs preservados.
+Luis confirmou revisão final e aprovação da versão, substituindo Fillmore,
+incluindo os NO_ROUTE anteriores às falhas e a falha histórica m13 de shutdown.
+Ambas as observações são preservadas; não se alega disponibilidade contínua nem
+causa exata de cada retirada ou da falha histórica. Clean verify1296/0/0/0 e JAR
+5f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52 mantêm-se
+inalterados; não houve nova execução Java. Test concluído,bolt ainda in-progress
+até integração desta evidência e cascata autorizada. Fecho de bolt/PHASE-03,
+commits e push autorizados; nenhum outro IMP iniciado.
+Aprovação: experiments/construction/022-rotas/closure/test-acceptance.json.
+Revisão: experiments/construction/022-rotas/closure/final-review-confirmation.json.
+
+Manual humano: [report original](../../../experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08/report.json),
+SHA2569f9497f36e53a769c6f90e6e835feb1b0a72b0e4fc22c36298bce0760183ea5f.
+[Análise separada dos NO_ROUTE](../../../experiments/construction/022-rotas/manual-human-review-20261115.json):
+no log C,retiradas da geração127 por R2/R1 precedem os dois últimos NO_ROUTE
+e são seguidas dos anúncios128. O log de receção não prova sozinho a ordem
+exata de processamento no owner nem o motivo de cada retirada. Política
+withdraw/geração nova aprovada em Q-C-29; limitações explicitamente aceites.
+A falha histórica m13 mantém-se documentada na secção própria, sem causa inventada.

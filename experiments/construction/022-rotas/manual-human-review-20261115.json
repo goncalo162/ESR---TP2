@@ -1,0 +1,64 @@
+{
+  "reviewed_at": "2026-11-15T16:24:55.829330+00:00",
+  "run": "experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08",
+  "operator_declared": "Luis",
+  "kind": "human",
+  "report_passed": true,
+  "checks_passed": 34,
+  "checks_total": 34,
+  "all_five_processes_reaped": true,
+  "frozen_hashes_checked": 233,
+  "hash_mismatches": [],
+  "evidence_sha256": {
+    "experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08/report.json": "9f9497f36e53a769c6f90e6e835feb1b0a72b0e4fc22c36298bce0760183ea5f",
+    "experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08/watch.result.json": "a132f7ccbd06f2b0eb70cf4837e52c4ad0d2021656722eaa18d7ca6a4ec92ccd",
+    "experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08/C.log": "c2fb643743347d88a22c3fb60f8e19f7fbcb131c99148aa939ba6f7e76062a35",
+    "experiments/construction/022-rotas/manual-runs/20261115T160738Z-me3p9b08/C.commands.jsonl": "17e4c4d3fb5a4e6647c5d404803ca8d66c31a2cae052708eb00e8bd7c50ad16d",
+    "experiments/construction/022-rotas/test-build-01/ott-streaming-1.0-SNAPSHOT.jar": "5f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52"
+  },
+  "pre_failure_no_route": {
+    "observation": "Both peers withdraw sequence 127 before two NO_ROUTE results, followed by announcements of sequence 128. Both peers were ACTIVE in the later neighbors snapshot.",
+    "events": [
+      {
+        "line": 2081,
+        "text": "TRACE_RESULT stream=00000000-0000-4000-8000-000000000001 trace=00b5ebe4-e300-4226-90c0-37aa7b55162a state=SUCCESS code=Optional.empty reason= visited=[C, R1, S] elapsedNanos=24408036"
+      },
+      {
+        "line": 2086,
+        "text": "EVENT node=C instance=a9850eed-6f6b-4756-9ed5-ca2ff3b68d67 Received[session=Session[nodeId=R2, instanceId=7256a94f-3c7e-47a2-ae4a-fb746199aa56, connectionId=cb41d3e5-5b24-48d5-b469-1e2e09bc6920, endpoint=Endpoint[nodeId=R2, instanceId=7256a94f-3c7e-47a2-ae4a-fb746199aa56, host=127.0.0.1, controlPort=20883, dataPort=20983, role=RELAY]], message=ControlMessage[version=2, type=STREAM_WITHDRAW, requestId=3ba9d4d2-d437-4f90-bc1a-795d19574d22, senderId=R2, senderInstance=7256a94f-3c7e-47a2-ae4a-fb746199aa56, payload=Withdrawal[streamId=00000000-0000-4000-8000-000000000001, serverEpoch=2ee54cff-371c-4b54-acd1-109ffe54d3cc, announceSeq=127]]]"
+      },
+      {
+        "line": 2088,
+        "text": "EVENT node=C instance=a9850eed-6f6b-4756-9ed5-ca2ff3b68d67 Received[session=Session[nodeId=R1, instanceId=99c08531-dccc-4dbe-b598-d3062b8a4c42, connectionId=f9529d20-b5e3-423e-892b-382b19944ee8, endpoint=Endpoint[nodeId=R1, instanceId=99c08531-dccc-4dbe-b598-d3062b8a4c42, host=127.0.0.1, controlPort=20882, dataPort=20982, role=RELAY]], message=ControlMessage[version=2, type=STREAM_WITHDRAW, requestId=1ca5a632-b4cf-4398-aff5-df3c66978112, senderId=R1, senderInstance=99c08531-dccc-4dbe-b598-d3062b8a4c42, payload=Withdrawal[streamId=00000000-0000-4000-8000-000000000001, serverEpoch=2ee54cff-371c-4b54-acd1-109ffe54d3cc, announceSeq=127]]]"
+      },
+      {
+        "line": 2090,
+        "text": "TRACE_STARTED stream=00000000-0000-4000-8000-000000000001 trace=47fa92dd-8c3c-4dc4-ac6e-2bcbfc30c0e8"
+      },
+      {
+        "line": 2091,
+        "text": "TRACE_ERROR stream=00000000-0000-4000-8000-000000000001 trace=47fa92dd-8c3c-4dc4-ac6e-2bcbfc30c0e8 state=ERROR code=Optional[NO_ROUTE] reason=NO_ROUTE visited=[C] elapsedNanos=235576"
+      },
+      {
+        "line": 2096,
+        "text": "TRACE_STARTED stream=00000000-0000-4000-8000-000000000001 trace=d81162b6-ad5b-4f75-8012-1fe8e4c1b065"
+      },
+      {
+        "line": 2097,
+        "text": "TRACE_ERROR stream=00000000-0000-4000-8000-000000000001 trace=d81162b6-ad5b-4f75-8012-1fe8e4c1b065 state=ERROR code=Optional[NO_ROUTE] reason=NO_ROUTE visited=[C] elapsedNanos=362740"
+      },
+      {
+        "line": 2098,
+        "text": "EVENT node=C instance=a9850eed-6f6b-4756-9ed5-ca2ff3b68d67 Received[session=Session[nodeId=R2, instanceId=7256a94f-3c7e-47a2-ae4a-fb746199aa56, connectionId=cb41d3e5-5b24-48d5-b469-1e2e09bc6920, endpoint=Endpoint[nodeId=R2, instanceId=7256a94f-3c7e-47a2-ae4a-fb746199aa56, host=127.0.0.1, controlPort=20883, dataPort=20983, role=RELAY]], message=ControlMessage[version=2, type=STREAM_ANNOUNCE, requestId=68ebfd1a-d1cc-459c-ae61-d36dc1f4822c, senderId=R2, senderInstance=7256a94f-3c7e-47a2-ae4a-fb746199aa56, payload=Announcement[stream=StreamInfo[streamId=00000000-0000-4000-8000-000000000001, serverId=S, title=Diagnostico 1, codec=1, fps=25, serverEpoch=2ee54cff-371c-4b54-acd1-109ffe54d3cc], announceSeq=128, costMicros=2340, path=[S, R2]]]]"
+      },
+      {
+        "line": 2100,
+        "text": "EVENT node=C instance=a9850eed-6f6b-4756-9ed5-ca2ff3b68d67 Received[session=Session[nodeId=R1, instanceId=99c08531-dccc-4dbe-b598-d3062b8a4c42, connectionId=f9529d20-b5e3-423e-892b-382b19944ee8, endpoint=Endpoint[nodeId=R1, instanceId=99c08531-dccc-4dbe-b598-d3062b8a4c42, host=127.0.0.1, controlPort=20882, dataPort=20982, role=RELAY]], message=ControlMessage[version=2, type=STREAM_ANNOUNCE, requestId=1ab4cd31-d196-4c49-a8e0-4a288816cd89, senderId=R1, senderInstance=99c08531-dccc-4dbe-b598-d3062b8a4c42, payload=Announcement[stream=StreamInfo[streamId=00000000-0000-4000-8000-000000000001, serverId=S, title=Diagnostico 1, codec=1, fps=25, serverEpoch=2ee54cff-371c-4b54-acd1-109ffe54d3cc], announceSeq=128, costMicros=2054, path=[S, R1]]]]"
+      }
+    ],
+    "policy_reference": "memory-bank/bolts/006-rotas/ddd-02-technical-design.md section 5",
+    "scope": "Explains the absence of a published candidate in this interval; the precise cause of each relay withdrawal is not proven by these logs. This run does not prove continuous route availability."
+  },
+  "Test_approved": false,
+  "final_review_and_integration": "pending"
+}
