@@ -6,7 +6,7 @@ Construir catálogo e candidatos por fluxo usando RTT medido e comprovar percurs
 
 ## 2. Contexto
 
-Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-010–012 DONE; TASK-013 IN PROGRESS (Test; manual humano pendente). O resultado global da fase ainda não foi demonstrado.
+Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: DONE. TASK-010–013 DONE; Test, manual humano e revisão final aprovados, versão integrada em main. [Evidência e limites do fecho](PHASE-03-CLOSURE-REVIEW.md).
 
 ## 3. Pré-requisitos
 
@@ -23,7 +23,7 @@ RF-003, RF-005, RF-006, RF-008, RF-009, RF-010, RF-012, RF-014, RP-001, RP-004, 
 | [TASK-010](../tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | V-010 | DONE |
 | [TASK-011](../tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | V-011 | DONE |
 | [TASK-012](../tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | V-012 | DONE |
-| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | IN PROGRESS |
+| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | DONE |
 
 ## 6. Ordem de execução
 
@@ -47,16 +47,16 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
-- [ ] Quatro streams são descobertas com rotas e alternativas, incluindo melhor anúncio que chega depois.
-- [ ] Trace termina na origem esperada e ciclos/expirações não causam flooding ilimitado.
-- [ ] O resultado «Rotas para várias streams, alternativas sem ciclos e trace até à origem.» é demonstrável no ambiente da fase.
-- [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
-- [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
+- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+- [x] Quatro streams são descobertas com rotas e alternativas, incluindo melhor anúncio que chega depois.
+- [x] Trace termina na origem esperada e ciclos/expirações não causam flooding ilimitado.
+- [x] O resultado «Rotas para várias streams, alternativas sem ciclos e trace até à origem.» é demonstrável no ambiente da fase.
+- [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+- [x] Não há regressão nos componentes anteriores afetados pelas alterações.
 
 ## 12. Definition of Done
 
-Coordenação do fecho: [Fillmore](../team/FILLMORE.md), com revisão dos três membros segundo a [coordenação da equipa](../team/00-COORDINATION.md). Autor e revisor de cada TASK constam na identificação; a atribuição não altera dependências ou estados.
+Coordenação histórica prevista: [Fillmore](../team/FILLMORE.md), segundo a [coordenação da equipa](../team/00-COORDINATION.md). Fecho atual autorizado explicitamente pelo utilizador; revisão final de IMP-010 por Luis, substituindo Fillmore. Não se atribuem revisões novas aos restantes membros. Autor e revisor de cada TASK constam na identificação; a atribuição não altera dependências ou estados.
 
 Cumprir [14](../14-DEFINITION-OF-DONE.md), incluindo evidência real e passagem de contexto. Atualizar [15](../15-PROJECT-PROGRESS.md); marcar a fase DONE apenas depois de todas as tarefas e critérios.
 
@@ -286,3 +286,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

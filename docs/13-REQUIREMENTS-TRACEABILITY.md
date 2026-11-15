@@ -17,7 +17,7 @@ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculo
 | [RF-007](02-REQUIREMENTS.md#rf-007) | Servir vários clientes em simultâneo | routing/streaming/client | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-014, V-015, V-021, V-024, V-027 | TODO | — |
 | [RF-008](02-REQUIREMENTS.md#rf-008) | Monitorizar a rede overlay | monitoring/experiments | 03, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-010, V-028 | TODO | — |
 | [RF-009](02-REQUIREMENTS.md#rf-009) | Atualizar rotas perante entradas, saídas e condições de rede | routing/monitoring | 03, 04, 06 | [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-012, V-015, V-016, V-017, V-026 | IN PROGRESS | [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md); adaptação de árvores/dados/CORE pendente |
-| [RF-010](02-REQUIREMENTS.md#rf-010) | Reencaminhar dados segundo a tabela | routing/streaming | 03, 05 | [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md) | V-013, V-019, V-021 | TODO | — |
+| [RF-010](02-REQUIREMENTS.md#rf-010) | Reencaminhar dados segundo a tabela | routing/streaming | 03, 05 | [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md) | V-013, V-019, V-021 | IN PROGRESS | [V-013](../memory-bank/bolts/022-rotas/test-walkthrough.md); diagnóstico concluído, reenvio de vídeo pendente V-019/V-021 |
 | [RF-011](02-REQUIREMENTS.md#rf-011) | Partilhar segmentos comuns e replicar nos pontos de ramificação | routing/streaming/experiments | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-014, V-015, V-021, V-025, V-028 | TODO | — |
 | [RF-012](02-REQUIREMENTS.md#rf-012) | Disponibilizar pelo menos dois servidores de conteúdos | config/server/app | 01, 03, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-012, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
 | [RF-013](02-REQUIREMENTS.md#rf-013) | Cada servidor oferece pelo menos dois vídeos distintos | config/server/media | 01, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes |
@@ -38,11 +38,11 @@ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculo
 | [RP-001](02-REQUIREMENTS.md#rp-001) | Catálogo e seleção explícita de stream | streaming/client | 01, 03, 05 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md) | V-003, V-012, V-023, V-024 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
 | [RP-002](02-REQUIREMENTS.md#rp-002) | Ativar sob pedido e podar ramo sem recetores | routing | 04 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-014, V-015 | TODO | — |
 | [RP-003](02-REQUIREMENTS.md#rp-003) | MJPEG, pacotes numerados e janela de reprodução | server/streaming/client | 05 | [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-023](tasks/PHASE-05/TASK-023.md) | V-019, V-020, V-022, V-023 | TODO | — |
-| [RP-004](02-REQUIREMENTS.md#rp-004) | Diagnóstico do percurso antes do vídeo | routing/app | 03 | [TASK-013](tasks/PHASE-03/TASK-013.md) | V-013 | TODO | — |
+| [RP-004](02-REQUIREMENTS.md#rp-004) | Diagnóstico do percurso antes do vídeo | routing/app | 03 | [TASK-013](tasks/PHASE-03/TASK-013.md) | V-013 | DONE | [V-013/Test1296 e manual Luis34](../memory-bank/bolts/022-rotas/test-walkthrough.md) |
 | [RP-005](02-REQUIREMENTS.md#rp-005) | Testar cenários de 4, 6 e overlay complexa | CORE/experiments | 06 | [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-026](tasks/PHASE-06/TASK-026.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-025, V-026, V-027 | TODO | — |
 | [RP-006](02-REQUIREMENTS.md#rp-006) | Código testável, entradas validadas e recursos limitados | config/protocol/transport/routing/client | 01, 02, 03, 04, 05 | [TASK-001](tasks/PHASE-01/TASK-001.md), [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md) | V-001, V-003, V-004, V-005, V-007, V-010, V-011, V-014, V-019, V-021, V-022 | IN PROGRESS | [V-003/V-004: configuração e codec](../experiments/task-004-codec-validation.md); [V-005: filas, sockets e shutdown](../experiments/task-005-transport-validation.md); restantes componentes pendentes |
 | [RP-007](02-REQUIREMENTS.md#rp-007) | Adotar formato LNCS para o artigo | report | 07 | [TASK-029](tasks/PHASE-07/TASK-029.md) | V-029 | TODO | — |
-| [RP-008](02-REQUIREMENTS.md#rp-008) | Documentar comandos, logs e operação reproduzível | app/experiments/delivery | 02, 03, 05, 06, 07 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-030](tasks/PHASE-07/TASK-030.md) | V-008, V-013, V-024, V-025, V-028, V-030 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE |
+| [RP-008](02-REQUIREMENTS.md#rp-008) | Documentar comandos, logs e operação reproduzível | app/experiments/delivery | 02, 03, 05, 06, 07 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-030](tasks/PHASE-07/TASK-030.md) | V-008, V-013, V-024, V-025, V-028, V-030 | IN PROGRESS | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); [V-013](../memory-bank/bolts/022-rotas/test-walkthrough.md); cobertura parcial, TASK-008/013 DONE |
 
 ## Interpretação dos estados
 
@@ -445,3 +445,25 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
 nenhum hash autorreferente ou resultado de publicação inventado.
 Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
 Prova: experiments/construction/006-rotas/closure/integration-proof.json.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

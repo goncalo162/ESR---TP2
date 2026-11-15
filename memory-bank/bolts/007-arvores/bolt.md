@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["001-ativar-arvores-com-ack-e-procura-agregada"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-15T16:36:52Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["022-rotas"]
 enables_bolts: ["023-arvores"]
 requires_units: ["003-rotas"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1
@@ -70,3 +70,11 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 - Prova futura: `experiments/construction/007-arvores/` e relatório local do bolt.
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+
+
+## Dependência concluída, sem iniciar execução
+
+Registo 2026-11-15T16:36:52Z.022-rotas e unidade003-rotas complete após integração
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff; PHASE-03 DONE. Apenas blocks=false;
+status planned,started/completed/current_stage null e stages_completed=[] mantidos.
+Nenhum Model/Java/teste ou outro IMP iniciado.

@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: onze histórias/bolts complete, incluindo006-rotas/IMP-009, e23 planned;022-rotas em Test técnico; manual humano pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: doze histórias/bolts complete, incluindo022-rotas/IMP-010, e23 planned; nenhum em execução; unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -76,7 +76,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
 
 ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
 
-**Tarefa:** IMP-010. **Estado:** in-progress, Plan/Implement aprovados; Test técnico/manual pendente. **Bolt:** 022-rotas.
+**Tarefa:** IMP-010. **Estado:** complete/implemented=true; Test/manual Luis/revisão final Luis aprovados, integração 3349d575ae38c772b38496cc08bc1d44ded764ff. **Bolt:** 022-rotas.
 **Ficheiro:** [004-diagnosticar-percursos-pela-tabela-de-rotas](intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
 
 ## 004-arvores/001-ativar-arvores-com-ack-e-procura-agregada.md ✅ GENERATED
@@ -730,3 +730,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

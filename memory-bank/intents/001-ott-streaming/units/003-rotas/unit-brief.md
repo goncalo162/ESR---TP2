@@ -3,13 +3,14 @@ unit: "003-rotas"
 intent: "001-ott-streaming"
 phase: "construction"
 source_phase: "PHASE-03"
-status: "in-progress"
+status: "complete"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-14T17:53:17Z"
+updated: "2026-11-15T16:36:52Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
 requires_units: ["002-overlay"]
+completed: "2026-11-15T16:36:52Z"
 ---
 # Unidade — 003-rotas
 
@@ -29,7 +30,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 - [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
 - [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
 - [x] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
-- [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
+- [x] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
 
 ## Dependências e critérios de fecho
 
@@ -475,3 +476,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

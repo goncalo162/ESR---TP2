@@ -1085,10 +1085,10 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Trace reflete a tabela de cada nó.
-  - [ ] Falhas terminam por erro/timeout em prazo.
-  - [ ] Diagnóstico não altera subscrições.
-  - [ ] Validação V-013 executada e evidência ligada no progresso.
+  - [x] Trace reflete a tabela de cada nó.
+  - [x] Falhas terminam por erro/timeout em prazo.
+  - [x] Diagnóstico não altera subscrições.
+  - [x] Validação V-013 executada e evidência ligada no progresso.
 
 **Concretizações aprovadas Q-C-32/33 — 2026-11-14T16:24:54Z:** OverlayNode apenas
 expõe requestTrace(UUID), delegando ao RoutingService existente sem revelar
@@ -1105,8 +1105,8 @@ até2 jobs físicos e wake coalescido; sem timer por pedido. CLI até4 tickets,
 sem mudança de tipos/códigos/bytes/caps, sem novo transporte ou executor de estado.
 Detalhes completos no [Plan aprovado](memory-bank/bolts/022-rotas/implementation-plan.md).
 Histórico: autorização inicial apenas de interfaces/testes vermelhos; autorização
-posterior de comportamentos registada no walkthrough IMP-010. Implement preparado
-para aprovação; Test e fecho não autorizados.
+posterior de comportamentos registada no walkthrough IMP-010. Test e revisão
+final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575ae38c772b38496cc08bc1d44ded764ff. [Prova e limites](memory-bank/bolts/022-rotas/closure-walkthrough.md).
 
 <a id="imp-011"></a>
 ### IMP-011 — Ativar procura com confirmação

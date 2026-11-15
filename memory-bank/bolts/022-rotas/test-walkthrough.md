@@ -2,13 +2,12 @@
 stage: test
 bolt: "022-rotas"
 created: "2026-11-14T17:45:23Z"
-status: "approved-integration-pending"
+status: "approved-complete"
 ---
-# IMP-010 — Test aprovado; fecho em preparação
+# IMP-010 — Test aprovado e bolt fechado
 
 ✅ Plan/Implement/Test aprovados; manual humano Luis executado e revisão final
-Luis confirmada em substituição de Fillmore. Integração do fecho autorizada e
-ainda pendente. Os registos anteriores abaixo conservam o histórico das etapas.
+Luis confirmada em substituição de Fillmore. Versão revista integrada em main; bolt e fase 3 fechados. Os registos anteriores abaixo conservam o histórico das etapas.
 
 ## Construção e código aprovado
 
@@ -161,3 +160,25 @@ e são seguidas dos anúncios128. O log de receção não prova sozinho a ordem
 exata de processamento no owner nem o motivo de cada retirada. Política
 withdraw/geração nova aprovada em Q-C-29; limitações explicitamente aceites.
 A falha histórica m13 mantém-se documentada na secção própria, sem causa inventada.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

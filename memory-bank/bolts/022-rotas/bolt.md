@@ -3,13 +3,13 @@ id: "022-rotas"
 unit: "003-rotas"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["004-diagnosticar-percursos-pela-tabela-de-rotas"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-15T16:31:56Z"
+updated: "2026-11-15T16:36:52Z"
 started: "2026-11-14T16:16:15Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-15T16:36:52Z"
+current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-14T16:24:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-14T17:24:31Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-15T16:31:56Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["004-overlay", "006-rotas", "020-overlay"]
 enables_bolts: ["007-arvores", "008-arvores", "009-arvores", "023-arvores", "024-arvores"]
@@ -41,7 +41,7 @@ Ler [IMP-010](../../../add.md#imp-010) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
+- [x] [004-diagnosticar-percursos-pela-tabela-de-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
 - Dependências: [004-overlay](../004-overlay/bolt.md), [006-rotas](../006-rotas/bolt.md), [020-overlay](../020-overlay/bolt.md).
 - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
 - Gates: nenhum adicional.
@@ -56,10 +56,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 
 ## Critérios de aceitação
 
-- [ ] Trace reflete a tabela de cada nó.
-- [ ] Falhas terminam por erro/timeout em prazo.
-- [ ] Diagnóstico não altera subscrições.
-- [ ] Validação V-013 executada e evidência ligada no progresso.
+- [x] Trace reflete a tabela de cada nó.
+- [x] Falhas terminam por erro/timeout em prazo.
+- [x] Diagnóstico não altera subscrições.
+- [x] Validação V-013 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -186,3 +186,25 @@ até integração desta evidência e cascata autorizada. Fecho de bolt/PHASE-03,
 commits e push autorizados; nenhum outro IMP iniciado.
 Aprovação: experiments/construction/022-rotas/closure/test-acceptance.json.
 Revisão: experiments/construction/022-rotas/closure/final-review-confirmation.json.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

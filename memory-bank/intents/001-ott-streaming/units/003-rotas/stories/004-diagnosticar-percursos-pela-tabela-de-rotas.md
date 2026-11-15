@@ -2,7 +2,7 @@
 id: "004-diagnosticar-percursos-pela-tabela-de-rotas"
 unit: "003-rotas"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-013"]
@@ -11,6 +11,8 @@ requirements: ["INT-001", "INT-002", "REQ-010", "REQ-019", "REQ-023"]
 adr_ids: ["ADR-004", "ADR-022", "ADR-024"]
 bolt: "022-rotas"
 size: "S"
+implemented: true
+completed: "2026-11-15T16:36:52Z"
 ---
 # História — Diagnosticar percursos pela CLI
 
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-010](../../../../../../add.md#imp-010); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Trace reflete a tabela de cada nó.
-- [ ] Falhas terminam por erro/timeout em prazo.
-- [ ] Diagnóstico não altera subscrições.
-- [ ] Validação V-013 executada e evidência ligada no progresso.
+- [x] Trace reflete a tabela de cada nó.
+- [x] Falhas terminam por erro/timeout em prazo.
+- [x] Diagnóstico não altera subscrições.
+- [x] Validação V-013 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -35,7 +37,7 @@ A tarefa normativa é [IMP-010](../../../../../../add.md#imp-010); o bolt só or
 
 - [TASK-013](../../../../../../docs/tasks/PHASE-03/TASK-013.md).
 - Bolts anteriores: 004-overlay, 006-rotas, 020-overlay.
-- Responsável de origem: Denji; revisor: Fillmore.
+- Responsável de origem: Denji; revisor final: Luis, substituindo Fillmore por confirmação explícita do utilizador.
 - Gates: nenhum específico adicional.
 
 
@@ -116,3 +118,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

@@ -1,10 +1,10 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 IN PROGRESS (Test; manual humano pendente); PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 em Test; manual humano pendente; Plan/Q-C-32/33 aprovados.
+**Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas;007-arvores planned e não iniciado.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -84,7 +84,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 |---|---|---|---|
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
-| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | IN PROGRESS | PHASE-02 DONE |
+| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
 | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
@@ -109,7 +109,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
-| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | IN PROGRESS | Test técnico clean verify1296/0/0/0,JAR novo; manual humano/aprovação Test/revisão/integração pendentes |
+| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
@@ -1270,3 +1270,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.

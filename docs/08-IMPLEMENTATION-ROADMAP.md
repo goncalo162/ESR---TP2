@@ -6,8 +6,9 @@ Sete fases seguem dependências reais: formatos/configuração antes da rede; vi
 
 Estado em 27-10-2026: PHASE-01 DONE; PHASE-02 IN PROGRESS, TASK-005 DONE. Build com 149 testes aprovados; próxima TASK-006 TODO. [Evidência](../experiments/task-005-transport-validation.md).
 
-Estado atual: PHASE-02 DONE, incluindo EXTRA-01 no controlo;005-rotas/IMP-007
-permanece planned. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md). A continuidade
+Estado atual: PHASE-01–03 DONE, incluindo EXTRA-01 no controlo.
+TASK-010–013 concluídas; PHASE-04 e007-arvores planned/não iniciados.
+[Fecho da fase 3](phases/PHASE-03-CLOSURE-REVIEW.md). [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md). A continuidade
 de vídeo será validada nas fases posteriores de routing/streaming.
 
 ## Fases e entregáveis

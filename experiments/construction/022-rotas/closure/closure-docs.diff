@@ -1,0 +1,693 @@
+diff --git a/add.md b/add.md
+index 558c943..e6e16a6 100644
+--- a/add.md
++++ b/add.md
+@@ -1085,10 +1085,10 @@ sem sockets/estado parcial; regressão de configuração/codec/transporte preser
+ - **Gates:** nenhum externo adicional.
+ - **Critérios de aceitação:**
+ 
+-  - [ ] Trace reflete a tabela de cada nó.
+-  - [ ] Falhas terminam por erro/timeout em prazo.
+-  - [ ] Diagnóstico não altera subscrições.
+-  - [ ] Validação V-013 executada e evidência ligada no progresso.
++  - [x] Trace reflete a tabela de cada nó.
++  - [x] Falhas terminam por erro/timeout em prazo.
++  - [x] Diagnóstico não altera subscrições.
++  - [x] Validação V-013 executada e evidência ligada no progresso.
+ 
+ **Concretizações aprovadas Q-C-32/33 — 2026-11-14T16:24:54Z:** OverlayNode apenas
+ expõe requestTrace(UUID), delegando ao RoutingService existente sem revelar
+@@ -1105,8 +1105,8 @@ até2 jobs físicos e wake coalescido; sem timer por pedido. CLI até4 tickets,
+ sem mudança de tipos/códigos/bytes/caps, sem novo transporte ou executor de estado.
+ Detalhes completos no [Plan aprovado](memory-bank/bolts/022-rotas/implementation-plan.md).
+ Histórico: autorização inicial apenas de interfaces/testes vermelhos; autorização
+-posterior de comportamentos registada no walkthrough IMP-010. Implement preparado
+-para aprovação; Test e fecho não autorizados.
++posterior de comportamentos registada no walkthrough IMP-010. Test e revisão
++final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575ae38c772b38496cc08bc1d44ded764ff. [Prova e limites](memory-bank/bolts/022-rotas/closure-walkthrough.md).
+ 
+ <a id="imp-011"></a>
+ ### IMP-011 — Ativar procura com confirmação
+diff --git a/docs/08-IMPLEMENTATION-ROADMAP.md b/docs/08-IMPLEMENTATION-ROADMAP.md
+index b4d5c3f..398e453 100644
+--- a/docs/08-IMPLEMENTATION-ROADMAP.md
++++ b/docs/08-IMPLEMENTATION-ROADMAP.md
+@@ -6,8 +6,9 @@ Sete fases seguem dependências reais: formatos/configuração antes da rede; vi
+ 
+ Estado em 27-10-2026: PHASE-01 DONE; PHASE-02 IN PROGRESS, TASK-005 DONE. Build com 149 testes aprovados; próxima TASK-006 TODO. [Evidência](../experiments/task-005-transport-validation.md).
+ 
+-Estado atual: PHASE-02 DONE, incluindo EXTRA-01 no controlo;005-rotas/IMP-007
+-permanece planned. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md). A continuidade
++Estado atual: PHASE-01–03 DONE, incluindo EXTRA-01 no controlo.
++TASK-010–013 concluídas; PHASE-04 e007-arvores planned/não iniciados.
++[Fecho da fase 3](phases/PHASE-03-CLOSURE-REVIEW.md). [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md). A continuidade
+ de vídeo será validada nas fases posteriores de routing/streaming.
+ 
+ ## Fases e entregáveis
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index a844fce..0af7e98 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -17,7 +17,7 @@ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculo
+ | [RF-007](02-REQUIREMENTS.md#rf-007) | Servir vários clientes em simultâneo | routing/streaming/client | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-014, V-015, V-021, V-024, V-027 | TODO | — |
+ | [RF-008](02-REQUIREMENTS.md#rf-008) | Monitorizar a rede overlay | monitoring/experiments | 03, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-010, V-028 | TODO | — |
+ | [RF-009](02-REQUIREMENTS.md#rf-009) | Atualizar rotas perante entradas, saídas e condições de rede | routing/monitoring | 03, 04, 06 | [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-012, V-015, V-016, V-017, V-026 | IN PROGRESS | [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md); adaptação de árvores/dados/CORE pendente |
+-| [RF-010](02-REQUIREMENTS.md#rf-010) | Reencaminhar dados segundo a tabela | routing/streaming | 03, 05 | [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md) | V-013, V-019, V-021 | TODO | — |
++| [RF-010](02-REQUIREMENTS.md#rf-010) | Reencaminhar dados segundo a tabela | routing/streaming | 03, 05 | [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md) | V-013, V-019, V-021 | IN PROGRESS | [V-013](../memory-bank/bolts/022-rotas/test-walkthrough.md); diagnóstico concluído, reenvio de vídeo pendente V-019/V-021 |
+ | [RF-011](02-REQUIREMENTS.md#rf-011) | Partilhar segmentos comuns e replicar nos pontos de ramificação | routing/streaming/experiments | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-014, V-015, V-021, V-025, V-028 | TODO | — |
+ | [RF-012](02-REQUIREMENTS.md#rf-012) | Disponibilizar pelo menos dois servidores de conteúdos | config/server/app | 01, 03, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-012, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+ | [RF-013](02-REQUIREMENTS.md#rf-013) | Cada servidor oferece pelo menos dois vídeos distintos | config/server/media | 01, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes |
+@@ -38,11 +38,11 @@ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculo
+ | [RP-001](02-REQUIREMENTS.md#rp-001) | Catálogo e seleção explícita de stream | streaming/client | 01, 03, 05 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md) | V-003, V-012, V-023, V-024 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+ | [RP-002](02-REQUIREMENTS.md#rp-002) | Ativar sob pedido e podar ramo sem recetores | routing | 04 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-014, V-015 | TODO | — |
+ | [RP-003](02-REQUIREMENTS.md#rp-003) | MJPEG, pacotes numerados e janela de reprodução | server/streaming/client | 05 | [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-023](tasks/PHASE-05/TASK-023.md) | V-019, V-020, V-022, V-023 | TODO | — |
+-| [RP-004](02-REQUIREMENTS.md#rp-004) | Diagnóstico do percurso antes do vídeo | routing/app | 03 | [TASK-013](tasks/PHASE-03/TASK-013.md) | V-013 | TODO | — |
++| [RP-004](02-REQUIREMENTS.md#rp-004) | Diagnóstico do percurso antes do vídeo | routing/app | 03 | [TASK-013](tasks/PHASE-03/TASK-013.md) | V-013 | DONE | [V-013/Test1296 e manual Luis34](../memory-bank/bolts/022-rotas/test-walkthrough.md) |
+ | [RP-005](02-REQUIREMENTS.md#rp-005) | Testar cenários de 4, 6 e overlay complexa | CORE/experiments | 06 | [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-026](tasks/PHASE-06/TASK-026.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-025, V-026, V-027 | TODO | — |
+ | [RP-006](02-REQUIREMENTS.md#rp-006) | Código testável, entradas validadas e recursos limitados | config/protocol/transport/routing/client | 01, 02, 03, 04, 05 | [TASK-001](tasks/PHASE-01/TASK-001.md), [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md) | V-001, V-003, V-004, V-005, V-007, V-010, V-011, V-014, V-019, V-021, V-022 | IN PROGRESS | [V-003/V-004: configuração e codec](../experiments/task-004-codec-validation.md); [V-005: filas, sockets e shutdown](../experiments/task-005-transport-validation.md); restantes componentes pendentes |
+ | [RP-007](02-REQUIREMENTS.md#rp-007) | Adotar formato LNCS para o artigo | report | 07 | [TASK-029](tasks/PHASE-07/TASK-029.md) | V-029 | TODO | — |
+-| [RP-008](02-REQUIREMENTS.md#rp-008) | Documentar comandos, logs e operação reproduzível | app/experiments/delivery | 02, 03, 05, 06, 07 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-030](tasks/PHASE-07/TASK-030.md) | V-008, V-013, V-024, V-025, V-028, V-030 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE |
++| [RP-008](02-REQUIREMENTS.md#rp-008) | Documentar comandos, logs e operação reproduzível | app/experiments/delivery | 02, 03, 05, 06, 07 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-030](tasks/PHASE-07/TASK-030.md) | V-008, V-013, V-024, V-025, V-028, V-030 | IN PROGRESS | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); [V-013](../memory-bank/bolts/022-rotas/test-walkthrough.md); cobertura parcial, TASK-008/013 DONE |
+ 
+ ## Interpretação dos estados
+ 
+@@ -445,3 +445,25 @@ transitórios fora dos commits, mantidos no disco. Commit de fecho posterior;
+ nenhum hash autorreferente ou resultado de publicação inventado.
+ Fecho: memory-bank/bolts/006-rotas/closure-walkthrough.md.
+ Prova: experiments/construction/006-rotas/closure/integration-proof.json.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index ca90edb..858c808 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,10 +1,10 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 IN PROGRESS: TASK-010–012 DONE; TASK-013 IN PROGRESS (Test; manual humano pendente); PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04–07 e TASK-014–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-012](tasks/PHASE-03/TASK-012.md), DONE. IMP-009/006-rotas integrado localmente em main b7d74be5d9bad9fe7f598f29fa17188037647cf2; clean verify1256/0/0/0, manual humano Luis53 e revisão final Denji confirmada pelo utilizador. [Fecho](../memory-bank/bolts/006-rotas/closure-walkthrough.md). PHASE-03 permanece in-progress;022-rotas/IMP-010 em Test; manual humano pendente; Plan/Q-C-32/33 aprovados.
++**Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas;007-arvores planned e não iniciado.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -84,7 +84,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ |---|---|---|---|
+ | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
+ | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+-| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | IN PROGRESS | PHASE-02 DONE |
++| [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
+ | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | TODO | PHASE-03 DONE |
+ | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
+ | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
+@@ -109,7 +109,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-010](tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009, TASK-034 | DONE | Fechado; Test1176/manual Francisco/revisão Fillmore e integração f990503 cumpridos |
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
+-| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | IN PROGRESS | Test técnico clean verify1296/0/0/0,JAR novo; manual humano/aprovação Test/revisão/integração pendentes |
++| [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | TODO | V-014: NÃO EXECUTADO |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
+@@ -1270,3 +1270,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/docs/phases/PHASE-03-ROUTING.md b/docs/phases/PHASE-03-ROUTING.md
+index 8eee674..0608be8 100644
+--- a/docs/phases/PHASE-03-ROUTING.md
++++ b/docs/phases/PHASE-03-ROUTING.md
+@@ -6,7 +6,7 @@ Construir catálogo e candidatos por fluxo usando RTT medido e comprovar percurs
+ 
+ ## 2. Contexto
+ 
+-Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: IN PROGRESS. TASK-010–012 DONE; TASK-013 IN PROGRESS (Test; manual humano pendente). O resultado global da fase ainda não foi demonstrado.
++Incremento 3 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado atual: DONE. TASK-010–013 DONE; Test, manual humano e revisão final aprovados, versão integrada em main. [Evidência e limites do fecho](PHASE-03-CLOSURE-REVIEW.md).
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -23,7 +23,7 @@ RF-003, RF-005, RF-006, RF-008, RF-009, RF-010, RF-012, RF-014, RP-001, RP-004,
+ | [TASK-010](../tasks/PHASE-03/TASK-010.md) | Medir RTT e publicar falhas de vizinhança | TASK-007, TASK-008, TASK-009 | V-010 | DONE |
+ | [TASK-011](../tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | V-011 | DONE |
+ | [TASK-012](../tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | V-012 | DONE |
+-| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | IN PROGRESS |
++| [TASK-013](../tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | V-013 | DONE |
+ 
+ ## 6. Ordem de execução
+ 
+@@ -47,16 +47,16 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+-- [ ] Quatro streams são descobertas com rotas e alternativas, incluindo melhor anúncio que chega depois.
+-- [ ] Trace termina na origem esperada e ciclos/expirações não causam flooding ilimitado.
+-- [ ] O resultado «Rotas para várias streams, alternativas sem ciclos e trace até à origem.» é demonstrável no ambiente da fase.
+-- [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+-- [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
++- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
++- [x] Quatro streams são descobertas com rotas e alternativas, incluindo melhor anúncio que chega depois.
++- [x] Trace termina na origem esperada e ciclos/expirações não causam flooding ilimitado.
++- [x] O resultado «Rotas para várias streams, alternativas sem ciclos e trace até à origem.» é demonstrável no ambiente da fase.
++- [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
++- [x] Não há regressão nos componentes anteriores afetados pelas alterações.
+ 
+ ## 12. Definition of Done
+ 
+-Coordenação do fecho: [Fillmore](../team/FILLMORE.md), com revisão dos três membros segundo a [coordenação da equipa](../team/00-COORDINATION.md). Autor e revisor de cada TASK constam na identificação; a atribuição não altera dependências ou estados.
++Coordenação histórica prevista: [Fillmore](../team/FILLMORE.md), segundo a [coordenação da equipa](../team/00-COORDINATION.md). Fecho atual autorizado explicitamente pelo utilizador; revisão final de IMP-010 por Luis, substituindo Fillmore. Não se atribuem revisões novas aos restantes membros. Autor e revisor de cada TASK constam na identificação; a atribuição não altera dependências ou estados.
+ 
+ Cumprir [14](../14-DEFINITION-OF-DONE.md), incluindo evidência real e passagem de contexto. Atualizar [15](../15-PROJECT-PROGRESS.md); marcar a fase DONE apenas depois de todas as tarefas e critérios.
+ 
+@@ -286,3 +286,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/docs/tasks/PHASE-03/TASK-013.md b/docs/tasks/PHASE-03/TASK-013.md
+index 110e18e..157e4ce 100644
+--- a/docs/tasks/PHASE-03/TASK-013.md
++++ b/docs/tasks/PHASE-03/TASK-013.md
+@@ -5,9 +5,9 @@
+ - ID: TASK-013
+ - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Denji](../../team/DENJI.md).
+-- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
++- Revisor final: Luis, substituindo [Fillmore](../../team/FILLMORE.md) por confirmação explícita do utilizador.
+ - Dependências: [TASK-008](../PHASE-02/TASK-008.md), [TASK-012](../PHASE-03/TASK-012.md).
+ - Requisitos relacionados: [RF-010](../../02-REQUIREMENTS.md#rf-010), [RP-004](../../02-REQUIREMENTS.md#rp-004), [RP-008](../../02-REQUIREMENTS.md#rp-008).
+ 
+@@ -31,16 +31,16 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
+ 
+ ## 6. Ficheiros e componentes envolvidos
+ 
+-Existentes: app/OttApplication.java, routing/RoutingService.java; planeado: routing/RouteTraceTest.java.
++Implementados: app/OttApplication.java, routing/RoutingService.java, routing/RouteTraceTest.java e delegação mínima em overlay/OverlayNode.java (Q-C-32).
+ 
+ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
+ 
+ ## 7. Passos de implementação
+ 
+-- [ ] Expor snapshots nos comandos locais sem mapas mutáveis.
+-- [ ] Implementar trace correlacionado e retorno pelo percurso inverso.
+-- [ ] Registar cada salto e custo observado.
+-- [ ] Comparar percurso com o esperado nas fixtures.
++- [x] Expor snapshots nos comandos locais sem mapas mutáveis.
++- [x] Implementar trace correlacionado e retorno pelo percurso inverso.
++- [x] Registar cada salto e custo observado.
++- [x] Comparar percurso com o esperado nas fixtures.
+ 
+ ## 8. Regras e restrições
+ 
+@@ -54,14 +54,14 @@ Stream desconhecida, ausência de candidato, timeout a meio, ttl esgotado e pedi
+ 
+ V-013: duas rotas alternativas produzem visited correto; NO_ROUTE e TTL são explícitos; não há ativação nem saída de vídeo após trace.
+ 
+-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
++Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial histórico: NÃO EXECUTADO; V-013 agora executada e Test aprovado, conforme relatório de fecho. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Trace reflete a tabela de cada nó.
+-- [ ] Falhas terminam por erro/timeout em prazo.
+-- [ ] Diagnóstico não altera subscrições.
+-- [ ] Validação V-013 executada e evidência ligada no progresso.
++- [x] Trace reflete a tabela de cada nó.
++- [x] Falhas terminam por erro/timeout em prazo.
++- [x] Diagnóstico não altera subscrições.
++- [x] Validação V-013 executada e evidência ligada no progresso.
+ 
+ ## 12. Definition of Done
+ 
+@@ -151,3 +151,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/bolts/007-arvores/bolt.md b/memory-bank/bolts/007-arvores/bolt.md
+index 72601b2..18e41d3 100644
+--- a/memory-bank/bolts/007-arvores/bolt.md
++++ b/memory-bank/bolts/007-arvores/bolt.md
+@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
+ status: "planned"
+ stories: ["001-ativar-arvores-com-ack-e-procura-agregada"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
++updated: "2026-11-15T16:36:52Z"
+ started: null
+ completed: null
+ current_stage: null
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["022-rotas"]
+ enables_bolts: ["023-arvores"]
+ requires_units: ["003-rotas"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+@@ -70,3 +70,11 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
+ - Prova futura: `experiments/construction/007-arvores/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++
++## Dependência concluída, sem iniciar execução
++
++Registo 2026-11-15T16:36:52Z.022-rotas e unidade003-rotas complete após integração
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff; PHASE-03 DONE. Apenas blocks=false;
++status planned,started/completed/current_stage null e stages_completed=[] mantidos.
++Nenhum Model/Java/teste ou outro IMP iniciado.
+diff --git a/memory-bank/bolts/022-rotas/bolt.md b/memory-bank/bolts/022-rotas/bolt.md
+index b5847da..ef1a8b0 100644
+--- a/memory-bank/bolts/022-rotas/bolt.md
++++ b/memory-bank/bolts/022-rotas/bolt.md
+@@ -3,13 +3,13 @@ id: "022-rotas"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["004-diagnosticar-percursos-pela-tabela-de-rotas"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-15T16:31:56Z"
++updated: "2026-11-15T16:36:52Z"
+ started: "2026-11-14T16:16:15Z"
+-completed: null
+-current_stage: "test"
++completed: "2026-11-15T16:36:52Z"
++current_stage: null
+ stages_completed: [{"name": "plan", "completed": "2026-11-14T16:24:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-14T17:24:31Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-15T16:31:56Z", "artifact": "test-walkthrough.md"}]
+ requires_bolts: ["004-overlay", "006-rotas", "020-overlay"]
+ enables_bolts: ["007-arvores", "008-arvores", "009-arvores", "023-arvores", "024-arvores"]
+@@ -41,7 +41,7 @@ Ler [IMP-010](../../../add.md#imp-010) e as ADR aí indicadas antes de qualquer
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
++- [x] [004-diagnosticar-percursos-pela-tabela-de-rotas](../../intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
+ - Dependências: [004-overlay](../004-overlay/bolt.md), [006-rotas](../006-rotas/bolt.md), [020-overlay](../020-overlay/bolt.md).
+ - Unidade: [003-rotas](../../intents/001-ott-streaming/units/003-rotas/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -56,10 +56,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Trace reflete a tabela de cada nó.
+-- [ ] Falhas terminam por erro/timeout em prazo.
+-- [ ] Diagnóstico não altera subscrições.
+-- [ ] Validação V-013 executada e evidência ligada no progresso.
++- [x] Trace reflete a tabela de cada nó.
++- [x] Falhas terminam por erro/timeout em prazo.
++- [x] Diagnóstico não altera subscrições.
++- [x] Validação V-013 executada e evidência ligada no progresso.
+ 
+ ## Evidência e fecho
+ 
+@@ -186,3 +186,25 @@ até integração desta evidência e cascata autorizada. Fecho de bolt/PHASE-03,
+ commits e push autorizados; nenhum outro IMP iniciado.
+ Aprovação: experiments/construction/022-rotas/closure/test-acceptance.json.
+ Revisão: experiments/construction/022-rotas/closure/final-review-confirmation.json.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/bolts/022-rotas/test-walkthrough.md b/memory-bank/bolts/022-rotas/test-walkthrough.md
+index f3ad987..e2be552 100644
+--- a/memory-bank/bolts/022-rotas/test-walkthrough.md
++++ b/memory-bank/bolts/022-rotas/test-walkthrough.md
+@@ -2,13 +2,12 @@
+ stage: test
+ bolt: "022-rotas"
+ created: "2026-11-14T17:45:23Z"
+-status: "approved-integration-pending"
++status: "approved-complete"
+ ---
+-# IMP-010 — Test aprovado; fecho em preparação
++# IMP-010 — Test aprovado e bolt fechado
+ 
+ ✅ Plan/Implement/Test aprovados; manual humano Luis executado e revisão final
+-Luis confirmada em substituição de Fillmore. Integração do fecho autorizada e
+-ainda pendente. Os registos anteriores abaixo conservam o histórico das etapas.
++Luis confirmada em substituição de Fillmore. Versão revista integrada em main; bolt e fase 3 fechados. Os registos anteriores abaixo conservam o histórico das etapas.
+ 
+ ## Construção e código aprovado
+ 
+@@ -161,3 +160,25 @@ e são seguidas dos anúncios128. O log de receção não prova sozinho a ordem
+ exata de processamento no owner nem o motivo de cada retirada. Política
+ withdraw/geração nova aprovada em Q-C-29; limitações explicitamente aceites.
+ A falha histórica m13 mantém-se documentada na secção própria, sem causa inventada.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+index 0a1068e..0265052 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/construction-log.md
+@@ -476,3 +476,25 @@ até integração desta evidência e cascata autorizada. Fecho de bolt/PHASE-03,
+ commits e push autorizados; nenhum outro IMP iniciado.
+ Aprovação: experiments/construction/022-rotas/closure/test-acceptance.json.
+ Revisão: experiments/construction/022-rotas/closure/final-review-confirmation.json.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
+index 9c4eb52..ac5bad8 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md
+@@ -2,7 +2,7 @@
+ id: "004-diagnosticar-percursos-pela-tabela-de-rotas"
+ unit: "003-rotas"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-013"]
+@@ -11,6 +11,8 @@ requirements: ["INT-001", "INT-002", "REQ-010", "REQ-019", "REQ-023"]
+ adr_ids: ["ADR-004", "ADR-022", "ADR-024"]
+ bolt: "022-rotas"
+ size: "S"
++implemented: true
++completed: "2026-11-15T16:36:52Z"
+ ---
+ # História — Diagnosticar percursos pela CLI
+ 
+@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-010](../../../../../../add.md#imp-010); o bolt só or
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Trace reflete a tabela de cada nó.
+-- [ ] Falhas terminam por erro/timeout em prazo.
+-- [ ] Diagnóstico não altera subscrições.
+-- [ ] Validação V-013 executada e evidência ligada no progresso.
++- [x] Trace reflete a tabela de cada nó.
++- [x] Falhas terminam por erro/timeout em prazo.
++- [x] Diagnóstico não altera subscrições.
++- [x] Validação V-013 executada e evidência ligada no progresso.
+ 
+ ## Testes
+ 
+@@ -35,7 +37,7 @@ A tarefa normativa é [IMP-010](../../../../../../add.md#imp-010); o bolt só or
+ 
+ - [TASK-013](../../../../../../docs/tasks/PHASE-03/TASK-013.md).
+ - Bolts anteriores: 004-overlay, 006-rotas, 020-overlay.
+-- Responsável de origem: Denji; revisor: Fillmore.
++- Responsável de origem: Denji; revisor final: Luis, substituindo Fillmore por confirmação explícita do utilizador.
+ - Gates: nenhum específico adicional.
+ 
+ 
+@@ -116,3 +118,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+index 5b558d5..90a1582 100644
+--- a/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/003-rotas/unit-brief.md
+@@ -3,13 +3,14 @@ unit: "003-rotas"
+ intent: "001-ott-streaming"
+ phase: "construction"
+ source_phase: "PHASE-03"
+-status: "in-progress"
++status: "complete"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-14T17:53:17Z"
++updated: "2026-11-15T16:36:52Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-005", "REQ-006", "REQ-008", "REQ-014", "REQ-019", "CON-008"]
+ requires_units: ["002-overlay"]
++completed: "2026-11-15T16:36:52Z"
+ ---
+ # Unidade — 003-rotas
+ 
+@@ -29,7 +30,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
+ - [x] [001-medir-rtt-e-publicar-falhas-de-vizinhanca](stories/001-medir-rtt-e-publicar-falhas-de-vizinhanca.md) → [005-rotas](../../../../bolts/005-rotas/bolt.md); IMP-007 (M).
+ - [x] [002-modelar-candidatos-custos-e-snapshots-por-stream](stories/002-modelar-candidatos-custos-e-snapshots-por-stream.md) → [021-rotas](../../../../bolts/021-rotas/bolt.md); IMP-008 (M).
+ - [x] [003-difundir-anuncios-e-construir-catalogo-e-rotas](stories/003-difundir-anuncios-e-construir-catalogo-e-rotas.md) → [006-rotas](../../../../bolts/006-rotas/bolt.md); IMP-009 (M).
+-- [ ] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
++- [x] [004-diagnosticar-percursos-pela-tabela-de-rotas](stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md) → [022-rotas](../../../../bolts/022-rotas/bolt.md); IMP-010 (S).
+ 
+ ## Dependências e critérios de fecho
+ 
+@@ -475,3 +476,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 04d2a91..d6b30f7 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,8 +17,9 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-next_bolt: "022-rotas (in-progress, validation interrupted by user; WIP local; resume Test/manual human pending)"
++next_bolt: "007-arvores (planned; desimpedido, não iniciado)"
+ 
+-last_completed_bolt: "006-rotas"
+-last_integrated_commit: "b7d74be5d9bad9fe7f598f29fa17188037647cf2"
+-phase_03_status: "in-progress"
++last_completed_bolt: "022-rotas"
++last_integrated_commit: "3349d575ae38c772b38496cc08bc1d44ded764ff"
++phase_03_status: "complete"
++phase_03_completed_at: 2026-11-15T16:36:52Z
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index c4bc174..3947495 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: onze histórias/bolts complete, incluindo006-rotas/IMP-009, e23 planned;022-rotas em Test técnico; manual humano pendente; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: doze histórias/bolts complete, incluindo022-rotas/IMP-010, e23 planned; nenhum em execução; unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -76,7 +76,7 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
+ 
+ ## 003-rotas/004-diagnosticar-percursos-pela-tabela-de-rotas.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-010. **Estado:** in-progress, Plan/Implement aprovados; Test técnico/manual pendente. **Bolt:** 022-rotas.
++**Tarefa:** IMP-010. **Estado:** complete/implemented=true; Test/manual Luis/revisão final Luis aprovados, integração 3349d575ae38c772b38496cc08bc1d44ded764ff. **Bolt:** 022-rotas.
+ **Ficheiro:** [004-diagnosticar-percursos-pela-tabela-de-rotas](intents/001-ott-streaming/units/003-rotas/stories/004-diagnosticar-percursos-pela-tabela-de-rotas.md).
+ 
+ ## 004-arvores/001-ativar-arvores-com-ack-e-procura-agregada.md ✅ GENERATED
+@@ -730,3 +730,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu
+ TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
+ Sem push/revisão final presumida/integração final/novo IMP. Retoma:
+ experiments/construction/022-rotas/RESUME.md.
++
++
++## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
++
++Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
++revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
++em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
++experiments/construction/022-rotas/closure/integration-proof.json.
++1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
++passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
++JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
++NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
++retiradas127/anúncios128 observados não provam a causa de cada retirada;
++a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
++alegada nem alteração de fontes/testes/prazos para obter aprovação.
++Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
++complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
++quatro streams/duas origens são prova controlada automatizada,losango humano
++usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
++Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
++desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
++o resultado de publicação só será declarado após execução e conferência remota.

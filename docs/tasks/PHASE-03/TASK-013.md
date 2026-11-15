@@ -5,9 +5,9 @@
 - ID: TASK-013
 - Fase: [PHASE-03 — Monitorização e descoberta de rotas](../../phases/PHASE-03-ROUTING.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Denji](../../team/DENJI.md).
-- Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
+- Revisor final: Luis, substituindo [Fillmore](../../team/FILLMORE.md) por confirmação explícita do utilizador.
 - Dependências: [TASK-008](../PHASE-02/TASK-008.md), [TASK-012](../PHASE-03/TASK-012.md).
 - Requisitos relacionados: [RF-010](../../02-REQUIREMENTS.md#rf-010), [RP-004](../../02-REQUIREMENTS.md#rp-004), [RP-008](../../02-REQUIREMENTS.md#rp-008).
 
@@ -31,16 +31,16 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existentes: app/OttApplication.java, routing/RoutingService.java; planeado: routing/RouteTraceTest.java.
+Implementados: app/OttApplication.java, routing/RoutingService.java, routing/RouteTraceTest.java e delegação mínima em overlay/OverlayNode.java (Q-C-32).
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
 ## 7. Passos de implementação
 
-- [ ] Expor snapshots nos comandos locais sem mapas mutáveis.
-- [ ] Implementar trace correlacionado e retorno pelo percurso inverso.
-- [ ] Registar cada salto e custo observado.
-- [ ] Comparar percurso com o esperado nas fixtures.
+- [x] Expor snapshots nos comandos locais sem mapas mutáveis.
+- [x] Implementar trace correlacionado e retorno pelo percurso inverso.
+- [x] Registar cada salto e custo observado.
+- [x] Comparar percurso com o esperado nas fixtures.
 
 ## 8. Regras e restrições
 
@@ -54,14 +54,14 @@ Stream desconhecida, ausência de candidato, timeout a meio, ttl esgotado e pedi
 
 V-013: duas rotas alternativas produzem visited correto; NO_ROUTE e TTL são explícitos; não há ativação nem saída de vídeo após trace.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial histórico: NÃO EXECUTADO; V-013 agora executada e Test aprovado, conforme relatório de fecho. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Trace reflete a tabela de cada nó.
-- [ ] Falhas terminam por erro/timeout em prazo.
-- [ ] Diagnóstico não altera subscrições.
-- [ ] Validação V-013 executada e evidência ligada no progresso.
+- [x] Trace reflete a tabela de cada nó.
+- [x] Falhas terminam por erro/timeout em prazo.
+- [x] Diagnóstico não altera subscrições.
+- [x] Validação V-013 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -151,3 +151,25 @@ current_stage=test,status=in-progress,completed=null; só Plan/Implement conclu�
 TASK-013/história/unidade/fase em progresso; sem implemented=true/DONE/complete.
 Sem push/revisão final presumida/integração final/novo IMP. Retoma:
 experiments/construction/022-rotas/RESUME.md.
+
+
+## IMP-010 / TASK-013 — fecho de bolt e PHASE-03 após integração
+
+Registo 2026-11-15T16:36:52Z. Test e manual humano Luis aprovados explicitamente pelo utilizador;
+revisão final Luis confirmada, substituindo Fillmore. Versão revista integrada
+em main 3349d575ae38c772b38496cc08bc1d44ded764ff, antes de marcar DONE. Prova:
+experiments/construction/022-rotas/closure/integration-proof.json.
+1296 testes/0falhas/0erros/0ignorados,17XML preservados; manual Luis34 checks,
+passed=true,cinco JVM recolhidas,zero UDP no intervalo e hashes intactos.
+JAR SHA2565f51dddc6482496f18c772f414788995ae53706511601712c3d0babcd1f5fe52.
+NO_ROUTE antes das falhas e falha histórica m13 de shutdown conservados;
+retiradas127/anúncios128 observados não provam a causa de cada retirada;
+a causa histórica de m13 permanece desconhecida. Sem disponibilidade contínua
+alegada nem alteração de fontes/testes/prazos para obter aprovação.
+Bolt022 e história complete/implemented=true,TASK-013 DONE,unidade003-rotas
+complete e PHASE-03 DONE. V-010–V-013 e demonstração integrada ligadas no fecho;
+quatro streams/duas origens são prova controlada automatizada,losango humano
+usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+o resultado de publicação só será declarado após execução e conferência remota.
