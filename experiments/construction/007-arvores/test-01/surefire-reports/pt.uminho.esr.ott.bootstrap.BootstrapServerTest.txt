@@ -1,0 +1,82 @@
+-------------------------------------------------------------------------------
+Test set: pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+-------------------------------------------------------------------------------
+Tests run: 20, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 0.360 s <<< FAILURE! -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.simultaneousRealTcpQueriesFromDifferentInstancesReturnOnlyConfiguredNeighbors -- Time elapsed: 0.021 s <<< ERROR!
+java.net.SocketException: Operation not permitted
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:577)
+	at java.base/sun.nio.ch.Net.bind(Net.java:566)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:152)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:137)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:189)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:135)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.simultaneousRealTcpQueriesFromDifferentInstancesReturnOnlyConfiguredNeighbors(BootstrapServerTest.java:408)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.completeErrorThenEofAndTwoValidRequestsChooseOnlyOneResponse -- Time elapsed: 0.005 s <<< ERROR!
+java.net.SocketException: Operation not permitted
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:577)
+	at java.base/sun.nio.ch.Net.bind(Net.java:566)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:152)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:137)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:189)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:135)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.completeErrorThenEofAndTwoValidRequestsChooseOnlyOneResponse(BootstrapServerTest.java:386)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.malformedFramesAndEarlyCloseDoNotKillBootstrapListener -- Time elapsed: 0.005 s <<< ERROR!
+java.net.SocketException: Operation not permitted
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:577)
+	at java.base/sun.nio.ch.Net.bind(Net.java:566)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:152)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:137)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:189)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:135)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.malformedFramesAndEarlyCloseDoNotKillBootstrapListener(BootstrapServerTest.java:425)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.queryReturnsConfiguredOfflineNeighborsThenEof -- Time elapsed: 0.003 s <<< ERROR!
+java.net.SocketException: Operation not permitted
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:577)
+	at java.base/sun.nio.ch.Net.bind(Net.java:566)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:278)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.configurationWithClosedNeighborPorts(BootstrapServerTest.java:52)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.queryReturnsConfiguredOfflineNeighborsThenEof(BootstrapServerTest.java:24)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.bootstrap.BootstrapServerTest.silentAndPartialRealTcpPeersExpireAndShutdownReleasesListenerPort -- Time elapsed: 0.004 s <<< ERROR!
+java.net.SocketException: Operation not permitted
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:577)
+	at java.base/sun.nio.ch.Net.bind(Net.java:566)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:152)
+	at pt.uminho.esr.ott.transport.Transport.<init>(Transport.java:137)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:189)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServer.<init>(BootstrapServer.java:135)
+	at pt.uminho.esr.ott.bootstrap.BootstrapServerTest.silentAndPartialRealTcpPeersExpireAndShutdownReleasesListenerPort(BootstrapServerTest.java:443)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

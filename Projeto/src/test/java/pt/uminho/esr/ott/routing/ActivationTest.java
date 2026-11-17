@@ -174,6 +174,72 @@ class ActivationTest {
         assertEquals(RoutingService.SubscriptionState.ERROR,result(fresh).state());assertEquals(Optional.of(ErrorCode.PATH_CHANGED),result(fresh).errorCode());
         assertEquals(Set.of(other),r.forwarding(A).localConsumers());
     }}
+    @Test void m07CancelledChildCannotBeReauthorizedByLateAckAcceptance(){try(var r=new Rig("S",true,4096,3)){
+        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
+        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
+        var branch=r.forwarding(A);var healthy=branch.downstreams().get("C2");
+        assertNotNull(healthy);assertEquals(Set.of("C2"),branch.downstreams().keySet());
+        UUID sub=UUID.randomUUID(),request=UUID.randomUUID();
+        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
+        var activation=r.activate(c1,A,r.instance,sub,1,request,List.of("S","C1"),6000);
+        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(request)).findFirst().orElseThrow();
+        assertFalse(pending.result.isDone());assertEquals(1,r.load().sends());
+        System.out.println("M07_BEFORE_CANCEL destinations="+r.forwarding(A).downstreams().keySet());
+        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));
+        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());
+        assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));assertEquals(1,r.load().sends());
+        System.out.println("M07_AFTER_CANCEL destinations="+r.forwarding(A).downstreams().keySet());
+        assertTrue(pending.result.complete(Connection.SendResult.ACCEPTED));r.pump();
+        System.out.println("M07_AFTER_LATE_ACCEPTED destinations="+r.forwarding(A).downstreams().keySet());
+        assertAll("Cancellation is terminal, the other child and its lease survive",
+                ()->assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet()),
+                ()->assertEquals(healthy,r.forwarding(A).downstreams().get("C2")),
+                ()->assertEquals(branch.path(),r.forwarding(A).path()),
+                ()->assertEquals(branch.upstream(),r.forwarding(A).upstream()),
+                ()->assertEquals(branch.serverEpoch(),r.forwarding(A).serverEpoch()),
+                ()->assertEquals(0,r.load().sends()));
+        // Replay must still see the cancellation terminal; ACCEPTED must not clear it.
+        r.receive(c1,activation);assertEquals(ErrorCode.STALE_REVISION,lastError(r));
+        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
+    }}
+    @Test void m07CancelledAckAndOldRevisionCannotMutateReplacementChild(){try(var r=new Rig("S",true,4096,3)){
+        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
+        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
+        var healthy=r.forwarding(A).downstreams().get("C2");UUID sub=UUID.randomUUID(),oldRequest=UUID.randomUUID();
+        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(oldRequest);
+        var old=r.activate(c1,A,r.instance,sub,1,oldRequest,List.of("S","C1"),6000);
+        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(oldRequest)).findFirst().orElseThrow();
+        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));r.tick(250_000_000L);
+        UUID freshRequest=UUID.randomUUID();r.activate(c1,A,r.instance,sub,2,freshRequest,List.of("S","C1"),6000);
+        var fresh=r.forwarding(A).downstreams().get("C1");assertEquals(2,fresh.revision());assertEquals(freshRequest,fresh.requestId());
+        assertEquals(1,r.load().sends());
+        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));
+        pending.result.complete(Connection.SendResult.ACCEPTED);r.pump();
+        assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
+        assertEquals(0,r.load().sends());r.receive(c1,old);assertEquals(ErrorCode.STALE_REVISION,lastError(r));
+        assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
+    }}
+    @Test void m07CancelledAckReservationWaitsForBothCallbackAndContinuation() throws Exception {try(var r=new Rig("S",true,4096,3)){
+        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
+        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
+        var healthy=r.forwarding(A).downstreams().get("C2");UUID sub=UUID.randomUUID(),request=UUID.randomUUID();
+        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
+        r.activate(c1,A,r.instance,sub,1,request,List.of("S","C1"),6000);
+        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(request)).findFirst().orElseThrow();
+        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));assertEquals(1,r.load().sends());
+        r.owner.hold=t->t.getName().equals("m07-cancelled-ack-callback");
+        var callback=new Thread(()->pending.result.complete(Connection.SendResult.ACCEPTED),"m07-cancelled-ack-callback");callback.start();
+        try{
+            assertTrue(r.owner.offered.await(5,TimeUnit.SECONDS));
+            // ready=true is already published, but the callback is still inside offer().
+            r.act(()->r.router.cancelPendingChild(c1,A,sub,1));
+            assertEquals(1,r.load().sends(),"A processed continuation does not finish a blocked callback");
+            assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
+        }finally{r.owner.hold=t->false;r.owner.resume.countDown();callback.join(5000);}
+        assertFalse(callback.isAlive());r.pump();assertEquals(0,r.load().sends());
+        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
+    }}
+
     @Test void m08DuplicatesRevisionsAndLineageAreBoundedAndIdempotent(){try(var r=new Rig("S",true,4096,3)){
         var c=peer("C1");r.up(c);UUID sub=UUID.randomUUID(),request=UUID.randomUUID();var m=r.activate(c,A,r.instance,sub,1,request,List.of("S","C1"),6000);
         for(int i=0;i<30;i++)r.receive(c,m);assertEquals(1,r.load().children());assertEquals(1,r.load().histories());

@@ -1,0 +1,38 @@
+M07_BEFORE_CANCEL destinations=[C2]
+M07_AFTER_CANCEL destinations=[C2]
+M07_AFTER_LATE_ACCEPTED destinations=[C2, C1]
+
+Test run finished after 235 ms
+[         2 containers found      ]
+[         0 containers skipped    ]
+[         2 containers started    ]
+[         0 containers aborted    ]
+[         2 containers successful ]
+[         0 containers failed     ]
+[         1 tests found           ]
+[         0 tests skipped         ]
+[         1 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         1 tests failed          ]
+
+
+Failures (1):
+  JUnit Jupiter:ActivationTest:m07CancelledChildCannotBeReauthorizedByLateAckAcceptance()
+    MethodSource [className = 'pt.uminho.esr.ott.routing.ActivationTest', methodName = 'm07CancelledChildCannotBeReauthorizedByLateAckAcceptance', methodParameterTypes = '']
+    => org.opentest4j.MultipleFailuresError: Cancellation is terminal, the other child and its lease survive (1 failure)
+	org.opentest4j.AssertionFailedError: expected: <[C2]> but was: <[C2, C1]>
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:80)
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:44)
+       org.junit.jupiter.api.Assertions.assertAll(Assertions.java:2961)
+       pt.uminho.esr.ott.routing.ActivationTest.m07CancelledChildCannotBeReauthorizedByLateAckAcceptance(ActivationTest.java:194)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       [...]
+       Suppressed: org.opentest4j.AssertionFailedError: expected: <[C2]> but was: <[C2, C1]>
+         org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+         org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+         org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+         org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+         org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+         [...]
+M07_COUNTS tests=1 failed=1 skipped=0 aborted=0

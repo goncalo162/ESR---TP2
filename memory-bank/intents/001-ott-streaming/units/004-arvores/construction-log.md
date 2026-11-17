@@ -14,7 +14,7 @@ Inception concluído em2026-11-03T20:54:11Z;003-rotas e022-rotas complete.
 
 ## Estrutura atual
 
-1 - ⏳ **007-arvores**: in-progress, Implement para revisão, Q-C-36/Q-C-37 aplicadas e regressão1325/0; Model/Design/ADR aprovados,
+1 - ⏳ **007-arvores**: in-progress, Test em progresso, Q-C-36–39 preservadas; clean verify1328/0; Model/Design/ADR/Implement aprovados,
 história001 planeada/não implementada, ativação com ACK.
 2 - [ ] **023-arvores**: planned; história002, renovação e poda.
 3 - [ ] **008-arvores**: planned; história003, recuperação de upstream.
@@ -145,3 +145,40 @@ budget configurado. Instrumento teve primeiro erro de cwd preservado, corrigido
 somente no lançamento; nenhum teste/fundação adicional alterado.
 Implement para revisão, sem aceitação/etapa Test/fecho/commits/push/outro IMP.
 V-014 consolidado, regressão aprovada, manual humano, revisão Waheed e integração pendentes.
+
+## Retoma M07 / Q-C-38
+
+Implement por aceitar: três testes novos reproduzem cancelamento/revisão antiga e
+reserva física. Guarda terminal mínima em RoutingService; Q-C-38 exclusivamente
+para corrigir referência do leitor CLI, autorizada pelo utilizador. Regressão
+incremental atual1328/0/0/0; negativos e 431 evidências anteriores preservados.
+Ver secção11 do walkthrough do bolt007-arvores. Sem Test, staging, commit ou push.
+V-014 consolidado, clean verify/JAR final, manual humano, revisão final Waheed e
+integração continuam pendentes.
+
+## Q-C-39 resolvida
+
+Patch documental de seis linhas autorizado/aplicado, V-ADD zero erros.
+M07 aceite tecnicamente; Implement ainda por aprovar. Java inalterado, sem
+nova regressão, Test, staging, commits, push ou fecho.
+
+## Test autorizado — validação técnica
+
+Implement aprovado pelo utilizador, sem alteração Java nesta etapa. Clean verify
+1328/0/0/0 com JDK21,18 suites. Primeira execução restrita1328/0/79/0 por sockets
+negados preservada. Logs/XML/JAR/hash em experiments/construction/007-arvores/test-02.
+V-014 e M01–M14 consolidados no relatório Test do bolt, com limites explícitos.
+Prova TCP real19 checks e oráculos adicionais18 checks; ensaio do roteiro24 checks
+como agente, não manual humano. Manual humano ainda pendente; Test por aprovar.
+Revisão final Waheed/integração pendentes; sem staging, commits/push ou fecho.
+
+## Manual humano e revisão final — confirmação do utilizador
+
+Francisco executou as cinco etapas,24 CHECK_PASS, CLEANUP_COMPLETE, MANUAL_PASS
+CHECKS=24, JAVA_EXIT0/PASSED=true e nenhuma divergência. Relatório humano
+20261117T233223Z-q2zk5pu4 conferido com hashes/origem do JAR/terminação da JVM.
+Waheed aprovou a revisão final da implementação atual, sem alterações pendentes,
+por confirmação explícita do utilizador; vinculada aos hashes atuais dos oito
+caminhos Java e JAR. Não houve alteração de código ou repetição desnecessária
+de regressão/manual. Test por aprovar, plano de integração para autorização.
+Sem staging/commits/push/fecho; bolt/unidade/PHASE mantidos em progresso.

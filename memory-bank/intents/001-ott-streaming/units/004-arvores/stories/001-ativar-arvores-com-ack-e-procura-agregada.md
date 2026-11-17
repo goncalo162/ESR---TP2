@@ -2,7 +2,7 @@
 id: "001-ativar-arvores-com-ack-e-procura-agregada"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "planned"
+status: "in-progress"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-014"]
@@ -37,3 +37,13 @@ A tarefa normativa é [IMP-011](../../../../../../add.md#imp-011); o bolt só or
 - Bolts anteriores: 022-rotas.
 - Responsável de origem: Fillmore; revisor: Waheed.
 - Gates: nenhum específico adicional.
+
+## Evidência atual
+
+Implement aprovado; [Test técnico](../../../../../bolts/007-arvores/ddd-03-test-report.md)
+1328/0/0/0 e V-014 consolidado. Manual humano e aprovação de Test pendentes;
+revisão final Waheed e integração também pendentes. História não concluída.
+
+Manual humano Francisco e revisão final Waheed confirmados/conferidos para
+a versão atual; Test e integração continuam pendentes. História in-progress,
+sem declaração de implementação concluída/fecho.

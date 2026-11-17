@@ -1117,6 +1117,7 @@ final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575a
 - **Ficheiros:** `routing/Route.java`, `routing/Subscription.java`, `routing/RoutingService.java`, `routing/ActivationTest.java`.
 - **Exceção Q-C-36 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java`. O `until` aguarda conjuntamente snapshot sem N1 e NeighborDown da Session esperada; todas as asserções, prazos e restantes testes mantêm-se. Não alarga o âmbito de produção nem aprova Implement ou a etapa Test.
 - **Exceção Q-C-37 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java` e `Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java`. Acrescenta apenas a guarda de HELLO inicial de saída com canal fechado e o novo teste das três ordens. Sete caminhos autorizados no total; testes/asserções/prazos/evidência anteriores preservados. Verificação incremental autorizada, sem aprovação de Implement/Test ou fecho; qualquer correção adicional exige apresentação prévia.
+- **Exceção Q-C-38 autorizada nesta retoma:** exclusivamente `Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java`, substituição de `this::read` por `() -> read(input)` no leitor CLI para corrigir a compilação. Oito caminhos autorizados no total; sem outra alteração de aplicação, protocolo ou transporte. Implement permanece pendente; ver evidência `experiments/construction/007-arvores/m07-cancellation-01/`.
 - **Dependências:** IMP-010 (022-rotas).
 - **ADR:** ADR-005, ADR-018, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-005, REQ-007, REQ-011, REQ-017, REQ-021.
@@ -1154,6 +1155,15 @@ D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
 Sem resposta, Closed/prazo existente terminam e libertam recursos; TCP real com
 zero reservas e awaitTermination confirmado. Implement reapresentado, não aprovado.
 Fecho exige V-014, regressão aprovada, manual humano, revisão final Waheed e integração.
+
+**Estado atual após confirmação explícita:** Implement aprovado; Test por aprovar.
+[Relatório V-014](memory-bank/bolts/007-arvores/ddd-03-test-report.md): clean verify
+1328/0/0/0 e provas suplementares consolidadas. Manual humano Francisco cumprido
+e conferido; revisão final Waheed confirmada para o código/evidência atuais,
+sem alterações pendentes. Fontes/JAR iguais à construção validada, Q-C-36–39
+preservadas. [Plano e versão revista](experiments/construction/007-arvores/integration-01/plan.md).
+Integração ainda por autorizar/executar e fecho não autorizado.
+Sem staging/commits/push/DONE ou novo IMP nesta autorização.
 
 <a id="imp-012"></a>
 ### IMP-012 — Renovar e podar subscrições

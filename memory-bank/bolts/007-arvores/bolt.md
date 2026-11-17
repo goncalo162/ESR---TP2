@@ -6,11 +6,11 @@ type: "ddd-construction-bolt"
 status: "in-progress"
 stories: ["001-ativar-arvores-com-ack-e-procura-agregada"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-17T21:49:25Z"
+updated: "2026-11-17T23:06:56Z"
 started: "2026-11-17T15:29:06Z"
 completed: null
-current_stage: "implement"
-stages_completed: [{"name": "model", "completed": "2026-11-17T17:02:14Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-17T17:30:07Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-17T17:50:02Z", "artifact": "adr-review.md"}]
+current_stage: "test"
+stages_completed: [{"name": "model", "completed": "2026-11-17T17:02:14Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-17T17:30:07Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-17T17:50:02Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-17T23:06:56Z", "artifact": "implementation-walkthrough.md"}]
 requires_bolts: ["022-rotas"]
 enables_bolts: ["023-arvores"]
 requires_units: ["003-rotas"]
@@ -51,7 +51,7 @@ Ler [IMP-011](../../../add.md#imp-011) e as ADR aí indicadas antes de qualquer 
 1. [x] **model** → `ddd-01-domain-model.md`; aprovado pelo utilizador, incluindo Q-C-34/35, em 2026-11-17T17:02:14Z.
 2. [x] **design** → `ddd-02-technical-design.md`; aprovado integralmente pelo utilizador em 2026-11-17T17:30:07Z.
 3. [x] **adr** → `adr-review.md`; aprovada pelo utilizador em 2026-11-17T17:50:02Z.
-4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-011 e as ADR do ADD.
+4. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-011 e as ADR do ADD.
 5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-011 e as ADR do ADD.
 
 Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
@@ -233,3 +233,27 @@ com zero reservas e awaitTermination confirmado. Evidência anterior preservada.
 Não se presume aprovação de Implement, regressão ou V-014. current_stage=implement,
 só Model/Design/ADR concluídos; sem Test/fecho/commits/push/outro IMP/gates novos.
 V-014 consolidado, regressão aprovada, manual humano, revisão Waheed e integração pendentes.
+
+## Retoma de Implement — M07
+
+Cancelamento terminal corrigido; Q-C-38 aplicada com autorização exclusiva.
+Regressão incremental atual: 1328/0/0/0; Implement por aceitar, Test não autorizado.
+Ver secção 11 do [walkthrough](implementation-walkthrough.md) e respetiva evidência.
+
+Q-C-39 resolvida pelo patch documental autorizado; V-ADD zero erros.
+M07 aceite tecnicamente; Implement continua por aprovar, Test não autorizado.
+
+## Checkpoint Test autorizado
+
+Implement aprovado pelo utilizador; Test autorizado e em progresso.
+Clean verify atual1328/0/0/0; V-014 técnico consolidado no
+[relatório Test](ddd-03-test-report.md). Manual humano pendente; depois aprovação
+de Test, revisão final Waheed e integração. Bolt aberto, sem commits/push/fecho.
+A data de conclusão de Implement acima é a data de registo desta autorização.
+
+## Manual humano e revisão final confirmados
+
+Francisco executou as cinco etapas/24 checks, conferidos com o JAR/hash fixo.
+Revisão final de Waheed da versão atual confirmada pelo utilizador, sem alterações
+pendentes; hashes vinculados no pacote integration-01. Test continua por aprovar,
+bolt aberto e integração por autorizar/executar. Sem staging/commits/push/fecho.

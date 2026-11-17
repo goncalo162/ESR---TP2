@@ -1392,3 +1392,58 @@ prévia. Os14 cenários por executar; sem Java, commits ou push.
 - **Estado:** apenas a exceção Java expressamente autorizada, sem avanço a Test, fecho,
   commits, push, outro IMP ou gates externos adicionais. V-014 consolidado,
   regressão aprovada, manual humano, revisão final Waheed e integração pendentes.
+
+
+## Q-C-38 — IMP-011: bloqueio de compilação preexistente fora dos sete caminhos
+
+Estado: DECIDIDA/APROVADA pelo utilizador; patch mínimo aplicado exclusivamente como proposto.
+Retoma M07 em main9c5ad094, árvore limpa à entrada. A primeira tentativa Maven
+parou na compilação de OttApplication.java:878, antes de executar M07. O
+construtor Console usa this::read, mas o único método é read(InputStream).
+O ficheiro coincide com HEAD e não foi alterado nesta retoma. Isto não é
+reprodução negativa do defeito de cancelamento, nem resultado de regressão.
+
+[Log preservado](../experiments/construction/007-arvores/m07-cancellation-01/red/maven.log)
+e [patch proposto de uma linha](../experiments/construction/007-arvores/m07-cancellation-01/q-c-38-proposed.patch).
+
+1. Recomendada: autorizar exclusivamente a lambda () -> read(input) nesta linha
+   de OttApplication.java, oitavo caminho limitado a repor a compilação. Mantém
+   reader virtual, input e comportamento pretendido; sem handshake/transporte,
+   wire, dependências ou prazos novos. Só aplicar após autorização explícita.
+2. Manter os sete caminhos: M07 pode ser investigado por compilação focada e
+   isolada do core, sem CLI e sem alterar esta fonte; o build/regressão integral
+   continuam bloqueados e não podem ser declarados aprovados.
+
+Implement continua pendente, Test não autorizado; nenhum commit/push/fecho.
+
+
+### Q-C-38 — aprovação explícita e aplicação exata
+
+Registo 2026-11-17T22:15:01.350853+00:00. O utilizador autorizou
+«Autorizar o patch mínimo e a regressão completa». Acrescenta OttApplication.java
+apenas para a lambda () -> read(input); patch aplicado sem ajustes. Não aprova
+Implement/Test/fecho nem permite outras alterações de CLI. M07 já reproduzido
+num core fresco isolado, com1 falha funcional esperada; não é regressão integral.
+
+## Q-C-39 — V-ADD: whitespace preexistente em CODESTYLE
+
+Aberta, sem correção aplicada. A validação documental desta retoma encontra um
+único erro: trailing whitespace em docs/style/CODESTYLE.md. O ficheiro é idêntico
+a HEAD/entrada e alheio ao âmbito autorizado.
+[Relatório](../experiments/construction/007-arvores/m07-cancellation-01/v-add.json) e
+[proveniência/linhas/hash](../experiments/construction/007-arvores/m07-cancellation-01/v-add-limitation.json).
+Opções: autorizar patch exclusivamente de whitespace nessas linhas; ou preservar
+o ficheiro e manter V-ADD pendente. Não alterar validador, código ou prazos.
+Implement permanece pendente; esta descoberta não invalida os 1328 testes Java
+executados nem autoriza Test/fecho.
+
+### Q-C-39 — correção autorizada aplicada
+
+O utilizador aceitou tecnicamente M07 e autorizou exclusivamente remover espaços
+finais nas linhas 26, 28, 91, 105, 138 e 178 de CODESTYLE.md. Aplicado sem outras
+alterações nesse ficheiro; código Java e validador preservados.
+[Patch e prova](../experiments/construction/007-arvores/q-c-39/README.md).
+Implement continua pendente de aprovação; Test não autorizado.
+
+Q-C-39 RESOLVIDA: V-ADD executado após o patch autorizado, zero erros.
+Relatório preservado na evidência Q-C-39; nenhuma alteração ao validador.

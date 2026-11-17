@@ -1,0 +1,54 @@
+CODE_SOURCE=file:/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar
+CONTROLLED_CLOCK_OWNER_PORT; NO_NETWORK_MEASUREMENTS; NO_VIDEO; NO_CORE
+
+STEP 1 / tronco S-A-R com C1/C2
+ESPERADO: Uma ACTIVATE R->A e uma A->S; C1/C2 recebem ACK próprios. Grants não aumentam ao descer.
+Prima Enter para executar; EOF interrompe sem sucesso.
+CHECK_PASS 1 C1/C2 pending share one R->A request
+CHECK_PASS 2 A pending, one A->S request
+CHECK_PASS 3 R confirms exactly C1/C2
+CHECK_PASS 4 one confirmed child per trunk
+CHECK_PASS 5 child has its own correlated ACK
+CHECK_PASS 6 child has its own correlated ACK
+CHECK_PASS 7 two relays reduce grants 6000->5500->4500 with controlled delay
+CHECK_PASS 8 late child reuses both trunks
+SOURCE forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={A=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=1b894d6b-28cd-4434-b463-c0ca00c2a275, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=4ff4372b-6d49-43b4-b2bd-531ec02d070c, revision=0, requestId=6fe4e86a-2483-4041-b810-b1e40f7bf666, expectedPath=[S, A], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=2] load=ActivationLoad[trees=1, children=1, locals=0, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+RELAY_A forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=S, instanceId=6ec7e567-25ea-3de0-84a1-cef90377dd1f, connectionId=78e77b5a-23f4-4ca2-b8f4-d2d11e7d012e, endpoint=Endpoint[nodeId=S, instanceId=6ec7e567-25ea-3de0-84a1-cef90377dd1f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A], downstreams={R=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=R, instanceId=9d41c099-a86b-301e-bcc8-4b1c4ec76d4a, connectionId=9801233f-8ea1-4af6-8b7b-2ba76b5bbd7b, endpoint=Endpoint[nodeId=R, instanceId=9d41c099-a86b-301e-bcc8-4b1c4ec76d4a, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=24e26960-b2ba-4eee-95d9-6921491388b5, revision=0, requestId=1b11bf60-0390-4fb9-9869-c751b7b025c5, expectedPath=[S, A, R], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=500000000, durationNanos=5500000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=0, durationNanos=6000000000]], revision=2] load=ActivationLoad[trees=1, children=1, locals=0, histories=2, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+RELAY_R forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=1b894d6b-28cd-4434-b463-c0ca00c2a275, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C3=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C3, instanceId=f9e7c6a4-9178-3300-a8bd-0f78f4ac988b, connectionId=a64bbd94-845e-411f-8950-fe13671634bf, endpoint=Endpoint[nodeId=C3, instanceId=f9e7c6a4-9178-3300-a8bd-0f78f4ac988b, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=e51e97e5-bc3d-47ac-9b14-3041aa79d726, revision=1, requestId=11b41e29-4bf7-46a8-be64-59807b0f35e9, expectedPath=[S, A, R, C3], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=1000000000, durationNanos=4500000000]]], C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=6a74c00e-118f-4518-b8b5-786c5ebca883, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=c18861ed-19c4-49a3-b4d3-b18b58e7c173, revision=1, requestId=26d80174-7c4a-4564-983e-5a53c77b1208, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=1000000000, durationNanos=4500000000]]], C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=4b5b3cee-79e4-41bd-98f8-92d0c1b74dc8, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5786065d-c639-45dd-b813-792925795567, revision=1, requestId=70ee191f-4eea-4078-9ffc-0096ae2c17a7, expectedPath=[S, A, R, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=1000000000, durationNanos=4500000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=0, durationNanos=5500000000]], revision=4] load=ActivationLoad[trees=1, children=3, locals=0, histories=4, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+
+STEP 2 / M07 cancelamento antes de ACCEPTED
+ESPERADO: C2 mantém o lease; C1 não reaparece, reserva 1 até callback/continuação e depois 0; replay STALE_REVISION.
+Prima Enter para executar; EOF interrompe sem sucesso.
+BEFORE_CANCEL forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=84cf4a7a-8767-4ab4-8dc3-8d0fa290ae59, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5837469e-156b-4508-8d8d-2df98822aa91, revision=1, requestId=9be70d25-d84d-4944-9c31-8d53d9d88254, expectedPath=[S, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=2] load=ActivationLoad[trees=1, children=2, locals=0, histories=2, sends=1, unbound=0, responseIntents=0, pendingChildren=1]
+AFTER_CANCEL forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=84cf4a7a-8767-4ab4-8dc3-8d0fa290ae59, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5837469e-156b-4508-8d8d-2df98822aa91, revision=1, requestId=9be70d25-d84d-4944-9c31-8d53d9d88254, expectedPath=[S, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=3] load=ActivationLoad[trees=1, children=2, locals=0, histories=2, sends=1, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 9 logical cancellation retains physical send
+AFTER_LATE_ACCEPTED forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=84cf4a7a-8767-4ab4-8dc3-8d0fa290ae59, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5837469e-156b-4508-8d8d-2df98822aa91, revision=1, requestId=9be70d25-d84d-4944-9c31-8d53d9d88254, expectedPath=[S, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=3] load=ActivationLoad[trees=1, children=1, locals=0, histories=2, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 10 late ACCEPTED never authorizes C1; send freed
+CHECK_PASS 11 C2 exact subscription and lease unchanged
+CHECK_PASS 12 terminal watermark rejects replay
+
+STEP 3 / streams e validade
+ESPERADO: Erro/cancelamento em A não altera B; ACK duplicado não renova; restante <1ms não concede; snapshot antigo expira.
+Prima Enter para executar; EOF interrompe sem sucesso.
+CHECK_PASS 13 cancel A preserves B confirmation
+CHECK_PASS 14 child bounded by parent remaining 5000ms
+CHECK_PASS 15 duplicate grant ages, not renews
+CHECK_PASS 16 999999ns cannot become a 1ms grant
+CHECK_PASS 17 live and old snapshots cannot authorize expired B
+
+STEP 4 / seleção divergente
+ESPERADO: Prefixos via A e B recusados PATH_CHANGED, confirmação de A e lease iguais; zero ACTIVATE/DEACTIVATE adicional.
+Prima Enter para executar; EOF interrompe sem sucesso.
+CHECK_PASS 18 refusal via A preserves confirmed branch
+CHECK_PASS 19 refusal via B preserves confirmed branch
+CHECK_PASS 20 no activation or pruning caused by refusal
+
+STEP 5 / capacidade e shutdown físico
+ESPERADO: E=2 retém dois ACKs físicos após expiração; await(0) false até conclusão; depois true, sem forwarding/timers.
+Prima Enter para executar; EOF interrompe sem sucesso.
+CHECK_PASS 21 two held physical ACKs, no authorized children
+CHECK_PASS 22 timeout does not recycle physical reservations
+CHECK_PASS 23 shutdown cannot report physical completion while sends held
+CHECK_PASS 24 shutdown ends only after physical completion, zero sends/timers/forwarding
+CLEANUP_COMPLETE
+MANUAL_PASS CHECKS=24

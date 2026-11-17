@@ -875,7 +875,7 @@ public final class OttApplication
             budget = config.runtime().control().shutdownTimeout().toNanos();
             commands = new ArrayBlockingQueue<>(config.runtime().overlay().eventsCapacity());
             outputs = new ArrayBlockingQueue<>(config.runtime().control().queueCapacity());
-            reader = Thread.ofVirtual().name("ott-cli-input").unstarted(this::read);
+            reader = Thread.ofVirtual().name("ott-cli-input").unstarted(() -> read(input));
             writer = Thread.ofVirtual().name("ott-cli-output").unstarted(() -> write(output, error));
         }
 

@@ -7,25 +7,16 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: IN PRO
 **Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0 histórico, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas.
 
 **Trabalho atual:** [007-arvores/IMP-011](../memory-bank/bolts/007-arvores/bolt.md),
-Model iniciado em 2026-11-17T15:29:06Z por seleção explícita do utilizador.
-Model/Q-C-34/35 aprovados em 2026-11-17T17:02:14Z e Design completo aprovado
-em 2026-11-17T17:30:07Z, incluindo leases/T/A/lineagens/capacidades/quotas.
-Revisão ADR aprovada em2026-11-17T17:50:02Z; apenas Implement autorizado.
-[Implementação e evidência](../memory-bank/bolts/007-arvores/implementation-walkthrough.md)
-nos quatro caminhos mais as exceções Q-C-36/Q-C-37 autorizadas e aplicadas,
-sete caminhos no total. [Resultados atuais](../experiments/construction/007-arvores/q-c-37/README.md):
-D11b/três ordens1/0/0/0, D11a original1/0/0/0, handshake/lifecycle202/0/0/0 e
-uma regressão incremental completa1325/0/0/0. Closed/prazo HELLO existente sem
-resposta terminam e libertam recursos; TCP real com zero reservas e terminação
-confirmada no shutdown configurado. Testes/asserções/prazos mantidos.
-Implement reapresentado para revisão, não aprovado; Test/fecho/outro IMP não
-iniciados, sem commits/push.12 bolts complete,1 in-progress,22 planned.
-Os14 grupos têm prova incremental parcial; V-014 integral não consolidado.
-Negativos NeighborDown e diagnóstico controlado, dois negativos D11a e sucesso
-isolado preservados byte a byte. A sequência histórica exata não foi reconstruída.
-Q-C-37 corrige só a corrida de continuação de HELLO expressamente autorizada;
-qualquer outra correção exige apresentação prévia. Fecho exige V-014 consolidado,
-regressão aprovada, manual humano, revisão final Waheed e integração; sem gates externos novos.
+Implement aprovado; **Test por aprovar**, integração por autorizar/executar.
+Clean verify atual1328/0/0/0,18 suites e V-014 técnico consolidado.
+[Relatório](../memory-bank/bolts/007-arvores/ddd-03-test-report.md).
+Manual humano Francisco cumprido: cinco etapas/24 checks, sem divergências;
+revisão final Waheed confirmada pelo utilizador, sem alterações pendentes.
+[Confirmações/hashes](../experiments/construction/007-arvores/integration-01/manual-and-review-verification.json)
+e [plano de integração](../experiments/construction/007-arvores/integration-01/plan.md).
+Código/JAR inalterados, Q-C-36–39 preservadas; negativos e evidências preservados.
+Unidade004-arvores, TASK-014 e PHASE-04 em progresso;12 bolts complete,1 in-progress,
+22 planned. Sem staging/commits/push/fecho/outro IMP; sem gates externos novos.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -131,7 +122,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
-| [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | IN PROGRESS | Model/Design/ADR aprovados; Implement para revisão; Q-C-36/37 aplicadas; regressão1325/0; V-014 integral/aceitação pendentes |
+| [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | IN PROGRESS | Model/Design/ADR/Implement aprovados; Test em progresso; clean verify1328/0; V-014 técnico consolidado; manual Francisco e revisão final Waheed cumpridos; aprovação de Test e integração pendentes |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
 | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | TODO | V-017: NÃO EXECUTADO |

@@ -139,3 +139,20 @@ awaitTermination no budget configurado. Sem alterar testes/asserções/prazos
 anteriores ou apagar negativos. Implement não aceite; sem etapa Test, fecho,
 commits, push, outro IMP ou gates novos. V-014 consolidado, regressão aprovada,
 manual humano, revisão final Waheed e integração pendentes.
+
+## Test atual — aprovação pendente
+
+Implement aprovado pelo utilizador; clean verify1328/0/0/0.
+[V-014 consolidado](../../../memory-bank/bolts/007-arvores/ddd-03-test-report.md),
+com logs/XML/JAR/hash e roteiro humano reproduzível. Código aprovado intacto.
+Manual humano não executado; Test não aprovado. Revisão final Waheed e integração
+continuam necessárias. TASK-014 IN PROGRESS; sem staging/commit/push/fecho.
+
+## Confirmações posteriores — Test reapresentado
+
+Manual humano de Francisco cumprido e conferido,24 checks nas cinco etapas,
+mesmo JAR/hash e fontes aprovadas. Revisão final de Waheed confirmada pelo
+utilizador para esta versão, sem alterações pendentes.
+[Versão revista e plano](../../../experiments/construction/007-arvores/integration-01/plan.md).
+Test por aprovar e integração por autorizar/executar; TASK-014 IN PROGRESS.
+Sem staging/commits/push/fecho.

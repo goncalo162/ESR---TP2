@@ -1,0 +1,295 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+index 002ef07..dd3dd3b 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -875,7 +875,7 @@ public final class OttApplication
+             budget = config.runtime().control().shutdownTimeout().toNanos();
+             commands = new ArrayBlockingQueue<>(config.runtime().overlay().eventsCapacity());
+             outputs = new ArrayBlockingQueue<>(config.runtime().control().queueCapacity());
+-            reader = Thread.ofVirtual().name("ott-cli-input").unstarted(this::read);
++            reader = Thread.ofVirtual().name("ott-cli-input").unstarted(() -> read(input));
+             writer = Thread.ofVirtual().name("ott-cli-output").unstarted(() -> write(output, error));
+         }
+ 
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index 995ecb5..e15d1d5 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -1272,6 +1272,9 @@ public final class RoutingService implements AutoCloseable {
+                 }else if(s.child!=null){var c=s.child;
+                     if(c.detached||c.line.child!=c)return;
+                     if(s.kind==SendKind.ACK){
++                        // Logical cancellation/failure is terminal even while its ACK send is physically live.
++                        // The finally below still completes this continuation and retains a running callback.
++                        if(c.line.terminal!=null)return;
+                         if(s.error==null&&s.result==Connection.SendResult.ACCEPTED&&epochCurrent(c.tree)
+                                 &&current(c.line.key.session)&&healthy(c.tree,at)&&!elapsed(at,c.began)
+                                 &&s.grant.validity().orElseThrow().remainingNanos(at)>0
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java
+index ff33781..ee921d7 100644
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java
+@@ -174,6 +174,72 @@ class ActivationTest {
+         assertEquals(RoutingService.SubscriptionState.ERROR,result(fresh).state());assertEquals(Optional.of(ErrorCode.PATH_CHANGED),result(fresh).errorCode());
+         assertEquals(Set.of(other),r.forwarding(A).localConsumers());
+     }}
++    @Test void m07CancelledChildCannotBeReauthorizedByLateAckAcceptance(){try(var r=new Rig("S",true,4096,3)){
++        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
++        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
++        var branch=r.forwarding(A);var healthy=branch.downstreams().get("C2");
++        assertNotNull(healthy);assertEquals(Set.of("C2"),branch.downstreams().keySet());
++        UUID sub=UUID.randomUUID(),request=UUID.randomUUID();
++        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
++        var activation=r.activate(c1,A,r.instance,sub,1,request,List.of("S","C1"),6000);
++        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(request)).findFirst().orElseThrow();
++        assertFalse(pending.result.isDone());assertEquals(1,r.load().sends());
++        System.out.println("M07_BEFORE_CANCEL destinations="+r.forwarding(A).downstreams().keySet());
++        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));
++        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());
++        assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));assertEquals(1,r.load().sends());
++        System.out.println("M07_AFTER_CANCEL destinations="+r.forwarding(A).downstreams().keySet());
++        assertTrue(pending.result.complete(Connection.SendResult.ACCEPTED));r.pump();
++        System.out.println("M07_AFTER_LATE_ACCEPTED destinations="+r.forwarding(A).downstreams().keySet());
++        assertAll("Cancellation is terminal, the other child and its lease survive",
++                ()->assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet()),
++                ()->assertEquals(healthy,r.forwarding(A).downstreams().get("C2")),
++                ()->assertEquals(branch.path(),r.forwarding(A).path()),
++                ()->assertEquals(branch.upstream(),r.forwarding(A).upstream()),
++                ()->assertEquals(branch.serverEpoch(),r.forwarding(A).serverEpoch()),
++                ()->assertEquals(0,r.load().sends()));
++        // Replay must still see the cancellation terminal; ACCEPTED must not clear it.
++        r.receive(c1,activation);assertEquals(ErrorCode.STALE_REVISION,lastError(r));
++        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
++    }}
++    @Test void m07CancelledAckAndOldRevisionCannotMutateReplacementChild(){try(var r=new Rig("S",true,4096,3)){
++        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
++        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
++        var healthy=r.forwarding(A).downstreams().get("C2");UUID sub=UUID.randomUUID(),oldRequest=UUID.randomUUID();
++        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(oldRequest);
++        var old=r.activate(c1,A,r.instance,sub,1,oldRequest,List.of("S","C1"),6000);
++        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(oldRequest)).findFirst().orElseThrow();
++        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));r.tick(250_000_000L);
++        UUID freshRequest=UUID.randomUUID();r.activate(c1,A,r.instance,sub,2,freshRequest,List.of("S","C1"),6000);
++        var fresh=r.forwarding(A).downstreams().get("C1");assertEquals(2,fresh.revision());assertEquals(freshRequest,fresh.requestId());
++        assertEquals(1,r.load().sends());
++        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));
++        pending.result.complete(Connection.SendResult.ACCEPTED);r.pump();
++        assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
++        assertEquals(0,r.load().sends());r.receive(c1,old);assertEquals(ErrorCode.STALE_REVISION,lastError(r));
++        assertEquals(fresh,r.forwarding(A).downstreams().get("C1"));assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
++    }}
++    @Test void m07CancelledAckReservationWaitsForBothCallbackAndContinuation() throws Exception {try(var r=new Rig("S",true,4096,3)){
++        var c1=peer("C1");var c2=peer("C2");r.up(c2);r.up(c1);
++        r.activate(c2,A,r.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","C2"),6000);
++        var healthy=r.forwarding(A).downstreams().get("C2");UUID sub=UUID.randomUUID(),request=UUID.randomUUID();
++        r.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
++        r.activate(c1,A,r.instance,sub,1,request,List.of("S","C1"),6000);
++        var pending=r.messages(MessageType.ACTIVATE_ACK).stream().filter(s->s.message.requestId().equals(request)).findFirst().orElseThrow();
++        r.act(()->r.router.cancelPendingChild(c1,A,sub,1));assertEquals(1,r.load().sends());
++        r.owner.hold=t->t.getName().equals("m07-cancelled-ack-callback");
++        var callback=new Thread(()->pending.result.complete(Connection.SendResult.ACCEPTED),"m07-cancelled-ack-callback");callback.start();
++        try{
++            assertTrue(r.owner.offered.await(5,TimeUnit.SECONDS));
++            // ready=true is already published, but the callback is still inside offer().
++            r.act(()->r.router.cancelPendingChild(c1,A,sub,1));
++            assertEquals(1,r.load().sends(),"A processed continuation does not finish a blocked callback");
++            assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
++        }finally{r.owner.hold=t->false;r.owner.resume.countDown();callback.join(5000);}
++        assertFalse(callback.isAlive());r.pump();assertEquals(0,r.load().sends());
++        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet());assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));
++    }}
++
+     @Test void m08DuplicatesRevisionsAndLineageAreBoundedAndIdempotent(){try(var r=new Rig("S",true,4096,3)){
+         var c=peer("C1");r.up(c);UUID sub=UUID.randomUUID(),request=UUID.randomUUID();var m=r.activate(c,A,r.instance,sub,1,request,List.of("S","C1"),6000);
+         for(int i=0;i<30;i++)r.receive(c,m);assertEquals(1,r.load().children());assertEquals(1,r.load().histories());
+diff --git a/add.md b/add.md
+index a6bb0d2..2e99313 100644
+--- a/add.md
++++ b/add.md
+@@ -1117,6 +1117,7 @@ final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575a
+ - **Ficheiros:** `routing/Route.java`, `routing/Subscription.java`, `routing/RoutingService.java`, `routing/ActivationTest.java`.
+ - **Exceção Q-C-36 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java`. O `until` aguarda conjuntamente snapshot sem N1 e NeighborDown da Session esperada; todas as asserções, prazos e restantes testes mantêm-se. Não alarga o âmbito de produção nem aprova Implement ou a etapa Test.
+ - **Exceção Q-C-37 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java` e `Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java`. Acrescenta apenas a guarda de HELLO inicial de saída com canal fechado e o novo teste das três ordens. Sete caminhos autorizados no total; testes/asserções/prazos/evidência anteriores preservados. Verificação incremental autorizada, sem aprovação de Implement/Test ou fecho; qualquer correção adicional exige apresentação prévia.
++- **Exceção Q-C-38 autorizada nesta retoma:** exclusivamente `Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java`, substituição de `this::read` por `() -> read(input)` no leitor CLI para corrigir a compilação. Oito caminhos autorizados no total; sem outra alteração de aplicação, protocolo ou transporte. Implement permanece pendente; ver evidência `experiments/construction/007-arvores/m07-cancellation-01/`.
+ - **Dependências:** IMP-010 (022-rotas).
+ - **ADR:** ADR-005, ADR-018, ADR-024.
+ - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-005, REQ-007, REQ-011, REQ-017, REQ-021.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 7da73e1..fd6cc30 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -6,6 +6,12 @@ Data de criação do plano: 26-10-2026. Estado global da implementação: IN PRO
+ 
+ **Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0 histórico, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas.
+ 
++**Última verificação de Implement:** M07 corrigido, regressão incremental atual
++1328/0/0/0 (18 suites), Q-C-38 autorizada/aplicada só à compilação CLI.
++[Retoma e preservação](../experiments/construction/007-arvores/m07-cancellation-01/README.md).
++Implement continua pendente de aceitação; Test não autorizado. Os resultados
++Q-C-37 abaixo são históricos e preservados; oito caminhos autorizados no total.
++
+ **Trabalho atual:** [007-arvores/IMP-011](../memory-bank/bolts/007-arvores/bolt.md),
+ Model iniciado em 2026-11-17T15:29:06Z por seleção explícita do utilizador.
+ Model/Q-C-34/35 aprovados em 2026-11-17T17:02:14Z e Design completo aprovado
+@@ -13,7 +19,7 @@ em 2026-11-17T17:30:07Z, incluindo leases/T/A/lineagens/capacidades/quotas.
+ Revisão ADR aprovada em2026-11-17T17:50:02Z; apenas Implement autorizado.
+ [Implementação e evidência](../memory-bank/bolts/007-arvores/implementation-walkthrough.md)
+ nos quatro caminhos mais as exceções Q-C-36/Q-C-37 autorizadas e aplicadas,
+-sete caminhos no total. [Resultados atuais](../experiments/construction/007-arvores/q-c-37/README.md):
++sete caminhos nessa revisão histórica. [Resultados históricos](../experiments/construction/007-arvores/q-c-37/README.md):
+ D11b/três ordens1/0/0/0, D11a original1/0/0/0, handshake/lifecycle202/0/0/0 e
+ uma regressão incremental completa1325/0/0/0. Closed/prazo HELLO existente sem
+ resposta terminam e libertam recursos; TCP real com zero reservas e terminação
+@@ -131,7 +137,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-011](tasks/PHASE-03/TASK-011.md) | Modelar candidatos, custos e snapshots por stream | TASK-003, TASK-010 | DONE | [V-011/Test1211,manual Luis43,revisão final e integração3b7aa74](../memory-bank/bolts/021-rotas/closure-walkthrough.md) |
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
+-| [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | IN PROGRESS | Model/Design/ADR aprovados; Implement para revisão; Q-C-36/37 aplicadas; regressão1325/0; V-014 integral/aceitação pendentes |
++| [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | IN PROGRESS | Model/Design/ADR aprovados; Implement para revisão; Q-C-36/37/38 aplicadas; M07 corrigido; regressão atual1328/0; V-014 integral/aceitação pendentes |
+ | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | TODO | V-017: NÃO EXECUTADO |
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index 8795c7b..c49d241 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1392,3 +1392,47 @@ prévia. Os14 cenários por executar; sem Java, commits ou push.
+ - **Estado:** apenas a exceção Java expressamente autorizada, sem avanço a Test, fecho,
+   commits, push, outro IMP ou gates externos adicionais. V-014 consolidado,
+   regressão aprovada, manual humano, revisão final Waheed e integração pendentes.
++
++
++## Q-C-38 — IMP-011: bloqueio de compilação preexistente fora dos sete caminhos
++
++Estado: DECIDIDA/APROVADA pelo utilizador; patch mínimo aplicado exclusivamente como proposto.
++Retoma M07 em main9c5ad094, árvore limpa à entrada. A primeira tentativa Maven
++parou na compilação de OttApplication.java:878, antes de executar M07. O
++construtor Console usa this::read, mas o único método é read(InputStream).
++O ficheiro coincide com HEAD e não foi alterado nesta retoma. Isto não é
++reprodução negativa do defeito de cancelamento, nem resultado de regressão.
++
++[Log preservado](../experiments/construction/007-arvores/m07-cancellation-01/red/maven.log)
++e [patch proposto de uma linha](../experiments/construction/007-arvores/m07-cancellation-01/q-c-38-proposed.patch).
++
++1. Recomendada: autorizar exclusivamente a lambda () -> read(input) nesta linha
++   de OttApplication.java, oitavo caminho limitado a repor a compilação. Mantém
++   reader virtual, input e comportamento pretendido; sem handshake/transporte,
++   wire, dependências ou prazos novos. Só aplicar após autorização explícita.
++2. Manter os sete caminhos: M07 pode ser investigado por compilação focada e
++   isolada do core, sem CLI e sem alterar esta fonte; o build/regressão integral
++   continuam bloqueados e não podem ser declarados aprovados.
++
++Implement continua pendente, Test não autorizado; nenhum commit/push/fecho.
++
++
++### Q-C-38 — aprovação explícita e aplicação exata
++
++Registo 2026-11-17T22:15:01.350853+00:00. O utilizador autorizou
++«Autorizar o patch mínimo e a regressão completa». Acrescenta OttApplication.java
++apenas para a lambda () -> read(input); patch aplicado sem ajustes. Não aprova
++Implement/Test/fecho nem permite outras alterações de CLI. M07 já reproduzido
++num core fresco isolado, com1 falha funcional esperada; não é regressão integral.
++
++## Q-C-39 — V-ADD: whitespace preexistente em CODESTYLE
++
++Aberta, sem correção aplicada. A validação documental desta retoma encontra um
++único erro: trailing whitespace em docs/style/CODESTYLE.md. O ficheiro é idêntico
++a HEAD/entrada e alheio ao âmbito autorizado.
++[Relatório](../experiments/construction/007-arvores/m07-cancellation-01/v-add.json) e
++[proveniência/linhas/hash](../experiments/construction/007-arvores/m07-cancellation-01/v-add-limitation.json).
++Opções: autorizar patch exclusivamente de whitespace nessas linhas; ou preservar
++o ficheiro e manter V-ADD pendente. Não alterar validador, código ou prazos.
++Implement permanece pendente; esta descoberta não invalida os 1328 testes Java
++executados nem autoriza Test/fecho.
+diff --git a/memory-bank/bolts/007-arvores/bolt.md b/memory-bank/bolts/007-arvores/bolt.md
+index 7ece7f3..039f010 100644
+--- a/memory-bank/bolts/007-arvores/bolt.md
++++ b/memory-bank/bolts/007-arvores/bolt.md
+@@ -233,3 +233,9 @@ com zero reservas e awaitTermination confirmado. Evidência anterior preservada.
+ Não se presume aprovação de Implement, regressão ou V-014. current_stage=implement,
+ só Model/Design/ADR concluídos; sem Test/fecho/commits/push/outro IMP/gates novos.
+ V-014 consolidado, regressão aprovada, manual humano, revisão Waheed e integração pendentes.
++
++## Retoma de Implement — M07
++
++Cancelamento terminal corrigido; Q-C-38 aplicada com autorização exclusiva.
++Regressão incremental atual: 1328/0/0/0; Implement por aceitar, Test não autorizado.
++Ver secção 11 do [walkthrough](implementation-walkthrough.md) e respetiva evidência.
+diff --git a/memory-bank/bolts/007-arvores/implementation-walkthrough.md b/memory-bank/bolts/007-arvores/implementation-walkthrough.md
+index ca14a6c..569b101 100644
+--- a/memory-bank/bolts/007-arvores/implementation-walkthrough.md
++++ b/memory-bank/bolts/007-arvores/implementation-walkthrough.md
+@@ -232,3 +232,55 @@ reconstruída por estes sucessos. Implement reapresentado para revisão, não ac
+ ou concluído; sem etapa Test, fecho, commits, push ou outro IMP. V-014 consolidado,
+ regressão aprovada, manual humano, revisão final Waheed e integração pendentes;
+ sem gates externos adicionais.
++
++## 11. Retoma M07 — cancelamento terminal e ACCEPTED tardio
++
++Base efetiva main/9c5ad094e58313622a5a695e259cd91b15a71a72, índice e árvore
++limpos à entrada. A formatação de Route.java já vinha do merge HEAD e foi
++preservada. Evidência nova em [m07-cancellation-01](../../../experiments/construction/007-arvores/m07-cancellation-01/README.md).
++
++Causa: cancelPendingChild marca a linhagem STALE_REVISION, mas conserva o filho
++até terminar o ACK físico. completed ainda reconhecia esse filho e, perante
++ACCEPTED tardio, reinstalava active e apagava o terminal. A guarda mínima em
++completed rejeita ACK de linhagem terminal. O finally original continua a marcar
++a continuação e só liberta a reserva quando callback e continuação terminaram.
++Não se usa !pending, que impediria replays legítimos de ACK. As guardas de
++identidade existentes continuam a isolar revisões/subscrições substitutas.
++
++Três testes novos, sem substituir testes históricos: cancelamento com C2 intacto
++e replay antigo rejeitado; revisão substituta imune ao callback/cancelamento
++antigos; callback bloqueado com reserva física retida mesmo após continuação.
++O negativo Maven anterior à correção executou 3 testes, 2 falhas de asserção,
++0 erros/ignorados, incluindo [C2] → [C2] → [C2,C1]. Depois da correção:
++6 testes M07, 31 ActivationTest e regressão incremental completa de 1328 testes
++em 18 suites, todos sem falhas/erros/ignorados. A regressão inclui TCP/CLI reais
++e testes históricos Q-C-36/37; não constitui consolidação V-014 nem etapa Test.
++JDK Temurin 21.0.13+9 / Maven 3.9.9, macOS; comandos/logs/XML preservados.
++
++Q-C-38: HEAD não compilava por this::read sem argumento em OttApplication.
++O utilizador autorizou exclusivamente o patch proposto, aplicado sem ajustes:
++() -> read(input). É o oitavo caminho autorizado, separado da correção M07.
++O primeiro Maven falhou antes dos testes; o primeiro instrumento isolado teve
++erro de classloader, o segundo reproduziu M07 no core; não são regressões
++integrais. Um lançamento Maven posterior teve erro de cwd antes de executar;
++todos os negativos e notas foram guardados, sem os contar como falhas M07.
++
++Preservação: 229 outros ficheiros src e 431 ficheiros de evidência anterior
++inalterados byte a byte. NeighborManager/NeighborManagerTest e
++OverlayNodeMonitoringTest (Q-C-36/37) intactos. target separado da entrega.
++Hashes SHA-256 atuais:
++
++- `ActivationTest.java`: `e5e8a2abd5aa0ed0f59162ad7b12238b9d56a73b75486628551b7751efa7af06`
++
++- `OttApplication.java`: `6eba42e6fcd1d5d67d65f24c9f4a408fb8abb2e584be1803b6301ececb1cbe2b`
++
++- `RoutingService.java`: `924bc65dd12d77caa9f38cdb48da79abfb848ece465cec8fe08acefec0650817`
++
++Implement reapresentado, pendente de aceitação. Test não autorizado. Pendentes:
++V-014 consolidado, clean verify/JAR final, manual humano antes da aprovação de
++Test, revisão final Waheed e integração. Sem staging, commits, push ou fecho.
++
++V-ADD executado nesta retoma: 1 erro de trailing whitespace preexistente em
++docs/style/CODESTYLE.md, byte a byte igual a HEAD. Q-C-39 aberta; ficheiro e
++validador preservados, V-ADD não aprovado. Ver relatório e v-add-limitation.json
++na pasta da evidência.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+index 0b6acd8..f2f13a8 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+@@ -145,3 +145,13 @@ budget configurado. Instrumento teve primeiro erro de cwd preservado, corrigido
+ somente no lançamento; nenhum teste/fundação adicional alterado.
+ Implement para revisão, sem aceitação/etapa Test/fecho/commits/push/outro IMP.
+ V-014 consolidado, regressão aprovada, manual humano, revisão Waheed e integração pendentes.
++
++## Retoma M07 / Q-C-38
++
++Implement por aceitar: três testes novos reproduzem cancelamento/revisão antiga e
++reserva física. Guarda terminal mínima em RoutingService; Q-C-38 exclusivamente
++para corrigir referência do leitor CLI, autorizada pelo utilizador. Regressão
++incremental atual1328/0/0/0; negativos e 431 evidências anteriores preservados.
++Ver secção11 do walkthrough do bolt007-arvores. Sem Test, staging, commit ou push.
++V-014 consolidado, clean verify/JAR final, manual humano, revisão final Waheed e
++integração continuam pendentes.

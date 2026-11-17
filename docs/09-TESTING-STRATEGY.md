@@ -167,7 +167,7 @@ Responsável: [TASK-013](tasks/PHASE-03/TASK-013.md). Requisitos: RF-010, RP-004
 
 V-014: dois clientes em tronco comum geram uma subscrição no tronco; ACK atrasado/cancelado não ativa; prefixo incorreto gera PATH_CHANGED; streams independentes mantêm estados separados.
 
-Responsável: [TASK-014](tasks/PHASE-04/TASK-014.md). Requisitos: RF-005, RF-007, RF-011, RP-002, RP-006. Estado: NÃO EXECUTADO.
+Responsável: [TASK-014](tasks/PHASE-04/TASK-014.md). Requisitos: RF-005, RF-007, RF-011, RP-002, RP-006. Estado: EXECUTADO tecnicamente; manual humano Francisco cumprido, Test por aprovar. [Relatório atual](../memory-bank/bolts/007-arvores/ddd-03-test-report.md), clean verify1328/0/0/0 e provas suplementares separadas; revisão final Waheed confirmada; integração pendente.
 
 ### V-015 — Podar ramos, renovar leases e remover procura abandonada
 

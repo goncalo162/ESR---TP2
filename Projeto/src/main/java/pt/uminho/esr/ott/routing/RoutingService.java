@@ -1272,6 +1272,9 @@ public final class RoutingService implements AutoCloseable {
                 }else if(s.child!=null){var c=s.child;
                     if(c.detached||c.line.child!=c)return;
                     if(s.kind==SendKind.ACK){
+                        // Logical cancellation/failure is terminal even while its ACK send is physically live.
+                        // The finally below still completes this continuation and retains a running callback.
+                        if(c.line.terminal!=null)return;
                         if(s.error==null&&s.result==Connection.SendResult.ACCEPTED&&epochCurrent(c.tree)
                                 &&current(c.line.key.session)&&healthy(c.tree,at)&&!elapsed(at,c.began)
                                 &&s.grant.validity().orElseThrow().remainingNanos(at)>0

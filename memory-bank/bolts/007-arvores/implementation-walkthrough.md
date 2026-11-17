@@ -2,11 +2,17 @@
 unit: "004-arvores"
 bolt: "007-arvores"
 stage: "implement"
-status: "in-progress"
+status: "complete"
 created: "2026-11-17T18:31:55Z"
 updated: "2026-11-17T21:49:25Z"
 ---
 # IMP-011 — Implement: ativação confirmada e investigação de NeighborDown
+
+**Estado atual:** Implement aprovado pelo utilizador; etapa Test autorizada.
+[Relatório Test atual](ddd-03-test-report.md). Os checkpoints/resultados anteriores
+abaixo são histórico preservado; Test/manual humano/revisão final/integração
+continuam por aprovar/concluir.
+
 
 ✅ Model/Design/ADR aprovados; autorização de Implement em2026-11-17T17:50:02Z.
 ⏳ Código nos quatro caminhos e exceções Q-C-36/Q-C-37 aplicadas; regressão
@@ -232,3 +238,66 @@ reconstruída por estes sucessos. Implement reapresentado para revisão, não ac
 ou concluído; sem etapa Test, fecho, commits, push ou outro IMP. V-014 consolidado,
 regressão aprovada, manual humano, revisão final Waheed e integração pendentes;
 sem gates externos adicionais.
+
+## 11. Retoma M07 — cancelamento terminal e ACCEPTED tardio
+
+Base efetiva main/9c5ad094e58313622a5a695e259cd91b15a71a72, índice e árvore
+limpos à entrada. A formatação de Route.java já vinha do merge HEAD e foi
+preservada. Evidência nova em [m07-cancellation-01](../../../experiments/construction/007-arvores/m07-cancellation-01/README.md).
+
+Causa: cancelPendingChild marca a linhagem STALE_REVISION, mas conserva o filho
+até terminar o ACK físico. completed ainda reconhecia esse filho e, perante
+ACCEPTED tardio, reinstalava active e apagava o terminal. A guarda mínima em
+completed rejeita ACK de linhagem terminal. O finally original continua a marcar
+a continuação e só liberta a reserva quando callback e continuação terminaram.
+Não se usa !pending, que impediria replays legítimos de ACK. As guardas de
+identidade existentes continuam a isolar revisões/subscrições substitutas.
+
+Três testes novos, sem substituir testes históricos: cancelamento com C2 intacto
+e replay antigo rejeitado; revisão substituta imune ao callback/cancelamento
+antigos; callback bloqueado com reserva física retida mesmo após continuação.
+O negativo Maven anterior à correção executou 3 testes, 2 falhas de asserção,
+0 erros/ignorados, incluindo [C2] → [C2] → [C2,C1]. Depois da correção:
+6 testes M07, 31 ActivationTest e regressão incremental completa de 1328 testes
+em 18 suites, todos sem falhas/erros/ignorados. A regressão inclui TCP/CLI reais
+e testes históricos Q-C-36/37; não constitui consolidação V-014 nem etapa Test.
+JDK Temurin 21.0.13+9 / Maven 3.9.9, macOS; comandos/logs/XML preservados.
+
+Q-C-38: HEAD não compilava por this::read sem argumento em OttApplication.
+O utilizador autorizou exclusivamente o patch proposto, aplicado sem ajustes:
+() -> read(input). É o oitavo caminho autorizado, separado da correção M07.
+O primeiro Maven falhou antes dos testes; o primeiro instrumento isolado teve
+erro de classloader, o segundo reproduziu M07 no core; não são regressões
+integrais. Um lançamento Maven posterior teve erro de cwd antes de executar;
+todos os negativos e notas foram guardados, sem os contar como falhas M07.
+
+Preservação: 229 outros ficheiros src e 431 ficheiros de evidência anterior
+inalterados byte a byte. NeighborManager/NeighborManagerTest e
+OverlayNodeMonitoringTest (Q-C-36/37) intactos. target separado da entrega.
+Hashes SHA-256 atuais:
+
+- `ActivationTest.java`: `e5e8a2abd5aa0ed0f59162ad7b12238b9d56a73b75486628551b7751efa7af06`
+
+- `OttApplication.java`: `6eba42e6fcd1d5d67d65f24c9f4a408fb8abb2e584be1803b6301ececb1cbe2b`
+
+- `RoutingService.java`: `924bc65dd12d77caa9f38cdb48da79abfb848ece465cec8fe08acefec0650817`
+
+Implement reapresentado, pendente de aceitação. Test não autorizado. Pendentes:
+V-014 consolidado, clean verify/JAR final, manual humano antes da aprovação de
+Test, revisão final Waheed e integração. Sem staging, commits, push ou fecho.
+
+V-ADD executado nesta retoma: 1 erro de trailing whitespace preexistente em
+docs/style/CODESTYLE.md, byte a byte igual a HEAD. Q-C-39 aberta; ficheiro e
+validador preservados, V-ADD não aprovado. Ver relatório e v-add-limitation.json
+na pasta da evidência.
+
+## 12. Q-C-39 resolvida — Implement reapresentado
+
+M07 aceite tecnicamente pelo utilizador; aprovação de Implement ainda pendente.
+Autorizada e aplicada exclusivamente a remoção de trailing whitespace das linhas
+26, 28, 91, 105, 138 e 178 de CODESTYLE.md. V-ADD passou com zero erros.
+[Patch, relatório e preservação](../../../experiments/construction/007-arvores/q-c-39/README.md).
+Os relatórios negativos anteriores continuam intactos como histórico.
+Código Java inalterado desde a regressão1328/0/0/0; não se repetiu Maven.
+Sem avanço a Test, staging, commits, push ou fecho. V-014 consolidado,
+clean verify/JAR final, manual humano, revisão final Waheed e integração pendentes.

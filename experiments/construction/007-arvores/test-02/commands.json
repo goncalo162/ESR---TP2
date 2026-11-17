@@ -1,0 +1,85 @@
+{
+  "recorded_at": "2026-11-17T23:05:59.753667+00:00",
+  "clean_verify": {
+    "cwd": "/Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto",
+    "argv": [
+      "mvn",
+      "-B",
+      "-ntp",
+      "-Dott.evidence.directory=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/007-arvores/test-02/cli-deployments",
+      "-Dott.trace.evidence=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/007-arvores/test-02/trace-deployments",
+      "clean",
+      "verify"
+    ],
+    "exit_code": 0
+  },
+  "supplement_java": {
+    "argv": [
+      "java",
+      "-Dfile.encoding=UTF-8",
+      "-Dstdout.encoding=UTF-8",
+      "-cp",
+      "experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar:experiments/construction/007-arvores/test-02/controlled-agent",
+      "pt.uminho.esr.ott.overlay.TcpActivationProbe"
+    ],
+    "exit_code": 0
+  },
+  "controlled_oracles_java": {
+    "argv": [
+      "java",
+      "-Dfile.encoding=UTF-8",
+      "-Dstdout.encoding=UTF-8",
+      "-cp",
+      "experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar:experiments/construction/007-arvores/test-02/controlled-agent",
+      "pt.uminho.esr.ott.routing.V014OracleProbe"
+    ],
+    "exit_code": 0
+  },
+  "compile_commands": [
+    {
+      "argv": [
+        "javac",
+        "--release",
+        "21",
+        "-encoding",
+        "UTF-8",
+        "-cp",
+        "experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar",
+        "-d",
+        "experiments/construction/007-arvores/test-02/controlled-agent",
+        "experiments/construction/007-arvores/test-manual-tools/ManualActivation.java"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "javac",
+        "--release",
+        "21",
+        "-encoding",
+        "UTF-8",
+        "-cp",
+        "experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar",
+        "-d",
+        "experiments/construction/007-arvores/test-02/controlled-agent",
+        "experiments/construction/007-arvores/test-manual-tools/TcpActivationProbe.java"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "javac",
+        "--release",
+        "21",
+        "-encoding",
+        "UTF-8",
+        "-cp",
+        "experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar:experiments/construction/007-arvores/test-02/controlled-agent",
+        "-d",
+        "experiments/construction/007-arvores/test-02/controlled-agent",
+        "experiments/construction/007-arvores/test-manual-tools/V014OracleProbe.java"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

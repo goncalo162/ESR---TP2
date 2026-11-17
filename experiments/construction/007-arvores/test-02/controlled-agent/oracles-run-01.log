@@ -1,0 +1,21 @@
+CODE_SOURCE=file:/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/007-arvores/test-02/ott-streaming-1.0-SNAPSHOT.jar
+CHECK_PASS 1 M03 unavailable source rejects A
+CHECK_PASS 2 M03 other local stream stays available
+CHECK_PASS 3 M09 A=1 no retry
+CHECK_PASS 4 M09 error per child's own requestId
+CHECK_PASS 5 M10 A lease expiry preserves B exactly
+CHECK_PASS 6 M12 ACK one nanosecond before t0+G activates for 1ns
+CHECK_PASS 7 M12 exact grant deadline removes authorization
+CHECK_PASS 8 M11 old Down cannot invalidate replacement Session
+CHECK_PASS 9 M13 four local tokens per stream; fifth refused
+CHECK_PASS 10 M13 global local limit 2 across streams
+CHECK_PASS 11 M13 child/history capacity refusal preserves two active leases
+CHECK_PASS 12 M13 bounded two trees, third operation refused
+CHECK_PASS 13 M13 per-Session physical send limit 4, fifth intent waits
+CHECK_PASS 14 M13 fifth send admitted only after physical release
+CHECK_PASS 15 M14 alarm physical jobs bounded under pending demand
+CHECK_PASS 16 M13 J/B global cap 2, third unbound error dropped
+CHECK_PASS 17 M13 no unbounded error backlog
+CHECK_PASS 18 M13 J slot freed after callback/continuation
+CLEANUP_COMPLETE
+ORACLES_PASS CHECKS=18
