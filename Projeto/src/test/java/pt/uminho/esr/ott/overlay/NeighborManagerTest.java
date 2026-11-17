@@ -798,6 +798,41 @@ class NeighborManagerTest {
             assertEquals(NeighborManager.CapabilityState.ACTIVE_DISCOVERY,f.manager.discoveryStatus().get("B").state());
         }
     }
+    @Test void D11bCapturedNegativeHelloReplySurvivesEarlierWriteContinuationAfterReaderClose() throws Exception {
+        for (int order = 0; order < 3; order++) try (var f = new Fixture("A")) {
+            f.ready("B"); var rejected = f.outbound(false); var hello = rejected.last();
+            var encoded = MessageCodec.encode(new ControlMessage(MessageType.HELLO_OK, hello.requestId(),
+                    "B", UUID.randomUUID(), new ControlMessage.HelloOk(3)));
+            java.nio.ByteBuffer.wrap(encoded).putInt(encoded.length - 4, 0);
+            var error = assertThrows(pt.uminho.esr.ott.protocol.ProtocolException.class,
+                    () -> MessageCodec.readFrame(new java.io.ByteArrayInputStream(encoded)));
+            var remote = ((MessageCodec.HandshakeFailure) error.getCause()).message();
+            f.events.clear();
+            if (order != 1) {
+                rejected.written();
+                if (order == 2) f.pump();
+            }
+            f.io.sink.protocolError(rejected, error, f.clock.get());
+            rejected.open = false; // Connection.readLoop closes after enqueuing protocolError.
+            if (order == 1) rejected.written();
+            f.io.sink.closed(rejected, Connection.CloseReason.PROTOCOL_ERROR, f.clock.get());
+            f.pump();
+            var diagnostics = f.events.stream().filter(e -> e instanceof NeighborManager.Diagnostic)
+                    .map(e -> (NeighborManager.Diagnostic) e).toList();
+            assertEquals(1, diagnostics.size(), "order=" + order);
+            var diagnostic = diagnostics.getFirst();
+            assertEquals(NeighborManager.Reason.REQUIRED_DISCOVERY_MISSING, diagnostic.reason(), "order=" + order);
+            assertEquals(Optional.of(rejected.id()), diagnostic.connectionId());
+            assertEquals(Optional.of(remote), diagnostic.remoteMessage());
+            assertEquals(hello.requestId(), diagnostic.remoteMessage().orElseThrow().requestId());
+            assertTrue(diagnostic.session().isEmpty());
+            assertEquals(NeighborManager.CapabilityState.INCOMPATIBLE, f.manager.discoveryStatus().get("B").state());
+            assertEquals(Optional.of(NeighborManager.Reason.REQUIRED_DISCOVERY_MISSING),
+                    f.manager.discoveryStatus().get("B").lastConfirmedRejection());
+            assertTrue(f.manager.snapshot().isEmpty()); assertEquals(0, f.ups());
+            assertFalse(f.owner.stopped); assertFalse(f.manager.start().toCompletableFuture().isCompletedExceptionally());
+        }
+    }
     @Test void D02cConfirmedRejectionSurvivesTemporaryAbsenceAndBackoffThenValidRetry() throws Exception {
         try(var f=new Fixture("A")) {
             f.ready("B");var rejected=f.outbound(true);var remote=UUID.randomUUID();

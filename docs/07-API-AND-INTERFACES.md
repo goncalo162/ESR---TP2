@@ -769,3 +769,66 @@ A reparação IMP-035 pode criar C–S após perder ambos os relays: esse trace
 continua correto; o manual retira S antes do último relay para observar NO_ROUTE.
 Não se muda política/wire/caps/API por causa da cena de teste. Roteiro/ensaio
 agent34checks não substituem manual humano; Test/revisão final/integração pendentes.
+
+## IMP-011 — Design aprovado; APIs reais conferidas em revisão ADR
+
+Registo 2026-11-17T17:35:51Z. O Design completo foi aprovado pelo utilizador em
+2026-11-17T17:30:07Z; autorizada apenas a
+[revisão ADR](../memory-bank/bolts/007-arvores/adr-review.md), preparada para aceitação.
+As notas seguintes são conferência estática, não novas APIs implementadas.
+
+RoutingService.Snapshot atual tem quatro componentes/construtor: capturedAtNanos,
+catalog, routes, diagnostics. A extensão aprovada prevê forwarding separado e
+conservação desse construtor com mapa vazio. Route e StreamCatalog.Entry continuam
+limitados a projeções de seleção; não relaxar os seus invariantes para ACTIVE.
+Tipos de confirmação ficam aninhados em Route.java e não autorizam vídeo por
+mera seleção. Subscription.java e ActivationTest.java ainda são caminhos ausentes.
+
+ControlPort.send(Session,ControlMessage) já devolve CompletionStage<SendResult>.
+NeighborManager admite/envia11/12/17 nas sessões correntes; falta integrar esses
+handlers no RoutingService. ERROR relacionado11 precisa de ramo próprio antes
+do retorno atual do trace, preservando relatedType15. Nenhuma mudança de wire,
+codec, máscaras ou send() do manager é necessária para essa integração.
+
+Scheduler real expõe schedule/requestClose/awaitTermination/physicalJobs;
+Ticket só cancel. Reutilizar alarme/wake/cleanup e incluir as reservas físicas
+de ativação na espera do RoutingService. OverlayNode já aguarda esse serviço
+no prazo restante e não precisa de alteração por esta revisão.
+M01–M14 e regressão nova por executar; NeighborDown continua por investigar
+antes da aceitação de Implement/Test. Sem Java/Implement/commits/push.
+
+## IMP-011 — APIs de Implement disponíveis; aceitação e Test pendentes
+
+Registo2026-11-17T18:36:18Z. ADR aprovada pelo utilizador; apenas Implement.
+[Walkthrough e evidência](../memory-bank/bolts/007-arvores/implementation-walkthrough.md).
+RoutingService.Snapshot acrescenta Map<UUID,Route.Confirmation> forwarding e
+conserva o construtor anterior de quatro argumentos com mapa vazio. Route e
+StreamCatalog mantêm seleção; a confirmação não altera os campos de dados
+legados de Route. Confirmation.visibleAt e Subscription.Lease filtram validade
+sem renovar prazos, com Session/endpoint confirmados e cópias defensivas.
+
+requestSubscription(streamId,consumerToken) devolve SubscriptionTicket com
+operationId/result/cancel, sem callbacks arbitrários no owner. Token repetido
+agrega idempotentemente; retrySubscription é operação explícita nova após terminal.
+Cancelamento lógico de filho é interno ao owner. Sem CLI nova ou wrapper em OverlayNode.
+O serviço trata11/12 e ERROR relacionado11 separadamente do trace15; regista
+lineagens/revisões limitadas, T/A, grants remanescentes e quotas aprovados.
+Alarme/wake/fecho partilhados; awaitTermination inclui envios físicos de ativação.
+
+Os 1324 testes verdes anteriores à exceção não são aceitação de Implement, Test, V-014
+integral ou prova de vídeo/GUI/CORE. Exceção Q-C-36 autorizada/aplicada só no teste
+histórico, sem alteração adicional de API/produção; negativos e diagnóstico
+preservados. [Verificação nova](../experiments/construction/007-arvores/q-c-36/README.md):
+focado NeighborDown 1/0/0/0; duas regressões 1324/1/0/0 (D11a), isolado D11a 1/0/0/0.
+Fecho, manual humano,
+revisão final Waheed e integração pendentes; sem commits/push.
+
+## Q-C-37 aplicada — retoma de Implement em 2026-11-17T21:49:25Z
+
+Exceção autorizada/aplicada somente em NeighborManager.java/NeighborManagerTest.java;
+sem nova API pública. HELLO inicial de saída, não ACTIVE e canal já fechado:
+continuação de escrita preserva contexto para protocolError/Closed/prazo existente.
+D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
+[Prova nova](../experiments/construction/007-arvores/q-c-37/README.md) inclui terminação
+sem resposta/recursos físicos, mantendo os prazos. Implement continua por aceitar,
+sem Test/fecho/commits/push/outro IMP; restantes requisitos de fecho pendentes.

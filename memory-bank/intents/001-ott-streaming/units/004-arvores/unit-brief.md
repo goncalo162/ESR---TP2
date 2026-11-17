@@ -1,11 +1,11 @@
 ---
 unit: "004-arvores"
 intent: "001-ott-streaming"
-phase: "inception"
+phase: "construction"
 source_phase: "PHASE-04"
-status: "ready"
+status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T20:54:11Z"
+updated: "2026-11-17T21:49:25Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
@@ -14,6 +14,17 @@ requires_units: ["003-rotas"]
 # Unidade — 004-arvores
 
 Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+
+Estado atual: 007-arvores/IMP-011 em Implement, após aprovação ADR
+em2026-11-17T17:50:02Z. [Código/evidência](../../../../bolts/007-arvores/implementation-walkthrough.md):
+Q-C-36 e Q-C-37 autorizadas/aplicadas exclusivamente como apresentadas, sete
+caminhos no total. D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0;
+regressão incremental1325/0/0/0 e terminação sem resposta/recursos verificados.
+[Resultados novos](../../../../../experiments/construction/007-arvores/q-c-37/README.md).
+Aceitação de Implement/etapa Test pendentes; negativos/diagnóstico anteriores
+preservados. Sem correção adicional ou gate externo novo.
+História001 mantém planned e não implementada; os outros quatro bolts não iniciados.
+[Registo de construção](construction-log.md). V-014 integral não consolidado/aceite.
 
 ## Requisitos atribuídos
 

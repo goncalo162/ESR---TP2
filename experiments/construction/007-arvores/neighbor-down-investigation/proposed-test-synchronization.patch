@@ -1,0 +1,13 @@
+--- a/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java
+@@ -92,7 +92,9 @@
+                         rig.instances.get(i), new ControlMessage.Probe(99))).toCompletableFuture().get(1, TimeUnit.SECONDS));
+             }
+             var survivor = rig.nodes.get(0); var old = survivor.snapshot().get("N1"); rig.nodes.get(1).close();
+-            until(() -> !survivor.monitoringSnapshot().links().containsKey("N1"));
++            until(() -> !survivor.monitoringSnapshot().links().containsKey("N1")
++                    && rig.observed.get(0).stream().anyMatch(e -> e instanceof NeighborManager.NeighborDown d
++                            && d.session().equals(old)));
+             assertTrue(rig.observed.get(0).stream().anyMatch(e -> e instanceof NeighborManager.NeighborDown d && d.session().equals(old)));
+             assertTrue(survivor.failure().isEmpty());
+         }

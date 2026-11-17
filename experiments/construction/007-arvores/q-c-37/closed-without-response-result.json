@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-11-17T21:47:34.807671+00:00",
+  "kind": "authorized external diagnostic during Implement; no test source edits beyond exact Q-C-37 patch",
+  "command": "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell --class-path <java.class.path captured from three-orders XML> ../experiments/construction/007-arvores/q-c-37/closed-without-response.jsh",
+  "working_directory": "Projeto",
+  "classpath_source": "three-orders/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml java.class.path",
+  "log": "closed-without-response-02.log",
+  "controlled_results": [
+    "CONTROLLED_OK path=Closed connection=d0aa74b7-e917-4184-b62d-baac822a93d9 reason=TRANSPORT contexts=0 retained=0 nativeDials=0 oldAttemptLive=false oldDeadlineLive=false peerContext=null peerAttempt=null Session=empty retry=existing elapsedNanos=0 configuredHelloBudgetNanos=3000000000",
+    "CONTROLLED_OK path=existing deadline connection=8795452f-163a-43e8-ba5a-491baa0c3944 reason=TIMEOUT contexts=0 retained=0 nativeDials=0 oldAttemptLive=false oldDeadlineLive=false peerContext=null peerAttempt=null Session=empty retry=existing elapsedNanos=3000000000 configuredHelloBudgetNanos=3000000000"
+  ],
+  "real_tcp_result": "REAL_TCP_OK Closed-and-existing-deadline; no response bytes; nativeConnectionCount=0; managerAwaitTermination=true; configuredHelloBudget=PT3S configuredShutdownBudget=PT1.5S",
+  "configured_hello_budget_ms": 3000,
+  "configured_shutdown_budget_ms": 1500,
+  "deadline_or_assertion_changes": false,
+  "prior_instrument_launch": {
+    "log": "closed-without-response.log",
+    "result": "two controlled cases passed; real TCP setup stopped by wrong cwd before service startup; diagnostic launch only corrected"
+  }
+}

@@ -1,0 +1,51 @@
+Error:
+pt.uminho.esr.ott.overlay.NeighborManager.Channel is not public in pt.uminho.esr.ott.overlay.NeighborManager; cannot be accessed from outside package
+        var channel=(NeighborManager.Channel)raw;
+                     ^---------------------^
+Warning:
+unchecked cast
+  required: java.util.List<pt.uminho.esr.ott.protocol.ControlMessage>
+  found:    java.lang.Object
+        var writes=(List<ControlMessage>)field(raw,"writes");var hello=writes.getLast();
+                                         ^-----------------^
+Error:
+reference to ProtocolException is ambiguous
+  both class pt.uminho.esr.ott.protocol.ProtocolException in pt.uminho.esr.ott.protocol and class java.net.ProtocolException in java.net match
+        ProtocolException error=null;
+        ^---------------^
+Error:
+reference to ProtocolException is ambiguous
+  both class pt.uminho.esr.ott.protocol.ProtocolException in pt.uminho.esr.ott.protocol and class java.net.ProtocolException in java.net match
+        catch(ProtocolException expected){error=expected;}
+              ^---------------^
+Error:
+pt.uminho.esr.ott.overlay.NeighborManager.Sink is not public in pt.uminho.esr.ott.overlay.NeighborManager; cannot be accessed from outside package
+        var io=field(f,"io");var sink=(NeighborManager.Sink)field(io,"sink");
+                                       ^------------------^
+Warning:
+unchecked cast
+  required: java.util.List<java.util.concurrent.CompletableFuture<java.lang.Void>>
+  found:    java.lang.Object
+        var completions=(List<CompletableFuture<Void>>)field(raw,"confirmations");
+                                                       ^------------------------^
+Warning:
+unchecked cast
+  required: java.util.List<pt.uminho.esr.ott.overlay.NeighborManager.Event>
+  found:    java.lang.Object
+        var events=(List<NeighborManager.Event>)field(f,"events");events.clear();
+                                                ^---------------^
+Error:
+cannot find symbol
+  symbol:   method probe(java.lang.String)
+try {probe("WRITER_QUEUED_THEN_READER_CLOSE");probe("READER_QUEUED_BEFORE_WRITER");probe("OWNER_PROCESSED_WRITE_BEFORE_READER");System.out.println("PROBE_OK 3 controlled orders; unchanged compiled fixture and production; no clock advance");}catch(Throwable e){e.printStackTrace();System.out.println("PROBE_FAILED");}
+     ^---^
+Error:
+cannot find symbol
+  symbol:   method probe(java.lang.String)
+try {probe("WRITER_QUEUED_THEN_READER_CLOSE");probe("READER_QUEUED_BEFORE_WRITER");probe("OWNER_PROCESSED_WRITE_BEFORE_READER");System.out.println("PROBE_OK 3 controlled orders; unchanged compiled fixture and production; no clock advance");}catch(Throwable e){e.printStackTrace();System.out.println("PROBE_FAILED");}
+                                              ^---^
+Error:
+cannot find symbol
+  symbol:   method probe(java.lang.String)
+try {probe("WRITER_QUEUED_THEN_READER_CLOSE");probe("READER_QUEUED_BEFORE_WRITER");probe("OWNER_PROCESSED_WRITE_BEFORE_READER");System.out.println("PROBE_OK 3 controlled orders; unchanged compiled fixture and production; no clock advance");}catch(Throwable e){e.printStackTrace();System.out.println("PROBE_FAILED");}
+                                                                                   ^---^

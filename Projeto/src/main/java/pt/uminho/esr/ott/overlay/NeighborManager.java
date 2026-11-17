@@ -593,6 +593,11 @@ public final class NeighborManager implements AutoCloseable {
             // enqueue that reply before Closed while the writer's callback is pending.
             // Only the reader's ordered Closed event/deadline may discard that reply.
             if (c.bootstrap && error != null) return;
+            // The HELLO reader can capture a rejection and close before this earlier
+            // write continuation runs. Preserve its context for the ordered reader
+            // protocolError/Closed event; the existing handshake deadline still applies.
+            if (!c.bootstrap && !c.active && c.direction == Direction.OUTBOUND
+                    && c.helloType == MessageType.HELLO && !c.channel.isOpen()) return;
             if (error != null || !c.bootstrap && !c.channel.isOpen()) { finish(c, Reason.TRANSPORT, null); return; }
             if (expired(c.openedAt, budget(c))) { finish(c, Reason.TIMEOUT, null); return; }
             c.responding = false;

@@ -1239,3 +1239,156 @@ Apenas interfaces/tipos e testes inicialmente vermelhos autorizados, quatro
 ficheiros. Comportamentos, Test, staging, commits/push e fecho não autorizados.
 V-013/T01–T18 integral, regressão atual, manual humano, revisão final Fillmore
 e integração continuam pendentes; sem gates externos adicionais.
+
+## Q-C-34 — IMP-011: fronteira de cancelamento e validade com IMP-012
+
+- **Estado:** DECIDIDA/APROVADA pelo utilizador em 2026-11-17T17:02:14Z,
+  juntamente com o [Model](../memory-bank/bolts/007-arvores/ddd-01-domain-model.md).
+- **Decisão:** IMP-011 inclui cancelamento/invalidação lógicos e validade mínima
+  para que ACK tardio, cancelado ou expirado não autorize a árvore. Retirar uma
+  intenção local identificada não remove a procura dos restantes consumidores.
+  Confirmações expiradas não aparecem na projeção utilizável.
+- **Fronteira:** CLI stop, renovação periódica, tratamento completo de
+  DEACTIVATE e poda propagada continuam em IMP-012. Antes disso não se promete
+  transmissão duradoura ou remoção imediata de ramos remotos já concedidos.
+- **Design autorizado:** concretizar o lease dos filhos limitado pela
+  confirmação remanescente a montante, os limites de tentativas/respostas/
+  históricos e os casos de teste. Detalhes concretos de Design não ficam
+  automaticamente aprovados por esta decisão de princípio.
+- **Limites da autorização:** apenas Design; sem Java, Implement, commits ou
+  push. M01–M14/V-014 por executar. Nenhum gate externo adicional.
+
+## Q-C-35 — IMP-011: seleção divergente do ramo confirmado
+
+- **Estado:** DECIDIDA/APROVADA pelo utilizador em 2026-11-17T17:02:14Z.
+- **Decisão:** na primeira ativação, revalidar caminho/época antes de confirmar;
+  para agregar uma adesão num ramo já ativo, exigir compatibilidade com os
+  prefixos selecionado e efetivamente confirmado. Divergência devolve
+  PATH_CHANGED sem trocar parent, cancelar filhos saudáveis ou remover a
+  confirmação existente. Mudança apenas da métrica, sem mudar prefixo/época/
+  sessão, não é divergência de caminho.
+- **Consequência:** seleção continua distinta de confirmação. Recuperação e
+  troca de árvore ficam nos IMP-013/014. O Design deve prever testes que
+  comprovem a recusa de novas adesões e a preservação do ramo confirmado.
+- **Pendência técnica:** preservar os logs anteriores de NeighborDown em
+  evidência duradoura; investigar antes de aceitar Implement/Test. Sem
+  atribuir causa por inferência ou alterar testes/fundações fora do âmbito.
+  A aprovação destas decisões não dispensa resolver essa pendência técnica.
+
+### Q-C-34/35 — concretização de Design no checkpoint anterior
+
+O [Design de IMP-011](../memory-bank/bolts/007-arvores/ddd-02-technical-design.md)
+concretiza o grant dos filhos pelo restante de montante, ancorado no início do
+pedido no recetor, com floor de ms e sem renovar por duplicado. Propõe prazo
+global T, até A tentativas, lineagem/maior revisão retida por Session/epoch e
+tetos separados para contextos, filhos, históricos, respostas e envios físicos.
+As variantes de seleção divergente verificam PATH_CHANGED e preservação de
+parent/destinos/leases, sem ativar uma troca. São detalhes de Design ainda
+propostos, não novas decisões já aceites ou gates externos adicionais.
+
+Logs de NeighborDown preservados em 2026-11-17T17:03:23Z:
+[README e manifesto SHA-256](../experiments/construction/007-arvores/neighbor-down-baseline/README.md).
+Três cópias byte a byte, sem repetir testes ou estabelecer a causa. Os14
+cenários M01–M14 continuam por executar; à data só Model estava concluído.
+
+### Q-C-34/35 — Design completo aprovado; apenas revisão ADR
+
+Registo 2026-11-17T17:30:07Z. O utilizador aprovou integralmente o Design,
+incluindo ancoramento dos leases, prazo global T/até A tentativas, lineagens,
+capacidades e quotas propostas. As menções a detalhes ainda por aprovar acima
+descrevem o checkpoint anterior; não são o estado atual.
+
+[Revisão ADR preparada](../memory-bank/bolts/007-arvores/adr-review.md) após
+conferir APIs reais e integração das projeções/lifecycle. Construtor real de
+Snapshot tem quatro argumentos; mantê-lo com forwarding vazio ao acrescentar
+a projeção separada. Route/catalog mantêm invariantes de seleção. Desmultiplexar
+ERROR11/15 no RoutingService e incluir envios físicos de ativação no seu fecho,
+sem alterar componentes externos ou testes históricos. Estes são pontos de
+integração nos quatro caminhos já previstos, não novas decisões de âmbito.
+
+Não se identificou necessidade de nova ADR/substituição ou quinto caminho
+pela análise estática. Revisão ADR ainda por aceitar, Implement não autorizado.
+NeighborDown continua pendente; negativos preservados e investigação obrigatória
+antes da aceitação de Implement/Test. Correção fora do âmbito exige apresentação
+prévia. Os14 cenários por executar; sem Java, commits ou push.
+
+## Q-C-36 — IMP-011: sincronização da observação de NeighborDown fora dos quatro caminhos
+
+- **Estado:** AUTORIZADA e APLICADA exclusivamente como apresentada. Proposta
+  original em 2026-11-17T18:36:18Z; autorização explícita do utilizador nesta retoma
+  em 2026-11-17, sem aprovação de Implement ou transição de etapa.
+- **Autorização atual:** os quatro caminhos de Implement mantêm-se, acrescidos
+  apenas da exceção para OverlayNodeMonitoringTest.java. Outras correções fora
+  desse âmbito continuam a exigir apresentação prévia, sem apagar/enfraquecer testes.
+- **Evidência consolidada:** o teste histórico espera só pela ausência de N1 no
+  snapshot e imediatamente exige NeighborDown na lista externa. OverlayNode
+  publica o monitor antes de entregar ao observador. Um novo teste autorizado,
+  com OverlayNode/TCP reais e barreira limitada, reproduz a janela e comprova
+  a entrega posterior da mesma Session. [Investigação/logs/XML](../experiments/construction/007-arvores/neighbor-down-investigation/README.md).
+  Não se reconstrói a interleaving exata dos negativos antigos a partir de logs
+  que não a contêm. Os negativos mantêm hashes originais; antes de Q-C-36, o teste
+  original passou isoladamente e nas regressões1322/1324, sem alteração.
+- **Patch autorizado e aplicado:** somente
+  [este patch](../experiments/construction/007-arvores/neighbor-down-investigation/proposed-test-synchronization.patch)
+  a Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java:
+  o until aguarda conjuntamente snapshot sem N1 e NeighborDown da Session esperada.
+  Conservar assertTrue, timeout20s, helper5s/poll5ms e restantes testes/fundações.
+  Nenhum sleep novo, skip, prazo aumentado ou alteração de produção.
+- **Impacto:** único quinto caminho, exclusivamente sincronização de teste.
+  Patch aplicado sem mudanças adicionais; nenhum novo tipo/protocolo/ADR/contrato de runtime.
+  Decisão técnica/de âmbito, não um gate externo novo.
+- **Resultados desta retoma:** [logs/XML/manifestos novos](../experiments/construction/007-arvores/q-c-36/README.md),
+  separados dos negativos e do diagnóstico anteriores, preservados sem alterações.
+- **Estado do IMP:** Implement reapresentado; NeighborDown focado 1/0/0/0.
+  Duas regressões atuais 1324/1/0/0, apenas D11a em OttApplicationTest.java:562;
+  D11a isolado 1/0/0/0. NeighborDown/diagnóstico controlado passaram; causa de
+  D11a não estabelecida, sem correção adicional. Aceitação pendente. Test/fecho/outro IMP não iniciados,
+  sem commits/push. V-014 integral, regressão aprovada, manual humano,
+  revisão final Waheed e integração continuam exigidos para fecho.
+
+## Q-C-37 — IMP-011: D11a, erro capturado preterido por continuação de escrita
+
+- **Estado:** INVESTIGAÇÃO CONSOLIDADA; patch AUTORIZADO E APLICADO exclusivamente
+  como apresentado, por instrução explícita do utilizador nesta retoma de
+  2026-11-17. Implement continua pendente de aceitação; nenhuma etapa promovida.
+- **Preservação:** os dois negativos completos 1324/1/0/0 e o sucesso isolado
+  1/0/0/0 de Q-C-36 mantêm hashes originais, tal como os negativos/diagnóstico
+  de NeighborDown. Os deployments dos dois negativos foram copiados de target.
+- **Evidência correlacionada:** uma execução fixa da classe original, com strace
+  e sem mudanças Java, passou 48/0/0/0. HELLO e HELLO_OK/selectedMask0 têm o mesmo
+  requestId em N0 e N1; o peer escreve os 46 bytes e fecha, o nó lê todos os bytes
+  e emite REQUIRED_DISCOVERY_MISSING na conexão correspondente. Session vazia
+  durante a negociação, sem fabricar identidade de uma ligação ACTIVE.
+- **Defeito comprovado em ensaio controlado:** a continuação de escrita de HELLO
+  pode estar antes do protocolError na fila do owner, mas correr depois do fecho
+  físico pelo reader. `write` retira então o contexto como TRANSPORT; o handler
+  do erro capturado encontra-o ausente e perde a rejeição. Com as classes intactas,
+  três ordens fixas dão TRANSPORT/REQUIRED_DISCOVERY_MISSING/REQUIRED_DISCOVERY_MISSING.
+  Não se avançou o relógio nem se alteraram prazos.
+- **Limite da atribuição:** isto demonstra um mecanismo que produz o sintoma;
+  os negativos antigos não permitem reconstruir os requestId negativos ou a
+  ordem interna exata de cada execução. Não se toma a execução instrumentada
+  verde como correção ou aprovação da regressão.
+- **Patch autorizado e aplicado:** [patch de dois caminhos](../experiments/construction/007-arvores/d11a-investigation/proposed-hello-continuation.patch).
+  Em `NeighborManager.java`, apenas HELLO inicial de saída, não ACTIVE e canal
+  fechado: deixar a decisão ao protocolError/Closed ordenados ou ao prazo atual.
+  Em `NeighborManagerTest.java`, acrescentar teste das três ordens com correlação
+  e rejeição confirmada. Não remover/alterar testes ou asserções existentes,
+  nem aumentar prazos. A autorização específica acrescenta apenas estes dois
+  caminhos aos cinco anteriores; nenhuma outra correção fica autorizada.
+  `git apply --check` passou e o patch foi aplicado sem ajustes.
+- **Prova e comandos:** [relatório/trace/logs/ensaio](../experiments/construction/007-arvores/d11a-investigation/README.md).
+  A investigação anterior conserva os seus logs e estados históricos; resultados
+  desta aplicação separados em `experiments/construction/007-arvores/q-c-37/`.
+  [Resultados desta aplicação](../experiments/construction/007-arvores/q-c-37/README.md):
+  D11b/três ordens 1/0/0/0; D11a original 1/0/0/0; handshake/lifecycle 202/0/0/0;
+  regressão incremental completa 1325/0/0/0. Nenhuma repetição da suite até verde.
+- **Sem resposta:** dois ensaios controlados comprovam terminação por Closed ou
+  prazo HELLO existente, com contexto/tentativa/timer antigos libertados e só retry
+  limitado existente. TCP real comprova fecho/EOF e prazo de 3 s, zero reservas
+  nativas e awaitTermination no shutdown configurado de 1,5 s. Nenhum prazo mudou.
+  O primeiro lançamento do instrumento parou por cwd incorreto antes da parte TCP;
+  log preservado, corrigido apenas o lançamento. A prova efetiva está separada.
+- **Estado:** apenas a exceção Java expressamente autorizada, sem avanço a Test, fecho,
+  commits, push, outro IMP ou gates externos adicionais. V-014 consolidado,
+  regressão aprovada, manual humano, revisão final Waheed e integração pendentes.

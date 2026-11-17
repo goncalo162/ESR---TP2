@@ -1,0 +1,28 @@
+Warning:
+unchecked cast
+  required: java.util.List<pt.uminho.esr.ott.protocol.ControlMessage>
+  found:    java.lang.Object
+        var writes=(List<ControlMessage>)field(raw,"writes");var hello=writes.getLast();
+                                         ^-----------------^
+Warning:
+unchecked cast
+  required: java.util.List<java.util.concurrent.CompletableFuture<java.lang.Void>>
+  found:    java.lang.Object
+        var completions=(List<CompletableFuture<Void>>)field(raw,"confirmations");
+                                                       ^------------------------^
+Warning:
+unchecked cast
+  required: java.util.List<pt.uminho.esr.ott.overlay.NeighborManager.Event>
+  found:    java.lang.Object
+        var events=(List<NeighborManager.Event>)field(f,"events");events.clear();
+                                                ^---------------^
+CASE=WRITER_QUEUED_THEN_READER_CLOSE connection=97e4e9af-b502-47e4-9dd8-f425e52a021d HELLO.request=dbd30424-4b46-41da-b618-3ffb37b3b06c HELLO.senderInstance=8dc80d9b-23c5-46d2-b303-d2d836513653 HELLO_OK.request=dbd30424-4b46-41da-b618-3ffb37b3b06c HELLO_OK.senderInstance=b31c3b3e-833a-4365-90ed-14bf5efd5f58 selected=0 preSession={}
+RESULT=WRITER_QUEUED_THEN_READER_CLOSE reason=TRANSPORT connection=Optional[97e4e9af-b502-47e4-9dd8-f425e52a021d] Session=Optional.empty remote=Optional.empty
+STATUS=WRITER_QUEUED_THEN_READER_CLOSE {B=PeerStatus[state=TEMPORARILY_UNAVAILABLE, currentReason=TRANSPORT, lastConfirmedRejection=Optional.empty, observedVersion=0, supportedMask=0, requiredMask=0, selectedMask=0, retryDelayMillis=500]} active={}
+CASE=READER_QUEUED_BEFORE_WRITER connection=fc82dd28-bb24-480c-8255-487fa35a5d95 HELLO.request=56e88e6d-d899-4bf6-a0b0-8034b0efc833 HELLO.senderInstance=7eda0ae2-6d2a-4f33-a005-2ae528c71914 HELLO_OK.request=56e88e6d-d899-4bf6-a0b0-8034b0efc833 HELLO_OK.senderInstance=e41fcb02-6144-404f-88ce-c24471a8657b selected=0 preSession={}
+RESULT=READER_QUEUED_BEFORE_WRITER reason=REQUIRED_DISCOVERY_MISSING connection=Optional[fc82dd28-bb24-480c-8255-487fa35a5d95] Session=Optional.empty remote=Optional[ControlMessage[version=2, type=HELLO_OK, requestId=56e88e6d-d899-4bf6-a0b0-8034b0efc833, senderId=B, senderInstance=e41fcb02-6144-404f-88ce-c24471a8657b, payload=HelloOk[selectedMask=0]]]
+STATUS=READER_QUEUED_BEFORE_WRITER {B=PeerStatus[state=INCOMPATIBLE, currentReason=REQUIRED_DISCOVERY_MISSING, lastConfirmedRejection=Optional[REQUIRED_DISCOVERY_MISSING], observedVersion=2, supportedMask=0, requiredMask=0, selectedMask=0, retryDelayMillis=500]} active={}
+CASE=OWNER_PROCESSED_WRITE_BEFORE_READER connection=11174ece-a6e7-4bfd-8602-9c93764e5a99 HELLO.request=1c6ed3e0-f969-4ee3-b98e-8b7c65a3ba44 HELLO.senderInstance=76ca97cf-0933-4162-ab3c-6e4cb957f337 HELLO_OK.request=1c6ed3e0-f969-4ee3-b98e-8b7c65a3ba44 HELLO_OK.senderInstance=936ed797-b3f6-419f-bc28-1275ee445962 selected=0 preSession={}
+RESULT=OWNER_PROCESSED_WRITE_BEFORE_READER reason=REQUIRED_DISCOVERY_MISSING connection=Optional[11174ece-a6e7-4bfd-8602-9c93764e5a99] Session=Optional.empty remote=Optional[ControlMessage[version=2, type=HELLO_OK, requestId=1c6ed3e0-f969-4ee3-b98e-8b7c65a3ba44, senderId=B, senderInstance=936ed797-b3f6-419f-bc28-1275ee445962, payload=HelloOk[selectedMask=0]]]
+STATUS=OWNER_PROCESSED_WRITE_BEFORE_READER {B=PeerStatus[state=INCOMPATIBLE, currentReason=REQUIRED_DISCOVERY_MISSING, lastConfirmedRejection=Optional[REQUIRED_DISCOVERY_MISSING], observedVersion=2, supportedMask=0, requiredMask=0, selectedMask=0, retryDelayMillis=500]} active={}
+PROBE_OK 3 controlled orders; unchanged compiled fixture and production; no clock advance

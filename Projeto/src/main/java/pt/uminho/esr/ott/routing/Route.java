@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import pt.uminho.esr.ott.routing.RoutingTable.SessionKey;
+import pt.uminho.esr.ott.overlay.Neighbor;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 /** Planning snapshot; selection alone never authorizes data transmission. */
 public record Route(UUID streamId, String serverId, Optional<UUID> serverEpoch,
@@ -44,5 +47,48 @@ public record Route(UUID streamId, String serverId, Optional<UUID> serverEpoch,
         }
         if (state != (selectedMetric.isPresent() ? RouteState.INACTIVE : RouteState.UNAVAILABLE))
             throw new IllegalArgumentException("Planning state does not match availability");
+    }
+
+    /** Data authorization is deliberately separate from the planning Route. */
+    public record Confirmation(UUID streamId, String serverId, UUID serverEpoch,
+            boolean localSource, Optional<Neighbor.Session> upstream, List<String> path,
+            Map<String, Subscription> downstreams, Set<UUID> localConsumers,
+            Optional<Subscription.Lease> upstreamLease, long revision) {
+        public Confirmation {
+            Objects.requireNonNull(streamId); RoutingTable.nodeId(serverId);
+            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(upstream);
+            Objects.requireNonNull(upstreamLease);
+            path = List.copyOf(path); downstreams = Map.copyOf(downstreams);
+            localConsumers = Set.copyOf(localConsumers);
+            if (revision < 0 || path.isEmpty() || path.size() > 32
+                    || !path.getFirst().equals(serverId) || Set.copyOf(path).size() != path.size()
+                    || localSource != upstream.isEmpty() || localSource != upstreamLease.isEmpty()
+                    || localSource && path.size() != 1 || !localSource && path.size() < 2
+                    || downstreams.size() > 63 || localConsumers.size() > 4)
+                throw new IllegalArgumentException("Inconsistent forwarding confirmation");
+            for (String id : path) RoutingTable.nodeId(id);
+            if (upstream.isPresent() && !path.get(path.size()-2).equals(upstream.orElseThrow().nodeId()))
+                throw new IllegalArgumentException("Upstream does not match confirmed path");
+            for (var e : downstreams.entrySet()) {
+                var child = e.getValue();
+                if (!e.getKey().equals(child.child().nodeId()) || !streamId.equals(child.streamId())
+                        || !serverEpoch.equals(child.serverEpoch()) || child.state() != Subscription.State.ACTIVE
+                        || path.contains(e.getKey()) || child.expectedPath().size() != path.size()+1
+                        || !child.expectedPath().subList(0,path.size()).equals(path))
+                    throw new IllegalArgumentException("Inconsistent forwarding child");
+            }
+        }
+        /** Ages immutable grants; never renews them or mutates the owner's state. */
+        public Optional<Confirmation> visibleAt(long now) {
+            if (upstreamLease.isPresent() && upstreamLease.orElseThrow().remainingNanos(now) == 0)
+                return Optional.empty();
+            var children = new LinkedHashMap<String,Subscription>();
+            downstreams.forEach((id,s) -> {
+                if (s.validity().orElseThrow().remainingNanos(now)>0) children.put(id,s);
+            });
+            if (children.isEmpty() && localConsumers.isEmpty()) return Optional.empty();
+            return Optional.of(new Confirmation(streamId,serverId,serverEpoch,localSource,upstream,path,
+                    children,localConsumers,upstreamLease,revision));
+        }
     }
 }

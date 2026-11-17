@@ -1,0 +1,2282 @@
+{
+  "recorded_at": "2026-11-17T21:37:46.531496+00:00",
+  "authorization": "User explicitly authorizes exactly the presented Q-C-37 patch in NeighborManager.java and NeighborManagerTest.java, focused D11b/D11a, handshake/lifecycle and full incremental regression, plus closed-without-response termination/resource verification. Implement acceptance/Test/closure not authorized.",
+  "head": "7164c9ba111268dff59d847982b517e6e41c7a98",
+  "prior_evidence": [
+    {
+      "path": "experiments/construction/007-arvores/adr-preservation-check.json",
+      "bytes": 1045,
+      "sha256": "598595e657edef9875c367071f0603b6447a1c0ab253eeb2fbc487e0eb8be30b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/adr-source-before.json",
+      "bytes": 49794,
+      "sha256": "0089e4dc793615bbf90d88ca455effd9ae4814b181a629dcb2ccb39cb7bd2644"
+    },
+    {
+      "path": "experiments/construction/007-arvores/adr-validation-01.log",
+      "bytes": 1429,
+      "sha256": "38df6b649911876622dad72157296dce57e756eb2194c5fe1db998efebee8a9d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/adr-validation.log",
+      "bytes": 1152,
+      "sha256": "4db8494f41c434e9cc398639bf70ed67a5889d279ecba6a601df508c46fc3912"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/README.md",
+      "bytes": 8668,
+      "sha256": "dfbcd22becbae868c5bc69b353b663eedf16490499f727e8fa1737084cae92ce"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 12465,
+      "sha256": "bbb8211d58b03958ba4f358180f1f922941cc6c3bf6e67227c61667173922a91"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/before.json",
+      "bytes": 69591,
+      "sha256": "5dd79a8e47854321f2b765ebe1c862c7736531289e3a8f4adbb9eb150c60fcae"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/checksum-manifest.json",
+      "bytes": 29760,
+      "sha256": "948ed1c88e51b5956f92bbb0829f58a89f59713c6b709f36c97082b0b5b78d44"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/correlate-trace.py",
+      "bytes": 4229,
+      "sha256": "228ca124e4afc89624ec9b4cceac29d462a0a0d06ef18203e8f898786010f017"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/historical-negative-comparison.json",
+      "bytes": 9399,
+      "sha256": "0f5be9a6cc4c0612d0bad2111d07490d49da023bb1cac66ccfae0841c77d6bad"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/N0.properties",
+      "bytes": 536,
+      "sha256": "372127b51bf4b7ac777b505e4b686b94eb119dd8b80cc7744c217ee19a042ccc"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/N1.properties",
+      "bytes": 333,
+      "sha256": "8b4d1e08052c6d9a8f54d0f8cf56f84b5bba5408781035ce023fd9b5a3d616b0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/N2.properties",
+      "bytes": 334,
+      "sha256": "590a6e2fcd6c3288595aace5116cb1d01d837c8825ca7d35f39954881a31dade"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "e477fbbb5a2bc00c8d32d64952c0b8d390dc32d62733fb04ac0c13b3ffaf108f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/process-0-0.log",
+      "bytes": 145,
+      "sha256": "26d45f98d7a2e5c9087b417b2d8140b2d39d9b1884c3becdbb4ac3add74abbbe"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/process-1-1.log",
+      "bytes": 11536,
+      "sha256": "fb08f6c449df28b24777d8cc86f5bf1848ce4a7fc4795ab437d2379550c14c43"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/process-2-2.log",
+      "bytes": 17722,
+      "sha256": "4eedef6bb268d34786edb76d0b305e6ff7fb4d67fc0b29f5427334cde45574cb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/deployment/topology.properties",
+      "bytes": 365,
+      "sha256": "aac2a5b50740d2d49c20b8ebb31ac8f90c39b75e54fcb7fbe342bd962f1c13e5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/diagnostic-extract.log",
+      "bytes": 4174,
+      "sha256": "83bcd4fb16ce8bc28f5bd944b25cbc90302a1749b14c0f7ce6e59f256ffb7112"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-01/provenance.json",
+      "bytes": 315,
+      "sha256": "f9368e99725636c1873633bbd4d3baa0b86ce3c900fce9bc0ff51dea9b9a882c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/N0.properties",
+      "bytes": 536,
+      "sha256": "058cac1ce5d327d4752b579f25633db6bdeda0b4bf96e408d40a2ce8903cd0bf"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/N1.properties",
+      "bytes": 333,
+      "sha256": "5365b7ab6918beab7ba5efe06b513370b367cbb1a0da12b3073daf4a6536d019"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/N2.properties",
+      "bytes": 334,
+      "sha256": "aad82dbc8fe6c417bf82e7eada66ab23874912b18bc6fb3c7972b2058fd29102"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "a7c1942058c3ec87d6d1f69437a937aad2580e773ddfe99cab97d20c3a04ee6e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/process-0-0.log",
+      "bytes": 145,
+      "sha256": "87b483df370ecd595b08fbb05de994aa15ba2f5a74f2e829299b20704373a033"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/process-1-1.log",
+      "bytes": 11536,
+      "sha256": "11bd6055460671d54c2f701a4f1ceff6653293d07050ef4e4199e54f3aef9d89"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/process-2-2.log",
+      "bytes": 17720,
+      "sha256": "ca62ea46a5986ae0b0ac7bf663c62d5871f322cfff20b157d8edb84195a88d09"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/deployment/topology.properties",
+      "bytes": 365,
+      "sha256": "90a334d0070c5389a28d66bc05849f7ccce846a59630e2807fef5752aee2a844"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/diagnostic-extract.log",
+      "bytes": 4172,
+      "sha256": "2c9255e746b01cb0b56c2f0b7b8175ca625d87871e780c40a49790070077d24c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/negative-02/provenance.json",
+      "bytes": 323,
+      "sha256": "47a9d7999b2c863f7c81375f7659c8857bad563d835fc16076b7db681ebd7295"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/owner-order-probe-02.log",
+      "bytes": 3621,
+      "sha256": "47f3724d753cb17be7a494ff8d34fc1db383c4b54452f0960532f6b1994169e6"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/owner-order-probe-unrestricted.log",
+      "bytes": 3248,
+      "sha256": "4da64e62e37b3ba71deb9fffd15f5118c42b1c1fb60955565638af098051c51b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/owner-order-probe.jsh",
+      "bytes": 5204,
+      "sha256": "36b6c5a1d78b44ff21ce7d77bd9cbb8160870cb5191ed643a72fdbcc8fad366c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/owner-order-probe.log",
+      "bytes": 1536,
+      "sha256": "d8240d6598cd4c6f547629d50818eb26a7974fb98016e2f4c482d6fe39163267"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/planning-validation.log",
+      "bytes": 1152,
+      "sha256": "b916af2b9fd2144ace6d02c61f3d3454e8723983b64deebcc332c3d4b2dc81b3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/preservation-check.json",
+      "bytes": 1525,
+      "sha256": "e6fc7006eeb28a66967d275f0ebf7901f29780aafa63a1ef3735d09b02bfcca8"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/proposed-hello-continuation.patch",
+      "bytes": 4367,
+      "sha256": "3a73298660de1557c3c54082074da025c19a761c7f63c5068e922ac57d8535fc"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/N0.properties",
+      "bytes": 597,
+      "sha256": "39de3abaa15447e413fa94340f24a78c7a877515d33f121aec0dfe21bc6aa6cf"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/N1.properties",
+      "bytes": 333,
+      "sha256": "5c59a59ce986d0d16ba23221b93409e60c673a4abe02bb8ba35ce1ed7b2d356b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/N2.properties",
+      "bytes": 334,
+      "sha256": "ce3d39848a4851f3983605e3bc31152b8bbcd798c813af4e2060a9b265a3a1c6"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "71e13dbb5b5fa3d510c81fe521bb040b266ed041e4676327705059a4e0aecfdd"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/physical-joins.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/physical-joins.txt",
+      "bytes": 96,
+      "sha256": "d5de86556f95f135f09e14d6fb7dfd7bc77948219ccff52aa934f30355d8fe76"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-38ef217a-bdd2-4c01-aed5-4be3dec76abf/topology.properties",
+      "bytes": 365,
+      "sha256": "4c156a2a14905c644be8fff7c1b0174ea700783733313e257075a4562d2fe38e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/N0.properties",
+      "bytes": 597,
+      "sha256": "b58c7e19fc94ca3d1b0f97d8750f39d815a2d571d86c95a63a1b974eb603c768"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/N1.properties",
+      "bytes": 333,
+      "sha256": "1113f5d33bda67e33df92e2ca4b2ef1716f45a87440c8a71404e6bf936ed05ac"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/N2.properties",
+      "bytes": 334,
+      "sha256": "9e3c9c4819129c99412cb32c7a88ee79c0bb10eca2c6e573a7b13482d3942a1d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "b1fd3e57e1f02ee8c783e1338d8c094b3ab28cff1ba55fdacca1c4b743fd7212"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/closed-pipe.log.exit",
+      "bytes": 1,
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-454b8753-423d-494d-bb41-b4b9659f2231/topology.properties",
+      "bytes": 365,
+      "sha256": "ca1c118457bf89f16e79ad88f585b96055f20610309cfc11ebaf6c33051667e2"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/N0.properties",
+      "bytes": 597,
+      "sha256": "a322fe70dd97cee6509afdfe8891ad844f8ef131009ff91b57445572ac148fd9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/N1.properties",
+      "bytes": 333,
+      "sha256": "1874f510a7d353db91a43793baa8f5762de660db9f3af847f9eccb720b44dd87"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/N2.properties",
+      "bytes": 334,
+      "sha256": "2608982af0d27d0f45d88e87e0a5f18037c9a5aaad8994dd0724447ba7180f1e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/blocked-pipe.log.exit",
+      "bytes": 1,
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "eafa6e0889d79eb9a9287098d32160b159574ad5f50de6ecf01dbd854c08f191"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-4686ccc2-7bc3-4cea-abaa-a27f771c6786/topology.properties",
+      "bytes": 365,
+      "sha256": "7ff117aa3981abead8873e3cf2ead7ea4390890ed9797e9208ed9783e7d64f8d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/N0.properties",
+      "bytes": 597,
+      "sha256": "422db33144d931ee56680e3202a35ea679fcbb8d05162d9b3b9b73e627974461"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/N1.properties",
+      "bytes": 333,
+      "sha256": "46c33ac6004f2789d6cf11a90487f9f9ecb018b59e21578600382abaa9701a18"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/N2.properties",
+      "bytes": 334,
+      "sha256": "8cc67cbde6dd8c09b13e4e23c92e012bc7af9e4f8bbdb27b6c7692dc14a3e932"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "5d612a8a11df2180a1c8eec65b8c69ff11a866a120bdfdf345ab8d32dd8a4ac0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/process-0-0.log",
+      "bytes": 145,
+      "sha256": "ccbca99f2c42641b1b325b30dfd5d998c3ff82c7f0c15956a8811f240b2be859"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/process-0-0.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/process-2-1.log",
+      "bytes": 3191,
+      "sha256": "85bd6ac98e814a555d28e89148e1953b397f3003cf4e1ea25ae84ad1574fa261"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/process-2-1.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-472ce9b4-9b83-40bf-9677-29c19dd1960c/topology.properties",
+      "bytes": 365,
+      "sha256": "ae43693eb6aba3972b312448207ad87f58abc7f4ebf6e505496359175f5a3ced"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/N0.properties",
+      "bytes": 597,
+      "sha256": "e8465630395d73da7e8ff4ec0321836a7cacb172a19ca44be3f0974cc236583d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/N1.properties",
+      "bytes": 333,
+      "sha256": "7f6e30610a8ae43f1259696030248a1c449fd7cdba06a57977a0fdbdd56610a7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/N2.properties",
+      "bytes": 334,
+      "sha256": "3af59bf037fd314f3b2cab9092655dba313da93c7d1d3898e814dc8562161f41"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "92e61c530f236db8db5bf77365b042fd17331dcc49f79503dcb2c5004a4bab5b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/process-2-0.log",
+      "bytes": 355,
+      "sha256": "5663f5e2211ba6490f805c90c1c79a9883fee8665b914473958d0924d149f54a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/process-2-0.log.exit",
+      "bytes": 1,
+      "sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7905f14e-eee5-46d2-8aca-af9868a83512/topology.properties",
+      "bytes": 365,
+      "sha256": "c957f5fbe7d0dd1c5097988b6369233eaf9d3af30cdf124ba29ae8fc936af11c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/N0.properties",
+      "bytes": 597,
+      "sha256": "ad415210ea6a6977656332f832c0ac3c8ef8bb1820cb1ab6dd96d057955e116b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/N1.properties",
+      "bytes": 333,
+      "sha256": "4daffaded15eed8adf149b3095f055203117d3629d994c6b67d5429d19b0cc60"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/N2.properties",
+      "bytes": 334,
+      "sha256": "48ef79c988bd39eef9122ad3bee7833c1f481d408a50bbb6318064ee599d4390"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "217b5ae0edfa5d98217674b1aab7927aefc6620920bf1cb0a21faa18f2901744"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/process-2-0.log",
+      "bytes": 113,
+      "sha256": "c2eea9d177feeef98a3f81faa8f3f997c6425d35864af893cf59617a59aa4876"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/process-2-0.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-7cc663ad-4318-4edd-a9f5-af79d2abeb1d/topology.properties",
+      "bytes": 365,
+      "sha256": "47ee716f8a2e9d1149cc24a4a966c1ec53935f419f546ed818064c7ca5a4418e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/N0.properties",
+      "bytes": 597,
+      "sha256": "3823a1ae8db0dfa516412b316b05acdf478cac359806db9c697dc058c775ad02"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/N1.properties",
+      "bytes": 351,
+      "sha256": "6243ed43f3807b6ea2cc7a8a71461ce4f977252070e684c7a38be9767cc88e0c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/N2.properties",
+      "bytes": 334,
+      "sha256": "f042e8fad252022a554ca4de838cc6da33deb8424999b7076e2b5ec12c7ceb41"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "30b6acc900433d74706a94ffcba3ce4f816f483866c90dd1cb8c875856620bbe"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/process-2-0.log",
+      "bytes": 245,
+      "sha256": "5075573624b0ddbc96f36d36223a5eff3a25294563b2972ef595932b383abc0b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/process-2-0.log.exit",
+      "bytes": 1,
+      "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8855cf1f-74ef-4012-a721-588a2f360ceb/topology.properties",
+      "bytes": 365,
+      "sha256": "efacd78b672285468b05a263e10b7e3a14302e7bc1c49952d1c3a4d55594d6a7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/N0.properties",
+      "bytes": 597,
+      "sha256": "541c56745db2954b1f7f122f68560acd0be0da0f9683a061943fc2b7f1b5e34e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/N1.properties",
+      "bytes": 333,
+      "sha256": "ecb616be60fb95cba92d364a0a7f04cb675c37a96e689b5526e0e518e63e1d94"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/N2.properties",
+      "bytes": 334,
+      "sha256": "0dbdd1bd1f4ee493f20072468aa5e70c348e96461ebf247df72b9b5ce20d7f4d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "9159eb9940154d98ea60d26db2753165c994d9a0a16a7d7dbbb237e23dd013a3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-0-0.log",
+      "bytes": 145,
+      "sha256": "642c1869880a70beaf953430a5cc5c56cc519989b1bbb6f20d4abe505055efde"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-0-0.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-1-1.log",
+      "bytes": 4340,
+      "sha256": "9ad89d6db0ef9eca620251c2e6db0175fa57b5ffc6954b76d21ec2f7ddb3b676"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-1-1.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-2-2.log",
+      "bytes": 5803,
+      "sha256": "ec8c8caaab7f3d84ccda8d53091178c1d0e4da32e267fdcc65992bbb8e862704"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/process-2-2.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-89c86998-9b1f-4055-8adb-c1c1b74fd38f/topology.properties",
+      "bytes": 365,
+      "sha256": "0531004e34edb132d12820446d074e419827ce0a12a25c8d15cc5a822b036c9c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/N0.properties",
+      "bytes": 597,
+      "sha256": "0c811bf58e80978a927c3c84cc2dbdf905e7d525a52106cf5e0d0d307af5b8eb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/N1.properties",
+      "bytes": 333,
+      "sha256": "94f3bbae411cd7ce9b8e0603139546854612225ec0fbd94649fee4c6c519c289"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/N2.properties",
+      "bytes": 334,
+      "sha256": "785dcaaea9e9088a6bfea1934917ed5e66bc00fbeffa31fed5899e93918b3e09"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "90be620bce33943e49dd26cb6c994bc65d5db89debbf0a27f3c774978d682485"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-0-0.log",
+      "bytes": 145,
+      "sha256": "7babe8c62571f573fa229ecd5f380cf660ef0147436b4667d3f3a217609e1b3a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-0-0.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-1-1.log",
+      "bytes": 6876,
+      "sha256": "4f29a530749983b662798fd3786bb79e28a87b84bf378079ff54e903fe72448e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-1-1.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-2-2.log",
+      "bytes": 8871,
+      "sha256": "ca33b9aab677cae82a977dba747c4d7d0acfd848791b55c588f4ecf44110f434"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-2-2.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-3-3.log",
+      "bytes": 2071,
+      "sha256": "ee2929462b2dc6d75c2bbbab1ac63d508e04a220d76422a0dbf2fffb2efad010"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-3-3.log.exit",
+      "bytes": 3,
+      "sha256": "d80eae6e96d148b3b2abbbc6760077b66c4ea071f847dab573d507a32c4d99a5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-3-4.log",
+      "bytes": 3071,
+      "sha256": "2485395d8a03f221a2011dbe3a7a1a8440e02b2553a282267fd10105fc155b76"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/process-3-4.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-8dce6058-e6ec-4b92-a8fc-758ec9a50e41/topology.properties",
+      "bytes": 365,
+      "sha256": "103df9146bae6c2d4349517b168a749bbe0751f0ef420f2df8ef9573768d60cd"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/N0.properties",
+      "bytes": 597,
+      "sha256": "a9fce3d7f2ae15cdd86374084cbf4095b5dd7d67e7f4e76346dfe8f0d661657a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/N1.properties",
+      "bytes": 333,
+      "sha256": "c8cdbfc5dce252393f25db47ba917ffe484558b38b46a3e07e7e4f4ec0ec29c4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/N2.properties",
+      "bytes": 334,
+      "sha256": "a396fff2401e9227449a607efd592087a0c19eafb889621585cc09a6079ae4ec"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "a23c048ac27a4b9ae9cb63ba71066f637e0729053f56b8b1e39cbbaaf3d3b467"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/process-2-0.log",
+      "bytes": 76,
+      "sha256": "3dd7f8c2f9ca7d20464aadc6de25b02de43617086ee5a5740100dfaf5b9bd569"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/process-2-0.log.exit",
+      "bytes": 3,
+      "sha256": "d6f0c71ef0c88e45e4b3a2118fcb83b0def392d759c901e9d755d0e879028727"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9a188319-0b53-445c-a772-dde56869f11a/topology.properties",
+      "bytes": 365,
+      "sha256": "83cfa9fdfbc81ec33c08fd796788799933a4842a719a502fcf4de6dfb8cc4244"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/N0.properties",
+      "bytes": 597,
+      "sha256": "d5de23b093818fc1bc03700cca0d0bb2cf4df7a4a2b0d43d0c2eaccf1673f4c1"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/N1.properties",
+      "bytes": 333,
+      "sha256": "41ffbacd656fb4bc8c3f2e83f776acbdbc7168eae6356608622635bf73d4789e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/N2.properties",
+      "bytes": 334,
+      "sha256": "c39a2fe30590a1840d3a7fab32bc35f01b58b8b4b68d5a6f834542e360a6f98e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "9d2d08ca9f5a9ccaaa703b03869bfedd3b802e16afd72c83abfb2306c305d973"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-0-0.log",
+      "bytes": 145,
+      "sha256": "16f5b577645f6de60c787c319dbf91a5f5ae9993d6c450ce55c3a958b67b4fb3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-0-0.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-0-4.log",
+      "bytes": 145,
+      "sha256": "2c303d45aad20cff9021b6d44ccffa6d3b62fb609f62228417d1e4e17999659f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-0-4.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-1-1.log",
+      "bytes": 14315,
+      "sha256": "c82d8570809ed1ebeabee371053cc747d043ab09b5a43ef0fd3c917e333e82f2"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-1-1.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-2-2.log",
+      "bytes": 18816,
+      "sha256": "583f0f426eec27cbe590c789be3447c95be41d3d5f1b33f4eec775e766527e6f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-2-2.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-3-3.log",
+      "bytes": 8546,
+      "sha256": "fdc4e58912822c0b7cfdf6b95ec8fa5282102f0fde5c2cd217bee40ef32730c3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-3-3.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-3-5.log",
+      "bytes": 7960,
+      "sha256": "f54f4cd65ee0b7b0c884e183e232a9d61a09d4104010788e9c3b2471db6ffab3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/process-3-5.log.exit",
+      "bytes": 1,
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-9bbbb693-ec70-4cc4-972e-55c33a2a392a/topology.properties",
+      "bytes": 365,
+      "sha256": "4c5f1c9b5dacde23b6198768f1f3b671b5b23d72627851f3bafca35e6ac4173c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-a67106b8-52f4-4e58-97dd-a04e986d3513/N0.properties",
+      "bytes": 597,
+      "sha256": "58cb2fa0cc28c46a4064cad04fdc8418c518d6a21b14468e147fb1b7c045ae54"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-a67106b8-52f4-4e58-97dd-a04e986d3513/N1.properties",
+      "bytes": 333,
+      "sha256": "db2b4a9ec32fd3471d9b1002818329d1aa51bb2bc9a5593c5c6ada7e17e6d0cd"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-a67106b8-52f4-4e58-97dd-a04e986d3513/N2.properties",
+      "bytes": 334,
+      "sha256": "b21b397f586595f26b4cbbc1d0a743837a6a3bbe07598680965b2e9f28c32016"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-a67106b8-52f4-4e58-97dd-a04e986d3513/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "b41f0343a095deb77734dd023d8446281b09845466acc4cf609dd9d1c071ce56"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-a67106b8-52f4-4e58-97dd-a04e986d3513/topology.properties",
+      "bytes": 365,
+      "sha256": "36113db0fe633b8f33ca883c3c9e4ed2f1fce7229fca385ef537624d89c3a963"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-e6d13340-0b03-4032-bca8-4798459ff67f/N0.properties",
+      "bytes": 597,
+      "sha256": "f342329a5661c2914dbf4900fdb92e62916353dc3a7caffe448a649034ab7a55"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-e6d13340-0b03-4032-bca8-4798459ff67f/N1.properties",
+      "bytes": 333,
+      "sha256": "157c6e652055fbbccad248110245980b6302c8a9784402be4d8e6b7e4fc4c814"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-e6d13340-0b03-4032-bca8-4798459ff67f/N2.properties",
+      "bytes": 334,
+      "sha256": "b8915e0474ca6e6bdd7e95247bcdf139b0094255d095b3dcf4b5094798c2b022"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-e6d13340-0b03-4032-bca8-4798459ff67f/bootstrap.properties",
+      "bytes": 165,
+      "sha256": "9914c6095d2cc42de385688f6c7150bb89d66605d38997dc0eafa97feadd1080"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-deployments/cli-e6d13340-0b03-4032-bca8-4798459ff67f/topology.properties",
+      "bytes": 365,
+      "sha256": "59cc7c7a6839ca60bd735445bc7517170fd558dccd24bb17f457dc0ba6eab309"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class-result.json",
+      "bytes": 641,
+      "sha256": "889c93c9a5afca214781a484d73bfade9dad8054963553edab26df5ff192acb4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class.log",
+      "bytes": 2045,
+      "sha256": "54a5990fb16ce70745c37fc070b47e5a26cb44126e3cf976f7d9909072b81fbc"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/traced-class.strace",
+      "bytes": 73945716,
+      "sha256": "9d26fa5c46c652a2d0aaa7d6b29bf709670f1faa80f8535c820a993034c68a15"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/wire-correlation.json",
+      "bytes": 3537,
+      "sha256": "ae36edd90e146e1e1f8652d4e9c61bceec139b706d29abd1e4bd679578be3651"
+    },
+    {
+      "path": "experiments/construction/007-arvores/d11a-investigation/wire-correlation.strace",
+      "bytes": 16886,
+      "sha256": "408442590684f7faeae68924e2ec80d9499aabb504a7c11504192cf48cacc416"
+    },
+    {
+      "path": "experiments/construction/007-arvores/design-validation.log",
+      "bytes": 1152,
+      "sha256": "eb49c8fe55b14b6293076c8e841a2d9d819b0338c3f308fa913e95c26fa5d3ba"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-activation-01.log",
+      "bytes": 2044,
+      "sha256": "ce91ff5bed816f76d45d921b5b7a7befa31991a5b66775df7ecf9d6d8f13bc61"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-activation-02.log",
+      "bytes": 2044,
+      "sha256": "872c644892c48624e5291c4a9dd2706c93e05c160e53ebe49cbb06f16a02dbfc"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-compile-01.log",
+      "bytes": 996,
+      "sha256": "7ae76b44e14336fb6b48603cc50b771c69d62cefda4138d8cc7801b16ff7b4ec"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-preservation-check.json",
+      "bytes": 2333,
+      "sha256": "d8e377da2ed9f2bc97587cb831d202c24fea8b05816511367109b5252af16bf0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 12267,
+      "sha256": "61f0911d28e19f6f0b540f5297e1abb141a6e0a3d7302a2ff4dfc861a56fa144"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml",
+      "bytes": 9013,
+      "sha256": "8fc2c4b28ce7f79732fb1e43469ab3d09644f8009b16de2bdf49f5d800ca320f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml",
+      "bytes": 124393,
+      "sha256": "0c1ae8130971f31ee65c66543e9bc5c043e3041ec3c3d59426507ed43da20722"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml",
+      "bytes": 13445,
+      "sha256": "75fe15ad5c70f36b7a15eec4a9ca0797cf71f22ea8b33895fa4407f94d176a23"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml",
+      "bytes": 7113,
+      "sha256": "65b68f0e31cc51b3417ff77f3a7d782923435a3d8f6e1fcfcf2bd5fb3efea89d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml",
+      "bytes": 8702,
+      "sha256": "c708ffc90e0ee948d864d9fd34544955d69783e7646025393e7b9952c121b5df"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml",
+      "bytes": 10772,
+      "sha256": "b399706764b4fed540d4dc0d03b002bb72ff9171ad29efae6e38e7f5de3c7fb4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml",
+      "bytes": 13728,
+      "sha256": "af687a1ff65df4b8feb5797d4c2cc646f32e46362f85b91be435100432ad2d7f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml",
+      "bytes": 7471,
+      "sha256": "642cc8be19c4bd394b8e0dc631b88453a00dab74c045251faee571357be9fb37"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml",
+      "bytes": 6669,
+      "sha256": "d9563318ac1fb31f5a299777a57ececddc7f2c9e30fd132da6031dbd220cab11"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml",
+      "bytes": 10098,
+      "sha256": "bf5cf16be76a66d0c61ce43f83e35e793e9636b7e95903f46f6b44e86de3b8ac"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml",
+      "bytes": 9548,
+      "sha256": "f855638cc0921a041d3b89ca3e9732bf61587e365a301f9eba4757efb939da97"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml",
+      "bytes": 19472,
+      "sha256": "1fcc8e4451ff4804824985211c748c00cdf5f306f89894583590f2c3588a0224"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml",
+      "bytes": 9441,
+      "sha256": "d6199f38dab18b243644e1c330f07f2474c411d24a75bd667f4cad3862f34982"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml",
+      "bytes": 11427,
+      "sha256": "a35836f9f2b14d79975c479ac193fc02b66f1b4989cdcf884507818bd506a3c1"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml",
+      "bytes": 11346,
+      "sha256": "e75d39a5384f18837d5ebc978bbd2231e151c3d0148eadd60f1404f3793da013"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml",
+      "bytes": 10647,
+      "sha256": "89f8df76f83a76d2260eecee01a7aed1aab9624b67b940b9177dabe83bd36763"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/TEST-pt.uminho.esr.ott.transport.TransportTest.xml",
+      "bytes": 11344,
+      "sha256": "c5a3b4e6ae8ae72e54b50ede018e8fdeabca0fdc634156df9fa2f99247119649"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01/result.json",
+      "bytes": 3705,
+      "sha256": "07a20d40233c04be70a9ff6ebe3f90a9aa87b293d777b391f5dc07dd624f7c8f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-01.log",
+      "bytes": 5401,
+      "sha256": "fd7311fa00fdc7df484f5eb71843640713db2d3ecd281079723cedd71c8ab770"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 12270,
+      "sha256": "36a3a8ddffebc140f136c8f36c5623a081e305de01ff0c7a1d167e3686784506"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml",
+      "bytes": 9012,
+      "sha256": "a122c0a7bcb3f6f97233fa56e6259df0715a37dbfb744e9208639d7b2150da90"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml",
+      "bytes": 124326,
+      "sha256": "288aae4e1cdd9947cc26c5ef715f90e985916225250095101b05df844af253e5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml",
+      "bytes": 13438,
+      "sha256": "5aa2d95c13e899dac034658564f140eaaa713e2103322106d8abac3ac5e5f34e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml",
+      "bytes": 7113,
+      "sha256": "ad11f1149321c6a8c3c4b3d29b8f8f842aaf12bde54e2ceea4a05097e1bc67fb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml",
+      "bytes": 8702,
+      "sha256": "75e015d3222c275de6f3ff492a61f4e104f29edc940e5326452096ed6cf4532a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml",
+      "bytes": 10789,
+      "sha256": "ab1a8a217069df865cc15455dad06c37ddb004cb0d262e7e02b857639b7463f7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml",
+      "bytes": 13732,
+      "sha256": "163169c619c9af98308375c6a6f71c4395abf7fa0426530722f0d2a709a8e295"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml",
+      "bytes": 7468,
+      "sha256": "dea380f9a23e9bbab882d147865316b8ddd7e203fe368b1bf4cced2b891992d5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml",
+      "bytes": 6669,
+      "sha256": "2af6300f45a503a415ac9fd5ff87d163fdec7762e8d4f20699d0b4184aae4c33"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml",
+      "bytes": 10104,
+      "sha256": "64d7476c6127b417d954793a13dba9fab0951d379f539d26228eec59649aec2a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml",
+      "bytes": 9546,
+      "sha256": "f7908adbc930a3469cf406064587dc4f68189045f65269ebc7c0d282fe0515b0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml",
+      "bytes": 19462,
+      "sha256": "0f48648d83d9d53788e985a7ef24d5b58d48032146e31e0155ed4a5c9f810630"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml",
+      "bytes": 9741,
+      "sha256": "9939746027db5cecff832c70994187db426aa9dee3b0f3f9cd96c32986e8a436"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml",
+      "bytes": 11417,
+      "sha256": "24428815ca20d1340cb248222b7e225e258a2f338c0215890d7da27f9c7b324f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml",
+      "bytes": 11339,
+      "sha256": "9fe54f2655b829214db4ca85986da2d5c33ce589bd615a82c22f8c4de290c1a0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml",
+      "bytes": 10647,
+      "sha256": "15cfd3268c241002d33fda8e31412041085424b16a2c493bc8a0478b5d5b8c5b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/TEST-pt.uminho.esr.ott.transport.TransportTest.xml",
+      "bytes": 11342,
+      "sha256": "40f7f97eebea424b1d522e2721864bb39cf22557f290e2400f8c2182ccbfce65"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02/result.json",
+      "bytes": 3698,
+      "sha256": "e3f9c84b3ea4a7f43585290e4c47c37e97b3ced82e596780e3f96a70c11c0999"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-regression-02.log",
+      "bytes": 5401,
+      "sha256": "704a2a1d6b137ca125703d2c923dfefb3ee8da5be4fef2c8946972edeacf237a"
+    },
+    {
+      "path": "experiments/construction/007-arvores/implement-validation.log",
+      "bytes": 1152,
+      "sha256": "d22bf671b4127d3493bcfc9c12c077055d130ababcbd0bbe7f361613a1616b95"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-baseline/README.md",
+      "bytes": 2820,
+      "sha256": "20899a812968a891b2ea5c8166ac6100f398bccc75c14e558915ff2c9129f648"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-baseline/manifest.json",
+      "bytes": 1775,
+      "sha256": "324f17c96431d96dea29d910ce7f6b3273af83bd31142ae0c8e63961ddc82b20"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-baseline/monitoring-recheck.log",
+      "bytes": 4010,
+      "sha256": "8e305ef9b9b0c6835cbfd52fbe0c25a13c74a7dc0e6e5c453c6e953f5621a698"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-baseline/verify-sandbox-denied.log",
+      "bytes": 98919,
+      "sha256": "d93686e65aeea9703900dfd2907609dfd9bca49dd4a9bd15e923cd02e8745dd7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-baseline/verify-unrestricted.log",
+      "bytes": 7164,
+      "sha256": "b30c4089764389a0561329ee95344cf5a6debfec5d32d7104d49baced44e4038"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-investigation/README.md",
+      "bytes": 3593,
+      "sha256": "a4c6254836b6fa15863b9d0bc5a62fcc217b260f8c22676c879ba12999413e73"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-investigation/original-isolated-reproduction.log",
+      "bytes": 2064,
+      "sha256": "cd5a89d445828d37cfc0278ba65faa2222a8c151ed1ddef87e4a70702ef4aca4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-investigation/proposed-test-synchronization.patch",
+      "bytes": 986,
+      "sha256": "1002f0063b3c4d4d853f19f1bc65f3062abbcca48b5d9cdc2d0b99631615d872"
+    },
+    {
+      "path": "experiments/construction/007-arvores/neighbor-down-investigation/report.json",
+      "bytes": 1343,
+      "sha256": "139e08a3229bc30c38e24442cd96b8dc975bb3aff6c7106e95aa323a4044b09d"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/README.md",
+      "bytes": 4422,
+      "sha256": "fb83fb5506d39ccf9e3ae4f67bc55176603e798003876a396144f00811c03657"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml",
+      "bytes": 6010,
+      "sha256": "a9492b0a6a973f384e0a4fd699be76e22dce24825d634ffc44bc5b908b37d9c4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/before.json",
+      "bytes": 14221,
+      "sha256": "dc8862e6542e9e4d158cb6665880d2e36098e5ec355e63fcfd4d4f63048604b4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/checksum-manifest.json",
+      "bytes": 9685,
+      "sha256": "d3dc03883c912752f0dd0fe78b6d27b11d0eca3d8b66a106924a59dbd534f840"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/d11a-isolated/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 6004,
+      "sha256": "266ef044c7075ec109f1e380da52397d8d6506aecf2505ea14464f387369f2bb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/d11a-isolated/result.json",
+      "bytes": 529,
+      "sha256": "fcffba0bb8e2d70050d11b07676d10c2f58e7b4acf12b6f0c57c3c0e78053cf3"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/d11a-isolated.log",
+      "bytes": 2042,
+      "sha256": "5c8e6aba1887f568d2ef108fd7d2a1b7c601411c8436ed1ce8075bb001b69842"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/focused-result.json",
+      "bytes": 683,
+      "sha256": "0cda7d23ac9157bb53c05efdbb68994b68b12640e86bef0f565bd7bb3b616caf"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/focused.log",
+      "bytes": 2064,
+      "sha256": "1745c1ae4dceb4b8ec6b42bcc74626e00d28b9f519fd7377cf0fd4f24535509c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/planning-validation.log",
+      "bytes": 1152,
+      "sha256": "c4b533827cc3c489945b05023907637c4d48338e14754ccd34830c0e43b0f54e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/preservation-check.json",
+      "bytes": 3099,
+      "sha256": "4a230b853859d4f38226a7376fd6f31ca7116310a5f78018abb915f8f1094d71"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 43201,
+      "sha256": "e841837330246606dc00f77cbe505d23b35e16878c02eec659bafccfaaafff84"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml",
+      "bytes": 9006,
+      "sha256": "38d1c01d7662627e7a4245a6b3f819116df1dfdfdb791deeb3a7f6ece333826b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml",
+      "bytes": 124346,
+      "sha256": "f55df5f7b83de2bcc4b7b9ee08aa2abd02834d7bd42ed85fa409b36b52e8cecb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml",
+      "bytes": 13449,
+      "sha256": "04d568554e008178c690c4fcc34f065d1bc6fcf8496bc568de143466bd0ca1b1"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml",
+      "bytes": 7113,
+      "sha256": "06d3a9bf298c76524e128d878ea51a67a4bc8367d945bdf102ae2656a69df710"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml",
+      "bytes": 8701,
+      "sha256": "a253563d051e48bacea51754078979acf671d214a4db0c8926eade3bdf9c8d13"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml",
+      "bytes": 10774,
+      "sha256": "5962c47fac13eb001f160ff0fdc387bd130585077479d02d2cdbb9e469fe46ed"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml",
+      "bytes": 13729,
+      "sha256": "d096122597757d7abf1aa1941d02af3e02eea694a0564a8de8a60c807579d620"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml",
+      "bytes": 7470,
+      "sha256": "1e62e0bc31daf542213fc3f2427fccc398c056516c3ca9eb134468811c93eafe"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml",
+      "bytes": 6669,
+      "sha256": "72ed36f87732594f708386bf2ba72156a0f3425d349f4ec4962cd1f1cd7db5b5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml",
+      "bytes": 10096,
+      "sha256": "139576403a71147336d4c47f32d7221084cef7ac58dcfa8b21fc85a683a84f51"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml",
+      "bytes": 9552,
+      "sha256": "376be7c059dfa40e1a9249ef97e6c3c34b1562cefa99212a1ccc765e3d0329c4"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml",
+      "bytes": 19454,
+      "sha256": "3dc70acba3c3dcd56bd126b257c81c3c01c7e05843c1708fc6abc540b91b2eeb"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml",
+      "bytes": 9740,
+      "sha256": "5d1731052100873b8db2cc7922794c9d79398eb8d51eb15afaeb5afaa658dfe5"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml",
+      "bytes": 11423,
+      "sha256": "e3844e9c0a39168f6da75b15c1e6a61e9061d338bdc39d01cca32efc89e696ed"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml",
+      "bytes": 11339,
+      "sha256": "cb478eb5da4a45ec3c693f76e81fd2f660e86e9f355ab2ae10e88dd42ba4973b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml",
+      "bytes": 10657,
+      "sha256": "0c564060f2122cccf5706f9d584fb007463bf8fcaae794cb631ae116389ba8b7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/TEST-pt.uminho.esr.ott.transport.TransportTest.xml",
+      "bytes": 11341,
+      "sha256": "ffc683639b6e546a0fec352596ac3ba7e6b93027bf2196657648728d033ef864"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression/result.json",
+      "bytes": 35034,
+      "sha256": "644c270341df714879ea3251161ecffba389956a81ff54cd272262d841b2d61c"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml",
+      "bytes": 43750,
+      "sha256": "314616502bf2c5ba22aaf58950925c5d1ee0639d9b9a34c7d05a8076adcb13e8"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml",
+      "bytes": 9010,
+      "sha256": "5e6ced3a1ffc60df34dc6e059445983f3af56f5f825b716d8de121e050795572"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml",
+      "bytes": 124326,
+      "sha256": "718065f0b3ff49b9f5d7e9044b5d6910e9e606d4b293a45a940a8e33b91b1356"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml",
+      "bytes": 13436,
+      "sha256": "6f55cdbbe663aacce00d0775f50905872b294cc94d6c9a84747aa7a3f83c4dce"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml",
+      "bytes": 7113,
+      "sha256": "750349839ef2e614bc84da7763643305752347e9c5c2b05add7716ffb5d1b9b7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml",
+      "bytes": 8702,
+      "sha256": "a5b77de15b4043c56d579bda42799326e9ea59ca3d3bd418919d591a5c8d660b"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml",
+      "bytes": 10776,
+      "sha256": "67dcd6216cbc859978ca47f52ccd9416f5f3182ea69f7c390c299687a6c2f613"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml",
+      "bytes": 13730,
+      "sha256": "9a20fca0fd4d21ce6a89fffc16371776c6550a1d33384d064991335ecb2a2053"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml",
+      "bytes": 7469,
+      "sha256": "43ddac30f2744db058df5d434d1be79733e9a817b4bff3b23e6b7413ed85699f"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml",
+      "bytes": 6669,
+      "sha256": "d9d3f0536c79ee86e90153d0e051eb7c808dbf7a640ef996dab0e1a8b849c6b0"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml",
+      "bytes": 10102,
+      "sha256": "8ee4c9be3d396a92fd026737718bc35c1a74d499d3c5ecde5b116bc29b689b29"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml",
+      "bytes": 9546,
+      "sha256": "820cfc2fa8bf8835de81795d45961a560b8ca9c9ab1a8cb2c05ed9a477879f45"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml",
+      "bytes": 19470,
+      "sha256": "727a584aa6a2c8b2f614f4fd1fa275eb566ce93ad8a927eb2c5c47e0a0724a91"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml",
+      "bytes": 9743,
+      "sha256": "1538535de3e8976f8e7cb4286a40e74cdaf7b2b9854b1ca0aeeb72dc7ffc775e"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml",
+      "bytes": 11413,
+      "sha256": "cee5a21ffd30b25f553d4a71eca5a31ccd953508baf707c67e66440ad69463c9"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml",
+      "bytes": 11341,
+      "sha256": "a4f368509712162f2f71377c7ede6cf27aa0c2313fea28fc73e2612f8884bac7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml",
+      "bytes": 10655,
+      "sha256": "d8a02deb2ccba4d920ec11557d5e5af8b8ca7058026b8a9ce9832078d14518bd"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/TEST-pt.uminho.esr.ott.transport.TransportTest.xml",
+      "bytes": 11344,
+      "sha256": "0d410cdca6052a1ce4675265de18c892759ae77d96af04c210443cc70f895ff8"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck/result.json",
+      "bytes": 35605,
+      "sha256": "03af6243cec8a7812040a9a40926b55c80e901e0cd148ada094ae7683c136ef7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression-recheck.log",
+      "bytes": 37696,
+      "sha256": "d982cfd6db6a8da5c1d8c8ab8b8c9b27297d844008d1412e93cea71e15305ab7"
+    },
+    {
+      "path": "experiments/construction/007-arvores/q-c-36/regression.log",
+      "bytes": 37150,
+      "sha256": "073cfb506d3d909ed5d72ca5c2e0bd3840b58054eef891e03c489d2abe731ec8"
+    }
+  ],
+  "sources": [
+    {
+      "path": "CORE/.bashrc",
+      "sha256": "d7dbb28ff7aa3618323c8bcbf42f571c2300f5bdad9756c5ee120896e96e9aad"
+    },
+    {
+      "path": "CORE/README.md",
+      "sha256": "88fc96656ddd3e68c6934bb32f2c8c6bc57f406d458322b4911d36bc0c7cb184"
+    },
+    {
+      "path": "CORE/container/Dockerfile",
+      "sha256": "fda9b68a30000426b67ecc5ad5b2332c74319743585de212be9da3bc24c05532"
+    },
+    {
+      "path": "CORE/container/fix-lab-curl.sh",
+      "sha256": "b74a48f2604baeb69a631e25294b077063b0b70b293b44d70b13b6e02c857476"
+    },
+    {
+      "path": "CORE/container/install-firefox.sh",
+      "sha256": "99cf42c3e5266f76268035d456e118619bbafe598d863a7ec5c3764244364771"
+    },
+    {
+      "path": "CORE/container/packages.txt",
+      "sha256": "98fef679ef0dbe8b359cb1a430676a9c5da8e7e6d4197aeeb0f5d0c391aaafec"
+    },
+    {
+      "path": "CORE/core-gui",
+      "sha256": "c2b5f67769125c67ef4e8b4fbd39c3a1070e77b4183cf76dab78f894a3802c23"
+    },
+    {
+      "path": "CORE/docker-compose.yml",
+      "sha256": "24648537034114fa30b009c486ecdefa6a9ffcfd8e715e53d42d3b84241c6405"
+    },
+    {
+      "path": "CORE/setup.sh",
+      "sha256": "647f1220cfabd7d733e337744aa576fa15769a4e904da1a347a8872af253e56a"
+    },
+    {
+      "path": "CORE/topologies/README.md",
+      "sha256": "d746b3977d436e0cf45d63559323b5a099715dc432180a81c632679dd63a2c48"
+    },
+    {
+      "path": "CORE/topologies/cenario1.xml",
+      "sha256": "45cbe4c5761811ab33855b9b21bb1f3e9ff00e41a5426e4df176a6f648f1a9b0"
+    },
+    {
+      "path": "CORE/topologies/cenario2.xml",
+      "sha256": "50bac29ed971afbf823cfc82ca7ed484f20ee73704705b7d8f7ed808856feaf8"
+    },
+    {
+      "path": "CORE/topologies/cenario3.xml",
+      "sha256": "26b1b5c57671ea332b2884ec12f8abeeaf5f50432c2669eb5f99f06cad7fbd15"
+    },
+    {
+      "path": "CORE/volume/README.md",
+      "sha256": "cea8d479b8405861db05e9e0d2c4077db9e643e7b42bec3d6fd7caa897365570"
+    },
+    {
+      "path": "CORE/volume/curl-static",
+      "sha256": "0a20b39a6f81c7546298039655e2324a5fb1083c0a615cae8e4f337214d543b8"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java",
+      "sha256": "b47c7ee7dc58ac6d8d46c8a0fcce64af06293569323b46873608322e98521e69"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/bootstrap/BootstrapServer.java",
+      "sha256": "5cbefdcc95679061fbea0c9e51210dd0a3b082e216ce3f03175a753915dfd461"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/client/StreamingClient.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/client/VideoPlayer.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationException.java",
+      "sha256": "4f802354e8b0db63b8e7b4dd65fdc5255fd67db1a74073d4edc887e9e9103271"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationLoader.java",
+      "sha256": "dae8f49a91cf4c72a4f6805cbea57fd518407a6757ae3d375eb94485eaf461b9"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/ConfigurationProblem.java",
+      "sha256": "92272119535ef7b87f90413c34cf8b32cc1fc65d025170ec8a17abb0d7b53332"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/NodeConfiguration.java",
+      "sha256": "f3d84d147d1a289f3fc4b6eedc9ef9460d4be9f786e718b4eca72bac79df8005"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java",
+      "sha256": "2620c367216f4eef53c9474b69ea2997eabe7c107023e776d5c2222bb1fb0a68"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/StreamConfiguration.java",
+      "sha256": "cfe159a59593e131aa227beb641fa48c573fac601c45fb048930dd9627f59689"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/config/TopologyConfiguration.java",
+      "sha256": "944f4c01b9c8a36249bba259f96beaa1643827731dfe1b2a98ad6eae95871194"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/monitoring/LinkMetrics.java",
+      "sha256": "7c9b14efefa27355885614257e9802e5cfd7eeb639053c8e0b6c84f04f86b996"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/monitoring/NetworkMonitor.java",
+      "sha256": "d7ab1173ca418589d731923e2deaf08c8a1d142687127761252b2ed6c1f7f350"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/CandidateCache.java",
+      "sha256": "004b7e951d6388d6bef0889072381e4d9c6f1b2493d38a32874f228631a5b523"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java",
+      "sha256": "5aebcc159facfe94297a8283124255de67c589d088808564322bba9bd148b58d"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborDiscovery.java",
+      "sha256": "1d156f385f2f383501370a1c18c5295882b4467d4272922c2c3738accb634458"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java",
+      "sha256": "7e4024a77ecf332e64addd40693199869d991829bb4dd14de908c0941bcb2429"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NodeRole.java",
+      "sha256": "9e56558ac1bed1aa9f3fb694dfa2da791e3393fb0bb493aa0c4dbaaa9f76813f"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java",
+      "sha256": "580f7887bb763f5ae305cc72b08668d0797ba5c725e0af40a256618504356227"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayRecovery.java",
+      "sha256": "66d4f55cb7d4ce99d593f3329dbccac293229b54522008ce5327615f4b9144e0"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java",
+      "sha256": "3f4884acfc8224fbb0f186e15bef8562e5d05d78197bb41489fcb43a2b1857d1"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/DiscoveryCodec.java",
+      "sha256": "7d6c2e555cf23d619f25311a86d7ad18b85192f8bc47ae25bd48f1ee2fcd37f6"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/DiscoveryMessage.java",
+      "sha256": "6704a36a0f0efb3dabdf4927ef0422b723c7303a265af620de86cd717f05c8ee"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/ErrorCode.java",
+      "sha256": "b01234ae0467bdf8aba443e3423d097e112fb9f1dc2bd330d441def1efc903b9"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java",
+      "sha256": "9959f7f8c48982ad35de46dc031cb25e0f5a9eecc638faea5c0d7cf45efe2e85"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageType.java",
+      "sha256": "1c070252738adc1fb80edcd0da974e40505bdc519ac3dcbeb5e8a03abd2fe255"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/protocol/ProtocolException.java",
+      "sha256": "4d7010b55c68aedde2193cde4cde073f7b250e946d98a13eb12f0827b2fe7208"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java",
+      "sha256": "09ddf351f2ed5c3d295eff5c33685813758cc525345069c6668ebbeb37c9143a"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java",
+      "sha256": "397ff382088bc771246586f251425c5fc7aa675d4e5150d41df5dd5418e041fb"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java",
+      "sha256": "4d91fc4d0bda61392b49ed2780566c15b0881de2e8777f733d0d78949cad0830"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteState.java",
+      "sha256": "0a86c03672c5a879ce281fe0a3a78af6126811c96db5bd410075ebca15104add"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+      "sha256": "15d72bb09ea945fd8b5f9c4efef428cfbcf8001e55a50101d8dee4c8a3db3e40"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java",
+      "sha256": "47b044f2313d805f99e253b843367d4d4eb6c5b0c05953e4ae9c0396ad9ec45b"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java",
+      "sha256": "167f6adf1514f40d88d745a5cb2cd44e782b974201f1e99c5d0f25859e1d59c4"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/server/StreamingServer.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/server/VideoSource.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamCatalog.java",
+      "sha256": "2d74f1693dcd4b685d2a096ff8b19583611d9fd55423e4b29081caab64b3f8a3"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamForwarder.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamInfo.java",
+      "sha256": "4de8cc0df948ed8dff40a400fb76b26d17e888b293e2b789a7c0b2a0fb7920d0"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/transport/Connection.java",
+      "sha256": "2a4279fd6e0baa9ab672b034e9a7c94bffa736f89f3d8b4a3e7c4ed004200a79"
+    },
+    {
+      "path": "Projeto/src/main/java/pt/uminho/esr/ott/transport/Transport.java",
+      "sha256": "78014ba3d37bd77aeda6b3c1436c9e4924ec63e002e582e1ba326521652bc091"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/bootstrap.properties",
+      "sha256": "27e0e93ac2fef2dd56d42e132eca4ece8a3d9c31cf271dec87cf05d70d0847f7"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/client.properties",
+      "sha256": "67a1901f841820ab18a1de9a7d6a74f5cb70f1a1d5b1d4cff36a88c2d56b8148"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/relay.properties",
+      "sha256": "d669fe49284aa205686b79471f753bc9ebafbceed011bc66e04c3a2a81df7e22"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/server-1.properties",
+      "sha256": "05a31357bacadb7dcdc7068c26414ab6c2083fbc287db20136570a5a05e6a45f"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/server-2.properties",
+      "sha256": "e1a26f90424e37344f7e132ae3531c7678b28d8d8a85ed1ccb1c6bd8244fc745"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/streams-s1.properties",
+      "sha256": "0850103529cae7cb7285612f1f9a1b6cd2b13ed2aaffc2a88d60e8d0d99c4445"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/streams-s2.properties",
+      "sha256": "200ec057630a68dfa4f7ac7d8ba74c147eedfbaeb5c0e49cbd6b3d0262e03bc4"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/streams.properties",
+      "sha256": "a8ef2cfa61854f39965e85d495fa4cdbd84b14c3cf9e3d20b69e3d14ff129eb0"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/topology.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/main/resources/config/topology.properties",
+      "sha256": "2b448efa10ea89fa4593207bdada7ae715459cfd9d975030d9bacba439db1212"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/app/OttApplicationTest.java",
+      "sha256": "25169d4c68bcef6add543e2052c52c76376adbb23fcfd90445be1af802a81f50"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/bootstrap/BootstrapServerTest.java",
+      "sha256": "a37ca1933cd5e3308efe610fcfee4eb8291af0dee51ce35420f4d4f549ff2627"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/config/ConfigurationLoaderTest.java",
+      "sha256": "139ecaa9cb693f5d556be66b1aeaff0cbe23b9676108cec33a75488d0d6e82d1"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/monitoring/NetworkMonitorTest.java",
+      "sha256": "537bd99e9d4979a42d184ecc376bcc7aada704cfd58744c0c443c84f17133958"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/CandidateCacheTest.java",
+      "sha256": "f8fd9cd1bdada90783ff9274c4f3a212ed7f6907adad2b1a828bbe535b8e3e85"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborDiscoveryTest.java",
+      "sha256": "edf496011b5fb08d1f8aaa165d3f3255f5b6965f0e26e7492c7c1bee6a4dfd45"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerLifecycleTest.java",
+      "sha256": "c76bab7056a025467b4eff14d099b42bfecee2d5682b555ca739d2837361275b"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java",
+      "sha256": "ad6f5a56bec40f85ab680e20270a8f1bf8626f181786c10dfb983f7f70717fc9"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java",
+      "sha256": "00eb9b837ad4b2a46b7a3fa3c2bfbbfa3b6344e580bcd8c91571761819076892"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeRoutingTest.java",
+      "sha256": "f640255cba2f43b797114c2ae88a53979f4b35d075cc67699a56904263f96fdd"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayRecoveryTest.java",
+      "sha256": "e366b283c10969f8742d7d17e55ee439953c934f68e94e3f7d9cd88c9d111d25"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/protocol/DiscoveryCodecTest.java",
+      "sha256": "ff091ec271b13fab7b5875cc4fe985cb32cabd815ecaf14ceee1232dd12eef34"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/protocol/MessageCodecTest.java",
+      "sha256": "aa764d66bcde382a3bc0fcbcaf948b74c40f45672046baf2fcb6f06f0f597deb"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java",
+      "sha256": "7f30057a8a302c10348df16dfefa538233d16bb011eaad18eeb2dd63c53e93b5"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteTraceTest.java",
+      "sha256": "9c4c6cd430aa05dd4d2802dc3d09e588fd6b60aa49d818d5e045fb14e318ecbc"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingServiceTest.java",
+      "sha256": "b19d73e562dfcd42fbae82354405d2b1d936b7b69011a01d5bf94f741a57f2df"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/routing/RoutingTableTest.java",
+      "sha256": "ce79c71e5ddc70d07f8bf1fb5462d13f2cfdc55d9bd362901052aa392d9eedd1"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamForwarderTest.java",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/test/java/pt/uminho/esr/ott/transport/TransportTest.java",
+      "sha256": "b279498313610667aa300fef64738e01bf29cd58717dbf7d857584d8f2f37581"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/README.md",
+      "sha256": "20cec8b76a34d42c2fdf7931d98bbf20f743194f342653e05de99a6c2b1205cc"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/manifest.json",
+      "sha256": "3188e5ff7cf67302e8f7c17f8f5a81c6d1284b2c727d92ec75af6d1fbe7ccf0c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-count.bin",
+      "sha256": "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-count.hex",
+      "sha256": "a2ea10a8eed854c351526a274f76773b2e3d80b75af05a58d4209725e8f11973"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-datagram-size.bin",
+      "sha256": "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-datagram-size.hex",
+      "sha256": "85d8d8e0f31e85b361dd732c542fb110cc2078b8216c1ebab464574f1cbf4c83"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-flags.bin",
+      "sha256": "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-flags.hex",
+      "sha256": "624ab0b0a6d5210d06e52ace1c9568696ee20cabf3b07613ea7faaf114475dbe"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-header-length.bin",
+      "sha256": "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-header-length.hex",
+      "sha256": "211226352fcc4dd05ca9eaf097edb166847b2ba56518c1e6bcc3caeff5abf483"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-index.bin",
+      "sha256": "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-index.hex",
+      "sha256": "b065c34a8df8b75cebfefcbe39b811c035b3e3063a94c83db18e9d96539b0ca8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-large-frame.bin",
+      "sha256": "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-large-frame.hex",
+      "sha256": "7ffcf46d08d3c755efaba73f55f3438392f4bde537d3056ff3dfb5364e95bc41"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-magic.bin",
+      "sha256": "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-magic.hex",
+      "sha256": "53fd4f6303ef6e6c27fac90bda9cfff64ec384b59823af076fb0f264df8dc72d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-negative-seq.bin",
+      "sha256": "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-negative-seq.hex",
+      "sha256": "5d5184a6ab771bd140459d9f38931c34bc719bde765af693c8c1d70895510c83"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-no-payload.bin",
+      "sha256": "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-no-payload.hex",
+      "sha256": "6207471b1037292a77b05c2fa7c5fca673a6c3c87ae1f0246cdca9975374b4a3"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-short-header.bin",
+      "sha256": "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-short-header.hex",
+      "sha256": "4e0025d4aed71642e3cda5e5a99903e899eb6c2eaa9c763d9decf7031b73e33a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-version.bin",
+      "sha256": "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-version.hex",
+      "sha256": "89729c6b2b371811a36a93dae2aff5fe859c497a4dea3b473c21f1496cf71783"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-zero-frame.bin",
+      "sha256": "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-invalid-zero-frame.hex",
+      "sha256": "7aa2ae697b57a4d077b62a2f66e9116b271f3c94e6f05d9a86be6fa54f2f968a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-min.bin",
+      "sha256": "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-min.hex",
+      "sha256": "25ef6f44d9dd663255340e3ddf2c0bd313a1a3c7dc31df1cb217cc6e68bbde76"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-small.bin",
+      "sha256": "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-small.hex",
+      "sha256": "ce9b61943dc5f16c8f6d637f005e1cc2c576516427d530239b8d8334059c5da5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-split-first.bin",
+      "sha256": "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-split-first.hex",
+      "sha256": "385357f3ace9482c804566d5dfb6ed8397f70430b44662f98e172bd51de2f864"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-split-last.bin",
+      "sha256": "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/udp-split-last.hex",
+      "sha256": "95752f55902b70344cdd66d461697dc3a64e26d23789e29e6676b05a84d22f50"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-activate-ack.bin",
+      "sha256": "f7f4adc98fed709f9c6d02e83529eac5510689fedf315500320ecfc995c6105e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-activate-ack.hex",
+      "sha256": "d66fc118019d090e0605b6d40e06f90a2aada2afa39486835711aacddaa2f70c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-activate.bin",
+      "sha256": "9ac38a5155bcd91d4df4f2a820d5ec1d37db53cfd21bceb4e76f1a73ec59c69d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-activate.hex",
+      "sha256": "344335945696b69c1deaa9b66032765d1cf1238b6400542b94461061c1b6c8df"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-deactivate.bin",
+      "sha256": "d8bc2b1206604e16484d7b343adacc891bd9cfaf02d9add5a01c43cf841fd097"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-deactivate.hex",
+      "sha256": "0ea7f54d6b206c717b82bf8d22ccddefb1d617d1c5f92dc262ea8b64a09edb83"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-over-cap.bin",
+      "sha256": "dfc4115c5938ddee320cf90ce01aec6ec13e1be1b1414fea282a92ae497464b7"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-over-cap.hex",
+      "sha256": "b795290d16c28e5e763234a073ed630c4eb63e333d0e425ede4a89b86e574455"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-query.bin",
+      "sha256": "711ca938e6dd0ba962f669450d7ae1ad4e0e366f8407de16b84bfecd87bb74c5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-query.hex",
+      "sha256": "b9aed27140cbe7e656c36ea16b8515242c207dc3da7bb8528ce515c80dc984b8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-snapshot-empty.bin",
+      "sha256": "6da29b79232eb3991542bd3ead22a1fb9710d5e5a507a4d2253d6474a4ee5a04"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-snapshot-empty.hex",
+      "sha256": "06cba4e8d197400ed5f586a374b1b587c771593ef64a226df80478e985550a64"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-snapshot.bin",
+      "sha256": "36e3f185d7c61f36a67392cc7f67e483030fa638a6f961129848fed33da0f89d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-discovery-snapshot.hex",
+      "sha256": "a6287871eee73fa8d2e3b31f5e1949b8d74614179097720d6b8ef5fff54de1c4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-error-discovery.bin",
+      "sha256": "f88ddd196739ad1ef8f1dce5545607f4f9c331520c0adcbdefe57de7e4d5afa4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-error-discovery.hex",
+      "sha256": "f5bdb08b0a815a07b8a8cc46c320e28abaecd598799022030e0a5028d695f0bc"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-error-no-route.bin",
+      "sha256": "fe7069d1736ff06c72c5b7fa5d7b7e5e7e9477a0f0b99b40c823e951628df97a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-error-no-route.hex",
+      "sha256": "5d67af57f30af41be3d25a8ab7244cc2e47c57cdd610cdb22718c342a6914a22"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-hello-ok.bin",
+      "sha256": "75cef1acca9e74e558d3462bd67ef840810b716d4667f65045f94c173856817e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-hello-ok.hex",
+      "sha256": "689e56c3677422fb67abc4f886346d82be55356c27d0b18dc904f499177393bd"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-hello.bin",
+      "sha256": "7ed30f626b85e8dc9f0ab7e443f7cb6b6d2dda676a5c99ce77cbd6735540d965"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-hello.hex",
+      "sha256": "03cb6df0285157d266577bf4863966bc4728318e516796a436781d55c8f5bf2a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-missing.bin",
+      "sha256": "76e562140022dd1119172189e5beb688cffecd2547ba37f10bddddead7a47a77"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-missing.hex",
+      "sha256": "19d9ad5d7aa4188834a8473979c3bc810e034adfa93324b514e09c11c6b5cf80"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.bin",
+      "sha256": "b8d4173297c4a6d674b9147c7134ee5d0278b89a4a24589ad3ee0250505942d1"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-not-required.hex",
+      "sha256": "a01beb723f07e9d82c6722d21025ec00029554c660394eac0a27582657fe46d6"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.bin",
+      "sha256": "605ffb34852ecfaf5775d8d50724b780c71b87e3e7e8699bdbc46fc3690f8771"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-capability-reserved.hex",
+      "sha256": "5f461fbab74e24dfce2a393aa573daf1eed1fbe96efb0a4250384e891bd5f7f2"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-identity-utf8.bin",
+      "sha256": "703b82e5f09b2c483a1a5ad02101ea84f6263efaadd99706c93ca3753d77f7e4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-identity-utf8.hex",
+      "sha256": "6276ea0d6b7a75fd6c965d06b4d34fd5c344df15bda254bba13f0d8e47f4ec99"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-large.bin",
+      "sha256": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-large.hex",
+      "sha256": "9e754b267983a3ecea198714ff106f29ff8f6a76371a2b5bf9c800b5e263e8bb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-small.bin",
+      "sha256": "b90b4a18500eb7e5f0553891c16101e137574d5f21f715393a64ffc7c3b730c5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-small.hex",
+      "sha256": "dc1f73bc09f10e0b806642117eab4612d00db43e8d02875a6a838e55c10e17c5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-unsigned.bin",
+      "sha256": "ad95131bc0b799c0b1af477fb14fcf26a6a9f76079e48bf090acb7e8367bfd0e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-length-unsigned.hex",
+      "sha256": "1d6f30f8f1adfa8c6a5b7cc2cd357760c98c9d263d62424fcc3cc5de96eee7fe"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-negative-probe.bin",
+      "sha256": "d0511a142f72f74f541b6dbb01a9465de8976f376313f2255c4cc35655f9b396"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-negative-probe.hex",
+      "sha256": "05b72f57450e9c69b4df992a6af3589c559b6f4ccd1240056c440d3da41825e4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-path-count.bin",
+      "sha256": "19e34c63f3e3231208d7997e5732c481a85037dc2cab0dfd12d078a52f0a6818"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-path-count.hex",
+      "sha256": "832d869ab78b78bfbbd67ac78e24952b2e0b165fea5fbffa97eb7289203c2022"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-retired-type.bin",
+      "sha256": "09d4009ab99bc5ced523756d1ec5cb174c904529597229fb9abf2bc06dd90add"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-retired-type.hex",
+      "sha256": "77f4656708b52184b1d96f1d1c122421c41dcb3d4609b046fdd118f92d74d583"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-role.bin",
+      "sha256": "a210ab2ce0bfcf639e727cd77406a71d37289b3e7f0028cbe785b470ca655a6f"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-role.hex",
+      "sha256": "94b1dd62e56836bcce742c7d41d1cca1443f0628e257de16966a491824f691cb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-selection.bin",
+      "sha256": "65a81cbe627188113b92af97324b6285a5f57c6930e8235d788f2d16292b7a10"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-selection.hex",
+      "sha256": "57a7235cad9bafdf57ff04cebe0a5c3c8dca88bbb44e02e252aa23f2b2667642"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-short-prefix.bin",
+      "sha256": "709e80c88487a2411e1ee4dfb9f22a861492d20c4765150c0c794abd70f8147c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-short-prefix.hex",
+      "sha256": "1f423625d3464022fc3288510c6e2a5e04ab092feadb6eabe53bf66291e8312f"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-trailing-byte.bin",
+      "sha256": "43cc27f03baeabe303bec2366ba82f2af033ab8ccd3c4f35ae985dc96c5278d8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-trailing-byte.hex",
+      "sha256": "5fa614a627b711cd811e3e7e921ff3b96fde3d2eeda1e777630791b8b0f0cca8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-truncated-body.bin",
+      "sha256": "1323d1733f0ad0bbcb26c2f328082e5a9961f8af31fb1ebca8c5ac0e1ada9dca"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-truncated-body.hex",
+      "sha256": "ef1c1225282f417fc0ec95dfb944314d1b462c1d94d9b38f8f73a7b29583a5b6"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-type.bin",
+      "sha256": "00e37d322f3871ccd52a92e2a5f09c9e09690293b9596096d01a71acb5f96a62"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-type.hex",
+      "sha256": "78ec94d7bac75c01d48abf824af15ae72a86db7df0f0b352686de985feaa9b2f"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-0.bin",
+      "sha256": "4ece6184380ad5b5ba0d50704d4a54f2e891b4184e407f6a06b7e978d5c397da"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-0.hex",
+      "sha256": "1fd423019d124bbfd15b05edecc79bcb81cfb7b6bf04303ffef71520201e906c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-1.bin",
+      "sha256": "245ddcf51dcb3a78f77a5428b321674e57fba9a03183e0545b057ff5206898ed"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-1.hex",
+      "sha256": "e0189d784045c50e1ea056ae910830cd6be9eeed5cf82f1fe0734c4125dd2e69"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-255.bin",
+      "sha256": "4f4050025c238c1837ed9ec2c80da6e4300422435e93c0b82279fc04bcfe48a4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-255.hex",
+      "sha256": "87d718ae3ae1b2816663e9a01ca1924fde74640084f09d8a118abecc868c435c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-3.bin",
+      "sha256": "e74b76c8a05b8462cb0be6ae2be9750df65966f573f2f001a90c87f483ff8007"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-invalid-version-3.hex",
+      "sha256": "ed4fc678e9f1d7592fd85b6deb5e6b1dd14853359d9744004fccef9ed370bd60"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-node-leave-min.bin",
+      "sha256": "91469b63ecf7cfeaeb58e63baa1dc6ad7540e7073c3cf4a2556b73975602e353"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-node-leave-min.hex",
+      "sha256": "d4f2e4c3405f64739dfb649a64c19dcb9428e130643505d2a778b6b6922864a2"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-node-leave.bin",
+      "sha256": "54363148900ab96913c7c4f0217b24c21479cfd433b3cd8e15da7a753e339a73"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-node-leave.hex",
+      "sha256": "34d14834d61b63d2eda75077c9d86b0357d7e0ac34efd6b3eac9a35a5aa429da"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-probe-ping.bin",
+      "sha256": "1f0079f46f51da9865c1ecc7d1ef4f85824dd8e13d6e8b48301e68440851129a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-probe-ping.hex",
+      "sha256": "f2f2b34d325ddfb2ebff9a4ac224f893854609097d98dc53b80916a660ed9047"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-probe-pong.bin",
+      "sha256": "a51b1c63ff5a0debd4ef319a2c71cba9eaedd28919f7d36713387a13839c7508"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-probe-pong.hex",
+      "sha256": "6bb4410634513bfc84b9d0cfecd8c7574035eda2f337c109b5b39da54254d8a1"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-register-ok.bin",
+      "sha256": "2bf17f91550674cedb0002053b59387d4f78bbee63e11c1a020fb466a2b2eedb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-register-ok.hex",
+      "sha256": "d5929508b11453ba3f1aba6dbf114866c65673132c82f85bc0ccab56da06fa81"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-register.bin",
+      "sha256": "bb5e19e1cc2f8f07545192fa9dac501a3016899f32fd9979d26dc021c5cfab55"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-register.hex",
+      "sha256": "0f24bc960b69fd89d5f33b0e87452cb3447e9c805767c92a390ab927b7bda5cf"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.bin",
+      "sha256": "9510a4ab91aeced9ddd7d18e5a1b428a847310a08ec8812e00d62bc2223b3751"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-discovery-only.hex",
+      "sha256": "dcda4947a34c155eb4365ba876cc25f97b0ece429219187b5c24f6d875d951b8"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.bin",
+      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-duplicate-owner.hex",
+      "sha256": "a43639b93ec3cb460071f223436037c273c1ad5e30a802afa77c0bc52c4fb28e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.bin",
+      "sha256": "45ac5f8333429d5b7e5a693df8f25577f497d17c0d19d54abb0b80e1398c09bb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-invalid-role.hex",
+      "sha256": "66875ac846d65e43be59082b056bc77803fb616a68bb070b30b0add417314919"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.bin",
+      "sha256": "76cc5805dab9b4eacefdb477f498020fd82bccdbc9c6a2d9ce10586ac85512b4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-above-global-cap.hex",
+      "sha256": "9e754b267983a3ecea198714ff106f29ff8f6a76371a2b5bf9c800b5e263e8bb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.bin",
+      "sha256": "e4485eb76277f285c93a19fd7b78cc5afeb859c756598b67e8bd655d224ce065"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-length-small.hex",
+      "sha256": "4bbed8256dab9e7f0f196d14a9241a2154456097fbcc5a55d54c570339023544"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.bin",
+      "sha256": "6e26196eb7f21c1469e8fa3c4a1c75c8918697eaaa0eca38d65f00aec06163c0"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-mandatory-missing.hex",
+      "sha256": "e75d04617bea800ad05b66d712e4702b9e51e28a2d31d24c58a44923e85ecd13"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.bin",
+      "sha256": "4b74ab3c7ae7bc2e50d33b6676e4db2d4046b4cd439ee438a9c6269c8870142d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-max.hex",
+      "sha256": "6738a6cc797b0476393c2f40408a9972275713652169b1ed498a43d00dc3df6e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.bin",
+      "sha256": "3dc8ad5ed79df00425e35d72b0618c0677ebaf9c33c2d6a5233e40a6b1ed4815"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-min.hex",
+      "sha256": "a43639b93ec3cb460071f223436037c273c1ad5e30a802afa77c0bc52c4fb28e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.bin",
+      "sha256": "55cbf9b3f8b2e9ffd7e6b821321948a657d9b3c9544f7314d58ee11f6dd3c75d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-reserved-mask.hex",
+      "sha256": "ee96ecccf5841bd252b4fcebc84108aa265d217e68474998db77756f688c4361"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.bin",
+      "sha256": "7a870dc39e1d073cf218a4be3c9e4032649002e04e9ba4253e3e69ea4e0f4ee0"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-truncated-endpoint.hex",
+      "sha256": "902c5f2a7d602f09fed7d4732120c888d54a4a50739c06fdb4d64fa4216fe487"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.bin",
+      "sha256": "2e230a17d00228124b4ef2b6a5c2fa2ea0c69a99e283fa227b8e30a7886fbd32"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-unknown-type21.hex",
+      "sha256": "5bde60d39ec5e364de4cb73af11c47468d7b37250ac1a3b5f79775d49ffe4dbf"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.bin",
+      "sha256": "b35df12668fe54601b1c81d558a01e9c836d2ca839cf4a4ad83498b5cd11b129"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-repair-hello-zero-request.hex",
+      "sha256": "b4c3648ef9d129776051de94aae7bf2e3773df9f909cf6ec93722512c683ccf4"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-route-trace.bin",
+      "sha256": "ac69f04db160f5efebc0c808795c1b0e0be4c5fbe73836600e6f35bf793de84e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-route-trace.hex",
+      "sha256": "e39315d75950703f73af6c78f327cca045590567851911771489b1ccc092a673"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-duplicate.bin",
+      "sha256": "17ad717f3c19a37af1b3a0ea1255e7bb8fdb220eae6dadeb4eeb848a7d27931d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-duplicate.hex",
+      "sha256": "b1a6a3761573a5a95e9db7161a3f62083619685570358d581e64d191b70ea865"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-field-length.bin",
+      "sha256": "f25ce859903c5c7c6fccbb06e0096b7c9024f037f87ae3927041afbd345c8c67"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-field-length.hex",
+      "sha256": "f3255e7e77e8a2526652459b032af3dcdc4e2367d74c857fffa3c024444e5ab9"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-generation-zero.bin",
+      "sha256": "0c10dcbe838b717c3f88daffb27ba10cd15f6ff3161a3ce1f48402fea5370ff5"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-generation-zero.hex",
+      "sha256": "b428cb82011a3d66759788cd902fc9d14ff1581ac869f20b6fccf43b141fab1f"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-invalid-count.bin",
+      "sha256": "461f26219580f69a46611c1b272d0f415507c83adc85b5714393824a7c773d3d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-invalid-count.hex",
+      "sha256": "08c8ad0c013fadb7556efeb82b156b97876af9e400f72094abc75c8ebbb5d4f7"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-invalid-role.bin",
+      "sha256": "12fd11dfba48f716a0ffd8fdc61d81046da1bb202e3ae9c67a0aaac75d58950d"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-invalid-role.hex",
+      "sha256": "44ef7d6362f2ab0ed120971e6753d17bc4df163fbaee1d2584dc72065a97acfb"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-trailing.bin",
+      "sha256": "05233ce4556fef7e3bce4535d79b8cb9dea2009f35114eef09d57b157ec21329"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-trailing.hex",
+      "sha256": "5c98450d5326a9739cb2584601a1e21d5f3d9628a2b4e7a43bd47196e0896b85"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-truncated-endpoint.bin",
+      "sha256": "418f708f2a7fa87dd9c3e7dc34f024b409856e79c6a87cb1c98cc0716e59486c"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-snapshot-truncated-endpoint.hex",
+      "sha256": "cdcb9153f1bce245bf9bb3a2e3976ada09fac9050d3956031757101958935667"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-announce-utf8.bin",
+      "sha256": "5966df0d35f1d0368dbb413ce057b60b078bf1d47bde997620f21d6ebf554473"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-announce-utf8.hex",
+      "sha256": "9ac787795d1353b9e013735242dd0ab072d13c61131f55981bdae2e0e134e5b6"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-announce.bin",
+      "sha256": "3cbfb908be2dee7138a5217ee50a74a7350891bfa93ea4fd1c49740648f2ae40"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-announce.hex",
+      "sha256": "62da549ccb68cea1c0d63fd758409aefef9d48d9e322fc47cb68d2e40b421f05"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-withdraw.bin",
+      "sha256": "df0cebbc5cf99a64cda9faa4baefbe1a9c684eb1207c3d2fd17d9bc1681eb11a"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-stream-withdraw.hex",
+      "sha256": "b39c71ed927b3a329eba3a5fd3d76e9f080f0de9e8db5db4f8579ea3724c398e"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-subscription-renew.bin",
+      "sha256": "0293fb02f8ba117cac07a5fe269ea20dd60d634ee9d5ecdbd884b888b70e6531"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-subscription-renew.hex",
+      "sha256": "a8e7465ecc1aed239620989e367be02b0725a2d5783b0671b8336f29f7e23c53"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-trace-result.bin",
+      "sha256": "5c47f8effe5035c6fbfa3ce53a8672265bb928f2e64f7eabf8c2f4949d169b09"
+    },
+    {
+      "path": "Projeto/src/test/resources/protocol/v2/tcp-trace-result.hex",
+      "sha256": "21efba3e5c7dc6219130aa62fac158684e39de90ae159b53f348c53a2a5b62fc"
+    },
+    {
+      "path": "Projeto/src/test/resources/topologies/scenario-1.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/test/resources/topologies/scenario-2.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Projeto/src/test/resources/topologies/scenario-3.json",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: doze histórias/bolts complete, incluindo022-rotas/IMP-010, e23 planned; nenhum em execução; unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual: doze histórias complete e23 planned; bolts:12 complete,1 in-progress (007-arvores/IMP-011 em Implement),22 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, sem história implementada nesta unidade.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -82,6 +82,10 @@ Revisão final atribuída a Denji e integração continuam exigidas antes de DON
 ## 004-arvores/001-ativar-arvores-com-ack-e-procura-agregada.md ✅ GENERATED
 
 **Tarefa:** IMP-011. **Estado:** planned. **Bolt:** 007-arvores.
+Model/Design/ADR aprovados; autorização de Implement em2026-11-17T17:50:02Z.
+[Código nos quatro caminhos/evidência](bolts/007-arvores/implementation-walkthrough.md),
+1324 testes incrementais verdes. História permanece planned/sem implemented=true
+até ao fecho; os14 grupos/V-014 integral, aceitação Implement e etapa Test pendentes.
 **Ficheiro:** [001-ativar-arvores-com-ack-e-procura-agregada](intents/001-ott-streaming/units/004-arvores/stories/001-ativar-arvores-com-ack-e-procura-agregada.md).
 
 ## 004-arvores/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md ✅ GENERATED

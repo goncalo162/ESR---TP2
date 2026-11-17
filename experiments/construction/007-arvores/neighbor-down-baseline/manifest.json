@@ -1,0 +1,49 @@
+{
+  "preserved_at": "2026-11-17T17:03:23Z",
+  "observed_checkout_at_preservation": "7164c9ba111268dff59d847982b517e6e41c7a98",
+  "provenance": "Logs generated earlier in this conversation on 2026-11-17; copied without rerunning Java tests. Checkout is the preservation context, not a reconstructed JAR identity.",
+  "files": [
+    {
+      "original_path": "/tmp/esr-tp2-review-verify-unrestricted.log",
+      "preserved_path": "verify-unrestricted.log",
+      "bytes": 7164,
+      "sha256": "b30c4089764389a0561329ee95344cf5a6debfec5d32d7104d49baced44e4038",
+      "byte_identical": true,
+      "role": "suite with local sockets authorized"
+    },
+    {
+      "original_path": "/tmp/esr-tp2-review-monitoring-recheck.log",
+      "preserved_path": "monitoring-recheck.log",
+      "bytes": 4010,
+      "sha256": "8e305ef9b9b0c6835cbfd52fbe0c25a13c74a7dc0e6e5c453c6e953f5621a698",
+      "byte_identical": true,
+      "role": "isolated repetition with local sockets authorized"
+    },
+    {
+      "original_path": "/tmp/esr-tp2-review-verify.log",
+      "preserved_path": "verify-sandbox-denied.log",
+      "bytes": 98919,
+      "sha256": "d93686e65aeea9703900dfd2907609dfd9bca49dd4a9bd15e923cd02e8745dd7",
+      "byte_identical": true,
+      "role": "restricted run with sockets denied; not evidence of product defect"
+    }
+  ],
+  "finding": {
+    "full_suite": {
+      "tests": 1296,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "isolated_repetition": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "test": "OverlayNodeMonitoringTest.realTcpUsesSameOwnerV2ProbesAndEofInvalidatesCurrentLink",
+    "assertion_line": 96,
+    "root_cause": "not established",
+    "new_test_execution_during_design": false
+  }
+}

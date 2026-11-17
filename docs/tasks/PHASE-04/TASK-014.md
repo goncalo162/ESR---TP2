@@ -5,7 +5,7 @@
 - ID: TASK-014
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-011](../PHASE-03/TASK-011.md), [TASK-012](../PHASE-03/TASK-012.md), [TASK-013](../PHASE-03/TASK-013.md).
@@ -72,3 +72,70 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Início de Model — 007-arvores / IMP-011
+
+Registo 2026-11-17T15:29:06Z. Seleção explícita do utilizador para iniciar este
+bolt. [Model preparado para revisão](../../../memory-bank/bolts/007-arvores/ddd-01-domain-model.md),
+com propostas Q-C-34/35 sobre cancelamento mínimo e compatibilidade de prefixos.
+Sem aprovação de Model, Design/ADR/Implement/Test ou execução V-014 nesta etapa.
+Revisão final por Waheed e integração continuam exigidas antes de DONE.
+A falha anterior de NeighborDown na regressão atual fica registada no Model;
+não se declara build verde nem se alteram as dependências historicamente DONE.
+
+## Model aprovado — Design apenas
+
+Registo 2026-11-17T17:02:14Z. O utilizador aprovou Model e Q-C-34/35;
+decisões também em [construction-duvidas](../../construction-duvidas.md).
+[Design para revisão](../../../memory-bank/bolts/007-arvores/ddd-02-technical-design.md)
+concretiza validade remanescente, limites, idempotência e seleção divergente
+que preserva o ramo confirmado. Detalhes novos de Design por aprovar.
+Os mesmos14 cenários M01–M14/V-014 por executar. Sem Java, ADR/Implement/Test,
+commits ou push; nenhum gate externo adicional.
+[Evidência duradoura de NeighborDown](../../../experiments/construction/007-arvores/neighbor-down-baseline/README.md)
+preservada com hashes; investigação antes da aceitação de Implement/Test,
+sem alterações a testes/fundações fora do âmbito por inferência.
+
+## Design completo aprovado — revisão ADR preparada
+
+Registo 2026-11-17T17:30:07Z. Design aprovado integralmente pelo utilizador,
+incluindo leases/T/A/lineagens/capacidades/quotas; apenas revisão ADR autorizada.
+[Revisão das APIs reais](../../../memory-bank/bolts/007-arvores/adr-review.md)
+preparada: Route/catalog conservam seleção; Snapshot real tem quatro argumentos
+e admite extensão aditiva compatível; dispatch ERROR11/15 e espera física da
+ativação cabem no RoutingService. Subscription.java e ActivationTest.java ainda
+não existem; a inspeção não os declara implementados.
+Revisão ADR por aceitar, nenhuma necessidade de novo caminho/ADR identificada
+estaticamente. NeighborDown pendente e negativos preservados; investigação antes
+de aceitar Implement/Test, apresentação prévia de correção fora do âmbito.
+M01–M14/V-014 por executar; sem Java, Implement, commits ou push.
+
+## ADR aprovada — Implement incremental e investigação consolidada
+
+Autorização2026-11-17T17:50:02Z. [Código e resultados](../../../memory-bank/bolts/007-arvores/implementation-walkthrough.md)
+nos quatro caminhos, com Route/catalog como seleção, forwarding separado,
+Snapshot4 compatível, ERROR11/15 isolados e reservas físicas no shutdown existente.
+Regressão incremental anterior à exceção1324/0/0/0,18 XML preservados;28 testes
+novos incluindo o diagnóstico de NeighborDown. Após Q-C-36, focado NeighborDown
+1/0/0/0; duas regressões 1324/1/0/0 (D11a), isolado D11a 1/0/0/0.
+[Resultados novos](../../../experiments/construction/007-arvores/q-c-36/README.md). Sem avanço à etapa Test.
+
+[Investigação consolidada](../../../experiments/construction/007-arvores/neighbor-down-investigation/README.md)
+e Q-C-36 fundamentam a exceção autorizada/aplicada apenas no teste histórico;
+asserções/prazos e negativos/diagnóstico intactos. D11a sem causa estabelecida
+e sem correção adicional. Implement continua por aceitar, sem fecho,
+commits/push ou outro IMP. Os14 grupos têm checks incrementais parciais;
+V-014 integral/variantes e aprovação pendentes. Fecho exige V-014, regressão
+aprovada, manual humano, revisão final Waheed e integração, sem gates externos novos.
+
+## Q-C-37 aplicada — Implement para revisão em 2026-11-17T21:49:25Z
+
+Exceção autorizada exclusivamente em NeighborManager.java/NeighborManagerTest.java;
+sete caminhos autorizados no total. [Resultados novos](../../../experiments/construction/007-arvores/q-c-37/README.md):
+D11b/três ordens1/0/0/0, D11a original1/0/0/0, handshake/lifecycle202/0/0/0,
+uma regressão incremental completa1325/0/0/0. Closed/prazo existente sem resposta
+terminam e libertam contexto/tentativa/timer; TCP real com zero reservas e
+awaitTermination no budget configurado. Sem alterar testes/asserções/prazos
+anteriores ou apagar negativos. Implement não aceite; sem etapa Test, fecho,
+commits, push, outro IMP ou gates novos. V-014 consolidado, regressão aprovada,
+manual humano, revisão final Waheed e integração pendentes.

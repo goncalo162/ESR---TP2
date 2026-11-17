@@ -1115,6 +1115,8 @@ final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575a
 - **Fase/unidade/tamanho:** PHASE-04 / 004-arvores / M.
 - **Bolt/origem:** [007-arvores](memory-bank/bolts/007-arvores/bolt.md); TASK-014.
 - **Ficheiros:** `routing/Route.java`, `routing/Subscription.java`, `routing/RoutingService.java`, `routing/ActivationTest.java`.
+- **Exceção Q-C-36 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/test/java/pt/uminho/esr/ott/overlay/OverlayNodeMonitoringTest.java`. O `until` aguarda conjuntamente snapshot sem N1 e NeighborDown da Session esperada; todas as asserções, prazos e restantes testes mantêm-se. Não alarga o âmbito de produção nem aprova Implement ou a etapa Test.
+- **Exceção Q-C-37 autorizada pelo utilizador em 2026-11-17:** exclusivamente o patch apresentado em `Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java` e `Projeto/src/test/java/pt/uminho/esr/ott/overlay/NeighborManagerTest.java`. Acrescenta apenas a guarda de HELLO inicial de saída com canal fechado e o novo teste das três ordens. Sete caminhos autorizados no total; testes/asserções/prazos/evidência anteriores preservados. Verificação incremental autorizada, sem aprovação de Implement/Test ou fecho; qualquer correção adicional exige apresentação prévia.
 - **Dependências:** IMP-010 (022-rotas).
 - **ADR:** ADR-005, ADR-018, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, REQ-005, REQ-007, REQ-011, REQ-017, REQ-021.
@@ -1126,6 +1128,32 @@ final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575a
   - [ ] Uma referência agregada a montante por stream.
   - [ ] Repetições são idempotentes e erros não deixam PENDING eterno.
   - [ ] Validação V-014 executada e evidência ligada no progresso.
+
+**Model aprovado em 2026-11-17T17:02:14Z**, incluindo Q-C-34/35: cancelamento
+lógico/validade mínima neste IMP, renovação/poda completas em IMP-012; recusa
+de nova adesão por prefixos selecionado/confirmado divergentes preserva ramo
+saudável. [Decisões registadas](docs/construction-duvidas.md).
+[Design integralmente aprovado](memory-bank/bolts/007-arvores/ddd-02-technical-design.md)
+em 2026-11-17T17:30:07Z, incluindo ancoramento dos leases, prazo global T/até A
+tentativas, lineagens, capacidades e quotas. Revisão ADR aprovada em
+2026-11-17T17:50:02Z; apenas Implement autorizado nos quatro caminhos.
+[Código e prova incremental](memory-bank/bolts/007-arvores/implementation-walkthrough.md):
+1324 testes verdes na regressão anterior à exceção Q-C-36. Após o patch autorizado,
+focado NeighborDown 1/0/0/0; duas regressões 1324/1/0/0 (D11a), com isolado D11a
+1/0/0/0, sem correções adicionais. Implement para revisão;14 grupos/V-014 integral
+não consolidados/aceites. Sem etapa
+Test, fecho, commits/push, outro IMP ou gates externos novos.
+[Logs anteriores de NeighborDown preservados](experiments/construction/007-arvores/neighbor-down-baseline/README.md);
+[investigação consolidada](experiments/construction/007-arvores/neighbor-down-investigation/README.md)
+e Q-C-36 fundamentam a exceção específica agora autorizada e aplicada ao teste
+histórico, além dos quatro caminhos originais. Negativos e diagnóstico controlado
+preservados; [resultados novos da retoma](experiments/construction/007-arvores/q-c-36/README.md).
+Retoma Q-C-37 autorizada/aplicada exclusivamente nos dois caminhos adicionais:
+[verificação e preservação](experiments/construction/007-arvores/q-c-37/README.md).
+D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
+Sem resposta, Closed/prazo existente terminam e libertam recursos; TCP real com
+zero reservas e awaitTermination confirmado. Implement reapresentado, não aprovado.
+Fecho exige V-014, regressão aprovada, manual humano, revisão final Waheed e integração.
 
 <a id="imp-012"></a>
 ### IMP-012 — Renovar e podar subscrições
@@ -1713,9 +1741,18 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | GUI/CORE reais | Gates de execução, sem sucesso presumido |
 | Revisor de TASK-032 | Pessoa distinta a designar antes do DONE |
 | Datas docentes, PL/grupo/prazo e upload | Equipa nos gates de avaliação/entrega/submissão |
+| Q-C-34 — fronteira de ativação/cancelamento com IMP-012 | Aprovada pelo utilizador em 2026-11-17T17:02:14Z: invalidação lógica e validade mínima em IMP-011; renovação/poda completas em IMP-012 |
+| Q-C-35 — seleção e prefixo confirmado divergentes | Aprovada pelo utilizador em 2026-11-17T17:02:14Z: adesão exige prefixos selecionado e confirmado compatíveis; PATH_CHANGED sem trocar parent ou remover ramo saudável |
+| Q-C-36 — sincronização do teste histórico NeighborDown, exceção de âmbito | Autorizada pelo utilizador e aplicada exclusivamente como apresentada; `until` aguarda snapshot e evento da Session esperada, conservando asserções/prazos/restantes testes. Resultados novos preservados separadamente; Implement continua por aceitar |
+| Q-C-37 — D11a, negociação HELLO e continuação de escrita | Autorizada e aplicada exclusivamente como apresentada em NeighborManager.java + NeighborManagerTest.java, dois caminhos adicionais. Verificação incremental e caso sem resposta exigidos; Implement por aceitar. Sequência histórica exata não reconstruída |
 
 | Data | Alteração | Motivo |
 |---|---|---|
+| 2026-11-17T17:50:02Z | Aprovar revisão ADR de IMP-011; autorizar apenas Implement nos quatro caminhos | Sem Test/fecho/commits/push/outro IMP; investigação de NeighborDown antes da aceitação e apresentação prévia de correções fora do âmbito |
+| 2026-11-17T18:36:18Z | Registar Implement incremental1324/0/0/0 e investigação/Q-C-36 proposta | Código nos quatro caminhos; negativos preservados, correção de teste fora do âmbito ainda não aplicada; fecho e V-014 integral pendentes |
+| 2026-11-17T17:30:07Z | Aprovar Design completo de IMP-011 e iniciar apenas revisão ADR | Instrução explícita: conferir APIs/projeções/lifecycle nos quatro caminhos; NeighborDown pendente e negativos preservados; sem Java/Implement/commits/push |
+| 2026-11-17T17:02:14Z | Model de IMP-011 e Q-C-34/35 aprovados; apenas Design autorizado | Instrução explícita; preservar logs de NeighborDown, manter investigação pendente e M01–M14 por executar; sem gates externos novos |
+| 2026-11-17T15:35:13Z | Iniciar Model de IMP-011/007-arvores; registar Q-C-34/35 como propostas | Seleção explícita do utilizador; sem decisão nova aceite, alteração wire ou implementação |
 | 2026-11-02T15:45:31Z | Criar specs/ADD 1.0.0, 40 entradas e 26 ADR | Pedido de documento mestre e respostas 1A/2A/3B/4A |
 | 2026-11-02T15:45:31Z | ADR-003 Substituída por ADR-013; preservar IDs | Histórico sem dois contratos bootstrap |
 | 2026-11-02T15:45:31Z | Acrescentar TASK-032 e parametrização validada | Lacuna aprovada em 2A |
@@ -1808,3 +1845,18 @@ current_stage=adr; só Model/Design concluídos. Implement/Test não iniciados.
 V-010, regressão atual, manual humano antes de aprovar Test, revisão final do
 código e integração pendentes; sem gates externos adicionais. Sem Java, staging,
 commits, push ou fecho. Relatório: memory-bank/bolts/005-rotas/adr-review.md.
+
+Registo de retoma IMP-011 em 2026-11-17T18:56:41Z: Q-C-36 explicitamente autorizada pelo
+utilizador, aplicada exclusivamente como apresentada em OverlayNodeMonitoringTest.java.
+[Resultados novos](experiments/construction/007-arvores/q-c-36/README.md): focado
+NeighborDown 1/0/0/0, duas regressões 1324/1/0/0 (D11a), isolado D11a 1/0/0/0.
+Asserções/prazos/restantes testes e negativos/diagnóstico preservados. Nenhuma
+aprovação de Implement/Test, fecho, commits, push ou outro IMP; sem gate externo novo.
+
+Retoma IMP-011 em 2026-11-17T21:49:25Z: utilizador autorizou Q-C-37 exclusivamente em
+NeighborManager.java e NeighborManagerTest.java; dois caminhos adicionais,
+sete no total. Patch exato aplicado, testes/asserções/prazos/evidências anteriores
+preservados. [Resultados novos](experiments/construction/007-arvores/q-c-37/README.md):
+D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0, regressão1325/0/0/0;
+Closed/prazo existente e libertação física verificados. Implement para revisão,
+sem aprovação, Test, fecho, commits, push, outro IMP ou gates externos novos.

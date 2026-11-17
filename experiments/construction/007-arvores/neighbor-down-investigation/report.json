@@ -1,0 +1,21 @@
+{
+  "recorded_at": "2026-11-17T18:31:55Z",
+  "historical_test_unchanged_sha256": "cc7d557fac277945012671d99e5aa32f75f9c030758997d04b5bf5200c9ab225",
+  "isolated_original_reproduction_log": {
+    "path": "original-isolated-reproduction.log",
+    "bytes": 2064,
+    "sha256": "cd5a89d445828d37cfc0278ba65faa2222a8c151ed1ddef87e4a70702ef4aca4",
+    "result": "1 test, 0 failures/errors/skipped; original test unchanged"
+  },
+  "controlled_counterexample": {
+    "test": "ActivationTest.neighborDownSnapshotCanPrecedeExternalObserverDelivery",
+    "result": "passed in incremental Implement runs; real OverlayNode/TCP and bounded observer barrier; exact expected Session eventually observed",
+    "xml": "../implement-regression-02/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml"
+  },
+  "established": "Monitor snapshot absence is not a happens-before guarantee of external NeighborDown observation. The original test waits only for the former and immediately asserts the latter.",
+  "historical_interleaving": "Not reconstructible from historical logs; do not claim each previous negative has an exact proved timeline.",
+  "proposed_patch": "proposed-test-synchronization.patch",
+  "patch_applied": false,
+  "outside_four_authorized_paths": true,
+  "approval": "required before applying; original assertion and existing deadlines preserved"
+}

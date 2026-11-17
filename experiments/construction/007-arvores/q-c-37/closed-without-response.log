@@ -1,0 +1,30 @@
+Warning:
+unchecked cast
+  required: java.util.List<pt.uminho.esr.ott.overlay.NeighborManager.Event>
+  found:    java.lang.Object
+        var events=(List<NeighborManager.Event>)field(f,"events");events.clear();
+                                                ^---------------^
+Warning:
+unchecked cast
+  required: java.util.List<java.nio.file.Path>
+  found:    java.lang.Object
+    var profiles=(List<Path>)field(d,"profiles");int[] ports=(int[])field(d,"ports");
+                             ^-----------------^
+CONTROLLED_OK path=Closed connection=fd1d96f5-e277-4c39-8caf-088ce85a7da5 reason=TRANSPORT contexts=0 retained=0 nativeDials=0 oldAttemptLive=false oldDeadlineLive=false peerContext=null peerAttempt=null Session=empty retry=existing elapsedNanos=0 configuredHelloBudgetNanos=3000000000
+CONTROLLED_OK path=existing deadline connection=45bc7ffc-b349-4c21-bdf0-ab4dde7dbe07 reason=TIMEOUT contexts=0 retained=0 nativeDials=0 oldAttemptLive=false oldDeadlineLive=false peerContext=null peerAttempt=null Session=empty retry=existing elapsedNanos=3000000000 configuredHelloBudgetNanos=3000000000
+pt.uminho.esr.ott.config.ConfigurationException: /home/luis/ESR/ESR---TP2/src/main/resources/config/streams-s1.properties [<file>]: não foi possível ler propriedades UTF-8: /home/luis/ESR/ESR---TP2/src/main/resources/config/streams-s1.properties
+	at pt.uminho.esr.ott.config.ConfigurationLoader.failIfAny(ConfigurationLoader.java:557)
+	at pt.uminho.esr.ott.config.ConfigurationLoader.load(ConfigurationLoader.java:54)
+	at REPL.$JShell$24.realTcp($JShell$24.java:10)
+	at REPL.$JShell$25.do_it$($JShell$25.java:5)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at jdk.jshell/jdk.jshell.execution.DirectExecutionControl.invoke(DirectExecutionControl.java:227)
+	at jdk.jshell/jdk.jshell.execution.RemoteExecutionControl.invoke(RemoteExecutionControl.java:157)
+	at jdk.jshell/jdk.jshell.execution.DirectExecutionControl.invoke(DirectExecutionControl.java:125)
+	at jdk.jshell/jdk.jshell.execution.ExecutionControlForwarder.processCommand(ExecutionControlForwarder.java:148)
+	at jdk.jshell/jdk.jshell.execution.ExecutionControlForwarder.commandLoop(ExecutionControlForwarder.java:266)
+	at jdk.jshell/jdk.jshell.execution.Util.forwardExecutionControl(Util.java:78)
+	at jdk.jshell/jdk.jshell.execution.Util.forwardExecutionControlAndIO(Util.java:148)
+	at jdk.jshell/jdk.jshell.execution.RemoteExecutionControl.main(RemoteExecutionControl.java:99)
+NO_RESPONSE_PROBE_FAILED

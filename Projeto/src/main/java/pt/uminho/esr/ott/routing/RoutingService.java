@@ -84,6 +84,30 @@ public final class RoutingService implements AutoCloseable {
             public void cancel() { }
         };
     }
+    public enum SubscriptionState { SUCCESS, ERROR, TIMEOUT, CANCELLED, CLOSED, RESOURCE_LIMIT, NOT_RUNNING }
+    public record SubscriptionOutcome(UUID streamId, UUID consumerToken, UUID operationId,
+            SubscriptionState state, Optional<ErrorCode> errorCode, String detail) {
+        public SubscriptionOutcome {
+            Objects.requireNonNull(streamId);Objects.requireNonNull(consumerToken);Objects.requireNonNull(operationId);
+            Objects.requireNonNull(state);Objects.requireNonNull(errorCode);Objects.requireNonNull(detail);
+        }
+    }
+    public interface SubscriptionTicket {
+        UUID operationId(); Optional<SubscriptionOutcome> result(); void cancel();
+    }
+    public SubscriptionTicket requestSubscription(UUID streamId,UUID consumerToken) {
+        return activation.request(streamId,consumerToken,false);
+    }
+    /** Explicit new operation; a duplicate requestSubscription never restarts a round. */
+    public SubscriptionTicket retrySubscription(UUID streamId,UUID consumerToken) {
+        return activation.request(streamId,consumerToken,true);
+    }
+    void cancelPendingChild(Neighbor.Session session,UUID streamId,UUID subscriptionId,long revision) {
+        requireOwner();activation.cancelChild(session,streamId,subscriptionId,revision);drive();
+    }
+    record ActivationLoad(int trees,int children,int locals,int histories,int sends,int unbound,
+            int responseIntents,int pendingChildren) { }
+    ActivationLoad activationLoad(){requireOwner();return activation.load();}
     public enum Phase { NEW, RUNNING, STOPPED }
     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
@@ -92,8 +116,12 @@ public final class RoutingService implements AutoCloseable {
             int ledgers, int pendingCells, int pendingIntents, int quotas, int sendTickets, int timers,
             long failures, boolean countersSaturated, Reason lastReason) { }
     public record Snapshot(long capturedAtNanos, StreamCatalog.Snapshot catalog,
-            Map<UUID,Route> routes, Diagnostics diagnostics) {
-        public Snapshot { Objects.requireNonNull(catalog);Objects.requireNonNull(diagnostics);routes=Map.copyOf(routes); }
+            Map<UUID,Route> routes, Diagnostics diagnostics, Map<UUID,Route.Confirmation> forwarding) {
+        public Snapshot { Objects.requireNonNull(catalog);Objects.requireNonNull(diagnostics);
+            routes=Map.copyOf(routes);forwarding=Map.copyOf(forwarding); }
+        public Snapshot(long capturedAtNanos,StreamCatalog.Snapshot catalog,Map<UUID,Route> routes,Diagnostics diagnostics) {
+            this(capturedAtNanos,catalog,routes,diagnostics,Map.of());
+        }
     }
     private static final long WINDOW=1_000_000_000L;
     private final NodeConfiguration config;
@@ -106,6 +134,7 @@ public final class RoutingService implements AutoCloseable {
     private final RoutingTable root;
     private final RoutingTable.Limits limits;
     private final StreamCatalog catalog;
+    private final ActivationEngine activation;
     private final int maxCache,maxPending,maxTickets,flood;
     private final long period,history,shutdownNanos;
     private final LinkedHashMap<UUID,Row> rows=new LinkedHashMap<>();
@@ -202,6 +231,7 @@ public final class RoutingService implements AutoCloseable {
         flood=r.floodMaxPerSecond();shutdownNanos=c.runtime().control().shutdownTimeout().toNanos();
         root=new RoutingTable(c.nodeId(),limits,r.candidateTtl().toMillis(),r.cacheTtl().toMillis(),clock);
         catalog=new StreamCatalog(limits.streamCapacity());
+        activation=new ActivationEngine();
         long initialTime=clock.getAsLong(); // fail before allocating a helper/registering cleanup
         this.scheduler=scheduler==null?new Timers():scheduler;
         try { registration=owner.onStop(this::ownerStopped);publish(initialTime); }
@@ -247,6 +277,7 @@ public final class RoutingService implements AutoCloseable {
         var outcome=root.confirmEpoch(origin,Optional.ofNullable(old),replacement);
         if(outcome.status()!=RoutingTable.Status.APPLIED){note(outcome.reason()==RoutingTable.Reason.CAPACITY_EXCEEDED?Reason.CAPACITY:Reason.INVALID_INPUT,false);return false;}
         epochs.put(origin,replacement);
+        activation.epochChanged(origin,replacement);
         for(var row:rows.values())if(row.origin.equals(origin)){row.info=null;refresh(row);}
         dirty();return true;
     }
@@ -266,6 +297,7 @@ public final class RoutingService implements AutoCloseable {
     public void onNeighborEvent(NeighborManager.Event event){
         requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
         try{
+            activation.kick();
             traceSweep=traceOrder.size();
             if(event instanceof NeighborManager.NeighborUp e){
                 var s=e.session();var old=sessions.get(s.nodeId());
@@ -277,6 +309,12 @@ public final class RoutingService implements AutoCloseable {
             }else if(event instanceof NeighborManager.NeighborDown e){if(current(e.session()))remove(e.session());}
             else if(event instanceof NeighborManager.Received e){
                 var m=e.message();if(!current(e.session()))return;
+                if (m.type()==MessageType.ACTIVATE || m.type()==MessageType.ACTIVATE_ACK
+                        || m.type()==MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p && p.relatedType()==11) {
+                    if(m.version()==2 && m.requestId()!=null && e.session().nodeId().equals(m.senderId())
+                            && e.session().instanceId().equals(m.senderInstance())) activation.receive(e.session(),m);
+                    drive();return;
+                }
                 if (m.type()==MessageType.ROUTE_TRACE || m.type()==MessageType.TRACE_RESULT || m.type()==MessageType.ERROR) {
                     if (m.version()==2 && m.requestId()!=null && e.session().nodeId().equals(m.senderId())
                             && e.session().instanceId().equals(m.senderInstance())) onTrace(e.session(),m);
@@ -324,6 +362,7 @@ public final class RoutingService implements AutoCloseable {
     public void onMetrics(NetworkMonitor.Event event){
         requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
         try{
+            activation.kick();
             Neighbor.Session session;OptionalLong cost;
             if(event instanceof NetworkMonitor.Updated e){session=e.metrics().session();cost=e.metrics().costMicros();}
             else if(event instanceof NetworkMonitor.Invalidated e){session=e.session();cost=OptionalLong.empty();}
@@ -336,6 +375,7 @@ public final class RoutingService implements AutoCloseable {
         if(row==null||!row.local)throw new IllegalArgumentException("Configured local stream required");
         if(row.offered==available)return;row.offered=available;
         try{
+            activation.kick();
             if(available){row.sequence=Math.incrementExact(row.sequence);row.nextAt=now()+period;applied(root.offerLocal(id,instance));}
             else applied(root.removeLocalOffer(id,instance));
             row.version=Math.incrementExact(row.version);dirty();drive();
@@ -343,6 +383,7 @@ public final class RoutingService implements AutoCloseable {
     }
     private void peersChanged(){peerIndex.clear();peerIndex.addAll(sessions.values());peerCursor=0;dirty();}
     private void retire(Neighbor.Session s){
+        activation.sessionDown(s);
         var iterator=ledgers.entrySet().iterator();while(iterator.hasNext()){
             var entry=iterator.next();if(entry.getKey().session.equals(s)){if(entry.getValue().cell)pending--;iterator.remove();}
         }
@@ -509,7 +550,7 @@ public final class RoutingService implements AutoCloseable {
                 row.nextAt=t+period;dirty();
             }
             // All owner projections precede the resulting send attempts.
-            publish(t); traceDrive(); int swept=sweepQuotas(t);scan(64-swept);
+            publish(t); traceDrive(); activation.drive(); int swept=sweepQuotas(t);scan(64-swept);
             // A slow/control-port callback may also advance time during this turn.
             long finished=now();applied(root.expire());publish(finished);
             if(scanRemaining>0)wake();
@@ -520,6 +561,7 @@ public final class RoutingService implements AutoCloseable {
     private void schedule(long t){
         if(stopping.get())return;
         long delay=Long.MAX_VALUE;
+        delay=Math.min(delay,activation.nextDelay(t));
         for (var context : traces.values()) delay=Math.min(delay,Math.max(1,TRACE_TIMEOUT.toNanos()-(t-context.began)));
         for(var row:rows.values()){
             if(row.offered)delay=Math.min(delay,Math.max(1,row.nextAt-t));
@@ -531,7 +573,7 @@ public final class RoutingService implements AutoCloseable {
         if(delay==Long.MAX_VALUE){if(alarm!=null)alarm.cancel();alarm=null;return;}
         long at=t+delay;if(alarm!=null&&alarmAt==at)return;
         if(alarm!=null)alarm.cancel();alarm=null;
-        alarmAt=at;alarm=scheduler.schedule(()->{wake();},delay);
+        alarmAt=at;alarm=scheduler.schedule(()->{activation.changed.set(true);wake();},delay);
     }
     private void wake(){
         if(stopping.get()||!wakeQueued.compareAndSet(false,true))return;
@@ -557,7 +599,7 @@ public final class RoutingService implements AutoCloseable {
         for(var l:ledgers.values())if(l.cell){if(l.debt!=null)intents++;if(l.want!=null)intents++;}
         var projection=new StreamCatalog.Snapshot(t,entries);catalog.replace(projection);
         int physical;synchronized(resources){physical=admissions.size();}
-        view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason));
+        view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason),activation.forwarding(t));
     }
     private static boolean traceText(String text,int maximum) {
         if (text==null || text.length()>maximum) return false;
@@ -808,6 +850,7 @@ public final class RoutingService implements AutoCloseable {
     private void cleanup(){
         requireOwner();if(cleaned.isDone())return;stopping.set(true);scheduler.requestClose();if(alarm!=null)alarm.cancel();alarm=null;
         closeTraces();
+        activation.close();
         rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
         publish(clock.getAsLong());cleaned.complete(null);
@@ -820,12 +863,510 @@ public final class RoutingService implements AutoCloseable {
         budget=Math.min(budget,left(shutdownNanos,firstStop.get()));
         try{cleaned.get(left(budget,began),TimeUnit.NANOSECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}catch(ExecutionException|TimeoutException e){return false;}
         if(!scheduler.awaitTermination(Duration.ofNanos(left(budget,began))))return false;
-        synchronized(resources){while(!admissions.isEmpty() || !traceSends.isEmpty()){
+        synchronized(resources){while(!admissions.isEmpty() || !traceSends.isEmpty() || !activation.sends.isEmpty()){
             long rest=left(budget,began);if(rest==0)return false;
             try{TimeUnit.NANOSECONDS.timedWait(resources,rest);}catch(InterruptedException e){Thread.currentThread().interrupt();return false;}
         }}return true;
     }
     public void close(){requestClose();if(!owner.isOwnerThread()&&!awaitTermination(Duration.ofNanos(left(shutdownNanos,firstStop.get()))))throw new IllegalStateException("Routing physical shutdown deadline");}
+
+    /** Activation owns only bounded logical state; the existing owner, alarm and port are borrowed. */
+    private final class ActivationEngine {
+        final int treeLimit=Math.min(owner.capacity(),256), childLimit=Math.min(owner.capacity(),256),
+                localLimit=Math.min(owner.capacity(),64), historyLimit=Math.min(owner.capacity(),1024),
+                sendLimit=Math.min(owner.capacity(),64), errorLimit=Math.min(owner.capacity(),16);
+        final long timeout=config.runtime().routing().activateTimeout().toNanos();
+        final long leaseMs=config.runtime().subscription().lease().toMillis();
+        final int attempts=config.runtime().routing().activateAttempts();
+        final Map<UUID,Tree> trees=new LinkedHashMap<>();
+        final ArrayDeque<Tree> treeOrder=new ArrayDeque<>();
+        final ArrayDeque<Child> childOrder=new ArrayDeque<>();
+        final Map<LineKey,Line> lines=new HashMap<>();
+        final Map<LocalKey,Local> localTickets=new HashMap<>(); // guarded by resources, including admission
+        final ArrayDeque<Local> localOrder=new ArrayDeque<>();
+        final Set<ActSend> sends=new HashSet<>(); // guarded by resources until callback AND continuation end
+        final Map<Neighbor.Session,ResponseQuota> responseQuotas=new HashMap<>();
+        final AtomicBoolean changed=new AtomicBoolean();
+        int treeSweep,childSweep,localSweep;
+        record LocalKey(UUID stream,UUID token) { }
+        record LineKey(boolean outgoing,UUID stream,UUID epoch,Neighbor.Session session) { }
+        final class Local implements SubscriptionTicket {
+            final LocalKey key;final UUID operation=UUID.randomUUID();final long began;
+            final AtomicBoolean cancelled=new AtomicBoolean();volatile SubscriptionOutcome outcome;
+            Local(LocalKey key,long began){this.key=key;this.began=began;}
+            public UUID operationId(){return operation;}
+            public Optional<SubscriptionOutcome> result(){return Optional.ofNullable(outcome);}
+            public void cancel(){if(cancelled.compareAndSet(false,true)){changed.set(true);wake();}}
+        }
+        final class Tree {
+            final UUID id,epoch;final String origin;
+            final Map<UUID,Local> locals=new LinkedHashMap<>();
+            final Map<Neighbor.Session,Child> children=new LinkedHashMap<>();
+            final Set<UUID> confirmedLocals=new HashSet<>();
+            Confirmed confirmed;Round round;ErrorCode failure;String detail="";long version;
+            Tree(Row row){id=row.id;epoch=row.route.serverEpoch().orElseThrow();origin=row.origin;}
+        }
+        record Confirmed(boolean source,UUID epoch,Neighbor.Session parent,List<String> path,Subscription.Lease lease) {
+            Confirmed { path=List.copyOf(path); }
+        }
+        final class Line {
+            final LineKey key;final UUID id;long revision=-1;UUID request;
+            ControlMessage.Activation fingerprint;ErrorCode terminal;String detail="";Child child;
+            Line(LineKey key,UUID id){this.key=key;this.id=id;}
+        }
+        final class Child {
+            final Tree tree;final Line line;final UUID request;final ControlMessage.Activation payload;
+            final long began;boolean pending=true,ackWanted,errorWanted,detached,replay;
+            ErrorCode error;String detail="";Subscription active;
+            Child(Tree tree,Line line,UUID request,ControlMessage.Activation p,long began){
+                this.tree=tree;this.line=line;this.request=request;payload=p;this.began=began;
+            }
+        }
+        final class Round {
+            final long began;int issued;Attempt attempt;
+            Round(long began){this.began=began;}
+        }
+        final class Attempt {
+            final Tree tree;final Round round;final Line line;final UUID request=UUID.randomUUID();
+            final List<String> path;final long began;final long revision;
+            boolean submitted,accepted;ControlMessage.ActivationAck early;
+            Attempt(Tree tree,Round round,Line line,List<String> path,long began,long revision){
+                this.tree=tree;this.round=round;this.line=line;this.path=List.copyOf(path);this.began=began;this.revision=revision;
+            }
+        }
+        final class ResponseQuota { long began;int used;ResponseQuota(long began){this.began=began;} }
+        enum SendKind { REQUEST, ACK, ERROR, UNBOUND }
+        final class ActSend {
+            final Object context;final Neighbor.Session session;final SendKind kind;
+            final Attempt attempt;final Child child;Subscription grant;
+            Connection.SendResult result;Throwable error;boolean ready,callbackDone,continuationDone;
+            ActSend(Object context,Neighbor.Session session,SendKind kind,Attempt attempt,Child child,Subscription grant){
+                this.context=context;this.session=session;this.kind=kind;this.attempt=attempt;this.child=child;this.grant=grant;
+            }
+            void complete(Connection.SendResult value,Throwable error){
+                synchronized(resources){result=value;this.error=error;ready=true;}
+                try{if(!stopping.get()){changed.set(true);wake();}}
+                finally{boolean freed;synchronized(resources){callbackDone=true;freed=release(this);}
+                    if(freed&&!stopping.get()){changed.set(true);wake();}}
+            }
+        }
+        void kick(){treeSweep=treeOrder.size();childSweep=childOrder.size();localSweep=localOrder.size();}
+        boolean elapsed(long now,long began){return age(now,began)>=timeout;}
+        long age(long now,long began){long age=now-began;if(age<0)throw new IllegalStateException("Activation clock horizon");return age;}
+        void outcome(Local l,SubscriptionState state,ErrorCode code,String detail){
+            if(l.outcome==null)l.outcome=new SubscriptionOutcome(l.key.stream,l.key.token,l.operation,state,Optional.ofNullable(code),detail);
+        }
+        SubscriptionTicket request(UUID stream,UUID token,boolean retry){
+            Objects.requireNonNull(stream);Objects.requireNonNull(token);var key=new LocalKey(stream,token);
+            long began=clock.getAsLong();var ticket=new Local(key,began);
+            synchronized(resources){
+                if(stopping.get()||view.diagnostics().phase()!=Phase.RUNNING){outcome(ticket,SubscriptionState.NOT_RUNNING,null,"NOT_RUNNING");return ticket;}
+                var old=localTickets.get(key);
+                if(old!=null&&!old.cancelled.get()&&(!retry||old.outcome==null))return old;
+                long perStream=localTickets.keySet().stream().filter(k->k.stream.equals(stream)).count();
+                if(old==null&&(localTickets.size()>=localLimit||perStream>=4)){
+                    outcome(ticket,SubscriptionState.RESOURCE_LIMIT,ErrorCode.RESOURCE_LIMIT,"LOCAL_CAPACITY");return ticket;
+                }
+                localTickets.put(key,ticket);
+            }
+            if(!owner.offer(()->{
+                try{admit(ticket);}catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
+            })){
+                synchronized(resources){localTickets.remove(key,ticket);outcome(ticket,SubscriptionState.CLOSED,null,"OWNER_REJECTED");}
+            }
+            return ticket;
+        }
+        Tree existing(UUID id){return trees.get(id);}
+        Row row(UUID id){return rows.get(id);}
+        boolean epochCurrent(Tree t){var row=row(t.id);return row!=null&&row.route.serverEpoch().equals(Optional.of(t.epoch));}
+        List<String> selectedPath(Tree t){
+            var row=row(t.id);if(!epochCurrent(t))return List.of();
+            if(row.offered)return List.of(config.nodeId());
+            return row.route.selectedCandidate().map(RouteCandidate::path).orElse(List.of());
+        }
+        boolean healthy(Tree t,long at){
+            var c=t.confirmed;if(c==null||!epochCurrent(t))return false;
+            return c.source?row(t.id).offered:current(c.parent)&&c.lease.remainingNanos(at)>0;
+        }
+        boolean compatible(Tree t,List<String> prefix,long at){
+            return healthy(t,at)&&t.confirmed.path.equals(prefix)&&selectedPath(t).equals(prefix)
+                    &&(t.confirmed.source||row(t.id).route.knownUpstream().equals(Optional.of(key(t.confirmed.parent))));
+        }
+        Tree create(Row row){var t=new Tree(row);trees.put(t.id,t);treeOrder.add(t);return t;}
+        void admit(Local l){
+            requireOwner();if(stopping.get())return;
+            synchronized(resources){if(localTickets.get(l.key)!=l)return;}
+            long at=now();var row=row(l.key.stream);
+            if(l.cancelled.get()){synchronized(resources){localTickets.remove(l.key,l);}outcome(l,SubscriptionState.CANCELLED,null,"CANCELLED");return;}
+            if(row==null){synchronized(resources){localTickets.remove(l.key,l);}outcome(l,SubscriptionState.ERROR,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM");return;}
+            if(row.route.serverEpoch().isEmpty()){synchronized(resources){localTickets.remove(l.key,l);}outcome(l,SubscriptionState.ERROR,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+            var t=existing(row.id);
+            if(t==null&&trees.size()>=treeLimit){synchronized(resources){localTickets.remove(l.key,l);}outcome(l,SubscriptionState.RESOURCE_LIMIT,ErrorCode.RESOURCE_LIMIT,"TREE_CAPACITY");return;}
+            if(t==null)t=create(row);
+            localOrder.removeIf(old->old.key.equals(l.key));localOrder.add(l);
+            var previous=t.locals.put(l.key.token,l);
+            if(previous!=null&&previous.cancelled.get()&&t.confirmedLocals.remove(l.key.token))
+                t.version=Math.incrementExact(t.version);
+            if(elapsed(at,l.began))outcome(l,SubscriptionState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT");
+            else if(healthy(t,at)&&!compatible(t,selectedPath(t),at))outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED");
+            else{t.failure=null;startRound(t,l.began,at);}
+            kick();drive();
+        }
+        void startRound(Tree t,long began,long at){
+            if(t.round!=null||healthy(t,at))return;
+            if(row(t.id).offered){t.confirmed=new Confirmed(true,t.epoch,null,List.of(config.nodeId()),null);t.version=Math.incrementExact(t.version);return;}
+            if(selectedPath(t).isEmpty()){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+            t.failure=null;t.round=new Round(began);
+        }
+        void receive(Neighbor.Session session,ControlMessage m){
+            long at=now();kick();
+            if(m.type()==MessageType.ACTIVATE&&m.payload() instanceof ControlMessage.Activation p)incoming(session,m.requestId(),p,at);
+            else if(m.type()==MessageType.ACTIVATE_ACK&&m.payload() instanceof ControlMessage.ActivationAck p){
+                var t=trees.get(p.streamId());var a=t==null||t.round==null?null:t.round.attempt;
+                if(a!=null&&a.submitted&&a.line.key.session.equals(session)&&a.request.equals(m.requestId())
+                        &&t.epoch.equals(p.serverEpoch())&&a.line.id.equals(p.subscriptionId())&&a.revision==p.revision()
+                        &&p.grantedLeaseMs()>0&&p.grantedLeaseMs()<=leaseMs){
+                    if(a.early==null)a.early=p;if(a.accepted)confirm(a,at);
+                }
+            }else if(m.type()==MessageType.ERROR&&m.payload() instanceof ControlMessage.ErrorPayload p&&p.relatedType()==11){
+                for(var t:trees.values())if(t.round!=null){var a=t.round.attempt;
+                    if(a!=null&&a.submitted&&a.request.equals(m.requestId())&&a.line.key.session.equals(session)
+                            &&p.code()!=null&&traceText(p.detail(),256)){
+                        failedAttempt(a,p.code(),p.detail());break;
+                    }
+                }
+            }
+        }
+        void incoming(Neighbor.Session session,UUID request,ControlMessage.Activation p,long at){
+            if(p.streamId()==null||p.serverEpoch()==null||p.subscriptionId()==null||p.revision()<0
+                    ||p.leaseMs()<1||p.leaseMs()>0xffff_ffffL||!tracePath(p.expectedPath(),false,false)
+                    ||p.expectedPath().size()<2||!p.expectedPath().getLast().equals(session.nodeId())){
+                unbound(session,request,ErrorCode.INVALID_MESSAGE,"INVALID_ACTIVATE",at);return;
+            }
+            var row=row(p.streamId());
+            if(row==null){unbound(session,request,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM",at);return;}
+            if(!row.route.serverEpoch().equals(Optional.of(p.serverEpoch()))){unbound(session,request,ErrorCode.PATH_CHANGED,"EPOCH_CHANGED",at);return;}
+            var lk=new LineKey(false,p.streamId(),p.serverEpoch(),session);var line=lines.get(lk);
+            if(line!=null){
+                if(!line.id.equals(p.subscriptionId())||p.revision()<line.revision){unbound(session,request,ErrorCode.STALE_REVISION,"STALE_REVISION",at);return;}
+                if(p.revision()==line.revision){
+                    if(!request.equals(line.request)){unbound(session,request,ErrorCode.STALE_REVISION,"REVISION_BOUND",at);return;}
+                    if(!p.equals(line.fingerprint)){unbound(session,request,ErrorCode.INVALID_MESSAGE,"CONFLICTING_DUPLICATE",at);return;}
+                    if(line.terminal!=null){unbound(session,request,line.terminal,line.detail,at);return;}
+                    var c=line.child;if(c!=null&&!c.detached&&c.active!=null&&!elapsed(at,c.began)){
+                        c.ackWanted=true;c.replay=true;
+                    }
+                    return;
+                }
+            }
+            var prefix=p.expectedPath().subList(0,p.expectedPath().size()-1);
+            if(!prefix.getLast().equals(config.nodeId())||!prefix.getFirst().equals(row.origin)){
+                unbound(session,request,ErrorCode.PATH_CHANGED,"PATH_CHANGED",at);return;
+            }
+            if(new HashSet<>(p.expectedPath()).size()!=p.expectedPath().size()){
+                unbound(session,request,ErrorCode.LOOP_DETECTED,"LOOP_DETECTED",at);return;
+            }
+            var t=trees.get(row.id);
+            var selected=row.offered?List.of(config.nodeId()):row.route.selectedCandidate().map(RouteCandidate::path).orElse(List.of());
+            if(row.local&&!row.offered){unbound(session,request,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE",at);return;}
+            if(!prefix.equals(selected)||t!=null&&healthy(t,at)&&!compatible(t,prefix,at)){
+                var code=selected.isEmpty()&&(t==null||!healthy(t,at))?ErrorCode.NO_ROUTE:ErrorCode.PATH_CHANGED;
+                unbound(session,request,code,code.name(),at);return;
+            }
+            var previous=line==null?null:line.child;
+            long peerPending=childOrder.stream().filter(c->!c.detached&&c.pending&&c.line.key.session.equals(session)&&c!=previous).count();
+            if(t==null&&trees.size()>=treeLimit||line==null&&lines.size()>=historyLimit
+                    ||(previous==null||previous.detached)&&childOrder.size()>=childLimit||peerPending>=4){
+                unbound(session,request,ErrorCode.RESOURCE_LIMIT,"ACTIVATION_CAPACITY",at);return;
+            }
+            if(t==null)t=create(row);
+            if(line==null){line=new Line(lk,p.subscriptionId());lines.put(lk,line);}
+            Subscription old=previous==null?null:previous.active;
+            if(previous!=null){detach(previous);}
+            var c=new Child(t,line,request,p,at);c.active=old;
+            line.revision=p.revision();line.request=request;line.fingerprint=p;line.terminal=null;line.detail="";line.child=c;
+            t.children.put(session,c);childOrder.add(c);t.failure=null;
+            startRound(t,at,at);kick();
+        }
+        void confirm(Attempt a,long at){
+            var t=a.tree;if(t.round!=a.round||a.round.attempt!=a||a.early==null||!a.accepted)return;
+            if(elapsed(at,a.round.began)){fail(t,ErrorCode.TIMEOUT,"TIMEOUT");return;}
+            if(!epochCurrent(t)||!current(a.line.key.session)||!selectedPath(t).equals(a.path)
+                    ||!row(t.id).route.knownUpstream().equals(Optional.of(key(a.line.key.session)))){
+                failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;
+            }
+            var validity=new Subscription.Lease(a.began,Math.multiplyExact(a.early.grantedLeaseMs(),1_000_000L));
+            if(validity.remainingNanos(at)==0){failedAttempt(a,ErrorCode.TIMEOUT,"GRANT_EXPIRED");return;}
+            t.confirmed=new Confirmed(false,t.epoch,a.line.key.session,a.path,validity);t.round=null;t.failure=null;
+            t.version=Math.incrementExact(t.version);kick();
+        }
+        void failedAttempt(Attempt a,ErrorCode code,String detail){
+            var t=a.tree;if(t.round!=a.round||a.round.attempt!=a)return;
+            a.round.attempt=null;
+            if(elapsed(now(),a.round.began)||a.round.issued>=attempts)fail(t,code,detail);
+            kick();
+        }
+        void fail(Tree t,ErrorCode code,String detail){t.round=null;t.failure=code;t.detail=detail;kick();}
+        void failChild(Child c,ErrorCode code,String detail,long at){
+            c.pending=false;c.ackWanted=false;c.error=code;c.detail=detail;c.errorWanted=!elapsed(at,c.began);
+            c.line.terminal=code;c.line.detail=detail;
+            childSweep=childOrder.size();
+        }
+        void cancelChild(Neighbor.Session s,UUID stream,UUID id,long revision){
+            var t=trees.get(stream);var c=t==null?null:t.children.get(s);
+            if(c==null||!c.line.id.equals(id)||c.payload.revision()!=revision)return;
+            c.active=null;failChild(c,ErrorCode.STALE_REVISION,"CANCELLED",now());c.errorWanted=false;
+            t.version=Math.incrementExact(t.version);kick();
+        }
+        void detach(Child c){c.detached=true;c.ackWanted=false;c.errorWanted=false;
+            c.tree.children.remove(c.line.key.session,c);childOrder.remove(c);if(c.line.child==c)c.line.child=null;}
+        boolean wants(Tree t){return t.locals.values().stream().anyMatch(l->l.outcome==null&&!l.cancelled.get())
+                ||t.children.values().stream().anyMatch(c->c.pending);}
+        void stepTree(Tree t,long at){
+            if(trees.get(t.id)!=t)return;
+            for(var l:List.copyOf(t.locals.values())){
+                boolean latest;synchronized(resources){latest=localTickets.get(l.key)==l;}
+                if(!latest||l.cancelled.get()){
+                    boolean removed=t.locals.remove(l.key.token,l);localOrder.remove(l);
+                    if(removed&&l.cancelled.get()&&t.confirmedLocals.remove(l.key.token))t.version=Math.incrementExact(t.version);
+                    if(latest){synchronized(resources){localTickets.remove(l.key,l);}}
+                    outcome(l,SubscriptionState.CANCELLED,null,"CANCELLED");
+                }
+            }
+            if(t.confirmed!=null&&!healthy(t,at)){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+            if(row(t.id).local&&!row(t.id).offered&&t.failure!=ErrorCode.SOURCE_UNAVAILABLE)
+                fail(t,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE");
+            if(t.round!=null&&!wants(t))t.round=null;
+            if(t.round!=null&&elapsed(at,t.round.began))fail(t,ErrorCode.TIMEOUT,"TIMEOUT");
+            for(var l:t.locals.values())if(l.outcome==null){
+                if(elapsed(at,l.began))outcome(l,SubscriptionState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT");
+                else if(healthy(t,at)){
+                    if(compatible(t,selectedPath(t),at)){if(t.confirmedLocals.add(l.key.token))t.version=Math.incrementExact(t.version);outcome(l,SubscriptionState.SUCCESS,null,"");}
+                    else outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED");
+                }else if(t.failure!=null)outcome(l,t.failure==ErrorCode.TIMEOUT?SubscriptionState.TIMEOUT:SubscriptionState.ERROR,t.failure,t.detail);
+            }
+            var r=t.round;
+            if(r!=null&&r.attempt==null){
+                var path=selectedPath(t);var candidate=row(t.id).route.selectedCandidate();
+                if(path.isEmpty()||candidate.isEmpty()){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+                var peer=sessions.get(candidate.orElseThrow().upstream().nodeId());
+                if(peer==null||!key(peer).equals(candidate.orElseThrow().upstream())){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+                var lk=new LineKey(true,t.id,t.epoch,peer);var line=lines.get(lk);
+                if(line==null){if(lines.size()>=historyLimit){fail(t,ErrorCode.RESOURCE_LIMIT,"HISTORY_CAPACITY");return;}
+                    line=new Line(lk,UUID.randomUUID());lines.put(lk,line);}
+                if(line.revision==Long.MAX_VALUE){fail(t,ErrorCode.STALE_REVISION,"REVISION_EXHAUSTED");return;}
+                r.attempt=new Attempt(t,r,line,path,r.issued==0?r.began:at,++line.revision);
+            }
+            if(r!=null&&r.attempt!=null&&!r.attempt.submitted){
+                var a=r.attempt;
+                if(r.issued>=attempts){fail(t,ErrorCode.TIMEOUT,"ATTEMPT_LIMIT");return;}
+                if(!selectedPath(t).equals(a.path)||!current(a.line.key.session)){failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;}
+                var m=new ControlMessage(MessageType.ACTIVATE,a.request,config.nodeId(),instance,
+                        new ControlMessage.Activation(t.id,t.epoch,a.line.id,a.revision,leaseMs,a.path));
+                send(t.id,a.line.key.session,SendKind.REQUEST,a,null,null,m,at);
+            }
+            if(t.locals.isEmpty()&&t.children.isEmpty()&&t.round==null){trees.remove(t.id,t);treeOrder.remove(t);}
+        }
+        void stepChild(Child c,long at){
+            if(c.detached)return;var t=c.tree;
+            if(!epochCurrent(t)||!current(c.line.key.session)){detach(c);return;}
+            if(c.active!=null&&(c.active.validity().orElseThrow().remainingNanos(at)==0||!healthy(t,at))){
+                c.active=null;if(!c.pending){c.line.terminal=ErrorCode.NO_ROUTE;c.line.detail="EXPIRED";}
+            }
+            if(c.pending){
+                if(elapsed(at,c.began)||t.round!=null&&elapsed(at,t.round.began))failChild(c,ErrorCode.TIMEOUT,"TIMEOUT",at);
+                else if(healthy(t,at)){
+                    var prefix=c.payload.expectedPath().subList(0,c.payload.expectedPath().size()-1);
+                    if(compatible(t,prefix,at))c.ackWanted=true;else failChild(c,ErrorCode.PATH_CHANGED,"PATH_CHANGED",at);
+                }else if(t.failure!=null)failChild(c,t.failure,t.detail,at);
+            }
+            if(c.ackWanted&&!healthy(t,at))failChild(c,ErrorCode.NO_ROUTE,"CONFIRMATION_EXPIRED",at);
+            boolean inFlight;synchronized(resources){inFlight=sends.stream().anyMatch(s->s.child==c&&!s.continuationDone);}
+            if(elapsed(at,c.began)){c.ackWanted=false;c.errorWanted=false;}
+            if(!inFlight&&(c.ackWanted||c.errorWanted)){
+                if(c.errorWanted){
+                    var m=new ControlMessage(MessageType.ERROR,c.request,config.nodeId(),instance,new ControlMessage.ErrorPayload(c.error,11,c.detail));
+                    if(send(c.line,c.line.key.session,SendKind.ERROR,null,c,null,m,at))c.errorWanted=false;
+                }else{
+                    long remaining=t.confirmed.source?Math.multiplyExact(Math.min(leaseMs,c.payload.leaseMs()),1_000_000L):t.confirmed.lease.remainingNanos(at);
+                    if(c.active!=null)remaining=Math.min(remaining,c.active.validity().orElseThrow().remainingNanos(at));
+                    long grant=Math.min(Math.min(leaseMs,c.payload.leaseMs()),remaining/1_000_000L);
+                    if(grant<1){failChild(c,ErrorCode.NO_ROUTE,"GRANT_TOO_SHORT",at);return;}
+                    var validity=new Subscription.Lease(at,Math.multiplyExact(grant,1_000_000L));
+                    var value=new Subscription(t.id,t.epoch,c.line.key.session,c.line.id,c.payload.revision(),c.request,
+                            c.payload.expectedPath(),c.payload.leaseMs(),Subscription.State.ACTIVE,Optional.of(validity));
+                    var m=new ControlMessage(MessageType.ACTIVATE_ACK,c.request,config.nodeId(),instance,
+                            new ControlMessage.ActivationAck(t.id,t.epoch,c.line.id,c.payload.revision(),grant));
+                    if(send(c.line,c.line.key.session,SendKind.ACK,null,c,value,m,at))c.ackWanted=false;
+                }
+            }
+            if(!c.pending&&c.active==null&&!c.ackWanted&&!c.errorWanted&&!inFlight)detach(c);
+        }
+        boolean quota(Neighbor.Session session,long at){
+            var q=responseQuotas.computeIfAbsent(session,s->new ResponseQuota(at));
+            if(age(at,q.began)>=WINDOW){q.began=at;q.used=0;}
+            if(q.used>=16)return false;q.used++;return true;
+        }
+        boolean send(Object context,Neighbor.Session session,SendKind kind,Attempt attempt,Child child,
+                Subscription grant,ControlMessage message,long at){
+            if(stopping.get()||!current(session))return false;
+            final ActSend send;
+            synchronized(resources){
+                if(sends.size()>=sendLimit||sends.stream().filter(s->s.session.equals(session)).count()>=4
+                        ||context!=null&&sends.stream().filter(s->s.context==context).count()>=2)return false;
+                if(kind==SendKind.UNBOUND&&(sends.stream().filter(s->s.kind==SendKind.UNBOUND).count()>=errorLimit
+                        ||sends.stream().anyMatch(s->s.kind==SendKind.UNBOUND&&s.session.equals(session))))return false;
+                send=new ActSend(context,session,kind,attempt,child,grant);sends.add(send);
+            }
+            if(kind!=SendKind.REQUEST&&!quota(session,at)){
+                synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
+            }
+            // Reserving a physical ticket/quota can consume time. Revalidate and
+            // rebuild durations at the actual port boundary, never extend a grant.
+            try{
+                long dispatch=now();
+                if(stopping.get()||!current(session)
+                        ||attempt!=null&&(attempt.tree.round!=attempt.round||elapsed(dispatch,attempt.round.began)
+                            ||!selectedPath(attempt.tree).equals(attempt.path))
+                        ||child!=null&&(child.detached||elapsed(dispatch,child.began))){
+                    synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
+                }
+                if(kind==SendKind.ACK){
+                    var t=child.tree;var prefix=child.payload.expectedPath().subList(0,child.payload.expectedPath().size()-1);
+                    if(!healthy(t,dispatch)||!child.replay&&!compatible(t,prefix,dispatch)){
+                        synchronized(resources){sends.remove(send);resources.notifyAll();}
+                        failChild(child,ErrorCode.PATH_CHANGED,"PATH_CHANGED",dispatch);return false;
+                    }
+                    long remaining=grant.validity().orElseThrow().remainingNanos(dispatch);
+                    if(!t.confirmed.source)remaining=Math.min(remaining,t.confirmed.lease.remainingNanos(dispatch));
+                    if(child.active!=null)remaining=Math.min(remaining,child.active.validity().orElseThrow().remainingNanos(dispatch));
+                    long millis=Math.min(Math.min(leaseMs,child.payload.leaseMs()),remaining/1_000_000L);
+                    if(millis<1){synchronized(resources){sends.remove(send);resources.notifyAll();}
+                        failChild(child,ErrorCode.NO_ROUTE,"GRANT_TOO_SHORT",dispatch);return false;}
+                    send.grant=new Subscription(grant.streamId(),grant.serverEpoch(),grant.child(),grant.subscriptionId(),
+                            grant.revision(),grant.requestId(),grant.expectedPath(),grant.requestedLeaseMs(),grant.state(),
+                            Optional.of(new Subscription.Lease(dispatch,Math.multiplyExact(millis,1_000_000L))));
+                    message=new ControlMessage(MessageType.ACTIVATE_ACK,child.request,config.nodeId(),instance,
+                            new ControlMessage.ActivationAck(t.id,t.epoch,child.line.id,child.payload.revision(),millis));
+                }
+            }catch(RuntimeException error){synchronized(resources){sends.remove(send);resources.notifyAll();}throw error;}
+            if(attempt!=null){attempt.submitted=true;attempt.round.issued++;}
+            try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
+            catch(RuntimeException e){send.complete(null,e);}return true;
+        }
+        void unbound(Neighbor.Session session,UUID request,ErrorCode code,String detail,long at){
+            send(null,session,SendKind.UNBOUND,null,null,null,new ControlMessage(MessageType.ERROR,request,
+                    config.nodeId(),instance,new ControlMessage.ErrorPayload(code,11,detail)),at);
+        }
+        boolean release(ActSend s){if(s.callbackDone&&s.continuationDone&&sends.remove(s)){resources.notifyAll();return true;}return false;}
+        void completed(ActSend s){
+            try{
+                long at=now();if(stopping.get())return;
+                if((s.result==Connection.SendResult.CLOSED||s.result==Connection.SendResult.OVERFLOW)&&current(s.session)){
+                    remove(s.session);return;
+                }
+                if(s.kind==SendKind.REQUEST){var a=s.attempt;
+                    if(a.tree.round!=a.round||a.round.attempt!=a)return;
+                    if(s.error==null&&s.result==Connection.SendResult.ACCEPTED){a.accepted=true;if(a.early!=null)confirm(a,at);}
+                    else failedAttempt(a,ErrorCode.NO_ROUTE,"ACTIVATE_SEND_FAILED");
+                }else if(s.child!=null){var c=s.child;
+                    if(c.detached||c.line.child!=c)return;
+                    if(s.kind==SendKind.ACK){
+                        if(s.error==null&&s.result==Connection.SendResult.ACCEPTED&&epochCurrent(c.tree)
+                                &&current(c.line.key.session)&&healthy(c.tree,at)&&!elapsed(at,c.began)
+                                &&s.grant.validity().orElseThrow().remainingNanos(at)>0
+                                &&(c.replay||compatible(c.tree,c.payload.expectedPath().subList(0,c.payload.expectedPath().size()-1),at))){
+                            c.active=s.grant;c.pending=false;c.ackWanted=false;c.line.terminal=null;c.replay=false;c.tree.version=Math.incrementExact(c.tree.version);
+                        }else failChild(c,ErrorCode.PATH_CHANGED,"ACK_NO_LONGER_VALID",at);
+                    }
+                }
+            }finally{synchronized(resources){s.continuationDone=true;release(s);}}
+        }
+        void drive(){
+            if(changed.getAndSet(false))kick();
+            List<ActSend> done;synchronized(resources){done=sends.stream().filter(s->s.ready&&!s.continuationDone).limit(4).toList();}
+            for(var s:done)completed(s);
+            int count=Math.min(4,treeSweep);while(count-->0&&!treeOrder.isEmpty()){
+                var t=treeOrder.removeFirst();treeOrder.addLast(t);treeSweep--;stepTree(t,now());
+            }
+            count=Math.min(6,childSweep);while(count-->0&&!childOrder.isEmpty()){
+                var c=childOrder.removeFirst();childOrder.addLast(c);childSweep--;stepChild(c,now());
+            }
+            count=Math.min(2,localSweep);while(count-->0&&!localOrder.isEmpty()){
+                var l=localOrder.removeFirst();localOrder.addLast(l);localSweep--;
+                boolean latest;synchronized(resources){latest=localTickets.get(l.key)==l;}
+                if(!latest||l.cancelled.get()){
+                    localOrder.remove(l);
+                    if(latest){synchronized(resources){localTickets.remove(l.key,l);}}
+                    var t=trees.get(l.key.stream);
+                    if(t!=null&&t.locals.remove(l.key.token,l)&&l.cancelled.get()&&t.confirmedLocals.remove(l.key.token))
+                        t.version=Math.incrementExact(t.version);
+                    outcome(l,SubscriptionState.CANCELLED,null,"CANCELLED");
+                }
+            }
+            treeSweep=Math.min(treeSweep,treeOrder.size());childSweep=Math.min(childSweep,childOrder.size());localSweep=Math.min(localSweep,localOrder.size());
+            boolean ready;synchronized(resources){ready=sends.stream().anyMatch(s->s.ready&&!s.continuationDone);}
+            if(treeSweep>0||childSweep>0||localSweep>0||ready||changed.get())wake();
+        }
+        long futureDelay(long remaining){return remaining>0?remaining:Long.MAX_VALUE;}
+        long nextDelay(long at){
+            long delay=Long.MAX_VALUE;
+            for(var t:trees.values()){
+                if(t.round!=null)delay=Math.min(delay,futureDelay(timeout-age(at,t.round.began)));
+                if(t.confirmed!=null&&!t.confirmed.source)delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
+            }
+            for(var c:childOrder){
+                if(c.pending||c.ackWanted||c.errorWanted)delay=Math.min(delay,futureDelay(timeout-age(at,c.began)));
+                if(c.active!=null)delay=Math.min(delay,futureDelay(c.active.validity().orElseThrow().remainingNanos(at)));
+                var q=responseQuotas.get(c.line.key.session);
+                if((c.ackWanted||c.errorWanted)&&q!=null&&q.used>=16)delay=Math.min(delay,futureDelay(WINDOW-age(at,q.began)));
+            }
+            return delay;
+        }
+        Map<UUID,Route.Confirmation> forwarding(long at){
+            var result=new LinkedHashMap<UUID,Route.Confirmation>();
+            for(var t:trees.values())if(healthy(t,at)){
+                var c=t.confirmed;var children=new LinkedHashMap<String,Subscription>();
+                for(var child:t.children.values())if(child.active!=null&&child.active.validity().orElseThrow().remainingNanos(at)>0)
+                    children.put(child.line.key.session.nodeId(),child.active);
+                var locals=new HashSet<UUID>();
+                for(var token:t.confirmedLocals){var l=t.locals.get(token);if(l!=null&&!l.cancelled.get())locals.add(token);}
+                if(!children.isEmpty()||!locals.isEmpty())result.put(t.id,new Route.Confirmation(t.id,t.origin,t.epoch,c.source,
+                        Optional.ofNullable(c.parent),c.path,children,locals,Optional.ofNullable(c.lease),t.version));
+            }
+            return result;
+        }
+        void sessionDown(Neighbor.Session session){
+            responseQuotas.remove(session);
+            for(var t:trees.values()){
+                var c=t.children.get(session);if(c!=null)detach(c);
+                if(t.confirmed!=null&&session.equals(t.confirmed.parent)){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+                if(t.round!=null&&t.round.attempt!=null&&session.equals(t.round.attempt.line.key.session))fail(t,ErrorCode.NO_ROUTE,"SESSION_CLOSED");
+            }
+            lines.keySet().removeIf(k->k.session.equals(session));kick();
+        }
+        void epochChanged(String origin,UUID epoch){
+            for(var t:List.copyOf(trees.values()))if(t.origin.equals(origin)&&!t.epoch.equals(epoch)){
+                for(var c:List.copyOf(t.children.values()))detach(c);
+                for(var l:t.locals.values()){outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"EPOCH_CHANGED");}
+                t.confirmed=null;t.confirmedLocals.clear();t.round=null;trees.remove(t.id);treeOrder.remove(t);
+            }
+            lines.keySet().removeIf(k->{var row=row(k.stream);return row!=null&&row.origin.equals(origin)&&!k.epoch.equals(epoch);});kick();
+        }
+        ActivationLoad load(){
+            synchronized(resources){return new ActivationLoad(trees.size(),childOrder.size(),localTickets.size(),lines.size(),sends.size(),
+                    (int)sends.stream().filter(s->s.kind==SendKind.UNBOUND).count(),
+                    (int)childOrder.stream().filter(c->c.ackWanted||c.errorWanted).count(),(int)childOrder.stream().filter(c->c.pending).count());}
+        }
+        void close(){
+            synchronized(resources){
+                for(var l:localTickets.values())outcome(l,SubscriptionState.CLOSED,null,"CLOSED");localTickets.clear();
+                for(var s:List.copyOf(sends)){s.continuationDone=true;release(s);}
+            }
+            for(var t:trees.values()){t.locals.clear();t.children.clear();t.confirmedLocals.clear();t.round=null;t.confirmed=null;}
+            trees.clear();treeOrder.clear();childOrder.clear();localOrder.clear();lines.clear();responseQuotas.clear();treeSweep=0;childSweep=0;localSweep=0;
+        }
+    }
 
     /** One timer worker, at most two physical jobs. Cancellation never releases a running job. */
     private static final class Timers implements Scheduler {

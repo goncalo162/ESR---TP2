@@ -1,6 +1,18 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** IMP-010/022-rotas em Test técnico; manual humano pendente; Plan/Q-C-32/33 aprovados. IMP-009/006-rotas complete; unidade003-rotas e PHASE-03 em progresso. clean verify1296/0/0/0 e JAR novo; Test não aprovado.
+**Estado atual:** IMP-010/022-rotas complete, unidade003-rotas e PHASE-03 concluídas.
+IMP-011/007-arvores em Implement desde2026-11-17T17:50:02Z, após aprovação ADR.
+[Walkthrough](../memory-bank/bolts/007-arvores/implementation-walkthrough.md): quatro
+caminhos mais exceções Q-C-36/Q-C-37 autorizadas e aplicadas, sete no total.
+[Resultados atuais](../experiments/construction/007-arvores/q-c-37/README.md):
+D11b1/0/0/0, D11a original1/0/0/0, handshake/lifecycle202/0/0/0 e uma regressão
+completa1325/0/0/0. Sem resposta, Closed/prazo existente terminam e libertam
+recursos; TCP real com zero reservas e awaitTermination no budget configurado.
+Sem aceitação de Implement, etapa Test, fecho, outro IMP, commits ou push.
+Os14 grupos/V-014 integral/manual/revisões/integração continuam pendentes.
+12 bolts complete,1 in-progress,22 planned. Negativos NeighborDown/D11a, sucesso
+isolado e diagnósticos anteriores preservados; sequência histórica exata não
+reconstruída. Qualquer correção adicional exige apresentação prévia; sem gates novos.
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;

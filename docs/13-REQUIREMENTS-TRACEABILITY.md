@@ -6,6 +6,18 @@ Estado inicial do plano: TODO para todos os requisitos. Estado atual: RF-001/003
 
 Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculos relevantes estiverem concluídos. Pode passar a IN PROGRESS com evidência parcial ou BLOCKED com causa concreta; nunca usar DONE por a documentação estar escrita. Registar ligações para evidências na coluna final durante a implementação.
 
+Atualização documental: TASK-014/IMP-011/007-arvores em Implement após aprovação
+ADR em2026-11-17T17:50:02Z.
+[Código/evidência incremental](../memory-bank/bolts/007-arvores/implementation-walkthrough.md)
+nos quatro caminhos mais exceções Q-C-36/Q-C-37 autorizadas/aplicadas, sete no total.
+[Resultados atuais](../experiments/construction/007-arvores/q-c-37/README.md):
+D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
+Terminação sem resposta/recursos verificados por Closed/prazo existente e TCP real.
+REQ-005/007/011/017/021 e INT-001/002 têm prova incremental parcial; nenhum
+requisito global promovido a DONE.14 grupos/V-014 integral, aceitação Implement
+e etapa Test pendentes. Negativos/diagnósticos anteriores preservados; sem gate novo.
+Os 1296 testes verdes do fecho de022-rotas conservam valor histórico.
+
 | ID | Descrição | Componente responsável | Fases | Tarefas | Testes / verificações | Estado | Evidência |
 |---|---|---|---|---|---|---|---|
 | [RF-001](02-REQUIREMENTS.md#rf-001) | Executar nós como aplicações em máquinas IP | app/config/overlay | 01, 02 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-008](tasks/PHASE-02/TASK-008.md) | V-003, V-008 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); [V-009: CLI em quatro JVMs](../memory-bank/bolts/004-overlay/test-walkthrough.md) |

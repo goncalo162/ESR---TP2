@@ -2,6 +2,27 @@
 
 Fonte normativa: [ADD](../../add.md).
 
+## IMP-011 — Model/Design/ADR aprovados; Implement em curso
+
+Registo 2026-11-17T17:02:14Z. O utilizador aprovou Model/Q-C-34/35 e autorizou
+apenas Design. [Decisões](../../docs/construction-duvidas.md): cancelamento e
+validade mínimos em IMP-011, renovação/poda completas em IMP-012; nova adesão
+exige compatibilidade entre seleção e confirmação, preservando o ramo saudável
+quando recusada. Sem substituição/alteração de estado de ADR aceite.
+[Design completo aprovado](../bolts/007-arvores/ddd-02-technical-design.md)
+em 2026-11-17T17:30:07Z: ancoramento de leases, T/A, lineagens, capacidades e
+quotas. [Revisão ADR](../bolts/007-arvores/adr-review.md) aprovada em
+2026-11-17T17:50:02Z: reutilização das ADR existentes, sem nova ADR/substituição.
+Apenas [Implement](../bolts/007-arvores/implementation-walkthrough.md) nos quatro
+caminhos mais exceções Q-C-36/Q-C-37 autorizadas/aplicadas, sete no total.
+D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
+[Resultados novos](../../experiments/construction/007-arvores/q-c-37/README.md),
+incluindo terminação sem resposta por Closed/prazo existente e recursos físicos.
+Etapa Test e aceitação Implement pendentes. Negativos/diagnósticos anteriores
+preservados; sem nova ADR, outra correção ou gate externo adicional.
+
+## Catálogo de ADR
+
 - [ADR-001 — Java 21 e Maven](../../add.md#adr-001) — Aceite.
 - [ADR-002 — TCP de controlo e UDP de vídeo](../../add.md#adr-002) — Aceite.
 - [ADR-003 — Bootstrap por grafo permitido — registo histórico](../../add.md#adr-003) — Substituída.
