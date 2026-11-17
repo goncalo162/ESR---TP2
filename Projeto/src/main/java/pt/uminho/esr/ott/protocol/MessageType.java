@@ -1,7 +1,11 @@
 package pt.uminho.esr.ott.protocol;
 
 /** Identificadores v2 explícitos; nunca usar ordinal() no formato de rede. */
-public enum MessageType {
+public enum MessageType
+{
+
+    //* === Valores === *
+
     // REGISTER/REGISTER_OK são apenas consulta/resposta de vizinhança, sem registo vivo.
     // Código 3 retirado (antiga renovação de registo); não reutilizar.
     REGISTER(1), REGISTER_OK(2), NODE_LEAVE(4),
@@ -10,18 +14,36 @@ public enum MessageType {
     DEACTIVATE(13), SUBSCRIPTION_RENEW(14), ROUTE_TRACE(15), TRACE_RESULT(16), ERROR(17),
     DISCOVERY_QUERY(18), DISCOVERY_SNAPSHOT(19), REPAIR_HELLO(20);
 
+
+
+    //* === Atributos e Variáveis === *
+
     private final int code;
 
-    MessageType(int code) {
+
+
+    //* === Construtor === *
+
+    MessageType(int code)
+    {
         this.code = code;
     }
 
-    public int code() {
+
+
+    //* === Métodos Públicos === *
+
+    public int code()
+    {
         return code;
     }
 
-    public static MessageType fromCode(int code) throws ProtocolException {
-        for (MessageType type : values()) if (type.code == code) return type;
+    public static MessageType fromCode(int code) throws ProtocolException
+    {
+        for(MessageType type : values())
+            if(type.code == code)
+                return type;
+
         throw new ProtocolException(ErrorCode.INVALID_MESSAGE, "Tipo de mensagem desconhecido: " + code);
     }
 }

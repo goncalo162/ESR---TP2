@@ -17,9 +17,13 @@ public record NodeConfiguration(
         Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
         Optional<Path> streamsFile, Optional<Path> mediaBase,
         Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams,
-        RuntimeConfiguration runtime) {
+        RuntimeConfiguration runtime)
+{
 
-    public NodeConfiguration {
+    //* === Construtor === *
+
+    public NodeConfiguration
+    {
         Objects.requireNonNull(sourceFile);
         Objects.requireNonNull(nodeId);
         Objects.requireNonNull(role);
@@ -31,10 +35,16 @@ public record NodeConfiguration(
         Objects.requireNonNull(mediaBase);
         Objects.requireNonNull(topology);
         Objects.requireNonNull(runtime);
-        if (role != NodeRole.BOOTSTRAP && runtime.control().queueCapacity() < 2)
+
+        if(role != NodeRole.BOOTSTRAP && runtime.control().queueCapacity() < 2)
             throw new IllegalArgumentException("Overlay discovery requires control.queue.capacity>=2");
+
         streams = List.copyOf(streams);
     }
+
+
+
+    //* === Construtor Auxiliar === *
 
     /** Compatibilidade com o construtor anterior à parametrização operacional. */
     public NodeConfiguration(
@@ -42,18 +52,35 @@ public record NodeConfiguration(
             String advertisedHost, int controlPort, int dataPort,
             Optional<BootstrapContact> bootstrap, Optional<Path> topologyFile,
             Optional<Path> streamsFile, Optional<Path> mediaBase,
-            Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams) {
+            Optional<TopologyConfiguration> topology, List<StreamConfiguration> streams)
+    {
         this(sourceFile, nodeId, role, bindHost, advertisedHost, controlPort, dataPort,
                 bootstrap, topologyFile, streamsFile, mediaBase, topology, streams,
                 RuntimeConfiguration.defaults());
     }
 
+
+
+    //* === Métodos Auxiliares === *
+
     /** Intrinsic overlay capability, never an operational switch. */
-    public boolean discoveryRequired() { return role != NodeRole.BOOTSTRAP; }
+    public boolean discoveryRequired()
+    {
+        return role != NodeRole.BOOTSTRAP;
+    }
+
+
+
+    //* === BootstrapContact (Record Interno) === *
 
     /** Contacto conhecido para obter a vizinhança, sem resolução de DNS na carga. */
-    public record BootstrapContact(String host, int port) {
-        public BootstrapContact {
+    public record BootstrapContact(String host, int port)
+    {
+
+        //* === Construtor === *
+
+        public BootstrapContact
+        {
             Objects.requireNonNull(host);
         }
     }
