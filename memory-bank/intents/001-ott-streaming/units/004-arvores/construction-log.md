@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-17T21:49:25Z"
+last_updated: "2026-11-17T23:51:24Z"
 ---
 # Construction Log — 004-arvores
 
@@ -14,8 +14,9 @@ Inception concluído em2026-11-03T20:54:11Z;003-rotas e022-rotas complete.
 
 ## Estrutura atual
 
-1 - ⏳ **007-arvores**: in-progress, Test em progresso, Q-C-36–39 preservadas; clean verify1328/0; Model/Design/ADR/Implement aprovados,
-história001 planeada/não implementada, ativação com ACK.
+1 - ✅ **007-arvores**: complete; história001 complete/implemented=true, TASK-014
+DONE. Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863
+comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
 2 - [ ] **023-arvores**: planned; história002, renovação e poda.
 3 - [ ] **008-arvores**: planned; história003, recuperação de upstream.
 4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
@@ -182,3 +183,15 @@ por confirmação explícita do utilizador; vinculada aos hashes atuais dos oito
 caminhos Java e JAR. Não houve alteração de código ou repetição desnecessária
 de regressão/manual. Test por aprovar, plano de integração para autorização.
 Sem staging/commits/push/fecho; bolt/unidade/PHASE mantidos em progresso.
+
+## Fecho documental autorizado — registo 2026-11-17T23:51:24Z
+
+Bolt007-arvores e história001 complete, implemented=true, TASK-014 DONE.
+Test aprovado pelo utilizador após clean verify1328/0/0/0 e manual humano
+Francisco24; revisão final Waheed confirmada sem alterações pendentes.
+Versão revista integrada em main37fa863ed416017e733e692f9565899fb61285ae;
+extração,568 caminhos/hashes/JAR e V-ADD zero erros conferidos.
+Prova posterior em experiments/construction/007-arvores/integration-proof-01.
+Unidade004-arvores/PHASE-04 continuam em progresso; quatro bolts planned.
+023-arvores apenas desimpedido pela atualização derivada blocks=false, sem
+início de execução. Fecho exclusivamente documental/evidência, sem Java/push.

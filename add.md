@@ -1125,10 +1125,10 @@ final aprovados por Luis; fecho autorizado e versão integrada em main 3349d575a
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Árvore ativa apenas após confirmação válida.
-  - [ ] Uma referência agregada a montante por stream.
-  - [ ] Repetições são idempotentes e erros não deixam PENDING eterno.
-  - [ ] Validação V-014 executada e evidência ligada no progresso.
+  - [x] Árvore ativa apenas após confirmação válida.
+  - [x] Uma referência agregada a montante por stream.
+  - [x] Repetições são idempotentes e erros não deixam PENDING eterno.
+  - [x] Validação V-014 executada e evidência ligada no progresso.
 
 **Model aprovado em 2026-11-17T17:02:14Z**, incluindo Q-C-34/35: cancelamento
 lógico/validade mínima neste IMP, renovação/poda completas em IMP-012; recusa
@@ -1156,14 +1156,13 @@ Sem resposta, Closed/prazo existente terminam e libertam recursos; TCP real com
 zero reservas e awaitTermination confirmado. Implement reapresentado, não aprovado.
 Fecho exige V-014, regressão aprovada, manual humano, revisão final Waheed e integração.
 
-**Estado atual após confirmação explícita:** Implement aprovado; Test por aprovar.
-[Relatório V-014](memory-bank/bolts/007-arvores/ddd-03-test-report.md): clean verify
-1328/0/0/0 e provas suplementares consolidadas. Manual humano Francisco cumprido
-e conferido; revisão final Waheed confirmada para o código/evidência atuais,
-sem alterações pendentes. Fontes/JAR iguais à construção validada, Q-C-36–39
-preservadas. [Plano e versão revista](experiments/construction/007-arvores/integration-01/plan.md).
-Integração ainda por autorizar/executar e fecho não autorizado.
-Sem staging/commits/push/DONE ou novo IMP nesta autorização.
+**Fecho autorizado:** IMP-011/007-arvores complete, história complete e
+implemented=true, TASK-014 DONE. Test1328/0/0/0 aprovado, manual humano
+Francisco24 e revisão final Waheed cumpridos; versão revista integrada em
+main37fa863ed416017e733e692f9565899fb61285ae e V-ADD da cópia extraída aprovado.
+[Fecho/prova](memory-bank/bolts/007-arvores/closure-walkthrough.md). Código/JAR,
+Q-C-36–39 e negativos preservados. Unidade004-arvores/PHASE-04 em progresso;
+sem Java, target, push ou início de outro IMP no fecho documental.
 
 <a id="imp-012"></a>
 ### IMP-012 — Renovar e podar subscrições

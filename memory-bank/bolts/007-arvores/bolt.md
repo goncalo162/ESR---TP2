@@ -3,14 +3,14 @@ id: "007-arvores"
 unit: "004-arvores"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["001-ativar-arvores-com-ack-e-procura-agregada"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-17T23:06:56Z"
+updated: "2026-11-17T23:51:24Z"
 started: "2026-11-17T15:29:06Z"
-completed: null
-current_stage: "test"
-stages_completed: [{"name": "model", "completed": "2026-11-17T17:02:14Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-17T17:30:07Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-17T17:50:02Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-17T23:06:56Z", "artifact": "implementation-walkthrough.md"}]
+completed: "2026-11-17T23:51:24Z"
+current_stage: null
+stages_completed: [{"name": "model", "completed": "2026-11-17T17:02:14Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-17T17:30:07Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-17T17:50:02Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-17T23:06:56Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-17T23:45:22Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["022-rotas"]
 enables_bolts: ["023-arvores"]
 requires_units: ["003-rotas"]
@@ -35,13 +35,22 @@ architecture_source: "add.md"
 ---
 # Bolt 007-arvores — Ativar procura com confirmação
 
+## Fecho atual — autorizado
+
+Bolt complete; história complete/implemented=true; TASK-014 DONE.
+[Fecho e provas](closure-walkthrough.md): clean verify1328/0/0/0, Test aprovado,
+manual humano Francisco24 e revisão final Waheed cumpridos. Versão revista
+integrada em main37fa863ed416017e733e692f9565899fb61285ae, conteúdo e V-ADD da
+cópia extraída conferidos. Unidade004-arvores/PHASE-04 continuam em progresso.
+Registos de etapas abaixo são histórico; nenhum outro IMP iniciado, sem push.
+
 ## Fonte normativa e âmbito
 
 Ler [IMP-011](../../../add.md#imp-011) e as ADR aí indicadas antes de qualquer etapa. Este bolt executa **uma** tarefa atómica; o ADD define o que construir, como e porquê. Fonte legada: [TASK-014](../../../docs/tasks/PHASE-04/TASK-014.md).
 
 ## História, dependências e gates
 
-- [ ] [001-ativar-arvores-com-ack-e-procura-agregada](../../intents/001-ott-streaming/units/004-arvores/stories/001-ativar-arvores-com-ack-e-procura-agregada.md).
+- [x] [001-ativar-arvores-com-ack-e-procura-agregada](../../intents/001-ott-streaming/units/004-arvores/stories/001-ativar-arvores-com-ack-e-procura-agregada.md).
 - Dependências: [022-rotas](../022-rotas/bolt.md).
 - Unidade: [004-arvores](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md).
 - Gates: nenhum adicional.
@@ -52,16 +61,16 @@ Ler [IMP-011](../../../add.md#imp-011) e as ADR aí indicadas antes de qualquer 
 2. [x] **design** → `ddd-02-technical-design.md`; aprovado integralmente pelo utilizador em 2026-11-17T17:30:07Z.
 3. [x] **adr** → `adr-review.md`; aprovada pelo utilizador em 2026-11-17T17:50:02Z.
 4. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-011 e as ADR do ADD.
-5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-011 e as ADR do ADD.
+5. [x] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-011 e as ADR do ADD.
 
 Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
 
 ## Critérios de aceitação
 
-- [ ] Árvore ativa apenas após confirmação válida.
-- [ ] Uma referência agregada a montante por stream.
-- [ ] Repetições são idempotentes e erros não deixam PENDING eterno.
-- [ ] Validação V-014 executada e evidência ligada no progresso.
+- [x] Árvore ativa apenas após confirmação válida.
+- [x] Uma referência agregada a montante por stream.
+- [x] Repetições são idempotentes e erros não deixam PENDING eterno.
+- [x] Validação V-014 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 

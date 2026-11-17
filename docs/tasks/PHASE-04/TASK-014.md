@@ -5,11 +5,20 @@
 - ID: TASK-014
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-011](../PHASE-03/TASK-011.md), [TASK-012](../PHASE-03/TASK-012.md), [TASK-013](../PHASE-03/TASK-013.md).
 - Requisitos relacionados: [RF-005](../../02-REQUIREMENTS.md#rf-005), [RF-007](../../02-REQUIREMENTS.md#rf-007), [RF-011](../../02-REQUIREMENTS.md#rf-011), [RP-002](../../02-REQUIREMENTS.md#rp-002), [RP-006](../../02-REQUIREMENTS.md#rp-006).
+
+## Fecho autorizado
+
+TASK-014 DONE, bolt/história complete, implemented=true. Test aprovado com
+clean verify1328/0/0/0, manual Francisco24 e revisão final Waheed cumpridos.
+Integração comprovada em main37fa863ed416017e733e692f9565899fb61285ae.
+[Fecho/evidência](../../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+Unidade004-arvores/PHASE-04 em progresso, restantes tarefas TODO.
+As entradas de checkpoints abaixo são histórico; sem push ou outro IMP iniciado.
 
 ## 2. Objetivo
 
@@ -58,10 +67,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Árvore ativa apenas após confirmação válida.
-- [ ] Uma referência agregada a montante por stream.
-- [ ] Repetições são idempotentes e erros não deixam PENDING eterno.
-- [ ] Validação V-014 executada e evidência ligada no progresso.
+- [x] Árvore ativa apenas após confirmação válida.
+- [x] Uma referência agregada a montante por stream.
+- [x] Repetições são idempotentes e erros não deixam PENDING eterno.
+- [x] Validação V-014 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 

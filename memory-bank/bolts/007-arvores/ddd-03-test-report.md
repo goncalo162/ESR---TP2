@@ -2,17 +2,16 @@
 unit: "004-arvores"
 bolt: "007-arvores"
 stage: "test"
-status: "in-progress"
+status: "complete"
 ---
 # IMP-011 — Test técnico / V-014
 
-Implement aprovado e Test autorizado pelo utilizador. **Test por aprovar.**
-Manual humano de Francisco cumprido e conferido, cinco etapas/24 checks, sem
-divergências; revisão final de Waheed confirmada pelo utilizador para a versão
-atual, sem alterações pendentes. [Verificação e hashes da versão revista](../../../experiments/construction/007-arvores/integration-01/manual-and-review-verification.json).
-Integração ainda não autorizada nem executada. Bolt/TASK/unidade/PHASE continuam
-em progresso. Sem staging, commits, push ou fecho. As menções anteriores a
-manual/revisão pendentes nos artefactos de execução são snapshots históricos.
+**Test aprovado pelo utilizador**, após clean verify1328/0/0/0, manual humano
+Francisco24 conferido e revisão final Waheed confirmada, sem alterações pendentes.
+[Integração comprovada37fa863](../../../experiments/construction/007-arvores/integration-proof-01/README.md).
+[Fecho autorizado](closure-walkthrough.md): bolt/história complete e TASK-014 DONE;
+unidade004-arvores/PHASE-04 em progresso. Código/JAR mantidos iguais.
+As menções a autorização pendente nas execuções originais são histórico.
 
 ## Construção e regressão atuais
 
@@ -141,3 +140,11 @@ por ADR-026, sem metas/FPS/latências inventados.
 **Test reapresentado para aprovação.** [Plano de integração](../../../experiments/construction/007-arvores/integration-01/plan.md)
 ainda requer autorização explícita antes de qualquer staging/commit. Não há
 integração ou fecho concluídos; sem push, DONE ou novo IMP.
+
+## Decisão final de Test e fecho
+
+Test aprovado explicitamente antes da integração; o manual humano Francisco24
+e a revisão final Waheed vinculados aos hashes atuais foram cumpridos. Integração
+37fa863 verificada por extração, hashes/JAR e V-ADD zero erros. Fecho documental
+posteriormente autorizado; não foi necessário repetir Java/manual sem mudar código.
+[Fecho](closure-walkthrough.md). Sem push ou outro IMP.

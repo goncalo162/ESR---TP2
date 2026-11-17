@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["007-arvores", "022-rotas"]
 enables_bolts: ["008-arvores"]
 requires_units: ["003-rotas"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

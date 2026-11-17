@@ -8,14 +8,11 @@ Ativar e podar árvores por procura, recuperar de falhas e mudar de rota com his
 
 Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
 
-Estado atual: IN PROGRESS desde 2026-11-17T15:29:06Z, apenas TASK-014/007-arvores
-em Implement após aprovação ADR em2026-11-17T17:50:02Z.
-[Código/evidência incremental](../../memory-bank/bolts/007-arvores/implementation-walkthrough.md),
-Q-C-36/Q-C-37 autorizadas/aplicadas exclusivamente como apresentadas, sete caminhos.
-D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
-[Prova nova](../../memory-bank/bolts/007-arvores/implementation-walkthrough.md),
-incluindo terminação sem resposta/recursos. Aceitação de Implement/etapa Test/
-V-014 integral pendentes; restantes requisitos de fecho mantidos. TASK-015–018 TODO.
+Estado atual: **IN PROGRESS**. TASK-014/IMP-011/007-arvores DONE após
+Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
+37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+TASK-015–018 TODO, sem execução de outro incremento iniciada.
+O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
 
 ## 3. Pré-requisitos
 
@@ -29,7 +26,7 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
 
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
-| [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | IN PROGRESS — Implement para revisão; Q-C-36/37 aplicadas; regressão1325/0 |
+| [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
 | [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | TODO |
 | [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | TODO |
 | [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | TODO |

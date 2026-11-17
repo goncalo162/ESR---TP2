@@ -8,7 +8,7 @@ updated: "2026-11-17T21:49:25Z"
 ---
 # IMP-011 — Implement: ativação confirmada e investigação de NeighborDown
 
-**Estado atual:** Implement aprovado pelo utilizador; etapa Test autorizada.
+**Estado atual:** Implement e Test aprovados, integração comprovada e fecho autorizado.
 [Relatório Test atual](ddd-03-test-report.md). Os checkpoints/resultados anteriores
 abaixo são histórico preservado; Test/manual humano/revisão final/integração
 continuam por aprovar/concluir.
@@ -301,3 +301,10 @@ Os relatórios negativos anteriores continuam intactos como histórico.
 Código Java inalterado desde a regressão1328/0/0/0; não se repetiu Maven.
 Sem avanço a Test, staging, commits, push ou fecho. V-014 consolidado,
 clean verify/JAR final, manual humano, revisão final Waheed e integração pendentes.
+
+## Fecho documental autorizado
+
+Implement/Test aprovados, clean verify1328/0/0/0, manual humano Francisco24 e
+revisão final Waheed cumpridos. Integração37fa863 comprovada.
+[Fecho atual](closure-walkthrough.md); bolt/história complete, implemented=true,
+TASK-014 DONE. Unidade/PHASE em progresso; sem mudança Java, push ou outro IMP.

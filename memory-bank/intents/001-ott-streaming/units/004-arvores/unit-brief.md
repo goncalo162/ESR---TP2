@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-04"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-17T21:49:25Z"
+updated: "2026-11-17T23:51:24Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
@@ -15,16 +15,13 @@ requires_units: ["003-rotas"]
 
 Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
 
-Estado atual: 007-arvores/IMP-011 em Implement, após aprovação ADR
-em2026-11-17T17:50:02Z. [Código/evidência](../../../../bolts/007-arvores/implementation-walkthrough.md):
-Q-C-36 e Q-C-37 autorizadas/aplicadas exclusivamente como apresentadas, sete
-caminhos no total. D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0;
-regressão incremental1325/0/0/0 e terminação sem resposta/recursos verificados.
-[Resultados novos](../../../../../experiments/construction/007-arvores/q-c-37/README.md).
-Aceitação de Implement/etapa Test pendentes; negativos/diagnóstico anteriores
-preservados. Sem correção adicional ou gate externo novo.
-História001 mantém planned e não implementada; os outros quatro bolts não iniciados.
-[Registo de construção](construction-log.md). V-014 integral não consolidado/aceite.
+Estado atual: unidade **in-progress**. História001/IMP-011/007-arvores complete,
+implemented=true, TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão
+final Waheed e integração37fa863 comprovada.
+[Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
+Os quatro restantes bolts continuam planned, sem execução iniciada. O sinalizador
+derivado blocks de023-arvores passa a false por dependências satisfeitas; isso
+não inicia outro IMP. PHASE-04 em progresso. Sem push.
 
 ## Requisitos atribuídos
 
@@ -36,7 +33,7 @@ História001 mantém planned e não implementada; os outros quatro bolts não in
 
 ## Histórias e bolts
 
-- [ ] [001-ativar-arvores-com-ack-e-procura-agregada](stories/001-ativar-arvores-com-ack-e-procura-agregada.md) → [007-arvores](../../../../bolts/007-arvores/bolt.md); IMP-011 (M).
+- [x] [001-ativar-arvores-com-ack-e-procura-agregada](stories/001-ativar-arvores-com-ack-e-procura-agregada.md) → [007-arvores](../../../../bolts/007-arvores/bolt.md); IMP-011 (M).
 - [ ] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md) → [023-arvores](../../../../bolts/023-arvores/bolt.md); IMP-012 (M).
 - [ ] [003-recuperar-arvores-apos-falha-de-upstream](stories/003-recuperar-arvores-apos-falha-de-upstream.md) → [008-arvores](../../../../bolts/008-arvores/bolt.md); IMP-013 (M).
 - [ ] [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md) → [024-arvores](../../../../bolts/024-arvores/bolt.md); IMP-014 (M).

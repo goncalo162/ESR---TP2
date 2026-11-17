@@ -2,7 +2,7 @@
 id: "001-ativar-arvores-com-ack-e-procura-agregada"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-014"]
@@ -11,6 +11,8 @@ requirements: ["INT-001", "INT-002", "REQ-005", "REQ-007", "REQ-011", "REQ-017",
 adr_ids: ["ADR-005", "ADR-018", "ADR-024"]
 bolt: "007-arvores"
 size: "M"
+implemented: true
+completed: "2026-11-17T23:51:24Z"
 ---
 # História — Ativar procura com confirmação
 
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-011](../../../../../../add.md#imp-011); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Árvore ativa apenas após confirmação válida.
-- [ ] Uma referência agregada a montante por stream.
-- [ ] Repetições são idempotentes e erros não deixam PENDING eterno.
-- [ ] Validação V-014 executada e evidência ligada no progresso.
+- [x] Árvore ativa apenas após confirmação válida.
+- [x] Uma referência agregada a montante por stream.
+- [x] Repetições são idempotentes e erros não deixam PENDING eterno.
+- [x] Validação V-014 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -47,3 +49,10 @@ revisão final Waheed e integração também pendentes. História não concluíd
 Manual humano Francisco e revisão final Waheed confirmados/conferidos para
 a versão atual; Test e integração continuam pendentes. História in-progress,
 sem declaração de implementação concluída/fecho.
+
+## Fecho autorizado
+
+Complete, implemented=true, TASK-014 DONE após Test1328/0/0/0, manual humano
+Francisco24, revisão final Waheed e integração local37fa863 comprovada.
+[Fecho](../../../../../bolts/007-arvores/closure-walkthrough.md).
+Unidade004-arvores/PHASE-04 em progresso; sem push/outro IMP.
