@@ -1,0 +1,708 @@
+diff --git a/add.md b/add.md
+index 1bf23d6..4c98be9 100644
+--- a/add.md
++++ b/add.md
+@@ -1178,22 +1178,19 @@ sem Java, target, push ou início de outro IMP no fecho documental.
+ - **Gates:** nenhum externo adicional.
+ - **Critérios de aceitação:**
+ 
+-  - [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
+-  - [ ] Ramos órfãos desaparecem por timeout.
+-  - [ ] Outros consumidores e fluxos mantêm-se ativos.
+-  - [ ] Validação V-015 executada e evidência ligada no progresso.
+-
+-**Model/Design/revisão ADR aprovados pelo utilizador**, Q-C-40–42 mantidas,
+-base main/b273b258a4642f94f8614ae00f060a46318d77a5.
+-[Implement](memory-bank/bolts/023-arvores/implementation-walkthrough.md) e
+-[Test aprovados pelo utilizador](memory-bank/bolts/023-arvores/ddd-03-test-report.md):
+-clean verify1379/0/0/0,19 XML,V-ADD e manual humano Francisco30 cumpridos.
+-Código/JAR/logs/negativos/Q-C-40–42 preservados. [Pacote para revisão final](memory-bank/bolts/023-arvores/final-review-summary.md)
+-e [plano de integração](memory-bank/bolts/023-arvores/integration-plan.md) preparados.
+-Revisão final Denji confirmada pelo utilizador,sem alterações pendentes;
+-[simulação/plano final](memory-bank/bolts/023-arvores/integration-plan.md) para
+-autorização da integração. Bolt/história/TASK/unidade/fase abertos.
+-Sem staging/commits/push/fecho/outro IMP; nenhum gate externo adicional.
++  - [x] Vídeo só permanece autorizado enquanto há procura efetiva.
++  - [x] Ramos órfãos desaparecem por timeout.
++  - [x] Outros consumidores e fluxos mantêm-se ativos.
++  - [x] Validação V-015 executada e evidência ligada no progresso.
++
++**IMP-012 / TASK-015 concluído**,bolt/história023-arvores complete,implemented=true,
++por autorização explícita do utilizador após integração local em main
++`4d18d1dd8fb50d14ace02609a9133733c20cabfc`. [Fecho](memory-bank/bolts/023-arvores/closure-walkthrough.md)
++e [prova de integração](experiments/construction/023-arvores/integration-proof-01/README.md).
++Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual humano Francisco30 e revisão
++final Denji cumpridos. Q-C-40–42,wire/caps,código/JAR/logs e negativos preservados.
++Âmbito é controlo/autorização de forwarding,sem alegar vídeo/GUI/CORE/metas.
++Unidade004/PHASE-04 em progresso; sem Java/push/outro IMP no fecho documental.
+ 
+ <a id="imp-013"></a>
+ ### IMP-013 — Recuperar falhas do upstream TCP
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+index 02938f8..9a8b61d 100644
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -922,3 +922,9 @@ Utilizador confirmou aprovação final da mesma implementação,sem alterações
+ [Confirmação e simulação](../experiments/construction/023-arvores/integration-01/README.md)
+ vinculadas aos hashes de fonte/JAR. Sem mudança API/Java/wire/caps/Q-C-40–42,
+ sem repetir build/manual; integração aguarda autorização,sem fecho/staging/commit/push.
++
++### IMP-012 — fecho autorizado
++
++[Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md) após integração4d18d1d,
++Test1379/0/0/0,19 XML,Francisco30 e Denji. Nenhuma API/Java alterada no fecho;
++Q-C-40–42 e reservas/leases mantidas,sem CLI ou vídeo novo. Unidade/fase em progresso.
+diff --git a/docs/09-TESTING-STRATEGY.md b/docs/09-TESTING-STRATEGY.md
+index 35dfac8..5aa8a6c 100644
+--- a/docs/09-TESTING-STRATEGY.md
++++ b/docs/09-TESTING-STRATEGY.md
+@@ -173,7 +173,7 @@ Responsável: [TASK-014](tasks/PHASE-04/TASK-014.md). Requisitos: RF-005, RF-007
+ 
+ V-015: sair um de dois consumidores mantém tronco ativo; sair o último remove; relógio falso elimina lease órfão; cancelamento velho não remove ramo novo.
+ 
+-Responsável: [TASK-015](tasks/PHASE-04/TASK-015.md). Requisitos: RF-002, RF-005, RF-007, RF-009, RF-011, RNF-003, RP-002. Estado: Test aprovado pelo utilizador, manual humano Francisco30 cumprido; revisão final Denji confirmada,integração pendente. [Consolidação V-015/L01–L24](../memory-bank/bolts/023-arvores/ddd-03-test-report.md): clean verify1379/0/0/0,19 XML,51 testes novos,TCP real,JAR/hash; código aprovado e negativos intactos. Ensaio kind=agent não é manual humano.
++Responsável: [TASK-015](tasks/PHASE-04/TASK-015.md), DONE. Requisitos: RF-002, RF-005, RF-007, RF-009, RF-011, RNF-003, RP-002. Estado: V-015 consolidado e Test aprovado,clean verify1379/0/0/0,19 XML,manual humano Francisco30,revisão final Denji e integração4d18d1d cumpridos. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md); código/JAR/logs/negativos preservados,sem vídeo/GUI/CORE alegados.
+ 
+ ### V-016 — Recuperar árvores após falha de upstream
+ 
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index 9a5411d..bcfcfbf 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -6,34 +6,34 @@ Estado inicial do plano: TODO para todos os requisitos. Estado atual: RF-001/003
+ 
+ Um requisito só passa a DONE quando todas as tarefas necessárias e os oráculos relevantes estiverem concluídos. Pode passar a IN PROGRESS com evidência parcial ou BLOCKED com causa concreta; nunca usar DONE por a documentação estar escrita. Registar ligações para evidências na coluna final durante a implementação.
+ 
+-Atualização documental: TASK-014/IMP-011/007-arvores DONE,
+-[fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md) após Test1328/0/0/0,
+-V-014 consolidado, manual humano Francisco24, revisão final Waheed e integração
+-37fa863 comprovada. REQ-005/007/011/017/021 e INT-001/002 têm prova parcial de
+-controlo/ativação; nenhum requisito global promovido a DONE. Renovação/poda,
+-vídeo e cenários CORE futuros continuam pendentes. Negativos/evidência preservados.
+-Unidade004-arvores/PHASE-04 em progresso; sem iniciar outro IMP ou push.
++Atualização documental: TASK-015/IMP-012/023-arvores DONE após integração local
++4d18d1d comprovada,Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual humano
++Francisco30 e revisão final Denji. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md)
++e [prova de integração](../experiments/construction/023-arvores/integration-proof-01/README.md).
++Acrescenta prova de controlo/renovação/poda/procura à ativação de IMP-011;
++nenhum requisito global é promovido a DONE. Vídeo/GUI/CORE e consumidores
++restantes mantêm os estados anteriores. Unidade004/PHASE-04 em progresso.
+ 
+ | ID | Descrição | Componente responsável | Fases | Tarefas | Testes / verificações | Estado | Evidência |
+ |---|---|---|---|---|---|---|---|
+ | [RF-001](02-REQUIREMENTS.md#rf-001) | Executar nós como aplicações em máquinas IP | app/config/overlay | 01, 02 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-008](tasks/PHASE-02/TASK-008.md) | V-003, V-008 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); [V-009: CLI em quatro JVMs](../memory-bank/bolts/004-overlay/test-walkthrough.md) |
+-| [RF-002](02-REQUIREMENTS.md#rf-002) | Entrada e saída dinâmica de nós | bootstrap/overlay/routing | 02, 04 | [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md) | V-006, V-007, V-008, V-015, V-016 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE |
++| [RF-002](02-REQUIREMENTS.md#rf-002) | Entrada e saída dinâmica de nós | bootstrap/overlay/routing | 02, 04 | [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md) | V-006, V-007, V-008, V-015, V-016 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RF-003](02-REQUIREMENTS.md#rf-003) | Estabelecer e manter X vizinhos TCP ou UDP | transport/overlay/monitoring | 02, 03 | [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-010](tasks/PHASE-03/TASK-010.md) | V-005, V-006, V-007, V-010 | IN PROGRESS | [V-005: TCP real, 18 testes](../experiments/task-005-transport-validation.md); [V-006](../memory-bank/bolts/002-overlay/ddd-03-test-report.md), [V-007](../memory-bank/bolts/003-overlay/ddd-03-test-report.md); V-010 pendente |
+ | [RF-004](02-REQUIREMENTS.md#rf-004) | Descobrir vizinhos por contacto conhecido | config/bootstrap/overlay | 01, 02 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-006](tasks/PHASE-02/TASK-006.md), [TASK-007](tasks/PHASE-02/TASK-007.md) | V-003, V-006, V-007 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); [V-006](../memory-bank/bolts/002-overlay/ddd-03-test-report.md) e [V-007](../memory-bank/bolts/003-overlay/ddd-03-test-report.md) comprovam descoberta e vizinhança locais |
+-| [RF-005](02-REQUIREMENTS.md#rf-005) | Manter tabela por fluxo com custo, origem, destinos e estado | routing | 03, 04 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-011, V-012, V-014, V-015 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes ; [V-014/ativação](../memory-bank/bolts/007-arvores/closure-walkthrough.md), restantes tarefas pendentes |
++| [RF-005](02-REQUIREMENTS.md#rf-005) | Manter tabela por fluxo com custo, origem, destinos e estado | routing | 03, 04 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-011, V-012, V-014, V-015 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes ; [V-014/ativação](../memory-bank/bolts/007-arvores/closure-walkthrough.md), restantes tarefas pendentes ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RF-006](02-REQUIREMENTS.md#rf-006) | Suportar caminhos alternativos | routing/CORE | 03, 04, 06 | [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-011, V-012, V-016, V-026 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+-| [RF-007](02-REQUIREMENTS.md#rf-007) | Servir vários clientes em simultâneo | routing/streaming/client | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-014, V-015, V-021, V-024, V-027 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes |
++| [RF-007](02-REQUIREMENTS.md#rf-007) | Servir vários clientes em simultâneo | routing/streaming/client | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-014, V-015, V-021, V-024, V-027 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RF-008](02-REQUIREMENTS.md#rf-008) | Monitorizar a rede overlay | monitoring/experiments | 03, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-010, V-028 | TODO | — |
+-| [RF-009](02-REQUIREMENTS.md#rf-009) | Atualizar rotas perante entradas, saídas e condições de rede | routing/monitoring | 03, 04, 06 | [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-012, V-015, V-016, V-017, V-026 | IN PROGRESS | [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md); adaptação de árvores/dados/CORE pendente |
++| [RF-009](02-REQUIREMENTS.md#rf-009) | Atualizar rotas perante entradas, saídas e condições de rede | routing/monitoring | 03, 04, 06 | [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-012, V-015, V-016, V-017, V-026 | IN PROGRESS | [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md); adaptação de árvores/dados/CORE pendente ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RF-010](02-REQUIREMENTS.md#rf-010) | Reencaminhar dados segundo a tabela | routing/streaming | 03, 05 | [TASK-013](tasks/PHASE-03/TASK-013.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-021](tasks/PHASE-05/TASK-021.md) | V-013, V-019, V-021 | IN PROGRESS | [V-013](../memory-bank/bolts/022-rotas/test-walkthrough.md); diagnóstico concluído, reenvio de vídeo pendente V-019/V-021 |
+-| [RF-011](02-REQUIREMENTS.md#rf-011) | Partilhar segmentos comuns e replicar nos pontos de ramificação | routing/streaming/experiments | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-014, V-015, V-021, V-025, V-028 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes |
++| [RF-011](02-REQUIREMENTS.md#rf-011) | Partilhar segmentos comuns e replicar nos pontos de ramificação | routing/streaming/experiments | 04, 05, 06 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-014, V-015, V-021, V-025, V-028 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RF-012](02-REQUIREMENTS.md#rf-012) | Disponibilizar pelo menos dois servidores de conteúdos | config/server/app | 01, 03, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-012, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+ | [RF-013](02-REQUIREMENTS.md#rf-013) | Cada servidor oferece pelo menos dois vídeos distintos | config/server/media | 01, 05, 06 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-024](tasks/PHASE-05/TASK-024.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-003, V-020, V-024, V-027 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes |
+ | [RF-014](02-REQUIREMENTS.md#rf-014) | Usar métricas de rede para construir rotas | monitoring/routing | 03, 04, 06 | [TASK-010](tasks/PHASE-03/TASK-010.md), [TASK-011](tasks/PHASE-03/TASK-011.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-010, V-011, V-012, V-017, V-026 | IN PROGRESS | [V-011/IMP-008 parcial](../memory-bank/bolts/021-rotas/ddd-03-test-report.md); routing/árvores restantes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+ | [RF-015](02-REQUIREMENTS.md#rf-015) | Entregar e reproduzir vídeo com objetivo de tempo real | server/streaming/client | 05 | [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md) | V-019, V-020, V-021, V-022, V-023, V-024 | TODO | — |
+ | [RNF-001](02-REQUIREMENTS.md#rnf-001) | Atraso baixo e utilização eficiente de largura de banda | routing/streaming/experiments | 04, 05, 06 | [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-017, V-019, V-020, V-021, V-022, V-028 | TODO | — |
+ | [RNF-002](02-REQUIREMENTS.md#rnf-002) | Escalabilidade para N clientes | streaming/CORE/experiments | 05, 06 | [TASK-021](tasks/PHASE-05/TASK-021.md), [TASK-027](tasks/PHASE-06/TASK-027.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-021, V-027, V-028 | TODO | — |
+-| [RNF-003](02-REQUIREMENTS.md#rnf-003) | Fiabilidade sob alterações e falhas | overlay/routing/client | 02, 04, 05, 06 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-008, V-015, V-016, V-017, V-022, V-026 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE |
++| [RNF-003](02-REQUIREMENTS.md#rnf-003) | Fiabilidade sob alterações e falhas | overlay/routing/client | 02, 04, 05, 06 | [TASK-008](tasks/PHASE-02/TASK-008.md), [TASK-015](tasks/PHASE-04/TASK-015.md), [TASK-016](tasks/PHASE-04/TASK-016.md), [TASK-017](tasks/PHASE-04/TASK-017.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-026](tasks/PHASE-06/TASK-026.md) | V-008, V-015, V-016, V-017, V-022, V-026 | TODO | [V-008](../memory-bank/bolts/020-overlay/test-walkthrough.md); cobertura parcial, TASK-008 DONE ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RNF-004](02-REQUIREMENTS.md#rnf-004) | Overlay aplicacional sobre transporte IP | transport/overlay/CORE | 02, 06 | [TASK-005](tasks/PHASE-02/TASK-005.md), [TASK-007](tasks/PHASE-02/TASK-007.md), [TASK-025](tasks/PHASE-06/TASK-025.md) | V-005, V-007, V-025 | IN PROGRESS | [V-005: TCP real, 18 testes](../experiments/task-005-transport-validation.md); [V-007](../memory-bank/bolts/003-overlay/ddd-03-test-report.md); V-025 em CORE pendente |
+ | [RNF-005](02-REQUIREMENTS.md#rnf-005) | Especificação, implementação e avaliação crítica verificáveis | protocol/tests/report | 01, 02, 04, 06, 07 | [TASK-002](tasks/PHASE-01/TASK-002.md), [TASK-004](tasks/PHASE-01/TASK-004.md), [TASK-009](tasks/PHASE-02/TASK-009.md), [TASK-018](tasks/PHASE-04/TASK-018.md), [TASK-028](tasks/PHASE-06/TASK-028.md), [TASK-029](tasks/PHASE-07/TASK-029.md), [TASK-031](tasks/PHASE-07/TASK-031.md) | V-002, V-004, V-009, V-018, V-028, V-029, V-031 | IN PROGRESS | [V-002/V-004: especificação e codec](../experiments/task-004-codec-validation.md); [V-009: primeiro marco técnico](../memory-bank/bolts/004-overlay/test-walkthrough.md); validações posteriores e relatório final pendentes |
+ | [RC-001](02-REQUIREMENTS.md#rc-001) | Usar CORE como bancada principal | CORE/experiments | 06 | [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-026](tasks/PHASE-06/TASK-026.md), [TASK-027](tasks/PHASE-06/TASK-027.md), [TASK-028](tasks/PHASE-06/TASK-028.md) | V-025, V-026, V-027, V-028 | TODO | — |
+@@ -44,7 +44,7 @@ Unidade004-arvores/PHASE-04 em progresso; sem iniciar outro IMP ou push.
+ | [RC-006](02-REQUIREMENTS.md#rc-006) | Submeter na troca de ficheiros do grupo Blackboard | equipa/Blackboard | 07 | [TASK-031](tasks/PHASE-07/TASK-031.md) | V-031 | TODO | — |
+ | [RC-007](02-REQUIREMENTS.md#rc-007) | Preparar duas avaliações intermédias e defesa final | experiments/report/equipa | 02, 04, 07 | [TASK-009](tasks/PHASE-02/TASK-009.md), [TASK-018](tasks/PHASE-04/TASK-018.md), [TASK-031](tasks/PHASE-07/TASK-031.md) | V-009, V-018, V-031 | IN PROGRESS | [V-009: primeiro marco técnico](../memory-bank/bolts/004-overlay/test-walkthrough.md). Data e conteúdo oficiais pendentes |
+ | [RP-001](02-REQUIREMENTS.md#rp-001) | Catálogo e seleção explícita de stream | streaming/client | 01, 03, 05 | [TASK-003](tasks/PHASE-01/TASK-003.md), [TASK-012](tasks/PHASE-03/TASK-012.md), [TASK-023](tasks/PHASE-05/TASK-023.md), [TASK-024](tasks/PHASE-05/TASK-024.md) | V-003, V-012, V-023, V-024 | IN PROGRESS | [V-003: configuração e 65 testes](../experiments/task-003-configuration-validation.md); restantes componentes pendentes; [V-012 anúncios/catálogo](../memory-bank/bolts/006-rotas/closure-walkthrough.md), restantes consumidores pendentes |
+-| [RP-002](02-REQUIREMENTS.md#rp-002) | Ativar sob pedido e podar ramo sem recetores | routing | 04 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-014, V-015 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes |
++| [RP-002](02-REQUIREMENTS.md#rp-002) | Ativar sob pedido e podar ramo sem recetores | routing | 04 | [TASK-014](tasks/PHASE-04/TASK-014.md), [TASK-015](tasks/PHASE-04/TASK-015.md) | V-014, V-015 | IN PROGRESS | [V-014/ativação confirmada](../memory-bank/bolts/007-arvores/closure-walkthrough.md); restantes tarefas/oráculos pendentes ; [V-015/renovação e poda](../memory-bank/bolts/023-arvores/closure-walkthrough.md) |
+ | [RP-003](02-REQUIREMENTS.md#rp-003) | MJPEG, pacotes numerados e janela de reprodução | server/streaming/client | 05 | [TASK-019](tasks/PHASE-05/TASK-019.md), [TASK-020](tasks/PHASE-05/TASK-020.md), [TASK-022](tasks/PHASE-05/TASK-022.md), [TASK-023](tasks/PHASE-05/TASK-023.md) | V-019, V-020, V-022, V-023 | TODO | — |
+ | [RP-004](02-REQUIREMENTS.md#rp-004) | Diagnóstico do percurso antes do vídeo | routing/app | 03 | [TASK-013](tasks/PHASE-03/TASK-013.md) | V-013 | DONE | [V-013/Test1296 e manual Luis34](../memory-bank/bolts/022-rotas/test-walkthrough.md) |
+ | [RP-005](02-REQUIREMENTS.md#rp-005) | Testar cenários de 4, 6 e overlay complexa | CORE/experiments | 06 | [TASK-025](tasks/PHASE-06/TASK-025.md), [TASK-026](tasks/PHASE-06/TASK-026.md), [TASK-027](tasks/PHASE-06/TASK-027.md) | V-025, V-026, V-027 | TODO | — |
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 6249706..37143ac 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,30 +1,21 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 DONE após Test, revisão final e integração; TASK-015 em primeiro passo de Implement; PHASE-05–07 e TASK-016–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 e TASK-015 DONE após Test, revisão final e integração; PHASE-05–07 e TASK-016–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+-**Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0 histórico, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas.
+-
+-**Último incremento concluído:** [007-arvores/IMP-011/TASK-014](../memory-bank/bolts/007-arvores/closure-walkthrough.md),
+-bolt/história complete, implemented=true, TASK-014 DONE. Clean verify1328/0/0/0
+-e V-014 consolidados, Test aprovado, manual humano Francisco24 e revisão final
+-Waheed cumpridos. Integração local main37fa863ed416017e733e692f9565899fb61285ae,
+-[conteúdo/hash/JAR/V-ADD da cópia extraída](../experiments/construction/007-arvores/integration-proof-01/README.md).
+-Q-C-36–39, negativos e código/JAR aprovados preservados.
+-Unidade004-arvores/PHASE-04 continuam IN PROGRESS; IMP-011 fechado e preservado.
+-
+-**Trabalho atual:** IMP-012/023-arvores/TASK-015 com Test aprovado pelo utilizador,
+-base b273b258a4642f94f8614ae00f060a46318d77a5. Clean verify1379/0/0/0,19 XML,
+-V-ADD e manual humano Francisco30 cumpridos; código/JAR/logs e negativos intactos.
+-[Resumo final para revisão Denji](../memory-bank/bolts/023-arvores/final-review-summary.md)
+-e [plano/allowlist exata](../memory-bank/bolts/023-arvores/integration-plan.md).
+-Revisão final Denji confirmada pelo utilizador,sem alterações pendentes;
+-integração aguarda autorização. [Confirmação/hashes/simulação](../experiments/construction/023-arvores/integration-01/README.md).
+-Q-C-40–42 e M07 preservados; WRAPPER_EXIT não fornecido/não inferido.
+-13 bolts complete,1 in-progress,21 planned; bolt/história/TASK-015/unidade004/
+-PHASE-04 continuam em progresso. Sem staging/commits/push/fecho/outro IMP;
+-target e alterações alheias excluídos. Nenhum gate externo adicional.
++**Última tarefa/incremento concluído:** [IMP-012/023-arvores/TASK-015](../memory-bank/bolts/023-arvores/closure-walkthrough.md),
++bolt/história complete,implemented=true,TASK-015 DONE por autorização explícita.
++Integração local em main `4d18d1dd8fb50d14ace02609a9133733c20cabfc`; [prova pós-commit](../experiments/construction/023-arvores/integration-proof-01/README.md)
++confere290 paths/hashes/modos,JAR264 classes,19 XML e V-ADD da cópia extraída.
++Test1379/0/0/0,V-015/L01–L24,V-ADD,manual humano Francisco30 e revisão final Denji
++cumpridos. Q-C-40–42/M07,logs/JAR/negativos preservados; WRAPPER_EXIT não fornecido.
++
++**Estado atual:**14 bolts/histórias complete,0 in-progress,21 planned. Unidade004-
++arvores/PHASE-04 continuam IN PROGRESS,com TASK-016–018 TODO. Nenhum outro IMP
++iniciado ou autorizado. [Fecho documental](../memory-bank/bolts/023-arvores/closure-walkthrough.md)
++sem alterações Java,target ou alterações alheias. Sem push. O restante trabalho
++mantém o estado anterior; não se afirma vídeo/GUI/CORE ou conclusão global.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -131,7 +122,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | DONE | Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863; [fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md) |
+-| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | IN PROGRESS | Model/Design/ADR aprovados; tipos/testes vermelhos por aceitar:22/20/0/0,30 históricos verdes; V-015 integral pendente |
++| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | DONE | [Fecho IMP-012](../memory-bank/bolts/023-arvores/closure-walkthrough.md):1379/0/0/0,19 XML,Francisco30,Denji,integração4d18d1d |
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | TODO | V-017: NÃO EXECUTADO |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | TODO | V-018: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index 8a0be17..222225c 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -1,14 +1,12 @@
+ # Bolts Construction alinhados com o ADD
+ 
+-**Estado atual:** IMP-011/007-arvores complete, história implemented=true,
+-TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão final Waheed e
+-integração37fa863 comprovada. [Fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+-13 bolts complete,1 in-progress,21 planned. Unidade004-arvores/PHASE-04 em
+-progresso;023-arvores/IMP-012 Test aprovado pelo utilizador: clean verify1379/0/0/0,
+-19 XML,V-ADD e manual humano Francisco30. [Resumo final](../memory-bank/bolts/023-arvores/final-review-summary.md)
+-e allowlist/diffs atualizados após confirmação da aprovação final de Denji.
+-Integração aguarda autorização,com simulação do conteúdo exato. Q-C-36–42/M07, fontes/JAR/negativos preservados.
+-Sem staging/commits/push/fecho/outro IMP; target e alterações alheias excluídos.
++**Estado atual:** IMP-012/023-arvores complete,história implemented=true,TASK-015
++DONE após Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão final Denji e
++integração4d18d1d comprovada. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
++14 bolts complete,0 in-progress,21 planned. Unidade004/PHASE-04 em progresso;
++restantes três bolts da unidade planned,sem início de outro IMP.
++Código/JAR/logs/negativos/Q-C-40–42 preservados. Fecho documental/evidência,
++sem Java,target,alterações alheias ou push.
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index dd7c71f..6ab72e1 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1552,3 +1552,10 @@ Aprovação final da mesma implementação confirmada explicitamente pelo utiliz
+ sem alterações pendentes. [Versão e plano](../memory-bank/bolts/023-arvores/integration-plan.md),
+ hashes e simulação atualizados; decisões40–42 inalteradas,sem nova ADR/âmbito.
+ Integração por autorizar/executar; sem staging/commits/push/fecho.
++
++### Q-C-40–42 — fecho documental após integração
++
++Decisões preservadas sem reabertura: IMP-012/TASK-015 DONE após integração4d18d1d,
++Test1379/0/0/0,19 XML,Francisco30 e revisão Denji. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
++Sem nova ADR/Java/âmbito,validador intacto,negativos preservados. Unidade/fase em
++progresso,sem push ou outro IMP.
+diff --git a/docs/phases/PHASE-04-FLOW-MANAGEMENT.md b/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
+index 01f7ab4..f4b8099 100644
+--- a/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
++++ b/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
+@@ -11,10 +11,11 @@ Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O re
+ Estado atual: **IN PROGRESS**. TASK-014/IMP-011/007-arvores DONE após
+ Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
+ 37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+-TASK-015/IMP-012 Test aprovado pelo utilizador:1379/0/0/0,19 XML,V-ADD e
+-manual humano Francisco30. [Resumo para Denji](../../memory-bank/bolts/023-arvores/final-review-summary.md)
+-e allowlist/diffs atualizados; aprovação final Denji confirmada pelo utilizador,integração pendente.
+-TASK-015/unidade/fase em progresso, TASK-016–018 TODO. Sem fecho/staging/commits/push.
++TASK-015/IMP-012 DONE,bolt/história023-arvores complete/implemented=true após
++Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão Denji e integração4d18d1d
++comprovada. [Fecho](../../memory-bank/bolts/023-arvores/closure-walkthrough.md).
++Unidade/fase continuam em progresso; TASK-016–018 TODO,sem execução iniciada.
++Sem Java,push ou outro IMP neste fecho documental.
+ O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
+ 
+ ## 3. Pré-requisitos
+@@ -30,7 +31,7 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+ | [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
+-| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | IN PROGRESS — Test/Denji aprovados; integração pendente |
++| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | DONE — Test1379/0/0/0,Francisco30,Denji,integração4d18d1d |
+ | [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | TODO |
+ | [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | TODO |
+ | [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | TODO |
+diff --git a/docs/tasks/PHASE-04/TASK-015.md b/docs/tasks/PHASE-04/TASK-015.md
+index 37381a1..bcd0a24 100644
+--- a/docs/tasks/PHASE-04/TASK-015.md
++++ b/docs/tasks/PHASE-04/TASK-015.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-015
+ - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Fillmore](../../team/FILLMORE.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-014](../PHASE-04/TASK-014.md).
+@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
+ 
+ ## 7. Passos de implementação
+ 
+-- [ ] Implementar remoção idempotente e recomputação de procura agregada.
+-- [ ] Renovar leases confirmados e verificar prefixo/epoch.
+-- [ ] Expirar filhos sem renovação e limpar pendentes.
+-- [ ] Integrar eventos de saída e desconexão com poda.
++- [x] Implementar remoção idempotente e recomputação de procura agregada.
++- [x] Renovar leases confirmados e verificar prefixo/epoch.
++- [x] Expirar filhos sem renovação e limpar pendentes.
++- [x] Integrar eventos de saída e desconexão com poda.
+ 
+ ## 8. Regras e restrições
+ 
+@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
+-- [ ] Ramos órfãos desaparecem por timeout.
+-- [ ] Outros consumidores e fluxos mantêm-se ativos.
+-- [ ] Validação V-015 executada e evidência ligada no progresso.
++- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
++- [x] Ramos órfãos desaparecem por timeout.
++- [x] Outros consumidores e fluxos mantêm-se ativos.
++- [x] Validação V-015 executada e evidência ligada no progresso.
+ 
+ ## 12. Definition of Done
+ 
+@@ -147,3 +147,14 @@ Utilizador confirmou aprovação final da implementação atual sem alterações
+ e [plano final](../../../memory-bank/bolts/023-arvores/integration-plan.md).
+ Mesmo código/JAR/Test/manual,sem repetição. Simulação exata com referências/V-ADD;
+ TASK-015 IN PROGRESS até integração comprovada/fecho. Sem staging/commits/push.
++
++## Fecho autorizado e evidência integrada
++
++TASK-015 DONE,bolt/história023-arvores complete/implemented=true por autorização
++explícita após integração comprovada4d18d1dd8fb50d14ace02609a9133733c20cabfc.
++[Fecho](../../../memory-bank/bolts/023-arvores/closure-walkthrough.md):
++Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual Francisco30 e revisão final
++Denji cumpridos. [Prova pós-commit](../../../experiments/construction/023-arvores/integration-proof-01/README.md).
++Âmbito é controlo/autorização/leases/poda; não comprova vídeo/GUI/CORE.
++Unidade004-arvores/PHASE-04 continuam IN PROGRESS. Sem alterações Java,push ou
++início de outro IMP; target/alterações alheias excluídos do fecho.
+diff --git a/memory-bank/bolts/008-arvores/bolt.md b/memory-bank/bolts/008-arvores/bolt.md
+index 17de7bb..4ef85af 100644
+--- a/memory-bank/bolts/008-arvores/bolt.md
++++ b/memory-bank/bolts/008-arvores/bolt.md
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["022-rotas", "023-arvores"]
+ enables_bolts: ["024-arvores"]
+ requires_units: ["003-rotas"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+diff --git a/memory-bank/bolts/023-arvores/bolt.md b/memory-bank/bolts/023-arvores/bolt.md
+index 878b8ed..e4c9f55 100644
+--- a/memory-bank/bolts/023-arvores/bolt.md
++++ b/memory-bank/bolts/023-arvores/bolt.md
+@@ -3,13 +3,13 @@ id: "023-arvores"
+ unit: "004-arvores"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["002-podar-ramos-renovar-leases-e-remover-procura-abandonada"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-19T21:48:56Z"
++updated: "2026-11-19T22:02:54Z"
+ started: "2026-11-18T15:40:16Z"
+-completed: null
+-current_stage: "test"
++completed: "2026-11-19T22:02:54Z"
++current_stage: null
+ stages_completed: [{"name": "model", "completed": "2026-11-18T15:58:39Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-18T16:12:04Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-18T16:41:21Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-18T17:46:39Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-18T18:00:35Z", "artifact": "ddd-03-test-report.md"}]
+ requires_bolts: ["007-arvores", "022-rotas"]
+ enables_bolts: ["008-arvores"]
+@@ -35,13 +35,23 @@ architecture_source: "add.md"
+ ---
+ # Bolt 023-arvores — Renovar e podar subscrições
+ 
++## Fecho atual — autorizado
++
++Bolt complete; história complete/implemented=true; TASK-015 DONE por autorização
++explícita do utilizador após integração local comprovada em main `4d18d1dd8fb50d14ace02609a9133733c20cabfc`.
++[Fecho e prova](closure-walkthrough.md): Test1379/0/0/0,19 XML,V-ADD,manual humano
++Francisco30 e revisão final Denji cumpridos. Unidade004-arvores/PHASE-04 em
++progresso,com três incrementos pendentes. Registos seguintes são históricos.
++Sem Java/push/outro IMP; target e alterações alheias excluídos do fecho.
++
++
+ ## Fonte normativa e âmbito
+ 
+ Ler [IMP-012](../../../add.md#imp-012) e as ADR aí indicadas antes de qualquer etapa. Este bolt executa **uma** tarefa atómica; o ADD define o que construir, como e porquê. Fonte legada: [TASK-015](../../../docs/tasks/PHASE-04/TASK-015.md).
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](../../intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
++- [x] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](../../intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
+ - Dependências: [007-arvores](../007-arvores/bolt.md), [022-rotas](../022-rotas/bolt.md).
+ - Unidade: [004-arvores](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -58,10 +68,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
+-- [ ] Ramos órfãos desaparecem por timeout.
+-- [ ] Outros consumidores e fluxos mantêm-se ativos.
+-- [ ] Validação V-015 executada e evidência ligada no progresso.
++- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
++- [x] Ramos órfãos desaparecem por timeout.
++- [x] Outros consumidores e fluxos mantêm-se ativos.
++- [x] Validação V-015 executada e evidência ligada no progresso.
+ 
+ ## Evidência e fecho
+ 
+diff --git a/memory-bank/bolts/023-arvores/ddd-03-test-report.md b/memory-bank/bolts/023-arvores/ddd-03-test-report.md
+index 4e6bce5..8525682 100644
+--- a/memory-bank/bolts/023-arvores/ddd-03-test-report.md
++++ b/memory-bank/bolts/023-arvores/ddd-03-test-report.md
+@@ -157,3 +157,11 @@ pendentes. [Registo vinculado aos hashes](../../../experiments/construction/023-
+ Código/JAR e prova Test/manual intactos; não houve repetição de build/manual.
+ [Plano final](integration-plan.md) aguarda autorização de integração; bolt aberto,
+ sem staging/commits/push/fecho. Aprovação Test anterior mantida integralmente.
++
++## Fecho documental autorizado — estado atual
++
++IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
++Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
++[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
++implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
++Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.
+diff --git a/memory-bank/bolts/023-arvores/final-review-summary.md b/memory-bank/bolts/023-arvores/final-review-summary.md
+index 1c5b686..174f7f4 100644
+--- a/memory-bank/bolts/023-arvores/final-review-summary.md
++++ b/memory-bank/bolts/023-arvores/final-review-summary.md
+@@ -91,3 +91,11 @@ sem repetir build/manual. [Plano final de integração](integration-plan.md) par
+ autorização; sem staging/commits/push/fecho/outro IMP. Falta integrar e comprovar
+ a versão revista, mantendo bolt/história/TASK/unidade/fase abertos até ao fecho.
+ Nenhum gate externo adicional.
++
++## Fecho documental autorizado — estado atual
++
++IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
++Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
++[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
++implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
++Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.
+diff --git a/memory-bank/bolts/023-arvores/implementation-walkthrough.md b/memory-bank/bolts/023-arvores/implementation-walkthrough.md
+index 82cfcec..d56cb1a 100644
+--- a/memory-bank/bolts/023-arvores/implementation-walkthrough.md
++++ b/memory-bank/bolts/023-arvores/implementation-walkthrough.md
+@@ -170,3 +170,11 @@ Contagem corrigida:19 XML por regressão, não20. [Inventário/errata](../../../
+ Originais/manifestos/negativos em experiments não foram alterados. Clean verify
+ 1379/0/0/0 e19 XML novos consolidados em Test; hashes Java iguais aos aprovados.
+ Manual humano, aceitação Test, revisão final Denji e integração pendentes.
++
++## Fecho documental autorizado — estado atual
++
++IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
++Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
++[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
++implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
++Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.
+diff --git a/memory-bank/bolts/023-arvores/integration-plan.md b/memory-bank/bolts/023-arvores/integration-plan.md
+index b6f94c0..1a9010d 100644
+--- a/memory-bank/bolts/023-arvores/integration-plan.md
++++ b/memory-bank/bolts/023-arvores/integration-plan.md
+@@ -58,3 +58,11 @@ sem alterações pendentes. Falta autorização/execução/comprovação da inte
+ Bolt/história/TASK-015/unidade004/PHASE-04 em progresso,sem staging/commits/push/fecho.
+ Código/JAR/logs/negativos preservados; WRAPPER_EXIT não fornecido/não inventado.
+ Nenhum gate externo adicional. [Resumo final](final-review-summary.md).
++
++## Fecho documental autorizado — estado atual
++
++IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
++Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
++[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
++implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
++Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+index 952a126..a890cb2 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+@@ -284,3 +284,17 @@ mesmo código/JAR,sem novo build/manual. Pacote simulado da base mais allowlist,
+ com hashes/referências/V-ADD e exclusão de deltas target/alheios.
+ Integração aguarda autorização. Bolt/história/TASK/unidade/fase abertos,
+ sem staging/commits/push/fecho/outro IMP. Nenhum gate externo adicional.
++
++## IMP-012 — fecho documental autorizado após integração comprovada
++
++Registo 2026-11-19T22:02:54Z: utilizador autorizou bolt/história complete,implemented=true e
++TASK-015 DONE após integração local `4d18d1dd8fb50d14ace02609a9133733c20cabfc`. [Prova pós-commit](../../../../../experiments/construction/023-arvores/integration-proof-01/README.md)
++e [fecho](../../../../bolts/023-arvores/closure-walkthrough.md) ligados.
++Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual Francisco30 e revisão final
++Denji cumpridos. Código/JAR/Q-C-40–42/negativos e evidências anteriores intactos.
++Unidade004/PHASE-04 continuam in-progress; três histórias/bolts planned,sem início.
++Fecho exclusivamente documental/evidência; sem Java,target,alterações alheias ou push.
++
++Cascata documental: apenas blocks=false em008-arvores após dependências complete;
++status planned,started=null,sem etapas/início. V-ADD inicial preserva o diagnóstico
++blocks mismatch,sem alterar o validador ou iniciar outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
+index f1c329c..0f9446e 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
+@@ -2,7 +2,7 @@
+ id: "002-podar-ramos-renovar-leases-e-remover-procura-abandonada"
+ unit: "004-arvores"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-015"]
+@@ -11,6 +11,8 @@ requirements: ["INT-001", "INT-002", "NFR-003", "REQ-002", "REQ-005", "REQ-007",
+ adr_ids: ["ADR-005", "ADR-024"]
+ bolt: "023-arvores"
+ size: "M"
++implemented: true
++completed: "2026-11-19T22:02:54Z"
+ ---
+ # História — Renovar e podar subscrições
+ 
+@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-012](../../../../../../add.md#imp-012); o bolt só or
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
+-- [ ] Ramos órfãos desaparecem por timeout.
+-- [ ] Outros consumidores e fluxos mantêm-se ativos.
+-- [ ] Validação V-015 executada e evidência ligada no progresso.
++- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
++- [x] Ramos órfãos desaparecem por timeout.
++- [x] Outros consumidores e fluxos mantêm-se ativos.
++- [x] Validação V-015 executada e evidência ligada no progresso.
+ 
+ ## Testes
+ 
+@@ -98,3 +100,13 @@ Utilizador confirmou aprovação final da implementação atual sem alterações
+ [Hashes/simulação/plano](../../../../../bolts/023-arvores/integration-plan.md),
+ mesmo código/JAR/Test/manual. História in-progress,sem implemented=true/complete,
+ aguardando integração comprovada. Sem staging/commits/push/fecho/outro IMP.
++
++## Fecho autorizado — estado atual
++
++História complete,implemented=true,TASK-015 DONE após autorização explícita.
++Integração main4d18d1dd8fb50d14ace02609a9133733c20cabfc comprovada;
++[Test/V-015](../../../../../bolts/023-arvores/ddd-03-test-report.md),1379/0/0/0,
++19 XML,manual humano Francisco30,revisão final Denji e V-ADD cumpridos.
++[Fecho e limitações](../../../../../bolts/023-arvores/closure-walkthrough.md).
++Unidade004-arvores/PHASE-04 em progresso,sem Java/push/novo IMP no fecho.
++Registos anteriores são snapshots históricos,sem reescrita de evidências.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+index 05acfb0..fbcdab1 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+@@ -19,11 +19,11 @@ Estado atual: unidade **in-progress**. História001/IMP-011/007-arvores complete
+ implemented=true, TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão
+ final Waheed e integração37fa863 comprovada.
+ [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
+-023-arvores/IMP-012: Test aprovado na base b273b258,clean verify1379/0/0/0,
+-19 XML,V-ADD e manual humano Francisco30. [Resumo para revisão final Denji](../../../../bolts/023-arvores/final-review-summary.md),
+-diffs/allowlist atualizados. Revisão final Denji confirmada,integração pendente; bolt/história/
+-TASK/unidade/fase abertos. Q-C-40–42 preservadas, restantes três bolts planned.
+-Sem staging/commits/push/fecho/outro IMP.
++023-arvores/IMP-012 complete,história implemented=true,TASK-015 DONE após
++Test1379/0/0/0,19 XML,V-ADD,manual humano Francisco30,revisão final Denji e
++integração4d18d1d comprovada. [Fecho](../../../../bolts/023-arvores/closure-walkthrough.md).
++Unidade/PHASE-04 continuam in-progress,com três histórias/bolts planned.
++Q-C-40–42/código/JAR/evidência intactos,sem Java/push/novo IMP no fecho.
+ 
+ ## Requisitos atribuídos
+ 
+@@ -36,7 +36,7 @@ Sem staging/commits/push/fecho/outro IMP.
+ ## Histórias e bolts
+ 
+ - [x] [001-ativar-arvores-com-ack-e-procura-agregada](stories/001-ativar-arvores-com-ack-e-procura-agregada.md) → [007-arvores](../../../../bolts/007-arvores/bolt.md); IMP-011 (M).
+-- [ ] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md) → [023-arvores](../../../../bolts/023-arvores/bolt.md); IMP-012 (M).
++- [x] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md) → [023-arvores](../../../../bolts/023-arvores/bolt.md); IMP-012 (M).
+ - [ ] [003-recuperar-arvores-apos-falha-de-upstream](stories/003-recuperar-arvores-apos-falha-de-upstream.md) → [008-arvores](../../../../bolts/008-arvores/bolt.md); IMP-013 (M).
+ - [ ] [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md) → [024-arvores](../../../../bolts/024-arvores/bolt.md); IMP-014 (M).
+ - [ ] [005-preparar-o-segundo-marco-com-arvores-e-adaptacao](stories/005-preparar-o-segundo-marco-com-arvores-e-adaptacao.md) → [009-arvores](../../../../bolts/009-arvores/bolt.md); IMP-015 (S).
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 775370b..bafdadf 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,13 +17,13 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: "023-arvores"
+-current_stage: "test"
+-next_bolt: "023-arvores (Test e revisao final Denji aprovados; bolt aberto; integracao aguarda autorizacao)"
++current_bolt: null
++current_stage: null
++next_bolt: "nenhum autorizado (IMP-012 concluido; nao iniciar outro IMP)"
+ phase_04_status: "in-progress"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+-last_completed_bolt: "007-arvores"
+-last_integrated_commit: "37fa863ed416017e733e692f9565899fb61285ae"
++last_completed_bolt: "023-arvores"
++last_integrated_commit: "4d18d1dd8fb50d14ace02609a9133733c20cabfc"
+ phase_03_status: "complete"
+ phase_03_completed_at: 2026-11-15T16:36:52Z
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+index 5bf35f8..fbf2dee 100644
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -2,13 +2,12 @@
+ 
+ Fonte normativa: [ADD](../../add.md).
+ 
+-## IMP-012 — Test e revisão final Denji aprovados, integração pendente
++## IMP-012 — concluído e integrado, decisões preservadas
+ 
+-Model/Design/ADR/Implement/Test aprovados; revisão ADR reutilizada sem decisão
+-nova ou alteração de âmbito. [Resumo final](../bolts/023-arvores/final-review-summary.md):
+-clean verify1379/0/0/0,19 XML,V-ADD e Francisco30. Q-C-40–42/M07/wire/caps/
+-físico/históricos preservados, mesmos código/JAR aprovados. Denji confirmado
+-pelo utilizador,sem alterações pendentes; bolt aberto até integração comprovada. Sem staging/commits/push/fecho.
++Model/Design/ADR/Implement/Test aprovados; revisão final Denji e integração local
++4d18d1d comprovadas. [Fecho](../bolts/023-arvores/closure-walkthrough.md):
++1379/0/0/0,19 XML,V-ADD,Francisco30. Q-C-40–42/M07/ADR aceites/wire/caps/físico
++preservados,sem nova ADR ou Java no fecho. Unidade/fase em progresso,sem push/novo IMP.
+ 
+ ## IMP-011 — Model/Design/ADR aprovados; Implement em curso
+ 
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index be801e8..24d10ca 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:13 histórias complete,1 in-progress e21 planned; bolts:13 complete,1 in-progress,21 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com história001/IMP-011 complete e implemented=true; as quatro restantes continuam planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:14 histórias complete,0 in-progress e21 planned; bolts:14 complete,0 in-progress,21 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com histórias001/IMP-011 e002/IMP-012 complete/implemented=true; as três restantes continuam planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -90,9 +90,10 @@ Unidade004-arvores/PHASE-04 em progresso; sem início de outro IMP ou push.
+ 
+ ## 004-arvores/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-012. **Estado:** in-progress, Test e revisão final Denji aprovados; integração pendente. **Bolt:** 023-arvores.
+-[Resumo final](bolts/023-arvores/final-review-summary.md):1379/0/0/0,19 XML,V-ADD,
+-Francisco30 cumpridos; código/JAR/evidências preservados. Bolt aberto, sem fecho.
++**Tarefa:** IMP-012. **Estado:** complete,implemented=true,TASK-015 DONE. **Bolt:** 023-arvores.
++[Fecho](bolts/023-arvores/closure-walkthrough.md): Test1379/0/0/0,19 XML,V-ADD,
++Francisco30,Denji e integração4d18d1d comprovados. Unidade/fase em progresso,
++sem push ou outro IMP. Negativos/código/JAR preservados.
+ **Ficheiro:** [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
+ 
+ ## 004-arvores/003-recuperar-arvores-apos-falha-de-upstream.md ✅ GENERATED
+diff --git a/memory-bank/bolts/023-arvores/closure-walkthrough.md b/memory-bank/bolts/023-arvores/closure-walkthrough.md
+new file mode 100644
+index 0000000..7214ed7
+--- /dev/null
++++ b/memory-bank/bolts/023-arvores/closure-walkthrough.md
+@@ -0,0 +1,74 @@
++# IMP-012 / 023-arvores / TASK-015 — fecho documental autorizado
++
++Bolt e história **complete**,implemented=true,TASK-015 **DONE** por autorização
++explícita do utilizador após integração local comprovada. Unidade004-arvores e
++PHASE-04 continuam **in-progress**,com TASK-016–018 e três histórias/bolts planned.
++Nenhum outro IMP iniciado; sem push. Registos anteriores são snapshots históricos.
++
++## Integração e aprovações cumpridas
++
++Commit de integração em main **4d18d1dd8fb50d14ace02609a9133733c20cabfc**,
++pai b273b258a4642f94f8614ae00f060a46318d77a5. Os290 caminhos/hashes/modos
++coincidem com o manifesto aprovado. [Prova pós-commit](../../../experiments/construction/023-arvores/integration-proof-01/README.md),
++[verificação do conteúdo](../../../experiments/construction/023-arvores/integration-proof-01/integration-proof.json)
++e [V-ADD da cópia extraída:0 erros](../../../experiments/construction/023-arvores/integration-proof-01/v-add-extracted-commit.md).
++Cópia extraída com6253 ficheiros,base fora da allowlist intacta,zero alterações
++alheias/target no delta e index vazio após integrar.
++
++Model/Design/ADR/Implement/Test aprovados explicitamente.
++[Test/V-015 consolidado](ddd-03-test-report.md): clean verify **1379 testes,
++0 falhas,0 erros,0 ignorados**, **19 XML** preservados,51 novos e6 M07 históricos.
++[Log/XML/JAR](../../../experiments/construction/023-arvores/test-01/README.md).
++JAR495568bytes,SHA-256
++`e2a41113b8dbb4d3d68024f546bb570e7509fdd47a2d09366c4b96ef907a1188`.
++264 classes do JAR e todos os hashes de fonte/artefactos conferidos antes/depois
++da integração; não se repetem build ou manual num fecho sem mudança de código.
++
++Francisco confirmou pessoalmente seis etapas sem divergências observadas:
++[relatório humano original](../../../experiments/construction/023-arvores/test-manual-runs/20261118T175055Z-oiu494h1/report.json),
++30 CHECK_PASS,CLEANUP_COMPLETE,MANUAL_PASS CHECKS=30,JAVA_EXIT0,passed=true.
++[Conferência de fontes/JAR/auxiliares/origem/JVM](../../../experiments/construction/023-arvores/manual-human-verification-01/verification.json).
++A confirmação humana vem do utilizador,não apenas da etiqueta human.
++WRAPPER_EXIT não consta da saída/relatório fornecidos e não é inventado.
++
++Revisão final Denji da implementação atual aprovada,sem alterações pendentes,
++conforme confirmação explícita do utilizador. [Registo vinculado aos três hashes
++Java e JAR](../../../experiments/construction/023-arvores/integration-01/review-confirmation.json).
++Não houve contacto com pessoas ou aprovação presumida.
++
++## Âmbito, preservação e limites
++
++Fecho exclusivamente documental/evidência. Todos os233 ficheiros src,19 testes
++históricos,745 ficheiros target existentes e282 artefactos de evidência anteriores
++são preservados por hash; os caminhos target ficam excluídos do commit de fecho.
++A prova posterior à integração acompanha o commit documental,sem ser reescrita.
++Nenhuma mudança Java/POM/runtime/validador,wire TCPv2/19 tipos/código3 rejeitado,
++framing/caps/UTF-8/UDP,owner único ou limites físicos. Q-C-40–42 preservadas:
++mesmo subscriptionId/revisão crescente/request novo,prefixo divergente recusado
++mantendo grant saudável e três ficheiros de produção/teste sem CLI stop/play.
++
++V-015/L01–L24 provam controlo/procura/renovação/poda/validade/correlação e retenção
++física. TCP loopback com dois relays/dois consumidores,sobrevivência além de um
++lease,saída parcial/final,órfão com sessão viva e shutdown/portas testados.
++Manual combina etapas controladas e TCP real numa JVM; não comprova processos
++remotos,vídeo/GUI/CORE,UDP medido ou metas7s/FPS. Autorização de forwarding não
++significa que vídeo está implementado. Nenhum requisito global é promovido a DONE.
++
++Negativos de tipos/replay/callback/harness/sandbox e V-ADD preservados. Errata
++20→19 XML documentada sem alterar originais. Avisos de whitespace nos logs/diffs
++brutos/TXT negativos e diagnóstico Git são bytes de evidência aprovada; não são
++normalizados nem ocultados,nem alteram o resultado do validador documental.
++
++## Estado final e publicação
++
++14 bolts/histórias complete,21 planned,nenhum em execução. Apenas o indicador
++derivado blocks de008-arvores passa a false pelas dependências concluídas;
++status=planned,started=null e stages_completed=[] preservados. Unidade004-arvores/
++PHASE-04 em progresso,sem início de TASK-016–018 ou outro IMP. Controlo
++renew/deactivate entregue não antecipa recuperação/adaptação/vídeo ou marco.
++
++[Allowlist de fecho](../../../experiments/construction/023-arvores/closure-01/allowlist.txt),
++[estado/preservação](../../../experiments/construction/023-arvores/closure-01/preservation-and-status.json),
++[V-ADD do fecho](../../../experiments/construction/023-arvores/closure-01/v-add-final.md)
++e manifesto/diff guardados em experiments/construction/023-arvores/closure-01.
++Commit local exclusivamente documental/evidência autorizado; sem push/novo IMP.

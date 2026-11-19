@@ -157,3 +157,11 @@ pendentes. [Registo vinculado aos hashes](../../../experiments/construction/023-
 Código/JAR e prova Test/manual intactos; não houve repetição de build/manual.
 [Plano final](integration-plan.md) aguarda autorização de integração; bolt aberto,
 sem staging/commits/push/fecho. Aprovação Test anterior mantida integralmente.
+
+## Fecho documental autorizado — estado atual
+
+IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
+Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
+[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
+implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
+Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.

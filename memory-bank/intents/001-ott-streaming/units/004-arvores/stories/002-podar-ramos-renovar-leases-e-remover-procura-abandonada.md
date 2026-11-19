@@ -2,7 +2,7 @@
 id: "002-podar-ramos-renovar-leases-e-remover-procura-abandonada"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-015"]
@@ -11,6 +11,8 @@ requirements: ["INT-001", "INT-002", "NFR-003", "REQ-002", "REQ-005", "REQ-007",
 adr_ids: ["ADR-005", "ADR-024"]
 bolt: "023-arvores"
 size: "M"
+implemented: true
+completed: "2026-11-19T22:02:54Z"
 ---
 # História — Renovar e podar subscrições
 
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-012](../../../../../../add.md#imp-012); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
-- [ ] Ramos órfãos desaparecem por timeout.
-- [ ] Outros consumidores e fluxos mantêm-se ativos.
-- [ ] Validação V-015 executada e evidência ligada no progresso.
+- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
+- [x] Ramos órfãos desaparecem por timeout.
+- [x] Outros consumidores e fluxos mantêm-se ativos.
+- [x] Validação V-015 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -98,3 +100,13 @@ Utilizador confirmou aprovação final da implementação atual sem alterações
 [Hashes/simulação/plano](../../../../../bolts/023-arvores/integration-plan.md),
 mesmo código/JAR/Test/manual. História in-progress,sem implemented=true/complete,
 aguardando integração comprovada. Sem staging/commits/push/fecho/outro IMP.
+
+## Fecho autorizado — estado atual
+
+História complete,implemented=true,TASK-015 DONE após autorização explícita.
+Integração main4d18d1dd8fb50d14ace02609a9133733c20cabfc comprovada;
+[Test/V-015](../../../../../bolts/023-arvores/ddd-03-test-report.md),1379/0/0/0,
+19 XML,manual humano Francisco30,revisão final Denji e V-ADD cumpridos.
+[Fecho e limitações](../../../../../bolts/023-arvores/closure-walkthrough.md).
+Unidade004-arvores/PHASE-04 em progresso,sem Java/push/novo IMP no fecho.
+Registos anteriores são snapshots históricos,sem reescrita de evidências.

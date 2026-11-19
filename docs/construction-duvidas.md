@@ -1552,3 +1552,10 @@ Aprovação final da mesma implementação confirmada explicitamente pelo utiliz
 sem alterações pendentes. [Versão e plano](../memory-bank/bolts/023-arvores/integration-plan.md),
 hashes e simulação atualizados; decisões40–42 inalteradas,sem nova ADR/âmbito.
 Integração por autorizar/executar; sem staging/commits/push/fecho.
+
+### Q-C-40–42 — fecho documental após integração
+
+Decisões preservadas sem reabertura: IMP-012/TASK-015 DONE após integração4d18d1d,
+Test1379/0/0/0,19 XML,Francisco30 e revisão Denji. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
+Sem nova ADR/Java/âmbito,validador intacto,negativos preservados. Unidade/fase em
+progresso,sem push ou outro IMP.

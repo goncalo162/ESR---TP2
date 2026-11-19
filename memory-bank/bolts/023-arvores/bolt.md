@@ -3,13 +3,13 @@ id: "023-arvores"
 unit: "004-arvores"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["002-podar-ramos-renovar-leases-e-remover-procura-abandonada"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-19T21:48:56Z"
+updated: "2026-11-19T22:02:54Z"
 started: "2026-11-18T15:40:16Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-19T22:02:54Z"
+current_stage: null
 stages_completed: [{"name": "model", "completed": "2026-11-18T15:58:39Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-18T16:12:04Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-18T16:41:21Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-18T17:46:39Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-18T18:00:35Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["007-arvores", "022-rotas"]
 enables_bolts: ["008-arvores"]
@@ -35,13 +35,23 @@ architecture_source: "add.md"
 ---
 # Bolt 023-arvores — Renovar e podar subscrições
 
+## Fecho atual — autorizado
+
+Bolt complete; história complete/implemented=true; TASK-015 DONE por autorização
+explícita do utilizador após integração local comprovada em main `4d18d1dd8fb50d14ace02609a9133733c20cabfc`.
+[Fecho e prova](closure-walkthrough.md): Test1379/0/0/0,19 XML,V-ADD,manual humano
+Francisco30 e revisão final Denji cumpridos. Unidade004-arvores/PHASE-04 em
+progresso,com três incrementos pendentes. Registos seguintes são históricos.
+Sem Java/push/outro IMP; target e alterações alheias excluídos do fecho.
+
+
 ## Fonte normativa e âmbito
 
 Ler [IMP-012](../../../add.md#imp-012) e as ADR aí indicadas antes de qualquer etapa. Este bolt executa **uma** tarefa atómica; o ADD define o que construir, como e porquê. Fonte legada: [TASK-015](../../../docs/tasks/PHASE-04/TASK-015.md).
 
 ## História, dependências e gates
 
-- [ ] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](../../intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
+- [x] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](../../intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
 - Dependências: [007-arvores](../007-arvores/bolt.md), [022-rotas](../022-rotas/bolt.md).
 - Unidade: [004-arvores](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md).
 - Gates: nenhum adicional.
@@ -58,10 +68,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
-- [ ] Ramos órfãos desaparecem por timeout.
-- [ ] Outros consumidores e fluxos mantêm-se ativos.
-- [ ] Validação V-015 executada e evidência ligada no progresso.
+- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
+- [x] Ramos órfãos desaparecem por timeout.
+- [x] Outros consumidores e fluxos mantêm-se ativos.
+- [x] Validação V-015 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 

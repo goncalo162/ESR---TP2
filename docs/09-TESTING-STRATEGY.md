@@ -173,7 +173,7 @@ Responsável: [TASK-014](tasks/PHASE-04/TASK-014.md). Requisitos: RF-005, RF-007
 
 V-015: sair um de dois consumidores mantém tronco ativo; sair o último remove; relógio falso elimina lease órfão; cancelamento velho não remove ramo novo.
 
-Responsável: [TASK-015](tasks/PHASE-04/TASK-015.md). Requisitos: RF-002, RF-005, RF-007, RF-009, RF-011, RNF-003, RP-002. Estado: Test aprovado pelo utilizador, manual humano Francisco30 cumprido; revisão final Denji confirmada,integração pendente. [Consolidação V-015/L01–L24](../memory-bank/bolts/023-arvores/ddd-03-test-report.md): clean verify1379/0/0/0,19 XML,51 testes novos,TCP real,JAR/hash; código aprovado e negativos intactos. Ensaio kind=agent não é manual humano.
+Responsável: [TASK-015](tasks/PHASE-04/TASK-015.md), DONE. Requisitos: RF-002, RF-005, RF-007, RF-009, RF-011, RNF-003, RP-002. Estado: V-015 consolidado e Test aprovado,clean verify1379/0/0/0,19 XML,manual humano Francisco30,revisão final Denji e integração4d18d1d cumpridos. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md); código/JAR/logs/negativos preservados,sem vídeo/GUI/CORE alegados.
 
 ### V-016 — Recuperar árvores após falha de upstream
 

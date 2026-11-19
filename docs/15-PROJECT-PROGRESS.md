@@ -1,30 +1,21 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 DONE após Test, revisão final e integração; TASK-015 em primeiro passo de Implement; PHASE-05–07 e TASK-016–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 e TASK-015 DONE após Test, revisão final e integração; PHASE-05–07 e TASK-016–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa concluída:** [TASK-013](tasks/PHASE-03/TASK-013.md), DONE. IMP-010/022-rotas integrado em main 3349d575ae38c772b38496cc08bc1d44ded764ff; clean verify1296/0/0/0 histórico, manual humano Luis34 e revisão final Luis confirmada em substituição de Fillmore. [Fecho](../memory-bank/bolts/022-rotas/closure-walkthrough.md). PHASE-03/unidade003-rotas concluídas.
+**Última tarefa/incremento concluído:** [IMP-012/023-arvores/TASK-015](../memory-bank/bolts/023-arvores/closure-walkthrough.md),
+bolt/história complete,implemented=true,TASK-015 DONE por autorização explícita.
+Integração local em main `4d18d1dd8fb50d14ace02609a9133733c20cabfc`; [prova pós-commit](../experiments/construction/023-arvores/integration-proof-01/README.md)
+confere290 paths/hashes/modos,JAR264 classes,19 XML e V-ADD da cópia extraída.
+Test1379/0/0/0,V-015/L01–L24,V-ADD,manual humano Francisco30 e revisão final Denji
+cumpridos. Q-C-40–42/M07,logs/JAR/negativos preservados; WRAPPER_EXIT não fornecido.
 
-**Último incremento concluído:** [007-arvores/IMP-011/TASK-014](../memory-bank/bolts/007-arvores/closure-walkthrough.md),
-bolt/história complete, implemented=true, TASK-014 DONE. Clean verify1328/0/0/0
-e V-014 consolidados, Test aprovado, manual humano Francisco24 e revisão final
-Waheed cumpridos. Integração local main37fa863ed416017e733e692f9565899fb61285ae,
-[conteúdo/hash/JAR/V-ADD da cópia extraída](../experiments/construction/007-arvores/integration-proof-01/README.md).
-Q-C-36–39, negativos e código/JAR aprovados preservados.
-Unidade004-arvores/PHASE-04 continuam IN PROGRESS; IMP-011 fechado e preservado.
-
-**Trabalho atual:** IMP-012/023-arvores/TASK-015 com Test aprovado pelo utilizador,
-base b273b258a4642f94f8614ae00f060a46318d77a5. Clean verify1379/0/0/0,19 XML,
-V-ADD e manual humano Francisco30 cumpridos; código/JAR/logs e negativos intactos.
-[Resumo final para revisão Denji](../memory-bank/bolts/023-arvores/final-review-summary.md)
-e [plano/allowlist exata](../memory-bank/bolts/023-arvores/integration-plan.md).
-Revisão final Denji confirmada pelo utilizador,sem alterações pendentes;
-integração aguarda autorização. [Confirmação/hashes/simulação](../experiments/construction/023-arvores/integration-01/README.md).
-Q-C-40–42 e M07 preservados; WRAPPER_EXIT não fornecido/não inferido.
-13 bolts complete,1 in-progress,21 planned; bolt/história/TASK-015/unidade004/
-PHASE-04 continuam em progresso. Sem staging/commits/push/fecho/outro IMP;
-target e alterações alheias excluídos. Nenhum gate externo adicional.
+**Estado atual:**14 bolts/histórias complete,0 in-progress,21 planned. Unidade004-
+arvores/PHASE-04 continuam IN PROGRESS,com TASK-016–018 TODO. Nenhum outro IMP
+iniciado ou autorizado. [Fecho documental](../memory-bank/bolts/023-arvores/closure-walkthrough.md)
+sem alterações Java,target ou alterações alheias. Sem push. O restante trabalho
+mantém o estado anterior; não se afirma vídeo/GUI/CORE ou conclusão global.
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
 
@@ -131,7 +122,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
 | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | DONE | Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863; [fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md) |
-| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | IN PROGRESS | Model/Design/ADR aprovados; tipos/testes vermelhos por aceitar:22/20/0/0,30 históricos verdes; V-015 integral pendente |
+| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | DONE | [Fecho IMP-012](../memory-bank/bolts/023-arvores/closure-walkthrough.md):1379/0/0/0,19 XML,Francisco30,Denji,integração4d18d1d |
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
 | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | TODO | V-017: NÃO EXECUTADO |
 | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | TODO | V-018: NÃO EXECUTADO |

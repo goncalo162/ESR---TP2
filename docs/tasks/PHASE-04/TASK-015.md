@@ -5,7 +5,7 @@
 - ID: TASK-015
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-014](../PHASE-04/TASK-014.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Implementar remoção idempotente e recomputação de procura agregada.
-- [ ] Renovar leases confirmados e verificar prefixo/epoch.
-- [ ] Expirar filhos sem renovação e limpar pendentes.
-- [ ] Integrar eventos de saída e desconexão com poda.
+- [x] Implementar remoção idempotente e recomputação de procura agregada.
+- [x] Renovar leases confirmados e verificar prefixo/epoch.
+- [x] Expirar filhos sem renovação e limpar pendentes.
+- [x] Integrar eventos de saída e desconexão com poda.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Vídeo só permanece autorizado enquanto há procura efetiva.
-- [ ] Ramos órfãos desaparecem por timeout.
-- [ ] Outros consumidores e fluxos mantêm-se ativos.
-- [ ] Validação V-015 executada e evidência ligada no progresso.
+- [x] Vídeo só permanece autorizado enquanto há procura efetiva.
+- [x] Ramos órfãos desaparecem por timeout.
+- [x] Outros consumidores e fluxos mantêm-se ativos.
+- [x] Validação V-015 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -147,3 +147,14 @@ Utilizador confirmou aprovação final da implementação atual sem alterações
 e [plano final](../../../memory-bank/bolts/023-arvores/integration-plan.md).
 Mesmo código/JAR/Test/manual,sem repetição. Simulação exata com referências/V-ADD;
 TASK-015 IN PROGRESS até integração comprovada/fecho. Sem staging/commits/push.
+
+## Fecho autorizado e evidência integrada
+
+TASK-015 DONE,bolt/história023-arvores complete/implemented=true por autorização
+explícita após integração comprovada4d18d1dd8fb50d14ace02609a9133733c20cabfc.
+[Fecho](../../../memory-bank/bolts/023-arvores/closure-walkthrough.md):
+Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual Francisco30 e revisão final
+Denji cumpridos. [Prova pós-commit](../../../experiments/construction/023-arvores/integration-proof-01/README.md).
+Âmbito é controlo/autorização/leases/poda; não comprova vídeo/GUI/CORE.
+Unidade004-arvores/PHASE-04 continuam IN PROGRESS. Sem alterações Java,push ou
+início de outro IMP; target/alterações alheias excluídos do fecho.

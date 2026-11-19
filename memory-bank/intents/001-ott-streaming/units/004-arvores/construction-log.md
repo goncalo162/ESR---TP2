@@ -284,3 +284,17 @@ mesmo código/JAR,sem novo build/manual. Pacote simulado da base mais allowlist,
 com hashes/referências/V-ADD e exclusão de deltas target/alheios.
 Integração aguarda autorização. Bolt/história/TASK/unidade/fase abertos,
 sem staging/commits/push/fecho/outro IMP. Nenhum gate externo adicional.
+
+## IMP-012 — fecho documental autorizado após integração comprovada
+
+Registo 2026-11-19T22:02:54Z: utilizador autorizou bolt/história complete,implemented=true e
+TASK-015 DONE após integração local `4d18d1dd8fb50d14ace02609a9133733c20cabfc`. [Prova pós-commit](../../../../../experiments/construction/023-arvores/integration-proof-01/README.md)
+e [fecho](../../../../bolts/023-arvores/closure-walkthrough.md) ligados.
+Test1379/0/0/0,19 XML,V-015/L01–L24,V-ADD,manual Francisco30 e revisão final
+Denji cumpridos. Código/JAR/Q-C-40–42/negativos e evidências anteriores intactos.
+Unidade004/PHASE-04 continuam in-progress; três histórias/bolts planned,sem início.
+Fecho exclusivamente documental/evidência; sem Java,target,alterações alheias ou push.
+
+Cascata documental: apenas blocks=false em008-arvores após dependências complete;
+status planned,started=null,sem etapas/início. V-ADD inicial preserva o diagnóstico
+blocks mismatch,sem alterar o validador ou iniciar outro IMP.

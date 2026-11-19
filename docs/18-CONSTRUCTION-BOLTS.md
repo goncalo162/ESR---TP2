@@ -1,14 +1,12 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** IMP-011/007-arvores complete, história implemented=true,
-TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão final Waheed e
-integração37fa863 comprovada. [Fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md).
-13 bolts complete,1 in-progress,21 planned. Unidade004-arvores/PHASE-04 em
-progresso;023-arvores/IMP-012 Test aprovado pelo utilizador: clean verify1379/0/0/0,
-19 XML,V-ADD e manual humano Francisco30. [Resumo final](../memory-bank/bolts/023-arvores/final-review-summary.md)
-e allowlist/diffs atualizados após confirmação da aprovação final de Denji.
-Integração aguarda autorização,com simulação do conteúdo exato. Q-C-36–42/M07, fontes/JAR/negativos preservados.
-Sem staging/commits/push/fecho/outro IMP; target e alterações alheias excluídos.
+**Estado atual:** IMP-012/023-arvores complete,história implemented=true,TASK-015
+DONE após Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão final Denji e
+integração4d18d1d comprovada. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
+14 bolts complete,0 in-progress,21 planned. Unidade004/PHASE-04 em progresso;
+restantes três bolts da unidade planned,sem início de outro IMP.
+Código/JAR/logs/negativos/Q-C-40–42 preservados. Fecho documental/evidência,
+sem Java,target,alterações alheias ou push.
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;

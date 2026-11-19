@@ -170,3 +170,11 @@ Contagem corrigida:19 XML por regressão, não20. [Inventário/errata](../../../
 Originais/manifestos/negativos em experiments não foram alterados. Clean verify
 1379/0/0/0 e19 XML novos consolidados em Test; hashes Java iguais aos aprovados.
 Manual humano, aceitação Test, revisão final Denji e integração pendentes.
+
+## Fecho documental autorizado — estado atual
+
+IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
+Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
+[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
+implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
+Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.

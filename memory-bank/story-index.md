@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:13 histórias complete,1 in-progress e21 planned; bolts:13 complete,1 in-progress,21 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com história001/IMP-011 complete e implemented=true; as quatro restantes continuam planned.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:14 histórias complete,0 in-progress e21 planned; bolts:14 complete,0 in-progress,21 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com histórias001/IMP-011 e002/IMP-012 complete/implemented=true; as três restantes continuam planned.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -90,9 +90,10 @@ Unidade004-arvores/PHASE-04 em progresso; sem início de outro IMP ou push.
 
 ## 004-arvores/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md ✅ GENERATED
 
-**Tarefa:** IMP-012. **Estado:** in-progress, Test e revisão final Denji aprovados; integração pendente. **Bolt:** 023-arvores.
-[Resumo final](bolts/023-arvores/final-review-summary.md):1379/0/0/0,19 XML,V-ADD,
-Francisco30 cumpridos; código/JAR/evidências preservados. Bolt aberto, sem fecho.
+**Tarefa:** IMP-012. **Estado:** complete,implemented=true,TASK-015 DONE. **Bolt:** 023-arvores.
+[Fecho](bolts/023-arvores/closure-walkthrough.md): Test1379/0/0/0,19 XML,V-ADD,
+Francisco30,Denji e integração4d18d1d comprovados. Unidade/fase em progresso,
+sem push ou outro IMP. Negativos/código/JAR preservados.
 **Ficheiro:** [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
 
 ## 004-arvores/003-recuperar-arvores-apos-falha-de-upstream.md ✅ GENERATED

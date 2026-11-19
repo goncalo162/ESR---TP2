@@ -19,11 +19,11 @@ Estado atual: unidade **in-progress**. História001/IMP-011/007-arvores complete
 implemented=true, TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão
 final Waheed e integração37fa863 comprovada.
 [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
-023-arvores/IMP-012: Test aprovado na base b273b258,clean verify1379/0/0/0,
-19 XML,V-ADD e manual humano Francisco30. [Resumo para revisão final Denji](../../../../bolts/023-arvores/final-review-summary.md),
-diffs/allowlist atualizados. Revisão final Denji confirmada,integração pendente; bolt/história/
-TASK/unidade/fase abertos. Q-C-40–42 preservadas, restantes três bolts planned.
-Sem staging/commits/push/fecho/outro IMP.
+023-arvores/IMP-012 complete,história implemented=true,TASK-015 DONE após
+Test1379/0/0/0,19 XML,V-ADD,manual humano Francisco30,revisão final Denji e
+integração4d18d1d comprovada. [Fecho](../../../../bolts/023-arvores/closure-walkthrough.md).
+Unidade/PHASE-04 continuam in-progress,com três histórias/bolts planned.
+Q-C-40–42/código/JAR/evidência intactos,sem Java/push/novo IMP no fecho.
 
 ## Requisitos atribuídos
 
@@ -36,7 +36,7 @@ Sem staging/commits/push/fecho/outro IMP.
 ## Histórias e bolts
 
 - [x] [001-ativar-arvores-com-ack-e-procura-agregada](stories/001-ativar-arvores-com-ack-e-procura-agregada.md) → [007-arvores](../../../../bolts/007-arvores/bolt.md); IMP-011 (M).
-- [ ] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md) → [023-arvores](../../../../bolts/023-arvores/bolt.md); IMP-012 (M).
+- [x] [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md) → [023-arvores](../../../../bolts/023-arvores/bolt.md); IMP-012 (M).
 - [ ] [003-recuperar-arvores-apos-falha-de-upstream](stories/003-recuperar-arvores-apos-falha-de-upstream.md) → [008-arvores](../../../../bolts/008-arvores/bolt.md); IMP-013 (M).
 - [ ] [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md) → [024-arvores](../../../../bolts/024-arvores/bolt.md); IMP-014 (M).
 - [ ] [005-preparar-o-segundo-marco-com-arvores-e-adaptacao](stories/005-preparar-o-segundo-marco-com-arvores-e-adaptacao.md) → [009-arvores](../../../../bolts/009-arvores/bolt.md); IMP-015 (S).

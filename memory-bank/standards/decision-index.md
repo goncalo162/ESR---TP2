@@ -2,13 +2,12 @@
 
 Fonte normativa: [ADD](../../add.md).
 
-## IMP-012 — Test e revisão final Denji aprovados, integração pendente
+## IMP-012 — concluído e integrado, decisões preservadas
 
-Model/Design/ADR/Implement/Test aprovados; revisão ADR reutilizada sem decisão
-nova ou alteração de âmbito. [Resumo final](../bolts/023-arvores/final-review-summary.md):
-clean verify1379/0/0/0,19 XML,V-ADD e Francisco30. Q-C-40–42/M07/wire/caps/
-físico/históricos preservados, mesmos código/JAR aprovados. Denji confirmado
-pelo utilizador,sem alterações pendentes; bolt aberto até integração comprovada. Sem staging/commits/push/fecho.
+Model/Design/ADR/Implement/Test aprovados; revisão final Denji e integração local
+4d18d1d comprovadas. [Fecho](../bolts/023-arvores/closure-walkthrough.md):
+1379/0/0/0,19 XML,V-ADD,Francisco30. Q-C-40–42/M07/ADR aceites/wire/caps/físico
+preservados,sem nova ADR ou Java no fecho. Unidade/fase em progresso,sem push/novo IMP.
 
 ## IMP-011 — Model/Design/ADR aprovados; Implement em curso
 

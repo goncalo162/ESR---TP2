@@ -91,3 +91,11 @@ sem repetir build/manual. [Plano final de integração](integration-plan.md) par
 autorização; sem staging/commits/push/fecho/outro IMP. Falta integrar e comprovar
 a versão revista, mantendo bolt/história/TASK/unidade/fase abertos até ao fecho.
 Nenhum gate externo adicional.
+
+## Fecho documental autorizado — estado atual
+
+IMP-012/023-arvores/TASK-015 concluído após integração local4d18d1d comprovada,
+Test1379/0/0/0,19 XML,V-ADD,Francisco30 e revisão final Denji.
+[Fecho e evidência](closure-walkthrough.md): bolt/história complete,
+implemented=true,TASK-015 DONE. Unidade004/PHASE-04 em progresso.
+Texto anterior preserva as etapas/planos históricos; sem Java/push/novo IMP no fecho.

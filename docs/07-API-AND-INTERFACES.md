@@ -922,3 +922,9 @@ Utilizador confirmou aprovação final da mesma implementação,sem alterações
 [Confirmação e simulação](../experiments/construction/023-arvores/integration-01/README.md)
 vinculadas aos hashes de fonte/JAR. Sem mudança API/Java/wire/caps/Q-C-40–42,
 sem repetir build/manual; integração aguarda autorização,sem fecho/staging/commit/push.
+
+### IMP-012 — fecho autorizado
+
+[Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md) após integração4d18d1d,
+Test1379/0/0/0,19 XML,Francisco30 e Denji. Nenhuma API/Java alterada no fecho;
+Q-C-40–42 e reservas/leases mantidas,sem CLI ou vídeo novo. Unidade/fase em progresso.
