@@ -108,6 +108,28 @@ public final class RoutingService implements AutoCloseable {
     record ActivationLoad(int trees,int children,int locals,int histories,int sends,int unbound,
             int responseIntents,int pendingChildren) { }
     ActivationLoad activationLoad(){requireOwner();return activation.load();}
+
+    // Captured operation inputs; no public API or wire change.
+    record RenewalRequest(Subscription.Identity identity, UUID requestId,
+            Subscription.Lease previousGrant, long beganNanos, long budgetNanos) {
+        RenewalRequest {
+            Objects.requireNonNull(identity); Objects.requireNonNull(requestId);
+            Objects.requireNonNull(previousGrant);
+            if(budgetNanos<1 || budgetNanos>previousGrant.durationNanos())
+                throw new IllegalArgumentException("Invalid renewal budget");
+        }
+    }
+
+    /** A retired identity is captured once; a later branch must never retarget this request. */
+    record PruneRequest(Subscription.Identity identity, UUID requestId,
+            long beganNanos, long budgetNanos) {
+        PruneRequest {
+            Objects.requireNonNull(identity); Objects.requireNonNull(requestId);
+            if(budgetNanos<1) throw new IllegalArgumentException("Invalid prune budget");
+        }
+    }
+    // End IMP-012 types.
+
     public enum Phase { NEW, RUNNING, STOPPED }
     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
@@ -310,7 +332,8 @@ public final class RoutingService implements AutoCloseable {
             else if(event instanceof NeighborManager.Received e){
                 var m=e.message();if(!current(e.session()))return;
                 if (m.type()==MessageType.ACTIVATE || m.type()==MessageType.ACTIVATE_ACK
-                        || m.type()==MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p && p.relatedType()==11) {
+                        || m.type()==MessageType.SUBSCRIPTION_RENEW || m.type()==MessageType.DEACTIVATE
+                        || m.type()==MessageType.ERROR && m.payload() instanceof ControlMessage.ErrorPayload p && (p.relatedType()==11||p.relatedType()==13||p.relatedType()==14)) {
                     if(m.version()==2 && m.requestId()!=null && e.session().nodeId().equals(m.senderId())
                             && e.session().instanceId().equals(m.senderInstance())) activation.receive(e.session(),m);
                     drive();return;
@@ -903,7 +926,7 @@ public final class RoutingService implements AutoCloseable {
             final Map<UUID,Local> locals=new LinkedHashMap<>();
             final Map<Neighbor.Session,Child> children=new LinkedHashMap<>();
             final Set<UUID> confirmedLocals=new HashSet<>();
-            Confirmed confirmed;Round round;ErrorCode failure;String detail="";long version;
+            Confirmed confirmed;Round round;Prune prune;Line upstream;long submittedRevision=-1,renewBegan,renewPeriod;ErrorCode failure;String detail="";long version;
             Tree(Row row){id=row.id;epoch=row.route.serverEpoch().orElseThrow();origin=row.origin;}
         }
         record Confirmed(boolean source,UUID epoch,Neighbor.Session parent,List<String> path,Subscription.Lease lease) {
@@ -911,31 +934,37 @@ public final class RoutingService implements AutoCloseable {
         }
         final class Line {
             final LineKey key;final UUID id;long revision=-1;UUID request;
-            ControlMessage.Activation fingerprint;ErrorCode terminal;String detail="";Child child;
+            ControlMessage.Activation fingerprint;boolean renew;ErrorCode terminal;String detail="";Child child;
             Line(LineKey key,UUID id){this.key=key;this.id=id;}
         }
         final class Child {
             final Tree tree;final Line line;final UUID request;final ControlMessage.Activation payload;
-            final long began;boolean pending=true,ackWanted,errorWanted,detached,replay;
+            final long began;long budget=timeout;boolean renew;boolean pending=true,ackWanted,errorWanted,detached,replay;
             ErrorCode error;String detail="";Subscription active;
             Child(Tree tree,Line line,UUID request,ControlMessage.Activation p,long began){
                 this.tree=tree;this.line=line;this.request=request;payload=p;this.began=began;
             }
         }
         final class Round {
-            final long began;int issued;Attempt attempt;
+            final long began;long budget=timeout;boolean renew;int issued;Attempt attempt;
             Round(long began){this.began=began;}
         }
         final class Attempt {
             final Tree tree;final Round round;final Line line;final UUID request=UUID.randomUUID();
-            final List<String> path;final long began;final long revision;
+            final List<String> path;final long began;final long revision;final RenewalRequest renewal;
             boolean submitted,accepted;ControlMessage.ActivationAck early;
             Attempt(Tree tree,Round round,Line line,List<String> path,long began,long revision){
                 this.tree=tree;this.round=round;this.line=line;this.path=List.copyOf(path);this.began=began;this.revision=revision;
+                renewal=round.renew?new RenewalRequest(new Subscription.Identity(line.key.session,tree.id,tree.epoch,
+                        line.id,revision,tree.version),request,tree.confirmed.lease,began,round.budget):null;
             }
         }
         final class ResponseQuota { long began;int used;ResponseQuota(long began){this.began=began;} }
-        enum SendKind { REQUEST, ACK, ERROR, UNBOUND }
+        final class Prune {
+            final PruneRequest request;final Line line;
+            Prune(PruneRequest request,Line line){this.request=request;this.line=line;}
+        }
+        enum SendKind { REQUEST, PRUNE, ACK, ERROR, UNBOUND }
         final class ActSend {
             final Object context;final Neighbor.Session session;final SendKind kind;
             final Attempt attempt;final Child child;Subscription grant;
@@ -1020,7 +1049,13 @@ public final class RoutingService implements AutoCloseable {
         }
         void receive(Neighbor.Session session,ControlMessage m){
             long at=now();kick();
-            if(m.type()==MessageType.ACTIVATE&&m.payload() instanceof ControlMessage.Activation p)incoming(session,m.requestId(),p,at);
+            if((m.type()==MessageType.ACTIVATE||m.type()==MessageType.SUBSCRIPTION_RENEW)&&m.payload() instanceof ControlMessage.Activation p)
+                incoming(session,m.requestId(),p,at,m.type()==MessageType.SUBSCRIPTION_RENEW);
+            else if(m.type()==MessageType.DEACTIVATE&&m.payload() instanceof ControlMessage.Deactivation p){
+                var line=lines.get(new LineKey(false,p.streamId(),p.serverEpoch(),session));
+                if(line!=null&&line.id.equals(p.subscriptionId())&&line.revision==p.revision())
+                    cancelChild(session,p.streamId(),p.subscriptionId(),p.revision());
+            }
             else if(m.type()==MessageType.ACTIVATE_ACK&&m.payload() instanceof ControlMessage.ActivationAck p){
                 var t=trees.get(p.streamId());var a=t==null||t.round==null?null:t.round.attempt;
                 if(a!=null&&a.submitted&&a.line.key.session.equals(session)&&a.request.equals(m.requestId())
@@ -1028,87 +1063,98 @@ public final class RoutingService implements AutoCloseable {
                         &&p.grantedLeaseMs()>0&&p.grantedLeaseMs()<=leaseMs){
                     if(a.early==null)a.early=p;if(a.accepted)confirm(a,at);
                 }
-            }else if(m.type()==MessageType.ERROR&&m.payload() instanceof ControlMessage.ErrorPayload p&&p.relatedType()==11){
+            }else if(m.type()==MessageType.ERROR&&m.payload() instanceof ControlMessage.ErrorPayload p&&(p.relatedType()==11||p.relatedType()==14)){
                 for(var t:trees.values())if(t.round!=null){var a=t.round.attempt;
-                    if(a!=null&&a.submitted&&a.request.equals(m.requestId())&&a.line.key.session.equals(session)
+                    if(a!=null&&p.relatedType()==(a.round.renew?14:11)&&a.submitted&&a.request.equals(m.requestId())&&a.line.key.session.equals(session)
                             &&p.code()!=null&&traceText(p.detail(),256)){
                         failedAttempt(a,p.code(),p.detail());break;
                     }
                 }
             }
         }
-        void incoming(Neighbor.Session session,UUID request,ControlMessage.Activation p,long at){
+        void incoming(Neighbor.Session session,UUID request,ControlMessage.Activation p,long at,boolean renew){
+            int related=renew?14:11;
             if(p.streamId()==null||p.serverEpoch()==null||p.subscriptionId()==null||p.revision()<0
                     ||p.leaseMs()<1||p.leaseMs()>0xffff_ffffL||!tracePath(p.expectedPath(),false,false)
                     ||p.expectedPath().size()<2||!p.expectedPath().getLast().equals(session.nodeId())){
-                unbound(session,request,ErrorCode.INVALID_MESSAGE,"INVALID_ACTIVATE",at);return;
+                unbound(session,request,related,ErrorCode.INVALID_MESSAGE,"INVALID_ACTIVATE",at);return;
             }
             var row=row(p.streamId());
-            if(row==null){unbound(session,request,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM",at);return;}
-            if(!row.route.serverEpoch().equals(Optional.of(p.serverEpoch()))){unbound(session,request,ErrorCode.PATH_CHANGED,"EPOCH_CHANGED",at);return;}
+            if(row==null){unbound(session,request,related,ErrorCode.UNKNOWN_STREAM,"UNKNOWN_STREAM",at);return;}
+            if(!row.route.serverEpoch().equals(Optional.of(p.serverEpoch()))){unbound(session,request,related,ErrorCode.PATH_CHANGED,"EPOCH_CHANGED",at);return;}
             var lk=new LineKey(false,p.streamId(),p.serverEpoch(),session);var line=lines.get(lk);
             if(line!=null){
-                if(!line.id.equals(p.subscriptionId())||p.revision()<line.revision){unbound(session,request,ErrorCode.STALE_REVISION,"STALE_REVISION",at);return;}
+                if(!line.id.equals(p.subscriptionId())||p.revision()<line.revision){unbound(session,request,related,ErrorCode.STALE_REVISION,"STALE_REVISION",at);return;}
                 if(p.revision()==line.revision){
-                    if(!request.equals(line.request)){unbound(session,request,ErrorCode.STALE_REVISION,"REVISION_BOUND",at);return;}
-                    if(!p.equals(line.fingerprint)){unbound(session,request,ErrorCode.INVALID_MESSAGE,"CONFLICTING_DUPLICATE",at);return;}
-                    if(line.terminal!=null){unbound(session,request,line.terminal,line.detail,at);return;}
-                    var c=line.child;if(c!=null&&!c.detached&&c.active!=null&&!elapsed(at,c.began)){
-                        c.ackWanted=true;c.replay=true;
+                    if(!request.equals(line.request)){unbound(session,request,related,ErrorCode.STALE_REVISION,"REVISION_BOUND",at);return;}
+                    if(renew!=line.renew||!p.equals(line.fingerprint)){unbound(session,request,related,ErrorCode.INVALID_MESSAGE,"CONFLICTING_DUPLICATE",at);return;}
+                    if(line.terminal!=null){unbound(session,request,related,line.terminal,line.detail,at);return;}
+                    var c=line.child;if(c!=null&&!c.detached&&c.active!=null&&!childElapsed(c,at)){
+                        if(!c.pending){c.ackWanted=true;c.replay=true;}
                     }
                     return;
                 }
             }
+            if(renew&&(line==null||line.child==null||line.child.active==null
+                    ||line.child.active.validity().orElseThrow().remainingNanos(at)==0)){
+                unbound(session,request,related,ErrorCode.NO_ROUTE,"NO_ACTIVE_GRANT",at);return;
+            }
             var prefix=p.expectedPath().subList(0,p.expectedPath().size()-1);
             if(!prefix.getLast().equals(config.nodeId())||!prefix.getFirst().equals(row.origin)){
-                unbound(session,request,ErrorCode.PATH_CHANGED,"PATH_CHANGED",at);return;
+                unbound(session,request,related,ErrorCode.PATH_CHANGED,"PATH_CHANGED",at);return;
             }
             if(new HashSet<>(p.expectedPath()).size()!=p.expectedPath().size()){
-                unbound(session,request,ErrorCode.LOOP_DETECTED,"LOOP_DETECTED",at);return;
+                unbound(session,request,related,ErrorCode.LOOP_DETECTED,"LOOP_DETECTED",at);return;
             }
             var t=trees.get(row.id);
             var selected=row.offered?List.of(config.nodeId()):row.route.selectedCandidate().map(RouteCandidate::path).orElse(List.of());
-            if(row.local&&!row.offered){unbound(session,request,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE",at);return;}
+            if(row.local&&!row.offered){unbound(session,request,related,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE",at);return;}
             if(!prefix.equals(selected)||t!=null&&healthy(t,at)&&!compatible(t,prefix,at)){
                 var code=selected.isEmpty()&&(t==null||!healthy(t,at))?ErrorCode.NO_ROUTE:ErrorCode.PATH_CHANGED;
-                unbound(session,request,code,code.name(),at);return;
+                unbound(session,request,related,code,code.name(),at);return;
             }
             var previous=line==null?null:line.child;
             long peerPending=childOrder.stream().filter(c->!c.detached&&c.pending&&c.line.key.session.equals(session)&&c!=previous).count();
             if(t==null&&trees.size()>=treeLimit||line==null&&lines.size()>=historyLimit
                     ||(previous==null||previous.detached)&&childOrder.size()>=childLimit||peerPending>=4){
-                unbound(session,request,ErrorCode.RESOURCE_LIMIT,"ACTIVATION_CAPACITY",at);return;
+                unbound(session,request,related,ErrorCode.RESOURCE_LIMIT,"ACTIVATION_CAPACITY",at);return;
             }
             if(t==null)t=create(row);
             if(line==null){line=new Line(lk,p.subscriptionId());lines.put(lk,line);}
             Subscription old=previous==null?null:previous.active;
             if(previous!=null){detach(previous);}
-            var c=new Child(t,line,request,p,at);c.active=old;
-            line.revision=p.revision();line.request=request;line.fingerprint=p;line.terminal=null;line.detail="";line.child=c;
+            var c=new Child(t,line,request,p,at);c.active=old;c.renew=renew;
+            if(renew)c.budget=Math.min(timeout,old.validity().orElseThrow().remainingNanos(at));
+            line.renew=renew;line.revision=p.revision();line.request=request;line.fingerprint=p;line.terminal=null;line.detail="";line.child=c;
             t.children.put(session,c);childOrder.add(c);t.failure=null;
             startRound(t,at,at);kick();
         }
         void confirm(Attempt a,long at){
             var t=a.tree;if(t.round!=a.round||a.round.attempt!=a||a.early==null||!a.accepted)return;
-            if(elapsed(at,a.round.began)){fail(t,ErrorCode.TIMEOUT,"TIMEOUT");return;}
+            if(roundElapsed(a.round,at)||a.renewal!=null&&a.renewal.previousGrant().remainingNanos(at)==0){
+                fail(t,ErrorCode.TIMEOUT,"TIMEOUT");return;
+            }
             if(!epochCurrent(t)||!current(a.line.key.session)||!selectedPath(t).equals(a.path)
                     ||!row(t.id).route.knownUpstream().equals(Optional.of(key(a.line.key.session)))){
                 failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;
             }
             var validity=new Subscription.Lease(a.began,Math.multiplyExact(a.early.grantedLeaseMs(),1_000_000L));
             if(validity.remainingNanos(at)==0){failedAttempt(a,ErrorCode.TIMEOUT,"GRANT_EXPIRED");return;}
-            t.confirmed=new Confirmed(false,t.epoch,a.line.key.session,a.path,validity);t.round=null;t.failure=null;
+            t.confirmed=new Confirmed(false,t.epoch,a.line.key.session,a.path,validity);
+            t.upstream=a.line;t.renewBegan=a.began;
+            t.renewPeriod=Math.min(config.runtime().subscription().renew().toNanos(),validity.durationNanos()/3);
+            t.round=null;t.failure=null;
             t.version=Math.incrementExact(t.version);kick();
         }
         void failedAttempt(Attempt a,ErrorCode code,String detail){
             var t=a.tree;if(t.round!=a.round||a.round.attempt!=a)return;
             a.round.attempt=null;
-            if(elapsed(now(),a.round.began)||a.round.issued>=attempts)fail(t,code,detail);
+            if(roundElapsed(a.round,now())||a.round.issued>=(a.round.renew?1:attempts))fail(t,code,detail);
             kick();
         }
         void fail(Tree t,ErrorCode code,String detail){t.round=null;t.failure=code;t.detail=detail;kick();}
         void failChild(Child c,ErrorCode code,String detail,long at){
-            c.pending=false;c.ackWanted=false;c.error=code;c.detail=detail;c.errorWanted=!elapsed(at,c.began);
+            c.pending=false;c.ackWanted=false;c.error=code;c.detail=detail;c.errorWanted=!childElapsed(c,at);
             c.line.terminal=code;c.line.detail=detail;
             childSweep=childOrder.size();
         }
@@ -1122,6 +1168,20 @@ public final class RoutingService implements AutoCloseable {
             c.tree.children.remove(c.line.key.session,c);childOrder.remove(c);if(c.line.child==c)c.line.child=null;}
         boolean wants(Tree t){return t.locals.values().stream().anyMatch(l->l.outcome==null&&!l.cancelled.get())
                 ||t.children.values().stream().anyMatch(c->c.pending);}
+        boolean roundElapsed(Round r,long at){return age(at,r.began)>=r.budget;}
+        boolean childElapsed(Child c,long at){return age(at,c.began)>=c.budget;}
+        boolean demand(Tree t,long at){
+            return t.locals.values().stream().anyMatch(l->!l.cancelled.get()&&(l.outcome==null||t.confirmedLocals.contains(l.key.token)))
+                    ||t.children.values().stream().anyMatch(c->c.pending||c.active!=null&&c.active.validity().orElseThrow().remainingNanos(at)>0);
+        }
+        void retireBranch(Tree t,long at){
+            t.round=null;
+            if(t.confirmed!=null&&!t.confirmed.source&&t.upstream!=null&&t.submittedRevision>=0){
+                var identity=new Subscription.Identity(t.upstream.key.session,t.id,t.epoch,t.upstream.id,t.submittedRevision,t.version);
+                t.prune=new Prune(new PruneRequest(identity,UUID.randomUUID(),at,timeout),t.upstream);
+            }
+            if(t.confirmed!=null){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+        }
         void stepTree(Tree t,long at){
             if(trees.get(t.id)!=t)return;
             for(var l:List.copyOf(t.locals.values())){
@@ -1136,8 +1196,22 @@ public final class RoutingService implements AutoCloseable {
             if(t.confirmed!=null&&!healthy(t,at)){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
             if(row(t.id).local&&!row(t.id).offered&&t.failure!=ErrorCode.SOURCE_UNAVAILABLE)
                 fail(t,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE");
-            if(t.round!=null&&!wants(t))t.round=null;
-            if(t.round!=null&&elapsed(at,t.round.began))fail(t,ErrorCode.TIMEOUT,"TIMEOUT");
+            boolean wanted=demand(t,at);
+            if(!wanted&&(t.confirmed!=null||t.round!=null))retireBranch(t,at);
+            if(wanted&&t.prune!=null)t.prune=null;
+            if(wanted&&healthy(t,at)&&!t.confirmed.source&&t.round==null
+                    &&age(at,t.renewBegan)>=t.renewPeriod&&compatible(t,t.confirmed.path,at)){
+                t.renewBegan=at;t.round=new Round(at);t.round.renew=true;
+                t.round.budget=Math.min(timeout,t.confirmed.lease.remainingNanos(at));
+            }
+            if(t.prune!=null){
+                var prune=t.prune;var q=prune.request;var i=q.identity();
+                if(age(at,q.beganNanos())>=q.budgetNanos())t.prune=null;
+                else if(send(prune.line,i.session(),SendKind.PRUNE,null,null,null,
+                        new ControlMessage(MessageType.DEACTIVATE,q.requestId(),config.nodeId(),instance,
+                            new ControlMessage.Deactivation(i.streamId(),i.serverEpoch(),i.subscriptionId(),i.revision())),at))t.prune=null;
+            }
+            if(t.round!=null&&roundElapsed(t.round,at))fail(t,ErrorCode.TIMEOUT,"TIMEOUT");
             for(var l:t.locals.values())if(l.outcome==null){
                 if(elapsed(at,l.began))outcome(l,SubscriptionState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT");
                 else if(healthy(t,at)){
@@ -1159,13 +1233,13 @@ public final class RoutingService implements AutoCloseable {
             }
             if(r!=null&&r.attempt!=null&&!r.attempt.submitted){
                 var a=r.attempt;
-                if(r.issued>=attempts){fail(t,ErrorCode.TIMEOUT,"ATTEMPT_LIMIT");return;}
+                if(r.issued>=(r.renew?1:attempts)){fail(t,ErrorCode.TIMEOUT,"ATTEMPT_LIMIT");return;}
                 if(!selectedPath(t).equals(a.path)||!current(a.line.key.session)){failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;}
-                var m=new ControlMessage(MessageType.ACTIVATE,a.request,config.nodeId(),instance,
+                var m=new ControlMessage(r.renew?MessageType.SUBSCRIPTION_RENEW:MessageType.ACTIVATE,a.request,config.nodeId(),instance,
                         new ControlMessage.Activation(t.id,t.epoch,a.line.id,a.revision,leaseMs,a.path));
-                send(t.id,a.line.key.session,SendKind.REQUEST,a,null,null,m,at);
+                send(a.line,a.line.key.session,SendKind.REQUEST,a,null,null,m,at);
             }
-            if(t.locals.isEmpty()&&t.children.isEmpty()&&t.round==null){trees.remove(t.id,t);treeOrder.remove(t);}
+            if(t.locals.isEmpty()&&t.children.isEmpty()&&t.round==null&&t.prune==null){trees.remove(t.id,t);treeOrder.remove(t);}
         }
         void stepChild(Child c,long at){
             if(c.detached)return;var t=c.tree;
@@ -1174,7 +1248,7 @@ public final class RoutingService implements AutoCloseable {
                 c.active=null;if(!c.pending){c.line.terminal=ErrorCode.NO_ROUTE;c.line.detail="EXPIRED";}
             }
             if(c.pending){
-                if(elapsed(at,c.began)||t.round!=null&&elapsed(at,t.round.began))failChild(c,ErrorCode.TIMEOUT,"TIMEOUT",at);
+                if(childElapsed(c,at)||t.round!=null&&roundElapsed(t.round,at))failChild(c,ErrorCode.TIMEOUT,"TIMEOUT",at);
                 else if(healthy(t,at)){
                     var prefix=c.payload.expectedPath().subList(0,c.payload.expectedPath().size()-1);
                     if(compatible(t,prefix,at))c.ackWanted=true;else failChild(c,ErrorCode.PATH_CHANGED,"PATH_CHANGED",at);
@@ -1182,14 +1256,14 @@ public final class RoutingService implements AutoCloseable {
             }
             if(c.ackWanted&&!healthy(t,at))failChild(c,ErrorCode.NO_ROUTE,"CONFIRMATION_EXPIRED",at);
             boolean inFlight;synchronized(resources){inFlight=sends.stream().anyMatch(s->s.child==c&&!s.continuationDone);}
-            if(elapsed(at,c.began)){c.ackWanted=false;c.errorWanted=false;}
+            if(childElapsed(c,at)){c.ackWanted=false;c.errorWanted=false;}
             if(!inFlight&&(c.ackWanted||c.errorWanted)){
                 if(c.errorWanted){
-                    var m=new ControlMessage(MessageType.ERROR,c.request,config.nodeId(),instance,new ControlMessage.ErrorPayload(c.error,11,c.detail));
+                    var m=new ControlMessage(MessageType.ERROR,c.request,config.nodeId(),instance,new ControlMessage.ErrorPayload(c.error,c.renew?14:11,c.detail));
                     if(send(c.line,c.line.key.session,SendKind.ERROR,null,c,null,m,at))c.errorWanted=false;
                 }else{
                     long remaining=t.confirmed.source?Math.multiplyExact(Math.min(leaseMs,c.payload.leaseMs()),1_000_000L):t.confirmed.lease.remainingNanos(at);
-                    if(c.active!=null)remaining=Math.min(remaining,c.active.validity().orElseThrow().remainingNanos(at));
+                    if(c.active!=null&&(!c.renew||c.replay))remaining=Math.min(remaining,c.active.validity().orElseThrow().remainingNanos(at));
                     long grant=Math.min(Math.min(leaseMs,c.payload.leaseMs()),remaining/1_000_000L);
                     if(grant<1){failChild(c,ErrorCode.NO_ROUTE,"GRANT_TOO_SHORT",at);return;}
                     var validity=new Subscription.Lease(at,Math.multiplyExact(grant,1_000_000L));
@@ -1218,7 +1292,7 @@ public final class RoutingService implements AutoCloseable {
                         ||sends.stream().anyMatch(s->s.kind==SendKind.UNBOUND&&s.session.equals(session))))return false;
                 send=new ActSend(context,session,kind,attempt,child,grant);sends.add(send);
             }
-            if(kind!=SendKind.REQUEST&&!quota(session,at)){
+            if((kind==SendKind.ACK||kind==SendKind.ERROR||kind==SendKind.UNBOUND)&&!quota(session,at)){
                 synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
             }
             // Reserving a physical ticket/quota can consume time. Revalidate and
@@ -1226,10 +1300,18 @@ public final class RoutingService implements AutoCloseable {
             try{
                 long dispatch=now();
                 if(stopping.get()||!current(session)
-                        ||attempt!=null&&(attempt.tree.round!=attempt.round||elapsed(dispatch,attempt.round.began)
+                        ||attempt!=null&&(attempt.tree.round!=attempt.round||roundElapsed(attempt.round,dispatch)
                             ||!selectedPath(attempt.tree).equals(attempt.path))
-                        ||child!=null&&(child.detached||elapsed(dispatch,child.began))){
+                        ||child!=null&&(child.detached||childElapsed(child,dispatch))){
                     synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
+                }
+                if(kind==SendKind.PRUNE){
+                    var payload=(ControlMessage.Deactivation)message.payload();var t=trees.get(payload.streamId());
+                    var prune=t==null?null:t.prune;
+                    if(prune==null||!prune.request.requestId().equals(message.requestId())
+                            ||age(dispatch,prune.request.beganNanos())>=prune.request.budgetNanos()){
+                        synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
+                    }
                 }
                 if(kind==SendKind.ACK){
                     var t=child.tree;var prefix=child.payload.expectedPath().subList(0,child.payload.expectedPath().size()-1);
@@ -1239,7 +1321,7 @@ public final class RoutingService implements AutoCloseable {
                     }
                     long remaining=grant.validity().orElseThrow().remainingNanos(dispatch);
                     if(!t.confirmed.source)remaining=Math.min(remaining,t.confirmed.lease.remainingNanos(dispatch));
-                    if(child.active!=null)remaining=Math.min(remaining,child.active.validity().orElseThrow().remainingNanos(dispatch));
+                    if(child.active!=null&&(!child.renew||child.replay))remaining=Math.min(remaining,child.active.validity().orElseThrow().remainingNanos(dispatch));
                     long millis=Math.min(Math.min(leaseMs,child.payload.leaseMs()),remaining/1_000_000L);
                     if(millis<1){synchronized(resources){sends.remove(send);resources.notifyAll();}
                         failChild(child,ErrorCode.NO_ROUTE,"GRANT_TOO_SHORT",dispatch);return false;}
@@ -1250,13 +1332,13 @@ public final class RoutingService implements AutoCloseable {
                             new ControlMessage.ActivationAck(t.id,t.epoch,child.line.id,child.payload.revision(),millis));
                 }
             }catch(RuntimeException error){synchronized(resources){sends.remove(send);resources.notifyAll();}throw error;}
-            if(attempt!=null){attempt.submitted=true;attempt.round.issued++;}
+            if(attempt!=null){attempt.submitted=true;attempt.round.issued++;attempt.tree.upstream=attempt.line;attempt.tree.submittedRevision=attempt.revision;}
             try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
             catch(RuntimeException e){send.complete(null,e);}return true;
         }
-        void unbound(Neighbor.Session session,UUID request,ErrorCode code,String detail,long at){
+        void unbound(Neighbor.Session session,UUID request,int related,ErrorCode code,String detail,long at){
             send(null,session,SendKind.UNBOUND,null,null,null,new ControlMessage(MessageType.ERROR,request,
-                    config.nodeId(),instance,new ControlMessage.ErrorPayload(code,11,detail)),at);
+                    config.nodeId(),instance,new ControlMessage.ErrorPayload(code,related,detail)),at);
         }
         boolean release(ActSend s){if(s.callbackDone&&s.continuationDone&&sends.remove(s)){resources.notifyAll();return true;}return false;}
         void completed(ActSend s){
@@ -1276,10 +1358,11 @@ public final class RoutingService implements AutoCloseable {
                         // The finally below still completes this continuation and retains a running callback.
                         if(c.line.terminal!=null)return;
                         if(s.error==null&&s.result==Connection.SendResult.ACCEPTED&&epochCurrent(c.tree)
-                                &&current(c.line.key.session)&&healthy(c.tree,at)&&!elapsed(at,c.began)
+                                &&current(c.line.key.session)&&healthy(c.tree,at)&&!childElapsed(c,at)
                                 &&s.grant.validity().orElseThrow().remainingNanos(at)>0
                                 &&(c.replay||compatible(c.tree,c.payload.expectedPath().subList(0,c.payload.expectedPath().size()-1),at))){
-                            c.active=s.grant;c.pending=false;c.ackWanted=false;c.line.terminal=null;c.replay=false;c.tree.version=Math.incrementExact(c.tree.version);
+                            if(!c.replay){c.active=s.grant;c.tree.version=Math.incrementExact(c.tree.version);}
+                            c.pending=false;c.ackWanted=false;c.line.terminal=null;c.replay=false;
                         }else failChild(c,ErrorCode.PATH_CHANGED,"ACK_NO_LONGER_VALID",at);
                     }
                 }
@@ -1315,11 +1398,16 @@ public final class RoutingService implements AutoCloseable {
         long nextDelay(long at){
             long delay=Long.MAX_VALUE;
             for(var t:trees.values()){
-                if(t.round!=null)delay=Math.min(delay,futureDelay(timeout-age(at,t.round.began)));
-                if(t.confirmed!=null&&!t.confirmed.source)delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
+                if(t.round!=null)delay=Math.min(delay,futureDelay(t.round.budget-age(at,t.round.began)));
+                if(t.confirmed!=null&&!t.confirmed.source){
+                    delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
+                    if(t.round==null&&demand(t,at)&&compatible(t,t.confirmed.path,at))
+                        delay=Math.min(delay,futureDelay(t.renewPeriod-age(at,t.renewBegan)));
+                }
+                if(t.prune!=null)delay=Math.min(delay,futureDelay(timeout-age(at,t.prune.request.beganNanos())));
             }
             for(var c:childOrder){
-                if(c.pending||c.ackWanted||c.errorWanted)delay=Math.min(delay,futureDelay(timeout-age(at,c.began)));
+                if(c.pending||c.ackWanted||c.errorWanted)delay=Math.min(delay,futureDelay(c.budget-age(at,c.began)));
                 if(c.active!=null)delay=Math.min(delay,futureDelay(c.active.validity().orElseThrow().remainingNanos(at)));
                 var q=responseQuotas.get(c.line.key.session);
                 if((c.ackWanted||c.errorWanted)&&q!=null&&q.used>=16)delay=Math.min(delay,futureDelay(WINDOW-age(at,q.began)));

@@ -1,0 +1,270 @@
+-------------------------------------------------------------------------------
+Test set: pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+-------------------------------------------------------------------------------
+Tests run: 22, Failures: 20, Errors: 0, Skipped: 0, Time elapsed: 0.676 s <<< FAILURE! -- in pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants -- Time elapsed: 0.204 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Both independent streams need a renewal ==> expected: <2> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants(SubscriptionLeaseTest.java:270)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l10OldDeactivateCannotRemoveRenewedRevision -- Time elapsed: 0.029 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ACTIVATE_ACK for request 257155ae-9fdf-451d-b269-18393281bc3b ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l10OldDeactivateCannotRemoveRenewedRevision(SubscriptionLeaseTest.java:212)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l04OrphanChildExpiresAndPrunesItsCommonTrunk -- Time elapsed: 0.015 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l04OrphanChildExpiresAndPrunesItsCommonTrunk(SubscriptionLeaseTest.java:172)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor(SubscriptionLeaseTest.java:196)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget(SubscriptionLeaseTest.java:290)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ACTIVATE_ACK for request 3947e73e-994b-444d-904d-029871115c38 ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd(SubscriptionLeaseTest.java:240)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease -- Time elapsed: 0.013 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ACTIVATE_ACK for request d8d018c4-fa45-432f-9b26-757e0d590ca9 ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease(SubscriptionLeaseTest.java:233)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l16DeactivateOneStreamPreservesOtherStreamExactly -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: DEACTIVATE must be scoped to the selected stream ==> expected: <false> but was: <true>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertFalse.failNotFalse(AssertFalse.java:63)
+	at org.junit.jupiter.api.AssertFalse.assertFalse(AssertFalse.java:36)
+	at org.junit.jupiter.api.Assertions.assertFalse(Assertions.java:239)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l16DeactivateOneStreamPreservesOtherStreamExactly(SubscriptionLeaseTest.java:265)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement(SubscriptionLeaseTest.java:219)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly -- Time elapsed: 0.165 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ERROR for request 66faa47d-52e9-41a6-960d-e6ec4e4c9f17 ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.errorReply(SubscriptionLeaseTest.java:134)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly(SubscriptionLeaseTest.java:254)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <java.lang.IllegalArgumentException> but was: <java.lang.AssertionError>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:67)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3128)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration(SubscriptionLeaseTest.java:297)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.AssertionError: Path copied before cap validation
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest$1.get(SubscriptionLeaseTest.java:296)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest$1.get(SubscriptionLeaseTest.java:296)
+	at java.base/java.util.AbstractList$Itr.next(AbstractList.java:373)
+	at java.base/java.util.AbstractCollection.toArray(AbstractCollection.java:148)
+	at java.base/java.util.ImmutableCollections.listCopy(ImmutableCollections.java:174)
+	at java.base/java.util.List.copyOf(List.java:1193)
+	at pt.uminho.esr.ott.routing.Subscription.<init>(Subscription.java:51)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.lambda$l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration$15(SubscriptionLeaseTest.java:297)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	... 6 more
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ERROR for request f21c5dc4-8f65-4e2a-9bee-dfbbfacc5056 ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.errorReply(SubscriptionLeaseTest.java:134)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating(SubscriptionLeaseTest.java:249)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup -- Time elapsed: 0.006 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup(SubscriptionLeaseTest.java:285)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l01DeactivateOneChildPreservesSiblingAndCommonTrunk -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: DEACTIVATE must remove only its exact child ==> expected: <[C2]> but was: <[C2, C1]>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l01DeactivateOneChildPreservesSiblingAndCommonTrunk(SubscriptionLeaseTest.java:146)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l19RenewRepliesShareExistingFixedWindowQuota -- Time elapsed: 0.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Initial ACK plus renewals must use the same 16-reply window ==> expected: <16> but was: <1>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l19RenewRepliesShareExistingFixedWindowQuota(SubscriptionLeaseTest.java:279)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain -- Time elapsed: 0.005 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Missing correlated ACTIVATE_ACK for request bb37794f-a9e0-4560-865b-48818707baa2 ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.reply(SubscriptionLeaseTest.java:130)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain(SubscriptionLeaseTest.java:203)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck(SubscriptionLeaseTest.java:190)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave -- Time elapsed: 0.048 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: The last child must remove the remaining aggregate demand ==> expected: <null> but was: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=ee28b284-454f-4abc-8ad9-0aade662b882, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=88156749-ca1e-4fb0-b5c9-fea7907c1bdf, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5b555a48-73c9-473c-865f-3710b30b6538, revision=1, requestId=24381e3b-909f-4168-a189-4bd2f3a567b3, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=0, durationNanos=6000000000]], revision=4]>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertNull.failNotNull(AssertNull.java:50)
+	at org.junit.jupiter.api.AssertNull.assertNull(AssertNull.java:35)
+	at org.junit.jupiter.api.Assertions.assertNull(Assertions.java:287)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave(SubscriptionLeaseTest.java:165)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes(SubscriptionLeaseTest.java:154)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:563)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.exactlyOne(SubscriptionLeaseTest.java:114)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest(SubscriptionLeaseTest.java:181)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

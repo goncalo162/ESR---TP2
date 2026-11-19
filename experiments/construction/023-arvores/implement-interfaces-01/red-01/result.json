@@ -1,0 +1,138 @@
+{
+  "tests": 21,
+  "failures": 19,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 1,
+  "compilation_succeeded": true,
+  "expected_red": true,
+  "scope": "new fake-clock/transport tests only; not full regression or Test stage",
+  "cases": [
+    {
+      "test": "l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Both independent streams need a renewal ==> expected: <2> but was: <0>"
+    },
+    {
+      "test": "l10OldDeactivateCannotRemoveRenewedRevision",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request a9cdb641-9e09-4b38-b209-92fdc28ff242 ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l04OrphanChildExpiresAndPrunesItsCommonTrunk",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request 422ee9e6-3c56-40eb-9471-c3411079049a ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request 9cf8866d-7078-4c94-a1f8-e96f259d7e34 ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l16DeactivateOneStreamPreservesOtherStreamExactly",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "DEACTIVATE must be scoped to the selected stream ==> expected: <false> but was: <true>"
+    },
+    {
+      "test": "l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ERROR for request 107be15c-3aaa-4b50-94e9-e6237adcffc8 ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Unexpected exception type thrown, expected: <java.lang.IllegalArgumentException> but was: <java.lang.AssertionError>"
+    },
+    {
+      "test": "l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ERROR for request 7af2a0d8-a072-4bde-b6d2-aed6b3f7279f ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l01DeactivateOneChildPreservesSiblingAndCommonTrunk",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "DEACTIVATE must remove only its exact child ==> expected: <[C2]> but was: <[C1, C2]>"
+    },
+    {
+      "test": "l19RenewRepliesShareExistingFixedWindowQuota",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Initial ACK plus renewals must use the same 16-reply window ==> expected: <16> but was: <1>"
+    },
+    {
+      "test": "l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request e87d8f3b-b08e-425c-8de5-6e0e97bc3319 ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "The last child must remove the remaining aggregate demand ==> expected: <null> but was: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=e8f0a3fb-4fe2-4213-921f-b2e690f32363, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=8ba8a022-74b6-45a2-a924-8a871d8af679, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=798dc6bb-dbe5-405a-a665-31bbf094e305, revision=1, requestId=a9ee96a8-7967-407d-8914-ba532762e881, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=0, durationNanos=6000000000]], revision=4]>"
+    },
+    {
+      "test": "l15OldSessionDeactivateCannotAffectReplacementConnection",
+      "passed": true,
+      "failure_type": null,
+      "message": null
+    },
+    {
+      "test": "l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "l04SourceExpiryAlreadyExcludesOrphanWithoutNewNetworkInput",
+      "passed": true,
+      "failure_type": null,
+      "message": null
+    },
+    {
+      "test": "l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>"
+    }
+  ]
+}

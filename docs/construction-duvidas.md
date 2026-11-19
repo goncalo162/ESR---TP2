@@ -1447,3 +1447,108 @@ Implement continua pendente de aprovação; Test não autorizado.
 
 Q-C-39 RESOLVIDA: V-ADD executado após o patch autorizado, zero erros.
 Relatório preservado na evidência Q-C-39; nenhuma alteração ao validador.
+
+## Q-C-40 — IMP-012: correlação e revisão da renovação
+
+Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
+Evidência estática: RoutingService.ActivationEngine.Line retém a maior revisão,
+requestId canónico e fingerprint; incoming rejeita requestId diferente na mesma
+revisão (REVISION_BOUND). ACTIVATE e RENEW usam o mesmo payload Activation;
+ACTIVATE_ACK12 não transporta um tipo de operação próprio.
+
+Opções apresentadas: (1) mesmo subscriptionId, revisão crescente e requestId novo
+por renovação; (2) mesma revisão e ledger próprio de ciclos de renovação, exigindo
+proteção adicional contra replay. O utilizador escolheu **opção1**.
+A correlação inclui Session completa/stream/epoch/ID/revisão/requestId e a espécie
+local da operação; o ACK12 de renovação não confirma ativação ou renovação antiga.
+O Design ainda deve concretizar o cancelamento durante renovação admitida/em voo,
+a revisão transportada por DEACTIVATE e a preservação do grant anterior até
+substituição válida. Long.MAX_VALUE não permite wrap; não se muda wire.
+Nenhuma implementação/teste executado, nova ADR ou aprovação de Model inferida.
+
+## Q-C-41 — IMP-012: RENEW com seleção divergente da confirmação
+
+Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
+Q-C-35 rege novas adesões; o contrato14 revalida prefixo/epoch, mas não esclarecia
+se renovação de ramo confirmado poderia dispensar a seleção atual.
+
+Opções apresentadas: (1) recusar RENEW divergente com PATH_CHANGED e preservar
+o grant atual; (2) renovar pelo ramo confirmado, com política distinta para
+adesões novas. O utilizador escolheu **opção1**.
+Recusa preserva parent, filhos/consumidores e prazos ainda válidos; não prolonga
+lease nem troca parent. Sem renovação válida, a autorização expira no prazo
+anterior. Recuperação/troca ficam em IMP-013/014, não implementadas por inferência.
+Q-C-35 e o fecho histórico de IMP-011 preservados. Nenhuma mudança de bytes/caps.
+
+## Q-C-42 — IMP-012: fronteira de CLI stop e âmbito de três ficheiros
+
+Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
+Evidência: OttApplication reconhece play como NOT_IMPLEMENTED e não tem comando
+stop; OverlayNode só delega requestTrace, não requestSubscription. Q-C-34 menciona
+CLI stop em IMP-012, enquanto o ADD/âmbito autorizado limita a três caminhos.
+TASK-015 lista NeighborManager, mas essa lista legada não alarga o ADD.
+
+Opções apresentadas: (1) manter os três ficheiros e esclarecer a fronteira CLI;
+(2) preparar exceção mínima de composição fora deles. O utilizador escolheu
+**opção1**: IMP-012 fornece renovação/poda e cancelamento pela SubscriptionTicket
+existente/DEACTIVATE de rede. A ligação à CLI fica para a composição posterior
+de cliente/aplicação, sem a declarar entregue neste IMP. Esta concretização
+clarifica a frase de Q-C-34, sem apagar o seu histórico ou reabrir IMP-011.
+Nenhuma extensão a OverlayNode/OttApplication/NeighborManager, transporte,
+comando CLI, runtime ou dependência. Model apenas; Design não autorizado.
+
+### Q-C-40–42 — Model aprovado; Design concretizado, por aprovar
+
+Registo 2026-11-18T16:04:20Z. O utilizador aprovou Model e reconfirmou as três opções1,
+autorizando apenas Design. [Design proposto](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md)
+concretiza a revisão a podar (maior submetida da geração retirada), match exato
+remoto, expiração como fallback quando a renovação não foi admitida, P constante
+por grant e prazo cortado pelo restante, intenções únicas/limites partilhados e
+shutdown sem fase adicional. ACK/ACCEPTED tardios não afetam substitutas, nem
+libertam reserva antes de callback e continuação acabarem.
+Esses detalhes novos aguardam aprovação do Design; não são novas decisões já
+aceites, ADR, alteração de âmbito ou execução de testes. Sem dúvidas novas que
+exijam substituir uma ADR aceite; não se criou outro Q-C por inferência.
+
+### Q-C-40–42 — Design aprovado; revisão ADR preparada
+
+Registo 2026-11-18T16:15:43Z: utilizador aprovou Design, matriz RENEW/DEACTIVATE, revisão
+submetida/match exato/lease fallback, cadência fixa, prazos restantes e limites.
+Apenas revisão ADR autorizada. [Revisão estática](../memory-bank/bolts/023-arvores/adr-review.md)
+reutiliza decisões aceites, sem divergência arquitetural concreta ou inviabilidade
+identificada. F01–F07 são adaptações futuras do código dentro dos três ficheiros;
+grant anterior, terminais M07 e finally/contabilização físicos preservados.
+Nenhuma ADR nova/substituta/estado aceite alterado, nenhuma Q-C nova por inferência.
+Revisão ADR por aprovar; sem Implement/Java/testes Java/staging/commits/push.
+
+### Q-C-40–42 — ADR aprovada; primeiro passo de Implement
+
+Registo 2026-11-18T16:51:40Z. Utilizador aprovou revisão ADR/reutilização, autorizando
+somente interfaces/tipos e testes vermelhos nos três ficheiros.
+[Checkpoint](../memory-bank/bolts/023-arvores/implementation-walkthrough.md):
+4 tipos internos, nenhum comportamento do engine alterado.22 testes novos,
+20 falhas de asserção/0 erros/0 ignorados;30 históricos selecionados verdes,
+6 M07 incluídos. Negativos preservados; restantes comportamentos/V-015/
+regressão integral pendentes. Nenhuma Q-C nova ou ADR inferida; limites mantidos.
+
+### Q-C-40–42 — Implement aprovado; Test autorizado
+
+Decisões inalteradas: revisão crescente, grant saudável preservado perante
+RENEW divergente e três ficheiros/sem CLI. [Test](../memory-bank/bolts/023-arvores/ddd-03-test-report.md)
+consolida clean verify1379/0/0/0,19 XML,TCP real e callbacks/limites/shutdown.
+Sem dúvida/ADR nova, alteração wire/caps/validador ou inferência de aprovação.
+Manual humano e aprovação Test pendentes; revisão final Denji e integração depois.
+
+### Q-C-40–42 — Test aprovado, revisão final/integração pendentes
+
+Utilizador aprovou Test com1379/0/0/0,19 XML,V-ADD e manual Francisco30.
+[Resumo para Denji](../memory-bank/bolts/023-arvores/final-review-summary.md):
+decisões inalteradas, código/JAR e negativos preservados; sem nova ADR/âmbito.
+Revisão final Denji não confirmada e integração pendente. Sem fecho/staging/commits/push.
+
+### Q-C-40–42 — revisão final Denji confirmada
+
+Aprovação final da mesma implementação confirmada explicitamente pelo utilizador,
+sem alterações pendentes. [Versão e plano](../memory-bank/bolts/023-arvores/integration-plan.md),
+hashes e simulação atualizados; decisões40–42 inalteradas,sem nova ADR/âmbito.
+Integração por autorizar/executar; sem staging/commits/push/fecho.

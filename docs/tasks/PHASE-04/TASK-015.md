@@ -5,7 +5,7 @@
 - ID: TASK-015
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-014](../PHASE-04/TASK-014.md).
@@ -72,3 +72,78 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Model em preparação — checkpoint anterior
+
+Base main/b273b258, dependências IMP-011/007-arvores e IMP-010/022-rotas complete.
+[Model](../../../memory-bank/bolts/023-arvores/ddd-01-domain-model.md) por aprovar;
+Q-C-40/41/42 decididas explicitamente, sem extensão dos três caminhos do ADD.
+A referência legada a NeighborManager na secção6 não autoriza alteração desse
+componente. Cancelamento por ticket/DEACTIVATE; composição CLI posterior.
+V-015/Java não executados; os1328 testes anteriores são históricos de IMP-011.
+Revisão final Denji/integração permanecem requisitos de fecho, não presumidos.
+
+## Design autorizado — preparado para aprovação
+
+Model aprovado e Q-C-40–42 reconfirmadas pelo utilizador.
+[Design](../../../memory-bank/bolts/023-arvores/ddd-02-technical-design.md) com
+APIs/estados, corrida RENEW/DEACTIVATE, prazos/cadência, limites físicos e L01–L24.
+Nenhum teste executado, Java alterado ou ADR/Implement iniciado. TASK em progresso.
+
+## Revisão ADR autorizada — checkpoint atual
+
+Design aprovado pelo utilizador. [Revisão ADR](../../../memory-bank/bolts/023-arvores/adr-review.md)
+preparada, sem nova ADR/divergência concreta; adaptações futuras F01–F07 nos
+três ficheiros, preservando grant/M07/quotas/físico/shutdown. Implement não
+autorizado, V-015 não executado. Sem Java/testes Java/staging/commits/push.
+
+## Implement — interfaces/tipos e testes vermelhos
+
+Revisão ADR aprovada, somente primeiro passo de Implement autorizado.
+[Walkthrough](../../../memory-bank/bolts/023-arvores/implementation-walkthrough.md):
+22 testes novos,20 falhas esperadas/0 erros/0 ignorados; compilação passou.
+30 históricos de ativação selecionados passaram, incluindo6 M07. APIs e testes
+históricos intactos; tipos main não ligados ao engine. Parar antes dos
+comportamentos, V-015 integral/Test/regressão pendentes. Sem staging/commit/push.
+
+## Implement — comportamentos para revisão
+
+Primeiro checkpoint aprovado; comportamentos autorizados nos três ficheiros.
+[Resultados incrementais e preservação](../../../memory-bank/bolts/023-arvores/implementation-walkthrough.md),
+incluindo TCP real, M07 e limites. Implement por aceitar; tarefa em progresso,
+sem DONE, Test/clean verify/JAR/manual/Denji/integração concluídos.
+Sem staging/commits/push e sem gates externos adicionais.
+
+## Checkpoint atual — Test, manual humano pendente
+
+Implement aprovado; Test autorizado pelo utilizador. [Relatório](../../../memory-bank/bolts/023-arvores/ddd-03-test-report.md)
+consolida clean verify1379/0/0/0,19 XML,V-015/L01–L24 e JAR/hash.
+Código/históricos/negativos/Q-C-40–42 intactos. [Manual](../../../experiments/construction/023-arvores/manual-instructions.md)
+preparado, por executar por humano; ensaio kind=agent não o substitui.
+Test por aprovar; depois revisão Denji e integração. TASK-015 IN PROGRESS,
+sem DONE/staging/commits/push/fecho.
+
+## Checkpoint Test após manual humano
+
+Francisco confirmou pessoalmente seis etapas sem divergências;30 checks,
+JAVA_EXIT0,hashes/origem no JAR e JVM terminada conferidos. [Prova](../../../experiments/construction/023-arvores/manual-human-verification-01/verification.json).
+WRAPPER_EXIT não fornecido/não inferido. Test reapresentado para aprovação;
+revisão final Denji e integração pendentes. TASK-015 continua IN PROGRESS.
+Sem staging/commits/push/fecho; código e evidências originais preservados.
+
+## Test aprovado — revisão final Denji e integração pendentes
+
+Utilizador aprovou Test1379/0/0/0,19 XML,V-ADD e Francisco30.
+[Resumo final](../../../memory-bank/bolts/023-arvores/final-review-summary.md)
+e [plano/allowlist](../../../memory-bank/bolts/023-arvores/integration-plan.md)
+preparados, preservando código/JAR/negativos/Q-C-40–42. Denji ainda não confirmado,
+integração não autorizada/executada. TASK-015 IN PROGRESS,sem DONE/fecho/staging/
+commits/push/outro IMP. Target e alterações alheias excluídos.
+
+## Revisão final Denji confirmada — integração por autorizar
+
+Utilizador confirmou aprovação final da implementação atual sem alterações pendentes.
+[Confirmação/hashes](../../../experiments/construction/023-arvores/integration-01/review-confirmation.json)
+e [plano final](../../../memory-bank/bolts/023-arvores/integration-plan.md).
+Mesmo código/JAR/Test/manual,sem repetição. Simulação exata com referências/V-ADD;
+TASK-015 IN PROGRESS até integração comprovada/fecho. Sem staging/commits/push.

@@ -1,0 +1,81 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 42 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 20 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+[ERROR] Tests run: 38, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 0.441 s <<< FAILURE! -- in pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+[ERROR] pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l08PendingDuplicateAndWrongKindCannotReanchor -- Time elapsed: 0.011 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <2> but was: <1>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:166)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:161)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:632)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l08PendingDuplicateAndWrongKindCannotReanchor(SubscriptionLeaseTest.java:328)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[ERROR] pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l09MaximumRevisionNeverWrapsAndEqualNewRequestIsRejected -- Time elapsed: 0.035 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4b959065-cfe6-412d-80b2-493ee9c7cc47, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=47f66f76-8eca-4ee3-be80-612ae91d878a, revision=9223372036854775807, requestId=a3a5c8d6-1323-4527-b9ca-cfdc0277c8f7, expectedPath=[S, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=3]> but was: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4b959065-cfe6-412d-80b2-493ee9c7cc47, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=47f66f76-8eca-4ee3-be80-612ae91d878a, revision=9223372036854775807, requestId=a3a5c8d6-1323-4527-b9ca-cfdc0277c8f7, expectedPath=[S, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=4]>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at pt.uminho.esr.ott.routing.SubscriptionLeaseTest.l09MaximumRevisionNeverWrapsAndEqualNewRequestIsRejected(SubscriptionLeaseTest.java:341)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   SubscriptionLeaseTest.l08PendingDuplicateAndWrongKindCannotReanchor:328 expected: <2> but was: <1>
+[ERROR]   SubscriptionLeaseTest.l09MaximumRevisionNeverWrapsAndEqualNewRequestIsRejected:341 expected: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4b959065-cfe6-412d-80b2-493ee9c7cc47, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=47f66f76-8eca-4ee3-be80-612ae91d878a, revision=9223372036854775807, requestId=a3a5c8d6-1323-4527-b9ca-cfdc0277c8f7, expectedPath=[S, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=3]> but was: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4b959065-cfe6-412d-80b2-493ee9c7cc47, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=47f66f76-8eca-4ee3-be80-612ae91d878a, revision=9223372036854775807, requestId=a3a5c8d6-1323-4527-b9ca-cfdc0277c8f7, expectedPath=[S, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=4]>
+[INFO] 
+[ERROR] Tests run: 38, Failures: 2, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.540 s
+[INFO] Finished at: 2026-11-18T17:05:09Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: There are test failures.
+[ERROR] 
+[ERROR] See /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

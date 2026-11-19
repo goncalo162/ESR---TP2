@@ -1,0 +1,286 @@
+{
+  "validation": "V-015",
+  "stage": "Test pending human manual and approval",
+  "source_hashes": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java": "7d3c8af82c551b56db14d568662711195a5bbb0592d44c057ae305c78958157a",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": "63ed46022b47258a6fcff6fa848714176b438ad19bf5a9eca3778ff9f1ca3d46",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java": "5c54b2cde853b79335ec421c9bd3bc0f6ae7d2ca21843cb7678fd0cc8e3cf53b"
+  },
+  "xml_files": 19,
+  "totals": {
+    "tests": 1379,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "groups": {
+    "L01": {
+      "design_criterion": "S-R-(C1,C2) confirmado; cancelar C1, repetir stop e ticks por dois períodos; C2/lease/path exatos preservados, nenhuma13 no tronco, uma14 agregada por ciclo",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l01SharedTrunkRenewsOncePerCycleAfterPartialDeparture",
+        "l01DeactivateOneChildPreservesSiblingAndCommonTrunk"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L02": {
+      "design_criterion": "Cancelar último local/child de ramo confirmado; snapshot vazio antes do future13 terminar; exatamente uma13 com revisão capturada, zero13 na fonte; B só liberto fisicamente",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes"
+      ],
+      "executed": 1,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L03": {
+      "design_criterion": "Local+child, retirar em ambas as ordens; último provoca poda, primeiro preserva outro e não cria14 por consumidor",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l03ChildLeavesBeforeLocalConsumer",
+        "l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L04": {
+      "design_criterion": "Desaparecer child sem LEAVE/13 e avançar relógio a G−1/G; autorização só antes, sweep termina sem evento de rede, ramo órfão remoto limitado pelo lease",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l04OrphanChildExpiresAndPrunesItsCommonTrunk",
+        "l04SourceExpiryAlreadyExcludesOrphanWithoutNewNetworkInput"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L05": {
+      "design_criterion": "Três ciclos com ACK válidos S-R-C; ID estável, revisões crescentes/requests novos, referência única e grants conservadores",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l05ThreeCyclesUseOneLineAndStrictlyIncreasingRevisions",
+        "l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L06": {
+      "design_criterion": "pedido6000/máximo3000, renew2000: grant3000/P1000; grant300/P100; grant1/P333333ns sem arredondamento para zero; quota não é aumentada",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l06OneMillisecondGrantUsesSubMillisecondCadenceAndExactExpiry",
+        "l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L07": {
+      "design_criterion": "Dois relays, fila/send/ACK com atrasos; grant novo ancorado em t0; restante999999ns nunca vira1ms; ACK limite exato/oversized não confirma",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor",
+        "l07OversizedAndExactDeadlineAckDoNotReplaceGrant",
+        "l07SubMillisecondParentRemainderIsNeverRoundedUp"
+      ],
+      "executed": 3,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L08": {
+      "design_criterion": "Repetir14 exato pending/sucesso/terminal; um contexto/intenção, restante antigo; mesmo revision com request/fields/espécie diferentes rejeitado sem renovar",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l08PendingDuplicateAndWrongKindCannotReanchor",
+        "l08TerminalReplayIsBoundedAndFreshRenewCanKeepOldHealthyGrant",
+        "l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain"
+      ],
+      "executed": 3,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L09": {
+      "design_criterion": "r+1/r+2 e request novo; ACK r+1 não substitui r+2; MAX_VALUE termina sem wrap nem UUID para contornar watermark",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l09MaximumRevisionNeverWrapsAndEqualNewRequestIsRejected",
+        "l09LatePreviousAckCannotReplaceNewRenewal"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L10": {
+      "design_criterion": "13 r depois de14 r+1 e13 r+1 depois de novo11 r+2; substituta e leases iguais. Mesmo token com ticket novo imune ao cancel velho",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l10OldPruneCannotCancelNewActivationOnSameSession",
+        "l10OldDeactivateCannotRemoveRenewedRevision"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L11": {
+      "design_criterion": "Matriz secção5: reservar/submeter/admitir14 antes/depois de cancel; ACK e ACCEPTED tardios, parent só conhece r, poda r+1 ignorada e expiração segura; outro child intacto",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease",
+        "l11UnsentPruneExpiresAndNewDemandInvalidatesOldIntent",
+        "l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement",
+        "l11UnknownHigherPruneUsesLeaseFallbackWithoutApproximateCancellation"
+      ],
+      "executed": 4,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L12": {
+      "design_criterion": "Callback bloqueado com continuação concluída e ordem inversa; B/J/2por contexto retidos, M07 finalmente executa, release único e wake após libertação",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd"
+      ],
+      "executed": 1,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L13": {
+      "design_criterion": "14 em concessão expirada/cancelada e antes de ACK11 admitido; não cria ramo nem revive terminal. Falha14 preserva grant anterior enquanto válido",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating",
+        "l13RenewBeforeInitialAckAndAfterCancelCannotActivate"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L14": {
+      "design_criterion": "Seleção B/confirmado A;14 por ambos os prefixos recusado PATH_CHANGED, parent/destinos/lease originais iguais até prazo; custo só diferente com mesmo path permite",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l14BothDivergentPrefixesPreserveConfirmedGrant",
+        "l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly",
+        "l14SamePathMetricChangeAllowsRenewal"
+      ],
+      "executed": 3,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L15": {
+      "design_criterion": "Novo connectionId na mesma instância e nova instanceId; Down/ACK/13/callback antigo não altera Session nova, sem herança de grant",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l15OldRenewCallbackAndAckCannotInvalidateNewInstance",
+        "l15OldSessionDeactivateCannotAffectReplacementConnection"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L16": {
+      "design_criterion": "Duas streams da mesma epoch e outra origem; cancelar/renovar/expirar/errar uma preserva confirmação/procura das outras, exceto perda física da Session partilhada",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l16DeactivateOneStreamPreservesOtherStreamExactly"
+      ],
+      "executed": 1,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L17": {
+      "design_criterion": "CLOSED/OVERFLOW correntes retiram só essa Session; INVALID_MESSAGE/exceção termina operação sem conceder mais tempo; ACCEPTED sozinho não confirma",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l17PhysicalFailureInvalidatesOnlyDependentSession",
+        "l17LocalSendFailurePreservesGrantAndAcceptedAloneDoesNotExtend"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L18": {
+      "design_criterion": "Intercalar ERROR11/13/14/15 e ACK12 de campos errados; cada correlação/tipo isolado, nenhum ERROR17 em resposta a ERROR17",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants",
+        "l18WrongAckFieldsAndErrorKindsAreIsolated"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L19": {
+      "design_criterion": "E pequeno e fronteiras C/D/L/H/B/J/quota; nova geração não escapa2/contexto, pending14/13 não cria pool/fila paralelos, estado saudável preservado; H protegido sem evicção",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l19SmallSharedHistoryAndLocalCapsPreserveHealthyGrant",
+        "l19UnboundErrorsShareGlobalAndPerSessionPhysicalCaps",
+        "l19RetiredGenerationsShareStablePhysicalContext",
+        "l19RenewRepliesShareExistingFixedWindowQuota",
+        "l19RenewalsShareFourPendingPerSessionAndNoParallelPool"
+      ],
+      "executed": 5,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L20": {
+      "design_criterion": "Alarme atrasado até depois de vários períodos, ACK tardio e falha; no máximo um ciclo atual, início real avança e P constante, sem remaining/3 em loop; wrap monotónico testado",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l20MonotonicWrapPreservesRenewalCadence",
+        "l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L21": {
+      "design_criterion": "Fonte oferta ativa sem consumidor: catálogo preservado/forwarding vazio/sem13 para si; cancelar A não fecha oferta B; nenhuma medição de bytes de vídeo presumida",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l21SourceCatalogSurvivesLastConsumerAndOtherStream"
+      ],
+      "executed": 1,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L22": {
+      "design_criterion": "Shutdown antes/depois de submissão14/13, callback preso e job físico; nenhuma submissão após stopping, deadline único, await(0)=false até terminar, sem prolongar orçamento",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget",
+        "l22ShutdownAfterPruneDoesNotSendMoreAndRetainsPhysicalReservation"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L23": {
+      "design_criterion": "Overloads de Snapshot, Subscription/Lease/State e ticket preservados; cópias defensivas; validadores antes de novas cópias; seleção/catálogo/trace sem procura implícita",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration",
+        "l23SubscriptionCopiesValidPathAndRetainsPublicShape"
+      ],
+      "executed": 2,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    },
+    "L24": {
+      "design_criterion": "Integração TCP real posterior com source/relay/dois consumidores e dois relays; saída parcial/final, renovação além de um lease, expiração órfã e shutdown/portas; consumidor via API, sem alteração CLI/OverlayNode",
+      "suite": "pt.uminho.esr.ott.routing.SubscriptionLeaseTest",
+      "tests": [
+        "l24TcpTwoRelaysAggregateRenewPruneExpireAndReleasePorts"
+      ],
+      "executed": 1,
+      "result": "PASS technical; Test acceptance pending human manual",
+      "xml": "surefire-reports/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml"
+    }
+  },
+  "scope": "24 groups mapped to 51 executed test methods, not percentage coverage. TCP loopback in same JVM; no video/GUI/CORE/manual-human claim."
+}

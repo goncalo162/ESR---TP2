@@ -2,6 +2,14 @@
 
 Fonte normativa: [ADD](../../add.md).
 
+## IMP-012 — Test e revisão final Denji aprovados, integração pendente
+
+Model/Design/ADR/Implement/Test aprovados; revisão ADR reutilizada sem decisão
+nova ou alteração de âmbito. [Resumo final](../bolts/023-arvores/final-review-summary.md):
+clean verify1379/0/0/0,19 XML,V-ADD e Francisco30. Q-C-40–42/M07/wire/caps/
+físico/históricos preservados, mesmos código/JAR aprovados. Denji confirmado
+pelo utilizador,sem alterações pendentes; bolt aberto até integração comprovada. Sem staging/commits/push/fecho.
+
 ## IMP-011 — Model/Design/ADR aprovados; Implement em curso
 
 Registo 2026-11-17T17:02:14Z. O utilizador aprovou Model/Q-C-34/35 e autorizou

@@ -1,0 +1,1168 @@
+diff --git a/add.md b/add.md
+index b6c5c7e..f76582f 100644
+--- a/add.md
++++ b/add.md
+@@ -1183,6 +1183,20 @@ sem Java, target, push ou início de outro IMP no fecho documental.
+   - [ ] Outros consumidores e fluxos mantêm-se ativos.
+   - [ ] Validação V-015 executada e evidência ligada no progresso.
+ 
++**Model de IMP-012 aprovado pelo utilizador**, Q-C-40–42 reconfirmadas, base
++main/b273b258a4642f94f8614ae00f060a46318d77a5.
++[Model aprovado](memory-bank/bolts/023-arvores/ddd-01-domain-model.md) e
++[Design para aprovação](memory-bank/bolts/023-arvores/ddd-02-technical-design.md).
++Q-C-40: mesmo subscriptionId, revisão crescente e requestId novo. Q-C-41: RENEW
++divergente recusa com PATH_CHANGED e preserva grant atual até ao prazo. Q-C-42:
++três ficheiros, ticket/DEACTIVATE sem CLI, clarificando a fronteira de Q-C-34.
++Design propõe poda na maior revisão submetida da geração retirada, ignorada
++quando não corresponde à admitida remotamente (lease como salvaguarda); cadência
++com P=min(renew,G/3) fixo por grant, um ciclo pendente e prazo cortado pelo
++restante; limites físicos partilhados e shutdown único. Estas concretizações
++aguardam aprovação de Design; não são implementação/ADR nova nem mudam wire.
++Sem Java/testes Java/staging/commits/push ou outro IMP.
++
+ <a id="imp-013"></a>
+ ### IMP-013 — Recuperar falhas do upstream TCP
+ 
+diff --git a/docs/07-API-AND-INTERFACES.md b/docs/07-API-AND-INTERFACES.md
+index d3b8ed3..7e97ba4 100644
+--- a/docs/07-API-AND-INTERFACES.md
++++ b/docs/07-API-AND-INTERFACES.md
+@@ -832,3 +832,43 @@ D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
+ [Prova nova](../experiments/construction/007-arvores/q-c-37/README.md) inclui terminação
+ sem resposta/recursos físicos, mantendo os prazos. Implement continua por aceitar,
+ sem Test/fecho/commits/push/outro IMP; restantes requisitos de fecho pendentes.
++
++## IMP-012 — decisões de Model, sem implementação
++
++[Model023-arvores](../memory-bank/bolts/023-arvores/ddd-01-domain-model.md),
++base b273b258a4642f94f8614ae00f060a46318d77a5. Model aprovado pelo utilizador; apenas Design autorizado;
++Q-C-40/41/42 respondidas explicitamente pelo utilizador:
++
++- RENEW14 mantém subscriptionId e usa revisão crescente/requestId novo. ACK12
++  e ERROR17 existentes são correlacionados pela operação/Session/stream/epoch/
++  ID/revisão/pedido; não se acrescenta campo ao wire.
++- Divergência selecionado/confirmado recusa RENEW com PATH_CHANGED, preservando
++  concessão anterior até ao seu prazo; não troca parent nem renova por recusa.
++- Cancelamento usa ticket local existente e DEACTIVATE13, sem CLI nova. A ligação
++  à CLI fica para composição posterior de cliente/aplicação; esta clarificação
++  de Q-C-34 mantém a allowlist de três ficheiros e o fecho histórico de IMP-011.
++
++Renovação ainda não implementada. RoutingService atual trata11/12/ERROR11;
++Design deverá especificar13/14/ERROR13/14 e a corrida de revisão/cancelamento,
++preservando ERROR/trace15 e os eventos alheios. NeighborManager/codec/transporte
++já representam estes tipos; nenhuma alteração fora do âmbito é autorizada.
++Sem Java/testes Java, novo executor, transporte, dependência ou ADR nesta etapa.
++
++### IMP-012 — Design proposto para aprovação
++
++[Design](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md): APIs públicas
++de SubscriptionTicket/requestSubscription/retrySubscription/snapshot e os records
++existentes preservados; novos handlers13/14/ERROR13/14 apenas no RoutingService.
++Nenhuma assinatura/wire pública nova ou mudança no manager/codec/transporte.
++
++Poda captura a maior revisão submetida da geração retirada; recetor só cancela
++Line/Session/stream/epoch/ID com revisão máxima admitida exata. Se o parent não
++admitiu a renovação, não há cancelamento aproximado: o ramo limpa pelo lease.
++ACK/ACCEPTED de operação antiga não publicam estado, mantendo o finally físico.
++
++Cadência proposta P=min(renew,G/3), constante por grant e nanos positivos;
++sem remaining/3 em cada wake ou recuperação de ticks perdidos. Prazo de renovação
++min(T,restante do grant antigo); falha preserva apenas o grant ainda válido.
++Uma operação lógica pendente por upstream, mesma reserva B/J/contexto e alarme.
++Shutdown não inicia podas após stopping nem cria prazo/fase extra por stream.
++Tudo acima é concretização de Design por aprovar, sem Java/testes executados.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index cd89141..fce16c5 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,6 +1,6 @@
+ # Progresso do projeto
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 DONE após Test, revisão final e integração; PHASE-05–07 e TASK-015–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 DONE após Test, revisão final e integração; TASK-015 em Design; PHASE-05–07 e TASK-016–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -12,9 +12,15 @@ e V-014 consolidados, Test aprovado, manual humano Francisco24 e revisão final
+ Waheed cumpridos. Integração local main37fa863ed416017e733e692f9565899fb61285ae,
+ [conteúdo/hash/JAR/V-ADD da cópia extraída](../experiments/construction/007-arvores/integration-proof-01/README.md).
+ Q-C-36–39, negativos e código/JAR aprovados preservados.
+-Unidade004-arvores/PHASE-04 continuam IN PROGRESS; TASK-015–018 TODO.
+-13 bolts complete,0 in-progress,22 planned; nenhum novo IMP iniciado.
+-Fecho exclusivamente documental/evidência, sem Java/target/push.
++Unidade004-arvores/PHASE-04 continuam IN PROGRESS; IMP-011 fechado e preservado.
++
++**Trabalho atual:** IMP-012/023-arvores/TASK-015 em Design, base operacional
++b273b258a4642f94f8614ae00f060a46318d77a5; dependências007-arvores/022-rotas complete.
++[Model aprovado/Design por aprovar](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md).
++Q-C-40/41/42 reconfirmadas; corrida/cadência/limites/L01–L24 concretizados no Design,
++sem ampliar os três caminhos nem avançar ADR/Implement.
++13 bolts complete,1 in-progress,21 planned. Sem Java/testes Java, staging,
++commits/push ou outro IMP iniciado. Os1328 testes são históricos de IMP-011.
+ 
+ **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
+ 
+@@ -95,7 +101,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
+ | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+ | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
+-| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | IN PROGRESS — TASK-014 DONE; TASK-015–018 TODO | PHASE-03 DONE |
++| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | IN PROGRESS — TASK-014 DONE; TASK-015 em Design; TASK-016–018 TODO | PHASE-03 DONE |
+ | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
+ | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
+ | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
+@@ -121,7 +127,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-012](tasks/PHASE-03/TASK-012.md) | Difundir anúncios e construir catálogo e rotas | TASK-007, TASK-010, TASK-011 | DONE | [V-012/Test1256,manual Luis53,revisão Denji e integração](../memory-bank/bolts/006-rotas/closure-walkthrough.md) |
+ | [TASK-013](tasks/PHASE-03/TASK-013.md) | Diagnosticar percursos pela tabela de rotas | TASK-008, TASK-012 | DONE | [V-013/Test1296,manual Luis34,revisão Luis e integração](../memory-bank/bolts/022-rotas/closure-walkthrough.md) |
+ | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | DONE | Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863; [fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md) |
+-| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | TODO | V-015: NÃO EXECUTADO |
++| [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | IN PROGRESS | Model aprovado/Design por aprovar; Q-C-40/41/42 reconfirmadas; V-015 NÃO EXECUTADO |
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | TODO | V-016: NÃO EXECUTADO |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | TODO | V-017: NÃO EXECUTADO |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | TODO | V-018: NÃO EXECUTADO |
+diff --git a/docs/18-CONSTRUCTION-BOLTS.md b/docs/18-CONSTRUCTION-BOLTS.md
+index fe8f36e..403a10b 100644
+--- a/docs/18-CONSTRUCTION-BOLTS.md
++++ b/docs/18-CONSTRUCTION-BOLTS.md
+@@ -3,10 +3,12 @@
+ **Estado atual:** IMP-011/007-arvores complete, história implemented=true,
+ TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão final Waheed e
+ integração37fa863 comprovada. [Fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+-13 bolts complete,0 in-progress,22 planned. Unidade004-arvores/PHASE-04 em
+-progresso; quatro histórias restantes planned.023-arvores desimpedido, não iniciado.
+-Q-C-36–39 e negativos/evidências preservados. Sem alterações Java, push ou
+-outro IMP iniciado nesta autorização de fecho exclusivamente documental.
++13 bolts complete,1 in-progress,21 planned. Unidade004-arvores/PHASE-04 em
++progresso;023-arvores/IMP-012 Model aprovado e apenas Design autorizado pelo utilizador,
++[Design por aprovar](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md).
++Q-C-40/41/42 decididas; três ficheiros, V-015 não executado.
++Q-C-36–42 e negativos/evidências preservados. Sem alterações Java/testes Java,
++staging, commits/push ou início de outro IMP nesta etapa Design.
+ 
+ Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
+ Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;
+diff --git a/docs/construction-duvidas.md b/docs/construction-duvidas.md
+index b129c6f..44f1ca6 100644
+--- a/docs/construction-duvidas.md
++++ b/docs/construction-duvidas.md
+@@ -1447,3 +1447,65 @@ Implement continua pendente de aprovação; Test não autorizado.
+ 
+ Q-C-39 RESOLVIDA: V-ADD executado após o patch autorizado, zero erros.
+ Relatório preservado na evidência Q-C-39; nenhuma alteração ao validador.
++
++## Q-C-40 — IMP-012: correlação e revisão da renovação
++
++Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
++Evidência estática: RoutingService.ActivationEngine.Line retém a maior revisão,
++requestId canónico e fingerprint; incoming rejeita requestId diferente na mesma
++revisão (REVISION_BOUND). ACTIVATE e RENEW usam o mesmo payload Activation;
++ACTIVATE_ACK12 não transporta um tipo de operação próprio.
++
++Opções apresentadas: (1) mesmo subscriptionId, revisão crescente e requestId novo
++por renovação; (2) mesma revisão e ledger próprio de ciclos de renovação, exigindo
++proteção adicional contra replay. O utilizador escolheu **opção1**.
++A correlação inclui Session completa/stream/epoch/ID/revisão/requestId e a espécie
++local da operação; o ACK12 de renovação não confirma ativação ou renovação antiga.
++O Design ainda deve concretizar o cancelamento durante renovação admitida/em voo,
++a revisão transportada por DEACTIVATE e a preservação do grant anterior até
++substituição válida. Long.MAX_VALUE não permite wrap; não se muda wire.
++Nenhuma implementação/teste executado, nova ADR ou aprovação de Model inferida.
++
++## Q-C-41 — IMP-012: RENEW com seleção divergente da confirmação
++
++Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
++Q-C-35 rege novas adesões; o contrato14 revalida prefixo/epoch, mas não esclarecia
++se renovação de ramo confirmado poderia dispensar a seleção atual.
++
++Opções apresentadas: (1) recusar RENEW divergente com PATH_CHANGED e preservar
++o grant atual; (2) renovar pelo ramo confirmado, com política distinta para
++adesões novas. O utilizador escolheu **opção1**.
++Recusa preserva parent, filhos/consumidores e prazos ainda válidos; não prolonga
++lease nem troca parent. Sem renovação válida, a autorização expira no prazo
++anterior. Recuperação/troca ficam em IMP-013/014, não implementadas por inferência.
++Q-C-35 e o fecho histórico de IMP-011 preservados. Nenhuma mudança de bytes/caps.
++
++## Q-C-42 — IMP-012: fronteira de CLI stop e âmbito de três ficheiros
++
++Estado: DECIDIDA/APROVADA pelo utilizador nesta etapa Model, registo 2026-11-18T15:45:34Z.
++Evidência: OttApplication reconhece play como NOT_IMPLEMENTED e não tem comando
++stop; OverlayNode só delega requestTrace, não requestSubscription. Q-C-34 menciona
++CLI stop em IMP-012, enquanto o ADD/âmbito autorizado limita a três caminhos.
++TASK-015 lista NeighborManager, mas essa lista legada não alarga o ADD.
++
++Opções apresentadas: (1) manter os três ficheiros e esclarecer a fronteira CLI;
++(2) preparar exceção mínima de composição fora deles. O utilizador escolheu
++**opção1**: IMP-012 fornece renovação/poda e cancelamento pela SubscriptionTicket
++existente/DEACTIVATE de rede. A ligação à CLI fica para a composição posterior
++de cliente/aplicação, sem a declarar entregue neste IMP. Esta concretização
++clarifica a frase de Q-C-34, sem apagar o seu histórico ou reabrir IMP-011.
++Nenhuma extensão a OverlayNode/OttApplication/NeighborManager, transporte,
++comando CLI, runtime ou dependência. Model apenas; Design não autorizado.
++
++### Q-C-40–42 — Model aprovado; Design concretizado, por aprovar
++
++Registo 2026-11-18T16:04:20Z. O utilizador aprovou Model e reconfirmou as três opções1,
++autorizando apenas Design. [Design proposto](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md)
++concretiza a revisão a podar (maior submetida da geração retirada), match exato
++remoto, expiração como fallback quando a renovação não foi admitida, P constante
++por grant e prazo cortado pelo restante, intenções únicas/limites partilhados e
++shutdown sem fase adicional. ACK/ACCEPTED tardios não afetam substitutas, nem
++libertam reserva antes de callback e continuação acabarem.
++Esses detalhes novos aguardam aprovação do Design; não são novas decisões já
++aceites, ADR, alteração de âmbito ou execução de testes. Sem dúvidas novas que
++exijam substituir uma ADR aceite; não se criou outro Q-C por inferência.
+diff --git a/docs/phases/PHASE-04-FLOW-MANAGEMENT.md b/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
+index d619b61..c91376c 100644
+--- a/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
++++ b/docs/phases/PHASE-04-FLOW-MANAGEMENT.md
+@@ -11,7 +11,9 @@ Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O re
+ Estado atual: **IN PROGRESS**. TASK-014/IMP-011/007-arvores DONE após
+ Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
+ 37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
+-TASK-015–018 TODO, sem execução de outro incremento iniciada.
++TASK-015/IMP-012 Model aprovado e apenas Design autorizado pelo utilizador;
++[Design por aprovar](../../memory-bank/bolts/023-arvores/ddd-02-technical-design.md),
++Q-C-40/41/42 decididas, sem Java/testes Java. TASK-016–018 TODO.
+ O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
+ 
+ ## 3. Pré-requisitos
+@@ -27,7 +29,7 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+ | [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
+-| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | TODO |
++| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | IN PROGRESS — Model aprovado/Design por aprovar |
+ | [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | TODO |
+ | [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | TODO |
+ | [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | TODO |
+diff --git a/docs/tasks/PHASE-04/TASK-015.md b/docs/tasks/PHASE-04/TASK-015.md
+index 5d85444..0b3ed1d 100644
+--- a/docs/tasks/PHASE-04/TASK-015.md
++++ b/docs/tasks/PHASE-04/TASK-015.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-015
+ - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Fillmore](../../team/FILLMORE.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-014](../PHASE-04/TASK-014.md).
+@@ -72,3 +72,20 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## Model em preparação — checkpoint anterior
++
++Base main/b273b258, dependências IMP-011/007-arvores e IMP-010/022-rotas complete.
++[Model](../../../memory-bank/bolts/023-arvores/ddd-01-domain-model.md) por aprovar;
++Q-C-40/41/42 decididas explicitamente, sem extensão dos três caminhos do ADD.
++A referência legada a NeighborManager na secção6 não autoriza alteração desse
++componente. Cancelamento por ticket/DEACTIVATE; composição CLI posterior.
++V-015/Java não executados; os1328 testes anteriores são históricos de IMP-011.
++Revisão final Denji/integração permanecem requisitos de fecho, não presumidos.
++
++## Design autorizado — preparado para aprovação
++
++Model aprovado e Q-C-40–42 reconfirmadas pelo utilizador.
++[Design](../../../memory-bank/bolts/023-arvores/ddd-02-technical-design.md) com
++APIs/estados, corrida RENEW/DEACTIVATE, prazos/cadência, limites físicos e L01–L24.
++Nenhum teste executado, Java alterado ou ADR/Implement iniciado. TASK em progresso.
+diff --git a/memory-bank/bolts/023-arvores/bolt.md b/memory-bank/bolts/023-arvores/bolt.md
+index 73501cd..f0c9d13 100644
+--- a/memory-bank/bolts/023-arvores/bolt.md
++++ b/memory-bank/bolts/023-arvores/bolt.md
+@@ -3,14 +3,14 @@ id: "023-arvores"
+ unit: "004-arvores"
+ intent: "001-ott-streaming"
+ type: "ddd-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["002-podar-ramos-renovar-leases-e-remover-procura-abandonada"]
+ created: "2026-11-02T15:36:48Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-18T15:58:39Z"
++started: "2026-11-18T15:40:16Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "design"
++stages_completed: [{"name": "model", "completed": "2026-11-18T15:58:39Z", "artifact": "ddd-01-domain-model.md"}]
+ requires_bolts: ["007-arvores", "022-rotas"]
+ enables_bolts: ["008-arvores"]
+ requires_units: ["003-rotas"]
+@@ -48,7 +48,7 @@ Ler [IMP-012](../../../add.md#imp-012) e as ADR aí indicadas antes de qualquer
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-012 e as ADR do ADD.
++1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-012 e as ADR do ADD.
+ 2. [ ] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-012 e as ADR do ADD.
+ 3. [ ] **adr** → `adr-review.md`; validar a etapa contra IMP-012 e as ADR do ADD.
+ 4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-012 e as ADR do ADD.
+@@ -70,3 +70,11 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
+ - Prova futura: `experiments/construction/023-arvores/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## Checkpoint Design
++
++Model aprovado pelo utilizador, Q-C-40–42 reconfirmadas;
++[Design preparado](ddd-02-technical-design.md) para aprovação. Somente Model
++em stages_completed. Sem ADR/Implement/Test, Java/testes Java, staging, commits
++ou push. Fecho exige V-015/L01–L24, regressão, manual humano, revisão Denji e
++integração; nenhum gate externo adicional.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+index c4a4cf0..58bec48 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md
+@@ -2,7 +2,7 @@
+ unit: "004-arvores"
+ intent: "001-ott-streaming"
+ created: "2026-11-17T15:29:06Z"
+-last_updated: "2026-11-17T23:51:24Z"
++last_updated: "2026-11-18T16:04:20Z"
+ ---
+ # Construction Log — 004-arvores
+ 
+@@ -17,7 +17,8 @@ Inception concluído em2026-11-03T20:54:11Z;003-rotas e022-rotas complete.
+ 1 - ✅ **007-arvores**: complete; história001 complete/implemented=true, TASK-014
+ DONE. Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863
+ comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
+-2 - [ ] **023-arvores**: planned; história002, renovação e poda.
++2 - ⏳ **023-arvores**: in-progress, Model aprovado e Design por aprovar; história002 em progresso.
++Q-C-40/41/42 decididas; nenhuma execução Java/V-015.
+ 3 - [ ] **008-arvores**: planned; história003, recuperação de upstream.
+ 4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
+ 5 - [ ] **009-arvores**: planned; história005, segundo marco.
+@@ -195,3 +196,21 @@ Prova posterior em experiments/construction/007-arvores/integration-proof-01.
+ Unidade004-arvores/PHASE-04 continuam em progresso; quatro bolts planned.
+ 023-arvores apenas desimpedido pela atualização derivada blocks=false, sem
+ início de execução. Fecho exclusivamente documental/evidência, sem Java/push.
++
++## IMP-012 — início exclusivo de Model
++
++Registo 2026-11-18T15:40:16Z, por seleção explícita do utilizador. Base main/b273b258a4642f94f8614ae00f060a46318d77a5, árvore/índice limpos antes do registo. Dependências IMP-011/007-arvores e IMP-010/022-rotas complete.023-arvores in-progress/current_stage=model, sem etapa aprovada. Só documentação e inspeção do código autorizadas; sem Java/testes Java, staging, commits, push ou outro IMP. Fechos anteriores preservados.
++
++Q-C-40/41/42 respondidas explicitamente no Model: revisão crescente e pedido
++novo por renovação, recusa de prefixo divergente preservando grant atual, três
++ficheiros sem CLI. Model preparado, sem Design/ADR/Implement/Test. Fontes/
++fechos anteriores preservados; V-015 por executar,1328 testes históricos.
++
++## IMP-012 — Design autorizado e preparado
++
++Registo 2026-11-18T16:04:20Z. Model/Q-C-40–42 aprovados/reconfirmados pelo utilizador.
++Design propõe APIs/estados, corrida14/13 com revisões capturadas, cadência e
++prazos remanescentes, tetos C/D/L/H/B/J partilhados e shutdown global. Mapa
++L01–L24/V-015 concretizado, nenhum teste Java executado.
++[Design por aprovar](../../../../bolts/023-arvores/ddd-02-technical-design.md).
++Sem ADR/Implement, alterações Java, staging, commits, push ou outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
+index 5ca6387..d5bd7a1 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md
+@@ -2,7 +2,7 @@
+ id: "002-podar-ramos-renovar-leases-e-remover-procura-abandonada"
+ unit: "004-arvores"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-015"]
+@@ -37,3 +37,14 @@ A tarefa normativa é [IMP-012](../../../../../../add.md#imp-012); o bolt só or
+ - Bolts anteriores: 007-arvores, 022-rotas.
+ - Responsável de origem: Fillmore; revisor: Denji.
+ - Gates: nenhum específico adicional.
++
++## Estado de construção
++
++Model aprovado em023-arvores, base operacional b273b258; apenas Design autorizado.
++Q-C-40/41/42 reconfirmadas; Design por aprovar, sem ADR/Implement/Java/testes Java.
++V-015 não executado, nenhum critério marcado como cumprido.
++[Model](../../../../../bolts/023-arvores/ddd-01-domain-model.md).
++
++Model aprovado pelo utilizador;
++[Design por aprovar](../../../../../bolts/023-arvores/ddd-02-technical-design.md).
++Somente Design autorizado; V-015/L01–L24 por executar, sem ADR/Implement/Java.
+diff --git a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+index 57e6101..5097b78 100644
+--- a/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-04"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-17T23:51:24Z"
++updated: "2026-11-18T16:04:20Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
+@@ -19,9 +19,11 @@ Estado atual: unidade **in-progress**. História001/IMP-011/007-arvores complete
+ implemented=true, TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão
+ final Waheed e integração37fa863 comprovada.
+ [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
+-Os quatro restantes bolts continuam planned, sem execução iniciada. O sinalizador
+-derivado blocks de023-arvores passa a false por dependências satisfeitas; isso
+-não inicia outro IMP. PHASE-04 em progresso. Sem push.
++023-arvores/IMP-012 iniciado exclusivamente em Model/Design por seleção do utilizador,
++base b273b258; Model aprovado, Design por aprovar, V-015 não executado.
++[Design](../../../../bolts/023-arvores/ddd-02-technical-design.md); Q-C-40/41/42 reconfirmadas.
++Os outros três bolts continuam planned, sem execução. PHASE-04 em progresso.
++Sem Java/testes Java, staging, commits ou push.
+ 
+ ## Requisitos atribuídos
+ 
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 5d9e118..fb43199 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,9 +17,9 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: null
+-current_stage: null
+-next_bolt: "023-arvores (planned; dependencias satisfeitas; nao iniciado, aguarda selecao/autorizacao)"
++current_bolt: "023-arvores"
++current_stage: "design"
++next_bolt: "023-arvores (in-progress; Model aprovado; Design por aprovar; sem ADR/Java)"
+ phase_04_status: "in-progress"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 16032ab..3d59ce2 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:13 histórias complete e22 planned; bolts:13 complete,0 in-progress,22 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com história001/IMP-011 complete e implemented=true; as quatro restantes continuam planned.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:13 histórias complete,1 in-progress e21 planned; bolts:13 complete,1 in-progress,21 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com história001/IMP-011 complete e implemented=true; as quatro restantes continuam planned.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -90,7 +90,9 @@ Unidade004-arvores/PHASE-04 em progresso; sem início de outro IMP ou push.
+ 
+ ## 004-arvores/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-012. **Estado:** planned. **Bolt:** 023-arvores.
++**Tarefa:** IMP-012. **Estado:** in-progress, Model aprovado/Design por aprovar. **Bolt:** 023-arvores.
++[Design](bolts/023-arvores/ddd-02-technical-design.md), Q-C-40/41/42 reconfirmadas.
++Sem ADR/Implement/Java/testes Java; V-015 não executado.
+ **Ficheiro:** [002-podar-ramos-renovar-leases-e-remover-procura-abandonada](intents/001-ott-streaming/units/004-arvores/stories/002-podar-ramos-renovar-leases-e-remover-procura-abandonada.md).
+ 
+ ## 004-arvores/003-recuperar-arvores-apos-falha-de-upstream.md ✅ GENERATED
+diff --git a/memory-bank/bolts/023-arvores/ddd-01-domain-model.md b/memory-bank/bolts/023-arvores/ddd-01-domain-model.md
+new file mode 100644
+index 0000000..fa6e724
+--- /dev/null
++++ b/memory-bank/bolts/023-arvores/ddd-01-domain-model.md
+@@ -0,0 +1,283 @@
++---
++unit: "004-arvores"
++bolt: "023-arvores"
++stage: "model"
++created: "2026-11-18T15:48:41Z"
++status: "complete"
++---
++# IMP-012 — Model de renovação e poda por procura
++
++Model aprovado explicitamente pelo utilizador, incluindo Q-C-40–42. Apenas
++Design autorizado; ADR/Implement/Test não iniciados. Texto de checkpoint no fim
++conserva o estado histórico da apresentação anterior.
++Base operacional main/b273b258a4642f94f8614ae00f060a46318d77a5, árvore/índice
++limpos à entrada. Dependências IMP-011/007-arvores e IMP-010/022-rotas complete,
++com TASK-014/TASK-013 DONE e fechos integrados na ancestralidade desta base.
++Os1328 testes do IMP-011 são evidência histórica: nenhum teste Java executado aqui.
++
++## 1. Fontes e fronteira
++
++Enunciado → specs → intent → documentação → código; decisões no
++[ADD](../../../add.md), secções2/5/6/8–12, especialmente IMP-012/ADR-005/024.
++Lidos [specs](../../../specs.md), [intent](../../intents/001-ott-streaming/requirements.md),
++[unidade](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md), história002,
++bolt023, [TASK-015](../../../docs/tasks/PHASE-04/TASK-015.md), contratos07/3–7,
++estratégia09, DoD14 e progresso15. Reutilizam-se ADR-014/016/017/018/020/021/026,
++ADR-034/035 e Q-C-34–39; nenhuma ADR criada/substituída nesta etapa.
++
++A leitura de código foi explicitamente pedida pelo utilizador e prevalece sobre
++a proibição genérica de leitura do template Model da skill. Não se alterou Java.
++Não há AGENTS.md aplicável encontrado na raiz/antecessores ou na pesquisa local.
++
++Âmbito futuro Java, sem ampliar:
++
++1 - routing/Subscription.java: valores de subscrição/lease, cópias defensivas.
++2 - routing/RoutingService.java: agregado de procura, renovação/poda e lifecycle.
++3 - routing/SubscriptionLeaseTest.java: novos oráculos V-015.
++
++Os dois primeiros são existentes; o teste ainda não existe. Preservar assinaturas,
++records/enums/códigos e os testes existentes. TASK-015 menciona NeighborManager,
++mas o ADD e a autorização atual limitam aos três caminhos acima.
++Q-C-42 aprovada: cancelamento pela SubscriptionTicket existente e DEACTIVATE de
++rede; composição da CLI fica para trabalho posterior de cliente/aplicação.
++Não se entrega CLI stop/play, emissão/receção de vídeo, GUI, CORE, recuperação
++por alternativa ou troca de parent neste incremento.
++
++## 2. Confronto com o código real
++
++Subscription é um record imutável de stream/epoch/Session do filho/ID/revisão/
++requestId/path/pedido/state/validity. Lease usa início+duração monotónicos,
++remainingNanos com verificação de horizonte/wrap e remainingMillis com floor.
++ACTIVE implica validade; não há conceito de renovação implementado nesse valor.
++
++ActivationEngine já possui Tree, Line, Child, Round/Attempt, Local e ActSend.
++Tree separa tokens locais, filhos e confirmação upstream. LineKey inclui direção,
++stream, epoch e Session completa; Line retém ID/maior revisão/request canónico,
++fingerprint e terminal. Pedido diferente na mesma revisão é STALE_REVISION.
++Ticket local guarda operationId e resultado imutável: SUCCESS de uma operação
++anterior não prova autorização atual, que se consulta em Snapshot.forwarding.
++
++Handlers atuais aceitam11/12/ERROR11;13/14 não chegam ao engine, e ERROR14 cai no
++ramo de trace sem tratamento de renovação. O codec já representa13 como
++Deactivation e14 com payload Activation; ACK12 e ERROR17 existentes bastam.
++NeighborManager.send aceita tipos de aplicação e exige Session atual/envelope;
++não é necessária alteração ao manager/codec/transporte. OverlayNode entrega
++Received ao routing e já aguarda o seu shutdown; sem nova porta para o core.
++
++cancelPendingChild verifica Session/stream/ID/revisão exata no owner; cancelamento
++local usa identidade do ticket/Local para não remover substituta. stepTree/stepChild
++filtram expiração, mas não enviam DEACTIVATE nem renovam. wants(Tree) só cobre
++operações locais pendentes/filhos pending, pelo que não pode ser reutilizado como
++predicado de procura contínua sem adaptação dentro do engine.
++
++M07: completed rejeita filho detached, identidade substituída e line.terminal antes
++de instalar ACK. O finally marca continuationDone; release exige callbackDone e
++continuationDone. Esta separação física/lógica é invariante a preservar também
++para renovação e poda. Expirar/cancelar/retirar árvore não liberta envio em voo.
++
++O scheduler comum integra nextDelay/drive com cursores, até2 jobs físicos/1 wake;
++awaitTermination inclui sends de ativação, anúncios/trace e o scheduler, limitado
++pelo primeiro início do shutdown e budget restante. Não se cria executor/timer
++por filho, nem shutdown independente de renovação/poda.
++
++## 3. Entidades e valores
++
++1 - **Árvore de procura por stream/epoch:** raiz do agregado, com confirmação
++upstream única (ausente na fonte), intenções locais e filhos da mesma stream.
++A oferta local da fonte é catálogo/disponibilidade; não equivale a procura.
++2 - **Intenção local:** (streamId, consumerToken, identidade da operação).
++Permanece até cancelamento explícito; terminal de admissão, intenção e autorização
++são coisas distintas. Cancelar ticket antigo não remove intenção substituta.
++3 - **Lineagem de ramo:** direção/stream/epoch/Session, subscriptionId fixado,
++revisão máxima admitida e watermark terminal. Não ordenar UUIDs, nem esquecer
++cancelamento para aceitar replay. Histórico protegido retido no contexto vigente.
++4 - **Concessão confirmada:** revisão/Session/path e Lease imutável que autoriza
++um ramo agora. Enquanto renovação está pendente, a concessão anterior pode
++continuar válida; não se prolonga por enviar ou repetir mensagens.
++5 - **Operação de renovação:** espécie local RENEW, correlação própria e prazo
++finito, mantendo referência à concessão que tenta substituir. Q-C-40: mesmo
++subscriptionId, revisão estritamente crescente e requestId novo. Há no máximo
++uma renovação lógica corrente por ramo upstream, partilhada pela procura agregada.
++6 - **Intenção de poda:** identidade capturada do ramo antigo a retirar, nunca
++uma consulta tardia ao ramo atual. DEACTIVATE não tem ACK de sucesso no wire.
++A intenção tem vida/recursos limitados; não é autorização para continuar forwarding.
++7 - **Envio físico:** reserva independente de contextos lógicos, associada a
++Session/identidade da operação e a callback/continuação. Sobrevive ao cancelamento
++lógico até ambos terminarem, dentro dos tetos existentes.
++
++Não existe DB/repositório persistente. Os mapas do RoutingService constituem o
++repositório volátil do agregado; snapshots imutáveis são projeções de leitura,
++sem devolver entidades mutáveis nem criar ficheiros/repositories Java adicionais.
++
++## 4. Procura, estados e invariantes
++
++Procura efetiva de uma stream = intenções locais vigentes + filhos com concessão
++não expirada e contexto vigente. Pending de admissão é interesse transitório
++limitado pelo prazo da sua operação; não é destino autorizado. História terminal,
++ACK/callback antigo, oferta de catálogo, anúncio/trace e simples tick não são procura.
++
++Estados conceptuais, sem acrescentar enums Java nesta etapa: sem procura;
++ativação pendente; confirmado; confirmado com renovação pendente; retirado/expirado.
++A remoção lógica pode coexistir com trabalho físico antigo ainda reservado.
++
++- Sair C1 com C2 vigente retira apenas C1; mantém o tronco confirmado e a sua
++  renovação agregada, sem ACTIVATE/DEACTIVATE upstream por cada consumidor final.
++- Sair o último consumidor retira imediatamente a autorização local/publicada,
++  cancela a renovação lógica e prepara DEACTIVATE do ramo correspondente. Se
++  faltar quota/espaço/conexão, não se mantém forwarding nem se espera sem prazo;
++  a expiração do lease remoto é a salvaguarda de limpeza.
++- Na fonte, sem procura não há Confirmation utilizável nem parent para podar.
++  A oferta de catálogo não desaparece por falta de consumidores; suspender bytes
++  da fonte pertence ao futuro componente de vídeo.
++- Perder child remove apenas esse child. Perder upstream invalida autorização
++  dependente; outra Session, stream ou origem não é atingida. Reconexão exige
++  ativação/identidade novas; não herda lease nem terminal da conexão antiga.
++- Expiração órfã verifica o relógio mesmo sem tráfego novo. Aos limites exatos,
++  confirmação/filho expirados não aparecem na projeção utilizável nem em
++  Confirmation.visibleAt. Sweep físico pode ocorrer depois sem autorizar dados.
++- DEACTIVATE e callbacks antigos nunca removem o ramo de revisão/Session/operação
++  substituta. Não usar comparação apenas por nodeId, stream ou subscriptionId.
++- Renovação após expiração/cancelamento não é ACTIVATE implícito; retorno a
++  autorização exige admissão explícita válida. Recuperação automática fica em
++  IMP-013/014. Intenção pode continuar indisponível sem renovação fantasma.
++
++## 5. Renovação e validade
++
++Fonte concede no máximo min(pedido, máximo local). Relay limita também ao
++restante da confirmação upstream corrente na emissão do ACK. Renovar um filho
++não renova por si a confirmação a montante e não cria referência por cliente.
++Se uma renovação upstream válida trouxer nova concessão, o agregado poderá usá-la
++para respostas seguintes; não se alteram bytes de ACK já entregues ao port.
++
++A nova concessão remota é ancorada no início local da operação de renovação,
++antes da fila, e não na chegada do ACK. Atrasos de fila/send/ACK consomem validade.
++Duplicado da mesma revisão/request/fingerprint devolve restante da concessão
++original ou o terminal; nunca cria novo horizonte. Um ciclo novo aprovado usa
++revisão maior. Cancelamento/expiração prevalecem sobre ACK12 tardio, mesmo ACCEPTED.
++
++Regra de negociação já proposta no ADD6.1: período efetivo
++min(subscription.renew, grantedLease/3), com precisão monotónica positiva e sem
++arredondar para zero. Deve ser concretizada/verificada em Design, incluindo
++configurações heterogéneas, grant curto, ACK que chega depois do instante elegível,
++uma única pendência e ausência de bursts/catch-up. Não se altera configuração
++nem se apresenta essa regra como imposição do PDF.
++
++O prazo lógico de renovação não pode autorizar para além da concessão vigente:
++falhar renovação não apaga antecipadamente grant saudável nem prolonga o velho.
++O Design fixará o corte por prazo restante, o instante da próxima renovação e a
++política de falhas locais usando os parâmetros/limites existentes.
++
++Q-C-41 aprovada: RENEW exige prefixo selecionado e confirmado compatíveis e epoch/
++Session correntes. Divergência devolve PATH_CHANGED, preserva o grant atual até ao
++seu prazo e não troca parent nem prolonga o ramo. Uma métrica diferente com o
++mesmo path/epoch/Session não é divergência.
++
++## 6. Cancelamento e concorrência
++
++Eventos serializados no owner: CancelLocal, ReceivedDeactivate, RenewalDue,
++ReceivedRenew, AckReceived, LeaseExpired, NeighborDown, EpochChanged, SendCompleted,
++OwnerStopped. São conceitos de domínio, sem classes/eventos de rede novos.
++
++Para cada evento, primeiro validar contexto/limites, depois alterar apenas o
++agregado/correlação correntes e publicar, preparando envios sem espera bloqueante.
++ACK de RENEW só pode instalar a concessão correlacionada vigente; ERROR11/13/14
++não pode terminar trace15 ou outro pedido. ERROR sobre ERROR não é emitido.
++
++Renovar/cancelar compete com revisão maior, novo token e reconexão: a referência
++à geração/Child/Line da operação é capturada, e reaplicação tardia é no-op sobre
++substituta. Preservar a guarda terminal M07 e o finally de conclusão física.
++
++O Design deve explicitar, antes de Implement, a corrida entre nova revisão RENEW
++emitida/admitida e DEACTIVATE: concessão anterior ainda ativa, revisão conhecida
++no requerente e revisão efetivamente admitida no parent, envio que falha antes
++ou depois de admissão, e ACK antecipado/tardio. Não se assume que ACCEPTED prova
++admissão remota. Na incerteza de entrega, a poda remota é best effort e termina
++pelo lease, sem cancelar por ID genérico ou iniciar retries ilimitados.
++
++## 7. Limites e shutdown
++
++E=capacidade do owner existente; preservar os tetos de IMP-011: C/D=min(E,256),
++L=min(E,64) com4 tokens/stream, H=min(E,1024), B=min(E,64), J=min(E,16),
++4 PENDING/Session,4 envios físicos/Session e2/contexto; resposta16/janela fixa1s,
++N=min(control.maxConnections,63), path<=32. Novas intenções/renovações/podas
++partilham estes orçamentos; não acrescentam filas/reservas paralelas ilimitadas.
++O Design terá de demonstrar como a representação cabe nesses recursos antes
++de alocar/copiar. Redução de memória lógica não antecipa libertação física.
++
++Alarme comum: até2 jobs físicos/1 wake, trabalho por turno limitado e justo com
++anúncio/trace. Sem timer por pedido, executor de estado extra ou novo transporte.
++Saturação recusa localmente preservando ramos saudáveis; owner.offer(false) mantém
++a política existente de fecho por saturação, sem bloquear callbacks.
++
++requestClose impede novas renovações/admissões, cancela intenções e retira a
++projeção. Poda de rede é best effort, sem inventar handshake/ACK de DEACTIVATE
++nem fase de drenagem do manager. awaitTermination inclui callbacks/continuações
++e alarme no budget global restante; não reinicia prazo por filho/stream/operação.
++
++## 8. Oráculos V-015 planeados — nenhum executado
++
++São grupos de oráculos, não contagem de testes nem garantia de resultado futuro.
++SubscriptionLeaseTest usará relógio/port/scheduler controlados e o owner existente
++injetável, com asserts de mensagens e de estado físico/lógico separados.
++
++| ID | Preparação e resultado verificável esperado |
++|---|---|
++| L01 | S-R-(C1,C2), ACK válidos; sair C1 mantém C2 e uma referência upstream, sem DEACTIVATE do tronco |
++| L02 | Sair o último interessado retira forwarding antes de concluir o envio de poda; um DEACTIVATE por ramo retirado, sem parent na fonte |
++| L03 | Consumidor local e child mistos; retirar um não elimina o outro, nem a renovação agregada |
++| L04 | Relógio falso ultrapassa lease órfão sem novo evento de rede; limpeza termina, terminal não reativa |
++| L05 | Renovações periódicas com procura mantêm uma referência no tronco e concessões dentro de cada horizonte |
++| L06 | Máximos heterogéneos: fonte pedido6000/máximo3000 concede3000; período efetivo<=1000ms; relay limita ao restante upstream |
++| L07 | Dois relays, filas/ACK atrasados e grant curto; floor não arredonda999999ns para1ms, nenhum nó concede para além da sua confirmação |
++| L08 | Mesmo ID/revisão/request/payload repetido não prolonga lease nem duplica resposta/contexto; campos conflitantes recusados |
++| L09 | Q-C-40: renovar com revisão maior/request novo; ACK da revisão anterior e Long.MAX_VALUE não contaminam operação atual nem fazem wrap |
++| L10 | Cancelar ticket antigo e DEACTIVATE antigo deixam token/ramo substituto com lease/path intactos |
++| L11 | Cancelar durante renovação/ACK held, depois ACCEPTED: não reinstala autorização; outro child e lease mantidos |
++| L12 | Callback bloqueado e continuação já processada: B/J/contexto não se reutilizam até ambos terminarem; repetir ordem inversa |
++| L13 | Renovação recebida depois do prazo/cancelamento recusada; não ativa via14 nem recria procura |
++| L14 | Q-C-41: seleção divergente devolve PATH_CHANGED, mantém grant original até expirar, zero troca de parent |
++| L15 | Session antiga/nova, mesma instanceId/nova connectionId e nova instanceId; evento/callback velho não remove a nova |
++| L16 | Mesmo epoch com duas streams e duas origens; poda/erro/expiração/renovação de uma preserva as outras |
++| L17 | Falha de envio CLOSED/OVERFLOW/INVALID_MESSAGE/exceção; nenhuma concessão nova por ACCEPTED isolado, cleanup limitado e erros localizados |
++| L18 | ERROR related11/13/14 e ACK12 com correlação errada não afetam trace15, ativação ou renovação alheias |
++| L19 | C/D/L/H/B/J/quota no limite e limite+1, sem evicção de watermark vivo nem backlog de podas/erros; perda de contexto liberta só o lógico elegível |
++| L20 | Uma renovação pendente impede bursts; scheduler atrasado/relógio no wrap, nenhum busy loop ou timer/stream |
++| L21 | Fonte mantém oferta de catálogo mas não ramo autorizado sem procura; não se conta vídeo emitido |
++| L22 | Shutdown durante ACK/RENEW/DEACTIVATE: primeiro deadline preservado, zero autorização e terminação física demonstrada, não presumida por fila vazia |
++| L23 | Compatibilidade dos records/snapshots e APIs de ticket; seleções, catálogo e trace mantêm semântica, cópias defensivas |
++| L24 | Integração posterior TCP real com S-R-(C1,C2) e cadeia de dois relays, sessões reais, remoção parcial/final e terminação; separado de prova de vídeo/GUI/CORE |
++
++Integração posterior pode compor manager/monitor/routing no teste com o owner/port
++existentes e consumidores via API, sem mudar OverlayNode/CLI. Só após autorização
++da etapa apropriada executar JDK21/regressão/clean verify e preservar logs/XML/JAR.
++Manual humano reprodutível, revisão final Denji atribuída na TASK-015 e integração
++continuam requisitos de fecho aplicáveis, sem presumir aprovação ou contacto.
++
++## 9. Decisões, pressupostos e checkpoint
++
++Q-C-40/41/42 foram respondidas explicitamente pelo utilizador nesta etapa:
++revisão crescente, recusa de RENEW divergente com grant preservado, três ficheiros
++sem CLI. [Registo](../../../docs/construction-duvidas.md) e concretizações no ADD/
++contratos. Não são decisões da retoma cancelada de outro IMP nem novas ADR.
++
++[PRESSUPOSTO] Manter identificadores aninhados e coleções privadas nos ficheiros
++previstos, sem novas classes públicas de infraestrutura: respeita a allowlist e
++as portas já existentes; os tipos concretos ficam para Design.
++
++Antes de Implement, Design detalhará a corrida de cancelamento Q-C-40, periodicidade
++com grants curtos, budget por operação, idempotência tipo11/tipo14 e contabilização
++física. Nenhuma política não aprovada é introduzida por código neste Model.
++
++Parar neste checkpoint: Model por aprovar, stages_completed vazio e
++current_stage=model. Sem Design/ADR/Implement/Test, Java/testes Java, staging,
++commits/push ou início de outro IMP. Evidência documental nova em
++experiments/construction/023-arvores/model-01, com diff/numstat contra a base e
++prova de preservação de fontes/fechos anteriores. Não se atribuem resultados
++históricos1328 ao IMP-012.
++
++## Aprovação de Model
++
++Registo 2026-11-18T15:58:39Z: utilizador aprovou Model e reconfirmou Q-C-40–42.
++Apenas Design autorizado, com os três ficheiros, owner/limites/shutdown existentes.
++Sem Java/testes Java/staging/commits/push; revisão final Denji e integração
++continuam requisitos futuros de fecho.
+diff --git a/memory-bank/bolts/023-arvores/ddd-02-technical-design.md b/memory-bank/bolts/023-arvores/ddd-02-technical-design.md
+new file mode 100644
+index 0000000..e8b1af4
+--- /dev/null
++++ b/memory-bank/bolts/023-arvores/ddd-02-technical-design.md
+@@ -0,0 +1,415 @@
++---
++unit: "004-arvores"
++bolt: "023-arvores"
++stage: "design"
++created: "2026-11-18T16:04:20Z"
++status: "in-progress"
++---
++# IMP-012 — Design de leases renováveis e poda agregada
++
++Model aprovado pelo utilizador, com Q-C-40–42 reconfirmadas. **Design por aprovar.**
++Este documento concretiza propostas para revisão; não é revisão ADR nem autorização
++de Implement. Base operacional main/b273b258a4642f94f8614ae00f060a46318d77a5.
++Sem alterações Java, execução Java/V-015, staging, commits ou push.
++
++## 1. Fontes, arquitetura e allowlist exata
++
++[Model aprovado](ddd-01-domain-model.md), [ADD](../../../add.md), IMP-012 e
++ADR-005/024; contratos07/3–7, estratégia09, DoD14 e TASK-015. Reutilizar
++ADR-014/016/017/018/020/021/026, TCP v2/ADR-034/035 e Q-C-34–42.
++Não há nova biblioteca, DB, HTTP, transporte ou executor de estado. A composição
++é o agregado volátil existente dentro de RoutingService no owner emprestado,
++port assíncrono e scheduler comum. Projeção de leitura imutável, sem persistência.
++
++Os únicos caminhos Java previstos para Implement são:
++
++1 - `Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java`.
++2 - `Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java`.
++3 - `Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java`.
++
++O terceiro é novo. Não alterar Route, RoutingTable, OverlayNode, NeighborManager,
++NetworkMonitor, codec, transporte, configuração/POM ou testes históricos. Q-C-42:
++sem CLI stop/play; consumidor usa SubscriptionTicket existente e mensagens de rede.
++Preservar enums/códigos, records, cópias defensivas, TCP v2/19 tipos/código3
++rejeitado, framing37..65536/UTF-8 estrito e UDP OTT1/64/1200/1136 intactos.
++
++O confronto estático com as APIs reais foi realizado em Model. Nesta etapa usa-se
++esse registo e os contratos aprovados, sem nova leitura/alteração de fontes.
++Todos os tipos auxiliares propostos ficam aninhados nos ficheiros autorizados.
++
++## 2. APIs e composição
++
++| Porta/API | Contrato preservado ou adição interna proposta |
++|---|---|
++| requestSubscription(UUID streamId, UUID consumerToken) | Admissão local existente; token repetido não duplica procura; ticket consultável sem callback arbitrário no owner |
++| retrySubscription(UUID, UUID) | Nova operação explícita após terminal; não equivale a timer de renovação nem recuperação automática |
++| SubscriptionTicket.operationId/result/cancel | Assinaturas preservadas; cancel usa identidade da Local/operação; resultado SUCCESS antigo não representa a validade atual do ramo |
++| cancelPendingChild(Session, UUID streamId, UUID subscriptionId, long revision) | Assinatura package-private preservada; cancelamento exato continua testável, incluindo M07; partilha guardas com DEACTIVATE, sem eliminar substituta |
++| onNeighborEvent(NeighborManager.Event) | No owner, incluir13/14 e ERROR related13/14 antes de trace; manter11/12/ERROR11, anúncios e restantes eventos |
++| onMetrics/setLocalAvailable | Preservar eventos e isolamento; perda de contexto/disponibilidade invalida só o que depende deles |
++| snapshot() / Snapshot.forwarding | Mesmo formato público, mapas imutáveis e construtor compatível; publicação de autorização atual, sem mudar seleção/catálogo |
++| Subscription / Subscription.Lease | Preservar componentes/construtor/State PENDING e ACTIVE; Lease usa início+duração, remainingNanos/remainingMillis existentes; validar limites/null/size antes de List.copyOf/instanciar novos valores, preservando validação e cópias defensivas |
++| ControlPort.send(Session, ControlMessage) | Mesmo CompletionStage<SendResult>; ACCEPTED só enfileira, não prova admissão remota ou ACK |
++| Scheduler/Ticket e requestClose/awaitTermination | Mesmo alarme/owner e primeiro budget de shutdown; reservas reais até callback e continuação acabarem |
++
++Não é necessária nova API pública. Assinaturas internas conceptuais, a implementar
++sem criar ficheiros novos: `receiveRenew(session, requestId, Activation, now)`,
++`receiveDeactivate(session, requestId, Deactivation, now)`,
++`effectiveDemand(tree, now)`, `renewalDue(tree, now)`,
++`retireBranch(tree, generation, cause, now)` e `tryPrune(pruneIntent, now)`.
++Métodos internos já existentes podem delegar nestes auxiliares; os nomes públicos
++anteriores e a semântica de wants para ativação inicial são preservados.
++
++A validação do construtor de Subscription pode ser reordenada internamente para
++rejeitar listas fora do cap antes de copiar/iterar; sem trocar componentes,
++construtor público, enum ou enfraquecer invariantes/testes existentes.
++Subscription não recebe serviços, threads ou futures. Estado do ciclo vive no
++ActivationEngine; Lease continua um valor, não um scheduler. Route.Confirmation
++existente permite publicar novos leases/destinos sem alterar Route.java.
++
++## 3. Estado lógico e representação limitada
++
++Por Tree/stream/epoch:
++
++- geração lógica do ramo, diferente de revisão wire; confirmação vigente opcional;
++- uma operação upstream inicial OU uma renovação lógica pendente, nunca duas
++  renovações correntes; referência ao grant anterior e à geração capturada;
++- procura local/filhos, último início de ciclo e cadência associada ao grant;
++- no máximo uma intenção de poda, usada quando não há procura; sem fila de podas.
++
++Por Line existente: direção/stream/epoch/Session, mesmo subscriptionId, revisão
++máxima admitida/submetida segundo a direção, requestId/fingerprint e espécie11/14
++da operação canónica, terminal resumido. Identidade lógica da geração protege
++callbacks; não se reutiliza UUID de pedido, ordena UUID ou guarda lista de todos
++os pedidos. Uma nova Session/epoch retira o histórico lógico correspondente.
++
++Por Child: concessão ACTIVE anterior opcional e no máximo uma operação de
++renovação pendente. A concessão pode continuar válida enquanto essa operação
++aguarda ACK local/admissão de resposta. Admitir revisão nova substitui contexto
++lógico anterior, mas transfere o valor confirmado saudável, sem copiar mapas
++ou libertar a reserva física do envio antigo. Line/Child/operação mantêm guardas
++de identidade; contexto detached não pode publicar.
++
++Terminais são específicos da operação. Falhar RENEW é diferente de cancelar
++a geração inteira: um terminal de renovação impede ACK tardio dessa operação,
++mas não apaga o grant anterior válido. Cancelar a geração remove também o grant
++anterior e deixa watermark que impede replay. Preservar o efeito da guarda M07;
++não a substituir por teste genérico !pending que rejeitaria ACKs legítimos.
++
++Estados internos conceptuais: QUIESCENT, ACTIVATING, CONFIRMED, RENEWING,
++RETIRING e EXPIRED. Não se acrescentam estes valores ao enum público Subscription.State.
++Histórico terminal e reserva física não contam como procura nem destino.
++
++| Evento | Alteração no mesmo turno do owner |
++|---|---|
++| Cancelar C1 havendo C2 | Retirar só C1; manter confirmação e cadência upstream |
++| Última procura retirada | Retirar forwarding, invalidar operação lógica, capturar poda; sem renovar |
++| Renovação elegível | Criar no máximo uma operação14 com correlação nova e prazo cortado pelo grant antigo |
++| ACK12 válido + ACCEPTED corrente | Substituir concessão, publicar e recalcular cadência uma vez |
++| Erro/timeout da renovação | Tornar operação terminal; preservar grant anterior ainda válido, sem alargar prazo |
++| Expiração | Retirar autorização atual; não permitir14 como nova ativação |
++| DEACTIVATE exato | Cancelar geração/child correspondente e a renovação pendente; recomputar procura |
++| NeighborDown/epoch nova | Invalidar apenas o contexto correspondente, preservar outros; sem reconstrução automática |
++| Shutdown | Encerrar admissão, retirar autorização, cancelar intenções; esperar físico fora do owner |
++
++## 4. Admissão e correlação de RENEW
++
++Validar envelope v2, Session completa corrente, stream/epoch, IDs, revisão,
++lease1..u32 e path2..32 simples antes de criar contexto ou copiar listas. Um RENEW
++só é admitido quando existe concessão do mesmo child/ID/Session ainda não expirada
++e confirmação upstream saudável/oferta local disponível. Tipo14 não cria ramo
++nem reabre terminal cancelado. RENEW que chega antes de o ACK de ACTIVATE ter
++admissão local pode ser recusado NO_ROUTE sem invalidar a ativação pendente.
++
++Q-C-41: prefixo selecionado=confirmado e Session/epoch compatíveis. Caso contrário,
++ERROR14/PATH_CHANGED sem mutar grant/parent/destinos. Recusa antes da admissão não
++consome watermark nem remove estado saudável. Saturação também recusa atomicamente.
++
++Q-C-40: requestId novo, revision maior, mesmo subscriptionId da Line. O ledger
++inclui a espécie11/14 no fingerprint: mesmos campos/request não autorizam trocar
++ACTIVATE por RENEW. Revisão menor é STALE_REVISION; igual e pedido diferente é
++REVISION_BOUND; igual com campos/espécie diferentes é INVALID_MESSAGE. Duplicado
++exato pendente coalesce; após sucesso devolve apenas o restante original, dentro
++da quota/deadline; após terminal devolve terminal limitado, sem reaplicar concessão.
++
++ACK12 é desmultiplexado por espécie local e tuplo completo
++(Session, stream, epoch, subscriptionId, revision, requestId, geração/operação).
++Guardar no máximo um ACK antecipado enquanto o envio do pedido aguarda ACCEPTED;
++só confirmar quando ambos forem válidos. ACK duplicado não reancora lease.
++ERROR11/14 só resolve a operação correlacionada de mesmo tipo; ERROR13 é diagnóstico
++de poda correspondente, sem cancelar ativação/renovação de uma geração posterior.
++Trace15 e outros ERROR/eventos mantêm o dispatcher anterior, sem ERROR sobre ERROR.
++
++## 5. Corrida RENEW / DEACTIVATE e revisão a podar
++
++Cada ramo upstream conserva `lastSubmittedRevision` e a revisão confirmada,
++ambas ligadas à mesma geração lógica e Session. Uma revisão reservada localmente
++mas ainda não entregue ao ControlPort não é submetida. Antes de invocar o port,
++marcar a submissão no contexto capturado, permitindo callback síncrono sem perder
++correlação. Isso não significa que o parent a admitiu.
++
++Ao retirar a última procura, capturar uma única intenção imutável:
++Session, stream, epoch, subscriptionId e **maior revisão submetida daquela geração**;
++na ausência de renovação submetida, usar a revisão do ACTIVATE/ramo retirado.
++Invalidar a operação lógica antes de preparar qualquer envio. Não consultar uma
++Tree/Line substituta ao completar callback ou tentar enviar a poda. DEACTIVATE
++usa requestId próprio e não espera ACK de sucesso (não existe no wire).
++
++No recetor, DEACTIVATE só altera Line de Session/stream/epoch/ID exatos cuja
++revisão máxima admitida coincide com a revisão recebida. Nesse caso retira a
++renovação e a concessão anterior transferida dentro dessa geração, conserva
++terminal e recomputa procura. Repetição é no-op idempotente; revisão menor,
++maior desconhecida ou outro ID não altera ramo e pode receber ERROR13/
++STALE_REVISION limitado por J/B/quota, sem criar histórico novo para o erro.
++Não usar >= para cancelar uma subscrição atual nem aceitar UUID arbitrário.
++
++| Ordem / corrida | Resultado proposto |
++|---|---|
++| Grant r, renovação r+1 só reservada, cancelamento | Não submeter14; poda captura r; ACK antigo não reativa |
++|14 r+1 submetido, cancelamento antes de ACCEPTED | Poda captura r+1; sem nova confirmação local, B do envio continua reservado |
++| Parent admitiu14 r+1 e conserva grant r durante ACK | DEACTIVATE r+1 cancela ambos os estados dessa geração; ACCEPTED/ACK tardios ignorados |
++| Parent recusou/não recebeu14 r+1, só conhece r | DEACTIVATE r+1 não cancela por aproximação; ramo r termina pelo lease, sem nova renovação |
++| Nova ativação explícita r+2, depois poda r+1 | Revisão antiga não remove r+2; callback da geração retirada não altera a substituta |
++| Cancelamento r chega depois de RENEW r+1 admitido | Não remove a revisão nova, mesmo enquanto grant antigo ainda é o valor publicado |
++| Nova Session com mesmo nodeId/instanceId | ConnectionId diferente torna mensagens/callbacks/poda antigos obsoletos |
++| ACK chega antes do callback ACCEPTED, depois ocorre cancelamento | ACK retido é descartado logicamente; finally/contabilização físicos mantidos |
++
++O caso de parent conhecer apenas r é deliberadamente best effort, conforme Model:
++não há prova de admissão remota no SendResult. Não enviar uma segunda poda de
++fallback, inventar ACK, baixar revisão ou manter forwarding para aguardar entrega.
++A garantia de limpeza remota é o lease finito efetivamente concedido. Bytes14 já
++aceites antes de cancelar podem chegar depois e originar um grant remoto antes
++da poda; não se promete limpeza pelo instante do grant que o requerente conhecia
++no cancelamento. Não há novos envios após a retirada, e a limpeza segue o último
++grant remoto válido e finito; não se deduz uma meta7s sem medição.
++Em TCP saudável, pedidos aceites
++na mesma Session preservam FIFO; isso não prova que o pedido foi aceite pela regra
++de domínio nem autoriza remover revisão diferente.
++
++A intenção de poda tem uma tentativa de envio: se B/quota de trabalho estiverem
++ocupados, aguarda dentro do prazo local T=activateTimeout capturado no cancelamento,
++sem reiniciar o prazo. Ao chamar o port é consumida; ACCEPTED não prova aplicação
++remota. INVALID_MESSAGE/exceção termina essa tentativa; CLOSED/OVERFLOW da Session
++corrente seguem a política existente de perda dessa conexão. Sem retry de rede
++ilimitado, fila de reenvios ou socket/future adicional para poda.
++
++Nova procura explícita antes de poda ainda não submetida invalida essa intenção
++antiga, sem retargeting: o ramo anterior limpa pelo lease se necessário. A nova
++ativação usa revisão maior da mesma Line; não cria outra intenção de poda para
++cada consumidor. Poda já submetida mantém referência/recursos até acabar, mas
++não modifica a nova geração. Long.MAX_VALUE termina por STALE_REVISION/
++REVISION_EXHAUSTED sem wrap; só novo contexto de Session permite outra lineagem.
++
++## 6. Leases, cadência e prazos concretos
++
++Usar pares início/duração e diferenças monotónicas verificadas, não somas de
++instantes que transbordem. G é grant wire em ms, convertido com multiplyExact;
++P = min(config.renew.toNanos(), floor(G*1000000/3)). Como G>=1ms, P>=333333ns;
++nenhum ceil/clamp artificial para1ms. Um relógio fora do horizonte suportado
++mantém o tratamento de erro operacional existente, sem oferecer mais tempo.
++
++Concessão remota confirmada por ACK da renovação começa no início local t0 dessa
++operação, capturado antes da fila. Restante novo=max(0,G*nanos-age(now,t0)).
++Não reancorar na receção/ACCEPTED; grant positivo mas já expirado não confirma.
++Grant >pedido/máximo é inválido e não substitui o anterior.
++
++Por concessão confirmada, guardar duração G e P constantes. **Não recalcular
++P como restante/3 a cada wake**, que criaria aproximação infinita ao deadline.
++Primeira elegibilidade: idade desde início da operação que confirmou o grant>=P.
++Após tentativa falhada: elegibilidade seguinte a P desde o último início real de
++ciclo, enquanto houver grant anterior saudável e procura. Ciclo novo usa revisão/
++requestId novos; não retransmite o mesmo pedido automaticamente. Cada ciclo14
++tem uma tentativa de envio, sem gastar/contornar as A tentativas da ronda inicial11.
++Depois de um erro, outro ciclo periódico só é elegível dentro do grant antigo
++ainda vivo; expirado esse grant não se reinicia ACTIVATE por timer.
++
++Se o alarme ou ACK chega depois da elegibilidade, admitir no máximo um ciclo agora,
++registar o seu início real=agora e não recuperar períodos perdidos. Se esse ACK
++permitir outro ciclo imediatamente elegível, só haverá uma operação corrente e
++um início novo=agora; um novo grant confirmado nessa operação terá elegibilidade
++futura positiva. Não criar lista de ticks vencidos nem vários14 no mesmo instante
++para compensar atraso. Recursos indisponíveis mantêm uma só intenção/contexto.
++
++Prazo do ciclo upstream: min(T, restante do grant anterior na admissão). No child,
++prazo de resposta: min(T, restante do grant anterior do próprio child); espera por
++B/quota/fila/ACK/callback consome esse mesmo prazo. Um ACK ou ACCEPTED só instala
++se o ciclo ainda é corrente, há procura, ambos os grants/contextos relevantes
++continuam válidos e o deadline não venceu (comparação >= termina exatamente).
++Ao prazo, tornar operação terminal; manter apenas o grant anterior ainda válido.
++Se este expira, retirar autorização e cessar renovação, sem ACTIVATE por tick.
++
++Na fonte, RENEW válido cria grant novo<=min(pedido,máximo local), podendo exceder
++restante do child antigo. No relay, limita também ao restante upstream na emissão.
++Só uma renovação14 explicitamente admitida pode estender lease; ACTIVATE11 e replay
++exato continuam sem renovação implícita, preservando os testes de IMP-011.
++Revalidar/floor novamente imediatamente antes de ControlPort.send. Depois não
++alterar bytes. Se resta<1ms concedível, NO_ROUTE/GRANT_TOO_SHORT, sem arredondar
++para cima nem remover antecipadamente a concessão anterior ainda válida.
++
++Receber RENEW de child não força um pedido upstream por child: responder a partir
++do grant corrente, sujeito a T/lease/recursos. A renovação upstream agregada tem
++cadência própria. Pode haver espera pelo trabalho já agendado, mas nunca outro
++ciclo/fanout a montante ou bloqueio do owner para obter um ACK melhor.
++
++Exemplos de oráculo, não medições: grant3000ms e renew2000ms implica P1000ms;
++grant300ms implica P100ms; grant1ms implica P333333ns. Atraso que deixa1ns de
++lease continua a valer só1ns; o novo pedido não ganha T completo. Grants muito
++curtos/carga que ultrapasse16 respostas/Session/janela não têm continuidade
++prometida: recusa/expiração segura e diagnóstico limitado, sem alterar caps.
++
++## 7. Procura, expiração órfã e fonte
++
++Separar intenção vigente, pedido inicial pendente e destinos autorizados.
++Renovar upstream só com intenções locais vigentes associadas à geração ou filhos
++ACTIVE de Session atual com lease>0; pending inicial é tratado pelo fluxo de
++ativação existente, não licença para renovar grants de uma geração cancelada.
++Históricos/erros, catálogo, trace e envios físicos sozinhos não são procura.
++
++Sair um de dois consumidores retira só o seu destino/token, sem mudar confirmação,
++lease ou referência dos outros. Ao sair o último, retirar confirmação utilizável
++e parar novas renovações no mesmo turno do owner que processa o cancelamento.
++Não se promete mutação síncrona antes de esse evento ser processado. Consultas de
++forwarding usam a publicação atual; snapshots antigos não se tratam como leitura
++nova após cancelamento. visibleAt continua a excluir expiração sem mutar o owner.
++
++Agendar no alarme comum os próximos prazos de grants e operações, mesmo sem rede
++nova. O sweep limitado retira Child expirado e conserva terminal enquanto o contexto
++for corrente. Recalcular procura pode disparar a poda do tronco; o prazo final de
++limpeza remota inclui lease já concedido, não se apresenta como ACK de DEACTIVATE.
++Metas experimentais de poda<=7s não foram executadas nem garantidas aqui.
++
++A fonte sem procura publica zero forwarding, mantendo anúncio/oferta e sem parent
++para podar. Não lê/fecha media neste IMP. Intenção local sobrevivente a indisponibilidade
++pode manter ticket SUCCESS histórico, mas autorização vem do snapshot atual;
++reconstrução de ramo por falha/troca pertence a IMP-013/014 ou nova operação explícita.
++
++## 8. Limites físicos e partilha
++
++Preservar parâmetros e limites de IMP-011; nada é aumentado para acomodar o recurso.
++
++| Recurso | Teto partilhado / representação proposta |
++|---|---|
++| Trees C | min(E,256), incluindo Tree sem procura com intenção de poda ainda viva |
++| Children D | min(E,256), até N/stream; renovação substitui contexto dentro do slot, conservando grant anterior por valor |
++| Pendentes por Session | Até4, partilhados entre ACTIVATE e RENEW de children; substituição do próprio contexto não cria outro slot |
++| Tokens L | min(E,64), até4/stream; mesma API e reserva antes de offer |
++| Históricos H | min(E,1024), até2N/stream por direções/sessões; mesmo ID/watermark, espécie11/14 no fingerprint, sem lista de revisões |
++| Envios B | min(E,64), até4/Session e2/contexto, somando11/12/13/14/ERROR de ativação/renovação/poda |
++| Erros sem slot J | min(E,16), até1/Session; partilha B, descarte limitado sem backlog |
++| Resposta | ACK/ERROR até16/janela fixa1s por Session; pedido RENEW/DEACTIVATE não é resposta nem ganha pool paralelo |
++| Intenções | Uma renovação por Tree, uma resposta por Child, uma poda por Tree em retirada; dentro de C/D, sem nova fila |
++| Trabalho | Mesmo passe<=16 ações:4 conclusões+4 trees+6 children+2 locais; cursores cedem com trace/anúncios |
++| Scheduler | Mesmo alarme,<=2 jobs físicos e1 wake; nenhum timer por stream/operação |
++
++N=min(control.maxConnections,63). Validar Session/IDs/path/capacidades antes de
++copiar/alocar. Novos valores só após reserva; rejeição não expulsa confirmação,
++watermark vivo ou substituta. Saturação de contexto não gera uma lista de intenções.
++
++Todos os envios upstream de uma stream (ACTIVATE/RENEW/DEACTIVATE), incluindo os
++retirados ainda físicos, usam a referência canónica estável do seu contexto, sem
++escapar a2/contexto pela criação de um objeto/generation novo. ACK/ERROR de child
++usam Line estável; não se usa UUID recém-criado como chave de quota física.
++Sessão nova tem identidade própria, mas antigos envios continuam a ocupar B global.
++
++Reserva antes do port; callback publica resultado/ready e apenas agenda trabalho.
++Continuação valida geração/identidades antes de mutar e marca continuationDone no
++finally mesmo no caminho ignorado. release só quando callbackDone && continuationDone.
++Não interpretar future.cancel(), fila vazia, limpeza de mapa ou ACCEPTED como
++terminação física. Após retirar contexto lógico, o envio mantém apenas identidade/
++valores necessários, sem cópia de tabela ou retenção desnecessária de coleções.
++
++Se acaba o prazo de poda, libertar a intenção lógica/C elegível; B de envio já
++submetido permanece. O H protegido só é retirado por Session/epoch, não por precisar
++de capacidade. Uma Tree nova para a mesma stream não herda confirmação/cancelamento
++da antiga; revisão da Line continua crescente e callbacks continuam isolados.
++
++CLOSED/OVERFLOW da **Session corrente** mantém a remoção dessa conexão, afetando
++naturalmente as streams que dependem dela; isso não é uma falha lógica isolada de
++renovação. Resultado de Session antiga nunca remove a nova. INVALID_MESSAGE ou
++exceção sem falha física termina só a operação corrente e preserva grant válido.
++owner.offer(false) mantém o hook existente de shutdown, sem esperar bloqueante.
++
++## 9. Shutdown global
++
++requestClose bloqueia novas admissões/renovações e cancela intenções de poda ainda
++não submetidas. Não criar fase adicional de drenagem, novo envio depois de stopping,
++ACK13 fictício ou prazo T extra para cada ramo. O manager já tem lifecycle/LEAVE/EOF;
++quando a notificação não chega, lease remoto limita o órfão. DEACTIVATE submetido
++antes do fecho pode completar fisicamente, mas não volta a publicar estado.
++
++Cleanup retira destinos/grants e termina operações/tickets ainda pendentes como
++CLOSED, preservando resultados terminais já publicados. Cancela alarme/jobs por
++hooks existentes; continuations que já foram limpas marcam a sua conclusão, mas
++callbacks ainda em execução conservam B/J. Cleanup só substitui a continuação
++lógica após executar a sua remoção no owner, onde não existe outra continuação
++de domínio simultânea; não basta cancelar um future ou antecipar a flag.
++Não usar timers para libertar contadores
++que ainda representam threads/callbacks reais.
++
++awaitTermination fora do owner usa o menor entre budget do chamador e restante
++do **primeiro** shutdown, já incluindo scheduler e envios de todos os subsistemas.
++Sem reiniciar orçamento por callback/stream/chamadas repetidas. Com callback retido,
++await(0)=false; após callback+continuação e jobs terminados, true apenas se dentro
++do orçamento. Se excede, falha explícita; não aumentar prazos/tests históricos.
++
++## 10. Mapa L01–L24 / V-015 — por executar
++
++Cada linha especifica grupos de asserts, não um total de métodos JUnit.
++Os helpers ficam em SubscriptionLeaseTest; relógio, port, owner e scheduler falsos
++controlam explicitamente a ordem. Não se executaram Java, benchmarks ou medições.
++
++| ID | Exercício concreto / critério de aprovação futuro |
++|---|---|
++| L01 | S-R-(C1,C2) confirmado; cancelar C1, repetir stop e ticks por dois períodos; C2/lease/path exatos preservados, nenhuma13 no tronco, uma14 agregada por ciclo |
++| L02 | Cancelar último local/child de ramo confirmado; snapshot vazio antes do future13 terminar; exatamente uma13 com revisão capturada, zero13 na fonte; B só liberto fisicamente |
++| L03 | Local+child, retirar em ambas as ordens; último provoca poda, primeiro preserva outro e não cria14 por consumidor |
++| L04 | Desaparecer child sem LEAVE/13 e avançar relógio a G−1/G; autorização só antes, sweep termina sem evento de rede, ramo órfão remoto limitado pelo lease |
++| L05 | Três ciclos com ACK válidos S-R-C; ID estável, revisões crescentes/requests novos, referência única e grants conservadores |
++| L06 | pedido6000/máximo3000, renew2000: grant3000/P1000; grant300/P100; grant1/P333333ns sem arredondamento para zero; quota não é aumentada |
++| L07 | Dois relays, fila/send/ACK com atrasos; grant novo ancorado em t0; restante999999ns nunca vira1ms; ACK limite exato/oversized não confirma |
++| L08 | Repetir14 exato pending/sucesso/terminal; um contexto/intenção, restante antigo; mesmo revision com request/fields/espécie diferentes rejeitado sem renovar |
++| L09 | r+1/r+2 e request novo; ACK r+1 não substitui r+2; MAX_VALUE termina sem wrap nem UUID para contornar watermark |
++| L10 |13 r depois de14 r+1 e13 r+1 depois de novo11 r+2; substituta e leases iguais. Mesmo token com ticket novo imune ao cancel velho |
++| L11 | Matriz secção5: reservar/submeter/admitir14 antes/depois de cancel; ACK e ACCEPTED tardios, parent só conhece r, poda r+1 ignorada e expiração segura; outro child intacto |
++| L12 | Callback bloqueado com continuação concluída e ordem inversa; B/J/2por contexto retidos, M07 finalmente executa, release único e wake após libertação |
++| L13 |14 em concessão expirada/cancelada e antes de ACK11 admitido; não cria ramo nem revive terminal. Falha14 preserva grant anterior enquanto válido |
++| L14 | Seleção B/confirmado A;14 por ambos os prefixos recusado PATH_CHANGED, parent/destinos/lease originais iguais até prazo; custo só diferente com mesmo path permite |
++| L15 | Novo connectionId na mesma instância e nova instanceId; Down/ACK/13/callback antigo não altera Session nova, sem herança de grant |
++| L16 | Duas streams da mesma epoch e outra origem; cancelar/renovar/expirar/errar uma preserva confirmação/procura das outras, exceto perda física da Session partilhada |
++| L17 | CLOSED/OVERFLOW correntes retiram só essa Session; INVALID_MESSAGE/exceção termina operação sem conceder mais tempo; ACCEPTED sozinho não confirma |
++| L18 | Intercalar ERROR11/13/14/15 e ACK12 de campos errados; cada correlação/tipo isolado, nenhum ERROR17 em resposta a ERROR17 |
++| L19 | E pequeno e fronteiras C/D/L/H/B/J/quota; nova geração não escapa2/contexto, pending14/13 não cria pool/fila paralelos, estado saudável preservado; H protegido sem evicção |
++| L20 | Alarme atrasado até depois de vários períodos, ACK tardio e falha; no máximo um ciclo atual, início real avança e P constante, sem remaining/3 em loop; wrap monotónico testado |
++| L21 | Fonte oferta ativa sem consumidor: catálogo preservado/forwarding vazio/sem13 para si; cancelar A não fecha oferta B; nenhuma medição de bytes de vídeo presumida |
++| L22 | Shutdown antes/depois de submissão14/13, callback preso e job físico; nenhuma submissão após stopping, deadline único, await(0)=false até terminar, sem prolongar orçamento |
++| L23 | Overloads de Snapshot, Subscription/Lease/State e ticket preservados; cópias defensivas; validadores antes de novas cópias; seleção/catálogo/trace sem procura implícita |
++| L24 | Integração TCP real posterior com source/relay/dois consumidores e dois relays; saída parcial/final, renovação além de um lease, expiração órfã e shutdown/portas; consumidor via API, sem alteração CLI/OverlayNode |
++
++A integração real do teste comporá manager/monitor/routing usando owner/port
++existentes, sem nova infraestrutura de produção. Distinguir teste fake do TCP
++real e de manual humano. Nomes concretos dos métodos surgem na etapa autorizada;
++preservar ActivationTest e restantes testes históricos integralmente.
++
++## 11. Riscos, observação e checkpoint
++
++Poda é best effort: maior revisão submetida pode não ter sido admitida remotamente;
++a salvaguarda é o lease, não cancelamento aproximado. Prefixo divergente pode levar
++a expiração/indisponibilidade sem troca automática, como Q-C-41 aprovou. Grants
++curtos e quotas/capacidades pequenas podem impedir continuidade; provar segurança
++e diagnóstico, sem esconder recusa, falha física ou inventar tempos/FPS.
++
++Registar resultados limitados/razões nos diagnósticos locais existentes e ticket/
++snapshots; sem stack trace/path de media no wire, log ilimitado ou novas dependências.
++Valores de configuração não mudam política/wire/hard caps. Se uma ADR aceite se
++mostrar inviável, aplicar ADD11, parar a parte afetada e pedir decisão; não se
++identificou essa inviabilidade ao preparar este Design.
++
++Propostas adicionais deste Design (corridas, revisão da poda, cadência/prazos,
++intenção única e partilha física) aguardam aprovação integral do documento;
++Q-C-40–42 mantêm o estatuto de decisões já aprovadas. Não se cria outra ADR por
++inferência, nem se apresenta o desenho como implementação ou resultado de teste.
++
++Parar no checkpoint Design, antes de ADR/Implement. Apenas Model em stages_completed;
++Design em progresso, sem Java/testes Java/staging/commits/push ou outro IMP.
++Fecho futuro exige V-015/L01–L24, regressão atual/clean verify, manual humano,
++revisão final Denji e integração. Nenhum gate externo adicional.

@@ -1,0 +1,48 @@
+{
+  "method": "static inspection only; no Java execution",
+  "files": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java": {
+      "sha256": "167f6adf1514f40d88d745a5cb2cd44e782b974201f1e99c5d0f25859e1d59c4",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": {
+      "sha256": "924bc65dd12d77caa9f38cdb48da79abfb848ece465cec8fe08acefec0650817",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java": {
+      "sha256": "edbf9e65faff9d3723a35d374d223ec210ef835f657db213ce9a6a4963982551",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java": {
+      "sha256": "e7ddc13d1e580dbc909e3b7ce2eb34a068a309c7a66156fd911bce7368862bd6",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java": {
+      "sha256": "9ceb2e8ab7a50695dfb8a134bcd57ae237555ac5675ddc481a72d07e96a92e57",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java": {
+      "sha256": "6eba42e6fcd1d5d67d65f24c9f4a408fb8abb2e584be1803b6301ececb1cbe2b",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/protocol/ControlMessage.java": {
+      "sha256": "13093537bec553adfd385ea39b7a391151b38683c9778fa8f7f795e549c8988a",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/protocol/MessageCodec.java": {
+      "sha256": "0b54ab3f19d66c4d4dacddae40818baeb183e44e8ea962bc4b1e85551d1d8e7f",
+      "matches_operational_base": true
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": {
+      "sha256": "cb15509f08fc9acad61571adeda17adcd57de80372ca517c47f31cdbae306a94",
+      "matches_operational_base": true
+    }
+  },
+  "ports": "existing SerialOwner/ControlPort/Scheduler; manager send accepts types13/14; RoutingService has no handlers13/14 yet; codec payloads already present",
+  "scope_decision": "Q-C-42 approved: no CLI/OverlayNode/NeighborManager extension",
+  "pending_Design_work": [
+    "revision/admission/DEACTIVATE race",
+    "finite renewal deadlines and grant cadence",
+    "bounded renewal/prune intents and physical budgets"
+  ]
+}

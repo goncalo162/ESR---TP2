@@ -1,0 +1,137 @@
+{
+  "base": "b273b258a4642f94f8614ae00f060a46318d77a5",
+  "branch": "main",
+  "HEAD": "b273b258a4642f94f8614ae00f060a46318d77a5",
+  "command": "JAVA_HOME=/Users/maria/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home mvn -B -ntp -f Projeto/pom.xml test",
+  "exit_code": 0,
+  "totals": {
+    "tests": 1379,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "xml_files": 19,
+  "lease_tests": 51,
+  "M07_historical": [
+    "m07CancellingOnePendingChildDoesNotCancelTheOther",
+    "m07CancelledChildCannotBeReauthorizedByLateAckAcceptance",
+    "m07CancelledRequestDoesNotReactivateAndOldCancellationCannotRemoveReplacement",
+    "m07CancelThenImmediateRejectedRetryCannotRestoreTheOldConsumer",
+    "m07CancelledAckReservationWaitsForBothCallbackAndContinuation",
+    "m07CancelledAckAndOldRevisionCannotMutateReplacementChild"
+  ],
+  "oracle_groups": {
+    "L01": [
+      "l01SharedTrunkRenewsOncePerCycleAfterPartialDeparture",
+      "l01DeactivateOneChildPreservesSiblingAndCommonTrunk"
+    ],
+    "L02": [
+      "l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes"
+    ],
+    "L03": [
+      "l03ChildLeavesBeforeLocalConsumer",
+      "l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave"
+    ],
+    "L04": [
+      "l04OrphanChildExpiresAndPrunesItsCommonTrunk",
+      "l04SourceExpiryAlreadyExcludesOrphanWithoutNewNetworkInput"
+    ],
+    "L05": [
+      "l05ThreeCyclesUseOneLineAndStrictlyIncreasingRevisions",
+      "l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest"
+    ],
+    "L06": [
+      "l06OneMillisecondGrantUsesSubMillisecondCadenceAndExactExpiry",
+      "l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck"
+    ],
+    "L07": [
+      "l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor",
+      "l07OversizedAndExactDeadlineAckDoNotReplaceGrant",
+      "l07SubMillisecondParentRemainderIsNeverRoundedUp"
+    ],
+    "L08": [
+      "l08PendingDuplicateAndWrongKindCannotReanchor",
+      "l08TerminalReplayIsBoundedAndFreshRenewCanKeepOldHealthyGrant",
+      "l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain"
+    ],
+    "L09": [
+      "l09MaximumRevisionNeverWrapsAndEqualNewRequestIsRejected",
+      "l09LatePreviousAckCannotReplaceNewRenewal"
+    ],
+    "L10": [
+      "l10OldPruneCannotCancelNewActivationOnSameSession",
+      "l10OldDeactivateCannotRemoveRenewedRevision"
+    ],
+    "L11": [
+      "l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease",
+      "l11UnsentPruneExpiresAndNewDemandInvalidatesOldIntent",
+      "l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement",
+      "l11UnknownHigherPruneUsesLeaseFallbackWithoutApproximateCancellation"
+    ],
+    "L12": [
+      "l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd"
+    ],
+    "L13": [
+      "l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating",
+      "l13RenewBeforeInitialAckAndAfterCancelCannotActivate"
+    ],
+    "L14": [
+      "l14BothDivergentPrefixesPreserveConfirmedGrant",
+      "l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly",
+      "l14SamePathMetricChangeAllowsRenewal"
+    ],
+    "L15": [
+      "l15OldRenewCallbackAndAckCannotInvalidateNewInstance",
+      "l15OldSessionDeactivateCannotAffectReplacementConnection"
+    ],
+    "L16": [
+      "l16DeactivateOneStreamPreservesOtherStreamExactly"
+    ],
+    "L17": [
+      "l17PhysicalFailureInvalidatesOnlyDependentSession",
+      "l17LocalSendFailurePreservesGrantAndAcceptedAloneDoesNotExtend"
+    ],
+    "L18": [
+      "l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants",
+      "l18WrongAckFieldsAndErrorKindsAreIsolated"
+    ],
+    "L19": [
+      "l19SmallSharedHistoryAndLocalCapsPreserveHealthyGrant",
+      "l19UnboundErrorsShareGlobalAndPerSessionPhysicalCaps",
+      "l19RetiredGenerationsShareStablePhysicalContext",
+      "l19RenewRepliesShareExistingFixedWindowQuota",
+      "l19RenewalsShareFourPendingPerSessionAndNoParallelPool"
+    ],
+    "L20": [
+      "l20MonotonicWrapPreservesRenewalCadence",
+      "l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup"
+    ],
+    "L21": [
+      "l21SourceCatalogSurvivesLastConsumerAndOtherStream"
+    ],
+    "L22": [
+      "l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget",
+      "l22ShutdownAfterPruneDoesNotSendMoreAndRetainsPhysicalReservation"
+    ],
+    "L23": [
+      "l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration",
+      "l23SubscriptionCopiesValidPathAndRetainsPublicShape"
+    ],
+    "L24": [
+      "l24TcpTwoRelaysAggregateRenewPruneExpireAndReleasePorts"
+    ]
+  },
+  "java_hashes": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java": "7d3c8af82c551b56db14d568662711195a5bbb0592d44c057ae305c78958157a",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": "63ed46022b47258a6fcff6fa848714176b438ad19bf5a9eca3778ff9f1ca3d46",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java": "5c54b2cde853b79335ec421c9bd3bc0f6ae7d2ca21843cb7678fd0cc8e3cf53b"
+  },
+  "stage": "Implement pending approval; Test not authorized",
+  "not_executed": [
+    "clean verify",
+    "final JAR",
+    "human manual",
+    "Denji final review",
+    "integration"
+  ]
+}

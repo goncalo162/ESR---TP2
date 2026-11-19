@@ -11,7 +11,10 @@ Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O re
 Estado atual: **IN PROGRESS**. TASK-014/IMP-011/007-arvores DONE após
 Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
 37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
-TASK-015–018 TODO, sem execução de outro incremento iniciada.
+TASK-015/IMP-012 Test aprovado pelo utilizador:1379/0/0/0,19 XML,V-ADD e
+manual humano Francisco30. [Resumo para Denji](../../memory-bank/bolts/023-arvores/final-review-summary.md)
+e allowlist/diffs atualizados; aprovação final Denji confirmada pelo utilizador,integração pendente.
+TASK-015/unidade/fase em progresso, TASK-016–018 TODO. Sem fecho/staging/commits/push.
 O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
 
 ## 3. Pré-requisitos
@@ -27,7 +30,7 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
 | [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
-| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | TODO |
+| [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | IN PROGRESS — Test/Denji aprovados; integração pendente |
 | [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | TODO |
 | [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | TODO |
 | [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | TODO |

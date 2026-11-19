@@ -1,0 +1,171 @@
+{
+  "tests": 22,
+  "failures": 20,
+  "errors": 0,
+  "skipped": 0,
+  "exit_code": 1,
+  "compilation_succeeded": true,
+  "expected_red": true,
+  "scope": "new fake-clock/transport tests only; no full regression, TCP integration, clean verify or Test approval",
+  "failure_causes": {
+    "periodic SUBSCRIPTION_RENEW emission absent": 7,
+    "SUBSCRIPTION_RENEW handler/reply absent": 7,
+    "upstream prune emission absent": 2,
+    "DEACTIVATE handler absent": 3,
+    "cap validation occurs after copy/iteration": 1
+  },
+  "cases": [
+    {
+      "test": "l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Both independent streams need a renewal ==> expected: <2> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l10OldDeactivateCannotRemoveRenewedRevision",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request 257155ae-9fdf-451d-b269-18393281bc3b ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l04OrphanChildExpiresAndPrunesItsCommonTrunk",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "upstream prune emission absent"
+    },
+    {
+      "test": "l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request 3947e73e-994b-444d-904d-029871115c38 ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request d8d018c4-fa45-432f-9b26-757e0d590ca9 ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l16DeactivateOneStreamPreservesOtherStreamExactly",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "DEACTIVATE must be scoped to the selected stream ==> expected: <false> but was: <true>",
+      "cause": "DEACTIVATE handler absent"
+    },
+    {
+      "test": "l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ERROR for request 66faa47d-52e9-41a6-960d-e6ec4e4c9f17 ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Unexpected exception type thrown, expected: <java.lang.IllegalArgumentException> but was: <java.lang.AssertionError>",
+      "cause": "cap validation occurs after copy/iteration"
+    },
+    {
+      "test": "l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ERROR for request f21c5dc4-8f65-4e2a-9bee-dfbbfacc5056 ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l01DeactivateOneChildPreservesSiblingAndCommonTrunk",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "DEACTIVATE must remove only its exact child ==> expected: <[C2]> but was: <[C2, C1]>",
+      "cause": "DEACTIVATE handler absent"
+    },
+    {
+      "test": "l19RenewRepliesShareExistingFixedWindowQuota",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Initial ACK plus renewals must use the same 16-reply window ==> expected: <16> but was: <1>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Missing correlated ACTIVATE_ACK for request bb37794f-a9e0-4560-865b-48818707baa2 ==> expected: <1> but was: <0>",
+      "cause": "SUBSCRIPTION_RENEW handler/reply absent"
+    },
+    {
+      "test": "l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    },
+    {
+      "test": "l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "The last child must remove the remaining aggregate demand ==> expected: <null> but was: <Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=ee28b284-454f-4abc-8ad9-0aade662b882, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=88156749-ca1e-4fb0-b5c9-fea7907c1bdf, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=5b555a48-73c9-473c-865f-3710b30b6538, revision=1, requestId=24381e3b-909f-4168-a189-4bd2f3a567b3, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=0, durationNanos=6000000000]], revision=4]>",
+      "cause": "DEACTIVATE handler absent"
+    },
+    {
+      "test": "l15OldSessionDeactivateCannotAffectReplacementConnection",
+      "passed": true,
+      "failure_type": null,
+      "message": null
+    },
+    {
+      "test": "l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one DEACTIVATE; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "upstream prune emission absent"
+    },
+    {
+      "test": "l04SourceExpiryAlreadyExcludesOrphanWithoutNewNetworkInput",
+      "passed": true,
+      "failure_type": null,
+      "message": null
+    },
+    {
+      "test": "l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest",
+      "passed": false,
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected exactly one SUBSCRIPTION_RENEW; missing IMP-012 behavior is not a timeout of this harness ==> expected: <1> but was: <0>",
+      "cause": "periodic SUBSCRIPTION_RENEW emission absent"
+    }
+  ]
+}

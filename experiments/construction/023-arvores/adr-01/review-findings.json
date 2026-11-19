@@ -1,0 +1,31 @@
+{
+  "type": "static architectural compliance review; not executed test assertions",
+  "approved_Design": "memory-bank/bolts/023-arvores/ddd-02-technical-design.md",
+  "findings": {
+    "F01": "separate continuous demand/renewal operation from initial wants/startRound; retain Tree.confirmed",
+    "F02": "allow legitimate new RENEW grant, preserve old cap for ACTIVATE/replay",
+    "F03": "operation terminal versus generation cancellation, M07 identity/terminal guards",
+    "F04": "13/14/ERROR demultiplex, kind-aware fingerprint and exact pruning revision",
+    "F05": "renewal budget clipped by prior remaining grant, anchored monotonic validity",
+    "F06": "explicit response quota classification; all new kinds share physical budgets",
+    "F07": "no submission after stopping; cleanup and physical callbacks share original shutdown budget"
+  },
+  "ADR_divergences_identified": [],
+  "substitute_ADR_proposed": false,
+  "implementation_paths": [
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java"
+  ],
+  "read_only_source_checks": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": "924bc65dd12d77caa9f38cdb48da79abfb848ece465cec8fe08acefec0650817",
+    "Projeto/src/main/java/pt/uminho/esr/ott/config/RuntimeConfiguration.java": "cb15509f08fc9acad61571adeda17adcd57de80372ca517c47f31cdbae306a94"
+  },
+  "pending": [
+    "V-015/L01-L24",
+    "current regression",
+    "human manual",
+    "Denji final review",
+    "integration"
+  ]
+}

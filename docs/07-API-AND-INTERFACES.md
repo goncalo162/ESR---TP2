@@ -832,3 +832,93 @@ D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0 e regressão1325/0/0/0.
 [Prova nova](../experiments/construction/007-arvores/q-c-37/README.md) inclui terminação
 sem resposta/recursos físicos, mantendo os prazos. Implement continua por aceitar,
 sem Test/fecho/commits/push/outro IMP; restantes requisitos de fecho pendentes.
+
+## IMP-012 — decisões de Model, sem implementação
+
+[Model023-arvores](../memory-bank/bolts/023-arvores/ddd-01-domain-model.md),
+base b273b258a4642f94f8614ae00f060a46318d77a5. Model/Design aprovados pelo utilizador; apenas revisão ADR autorizada;
+Q-C-40/41/42 respondidas explicitamente pelo utilizador:
+
+- RENEW14 mantém subscriptionId e usa revisão crescente/requestId novo. ACK12
+  e ERROR17 existentes são correlacionados pela operação/Session/stream/epoch/
+  ID/revisão/pedido; não se acrescenta campo ao wire.
+- Divergência selecionado/confirmado recusa RENEW com PATH_CHANGED, preservando
+  concessão anterior até ao seu prazo; não troca parent nem renova por recusa.
+- Cancelamento usa ticket local existente e DEACTIVATE13, sem CLI nova. A ligação
+  à CLI fica para composição posterior de cliente/aplicação; esta clarificação
+  de Q-C-34 mantém a allowlist de três ficheiros e o fecho histórico de IMP-011.
+
+Renovação ainda não implementada. RoutingService atual trata11/12/ERROR11;
+Design deverá especificar13/14/ERROR13/14 e a corrida de revisão/cancelamento,
+preservando ERROR/trace15 e os eventos alheios. NeighborManager/codec/transporte
+já representam estes tipos; nenhuma alteração fora do âmbito é autorizada.
+Sem Java/testes Java, novo executor, transporte, dependência ou ADR nesta etapa.
+
+### IMP-012 — Design aprovado; revisão ADR preparada
+
+[Design](../memory-bank/bolts/023-arvores/ddd-02-technical-design.md): APIs públicas
+de SubscriptionTicket/requestSubscription/retrySubscription/snapshot e os records
+existentes preservados; novos handlers13/14/ERROR13/14 apenas no RoutingService.
+Nenhuma assinatura/wire pública nova ou mudança no manager/codec/transporte.
+
+Poda captura a maior revisão submetida da geração retirada; recetor só cancela
+Line/Session/stream/epoch/ID com revisão máxima admitida exata. Se o parent não
+admitiu a renovação, não há cancelamento aproximado: o ramo limpa pelo lease.
+ACK/ACCEPTED de operação antiga não publicam estado, mantendo o finally físico.
+
+Cadência proposta P=min(renew,G/3), constante por grant e nanos positivos;
+sem remaining/3 em cada wake ou recuperação de ticks perdidos. Prazo de renovação
+min(T,restante do grant antigo); falha preserva apenas o grant ainda válido.
+Uma operação lógica pendente por upstream, mesma reserva B/J/contexto e alarme.
+Shutdown não inicia podas após stopping nem cria prazo/fase extra por stream.
+As concretizações de Design acima foram aprovadas pelo utilizador; revisão ADR
+preparada, sem Java/testes executados.
+
+### IMP-012 — conformidade ADR, sem implementação
+
+[Revisão para aprovação](../memory-bank/bolts/023-arvores/adr-review.md): reutiliza
+ADR aceites sem alterar wire/caps/portas públicas. Diferenças de código F01–F07
+são trabalho futuro dentro do RoutingService/Subscription: procura contínua,
+grant14 legítimo versus replay11, terminal por operação versus cancelamento,
+correlação/dispatcher13/14/ERROR, prazo restante, quota explícita de respostas
+e retenção física/shutdown. Não são divergências de ADR ou correções executadas.
+Sem extensão ao manager/codec/transporte/CLI, nova ADR ou dependência.
+
+### IMP-012 — primeiro passo de Implement autorizado
+
+Revisão ADR aprovada pelo utilizador; somente tipos/interfaces e testes vermelhos.
+[Walkthrough](../memory-bank/bolts/023-arvores/implementation-walkthrough.md):
+Subscription.Operation/Identity e RoutingService.RenewalRequest/PruneRequest
+são tipos internos imutáveis/package-private, ainda não usados pelo engine.
+APIs públicas, payloads/códigos, Estado PENDING/ACTIVE e métodos antigos preservados.
+Handlers13/14, cadência, poda e reordenação da validação/cópia continuam ausentes.
+22 testes novos compilam,20 falhas de asserção esperadas;30 históricos selecionados
+passaram, incluindo6 M07. Não é V-015 validado ou regressão integral/etapa Test.
+
+### IMP-012 — comportamentos no checkpoint Implement
+
+Primeiro passo aprovado e comportamentos autorizados nos mesmos três ficheiros.
+[Walkthrough](../memory-bank/bolts/023-arvores/implementation-walkthrough.md):
+nenhuma API pública nova, dispatch13/14/ERROR11/13/14 isolado de trace, revisão
+crescente e request novo, grant anterior preservado durante/falha de renovação.
+P constante por grant e prazo min(T,restante), uma pendência; DEACTIVATE exato
+pela maior revisão admitida/submetida, poda best effort e lease fallback.
+ACK/ERROR partilham quota16/janela1s; pedidos11/13/14 usam Line estável e B comum.
+Guarda M07 e finally callback/continuação preservados. Sem CLI/UDP/vídeo novo.
+Implement por aceitar, Test não autorizado; Q-C-40–42 mantidas.
+
+### IMP-012 — conformidade em Test
+
+Implement aprovado; [Test autorizado](../memory-bank/bolts/023-arvores/ddd-03-test-report.md),
+clean verify1379/0/0/0,19 XML e JAR da mesma fonte aprovada. Nenhuma API/Java
+alterada nesta etapa. Q-C-40–42, owner, grants e reservas físicos preservados.
+Roteiro humano usa APIs/tickets existentes; sem composição CLI stop/play.
+Manual humano Francisco30 cumprido, sem alteração Java/API/JAR; Test aprovado
+pelo utilizador. Revisão final Denji e integração pendentes.
+
+### IMP-012 — revisão final Denji confirmada
+
+Utilizador confirmou aprovação final da mesma implementação,sem alterações pendentes.
+[Confirmação e simulação](../experiments/construction/023-arvores/integration-01/README.md)
+vinculadas aos hashes de fonte/JAR. Sem mudança API/Java/wire/caps/Q-C-40–42,
+sem repetir build/manual; integração aguarda autorização,sem fecho/staging/commit/push.

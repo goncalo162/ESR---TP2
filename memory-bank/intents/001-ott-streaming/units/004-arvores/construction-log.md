@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-17T23:51:24Z"
+last_updated: "2026-11-18T16:15:43Z"
 ---
 # Construction Log — 004-arvores
 
@@ -17,7 +17,8 @@ Inception concluído em2026-11-03T20:54:11Z;003-rotas e022-rotas complete.
 1 - ✅ **007-arvores**: complete; história001 complete/implemented=true, TASK-014
 DONE. Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863
 comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
-2 - [ ] **023-arvores**: planned; história002, renovação e poda.
+2 - ⏳ **023-arvores**: in-progress, Model/Design/ADR aprovados; primeiro passo de Implement por aceitar, história002 em progresso.
+Q-C-40/41/42 decididas; nenhuma execução Java/V-015.
 3 - [ ] **008-arvores**: planned; história003, recuperação de upstream.
 4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
 5 - [ ] **009-arvores**: planned; história005, segundo marco.
@@ -195,3 +196,91 @@ Prova posterior em experiments/construction/007-arvores/integration-proof-01.
 Unidade004-arvores/PHASE-04 continuam em progresso; quatro bolts planned.
 023-arvores apenas desimpedido pela atualização derivada blocks=false, sem
 início de execução. Fecho exclusivamente documental/evidência, sem Java/push.
+
+## IMP-012 — início exclusivo de Model
+
+Registo 2026-11-18T15:40:16Z, por seleção explícita do utilizador. Base main/b273b258a4642f94f8614ae00f060a46318d77a5, árvore/índice limpos antes do registo. Dependências IMP-011/007-arvores e IMP-010/022-rotas complete.023-arvores in-progress/current_stage=model, sem etapa aprovada. Só documentação e inspeção do código autorizadas; sem Java/testes Java, staging, commits, push ou outro IMP. Fechos anteriores preservados.
+
+Q-C-40/41/42 respondidas explicitamente no Model: revisão crescente e pedido
+novo por renovação, recusa de prefixo divergente preservando grant atual, três
+ficheiros sem CLI. Model preparado, sem Design/ADR/Implement/Test. Fontes/
+fechos anteriores preservados; V-015 por executar,1328 testes históricos.
+
+## IMP-012 — Design autorizado e preparado
+
+Registo 2026-11-18T16:04:20Z. Model/Q-C-40–42 aprovados/reconfirmados pelo utilizador.
+Design propõe APIs/estados, corrida14/13 com revisões capturadas, cadência e
+prazos remanescentes, tetos C/D/L/H/B/J partilhados e shutdown global. Mapa
+L01–L24/V-015 concretizado, nenhum teste Java executado.
+[Design por aprovar](../../../../bolts/023-arvores/ddd-02-technical-design.md).
+Sem ADR/Implement, alterações Java, staging, commits, push ou outro IMP.
+
+## IMP-012 — revisão ADR autorizada e preparada
+
+Registo 2026-11-18T16:15:43Z. Design aprovado pelo utilizador, incluindo corridas/revisões,
+cadência/prazos e limites físicos. Apenas revisão ADR autorizada.
+[Conformidade estática](../../../../bolts/023-arvores/adr-review.md): reutilização
+sem ADR nova/substituição/divergência concreta. F01–F07 documentam adaptações
+futuras dentro dos três ficheiros; guardas M07, grant/quotas/físico/shutdown
+preservados. Revisão por aprovar, sem Implement/Java/testes Java, staging,
+commits/push ou outro IMP. V-015/regressão/manual/Denji/integração pendentes.
+
+## IMP-012 — tipos e testes vermelhos
+
+Registo 2026-11-18T16:51:40Z. Revisão ADR aprovada; primeiro passo de Implement autorizado.
+Tipos aninhados imutáveis, sem nova API pública ou ligação de comportamento.
+Novo SubscriptionLeaseTest com22 testes/20 falhas esperadas/0 erros/0 ignorados;
+compilação passou. Negativo inicial21/19/0/0 preservado antes de novo caso de
+poda por maior revisão submetida.30 históricos selecionados passaram,6 M07.
+Não é regressão integral ou aprovação V-015/Test. APIs/código antigo/testes
+históricos e evidência anterior preservados; target separado.
+[Checkpoint](../../../../bolts/023-arvores/implementation-walkthrough.md), parar
+antes dos comportamentos. Sem staging/commits/push/outro IMP.
+
+## IMP-012 — comportamentos de Implement autorizados
+
+Utilizador aprovou interfaces/tipos/testes vermelhos e autorizou renovação/poda
+nos três ficheiros e ampliação V-015/L01–L24, incluindo TCP real.
+[Checkpoint Implement](../../../../bolts/023-arvores/implementation-walkthrough.md)
+com resultados reais, negativos, XML, hashes e preservação. Implement por aceitar,
+Test não autorizado. Manual humano, Denji e integração não presumidos; sem fecho,
+staging/commits/push/outro IMP. Unidade/PHASE-04 permanecem em progresso.
+
+## IMP-012 — Test autorizado, validação técnica concluída
+
+Registo 2026-11-18T17:46:39Z: aprovação explícita de Implement e autorização Test pelo utilizador.
+[Relatório](../../../../bolts/023-arvores/ddd-03-test-report.md): clean verify1379/0/0/0,
+19 XML reais (errata documental20→19, originais intactos),51 novos,V-015/L01–L24,
+TCP real,JAR/hash e fonte aprovada preservados. Ensaio Codex30/exit0,kind=agent,
+não substitui manual humano. Roteiro humano preparado; Test por aprovar.
+Revisão final Denji e integração pendentes. Bolt/história/TASK/unidade/fase em
+progresso; sem staging/commits/push/fecho/outro IMP. Nenhum gate externo adicional.
+
+## IMP-012 — manual humano Francisco conferido
+
+Registo 2026-11-18T17:55:21Z: utilizador confirmou execução pessoal das seis etapas,
+30 CHECK_PASS,CLEANUP_COMPLETE,MANUAL_PASS CHECKS=30,JAVA_EXIT0,passed=true,
+sem divergências observadas. [Conferência](../../../../../experiments/construction/023-arvores/manual-human-verification-01/verification.json)
+valida hashes/evidências/origem da classe no JAR/JVM recolhida; mesmas fontes/JAR
+do clean verify1379/0/0/0,19 XML. WRAPPER_EXIT não consta da saída/relatório:
+não se atribui resultado. Test por aprovar; Denji e integração pendentes.
+Sem staging/commits/push/fecho; bolt/história/TASK/unidade/fase em progresso.
+
+## IMP-012 — Test aprovado, pacote para revisão final
+
+Registo 2026-11-18T18:00:35Z: aprovação explícita do utilizador ao Test1379/0/0/0,
+19 XML,V-ADD e Francisco30. [Resumo final](../../../../bolts/023-arvores/final-review-summary.md)
+e [plano/allowlist](../../../../bolts/023-arvores/integration-plan.md) preparados
+sem alterar código/JAR/logs/negativos/Q-C-40–42. Denji ainda não confirmou revisão
+final; integração não autorizada/executada. Bolt/história/TASK/unidade/fase abertas.
+Sem staging/commits/push/fecho/outro IMP; target/alterações alheias excluídos.
+
+## IMP-012 — confirmação da revisão Denji e simulação de integração
+
+Registo 2026-11-19T21:48:56Z: utilizador confirmou revisão final Denji aprovada da implementação
+atual,sem alterações pendentes. [Versão/hashes](../../../../../experiments/construction/023-arvores/integration-01/review-confirmation.json)
+e [plano final](../../../../bolts/023-arvores/integration-plan.md) atualizados;
+mesmo código/JAR,sem novo build/manual. Pacote simulado da base mais allowlist,
+com hashes/referências/V-ADD e exclusão de deltas target/alheios.
+Integração aguarda autorização. Bolt/história/TASK/unidade/fase abertos,
+sem staging/commits/push/fecho/outro IMP. Nenhum gate externo adicional.

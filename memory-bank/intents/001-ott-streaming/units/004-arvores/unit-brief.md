@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-04"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-17T23:51:24Z"
+updated: "2026-11-18T16:15:43Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
@@ -19,9 +19,11 @@ Estado atual: unidade **in-progress**. História001/IMP-011/007-arvores complete
 implemented=true, TASK-014 DONE após Test1328/0/0/0, manual Francisco24, revisão
 final Waheed e integração37fa863 comprovada.
 [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
-Os quatro restantes bolts continuam planned, sem execução iniciada. O sinalizador
-derivado blocks de023-arvores passa a false por dependências satisfeitas; isso
-não inicia outro IMP. PHASE-04 em progresso. Sem push.
+023-arvores/IMP-012: Test aprovado na base b273b258,clean verify1379/0/0/0,
+19 XML,V-ADD e manual humano Francisco30. [Resumo para revisão final Denji](../../../../bolts/023-arvores/final-review-summary.md),
+diffs/allowlist atualizados. Revisão final Denji confirmada,integração pendente; bolt/história/
+TASK/unidade/fase abertos. Q-C-40–42 preservadas, restantes três bolts planned.
+Sem staging/commits/push/fecho/outro IMP.
 
 ## Requisitos atribuídos
 

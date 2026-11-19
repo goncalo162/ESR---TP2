@@ -1,0 +1,378 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index e15d1d5..81d56be 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -108,6 +108,28 @@ public final class RoutingService implements AutoCloseable {
+     record ActivationLoad(int trees,int children,int locals,int histories,int sends,int unbound,
+             int responseIntents,int pendingChildren) { }
+     ActivationLoad activationLoad(){requireOwner();return activation.load();}
++
++    // IMP-012 types only: immutable inputs, not connected to the engine yet.
++    record RenewalRequest(Subscription.Identity identity, UUID requestId,
++            Subscription.Lease previousGrant, long beganNanos, long budgetNanos) {
++        RenewalRequest {
++            Objects.requireNonNull(identity); Objects.requireNonNull(requestId);
++            Objects.requireNonNull(previousGrant);
++            if(budgetNanos<1 || budgetNanos>previousGrant.durationNanos())
++                throw new IllegalArgumentException("Invalid renewal budget");
++        }
++    }
++
++    /** A retired identity is captured once; a later branch must never retarget this request. */
++    record PruneRequest(Subscription.Identity identity, UUID requestId,
++            long beganNanos, long budgetNanos) {
++        PruneRequest {
++            Objects.requireNonNull(identity); Objects.requireNonNull(requestId);
++            if(budgetNanos<1) throw new IllegalArgumentException("Invalid prune budget");
++        }
++    }
++    // End IMP-012 types.
++
+     public enum Phase { NEW, RUNNING, STOPPED }
+     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
+         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java
+index 67d3c21..aa87934 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java
+@@ -2,6 +2,7 @@ package pt.uminho.esr.ott.routing;
+ 
+ import java.util.*;
+ import pt.uminho.esr.ott.overlay.Neighbor;
++import pt.uminho.esr.ott.protocol.MessageType;
+ 
+ /** Immutable view of one admitted child, not the aggregate upstream identity. */
+ public record Subscription(UUID streamId, UUID serverEpoch, Neighbor.Session child,
+@@ -9,6 +10,26 @@ public record Subscription(UUID streamId, UUID serverEpoch, Neighbor.Session chi
+         long requestedLeaseMs, State state, Optional<Lease> validity) {
+     public enum State { PENDING, ACTIVE }
+ 
++    // IMP-012 types only: not wired into activation or renewal behavior yet.
++    enum Operation {
++        ACTIVATE(MessageType.ACTIVATE), RENEW(MessageType.SUBSCRIPTION_RENEW);
++
++        private final MessageType wireType;
++        Operation(MessageType wireType) { this.wireType=wireType; }
++        MessageType wireType() { return wireType; }
++    }
++
++    /** Captured branch generation; revision is a wire value, generation is local only. */
++    record Identity(Neighbor.Session session, UUID streamId, UUID serverEpoch,
++            UUID subscriptionId, long revision, long generation) {
++        Identity {
++            Objects.requireNonNull(session); Objects.requireNonNull(streamId);
++            Objects.requireNonNull(serverEpoch); Objects.requireNonNull(subscriptionId);
++            if(revision<0 || generation<0) throw new IllegalArgumentException("Invalid branch identity");
++        }
++    }
++    // End IMP-012 types.
++
+     /** A duration anchored before the request queue; safe across nanoTime wrap. */
+     public record Lease(long beganNanos, long durationNanos) {
+         public Lease {
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java
+new file mode 100644
+index 0000000..0690ce7
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java
+@@ -0,0 +1,300 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import static org.junit.jupiter.api.Assertions.*;
++import java.net.*;
++import java.nio.file.Path;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++import java.util.function.*;
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.monitoring.*;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.Connection;
++
++@Timeout(20)
++class SubscriptionLeaseTest {
++    static final UUID A=new UUID(1,1),B=new UUID(1,2),C=new UUID(1,3);
++    static UUID id(String name){return UUID.nameUUIDFromBytes(name.getBytes(java.nio.charset.StandardCharsets.UTF_8));}
++    static final UUID EPOCH=id("S-instance");
++    static Neighbor.Session peer(String name){UUID instance=id(name+"-instance");return new Neighbor.Session(name,instance,UUID.randomUUID(),
++            new ControlMessage.Endpoint(name,instance,"127.0.0.1",19001,19101,NodeRole.RELAY));}
++    static NodeConfiguration config(String name,boolean source,int capacity,int attempts){
++        var d=RuntimeConfiguration.defaults();
++        var runtime=new RuntimeConfiguration(d.control(),new RuntimeConfiguration.Overlay(d.overlay().helloTimeout(),d.overlay().retryInitial(),
++                d.overlay().retryMax(),d.overlay().retryJitterPercent(),capacity),d.monitoring(),
++                new RuntimeConfiguration.Routing(d.routing().announceInterval(),d.routing().candidateTtl(),4096,d.routing().cacheTtl(),10,
++                        Duration.ofMillis(3000),attempts,20,3,d.routing().switchMinDwell()),d.subscription(),d.video(),d.source());
++        var streams=source?List.of(new StreamConfiguration(Path.of("catalog"),A,name,"A",Path.of("a.Mjpeg"),10,false),
++                new StreamConfiguration(Path.of("catalog"),B,name,"B",Path.of("b.Mjpeg"),10,false)):List.<StreamConfiguration>of();
++        return new NodeConfiguration(Path.of("node"),name,source?NodeRole.SERVER:NodeRole.RELAY,"127.0.0.1","127.0.0.1",19001,19101,
++                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1",19000)),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),streams,runtime);
++    }
++    static final class Owner implements NeighborManager.SerialOwner {
++        final ArrayDeque<Runnable> queue=new ArrayDeque<>();final List<Runnable> hooks=new ArrayList<>();final int capacity;
++        volatile Thread running;boolean stopped;volatile Predicate<Thread> hold=t->false;
++        final CountDownLatch offered=new CountDownLatch(1),resume=new CountDownLatch(1);
++        Owner(int capacity){this.capacity=capacity;}
++        public int capacity(){return capacity;}public boolean isOwnerThread(){return running==Thread.currentThread();}
++        public boolean offer(Runnable r){
++            if(hold.test(Thread.currentThread())){offered.countDown();try{assertTrue(resume.await(5,TimeUnit.SECONDS));}catch(InterruptedException e){throw new AssertionError(e);}}
++            synchronized(queue){if(stopped)return false;if(queue.size()>=capacity){fail(new IllegalStateException("full"));return false;}queue.add(r);return true;}
++        }
++        public NeighborManager.Registration onStop(Runnable r){hooks.add(r);return ()->hooks.remove(r);}
++        public void fail(Throwable t){requestClose();}
++        public void requestClose(){if(stopped)return;stopped=true;synchronized(queue){queue.clear();}run(()->{for(var h:List.copyOf(hooks))h.run();});}
++        public boolean awaitTermination(Duration d){return stopped;}public void close(){requestClose();}
++        void run(Runnable r){var old=running;running=Thread.currentThread();try{r.run();}finally{running=old;}}
++        boolean drain(){boolean did=false;for(int n=0;n<10000;n++){
++            Runnable r;synchronized(queue){r=queue.poll();}if(r==null)return did;did=true;run(r);
++        }throw new AssertionError("Unbounded owner wake loop");}
++    }
++    static final class Timers implements RoutingService.Scheduler {
++        final AtomicLong clock;final List<Job> jobs=new ArrayList<>();boolean stopped;
++        final class Job implements RoutingService.Ticket {final Runnable r;final long began,delay;
++            Job(Runnable r,long delay){this.r=r;this.delay=delay;began=clock.get();}public void cancel(){jobs.remove(this);}}
++        Timers(AtomicLong clock){this.clock=clock;}
++        public RoutingService.Ticket schedule(Runnable r,long delay){if(stopped||jobs.size()>=2)throw new RejectedExecutionException();var j=new Job(r,delay);jobs.add(j);return j;}
++        public void requestClose(){stopped=true;jobs.clear();}public boolean awaitTermination(Duration d){return jobs.isEmpty();}public int physicalJobs(){return jobs.size();}
++        boolean fire(){for(var j:List.copyOf(jobs))if(clock.get()-j.began>=j.delay){jobs.remove(j);j.r.run();return true;}return false;}
++    }
++    record Sent(Neighbor.Session peer,ControlMessage message,CompletableFuture<Connection.SendResult> result) { }
++    static final class Rig implements AutoCloseable {
++        final String name;final UUID instance;final AtomicLong clock=new AtomicLong();final Owner owner;final Timers timers=new Timers(clock);
++        final List<Sent> sent=new ArrayList<>();final RoutingService router;Predicate<ControlMessage> hold=m->false;
++        Rig(){this("R",false,4096,3);}Rig(String name,boolean source,int capacity,int attempts){
++            this.name=name;instance=id(name+"-instance");owner=new Owner(capacity);
++            router=new RoutingService(config(name,source,capacity,attempts),instance,owner,(p,m)->{
++                assertTrue(owner.isOwnerThread());var result=new CompletableFuture<Connection.SendResult>();sent.add(new Sent(p,m,result));
++                if(!hold.test(m))result.complete(Connection.SendResult.ACCEPTED);return result;
++            },e->{assertFalse(e.fatal(),e.toString());},clock::get,timers);
++            act(router::start);
++        }
++        void act(Runnable r){owner.run(r);pump();}
++        void pump(){for(int i=0;i<10000;i++){boolean did=owner.drain();boolean timer=timers.fire();if(!did&&!timer)return;}fail("Timer/owner busy loop");}
++        void tick(long nanos){clock.addAndGet(nanos);pump();}
++        void up(Neighbor.Session p){act(()->router.onNeighborEvent(new NeighborManager.NeighborUp(p)));}
++        void metric(Neighbor.Session p,long cost){act(()->router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(p,LinkMetrics.State.MEASURED,
++                OptionalDouble.of(cost),OptionalLong.of(cost),1,false,OptionalLong.of(clock.get()),0))));}
++        void receive(Neighbor.Session p,ControlMessage m){act(()->router.onNeighborEvent(new NeighborManager.Received(p,m)));}
++        void ad(Neighbor.Session p,long seq,long cost){ad(p,A,"S",EPOCH,seq,cost);}
++        void ad(Neighbor.Session p,UUID stream,String source,UUID epoch,long seq,long cost){
++            receive(p,new ControlMessage(MessageType.STREAM_ANNOUNCE,UUID.randomUUID(),p.nodeId(),p.instanceId(),
++                    new ControlMessage.Announcement(new ControlMessage.StreamInfo(stream,source,"Video",1,10,epoch),seq,cost,List.of(source,p.nodeId()))));
++        }
++        void route(Neighbor.Session p){up(p);metric(p,10);ad(p,1,100);}
++        ControlMessage activate(Neighbor.Session p,UUID stream,UUID epoch,UUID sub,long rev,UUID request,List<String> path,long lease){
++            var m=new ControlMessage(MessageType.ACTIVATE,request,p.nodeId(),p.instanceId(),new ControlMessage.Activation(stream,epoch,sub,rev,lease,path));receive(p,m);return m;
++        }
++        ControlMessage child(Neighbor.Session p){return activate(p,A,EPOCH,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","A",name,p.nodeId()),6000);}
++        List<Sent> messages(MessageType type){return sent.stream().filter(s->s.message.type()==type).toList();}
++        Sent latestRequest(){return messages(MessageType.ACTIVATE).getLast();}
++        void ack(Sent request,long grant){var p=(ControlMessage.Activation)request.message.payload();
++            receive(request.peer,new ControlMessage(MessageType.ACTIVATE_ACK,request.message.requestId(),request.peer.nodeId(),request.peer.instanceId(),
++                    new ControlMessage.ActivationAck(p.streamId(),p.serverEpoch(),p.subscriptionId(),p.revision(),grant)));}
++        void error(Sent request,int related,ErrorCode code){receive(request.peer,new ControlMessage(MessageType.ERROR,request.message.requestId(),
++                request.peer.nodeId(),request.peer.instanceId(),new ControlMessage.ErrorPayload(code,related,"fixture")));}
++        RoutingService.SubscriptionTicket local(UUID stream,UUID token){var t=router.requestSubscription(stream,token);pump();return t;}
++        Route.Confirmation forwarding(UUID stream){return router.snapshot().forwarding().get(stream);}
++        RoutingService.ActivationLoad load(){var result=new AtomicReference<RoutingService.ActivationLoad>();owner.run(()->result.set(router.activationLoad()));return result.get();}
++        public void close(){router.requestClose();owner.drain();for(var s:sent)if(!s.result.isDone())s.result.complete(Connection.SendResult.CLOSED);owner.drain();
++            assertTrue(router.awaitTermination(Duration.ofSeconds(1)));owner.close();}
++    }
++    static ErrorCode lastError(Rig r){return ((ControlMessage.ErrorPayload)r.messages(MessageType.ERROR).getLast().message.payload()).code();}
++    static RoutingService.SubscriptionOutcome result(RoutingService.SubscriptionTicket t){return t.result().orElseThrow();}
++
++
++    static Sent exactlyOne(Rig r,MessageType type){
++        var values=r.messages(type);
++        assertEquals(1,values.size(),"Expected exactly one "+type+"; missing IMP-012 behavior is not a timeout of this harness");
++        return values.getFirst();
++    }
++    static ControlMessage renew(Rig r,Neighbor.Session child,ControlMessage original,long revision,UUID request){
++        var p=(ControlMessage.Activation)original.payload();
++        var m=new ControlMessage(MessageType.SUBSCRIPTION_RENEW,request,child.nodeId(),child.instanceId(),
++                new ControlMessage.Activation(p.streamId(),p.serverEpoch(),p.subscriptionId(),revision,p.leaseMs(),p.expectedPath()));
++        r.receive(child,m);return m;
++    }
++    static void deactivate(Rig r,Neighbor.Session child,ControlMessage original,long revision){
++        var p=(ControlMessage.Activation)original.payload();
++        r.receive(child,new ControlMessage(MessageType.DEACTIVATE,UUID.randomUUID(),child.nodeId(),child.instanceId(),
++                new ControlMessage.Deactivation(p.streamId(),p.serverEpoch(),p.subscriptionId(),revision)));
++    }
++    static Sent reply(Rig r,MessageType type,UUID request){
++        var values=r.messages(type).stream().filter(s->s.message.requestId().equals(request)).toList();
++        assertEquals(1,values.size(),"Missing correlated "+type+" for request "+request);
++        return values.getFirst();
++    }
++    static void errorReply(Rig r,ControlMessage request,int related,ErrorCode code){
++        var p=(ControlMessage.ErrorPayload)reply(r,MessageType.ERROR,request.requestId()).message.payload();
++        assertEquals(related,p.relatedType());assertEquals(code,p.code());
++    }
++    static ControlMessage sourceChild(Rig s,Neighbor.Session child,UUID stream,long lease){
++        return s.activate(child,stream,s.instance,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S",child.nodeId()),lease);
++    }
++
++    @Test void l01DeactivateOneChildPreservesSiblingAndCommonTrunk(){try(var r=new Rig()){
++        var a=peer("A");var c1=peer("C1");var c2=peer("C2");r.route(a);r.up(c1);r.up(c2);
++        var one=r.child(c1);r.child(c2);r.ack(r.latestRequest(),6000);
++        var healthy=r.forwarding(A).downstreams().get("C2");var upstream=r.forwarding(A).upstreamLease();
++        deactivate(r,c1,one,1);
++        assertEquals(Set.of("C2"),r.forwarding(A).downstreams().keySet(),"DEACTIVATE must remove only its exact child");
++        assertEquals(healthy,r.forwarding(A).downstreams().get("C2"));assertEquals(upstream,r.forwarding(A).upstreamLease());
++        assertEquals(1,r.messages(MessageType.ACTIVATE).size());assertTrue(r.messages(MessageType.DEACTIVATE).isEmpty());
++    }}
++    @Test void l02LastCancellationRemovesAuthorizationBeforeHeldPruneCompletes(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);var local=r.local(A,UUID.randomUUID());var original=r.latestRequest();r.ack(original,6000);
++        r.hold=m->m.type()==MessageType.DEACTIVATE;local.cancel();r.pump();
++        assertNull(r.forwarding(A),"Logical removal must not wait for physical pruning");
++        var sent=exactlyOne(r,MessageType.DEACTIVATE);var old=(ControlMessage.Activation)original.message.payload();
++        var p=(ControlMessage.Deactivation)sent.message.payload();
++        assertEquals(original.peer,sent.peer);assertEquals(old.streamId(),p.streamId());assertEquals(old.serverEpoch(),p.serverEpoch());
++        assertEquals(old.subscriptionId(),p.subscriptionId());assertEquals(old.revision(),p.revision());
++        assertFalse(sent.result.isDone());assertEquals(1,r.load().sends());
++        r.router.requestClose();r.owner.drain();assertFalse(r.router.awaitTermination(Duration.ZERO));
++        sent.result.complete(Connection.SendResult.ACCEPTED);r.pump();assertTrue(r.router.awaitTermination(Duration.ofMillis(10)));
++    }}
++    @Test void l03MixedLocalAndChildDemandPrunesOnlyAfterBothLeave(){try(var r=new Rig()){
++        var a=peer("A");var c=peer("C1");r.route(a);r.up(c);var local=r.local(A,UUID.randomUUID());var child=r.child(c);r.ack(r.latestRequest(),6000);
++        local.cancel();r.pump();assertEquals(Set.of("C1"),r.forwarding(A).downstreams().keySet());assertTrue(r.messages(MessageType.DEACTIVATE).isEmpty());
++        deactivate(r,c,child,1);assertNull(r.forwarding(A),"The last child must remove the remaining aggregate demand");
++        exactlyOne(r,MessageType.DEACTIVATE);
++    }}
++    @Test void l04OrphanChildExpiresAndPrunesItsCommonTrunk(){try(var r=new Rig()){
++        var a=peer("A");var c=peer("C1");r.route(a);r.up(c);
++        r.activate(c,A,EPOCH,UUID.randomUUID(),1,UUID.randomUUID(),List.of("S","A","R","C1"),1000);r.ack(r.latestRequest(),6000);
++        r.tick(999_999_999L);assertNotNull(r.forwarding(A));r.tick(1);assertNull(r.forwarding(A));
++        assertEquals(a,exactlyOne(r,MessageType.DEACTIVATE).peer,"Orphan expiry must propagate the loss of final demand");
++    }}
++    @Test void l04SourceExpiryAlreadyExcludesOrphanWithoutNewNetworkInput(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);sourceChild(s,c,A,1000);var old=s.forwarding(A);
++        s.tick(999_999_999L);assertNotNull(s.forwarding(A));s.tick(1);
++        assertNull(s.forwarding(A));assertTrue(old.visibleAt(s.clock.get()).isEmpty());assertTrue(s.messages(MessageType.DEACTIVATE).isEmpty());
++    }}
++    @Test void l05PeriodicRenewalKeepsIdAndAdvancesRevisionAndRequest(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.local(A,UUID.randomUUID());var first=r.latestRequest();r.ack(first,6000);
++        r.tick(2_000_000_000L);var sent=exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);
++        var before=(ControlMessage.Activation)first.message.payload();var after=(ControlMessage.Activation)sent.message.payload();
++        assertEquals(before.subscriptionId(),after.subscriptionId());assertTrue(after.revision()>before.revision());
++        assertNotEquals(first.message.requestId(),sent.message.requestId());assertEquals(before.expectedPath(),after.expectedPath());
++        assertEquals(first.peer,sent.peer);assertEquals(1,r.messages(MessageType.ACTIVATE).size());
++    }}
++    @Test void l06ShortGrantSchedulesAtOneThirdAndStillExpiresWithoutAck(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.local(A,UUID.randomUUID());r.ack(r.latestRequest(),300);
++        r.tick(99_999_999L);assertTrue(r.messages(MessageType.SUBSCRIPTION_RENEW).isEmpty());r.tick(1);
++        exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);r.tick(200_000_000L);
++        assertNull(r.forwarding(A),"Renewal waiting for ACK cannot prolong the old grant");
++    }}
++    @Test void l07EarlyRenewAckWaitsForAcceptanceAndUsesRequestAnchor(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.local(A,UUID.randomUUID());r.ack(r.latestRequest(),3000);
++        var before=r.forwarding(A).upstreamLease();r.hold=m->m.type()==MessageType.SUBSCRIPTION_RENEW;r.tick(1_000_000_000L);
++        var sent=exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);r.tick(100_000_000L);r.ack(sent,2500);
++        assertEquals(before,r.forwarding(A).upstreamLease(),"ACK alone cannot replace the grant while admission is unconfirmed");
++        sent.result.complete(Connection.SendResult.ACCEPTED);r.pump();
++        assertEquals(2_400_000_000L,r.forwarding(A).upstreamLease().orElseThrow().remainingNanos(r.clock.get()));
++    }}
++    @Test void l08NewRenewalExtendsButExactDuplicateNeverRenewsAgain(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var first=sourceChild(s,c,A,6000);s.tick(1_000_000_000L);UUID request=UUID.randomUUID();
++        var renewal=renew(s,c,first,2,request);reply(s,MessageType.ACTIVATE_ACK,request);
++        var grant=s.forwarding(A).downstreams().get("C1");assertEquals(2,grant.revision());
++        assertEquals(6_000_000_000L,grant.validity().orElseThrow().remainingNanos(s.clock.get()),"A fresh type14 may extend the old remaining 5s");
++        s.tick(500_000_000L);s.receive(c,renewal);assertEquals(grant,s.forwarding(A).downstreams().get("C1"));
++        assertEquals(5500,((ControlMessage.ActivationAck)s.messages(MessageType.ACTIVATE_ACK).getLast().message.payload()).grantedLeaseMs());
++        assertEquals(1,s.load().histories());assertEquals(1,s.load().children());
++    }}
++    @Test void l10OldDeactivateCannotRemoveRenewedRevision(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var first=sourceChild(s,c,A,6000);UUID request=UUID.randomUUID();renew(s,c,first,2,request);
++        reply(s,MessageType.ACTIVATE_ACK,request);var stable=s.forwarding(A).downstreams().get("C1");assertEquals(2,stable.revision());
++        deactivate(s,c,first,1);assertEquals(stable,s.forwarding(A).downstreams().get("C1"));
++        deactivate(s,c,first,2);assertNull(s.forwarding(A),"Only the admitted current revision may be removed");
++    }}
++    @Test void l11PruneCapturesSubmittedRenewalRevisionAndLateAckCannotChangeReplacement(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);UUID token=UUID.randomUUID();var old=r.local(A,token);r.ack(r.latestRequest(),6000);
++        r.hold=m->m.type()==MessageType.SUBSCRIPTION_RENEW;r.tick(2_000_000_000L);
++        var pending=exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);var renewal=(ControlMessage.Activation)pending.message.payload();
++        old.cancel();r.pump();assertNull(r.forwarding(A));
++        var prune=(ControlMessage.Deactivation)exactlyOne(r,MessageType.DEACTIVATE).message.payload();
++        assertEquals(renewal.subscriptionId(),prune.subscriptionId());assertEquals(renewal.revision(),prune.revision());
++        assertEquals(1,r.load().sends(),"Only the submitted renewal is still physically held");
++        var fresh=r.router.retrySubscription(A,token);r.pump();var replacement=r.latestRequest();
++        assertTrue(((ControlMessage.Activation)replacement.message.payload()).revision()>renewal.revision());
++        r.ack(replacement,6000);var stable=r.forwarding(A);assertEquals(RoutingService.SubscriptionState.SUCCESS,result(fresh).state());
++        r.ack(pending,6000);pending.result.complete(Connection.SendResult.ACCEPTED);r.pump();old.cancel();r.pump();
++        assertEquals(stable,r.forwarding(A));assertEquals(Set.of(token),r.forwarding(A).localConsumers());assertEquals(0,r.load().sends());
++    }}
++    @Test void l11CancelledRenewAckCannotRestoreChildOrChangeSiblingLease(){try(var s=new Rig("S",true,4096,3)){
++        var c1=peer("C1");var c2=peer("C2");s.up(c1);s.up(c2);var first=sourceChild(s,c1,A,6000);sourceChild(s,c2,A,6000);
++        var healthy=s.forwarding(A).downstreams().get("C2");UUID request=UUID.randomUUID();s.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
++        renew(s,c1,first,2,request);var held=reply(s,MessageType.ACTIVATE_ACK,request);assertFalse(held.result.isDone());
++        deactivate(s,c1,first,2);assertEquals(Set.of("C2"),s.forwarding(A).downstreams().keySet());assertEquals(1,s.load().sends());
++        held.result.complete(Connection.SendResult.ACCEPTED);s.pump();assertEquals(Set.of("C2"),s.forwarding(A).downstreams().keySet());
++        assertEquals(healthy,s.forwarding(A).downstreams().get("C2"));assertEquals(0,s.load().sends());
++    }}
++    @Test void l12CancelledRenewAckRetainsPhysicalSlotUntilCallbackAndContinuationEnd() throws Exception {try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var first=sourceChild(s,c,A,6000);UUID request=UUID.randomUUID();s.hold=m->m.type()==MessageType.ACTIVATE_ACK&&m.requestId().equals(request);
++        renew(s,c,first,2,request);var held=reply(s,MessageType.ACTIVATE_ACK,request);deactivate(s,c,first,2);assertNull(s.forwarding(A));
++        s.owner.hold=t->t.getName().equals("renew-ack-callback-held");var callback=new Thread(()->held.result.complete(Connection.SendResult.ACCEPTED),"renew-ack-callback-held");callback.start();
++        try{assertTrue(s.owner.offered.await(5,TimeUnit.SECONDS));s.act(()->s.router.cancelPendingChild(c,A,((ControlMessage.Activation)first.payload()).subscriptionId(),2));
++            assertEquals(1,s.load().sends(),"A processed continuation does not finish its blocked callback");assertNull(s.forwarding(A));
++        }finally{s.owner.hold=t->false;s.owner.resume.countDown();callback.join(5000);}
++        assertFalse(callback.isAlive());s.pump();assertEquals(0,s.load().sends());assertNull(s.forwarding(A));
++    }}
++    @Test void l13ExpiredRenewalIsExplicitlyRejectedWithoutActivating(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var first=sourceChild(s,c,A,100);s.tick(100_000_000L);assertNull(s.forwarding(A));
++        var request=renew(s,c,first,2,UUID.randomUUID());errorReply(s,request,14,ErrorCode.NO_ROUTE);assertNull(s.forwarding(A));
++    }}
++    @Test void l14DivergentRenewalPreservesOldGrantAndRejectsExplicitly(){try(var r=new Rig()){
++        var a=peer("A");var b=peer("B");var c=peer("C1");r.route(a);r.up(b);r.metric(b,10);r.ad(b,1,500);r.up(c);var child=r.child(c);r.ack(r.latestRequest(),6000);
++        var stable=r.forwarding(A);r.ad(b,2,1);var request=renew(r,c,child,2,UUID.randomUUID());
++        errorReply(r,request,14,ErrorCode.PATH_CHANGED);assertEquals(stable,r.forwarding(A));
++        assertEquals(1,r.messages(MessageType.ACTIVATE).size());assertTrue(r.messages(MessageType.DEACTIVATE).isEmpty());
++    }}
++    @Test void l15OldSessionDeactivateCannotAffectReplacementConnection(){try(var s=new Rig("S",true,4096,3)){
++        var old=peer("C1");s.up(old);var first=sourceChild(s,old,A,6000);
++        var fresh=new Neighbor.Session(old.nodeId(),old.instanceId(),UUID.randomUUID(),old.endpoint());s.up(fresh);sourceChild(s,fresh,A,6000);var stable=s.forwarding(A);
++        deactivate(s,old,first,1);s.act(()->s.router.onNeighborEvent(new NeighborManager.NeighborDown(old,NeighborManager.Reason.TRANSPORT)));
++        assertEquals(stable,s.forwarding(A));assertEquals(fresh,s.forwarding(A).downstreams().get("C1").child());
++    }}
++    @Test void l16DeactivateOneStreamPreservesOtherStreamExactly(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var one=sourceChild(s,c,A,6000);sourceChild(s,c,B,6000);var healthy=s.forwarding(B);
++        deactivate(s,c,one,1);assertFalse(s.router.snapshot().forwarding().containsKey(A),"DEACTIVATE must be scoped to the selected stream");
++        assertEquals(healthy,s.forwarding(B));
++    }}
++    @Test void l18RenewErrorAndTraceErrorDoNotInvalidateHealthyGrants(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.ad(a,B,"S",EPOCH,1,100);r.local(A,UUID.randomUUID());var qa=r.latestRequest();r.local(B,UUID.randomUUID());var qb=r.latestRequest();r.ack(qa,6000);r.ack(qb,6000);
++        var beforeA=r.forwarding(A);var beforeB=r.forwarding(B);r.tick(2_000_000_000L);var sent=r.messages(MessageType.SUBSCRIPTION_RENEW);assertEquals(2,sent.size(),"Both independent streams need a renewal");
++        var ra=sent.stream().filter(x->((ControlMessage.Activation)x.message.payload()).streamId().equals(A)).findFirst().orElseThrow();
++        var rb=sent.stream().filter(x->((ControlMessage.Activation)x.message.payload()).streamId().equals(B)).findFirst().orElseThrow();
++        r.error(ra,14,ErrorCode.PATH_CHANGED);r.error(rb,15,ErrorCode.NO_ROUTE);assertEquals(beforeA,r.forwarding(A));assertEquals(beforeB,r.forwarding(B));
++        r.ack(rb,6000);assertEquals(beforeA,r.forwarding(A));assertEquals(6_000_000_000L,r.forwarding(B).upstreamLease().orElseThrow().remainingNanos(r.clock.get()));
++    }}
++    @Test void l19RenewRepliesShareExistingFixedWindowQuota(){try(var s=new Rig("S",true,4096,3)){
++        var c=peer("C1");s.up(c);var first=sourceChild(s,c,A,6000);
++        for(long revision=2;revision<=17;revision++)renew(s,c,first,revision,UUID.randomUUID());
++        assertEquals(16,s.messages(MessageType.ACTIVATE_ACK).size(),"Initial ACK plus renewals must use the same 16-reply window");
++        assertTrue(s.load().responseIntents()<=1);assertEquals(1,s.load().histories());s.tick(1_000_000_000L);
++        assertEquals(17,s.messages(MessageType.ACTIVATE_ACK).size());
++    }}
++    @Test void l20LateTimerAdmitsOneCurrentRenewalWithoutCatchup(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.local(A,UUID.randomUUID());r.ack(r.latestRequest(),6000);r.hold=m->m.type()==MessageType.SUBSCRIPTION_RENEW;
++        r.tick(4_000_000_000L);var sent=exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);r.tick(100_000_000L);assertEquals(1,r.messages(MessageType.SUBSCRIPTION_RENEW).size());
++        r.ack(sent,6000);sent.result.complete(Connection.SendResult.ACCEPTED);r.pump();assertEquals(1,r.messages(MessageType.SUBSCRIPTION_RENEW).size());
++    }}
++    @Test void l22ShutdownWaitsForPhysicalRenewalCompletionWithinOriginalBudget(){try(var r=new Rig()){
++        var a=peer("A");r.route(a);r.local(A,UUID.randomUUID());r.ack(r.latestRequest(),6000);r.hold=m->m.type()==MessageType.SUBSCRIPTION_RENEW;r.tick(2_000_000_000L);
++        var sent=exactlyOne(r,MessageType.SUBSCRIPTION_RENEW);r.router.requestClose();r.owner.drain();assertTrue(r.router.snapshot().forwarding().isEmpty());
++        assertFalse(r.router.awaitTermination(Duration.ZERO));sent.result.complete(Connection.SendResult.CLOSED);r.pump();
++        assertTrue(r.router.awaitTermination(Duration.ofMillis(10)));assertEquals(0,r.load().sends());
++    }}
++    @Test void l23OversizedSubscriptionPathIsRejectedBeforeCopyOrIteration(){
++        var c=peer("C1");var accesses=new AtomicInteger();
++        var oversized=new AbstractList<String>(){public int size(){return 33;}public String get(int index){accesses.incrementAndGet();throw new AssertionError("Path copied before cap validation");}};
++        assertThrows(IllegalArgumentException.class,()->new Subscription(A,EPOCH,c,UUID.randomUUID(),1,UUID.randomUUID(),oversized,6000,Subscription.State.PENDING,Optional.empty()));
++        assertEquals(0,accesses.get());
++    }
++}

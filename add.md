@@ -1183,6 +1183,18 @@ sem Java, target, push ou início de outro IMP no fecho documental.
   - [ ] Outros consumidores e fluxos mantêm-se ativos.
   - [ ] Validação V-015 executada e evidência ligada no progresso.
 
+**Model/Design/revisão ADR aprovados pelo utilizador**, Q-C-40–42 mantidas,
+base main/b273b258a4642f94f8614ae00f060a46318d77a5.
+[Implement](memory-bank/bolts/023-arvores/implementation-walkthrough.md) e
+[Test aprovados pelo utilizador](memory-bank/bolts/023-arvores/ddd-03-test-report.md):
+clean verify1379/0/0/0,19 XML,V-ADD e manual humano Francisco30 cumpridos.
+Código/JAR/logs/negativos/Q-C-40–42 preservados. [Pacote para revisão final](memory-bank/bolts/023-arvores/final-review-summary.md)
+e [plano de integração](memory-bank/bolts/023-arvores/integration-plan.md) preparados.
+Revisão final Denji confirmada pelo utilizador,sem alterações pendentes;
+[simulação/plano final](memory-bank/bolts/023-arvores/integration-plan.md) para
+autorização da integração. Bolt/história/TASK/unidade/fase abertos.
+Sem staging/commits/push/fecho/outro IMP; nenhum gate externo adicional.
+
 <a id="imp-013"></a>
 ### IMP-013 — Recuperar falhas do upstream TCP
 

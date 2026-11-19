@@ -1,0 +1,65 @@
+/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/023-arvores/test-manual-runs/20261118T174421Z-clqz57m8
+CODE_SOURCE=file:/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/023-arvores/test-01/ott-streaming-1.0-SNAPSHOT.jar
+STEPS1_5_CONTROLLED_OWNER_CLOCK_PORT; STEP6_REAL_TCP_LOOPBACK; NO_VIDEO_GUI_CORE
+
+STEP 1 / renovação agregada
+ESPERADO: C1/C2 partilham um tronco. Três ciclos, mesmo subscriptionId, revisões e requestId novos. Ainda autorizado em t=6s.
+CHECK_PASS 1 one trunk for two children
+CHECK_PASS 2 cycle 1 stable ID/new revision/new request/no fanout
+CYCLE 1 t=2000000000 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=5b985ee8-2625-4e4c-be22-31b85692b716, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=4626d295-aa03-4355-9c24-7bc8c81a470c, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=2a7b4613-b565-4b4a-812e-c55bacaca516, revision=2, requestId=44b97115-a981-4b40-9d9c-8938ebc6c9e6, expectedPath=[S, A, R, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=2000000000, durationNanos=6000000000]]], C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4aec0246-66a3-4a5c-b823-942120b86b31, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=13945077-c34c-46c7-9235-40a318fc4645, revision=2, requestId=b3507e5f-1c7e-41c0-bf73-d03dfd556faa, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=2000000000, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=2000000000, durationNanos=6000000000]], revision=6] physical=ActivationLoad[trees=1, children=2, locals=0, histories=3, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 3 cycle 2 stable ID/new revision/new request/no fanout
+CYCLE 2 t=4000000000 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=5b985ee8-2625-4e4c-be22-31b85692b716, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=4626d295-aa03-4355-9c24-7bc8c81a470c, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=2a7b4613-b565-4b4a-812e-c55bacaca516, revision=3, requestId=11b49bb3-073a-4e8a-8591-6a1db1a73fd4, expectedPath=[S, A, R, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=4000000000, durationNanos=6000000000]]], C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4aec0246-66a3-4a5c-b823-942120b86b31, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=13945077-c34c-46c7-9235-40a318fc4645, revision=3, requestId=c455a768-8e14-47c8-9956-3954bac86e00, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=4000000000, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=4000000000, durationNanos=6000000000]], revision=9] physical=ActivationLoad[trees=1, children=2, locals=0, histories=3, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 4 cycle 3 stable ID/new revision/new request/no fanout
+CYCLE 3 t=6000000000 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=5b985ee8-2625-4e4c-be22-31b85692b716, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=4626d295-aa03-4355-9c24-7bc8c81a470c, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=2a7b4613-b565-4b4a-812e-c55bacaca516, revision=4, requestId=6e96004a-293d-41b1-820b-668c992b3d3c, expectedPath=[S, A, R, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=6000000000, durationNanos=6000000000]]], C1=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, connectionId=4aec0246-66a3-4a5c-b823-942120b86b31, endpoint=Endpoint[nodeId=C1, instanceId=3986c87b-67ca-381e-97eb-911a2de6841c, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=13945077-c34c-46c7-9235-40a318fc4645, revision=4, requestId=2330d0ac-dbcf-4c4d-b75c-7decabe868fe, expectedPath=[S, A, R, C1], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=6000000000, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional[Lease[beganNanos=6000000000, durationNanos=6000000000]], revision=12] physical=ActivationLoad[trees=1, children=2, locals=0, histories=3, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 5 demand authorized beyond original expiry
+
+STEP 2 / saída parcial/final e callback cancelado
+ESPERADO: C1 nunca reaparece após ACCEPTED tardio. C2 e lease intactos. Último sai sem apagar catálogo da fonte.
+AFTER_CANCEL_C1 t=0 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=058d4107-880d-4e79-a15f-4d14c7ccc7c0, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=784fd776-58ed-4934-88ca-8f900d74b9b4, revision=1, requestId=e55c807f-a246-4abf-9fdb-1625e2eb41e6, expectedPath=[S, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=4] physical=ActivationLoad[trees=1, children=2, locals=0, histories=2, sends=1, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 6 partial cancellation preserves sibling and exact lease
+CHECK_PASS 7 cancelled response remains physically reserved
+AFTER_LATE_ACCEPTED t=0 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=true, upstream=Optional.empty, path=[S], downstreams={C2=Subscription[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, child=Session[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, connectionId=058d4107-880d-4e79-a15f-4d14c7ccc7c0, endpoint=Endpoint[nodeId=C2, instanceId=af8ff322-52e4-33ed-ae4c-972f94ac3924, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]], subscriptionId=784fd776-58ed-4934-88ca-8f900d74b9b4, revision=1, requestId=e55c807f-a246-4abf-9fdb-1625e2eb41e6, expectedPath=[S, C2], requestedLeaseMs=6000, state=ACTIVE, validity=Optional[Lease[beganNanos=0, durationNanos=6000000000]]]}, localConsumers=[], upstreamLease=Optional.empty, revision=4] physical=ActivationLoad[trees=1, children=1, locals=0, histories=2, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 8 late acceptance cannot restore C1; physical completion releases B
+CHECK_PASS 9 source last departure preserves offer; no parent prune
+
+STEP 3 / poda e substituta
+ESPERADO: 13 captura a maior revisão14 submetida. Forwarding sai antes da conclusão física. ACK/callback/ticket antigos não alteram a substituta.
+RETIRED t=2000000000 forwarding=null physical=ActivationLoad[trees=0, children=0, locals=0, histories=1, sends=1, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 10 prune uses highest submitted revision; zero authorization immediately
+CHECK_PASS 11 retired renewal still physical
+CHECK_PASS 12 explicit replacement confirmed
+REPLACEMENT_AFTER_OLD_CALLBACK t=2000000000 forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=768bf8a9-39ea-4a7d-b2b1-3828f9ac1f61, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={}, localConsumers=[f948cf92-4918-4d19-9869-f13e289110b3], upstreamLease=Optional[Lease[beganNanos=2000000000, durationNanos=6000000000]], revision=2] physical=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 13 old ACK/ACCEPTED/cancel leave replacement unchanged
+
+STEP 4 / órfão e grant curto
+ESPERADO: Órfão autorizado em G-1 e ausente em G sem rede nova. Grant1ms dispara em333333ns e expira em1ms sem ACK.
+CHECK_PASS 14 orphan valid at G-1
+ORPHAN_EXPIRED t=300000000 forwarding=null physical=ActivationLoad[trees=1, children=0, locals=0, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS 15 orphan excluded exactly at G without new network event
+CHECK_PASS 16 no early short-grant cycle
+CHECK_PASS 17 one renewal at floor(1ms/3)
+CHECK_PASS 18 expiry without ACK; no catchup burst
+
+STEP 5 / limites físicos e shutdown
+ESPERADO: Duas gerações ocupam2/Line. Terceira aguarda sem pool novo. Shutdown não envia mais; await(0)=false até acabar callbacks.
+CHECK_PASS 19 renew/prune share exactly two physical slots per Line
+CHECK_PASS 20 new generation cannot evade retired slots
+CHECK_PASS 21 logical cleanup does not claim physical termination
+CHECK_PASS 22 zero submissions after shutdown
+CHECK_PASS 23 all physical slots and timer jobs terminate within original budget
+
+STEP 6 / TCP real S-R1-R2-(C1,C2)
+ESPERADO: Lease3000ms/renew200ms. Mantém dois consumidores por3300ms, sai um, sai último, reativa e expira órfão com TCP vivo. Fecha owners/timers/sockets e confirma6 portas TCP disponíveis.
+TCP_CONTROL_PORTS=[57628, 57629, 57630, 57631, 57632, 57633] DATA_ENDPOINT_PORTS=[57634, 57635, 57636, 57637, 57638]
+CHECK_PASS 24 TCP renewals observed after 3300ms with 3000ms grant
+CHECK_PASS 25 TCP partial departure preserves C2 and trunk
+CHECK_PASS 26 TCP final departure prunes all authorizations
+CHECK_PASS 27 TCP orphan keeps live session while routing is stopped
+CHECK_PASS 28 TCP orphan expires through two relays
+CHECK_PASS 29 TCP routing/monitor/manager/owner physical shutdown complete
+CHECK_PASS 30 six TCP control ports rebound after shutdown
+CLEANUP_COMPLETE
+MANUAL_PASS CHECKS=30
+REPORT=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/023-arvores/test-manual-runs/20261118T174421Z-clqz57m8/report.json
+JAVA_EXIT=0
+PASSED=true

@@ -1,0 +1,127 @@
+---
+unit: "004-arvores"
+bolt: "023-arvores"
+stage: "implement"
+status: "in-progress"
+created: "2026-11-18T16:50:11Z"
+---
+# IMP-012 — primeiro passo de Implement: tipos e testes vermelhos
+
+Model/Design/revisão ADR aprovados pelo utilizador. Autorizados **apenas tipos e
+interfaces necessários e testes inicialmente vermelhos**. Checkpoint por aceitar;
+comportamentos de renovação/poda ainda não implementados, Test não autorizado.
+Base main/b273b258a4642f94f8614ae00f060a46318d77a5; sem staging/commits/push.
+
+## 1. Âmbito e tipos concretos
+
+Somente os três ficheiros autorizados:
+
+- Subscription.java: acrescentados Operation (ACTIVATE/RENEW com MessageType11/14
+  existentes, sem ordinal wire) e Identity (Session completa, stream, epoch, ID,
+  revisão e geração local). Tipos aninhados/package-private, imutáveis, com guardas
+  de null/valores negativos; nenhum componente/State/construtor antigo substituído.
+- RoutingService.java: RenewalRequest captura Identity/requestId/grant anterior/
+  início/budget; PruneRequest captura Identity/requestId/início/budget. Records
+  package-private com guardas estruturais; sem relógio/port/future/estado mutável.
+  Não há nova API pública, handler, scheduler ou ligação destes tipos ao engine.
+- SubscriptionLeaseTest.java: ficheiro novo,22 testes de comportamento observável,
+  harness próprio de owner/relógio/scheduler/port falsos, sem sockets. Helpers
+  baseados no padrão dos históricos, contidos neste ficheiro; históricos intactos.
+
+Os records representam entradas capturadas do Design, não implementam políticas:
+por exemplo, RenewalRequest rejeita budget não positivo/maior que a duração do
+valor anterior, mas a admissão futura ainda terá de calcular min(T,restante) no
+instante correto. Não se apresenta essa guarda estrutural como renovação pronta.
+Operation distingue a espécie do fingerprint; Identity distingue revisão wire
+(sem novo campo) de geração local. PruneRequest não consulta uma substituta.
+
+Nenhuma interface pública nova é necessária: portas/tickets/snapshots existentes
+já bastam. Lease e Subscription conservam todos os componentes públicos e cópias
+defensivas; a ordem atual de validação/cópia do path foi deixada intacta de
+propósito, ficando vermelha em L23. Não se implementou essa correção antecipadamente.
+
+## 2. Negativo atual — compilação passa, testes falham pelos contratos ausentes
+
+JDK Temurin21.0.13+9 / Maven3.9.9, macOS. Comando em Projeto/:
+`mvn -o -B -ntp -Dtest=SubscriptionLeaseTest test`.
+
+[Execução atual red-02](../../../experiments/construction/023-arvores/implement-interfaces-01/red-02/result.json):
+**22 testes,20 falhas de asserção,0 erros,0 ignorados; Maven exit1**. Compilação
+passou; todas as falhas são AssertionFailedError. Não são falhas de compilação,
+rede/sandbox, dependências ou timeout do harness.
+
+| Causa observada | Falhas |
+|---|---:|
+| Nenhuma emissão periódica SUBSCRIPTION_RENEW | 7 |
+| SUBSCRIPTION_RENEW não tratado/sem ACK ou ERROR correlacionado | 7 |
+| Sem emissão de poda upstream após último cancelamento/expiração | 2 |
+| DEACTIVATE não tratado (filho/mistura de procura/stream permanece) | 3 |
+| Path33 copiado/iterado antes da rejeição por cap | 1 |
+
+Os dois testes verdes confirmam comportamentos já existentes: expiração de child
+na fonte sem novo evento de rede e isolamento de Session antiga perante substituta.
+Não provam os handlers13/14 ainda ausentes.
+
+[red-01 preservado](../../../experiments/construction/023-arvores/implement-interfaces-01/red-01/result.json):
+21 testes,19 falhas/0 erros/0 ignorados. Depois foi acrescentado um caso explícito
+que exige poda com a maior revisão RENEW submetida e protege uma nova operação
+local contra ACK/ACCEPTED/cancelamento antigos. Essa adição motivou red-02;
+nenhum comportamento principal mudou nem se repetiu uma suite até obter verde.
+Logs, XML/TXT, comandos, versões e hashes de cada negativo guardados separadamente.
+
+## 3. Oráculos significativos e alcance
+
+Há asserts iniciais em20 grupos L01–L24, sem declarar cobertura integral.
+O novo ficheiro exercita retirada parcial/final, procura mista, órfão, cadência
+curta, ACK antecipado versus ACCEPTED, ancoramento de lease, renovação legítima
+versus duplicado, revisões/cancelamento, reserva física, recusa14 expirada/
+divergente, Session/stream, ERROR14/15, quota16, atraso de timer e shutdown.
+
+O caso adicional L11 captura r+1 submetido, cancela e exige13(r+1), cria nova
+ativação r+2 e exige que ACK/ACCEPTED/ticket antigos conservem essa substituta.
+O caso L23 usa uma AbstractList de tamanho33 que denuncia qualquer cópia/iteração:
+a falha atual mostra que List.copyOf precede a guarda do limite. Este é o motivo
+concreto da falha; não se diminuiu cap, trocou exceção esperada ou corrigiu a ordem.
+
+As falhas de RENEW param nas primeiras asserções de emissão/resposta ausente:
+os asserts posteriores de callback/continuação/lease ainda não foram alcançados
+esses cenários. Portanto **não são prova atual** de segurança física de renovação.
+L09/L17/L21/L24 e variantes adicionais ainda precisam de ampliação, incluindo
+MAX_VALUE/campos errados, limites completos, integração TCP real e todos os casos
+do mapa aprovado. V-015 integral não consolidado nem aprovado.
+
+## 4. Preservação histórica executada nesta etapa
+
+Em Projeto/: `mvn -o -B -ntp '-Dtest=ActivationTest#m*' test`.
+[Resultado e XML](../../../experiments/construction/023-arvores/implement-interfaces-01/historical-activation-01/result.json):
+**30 testes,0 falhas/erros/ignorados, exit0**, incluindo os seis M07. Destinos
+continuam C2 antes/depois de cancelar C1 e do ACCEPTED tardio; os asserts de
+lease, substituta e reserva física históricos passaram. O diagnóstico NeighborDown
+com TCP não foi selecionado; não se trata de regressão integral.
+
+O único teste posterior acrescentado ao red-02 não alterou fontes main; os hashes
+main da execução histórica são os atuais. Não se repetiram os30 por uma adição
+independente ao novo teste. Os1328 testes anteriores são históricos de IMP-011,
+não resultado atual deste incremento. Nenhum clean verify/JAR final executado.
+
+## 5. Prova estática de preservação
+
+[Preservação](../../../experiments/construction/023-arvores/implement-interfaces-01/preservation.json):
+230 outros ficheiros anteriores de src intactos,19 ficheiros Java de testes
+históricos byte a byte iguais e31 artefactos de evidência das etapas anteriores
+intactos. Ao remover apenas os blocos de tipos novos/import, as duas fontes main
+são byte a byte iguais à base: handlers, campos de estado/filas, M07/finally,
+quotas e shutdown existentes não foram substituídos ou reordenados.
+
+Q-C-40–42 continuam aprovadas, sem nova política aplicada; Q-C-36–39 e fundações
+anteriores intactas. Codec/enums wire/config/transporte/POM/validador inalterados,
+sem dependência runtime nova. Records novos não estão instanciados no engine.
+Target contém resultados gerados e fica separado do pacote de entrega; logs/XML
+necessários copiados para experiments, sem apagar negativos ou alterar testes.
+
+## 6. Checkpoint
+
+Parar após tipos/testes vermelhos, antes de implementar comportamentos. Implement
+em progresso, só Model/Design/ADR em stages_completed. Sem Test, staging, commits,
+push ou outro IMP. Fecho exige V-015/L01–L24, regressão atual/clean verify/JAR,
+manual humano, revisão final Denji e integração; sem gates externos adicionais.
