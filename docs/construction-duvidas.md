@@ -1730,3 +1730,12 @@ prova a causa. Nova correção exige reprodução/âmbito apresentados.
 Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
 sem gates externos adicionais.
 [Relatório Test](../memory-bank/bolts/008-arvores/ddd-03-test-report.md).
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md).

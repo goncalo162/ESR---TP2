@@ -1206,22 +1206,19 @@ Unidade004/PHASE-04 em progresso; sem Java/push/outro IMP no fecho documental.
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Há recuperação quando existe caminho até à mesma fonte.
-  - [ ] Ausência de caminho é visível e não produz laço.
-  - [ ] Estado antigo não é reativado por mensagens atrasadas.
-  - [ ] Validação V-016 executada e evidência ligada no progresso.
+  - [x] Há recuperação quando existe caminho até à mesma fonte.
+  - [x] Ausência de caminho é visível e não produz laço.
+  - [x] Estado antigo não é reativado por mensagens atrasadas.
+  - [x] Validação V-016 executada e evidência ligada no progresso.
 
-**Model/Design/ADR/Implement, incluindo R10, aprovados; apenas Test autorizado.**
-IMP-013/008-arvores/TASK-016 em Test. Implement/R10 aprovados pelo utilizador;
-Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
-[Test técnico](memory-bank/bolts/008-arvores/ddd-03-test-report.md): clean verify JDK21 novo1419/0/0/0,20 XML e JAR SHA256
-81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
-V-016/R01–R18 consolidado tecnicamente,40 RecoveryTest/1379 históricos.
-Manual preparado:7 etapas/28 checks; ensaio Codex kind=agent passou e não
-substitui repetição humana. Aguardar execução pessoal antes de pedir aprovação
-Test. Código aprovado/evidências preservados; R17 inicial sem causa estabelecida,
-métricas controladas não demonstram a causa. Test não aprovado; sem fecho,
-commits/push/outro IMP. Fillmore/integração pendentes; sem gates externos novos.
+IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
+Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
+V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
+aprovados. [Fecho](memory-bank/bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
+R17 inicial continua sem causa estabelecida e métricas controladas não a
+demonstram. Unidade004/PHASE-04 em progresso,15 bolts complete/20planned,
+nenhum bolt em execução.024-arvores apenas desimpedido,nenhum outro IMP iniciado.
+Commit/push autorizados; sem novo código/build/manual ou gate externo.
 
 <a id="imp-014"></a>
 ### IMP-014 — Trocar parent com histerese

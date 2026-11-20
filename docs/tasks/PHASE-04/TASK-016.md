@@ -5,7 +5,7 @@
 - ID: TASK-016
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-012](../PHASE-03/TASK-012.md), [TASK-014](../PHASE-04/TASK-014.md), [TASK-015](../PHASE-04/TASK-015.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Ligar neighborDown à invalidação de candidatos e snapshot.
-- [ ] Selecionar alternativa e iniciar ativação correlacionada.
-- [ ] Confirmar troca ou reportar indisponibilidade.
-- [ ] Testar retorno de relay e rejeição de dados/ACK antigos.
+- [x] Ligar neighborDown à invalidação de candidatos e snapshot.
+- [x] Selecionar alternativa e iniciar ativação correlacionada.
+- [x] Confirmar troca ou reportar indisponibilidade.
+- [x] Testar retorno de relay e rejeição de dados/ACK antigos.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Há recuperação quando existe caminho até à mesma fonte.
-- [ ] Ausência de caminho é visível e não produz laço.
-- [ ] Estado antigo não é reativado por mensagens atrasadas.
-- [ ] Validação V-016 executada e evidência ligada no progresso.
+- [x] Há recuperação quando existe caminho até à mesma fonte.
+- [x] Ausência de caminho é visível e não produz laço.
+- [x] Estado antigo não é reativado por mensagens atrasadas.
+- [x] Validação V-016 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -165,3 +165,12 @@ prova a causa. Nova correção exige reprodução/âmbito apresentados.
 Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
 sem gates externos adicionais.
 [Relatório Test](../../../memory-bank/bolts/008-arvores/ddd-03-test-report.md).
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](../../../memory-bank/bolts/008-arvores/closure-walkthrough.md).

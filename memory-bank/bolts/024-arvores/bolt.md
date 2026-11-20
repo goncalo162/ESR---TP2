@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-20T16:24:13Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["008-arvores", "022-rotas"]
 enables_bolts: ["009-arvores"]
 requires_units: ["003-rotas"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

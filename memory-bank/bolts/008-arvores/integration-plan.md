@@ -20,3 +20,12 @@ utilizador. Commit/push autorizados. Base local e remota main/Denji40592da.
 R17 inicial permanece sem causa estabelecida. Mesmos1419 testes,20 XML,
 manual Luis28 e JAR81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
 Nenhum novo código/build/manual, gate externo ou outro IMP.
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](closure-walkthrough.md).

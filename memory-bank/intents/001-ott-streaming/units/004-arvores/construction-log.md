@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-20T16:07:46Z"
+last_updated: "2026-11-20T16:24:13Z"
 ---
 # Construction Log — 004-arvores
 
@@ -19,8 +19,8 @@ DONE. Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37
 comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
 2 - ✅ **023-arvores**: complete; história002 complete/implemented=true, TASK-015 DONE.
 Test1379/0/0/0, Francisco30, revisão final Denji e integração4d18d1d comprovados.
-3 - ⏳ **008-arvores**: in-progress/current_stage=test; Implement/R10 aprovados;
-Test técnico1419/0/0/0, manual humano pendente; história003 não concluída.
+3 - ✅ **008-arvores**: complete; Test1419/0/0/0,Luis7/28,Fillmore e integração447ae4b
+comprovados; história003 complete/implemented=true,TASK-016 DONE.
 4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
 5 - [ ] **009-arvores**: planned; história005, segundo marco.
 
@@ -411,3 +411,12 @@ prova a causa. Nova correção exige reprodução/âmbito apresentados.
 Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
 sem gates externos adicionais.
 [Relatório Test](../../../../bolts/008-arvores/ddd-03-test-report.md).
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](../../../../bolts/008-arvores/closure-walkthrough.md).

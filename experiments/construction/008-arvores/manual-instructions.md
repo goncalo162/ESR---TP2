@@ -1,8 +1,9 @@
-# IMP-013 / V-016 — repetição humana pendente
+# IMP-013 / V-016 — roteiro humano; Luis concluído
 
-Implement/R10 aprovados; apenas Test autorizado. Este roteiro está preparado,
-mas a execução humana ainda não aconteceu. O ensaio Codex é kind=agent e não
-constitui repetição humana ou aprovação de Test.
+Manual Luis concluído e confirmado pessoalmente pelo utilizador; Test aprovado,
+Fillmore confirmado e integração447ae4b comprovada. O roteiro original abaixo é
+reproduzível e conserva a preparação histórica; o ensaio kind=agent permanece
+separado e não é a prova humana. [Conferência Luis](manual-human-verification-01/verification.json).
 
 ## Versão congelada
 

@@ -2,7 +2,9 @@
 id: "003-recuperar-arvores-apos-falha-de-upstream"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "planned"
+status: "complete"
+implemented: true
+completed: "2026-11-20T16:23:16Z"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-016"]
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-013](../../../../../../add.md#imp-013); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Há recuperação quando existe caminho até à mesma fonte.
-- [ ] Ausência de caminho é visível e não produz laço.
-- [ ] Estado antigo não é reativado por mensagens atrasadas.
-- [ ] Validação V-016 executada e evidência ligada no progresso.
+- [x] Há recuperação quando existe caminho até à mesma fonte.
+- [x] Ausência de caminho é visível e não produz laço.
+- [x] Estado antigo não é reativado por mensagens atrasadas.
+- [x] Validação V-016 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -37,3 +39,9 @@ A tarefa normativa é [IMP-013](../../../../../../add.md#imp-013); o bolt só or
 - Bolts anteriores: 022-rotas, 023-arvores.
 - Responsável de origem: Waheed; revisor: Fillmore.
 - Gates: nenhum específico adicional.
+
+## Execução e fecho
+
+Test/V-0161419/0/0/0,20 XML,manual Luis7/28,Fillmore e integração
+447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovados. [Fecho](../../../../../bolts/008-arvores/closure-walkthrough.md).
+R17 inicial sem causa estabelecida; métricas controladas não demonstram a causa.

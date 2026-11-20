@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:14 histórias complete,0 in-progress e21 planned; bolts:14 complete,1 in-progress,20 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com histórias001/IMP-011 e002/IMP-012 complete/implemented=true; as três restantes continuam planned.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:15 histórias complete,0 in-progress e20 planned; bolts:15 complete,0 in-progress,20 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores/PHASE-04 em progresso desde2026-11-17T15:29:06Z, com histórias001/IMP-011,002/IMP-012 e003/IMP-013 complete/implemented=true; as duas restantes continuam planned.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -98,17 +98,15 @@ sem push ou outro IMP. Negativos/código/JAR preservados.
 
 ## 004-arvores/003-recuperar-arvores-apos-falha-de-upstream.md ✅ GENERATED
 
-**Tarefa:** IMP-013. **Estado formal da história:** planned/não concluída. **Bolt:**008-arvores in-progress.
-IMP-013/008-arvores/TASK-016 em Test. Implement/R10 aprovados pelo utilizador;
-Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
-[Test técnico](bolts/008-arvores/ddd-03-test-report.md): clean verify JDK21 novo1419/0/0/0,20 XML e JAR SHA256
-81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
-V-016/R01–R18 consolidado tecnicamente,40 RecoveryTest/1379 históricos.
-Manual preparado:7 etapas/28 checks; ensaio Codex kind=agent passou e não
-substitui repetição humana. Aguardar execução pessoal antes de pedir aprovação
-Test. Código aprovado/evidências preservados; R17 inicial sem causa estabelecida,
-métricas controladas não demonstram a causa. Test não aprovado; sem fecho,
-commits/push/outro IMP. Fillmore/integração pendentes; sem gates externos novos.
+**Tarefa:** IMP-013. **Estado:** complete,implemented=true. **Bolt:**008-arvores complete.
+IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
+Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
+V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
+aprovados. [Fecho](bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
+R17 inicial continua sem causa estabelecida e métricas controladas não a
+demonstram. Unidade004/PHASE-04 em progresso,15 bolts complete/20planned,
+nenhum bolt em execução.024-arvores apenas desimpedido,nenhum outro IMP iniciado.
+Commit/push autorizados; sem novo código/build/manual ou gate externo.
 **Ficheiro:** [003-recuperar-arvores-apos-falha-de-upstream](intents/001-ott-streaming/units/004-arvores/stories/003-recuperar-arvores-apos-falha-de-upstream.md).
 
 ## 004-arvores/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md ✅ GENERATED

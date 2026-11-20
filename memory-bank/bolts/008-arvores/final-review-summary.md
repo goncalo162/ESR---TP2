@@ -26,3 +26,12 @@ SLA/FPS ou recuperação de falha exclusiva UDP alegados.
 Commit/push autorizados. Integrar por avanço rápido de main/Denji a partir de
 40592da, comprovar o commit exportado e só depois marcar bolt/história/TASK DONE.
 Unidade004/PHASE-04 continuam em progresso e nenhum outro IMP é iniciado.
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](closure-walkthrough.md).

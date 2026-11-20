@@ -10,7 +10,8 @@ created: "2026-11-20T16:06:41Z"
 Test aprovado explicitamente pelo utilizador após confirmação pessoal de Luis:
 sete etapas/28 verificações. Relatório humano e hashes conferidos; revisão final
 Fillmore aprovada sem alterações por confirmação explícita. Commit/push autorizados.
-Integração e fecho documental em preparação; completed=null até prova de integração.
+Integração447ae4b comprovada; bolt/história complete e TASK-016 DONE.
+Unidade004/PHASE-04 continuam em progresso.
 Registos anteriores de manual pendente abaixo permanecem históricos.
 
 ## 1. Clean verify e JAR novo
@@ -140,3 +141,12 @@ corretos, JVM terminada. WRAPPER_EXIT não fornecido, não inferido.
 [Fillmore aprovou sem alterações](../../../experiments/construction/008-arvores/integration-01/review-confirmation.json),
 por confirmação explícita do utilizador. Integração autorizada, ainda por
 comprovar; nenhum código/build/manual repetido. Limitação e negativos R17 intactos.
+
+## Fecho após integração comprovada
+
+Registo 2026-11-20T16:23:16Z: Test/manual Luis7/28 e revisão Fillmore aprovados;
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
+iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
+[Fecho](closure-walkthrough.md).

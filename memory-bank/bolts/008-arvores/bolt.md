@@ -3,13 +3,13 @@ id: "008-arvores"
 unit: "004-arvores"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["003-recuperar-arvores-apos-falha-de-upstream"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-20T16:07:46Z"
+updated: "2026-11-20T16:23:16Z"
 started: "2026-11-20T10:52:56Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-20T16:23:16Z"
+current_stage: null
 stages_completed: [{"name": "model", "completed": "2026-11-20T11:07:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-20T11:41:00Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-20T11:55:33Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-20T15:59:41Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-20T16:17:51Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["022-rotas", "023-arvores"]
 enables_bolts: ["024-arvores"]
@@ -41,7 +41,7 @@ Ler [IMP-013](../../../add.md#imp-013) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [003-recuperar-arvores-apos-falha-de-upstream](../../intents/001-ott-streaming/units/004-arvores/stories/003-recuperar-arvores-apos-falha-de-upstream.md).
+- [x] [003-recuperar-arvores-apos-falha-de-upstream](../../intents/001-ott-streaming/units/004-arvores/stories/003-recuperar-arvores-apos-falha-de-upstream.md).
 - Dependências: [022-rotas](../022-rotas/bolt.md), [023-arvores](../023-arvores/bolt.md).
 - Unidade: [004-arvores](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md).
 - Gates: nenhum adicional.
@@ -58,10 +58,10 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Há recuperação quando existe caminho até à mesma fonte.
-- [ ] Ausência de caminho é visível e não produz laço.
-- [ ] Estado antigo não é reativado por mensagens atrasadas.
-- [ ] Validação V-016 executada e evidência ligada no progresso.
+- [x] Há recuperação quando existe caminho até à mesma fonte.
+- [x] Ausência de caminho é visível e não produz laço.
+- [x] Estado antigo não é reativado por mensagens atrasadas.
+- [x] Validação V-016 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -216,3 +216,10 @@ Fillmore reviu e aprovou a mesma versão sem alterações, por confirmação exp
 do utilizador. Commit/push autorizados; integrar e comprovar antes de marcar
 complete/DONE. R17 inicial sem causa estabelecida; negativos preservados.
 Nenhum outro IMP iniciado.
+
+## Fecho após integração
+
+Registo 2026-11-20T16:23:16Z: cinco etapas aprovadas,Luis7/28,Fillmore confirmado e
+integração main 447ae4bf68bf96329bd1a0c7e16ed20df06bc55b comprovada.
+Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progresso.
+[Fecho](closure-walkthrough.md). Não iniciar outro IMP; negativos/R17 preservados.
