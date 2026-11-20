@@ -1,0 +1,140 @@
+--- before/Projeto/src/test/java/pt/uminho/esr/ott/routing/RecoveryTest.java
++++ after/Projeto/src/test/java/pt/uminho/esr/ott/routing/RecoveryTest.java
+@@ -899,6 +899,137 @@
+             var renewed = rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast();
+             assertEquals(activation(recovered).subscriptionId(), activation(renewed).subscriptionId());
+             assertTrue(activation(renewed).revision() > activation(recovered).revision());
++        }
++    }
++
++
++    @Test
++    void r10MetricOverflowAndRecoveryCannotReuseTheBlockedGeneration()
++    {
++        try(var rig = new Rig("R", false, 4096, 1))
++        {
++            var parent = peer("A");
++            rig.up(parent);
++            rig.metric(parent, 10);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            rig.local(A, UUID.randomUUID());
++            rig.error(rig.latestRequest(), 11, ErrorCode.PATH_CHANGED);
++            rig.tick(T);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
++            rig.metric(parent, 2000);
++            assertTrue(rig.router.snapshot().routes().get(A).selectedCandidate().isEmpty());
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.metric(parent, 10);
++            assertTrue(rig.router.snapshot().routes().get(A).selectedCandidate().isPresent());
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
++        }
++    }
++
++
++    @Test
++    void r10FirstValidMetricStillAdmitsTheInitialEligibleProof()
++    {
++        try(var rig = new Rig("R", false, 4096, 1))
++        {
++            var parent = peer("A");
++            rig.up(parent);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            var token = UUID.randomUUID();
++            var ticket = rig.local(A, token);
++            var outcome = result(ticket);
++            assertEquals(Optional.of(ErrorCode.NO_ROUTE), outcome.errorCode());
++            assertTrue(rig.messages(MessageType.ACTIVATE).isEmpty());
++            rig.tick(T);
++            rig.metric(parent, 10);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.ack(rig.latestRequest(), 6000);
++            assertEquals(Set.of(token), rig.forwarding(A).localConsumers());
++            assertSame(outcome, result(ticket));
++        }
++    }
++
++
++    @Test
++    void r10NewPostFailureAnnouncementStillRearmsAfterMetricRecovery()
++    {
++        try(var rig = new Rig("R", false, 4096, 1))
++        {
++            var parent = peer("A");
++            rig.up(parent);
++            rig.metric(parent, 10);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            var ticket = rig.local(A, UUID.randomUUID());
++            var original = rig.latestRequest();
++            rig.error(original, 11, ErrorCode.PATH_CHANGED);
++            var outcome = result(ticket);
++            rig.tick(T);
++            rig.metric(parent, 2000);
++            rig.metric(parent, 10);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
++            rig.ad(parent, 3, Long.MAX_VALUE - 1000);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            var current = rig.latestRequest();
++            assertEquals(activation(original).subscriptionId(), activation(current).subscriptionId());
++            assertTrue(activation(current).revision() > activation(original).revision());
++            assertNotEquals(original.message().requestId(), current.message().requestId());
++            rig.ack(current, 6000);
++            assertNotNull(rig.forwarding(A));
++            assertSame(outcome, result(ticket));
++            rig.ad(parent, 3, Long.MAX_VALUE - 1000);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        }
++    }
++
++
++    @Test
++    void r10MetricRecoveryCannotReuseANewerAnnouncementAlreadySeenBeforeFailure()
++    {
++        try(var rig = new Rig("R", false, 4096, 1))
++        {
++            var parent = peer("A");
++            rig.up(parent);
++            rig.metric(parent, 10);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            rig.local(A, UUID.randomUUID());
++            rig.tick(1);
++            rig.ad(parent, 3, Long.MAX_VALUE - 1000);
++            rig.error(rig.latestRequest(), 11, ErrorCode.PATH_CHANGED);
++            rig.tick(T);
++            rig.metric(parent, 2000);
++            rig.metric(parent, 10);
++            rig.ad(parent, 3, Long.MAX_VALUE - 1000);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
++        }
++    }
++
++
++    @Test
++    void r10PostFailureAnnouncementWithoutMetricRemainsUsefulForFirstEligibleObservation()
++    {
++        try(var rig = new Rig("R", false, 4096, 1))
++        {
++            var parent = peer("A");
++            rig.up(parent);
++            rig.metric(parent, 10);
++            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
++            rig.local(A, UUID.randomUUID());
++            rig.error(rig.latestRequest(), 11, ErrorCode.PATH_CHANGED);
++            rig.tick(T);
++            rig.act(() -> rig.router.onMetrics(
++                    new NetworkMonitor.Invalidated(parent, NetworkMonitor.Reason.TIMEOUT)));
++            rig.ad(parent, 3, Long.MAX_VALUE - 1000);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(3, rig.router.snapshot().routes().get(A).candidates().getFirst().announceSeq());
++            assertTrue(rig.router.snapshot().routes().get(A).selectedCandidate().isEmpty());
++            rig.metric(parent, 10);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            rig.ack(rig.latestRequest(), 6000);
++            assertNotNull(rig.forwarding(A));
+         }
+     }
+ 

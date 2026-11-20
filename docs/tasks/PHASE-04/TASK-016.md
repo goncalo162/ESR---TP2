@@ -5,7 +5,7 @@
 - ID: TASK-016
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Fillmore](../../team/FILLMORE.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-012](../PHASE-03/TASK-012.md), [TASK-014](../PHASE-04/TASK-014.md), [TASK-015](../PHASE-04/TASK-015.md).
@@ -82,3 +82,86 @@ caminho e do vídeo ao cenário S–R1–C / S–R2–C, com morte sequencial do
 relays e formação de S–C. A aprendizagem e a reparação da overlay demonstram a conectividade.
 O teste integrado deve identificar stream, origem, nova aresta, percurso
 selecionado, confirmação de ativação e resultado observado.
+
+## Construction — apenas Model em 2026-11-20T11:02:52Z
+
+Seleção explícita do utilizador para008-arvores/IMP-013; dependências concluídas.
+[Modelo proposto](../../../memory-bank/bolts/008-arvores/ddd-01-domain-model.md)
+e Q-C-43/44 aguardam aprovação. Âmbito futuro normativo: Route.java,
+RoutingService.java e RecoveryTest.java; RoutingTable/FailoverTest citados acima
+são detalhe legado, não autorização de ampliação. V-016/R01–R18 não executados;
+recuperação de controlo não comprova vídeo. Sem fontes lidas/analisadas/alteradas,
+Maven, Design/ADR/Implement/Test, commits ou push. Fecho futuro mantém V-016,
+regressão aprovada, manual humano, revisão final Fillmore e integração.
+
+## Model aprovado; Design para revisão em 2026-11-20T11:21:05Z
+
+Model/Q-C-43/44 aprovados explicitamente; apenas Design autorizado.
+[Design proposto](../../../memory-bank/bolts/008-arvores/ddd-02-technical-design.md)
+concretiza novidade útil F/G, rondas T/A com cadência limitada e renegociação
+filhos automática por11, sem intervenção humana/extensão de grants antigos.
+Três caminhos do ADD preservados, compatibilidade real por conferir em ADR.
+V-016/R01–R18 por executar; sem fontes lidas/alteradas, Implement, Maven, commits
+ou push. Fecho mantém testes, regressão JDK21, manual humano, Fillmore e integração;
+sem gates externos adicionais.
+
+## IMP-013 — Design revisto aprovado; revisão ADR preparada
+
+Registo 2026-11-20T11:45:38Z. Design revisto e clarificação de Q-C-44 aprovados
+pelo utilizador em2026-11-20T11:41:00Z; apenas revisão ADR autorizada.
+APIs reais conferidas estaticamente: announceSeq/Outcome disponíveis, watermark
+interno privado sem necessidade de API nova; intenção distinta de resultado do
+ticket, mudança de época, ACTIVATE/revisões, construtores4/5/projeções e lifecycle.
+Revisão para aprovação, sem impedimento de âmbito identificado ou nova ADR.
+A01–A08 são trabalho futuro nos mesmos três caminhos; nenhuma correção aplicada.
+V-016/R01–R18 não executados; fontes só consultadas, sem Java alterado, Maven,
+Implement/Test, fecho, staging, commits, push ou outro IMP. Negativos/provas
+anteriores preservados. Fecho exige testes, regressão JDK21, manual humano,
+revisão final Fillmore e integração, sem gates externos adicionais.
+[Revisão completa](../../../memory-bank/bolts/008-arvores/adr-review.md).
+
+## IMP-013 — Implement reapresentado, sem aceitação/Test
+
+Registo 2026-11-20T12:27:18Z. Utilizador aprovou ADR e autorizou apenas Implement A01–A08
+nos três caminhos do ADD, com CODESTYLE, históricos/correlações/construtores e
+reservas físicas preservados. Implement preparado para revisão: regressão JDK21
+incremental final1414/0/0/0,20 XML,35 testes novos e1379 históricos byte intactos.
+Duas integrações TCP reais com métricas controladas passaram; negativos guardados
+separadamente, incluindo R13, prazo de fila, R18/fixture, R17 inicial sem causa
+estabelecida e alternativa consumida R10. Remoções/substituições justificadas no
+walkthrough; sem teste/asserção/prazo histórico retirado ou fundação alterada.
+Só Model/Design/ADR em stages_completed; current_stage=implement, completed=null.
+Implement ainda por aceitar; sem etapa Test, fecho, commits/push ou outro IMP.
+V-016 consolidado, regressão da etapa Test, manual humano antes de aprovar Test,
+revisão final Fillmore e integração continuam obrigatórios; sem gates novos.
+[Walkthrough e prova](../../../memory-bank/bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — R10 corrigido; Implement permanece pendente
+
+Registo 2026-11-20T15:44:31Z. Implement continua pendente. Reprodução exata com G2,
+Long.MAX_VALUE-1000, métrica10→2000→10 após PATH_CHANGED/T3s: negativo preservado
+esperado1/observado2 ACTIVATEs. A transição previous==null agora confere blocked
+antes de conceder crédito; métrica isolada não reutiliza a prova bloqueada.
+Primeira medição válida, anúncio novo posterior e T/A/cadência preservados.
+11 testes R10 focados passaram; regressão JDK21 atual1419/0/0/0,20 XML,
+40 RecoveryTest (35 anteriores intactos+5 novos),1379 históricos intactos.
+Delta Java só em RoutingService e RecoveryTest; Route/fundações inalterados.
+R17 inicial mantém causa não estabelecida. Sem aceitação de Implement, Test,
+fecho, commits ou push. V-016 consolidado, manual humano, Fillmore e integração
+pendentes; sem gates externos adicionais.
+[Walkthrough atualizado](../../../memory-bank/bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — Test técnico, aguardar manual humano
+
+Registo 2026-11-20T16:07:46Z. Implement/R10 aprovados; apenas Test autorizado.
+Clean verify JDK21 novo1419/0/0/0,20 XML e JAR504997bytes/SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente; fontes/históricos/evidências intactos.
+Manual humano preparado:7 etapas/28 checks. Ensaio kind=agent passou no JAR
+congelado, hashes/origem/JVM conferidos; não satisfaz obrigação humana.
+Aguardar repetição pessoal antes de pedir aprovação Test. Test não aprovado;
+R17 inicial sem causa estabelecida, integração com métricas controladas não
+prova a causa. Nova correção exige reprodução/âmbito apresentados.
+Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
+sem gates externos adicionais.
+[Relatório Test](../../../memory-bank/bolts/008-arvores/ddd-03-test-report.md).

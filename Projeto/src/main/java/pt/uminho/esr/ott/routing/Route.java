@@ -72,6 +72,44 @@ public record Route(UUID streamId, String serverId, Optional<UUID> serverEpoch,
             throw new IllegalArgumentException("Planning state does not match availability");
     }
 
+
+
+    //* === Recuperação === *
+
+    public enum RecoveryPhase
+    {
+        WAITING_FOR_ROUTE, WAITING_FOR_BUDGET, ACTIVATING, UNAVAILABLE, CONFIRMED
+    }
+
+
+    public record Recovery(UUID streamId, UUID serverEpoch, RecoveryPhase phase,
+            Optional<pt.uminho.esr.ott.protocol.ErrorCode> reason, String detail,
+            long generation, boolean intentPresent, int issued, int attemptLimit,
+            Optional<Neighbor.Session> pendingUpstream, List<String> pendingPath,
+            long remainingNanos)
+    {
+        //* === Construtores === *
+
+        public Recovery
+        {
+            Objects.requireNonNull(streamId);
+            Objects.requireNonNull(serverEpoch);
+            Objects.requireNonNull(phase);
+            Objects.requireNonNull(reason);
+            Objects.requireNonNull(detail);
+            Objects.requireNonNull(pendingUpstream);
+            pendingPath = List.copyOf(pendingPath);
+            if(generation < 0 || issued < 0 || attemptLimit < 1 || issued > attemptLimit
+                    || remainingNanos < 0 || pendingPath.size() > 32
+                    || pendingUpstream.isPresent() != !pendingPath.isEmpty())
+                throw new IllegalArgumentException("Invalid recovery projection");
+        }
+    }
+
+
+
+    //* === Confirmação === *
+
     /** Data authorization is deliberately separate from the planning Route. */
     public record Confirmation(UUID streamId, String serverId, UUID serverEpoch,
             boolean localSource, Optional<Neighbor.Session> upstream, List<String> path,

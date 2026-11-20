@@ -1,0 +1,860 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
+index 3029640..f6983b4 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java
+@@ -72,6 +72,44 @@ public record Route(UUID streamId, String serverId, Optional<UUID> serverEpoch,
+             throw new IllegalArgumentException("Planning state does not match availability");
+     }
+ 
++
++
++    //* === Recuperação === *
++
++    public enum RecoveryPhase
++    {
++        WAITING_FOR_ROUTE, WAITING_FOR_BUDGET, ACTIVATING, UNAVAILABLE, CONFIRMED
++    }
++
++
++    public record Recovery(UUID streamId, UUID serverEpoch, RecoveryPhase phase,
++            Optional<pt.uminho.esr.ott.protocol.ErrorCode> reason, String detail,
++            long generation, boolean intentPresent, int issued, int attemptLimit,
++            Optional<Neighbor.Session> pendingUpstream, List<String> pendingPath,
++            long remainingNanos)
++    {
++        //* === Construtores === *
++
++        public Recovery
++        {
++            Objects.requireNonNull(streamId);
++            Objects.requireNonNull(serverEpoch);
++            Objects.requireNonNull(phase);
++            Objects.requireNonNull(reason);
++            Objects.requireNonNull(detail);
++            Objects.requireNonNull(pendingUpstream);
++            pendingPath = List.copyOf(pendingPath);
++            if(generation < 0 || issued < 0 || attemptLimit < 1 || issued > attemptLimit
++                    || remainingNanos < 0 || pendingPath.size() > 32
++                    || pendingUpstream.isPresent() != !pendingPath.isEmpty())
++                throw new IllegalArgumentException("Invalid recovery projection");
++        }
++    }
++
++
++
++    //* === Confirmação === *
++
+     /** Data authorization is deliberately separate from the planning Route. */
+     public record Confirmation(UUID streamId, String serverId, UUID serverEpoch,
+             boolean localSource, Optional<Neighbor.Session> upstream, List<String> path,
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+index 70a33ca..8feb07a 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -138,11 +138,33 @@ public final class RoutingService implements AutoCloseable {
+             int ledgers, int pendingCells, int pendingIntents, int quotas, int sendTickets, int timers,
+             long failures, boolean countersSaturated, Reason lastReason) { }
+     public record Snapshot(long capturedAtNanos, StreamCatalog.Snapshot catalog,
+-            Map<UUID,Route> routes, Diagnostics diagnostics, Map<UUID,Route.Confirmation> forwarding) {
+-        public Snapshot { Objects.requireNonNull(catalog);Objects.requireNonNull(diagnostics);
+-            routes=Map.copyOf(routes);forwarding=Map.copyOf(forwarding); }
+-        public Snapshot(long capturedAtNanos,StreamCatalog.Snapshot catalog,Map<UUID,Route> routes,Diagnostics diagnostics) {
+-            this(capturedAtNanos,catalog,routes,diagnostics,Map.of());
++            Map<UUID,Route> routes, Diagnostics diagnostics, Map<UUID,Route.Confirmation> forwarding,
++            Map<UUID,Route.Recovery> recoveries)
++    {
++        //* === Construtores === *
++
++        public Snapshot
++        {
++            Objects.requireNonNull(catalog);
++            Objects.requireNonNull(diagnostics);
++            routes = Map.copyOf(routes);
++            forwarding = Map.copyOf(forwarding);
++            recoveries = Map.copyOf(recoveries);
++        }
++
++
++        public Snapshot(long capturedAtNanos, StreamCatalog.Snapshot catalog,
++                Map<UUID,Route> routes, Diagnostics diagnostics,
++                Map<UUID,Route.Confirmation> forwarding)
++        {
++            this(capturedAtNanos, catalog, routes, diagnostics, forwarding, Map.of());
++        }
++
++
++        public Snapshot(long capturedAtNanos, StreamCatalog.Snapshot catalog,
++                Map<UUID,Route> routes, Diagnostics diagnostics)
++        {
++            this(capturedAtNanos, catalog, routes, diagnostics, Map.of(), Map.of());
+         }
+     }
+     private static final long WINDOW=1_000_000_000L;
+@@ -378,6 +400,7 @@ public final class RoutingService implements AutoCloseable {
+         var outcome=root.announce(new RoutingTable.Advertisement(info.streamId(),info.serverId(),info.serverEpoch(),key(session),a.announceSeq(),a.costMicros(),path));
+         if(applied(outcome)){
+             if(row.info==null)row.info=info;
++            activation.observeAnnouncement(session, a, now());
+             // Catalog must be published with the newly established canonical metadata.
+             dirty();
+         }
+@@ -622,7 +645,7 @@ public final class RoutingService implements AutoCloseable {
+         for(var l:ledgers.values())if(l.cell){if(l.debt!=null)intents++;if(l.want!=null)intents++;}
+         var projection=new StreamCatalog.Snapshot(t,entries);catalog.replace(projection);
+         int physical;synchronized(resources){physical=admissions.size();}
+-        view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason),activation.forwarding(t));
++        view=new Snapshot(t,projection,routes,new Diagnostics(phase,sessions.size(),rows.size(),refs,cache.size(),ledgers.size(),pending,intents,quotas.size(),physical,scheduler.physicalJobs(),failures,countersSaturated,lastReason),activation.forwarding(t),activation.recoveries(t));
+     }
+     private static boolean traceText(String text,int maximum) {
+         if (text==null || text.length()>maximum) return false;
+@@ -922,11 +945,15 @@ public final class RoutingService implements AutoCloseable {
+             public void cancel(){if(cancelled.compareAndSet(false,true)){changed.set(true);wake();}}
+         }
+         final class Tree {
+-            final UUID id,epoch;final String origin;
++            final UUID id;UUID epoch;final String origin;
+             final Map<UUID,Local> locals=new LinkedHashMap<>();
+             final Map<Neighbor.Session,Child> children=new LinkedHashMap<>();
+             final Set<UUID> confirmedLocals=new HashSet<>();
+             Confirmed confirmed;Round round;Prune prune;Line upstream;long submittedRevision=-1,renewBegan,renewPeriod;ErrorCode failure;String detail="";long version;
++            Proof view, used, blocked, credit, renewalBlocked;
++            long failedAt, renewalFailedAt, lastRoundStart, generation;
++            boolean roundStarted, lossCredit, sourceAvailable, permanent;
++            int issued;
+             Tree(Row row){id=row.id;epoch=row.route.serverEpoch().orElseThrow();origin=row.origin;}
+         }
+         record Confirmed(boolean source,UUID epoch,Neighbor.Session parent,List<String> path,Subscription.Lease lease) {
+@@ -934,6 +961,7 @@ public final class RoutingService implements AutoCloseable {
+         }
+         final class Line {
+             final LineKey key;final UUID id;long revision=-1;UUID request;
++            long observedSequence = -1, blockedSequence = -1;
+             ControlMessage.Activation fingerprint;boolean renew;ErrorCode terminal;String detail="";Child child;
+             Line(LineKey key,UUID id){this.key=key;this.id=id;}
+         }
+@@ -941,12 +969,15 @@ public final class RoutingService implements AutoCloseable {
+             final Tree tree;final Line line;final UUID request;final ControlMessage.Activation payload;
+             final long began;long budget=timeout;boolean renew;boolean pending=true,ackWanted,errorWanted,detached,replay;
+             ErrorCode error;String detail="";Subscription active;
++            Subscription.Lease suspended;
+             Child(Tree tree,Line line,UUID request,ControlMessage.Activation p,long began){
+                 this.tree=tree;this.line=line;this.request=request;payload=p;this.began=began;
+             }
+         }
+         final class Round {
+             final long began;long budget=timeout;boolean renew;int issued;Attempt attempt;
++            Proof rejected;
++            boolean capacityBlocked;
+             Round(long began){this.began=began;}
+         }
+         final class Attempt {
+@@ -979,6 +1010,201 @@ public final class RoutingService implements AutoCloseable {
+                     if(freed&&!stopping.get()){changed.set(true);wake();}}
+             }
+         }
++
++
++        //* === Recuperação === *
++
++        record Proof(UUID epoch, Neighbor.Session session, List<String> path, long sequence)
++        {
++            //* === Construtores === *
++
++            Proof
++            {
++                path = List.copyOf(path);
++            }
++
++
++
++            //* === Lógica === *
++
++            boolean sameBranch(Proof other)
++            {
++                return other != null && epoch.equals(other.epoch)
++                        && session.equals(other.session) && path.equals(other.path);
++            }
++        }
++
++
++        Proof eligibleProof(Tree t, long at)
++        {
++            if(!epochCurrent(t))
++                return null;
++            var candidate = row(t.id).route.selectedCandidate().orElse(null);
++            if(candidate == null || candidate.metric().isEmpty()
++                    || age(at, candidate.generationStartedAtNanos()) >= candidate.candidateTtlNanos())
++                return null;
++            var session = sessions.get(candidate.upstream().nodeId());
++            if(session == null || !key(session).equals(candidate.upstream()) || !current(session))
++                return null;
++            return new Proof(t.epoch, session, candidate.path(), candidate.announceSeq());
++        }
++
++
++        boolean recheckable(ErrorCode code)
++        {
++            return code == ErrorCode.PATH_CHANGED || code == ErrorCode.NO_ROUTE
++                    || code == ErrorCode.SOURCE_UNAVAILABLE || code == ErrorCode.TIMEOUT
++                    || code == ErrorCode.RESOURCE_LIMIT;
++        }
++
++
++        long observedSequence(Tree t, Proof proof)
++        {
++            if(proof == null)
++                return -1;
++            long sequence = proof.sequence;
++            for(var candidate : row(t.id).route.candidates())
++            {
++                if(candidate.serverEpoch().equals(proof.epoch)
++                        && candidate.upstream().equals(key(proof.session)))
++                    sequence = Math.max(sequence, candidate.announceSeq());
++            }
++            var line = lines.get(new LineKey(true, t.id, proof.epoch, proof.session));
++            return line == null ? sequence : Math.max(sequence, line.observedSequence);
++        }
++
++
++        void observeAnnouncement(Neighbor.Session session, ControlMessage.Announcement announcement, long at)
++        {
++            var t = trees.get(announcement.stream().streamId());
++            if(t == null || !t.epoch.equals(announcement.stream().serverEpoch()))
++                return;
++            var line = lines.get(new LineKey(true, t.id, t.epoch, session));
++            if(line != null)
++                line.observedSequence = Math.max(line.observedSequence, announcement.announceSeq());
++            var proof = eligibleProof(t, at);
++            if(proof == null || !proof.session.equals(session)
++                    || proof.sequence != announcement.announceSeq())
++                return;
++            if(t.renewalBlocked != null && proof.sameBranch(t.renewalBlocked)
++                    && proof.sequence > t.renewalBlocked.sequence && age(at, t.renewalFailedAt) > 0)
++                t.renewalBlocked = null;
++            if(t.round != null && t.round.rejected != null && proof.sameBranch(t.round.rejected)
++                    && proof.sequence > t.round.rejected.sequence && age(at, t.failedAt) > 0)
++                t.round.rejected = null;
++            if(!healthy(t, at) && !t.permanent && recheckable(t.failure)
++                    && proof.sameBranch(t.blocked) && proof.sequence > t.blocked.sequence
++                    && age(at, t.failedAt) > 0)
++                t.credit = proof;
++        }
++
++
++        void blockRecoveryProof(Tree t, long at)
++        {
++            var proof = t.used == null ? eligibleProof(t, at) : t.used;
++            if(proof != null)
++            {
++                long sequence = observedSequence(t, proof);
++                t.blocked = new Proof(proof.epoch, proof.session, proof.path, sequence);
++                var line = lines.get(new LineKey(true, t.id, proof.epoch, proof.session));
++                if(line != null)
++                    line.blockedSequence = Math.max(line.blockedSequence, sequence);
++            }
++            t.failedAt = at;
++            if(t.credit != null && t.credit.sameBranch(t.blocked)
++                    && t.credit.sequence <= t.blocked.sequence)
++                t.credit = null;
++        }
++
++
++        boolean childInterest(Child c, long at)
++        {
++            return !c.detached && current(c.line.key.session) && epochCurrent(c.tree)
++                    && (c.pending && !childElapsed(c, at)
++                        || c.active != null && c.active.validity().orElseThrow().remainingNanos(at) > 0
++                        || c.suspended != null && c.suspended.remainingNanos(at) > 0);
++        }
++
++
++        void loseConfirmation(Tree t, long at)
++        {
++            if(t.confirmed == null)
++                return;
++            t.confirmed = null;
++            t.confirmedLocals.clear();
++            t.version = Math.incrementExact(t.version);
++            t.lossCredit = true;
++            if(t.round != null && t.round.renew)
++                fail(t, ErrorCode.NO_ROUTE, "CONFIRMATION_LOST");
++            for(var child : t.children.values())
++            {
++                if(child.active != null)
++                {
++                    child.suspended = child.active.validity().orElseThrow();
++                    child.active = null;
++                }
++            }
++        }
++
++
++        void reconcileRecovery(Tree t, long at)
++        {
++            var proof = eligibleProof(t, at);
++            var previous = t.view;
++            t.view = proof;
++            boolean source = epochCurrent(t) && row(t.id).offered;
++            boolean sourceReturned = source && !t.sourceAvailable;
++            t.sourceAvailable = source;
++            if(!demand(t, at))
++            {
++                t.credit = null;
++                t.lossCredit = false;
++                return;
++            }
++            if(healthy(t, at))
++                return;
++            boolean contextChanged = proof != null && (t.used == null
++                    || !proof.session.equals(t.used.session) || !proof.epoch.equals(t.used.epoch));
++            if(t.permanent && !contextChanged)
++                return;
++            if(proof != null && (!proof.sameBranch(t.used) || previous == null))
++                t.credit = proof;
++            if(t.credit != null && (!t.credit.sameBranch(proof) || proof.sequence < t.credit.sequence))
++                t.credit = null;
++            boolean credit = proof != null && (t.credit != null || t.lossCredit)
++                    || source && (sourceReturned || t.lossCredit);
++            if(t.round != null || !credit || t.roundStarted && age(at, t.lastRoundStart) < timeout)
++                return;
++            startRound(t, at, at);
++        }
++
++
++        Map<UUID,Route.Recovery> recoveries(long at)
++        {
++            var result = new LinkedHashMap<UUID,Route.Recovery>();
++            for(var t : trees.values())
++            {
++                var phase = Route.RecoveryPhase.UNAVAILABLE;
++                if(healthy(t, at))
++                    phase = Route.RecoveryPhase.CONFIRMED;
++                else if(t.round != null)
++                    phase = Route.RecoveryPhase.ACTIVATING;
++                else if((t.credit != null || t.lossCredit) && eligibleProof(t, at) != null)
++                    phase = Route.RecoveryPhase.WAITING_FOR_BUDGET;
++                var attempt = t.round == null ? null : t.round.attempt;
++                long remaining = t.round == null ? 0 : Math.max(0, t.round.budget - age(at, t.round.began));
++                result.put(t.id, new Route.Recovery(t.id, t.epoch, phase, Optional.ofNullable(t.failure),
++                        t.detail, t.generation, demand(t, at), t.round == null ? t.issued : t.round.issued,
++                        attempts, Optional.ofNullable(attempt == null ? null : attempt.line.key.session),
++                        attempt == null ? List.of() : attempt.path, remaining));
++            }
++            return result;
++        }
++
++
++
++        //* === Ativação === *
++
+         void kick(){treeSweep=treeOrder.size();childSweep=childOrder.size();localSweep=localOrder.size();}
+         boolean elapsed(long now,long began){return age(now,began)>=timeout;}
+         long age(long now,long began){long age=now-began;if(age<0)throw new IllegalStateException("Activation clock horizon");return age;}
+@@ -1039,13 +1265,36 @@ public final class RoutingService implements AutoCloseable {
+             if(elapsed(at,l.began))outcome(l,SubscriptionState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT");
+             else if(healthy(t,at)&&!compatible(t,selectedPath(t),at))outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED");
+             else{t.failure=null;startRound(t,l.began,at);}
+-            kick();drive();
+-        }
+-        void startRound(Tree t,long began,long at){
+-            if(t.round!=null||healthy(t,at))return;
+-            if(row(t.id).offered){t.confirmed=new Confirmed(true,t.epoch,null,List.of(config.nodeId()),null);t.version=Math.incrementExact(t.version);return;}
+-            if(selectedPath(t).isEmpty()){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+-            t.failure=null;t.round=new Round(began);
++            kick();RoutingService.this.drive();
++        }
++        void startRound(Tree t, long began, long at)
++        {
++            if(t.round != null || healthy(t, at))
++                return;
++            t.lastRoundStart = began;
++            t.roundStarted = true;
++            t.generation = Math.incrementExact(t.generation);
++            t.issued = 0;
++            t.used = eligibleProof(t, at);
++            t.view = t.used;
++            t.credit = null;
++            t.lossCredit = false;
++            t.permanent = false;
++            if(row(t.id).offered)
++            {
++                t.confirmed = new Confirmed(true, t.epoch, null, List.of(config.nodeId()), null);
++                t.failure = null;
++                t.version = Math.incrementExact(t.version);
++                return;
++            }
++            if(t.used == null)
++            {
++                fail(t, ErrorCode.NO_ROUTE, "NO_ROUTE");
++                return;
++            }
++            t.failure = null;
++            t.detail = "";
++            t.round = new Round(began);
+         }
+         void receive(Neighbor.Session session,ControlMessage m){
+             long at=now();kick();
+@@ -1127,7 +1376,14 @@ public final class RoutingService implements AutoCloseable {
+             if(renew)c.budget=Math.min(timeout,old.validity().orElseThrow().remainingNanos(at));
+             line.renew=renew;line.revision=p.revision();line.request=request;line.fingerprint=p;line.terminal=null;line.detail="";line.child=c;
+             t.children.put(session,c);childOrder.add(c);t.failure=null;
+-            startRound(t,at,at);kick();
++            if(!t.roundStarted)
++                startRound(t, at, at);
++            else if(!healthy(t, at))
++            {
++                t.credit = eligibleProof(t, at);
++                reconcileRecovery(t, at);
++            }
++            kick();
+         }
+         void confirm(Attempt a,long at){
+             var t=a.tree;if(t.round!=a.round||a.round.attempt!=a||a.early==null||!a.accepted)return;
+@@ -1146,13 +1402,46 @@ public final class RoutingService implements AutoCloseable {
+             t.round=null;t.failure=null;
+             t.version=Math.incrementExact(t.version);kick();
+         }
+-        void failedAttempt(Attempt a,ErrorCode code,String detail){
+-            var t=a.tree;if(t.round!=a.round||a.round.attempt!=a)return;
+-            a.round.attempt=null;
+-            if(roundElapsed(a.round,now())||a.round.issued>=(a.round.renew?1:attempts))fail(t,code,detail);
++        void failedAttempt(Attempt a, ErrorCode code, String detail)
++        {
++            var t = a.tree;
++            if(t.round != a.round || a.round.attempt != a)
++                return;
++            long at = now();
++            a.round.attempt = null;
++            if(a.round.renew && code == ErrorCode.PATH_CHANGED)
++            {
++                var proof = eligibleProof(t, at);
++                long sequence = proof == null ? observedSequence(t, t.used) : observedSequence(t, proof);
++                t.renewalBlocked = new Proof(t.epoch, a.line.key.session, a.path, sequence);
++                t.renewalFailedAt = at;
++            }
++            if(!a.round.renew && code == ErrorCode.PATH_CHANGED)
++            {
++                var rejected = new Proof(t.epoch, a.line.key.session, a.path, -1);
++                a.round.rejected = new Proof(t.epoch, rejected.session, rejected.path, observedSequence(t, rejected));
++                t.failedAt = at;
++            }
++            if(roundElapsed(a.round, at) || a.round.issued >= (a.round.renew ? 1 : attempts)
++                    || code == ErrorCode.INVALID_MESSAGE || code == ErrorCode.STALE_REVISION)
++                fail(t, code, detail);
+             kick();
+         }
+-        void fail(Tree t,ErrorCode code,String detail){t.round=null;t.failure=code;t.detail=detail;kick();}
++
++
++        void fail(Tree t, ErrorCode code, String detail)
++        {
++            if(t.round != null)
++                t.issued = t.round.issued;
++            blockRecoveryProof(t, now());
++            t.round = null;
++            t.failure = code;
++            t.detail = detail;
++            t.permanent = code == ErrorCode.INVALID_MESSAGE || code == ErrorCode.STALE_REVISION;
++            kick();
++        }
++
++
+         void failChild(Child c,ErrorCode code,String detail,long at){
+             c.pending=false;c.ackWanted=false;c.error=code;c.detail=detail;c.errorWanted=!childElapsed(c,at);
+             c.line.terminal=code;c.line.detail=detail;
+@@ -1161,92 +1450,199 @@ public final class RoutingService implements AutoCloseable {
+         void cancelChild(Neighbor.Session s,UUID stream,UUID id,long revision){
+             var t=trees.get(stream);var c=t==null?null:t.children.get(s);
+             if(c==null||!c.line.id.equals(id)||c.payload.revision()!=revision)return;
+-            c.active=null;failChild(c,ErrorCode.STALE_REVISION,"CANCELLED",now());c.errorWanted=false;
++            c.active=null;c.suspended=null;failChild(c,ErrorCode.STALE_REVISION,"CANCELLED",now());c.errorWanted=false;
+             t.version=Math.incrementExact(t.version);kick();
+         }
+-        void detach(Child c){c.detached=true;c.ackWanted=false;c.errorWanted=false;
+-            c.tree.children.remove(c.line.key.session,c);childOrder.remove(c);if(c.line.child==c)c.line.child=null;}
++        void detach(Child c)
++        {
++            c.detached = true;
++            c.ackWanted = false;
++            c.errorWanted = false;
++            c.tree.children.remove(c.line.key.session, c);
++            childOrder.remove(c);
++            if(c.line.child == c)
++                c.line.child = null;
++            treeSweep = treeOrder.size();
++        }
+         boolean wants(Tree t){return t.locals.values().stream().anyMatch(l->l.outcome==null&&!l.cancelled.get())
+                 ||t.children.values().stream().anyMatch(c->c.pending);}
+         boolean roundElapsed(Round r,long at){return age(at,r.began)>=r.budget;}
+         boolean childElapsed(Child c,long at){return age(at,c.began)>=c.budget;}
+-        boolean demand(Tree t,long at){
+-            return t.locals.values().stream().anyMatch(l->!l.cancelled.get()&&(l.outcome==null||t.confirmedLocals.contains(l.key.token)))
+-                    ||t.children.values().stream().anyMatch(c->c.pending||c.active!=null&&c.active.validity().orElseThrow().remainingNanos(at)>0);
++        boolean demand(Tree t, long at)
++        {
++            return t.locals.values().stream().anyMatch(l -> !l.cancelled.get())
++                    || t.children.values().stream().anyMatch(c -> childInterest(c, at));
+         }
++
++
+         void retireBranch(Tree t,long at){
+             t.round=null;
++            t.credit = null;
++            t.lossCredit = false;
+             if(t.confirmed!=null&&!t.confirmed.source&&t.upstream!=null&&t.submittedRevision>=0){
+                 var identity=new Subscription.Identity(t.upstream.key.session,t.id,t.epoch,t.upstream.id,t.submittedRevision,t.version);
+                 t.prune=new Prune(new PruneRequest(identity,UUID.randomUUID(),at,timeout),t.upstream);
+             }
+             if(t.confirmed!=null){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+         }
+-        void stepTree(Tree t,long at){
+-            if(trees.get(t.id)!=t)return;
+-            for(var l:List.copyOf(t.locals.values())){
+-                boolean latest;synchronized(resources){latest=localTickets.get(l.key)==l;}
+-                if(!latest||l.cancelled.get()){
+-                    boolean removed=t.locals.remove(l.key.token,l);localOrder.remove(l);
+-                    if(removed&&l.cancelled.get()&&t.confirmedLocals.remove(l.key.token))t.version=Math.incrementExact(t.version);
+-                    if(latest){synchronized(resources){localTickets.remove(l.key,l);}}
+-                    outcome(l,SubscriptionState.CANCELLED,null,"CANCELLED");
++        void stepTree(Tree t, long at)
++        {
++            if(trees.get(t.id) != t)
++                return;
++            for(var l : List.copyOf(t.locals.values()))
++            {
++                boolean latest;
++                synchronized(resources)
++                {
++                    latest = localTickets.get(l.key) == l;
++                }
++                if(!latest || l.cancelled.get())
++                {
++                    boolean removed = t.locals.remove(l.key.token, l);
++                    localOrder.remove(l);
++                    if(removed && l.cancelled.get() && t.confirmedLocals.remove(l.key.token))
++                        t.version = Math.incrementExact(t.version);
++                    if(latest)
++                    {
++                        synchronized(resources)
++                        {
++                            localTickets.remove(l.key, l);
++                        }
++                    }
++                    outcome(l, SubscriptionState.CANCELLED, null, "CANCELLED");
+                 }
+             }
+-            if(t.confirmed!=null&&!healthy(t,at)){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+-            if(row(t.id).local&&!row(t.id).offered&&t.failure!=ErrorCode.SOURCE_UNAVAILABLE)
+-                fail(t,ErrorCode.SOURCE_UNAVAILABLE,"SOURCE_UNAVAILABLE");
+-            boolean wanted=demand(t,at);
+-            if(!wanted&&(t.confirmed!=null||t.round!=null))retireBranch(t,at);
+-            if(wanted&&t.prune!=null)t.prune=null;
+-            if(wanted&&healthy(t,at)&&!t.confirmed.source&&t.round==null
+-                    &&age(at,t.renewBegan)>=t.renewPeriod&&compatible(t,t.confirmed.path,at)){
+-                t.renewBegan=at;t.round=new Round(at);t.round.renew=true;
+-                t.round.budget=Math.min(timeout,t.confirmed.lease.remainingNanos(at));
+-            }
+-            if(t.prune!=null){
+-                var prune=t.prune;var q=prune.request;var i=q.identity();
+-                if(age(at,q.beganNanos())>=q.budgetNanos())t.prune=null;
+-                else if(send(prune.line,i.session(),SendKind.PRUNE,null,null,null,
+-                        new ControlMessage(MessageType.DEACTIVATE,q.requestId(),config.nodeId(),instance,
+-                            new ControlMessage.Deactivation(i.streamId(),i.serverEpoch(),i.subscriptionId(),i.revision())),at))t.prune=null;
+-            }
+-            if(t.round!=null&&roundElapsed(t.round,at))fail(t,ErrorCode.TIMEOUT,"TIMEOUT");
+-            for(var l:t.locals.values())if(l.outcome==null){
+-                if(elapsed(at,l.began))outcome(l,SubscriptionState.TIMEOUT,ErrorCode.TIMEOUT,"TIMEOUT");
+-                else if(healthy(t,at)){
+-                    if(compatible(t,selectedPath(t),at)){if(t.confirmedLocals.add(l.key.token))t.version=Math.incrementExact(t.version);outcome(l,SubscriptionState.SUCCESS,null,"");}
+-                    else outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"PATH_CHANGED");
+-                }else if(t.failure!=null)outcome(l,t.failure==ErrorCode.TIMEOUT?SubscriptionState.TIMEOUT:SubscriptionState.ERROR,t.failure,t.detail);
+-            }
+-            var r=t.round;
+-            if(r!=null&&r.attempt==null){
+-                var path=selectedPath(t);var candidate=row(t.id).route.selectedCandidate();
+-                if(path.isEmpty()||candidate.isEmpty()){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+-                var peer=sessions.get(candidate.orElseThrow().upstream().nodeId());
+-                if(peer==null||!key(peer).equals(candidate.orElseThrow().upstream())){fail(t,ErrorCode.NO_ROUTE,"NO_ROUTE");return;}
+-                var lk=new LineKey(true,t.id,t.epoch,peer);var line=lines.get(lk);
+-                if(line==null){if(lines.size()>=historyLimit){fail(t,ErrorCode.RESOURCE_LIMIT,"HISTORY_CAPACITY");return;}
+-                    line=new Line(lk,UUID.randomUUID());lines.put(lk,line);}
+-                if(line.revision==Long.MAX_VALUE){fail(t,ErrorCode.STALE_REVISION,"REVISION_EXHAUSTED");return;}
+-                r.attempt=new Attempt(t,r,line,path,r.issued==0?r.began:at,++line.revision);
+-            }
+-            if(r!=null&&r.attempt!=null&&!r.attempt.submitted){
+-                var a=r.attempt;
+-                if(r.issued>=(r.renew?1:attempts)){fail(t,ErrorCode.TIMEOUT,"ATTEMPT_LIMIT");return;}
+-                if(!selectedPath(t).equals(a.path)||!current(a.line.key.session)){failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;}
+-                var m=new ControlMessage(r.renew?MessageType.SUBSCRIPTION_RENEW:MessageType.ACTIVATE,a.request,config.nodeId(),instance,
+-                        new ControlMessage.Activation(t.id,t.epoch,a.line.id,a.revision,leaseMs,a.path));
+-                send(a.line,a.line.key.session,SendKind.REQUEST,a,null,null,m,at);
+-            }
+-            if(t.locals.isEmpty()&&t.children.isEmpty()&&t.round==null&&t.prune==null){trees.remove(t.id,t);treeOrder.remove(t);}
++            if(t.confirmed != null && !healthy(t, at))
++                loseConfirmation(t, at);
++            if(row(t.id).local && !row(t.id).offered && t.failure != ErrorCode.SOURCE_UNAVAILABLE)
++                fail(t, ErrorCode.SOURCE_UNAVAILABLE, "SOURCE_UNAVAILABLE");
++            boolean wanted = demand(t, at);
++            if(!wanted && (t.confirmed != null || t.round != null))
++                retireBranch(t, at);
++            if(wanted && t.prune != null)
++                t.prune = null;
++            reconcileRecovery(t, at);
++            if(wanted && healthy(t, at) && !t.confirmed.source && t.round == null
++                    && t.renewalBlocked == null && age(at, t.renewBegan) >= t.renewPeriod
++                    && compatible(t, t.confirmed.path, at))
++            {
++                t.renewBegan = at;
++                t.round = new Round(at);
++                t.round.renew = true;
++                t.round.budget = Math.min(timeout, t.confirmed.lease.remainingNanos(at));
++            }
++            if(t.prune != null)
++            {
++                var prune = t.prune;
++                var q = prune.request;
++                var i = q.identity();
++                if(age(at, q.beganNanos()) >= q.budgetNanos())
++                    t.prune = null;
++                else if(send(row(t.id), i.session(), SendKind.PRUNE, null, null, null,
++                        new ControlMessage(MessageType.DEACTIVATE, q.requestId(), config.nodeId(), instance,
++                            new ControlMessage.Deactivation(i.streamId(), i.serverEpoch(), i.subscriptionId(), i.revision())), at))
++                    t.prune = null;
++            }
++            if(t.round != null && roundElapsed(t.round, at))
++            {
++                boolean capacity = t.round.capacityBlocked && t.round.attempt != null
++                        && !t.round.attempt.submitted;
++                fail(t, capacity ? ErrorCode.RESOURCE_LIMIT : ErrorCode.TIMEOUT,
++                        capacity ? "ACTIVATION_CAPACITY" : "TIMEOUT");
++            }
++            for(var l : t.locals.values())
++            {
++                if(!l.cancelled.get() && healthy(t, at) && compatible(t, selectedPath(t), at)
++                        && t.confirmedLocals.add(l.key.token))
++                    t.version = Math.incrementExact(t.version);
++                if(l.outcome != null)
++                    continue;
++                if(elapsed(at, l.began))
++                    outcome(l, SubscriptionState.TIMEOUT, ErrorCode.TIMEOUT, "TIMEOUT");
++                else if(healthy(t, at))
++                {
++                    if(compatible(t, selectedPath(t), at))
++                        outcome(l, SubscriptionState.SUCCESS, null, "");
++                    else
++                        outcome(l, SubscriptionState.ERROR, ErrorCode.PATH_CHANGED, "PATH_CHANGED");
++
++                }else if(t.failure != null){
++                    outcome(l, t.failure == ErrorCode.TIMEOUT ? SubscriptionState.TIMEOUT : SubscriptionState.ERROR,
++                            t.failure, t.detail);
++                }
++            }
++            var r = t.round;
++            if(r != null && r.attempt == null)
++            {
++                var proof = eligibleProof(t, at);
++                if(proof == null)
++                {
++                    fail(t, ErrorCode.NO_ROUTE, "NO_ROUTE");
++                    return;
++                }
++                if(r.rejected != null && proof.sameBranch(r.rejected))
++                    return;
++                var lk = new LineKey(true, t.id, t.epoch, proof.session);
++                var line = lines.get(lk);
++                if(line == null)
++                {
++                    if(lines.size() >= historyLimit)
++                    {
++                        fail(t, ErrorCode.RESOURCE_LIMIT, "HISTORY_CAPACITY");
++                        return;
++                    }
++                    line = new Line(lk, UUID.randomUUID());
++                    lines.put(lk, line);
++                }
++                line.observedSequence = Math.max(line.observedSequence, proof.sequence);
++                if(line.revision == Long.MAX_VALUE)
++                {
++                    fail(t, ErrorCode.STALE_REVISION, "REVISION_EXHAUSTED");
++                    return;
++                }
++                r.attempt = new Attempt(t, r, line, proof.path, r.issued == 0 ? r.began : at, ++line.revision);
++            }
++            if(r != null && r.attempt != null && !r.attempt.submitted)
++            {
++                var a = r.attempt;
++                if(r.issued >= (r.renew ? 1 : attempts))
++                {
++                    fail(t, ErrorCode.TIMEOUT, "ATTEMPT_LIMIT");
++                    return;
++                }
++                if(!selectedPath(t).equals(a.path) || !current(a.line.key.session))
++                {
++                    failedAttempt(a, ErrorCode.PATH_CHANGED, "PATH_CHANGED");
++                    return;
++                }
++                var m = new ControlMessage(r.renew ? MessageType.SUBSCRIPTION_RENEW : MessageType.ACTIVATE,
++                        a.request, config.nodeId(), instance,
++                        new ControlMessage.Activation(t.id, t.epoch, a.line.id, a.revision, leaseMs, a.path));
++                r.capacityBlocked = !send(row(t.id), a.line.key.session, SendKind.REQUEST, a, null, null, m, at);
++            }
++            if(t.locals.isEmpty() && t.children.isEmpty() && t.round == null && t.prune == null)
++            {
++                trees.remove(t.id, t);
++                treeOrder.remove(t);
++            }
+         }
++
++
+         void stepChild(Child c,long at){
+             if(c.detached)return;var t=c.tree;
+             if(!epochCurrent(t)||!current(c.line.key.session)){detach(c);return;}
+-            if(c.active!=null&&(c.active.validity().orElseThrow().remainingNanos(at)==0||!healthy(t,at))){
+-                c.active=null;if(!c.pending){c.line.terminal=ErrorCode.NO_ROUTE;c.line.detail="EXPIRED";}
++            if(c.active != null && (c.active.validity().orElseThrow().remainingNanos(at) == 0 || !healthy(t, at)))
++            {
++                c.suspended = c.active.validity().orElseThrow();
++                c.active = null;
++                if(!c.pending)
++                {
++                    c.line.terminal = ErrorCode.NO_ROUTE;
++                    c.line.detail = "EXPIRED";
++                }
+             }
++            if(c.suspended != null && c.suspended.remainingNanos(at) == 0)
++                c.suspended = null;
+             if(c.pending){
+                 if(childElapsed(c,at)||t.round!=null&&roundElapsed(t.round,at))failChild(c,ErrorCode.TIMEOUT,"TIMEOUT",at);
+                 else if(healthy(t,at)){
+@@ -1274,7 +1670,7 @@ public final class RoutingService implements AutoCloseable {
+                     if(send(c.line,c.line.key.session,SendKind.ACK,null,c,value,m,at))c.ackWanted=false;
+                 }
+             }
+-            if(!c.pending&&c.active==null&&!c.ackWanted&&!c.errorWanted&&!inFlight)detach(c);
++            if(!c.pending&&c.active==null&&c.suspended==null&&!c.ackWanted&&!c.errorWanted&&!inFlight)detach(c);
+         }
+         boolean quota(Neighbor.Session session,long at){
+             var q=responseQuotas.computeIfAbsent(session,s->new ResponseQuota(at));
+@@ -1401,14 +1797,19 @@ public final class RoutingService implements AutoCloseable {
+                 if(t.round!=null)delay=Math.min(delay,futureDelay(t.round.budget-age(at,t.round.began)));
+                 if(t.confirmed!=null&&!t.confirmed.source){
+                     delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
+-                    if(t.round==null&&demand(t,at)&&compatible(t,t.confirmed.path,at))
++                    if(t.round==null&&t.renewalBlocked==null&&demand(t,at)&&compatible(t,t.confirmed.path,at))
+                         delay=Math.min(delay,futureDelay(t.renewPeriod-age(at,t.renewBegan)));
+                 }
++                if(t.round == null && !healthy(t, at) && demand(t, at)
++                        && (t.credit != null || t.lossCredit) && (eligibleProof(t, at) != null || row(t.id).offered))
++                    delay = Math.min(delay, futureDelay(timeout - age(at, t.lastRoundStart)));
+                 if(t.prune!=null)delay=Math.min(delay,futureDelay(timeout-age(at,t.prune.request.beganNanos())));
+             }
+             for(var c:childOrder){
+                 if(c.pending||c.ackWanted||c.errorWanted)delay=Math.min(delay,futureDelay(c.budget-age(at,c.began)));
+                 if(c.active!=null)delay=Math.min(delay,futureDelay(c.active.validity().orElseThrow().remainingNanos(at)));
++                if(c.suspended != null)
++                    delay = Math.min(delay, futureDelay(c.suspended.remainingNanos(at)));
+                 var q=responseQuotas.get(c.line.key.session);
+                 if((c.ackWanted||c.errorWanted)&&q!=null&&q.used>=16)delay=Math.min(delay,futureDelay(WINDOW-age(at,q.began)));
+             }
+@@ -1427,23 +1828,66 @@ public final class RoutingService implements AutoCloseable {
+             }
+             return result;
+         }
+-        void sessionDown(Neighbor.Session session){
++        void sessionDown(Neighbor.Session session)
++        {
++            long at = now();
+             responseQuotas.remove(session);
+-            for(var t:trees.values()){
+-                var c=t.children.get(session);if(c!=null)detach(c);
+-                if(t.confirmed!=null&&session.equals(t.confirmed.parent)){t.confirmed=null;t.confirmedLocals.clear();t.version=Math.incrementExact(t.version);}
+-                if(t.round!=null&&t.round.attempt!=null&&session.equals(t.round.attempt.line.key.session))fail(t,ErrorCode.NO_ROUTE,"SESSION_CLOSED");
++            for(var t : trees.values())
++            {
++                var child = t.children.get(session);
++                if(child != null)
++                    detach(child);
++                if(t.confirmed != null && session.equals(t.confirmed.parent))
++                    loseConfirmation(t, at);
++                if(t.round != null && t.round.attempt != null
++                        && session.equals(t.round.attempt.line.key.session))
++                    fail(t, ErrorCode.NO_ROUTE, "SESSION_CLOSED");
+             }
+-            lines.keySet().removeIf(k->k.session.equals(session));kick();
++            lines.keySet().removeIf(k -> k.session.equals(session));
++            kick();
+         }
+-        void epochChanged(String origin,UUID epoch){
+-            for(var t:List.copyOf(trees.values()))if(t.origin.equals(origin)&&!t.epoch.equals(epoch)){
+-                for(var c:List.copyOf(t.children.values()))detach(c);
+-                for(var l:t.locals.values()){outcome(l,SubscriptionState.ERROR,ErrorCode.PATH_CHANGED,"EPOCH_CHANGED");}
+-                t.confirmed=null;t.confirmedLocals.clear();t.round=null;trees.remove(t.id);treeOrder.remove(t);
++
++
++        void epochChanged(String origin, UUID epoch)
++        {
++            long at = now();
++            for(var t : List.copyOf(trees.values()))
++            {
++                if(!t.origin.equals(origin) || t.epoch.equals(epoch))
++                    continue;
++                for(var child : List.copyOf(t.children.values()))
++                {
++                    detach(child);
++                }
++                for(var local : t.locals.values())
++                {
++                    outcome(local, SubscriptionState.ERROR, ErrorCode.PATH_CHANGED, "EPOCH_CHANGED");
++                }
++                loseConfirmation(t, at);
++                fail(t, ErrorCode.PATH_CHANGED, "EPOCH_CHANGED");
++                t.epoch = epoch;
++                t.prune = null;
++                t.upstream = null;
++                t.submittedRevision = -1;
++                t.renewalBlocked = null;
++                t.view = null;
++                t.credit = null;
++                t.lossCredit = true;
++                t.version = Math.incrementExact(t.version);
++                if(t.locals.isEmpty())
++                {
++                    trees.remove(t.id, t);
++                    treeOrder.remove(t);
++                }
+             }
+-            lines.keySet().removeIf(k->{var row=row(k.stream);return row!=null&&row.origin.equals(origin)&&!k.epoch.equals(epoch);});kick();
++            lines.keySet().removeIf(k -> {
++                var row = row(k.stream);
++                return row != null && row.origin.equals(origin) && !k.epoch.equals(epoch);
++            });
++            kick();
+         }
++
++
+         ActivationLoad load(){
+             synchronized(resources){return new ActivationLoad(trees.size(),childOrder.size(),localTickets.size(),lines.size(),sends.size(),
+                     (int)sends.stream().filter(s->s.kind==SendKind.UNBOUND).count(),
+@@ -1454,7 +1898,21 @@ public final class RoutingService implements AutoCloseable {
+                 for(var l:localTickets.values())outcome(l,SubscriptionState.CLOSED,null,"CLOSED");localTickets.clear();
+                 for(var s:List.copyOf(sends)){s.continuationDone=true;release(s);}
+             }
+-            for(var t:trees.values()){t.locals.clear();t.children.clear();t.confirmedLocals.clear();t.round=null;t.confirmed=null;}
++            for(var t : trees.values())
++            {
++                t.locals.clear();
++                t.children.clear();
++                t.confirmedLocals.clear();
++                t.round = null;
++                t.confirmed = null;
++                t.credit = null;
++                t.lossCredit = false;
++                t.view = null;
++                t.used = null;
++                t.blocked = null;
++                t.renewalBlocked = null;
++                t.prune = null;
++            }
+             trees.clear();treeOrder.clear();childOrder.clear();localOrder.clear();lines.clear();responseQuotas.clear();treeSweep=0;childSweep=0;localSweep=0;
+         }
+     }

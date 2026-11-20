@@ -1,0 +1,85 @@
+{
+  "kind": "static source/API inspection, NOT test execution",
+  "base_commit": "40592dafe1d84fa71b3ee936d048784e65fe2fe7",
+  "files": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java": {
+      "sha256": "63ed46022b47258a6fcff6fa848714176b438ad19bf5a9eca3778ff9f1ca3d46",
+      "reviewed_points": [
+        "95-147 public tickets and Snapshot constructors",
+        "279-300 owner, Session identity, Outcome application and epoch",
+        "320-384 Received validation and validated ANN boundary",
+        "566-625 drive, scheduling and owner snapshots",
+        "866-901 lifecycle waits and limits",
+        "915-1054 intent/Line/round admission",
+        "1054-1280 correlation, incoming revisions, demand and child deadlines",
+        "1280-1459 send reservations, continuations, projections and cleanup"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Route.java": {
+      "sha256": "edbf9e65faff9d3723a35d374d223ec210ef835f657db213ce9a6a4963982551",
+      "reviewed_points": [
+        "record shape, constructor invariants, Confirmation and visibleAt"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteCandidate.java": {
+      "sha256": "a23f4968e167e7b39e5a331ad189b3043112884915f226e1d9987266563cfc1b",
+      "reviewed_points": [
+        "public announceSeq, provenance and TTL fields"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingTable.java": {
+      "sha256": "3881de340d0b0b219c30cd58bd2b8bbe40e93a23abc7c635786c4cc5ad4ce2dc",
+      "reviewed_points": [
+        "private Slot watermark",
+        "358-413 validated projection",
+        "632-709 announce outcomes",
+        "749-802 expiry retains watermark"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/Subscription.java": {
+      "sha256": "7d3c8af82c551b56db14d568662711195a5bbb0592d44c057ae305c78958157a",
+      "reviewed_points": [
+        "Identity and Lease API; no change needed"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/Neighbor.java": {
+      "sha256": "fb297ef3bc61c9e83b3d42eaf251fca4a2c82a64ba5123b9c37f80885745f4fa",
+      "reviewed_points": [
+        "Session record"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/NeighborManager.java": {
+      "sha256": "e7ddc13d1e580dbc909e3b7ce2eb34a068a309c7a66156fd911bce7368862bd6",
+      "reviewed_points": [
+        "Received event and SerialOwner API"
+      ]
+    },
+    "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java": {
+      "sha256": "9ceb2e8ab7a50695dfb8a134bcd57ae237555ac5675ddc481a72d07e96a92e57",
+      "reviewed_points": [
+        "77-81 routingSnapshot",
+        "198-230 event forwarding",
+        "353-358 and 449-455 global lifecycle"
+      ]
+    },
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/ActivationTest.java": {
+      "sha256": "e5e8a2abd5aa0ed0f59162ad7b12238b9d56a73b75486628551b7751efa7af06",
+      "reviewed_points": [
+        "M05/M07/M11/M12 compatibility, Snapshot four-argument test"
+      ]
+    },
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/SubscriptionLeaseTest.java": {
+      "sha256": "5c54b2cde853b79335ec421c9bd3bc0f6ae7d2ca21843cb7678fd0cc8e3cf53b",
+      "reviewed_points": [
+        "controlled harness, L15/L17-L20 lifecycle/revision/physical tests"
+      ]
+    }
+  },
+  "conclusion": "No static API blocker or scope expansion identified; A01-A08 in adr-review.md are unimplemented adaptations within three ADD paths",
+  "new_ADRs": 0,
+  "modified_accepted_ADRs": 0,
+  "wire_reader_or_remote_timestamp_available": false,
+  "validated_ANN_time": "RoutingService owner validation/admission time",
+  "RecoveryTest_exists": false,
+  "java_execution": false
+}

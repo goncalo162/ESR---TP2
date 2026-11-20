@@ -1211,6 +1211,18 @@ Unidade004/PHASE-04 em progresso; sem Java/push/outro IMP no fecho documental.
   - [ ] Estado antigo não é reativado por mensagens atrasadas.
   - [ ] Validação V-016 executada e evidência ligada no progresso.
 
+**Model/Design/ADR/Implement, incluindo R10, aprovados; apenas Test autorizado.**
+IMP-013/008-arvores/TASK-016 em Test. Implement/R10 aprovados pelo utilizador;
+Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
+[Test técnico](memory-bank/bolts/008-arvores/ddd-03-test-report.md): clean verify JDK21 novo1419/0/0/0,20 XML e JAR SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente,40 RecoveryTest/1379 históricos.
+Manual preparado:7 etapas/28 checks; ensaio Codex kind=agent passou e não
+substitui repetição humana. Aguardar execução pessoal antes de pedir aprovação
+Test. Código aprovado/evidências preservados; R17 inicial sem causa estabelecida,
+métricas controladas não demonstram a causa. Test não aprovado; sem fecho,
+commits/push/outro IMP. Fillmore/integração pendentes; sem gates externos novos.
+
 <a id="imp-014"></a>
 ### IMP-014 — Trocar parent com histerese
 
@@ -1763,6 +1775,8 @@ pendentes nos gates: cobertura de plano não significa conformidade técnica.
 | Q-C-35 — seleção e prefixo confirmado divergentes | Aprovada pelo utilizador em 2026-11-17T17:02:14Z: adesão exige prefixos selecionado e confirmado compatíveis; PATH_CHANGED sem trocar parent ou remover ramo saudável |
 | Q-C-36 — sincronização do teste histórico NeighborDown, exceção de âmbito | Autorizada pelo utilizador e aplicada exclusivamente como apresentada; `until` aguarda snapshot e evento da Session esperada, conservando asserções/prazos/restantes testes. Resultados novos preservados separadamente; Implement continua por aceitar |
 | Q-C-37 — D11a, negociação HELLO e continuação de escrita | Autorizada e aplicada exclusivamente como apresentada em NeighborManager.java + NeighborManagerTest.java, dois caminhos adicionais. Verificação incremental e caso sem resposta exigidos; Implement por aceitar. Sequência histórica exata não reconstruída |
+| Q-C-43 — IMP-013, intenção e interesse de filho | Aprovada pelo utilizador em 2026-11-20T11:07:54Z: intenção local persiste; interesse remoto limitado à Session/época/prazo; novo path exige renegociação sem grant implícito |
+| Q-C-44 — IMP-013, ronda finita e rearme | Model aprovado em 2026-11-20T11:07:54Z. Clarificação explícita: RESOURCE_LIMIT temporário permite crédito de ANN validado posterior à falha e acima do watermark, mesmo Session/época/path, respeitando capacidade/T/A/cadência. Callback sozinho e duplicados não rearmam; R13 acrescentado, Design por aprovar |
 
 | Data | Alteração | Motivo |
 |---|---|---|
@@ -1878,3 +1892,29 @@ preservados. [Resultados novos](experiments/construction/007-arvores/q-c-37/READ
 D11b1/0/0/0, D11a1/0/0/0, handshake/lifecycle202/0/0/0, regressão1325/0/0/0;
 Closed/prazo existente e libertação física verificados. Implement para revisão,
 sem aprovação, Test, fecho, commits, push, outro IMP ou gates externos novos.
+
+Registo 2026-11-20T11:02:06Z:008-arvores/IMP-013 selecionado explicitamente apenas em
+Model, dependências concluídas. Modelo e Q-C-43/44 propostos para revisão,
+18 grupos V-016 planeados. Sem fontes lidas/analisadas/alteradas, Maven,
+Design/ADR/Implement/Test, commits, push, outro IMP, ADR nova ou gate externo.
+
+
+Registo 2026-11-20T11:07:54Z: Model do IMP-013 e Q-C-43/44 aprovados; apenas Design
+autorizado. Concretizar rearme/rondas/filhos automáticos sem estender prazos antigos,
+sem ampliar os três caminhos, Implement, commits ou push. V-016/R01–R18 não
+executados; fecho mantém testes/JDK21/manual/Fillmore/integração e nenhum gate externo novo.
+
+Registo 2026-11-20T11:21:05Z: Design do IMP-013 preparado para revisão, mantendo os três
+caminhos e decisões de Model aprovadas. Novidade/rearme, rondas e filhos sem
+intervenção humana concretizados; nenhum prazo antigo estendido por espera.
+V-016/R01–R18 por executar, sem fontes lidas/alteradas, ADR/Implement/Test,
+Maven, commits/push/outro IMP ou gate externo adicional.
+
+
+Registo 2026-11-20T11:34:53Z: utilizador clarifica exclusivamente Q-C-44/RESOURCE_LIMIT
+transitório. ANN validado de geração posterior à falha permite reavaliar admissão
+com Session/época/path iguais, sujeito a capacidade/watermark/T/A/cadência;
+libertar callback sozinho e duplicados não rearmam. R13 concretiza o percurso
+saturação→UNAVAILABLE→capacidade livre sem retry→ANN novo→recuperação limitada.
+Design reapresentado, não aprovado; sem ADR/Implement/Java, commits/push ou gates
+novos. V-016, regressão JDK21, manual humano, Fillmore e integração obrigatórios.

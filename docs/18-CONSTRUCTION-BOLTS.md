@@ -3,10 +3,18 @@
 **Estado atual:** IMP-012/023-arvores complete,história implemented=true,TASK-015
 DONE após Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão final Denji e
 integração4d18d1d comprovada. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
-14 bolts complete,0 in-progress,21 planned. Unidade004/PHASE-04 em progresso;
-restantes três bolts da unidade planned,sem início de outro IMP.
-Código/JAR/logs/negativos/Q-C-40–42 preservados. Fecho documental/evidência,
-sem Java,target,alterações alheias ou push.
+14 bolts complete,1in-progress,20planned.
+IMP-013/008-arvores/TASK-016 em Test. Implement/R10 aprovados pelo utilizador;
+Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
+[Test técnico](../memory-bank/bolts/008-arvores/ddd-03-test-report.md): clean verify JDK21 novo1419/0/0/0,20 XML e JAR SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente,40 RecoveryTest/1379 históricos.
+Manual preparado:7 etapas/28 checks; ensaio Codex kind=agent passou e não
+substitui repetição humana. Aguardar execução pessoal antes de pedir aprovação
+Test. Código aprovado/evidências preservados; R17 inicial sem causa estabelecida,
+métricas controladas não demonstram a causa. Test não aprovado; sem fecho,
+commits/push/outro IMP. Fillmore/integração pendentes; sem gates externos novos.
+
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;

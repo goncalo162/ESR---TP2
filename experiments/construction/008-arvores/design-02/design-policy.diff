@@ -1,0 +1,77 @@
+--- prior/ddd-02-technical-design.md
++++ revised/ddd-02-technical-design.md
+@@ -4,7 +4,7 @@
+ stage: "design"
+ status: "in-progress"
+ created: "2026-11-20T11:07:54Z"
+-updated: "2026-11-20T11:21:05Z"
++updated: "2026-11-20T11:34:53Z"
+ ---
+ # IMP-013 — Design de recuperação limitada e recomposição automática
+ 
+@@ -121,13 +121,13 @@
+ | Perda da confirmação corrente | Sim, uma vez por identidade/grant perdido | criar incidente; Down duplicado da mesma Session não cria outro |
+ | Session nova, época corrente admitida diferente ou path estrutural diferente | Sim, se elegível | F difere da última prova consumida; revalidar proteção de época/lineagem |
+ | Candidato passa de inelegível a elegível | Sim, com causa validada | por Session admitida, geração nova após TTL expirado ou primeira amostra válida; não por ler o mesmo snapshot noutro instante |
+-| F igual após PATH_CHANGED, NO_ROUTE, SOURCE_UNAVAILABLE ou TIMEOUT | Só com geração nova posterior à falha | ANN validado recebido depois da falha, G estritamente maior que o watermark bloqueado/consumido; dá no máximo um crédito coalescido |
++| F igual após PATH_CHANGED, NO_ROUTE, SOURCE_UNAVAILABLE, TIMEOUT ou RESOURCE_LIMIT temporário de admissão | Só com geração nova posterior à falha | ANN validado recebido depois da falha, G estritamente maior que o watermark bloqueado/consumido; dá no máximo um crédito coalescido, sujeito a capacidade/T/A/cadência |
+ | Mesmo F/G repetido, melhoria de custo/RTT, refresh da projeção | Não | não altera watermark nem cria crédito/ronda |
+ | ANN de outra stream/origem ou época retirada | Não | isolamento; rejeição existente antes de recuperação |
+ | Callback/libertação física antiga | Não cria crédito | pode servir a tentativa/ronda ainda vigente, nunca reabrir terminal |
+ | Erro de formato, revisão esgotada, cancelamento ou shutdown | Não por ANN periódico | corrigir contexto admissível ou criar Session legítima nova; nunca contornar com outro UUID |
+ 
+-Um G maior com F igual é permitido apenas nas quatro razões da tabela: significa
++Um G maior com F igual é permitido apenas nas razões de falha reavaliável da tabela: significa
+ um anúncio realmente novo da fonte após o fracasso, não simples refresh/duplicado
+ da mesma geração. É oportunidade limitada para verificar se o parent já pode
+ confirmar, não prova de que está confirmado. Se voltar a falhar, consumir a prova
+@@ -148,11 +148,31 @@
+ Revisitar um path após mudança real pode dar nova oportunidade, mas continua
+ sujeito à cadência e aos tetos abaixo; oscilação não ganha tentativas ilimitadas.
+ 
+-Saturação antes de emitir não consome prova/tentativa nem cria nova ronda: a
+-operação vigente pode aguardar capacidade dentro do seu deadline. Se termina
+-por RESOURCE_LIMIT, libertar callback sozinho não reabre o terminal. Nova
+-demanda explicitamente admitida ou mudança estrutural elegível pode ser reavaliada;
+-não transformar incapacidade local em falha global ou retry por timer sem evento.
++Saturação antes de emitir não consome tentativa de envio nem cria nova ronda:
++a operação vigente pode aguardar capacidade dentro do seu deadline. Se termina
++por RESOURCE_LIMIT temporário, publicar UNAVAILABLE e bloquear a prova da visão
++esgotada no watermark, mesmo que não tenha sido submetido qualquer envio.
++Crédito dessa mesma Line/F com G não superior ao watermark bloqueado não fica
++retido para repetir a admissão por timer; isto não altera a contagem de envios A.
++
++Libertar callback/capacidade, por si só, não reabre o terminal nem cria crédito.
++Porém, um ANN validado de geração estritamente posterior à falha pode dar um
++crédito coalescido para reavaliar a admissão, mesmo com Session/época/path iguais:
++receção posterior ao erro, G superior ao watermark, candidato ainda elegível e
++intenção ainda legítima. Não exige novo pedido humano nem mudança estrutural.
++Respeitar a capacidade atual, o prazo/limite T/A da nova ronda e a mesma cadência
++de rearme; sem furar cotas, evictar proteção ou estender prazos antigos.
++
++Se a capacidade continua indisponível, não submeter envio nem fingir confirmação.
++A ronda admitida só pode aguardar dentro do seu T; ao terminar novamente,
++atualizar o watermark e bloquear a prova usada/observada. Duplicados desse ANN
++não rearmam, e uma sequência de callbacks livres não substitui anúncio novo.
++O caso reavaliável é pressão temporária de admissão; formato inválido, revisão
++esgotada, cancelamento e shutdown continuam excluídos. ANN novo não comprova
++que a saturação acabou: apenas permite a verificação limitada da capacidade.
++Nova demanda explicitamente admitida ou mudança estrutural elegível conserva
++o tratamento anterior; não transformar incapacidade local em falha global ou
++retry por timer sem evento.
+ 
+ ## 5. Limites das rondas e admissão automática
+ 
+@@ -446,6 +466,12 @@
+ 13 - **R13:** E/N pequenos e fronteiras C/D/L/H/B/J/quotas; recurso ocupado não
+ é tentativa antes de admissão, mas consome tempo; recusa/replay não expulsa
+ estado saudável. ERROR11/14/15 e falhas físicas isoladas por Session.
++Acrescentar saturação temporária → UNAVAILABLE → capacidade libertada sem
++retry/ronda espontânea → ANN novo validado posterior à falha, mesmo F e G acima
++do watermark → recuperação automática limitada por capacidade/T/A/cadência,
++sem novo pedido humano. Duplicados/ANN anterior à falha/callbacks não rearmam;
++se ainda falta capacidade, não há envio indevido e a prova fica bloqueada ao
++novo terminal, sem reutilização automática do mesmo crédito ou extensão de prazo.
+ 14 - **R14:** callback/continuação retidos, cancelamento/rebind/novo Tree não
+ furam2/contexto ou libertam B cedo; guardas M07 e todos os testes históricos mantidos.
+ 15 - **R15:** shutdown em WAIT_BUDGET/envio/ACK, sem novas submissões após

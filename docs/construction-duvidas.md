@@ -1559,3 +1559,174 @@ Decisões preservadas sem reabertura: IMP-012/TASK-015 DONE após integração4d
 Test1379/0/0/0,19 XML,Francisco30 e revisão Denji. [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md).
 Sem nova ADR/Java/âmbito,validador intacto,negativos preservados. Unidade/fase em
 progresso,sem push ou outro IMP.
+
+## Q-C-43 — IMP-013: intenção local e interesse descendente após perda de upstream
+
+- **Estado:** APROVADA explicitamente pelo utilizador em 2026-11-20T11:07:54Z.
+  Proposta inicial preservada em model-01/design-01; Model/Design/ADR aprovados, Implement autorizado e por aceitar.
+- **Base:** ADR-005/020 preservam intenção de consumo, não subscrição de conexão
+  morta; Q-C-35/41 preservam grant saudável antes da perda efetiva.
+- **Questão:** como tratar o filho cuja Session continua viva quando o parent do
+  relay falha, sem prolongar lease ou autorizar path diferente implicitamente.
+- **Decisão aprovada:** intenção local conserva-se até cancelamento; interesse
+  do filho conserva-se só enquanto Session/época e prazo original são admissíveis.
+  Autoridade dependente fica suspensa após perda upstream. Interesse limitado pode
+  justificar recuperação agregada; prefixo/época novos exigem pedido fresco
+  correlacionado e confirmação antes de conceder autoridade novamente ao filho.
+  Session morta, expiração ou cancelamento retiram interesse remoto; uma conexão
+  nova não o herda. A espera de recuperação não renova o lease.
+- **Alternativa:** eliminar todo o interesse dos filhos imediatamente e aguardar
+  pedidos novos, com possível atraso de recomposição. Alternativa não adotada na aprovação.
+- **Modelo/limites:** [secção5](../memory-bank/bolts/008-arvores/ddd-01-domain-model.md).
+  Sem nova mensagem/enum, persistência, CLI ou caminho Java adicional aprovado.
+
+## Q-C-44 — IMP-013: ronda finita e rearme após indisponibilidade
+
+- **Estado:** APROVADA explicitamente pelo utilizador em 2026-11-20T11:07:54Z.
+  Proposta inicial preservada em model-01/design-01; Model/Design/ADR aprovados, Implement autorizado e por aceitar.
+- **Questão:** intenção pode sobreviver a partição, mas cada operação deve terminar;
+  duplicados/adesões/callbacks não podem reiniciar orçamento de recuperação.
+- **Decisão aprovada:** uma ronda coalescida por árvore/incidente com prazo
+  total/tentativas limitadas. Sem alternativa ou limites esgotados, termina em
+  UNAVAILABLE; intenção ainda admissível pode ser reavaliada perante novidade
+  útil de candidato/Session/época, sem reinício humano, sem spin da mesma visão e
+  sem trocar parent que continua saudável apenas por melhoria de RTT.
+- **Design futuro:** concretizar novidade útil/rearme, correlação e limites dentro
+  dos tetos existentes. Recusa física pode ser reavaliada na ronda ainda válida;
+  libertação de callback antigo não reabre ronda terminal. Sem parâmetro/recurso novo aprovado.
+- **Clarificação explícita aprovada pelo utilizador em 2026-11-20T11:34:53Z:** após
+  RESOURCE_LIMIT temporário de admissão, libertar callback/capacidade por si só
+  não reabre ronda terminal. Um ANN validado recebido depois da falha, com G
+  estritamente superior ao watermark bloqueado/consumido, pode fornecer um
+  crédito coalescido para reavaliar admissão mesmo com Session/época/path iguais.
+  Preservar capacidade, T/A, cadência e validade da intenção/candidato; sem novo
+  pedido humano, extensão de prazo antigo ou aprovação global de Design.
+  Ao terminal por saturação, bloquear a prova já observada mesmo sem envio,
+  para que crédito anterior não sobreviva como retry por timer. Se ainda não há
+  capacidade, nenhum envio indevido; novo terminal atualiza o watermark.
+  Duplicados/ANN anteriores à falha/callbacks não rearmam. Erros permanentes,
+  revisão esgotada, cancelamento e shutdown não ganham este tratamento.
+- **R13 acrescentado, não executado:** saturação temporária → UNAVAILABLE →
+  capacidade libertada sem retry espontâneo → ANN novo válido posterior à falha
+  → recuperação automática limitada, sem novo pedido humano; duplicados não rearmam.
+- **Modelo/limites:** [secção6](../memory-bank/bolts/008-arvores/ddd-01-domain-model.md).
+  Não promete recuperação em partição permanente ou perda exclusiva UDP;
+  sem ADR nova, alteração Java, Implement/Test ou gate externo adicional.
+
+## IMP-013 — checkpoint Model
+
+Apenas Model autorizado pela seleção explícita do utilizador.
+[Proposta de domínio](../memory-bank/bolts/008-arvores/ddd-01-domain-model.md) e
+Q-C-43/44 aguardam aprovação; V-016/R01–R18 planeados/não executados.
+Sem fontes lidas/analisadas/alteradas, Maven, Design/ADR/Implement/Test, commits
+ou push. Fechos, negativos e evidências anteriores preservados.
+
+
+## IMP-013 — Model/Q-C-43/44 aprovados; apenas Design
+
+Registo 2026-11-20T11:07:54Z: aprovação explícita do utilizador. Design deve concretizar
+novidade útil/rearme, limites das rondas e renegociação automática dos filhos,
+sem intervenção humana ou extensão de prazos antigos. Três caminhos do ADD
+preservados; qualquer ampliação será apresentada antes de alterar código.
+V-016/R01–R18 não executados; sem Implement, commits ou push. Fecho: testes,
+regressão JDK21, manual humano, Fillmore e integração; sem gates externos novos.
+
+## Q-C-43/44 — concretização proposta em Design em 2026-11-20T11:21:05Z
+
+Model/Q-C-43/44 aprovados; apenas Design autorizado. [Design proposto](../memory-bank/bolts/008-arvores/ddd-02-technical-design.md):
+
+- F estrutural=(stream/origem/época/Session completa/path); G=announceSeq. RTT,
+  custo, snapshot/tick e mesmo F/G não são novidade. G novo observado depois
+  de PATH_CHANGED/NO_ROUTE/SOURCE_UNAVAILABLE/TIMEOUT pode fornecer um crédito
+  limitado; não comprova grant remoto. Watermark bloqueia provas já observadas
+  à falha; uma prova coalescida, sem lista de eventos ou rondas.
+- T=activateTimeout/A=activateAttempts existentes, defaults3000ms/3. Prazo global
+  desde admissão, até A envios admitidos; novas adesões/erros não renovam T/A.
+  Uma ronda automática por T por stream; timer só pode gastar crédito útil já
+  obtido, não o cria. Novidade durante ronda usa orçamento restante.
+- Filho preserva grant saudável só até ao prazo original; seleção divergente/
+  ERROR14 não o revogam por inferência. Após perda efetiva, reativa automaticamente
+  com11, mesma lineagem na Session/época e revisão maior/requestId novo. Sem
+  RENEW14 para recriar grant expirado ou ACK espontâneo do parent. Interesse
+  suspenso só vive até ao seu prazo; filhos com intenção persistente reconstroem
+  os saltos por pedidos frescos, sem comando humano ou lease antigo estendido.
+- Propostas de valores/projeção locais em Route e Snapshot com construtores4/5
+  preservados, dentro dos três caminhos. Compatibilidade real por conferir em ADR;
+  necessidade de ampliação será apresentada antes de código.
+
+Os detalhes técnicos acima aguardam aprovação de Design; não são Implement ou
+alteração de ADR. V-016/R01–R18 não executados; sem fontes lidas/analisadas/
+alteradas, Maven, commits ou push. Testes, regressão JDK21, manual humano,
+revisão final Fillmore e integração continuam exigidos para fecho, sem gates novos.
+
+
+## IMP-013 — Design reapresentado após clarificação de RESOURCE_LIMIT em 2026-11-20T11:34:53Z
+
+Alterada exclusivamente a política de rearme após pressão temporária de admissão,
+na secção4 e R13 do [Design](../memory-bank/bolts/008-arvores/ddd-02-technical-design.md).
+A clarificação em Q-C-44 está autorizada; Design completo continua por aprovar.
+T/A, cadência, capacidades, watermark, três caminhos, renegociação dos filhos e
+restantes políticas preservados. Sem ADR/Implement, fontes lidas/alteradas,
+Maven, commits ou push. V-016/R01–R18 não executados. Fecho exige testes,
+regressão JDK21, manual humano, revisão Fillmore e integração; nenhum gate novo.
+
+## IMP-013 — Design revisto aprovado; revisão ADR preparada
+
+Registo 2026-11-20T11:45:38Z. Design revisto e clarificação de Q-C-44 aprovados
+pelo utilizador em2026-11-20T11:41:00Z; apenas revisão ADR autorizada.
+APIs reais conferidas estaticamente: announceSeq/Outcome disponíveis, watermark
+interno privado sem necessidade de API nova; intenção distinta de resultado do
+ticket, mudança de época, ACTIVATE/revisões, construtores4/5/projeções e lifecycle.
+Revisão para aprovação, sem impedimento de âmbito identificado ou nova ADR.
+A01–A08 são trabalho futuro nos mesmos três caminhos; nenhuma correção aplicada.
+V-016/R01–R18 não executados; fontes só consultadas, sem Java alterado, Maven,
+Implement/Test, fecho, staging, commits, push ou outro IMP. Negativos/provas
+anteriores preservados. Fecho exige testes, regressão JDK21, manual humano,
+revisão final Fillmore e integração, sem gates externos adicionais.
+[Revisão completa](../memory-bank/bolts/008-arvores/adr-review.md).
+
+## IMP-013 — Implement reapresentado, sem aceitação/Test
+
+Registo 2026-11-20T12:27:18Z. Utilizador aprovou ADR e autorizou apenas Implement A01–A08
+nos três caminhos do ADD, com CODESTYLE, históricos/correlações/construtores e
+reservas físicas preservados. Implement preparado para revisão: regressão JDK21
+incremental final1414/0/0/0,20 XML,35 testes novos e1379 históricos byte intactos.
+Duas integrações TCP reais com métricas controladas passaram; negativos guardados
+separadamente, incluindo R13, prazo de fila, R18/fixture, R17 inicial sem causa
+estabelecida e alternativa consumida R10. Remoções/substituições justificadas no
+walkthrough; sem teste/asserção/prazo histórico retirado ou fundação alterada.
+Só Model/Design/ADR em stages_completed; current_stage=implement, completed=null.
+Implement ainda por aceitar; sem etapa Test, fecho, commits/push ou outro IMP.
+V-016 consolidado, regressão da etapa Test, manual humano antes de aprovar Test,
+revisão final Fillmore e integração continuam obrigatórios; sem gates novos.
+[Walkthrough e prova](../memory-bank/bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — R10 corrigido; Implement permanece pendente
+
+Registo 2026-11-20T15:44:31Z. Implement continua pendente. Reprodução exata com G2,
+Long.MAX_VALUE-1000, métrica10→2000→10 após PATH_CHANGED/T3s: negativo preservado
+esperado1/observado2 ACTIVATEs. A transição previous==null agora confere blocked
+antes de conceder crédito; métrica isolada não reutiliza a prova bloqueada.
+Primeira medição válida, anúncio novo posterior e T/A/cadência preservados.
+11 testes R10 focados passaram; regressão JDK21 atual1419/0/0/0,20 XML,
+40 RecoveryTest (35 anteriores intactos+5 novos),1379 históricos intactos.
+Delta Java só em RoutingService e RecoveryTest; Route/fundações inalterados.
+R17 inicial mantém causa não estabelecida. Sem aceitação de Implement, Test,
+fecho, commits ou push. V-016 consolidado, manual humano, Fillmore e integração
+pendentes; sem gates externos adicionais.
+[Walkthrough atualizado](../memory-bank/bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — Test técnico, aguardar manual humano
+
+Registo 2026-11-20T16:07:46Z. Implement/R10 aprovados; apenas Test autorizado.
+Clean verify JDK21 novo1419/0/0/0,20 XML e JAR504997bytes/SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente; fontes/históricos/evidências intactos.
+Manual humano preparado:7 etapas/28 checks. Ensaio kind=agent passou no JAR
+congelado, hashes/origem/JVM conferidos; não satisfaz obrigação humana.
+Aguardar repetição pessoal antes de pedir aprovação Test. Test não aprovado;
+R17 inicial sem causa estabelecida, integração com métricas controladas não
+prova a causa. Nova correção exige reprodução/âmbito apresentados.
+Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
+sem gates externos adicionais.
+[Relatório Test](../memory-bank/bolts/008-arvores/ddd-03-test-report.md).

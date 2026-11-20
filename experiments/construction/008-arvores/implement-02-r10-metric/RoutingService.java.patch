@@ -1,0 +1,18 @@
+--- before/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ after/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -1250,8 +1250,13 @@
+                     || !proof.session.equals(t.used.session) || !proof.epoch.equals(t.used.epoch));
+             if(t.permanent && !contextChanged)
+                 return;
+-            if(proof != null && (!proof.sameBranch(t.used) || previous == null))
+-                t.credit = proof;
++            if(proof != null)
++            {
++                boolean unblocked = t.blocked == null || !proof.sameBranch(t.blocked)
++                        || proof.sequence > t.blocked.sequence;
++                if(!proof.sameBranch(t.used) || previous == null && unblocked)
++                    t.credit = proof;
++            }
+             if(t.credit != null && (!t.credit.sameBranch(proof) || proof.sequence < t.credit.sequence))
+                 t.credit = null;
+             boolean credit = proof != null && (t.credit != null || t.lossCredit)

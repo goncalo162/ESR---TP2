@@ -1,0 +1,1242 @@
+package pt.uminho.esr.ott.routing;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import static org.junit.jupiter.api.Assertions.*;
+import static pt.uminho.esr.ott.routing.SubscriptionLeaseTest.*;
+import java.net.*;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.*;
+import pt.uminho.esr.ott.bootstrap.BootstrapServer;
+import pt.uminho.esr.ott.config.*;
+import pt.uminho.esr.ott.overlay.*;
+import pt.uminho.esr.ott.monitoring.*;
+import java.util.concurrent.atomic.AtomicReference;
+import pt.uminho.esr.ott.protocol.*;
+import pt.uminho.esr.ott.transport.Connection;
+import pt.uminho.esr.ott.routing.RoutingService.SubscriptionState;
+
+@Timeout(25)
+class RecoveryTest
+{
+    //* === Atributos e Variáveis === *
+    private static final long T = 3_000_000_000L;
+
+
+
+    //* === Auxiliar === *
+
+    private static void down(Rig rig, Neighbor.Session session)
+    {
+        rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(session,
+                NeighborManager.Reason.TRANSPORT)));
+    }
+
+
+    private static void alternative(Rig rig, Neighbor.Session session)
+    {
+        rig.up(session);
+        rig.metric(session, 10);
+        rig.ad(session, 1, 500);
+    }
+
+
+    private static Route.Recovery recovery(Rig rig)
+    {
+        return rig.router.snapshot().recoveries().get(A);
+    }
+
+
+    private static ControlMessage.Activation activation(Sent sent)
+    {
+        return (ControlMessage.Activation) sent.message().payload();
+    }
+
+
+    private static void rejectRound(Rig rig)
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+        }
+        assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+    }
+
+
+
+    //* === Recuperação === *
+
+    @Test
+    void r01DiamondLosesAuthorityBeforeConfirmingTheAlternative()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            var second = peer("B");
+            rig.route(first);
+            alternative(rig, second);
+            var token = UUID.randomUUID();
+            var ticket = rig.local(A, token);
+            rig.ack(rig.latestRequest(), 6000);
+            var outcome = result(ticket);
+            down(rig, first);
+            assertNull(rig.forwarding(A));
+            assertEquals(Route.RecoveryPhase.WAITING_FOR_BUDGET, recovery(rig).phase());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(T);
+            assertEquals(second, rig.latestRequest().peer());
+            assertNull(rig.forwarding(A));
+            rig.ack(rig.latestRequest(), 6000);
+            assertEquals(second, rig.forwarding(A).upstream().orElseThrow());
+            assertEquals(Set.of(token), rig.forwarding(A).localConsumers());
+            assertSame(outcome, result(ticket));
+            assertEquals(1, rig.load().locals());
+        }
+    }
+
+
+    @Test
+    void r02PartitionIsUnavailableWithoutLosingAdmittedIntentOrRetryingOnTicks()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            var ticket = rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            down(rig, parent);
+            assertNull(rig.forwarding(A));
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            assertTrue(recovery(rig).intentPresent());
+            rig.tick(20 * T);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            assertEquals(1, rig.load().locals());
+        }
+    }
+
+
+    @Test
+    void r03ReturnedSessionAutomaticallyRecoversTheSameConsumer()
+    {
+        try(var rig = new Rig())
+        {
+            var old = peer("A");
+            rig.route(old);
+            var token = UUID.randomUUID();
+            var ticket = rig.local(A, token);
+            rig.ack(rig.latestRequest(), 6000);
+            down(rig, old);
+            rig.tick(T);
+            var returned = peer("A");
+            rig.route(returned);
+            assertEquals(returned, rig.latestRequest().peer());
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(rig.latestRequest(), 6000);
+            assertEquals(Set.of(token), rig.forwarding(A).localConsumers());
+            assertSame(ticket, rig.router.requestSubscription(A, token));
+        }
+    }
+
+
+    @Test
+    void r04RetiredSessionAckErrorAndPhysicalCallbackCannotRetireReplacement()
+    {
+        try(var rig = new Rig())
+        {
+            var old = peer("A");
+            rig.route(old);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            var ticket = rig.local(A, UUID.randomUUID());
+            var stale = rig.latestRequest();
+            down(rig, old);
+            rig.tick(T);
+            var current = peer("A");
+            rig.hold = message -> false;
+            rig.route(current);
+            var fresh = rig.latestRequest();
+            rig.ack(stale, 6000);
+            assertNull(rig.forwarding(A));
+            rig.ack(fresh, 6000);
+            var confirmed = rig.forwarding(A);
+            assertNotNull(confirmed);
+            down(rig, old);
+            rig.error(stale, 11, ErrorCode.NO_ROUTE);
+            stale.result().complete(Connection.SendResult.CLOSED);
+            rig.pump();
+            assertEquals(confirmed, rig.forwarding(A));
+            assertEquals(SubscriptionState.ERROR, result(ticket).state());
+            assertEquals(0, rig.load().sends());
+        }
+    }
+
+
+    @Test
+    void r05FailureAndEpochChangeAreIsolatedFromTheOtherOrigin()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            var other = peer("Z");
+            rig.route(first);
+            rig.up(other);
+            rig.metric(other, 10);
+            var otherEpoch = id("T-epoch");
+            rig.ad(other, B, "T", otherEpoch, 1, 100);
+            rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            rig.local(B, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            var unchanged = rig.forwarding(B);
+            rig.ad(first, A, "S", UUID.randomUUID(), 0, 100);
+            assertEquals(unchanged, rig.forwarding(B));
+            down(rig, first);
+            rig.ad(first, A, "S", UUID.randomUUID(), 0, 100);
+            assertEquals(unchanged, rig.forwarding(B));
+            assertNull(rig.forwarding(A));
+            assertEquals(2, rig.load().locals());
+        }
+    }
+
+
+    @Test
+    void r06SamePathNeedsANewValidatedGenerationAfterTheFailure()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            var ticket = rig.local(A, UUID.randomUUID());
+            var original = rig.latestRequest();
+            rig.error(original, 11, ErrorCode.PATH_CHANGED);
+            var outcome = result(ticket);
+            rig.tick(T);
+            rig.ad(parent, 1, 100);
+            rig.metric(parent, 11);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 2, 100);
+            var recovered = rig.latestRequest();
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(activation(original).subscriptionId(), activation(recovered).subscriptionId());
+            assertTrue(activation(recovered).revision() > activation(original).revision());
+            assertNotEquals(original.message().requestId(), recovered.message().requestId());
+            rig.ack(recovered, 6000);
+            assertNotNull(rig.forwarding(A));
+            assertSame(outcome, result(ticket));
+        }
+    }
+
+
+    @Test
+    void r07CancellationWinsAgainstCreditAndAnOldTicketCannotCancelItsReplacement()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            var token = UUID.randomUUID();
+            var old = rig.local(A, token);
+            rejectRound(rig);
+            old.cancel();
+            rig.pump();
+            rig.tick(T);
+            rig.ad(parent, 2, 100);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertNull(recovery(rig));
+            var fresh = rig.router.retrySubscription(A, token);
+            rig.pump();
+            old.cancel();
+            rig.ack(rig.latestRequest(), 6000);
+            assertEquals(SubscriptionState.SUCCESS, result(fresh).state());
+            assertEquals(Set.of(token), rig.forwarding(A).localConsumers());
+        }
+    }
+
+
+    @Test
+    void r08ADeadChildSessionDoesNotLeaveRecoverableDemand()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            var child = peer("C1");
+            rig.route(parent);
+            rig.up(child);
+            rig.child(child);
+            rig.ack(rig.latestRequest(), 6000);
+            down(rig, parent);
+            assertEquals(1, rig.load().children());
+            down(rig, child);
+            rig.tick(T);
+            assertEquals(0, rig.load().children());
+            assertEquals(0, rig.load().trees());
+            assertNull(rig.forwarding(A));
+            var replacement = peer("C1");
+            rig.up(replacement);
+            assertEquals(0, rig.load().children());
+        }
+    }
+
+
+    @Test
+    void r09SuspendedChildNeedsFreshHigherRevisionForTheChangedPrefix()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            var second = peer("B");
+            var child = peer("C1");
+            rig.route(first);
+            alternative(rig, second);
+            rig.up(child);
+            var old = rig.child(child);
+            rig.ack(rig.latestRequest(), 6000);
+            var grant = rig.forwarding(A).downstreams().get("C1");
+            rig.tick(T);
+            down(rig, first);
+            assertNull(rig.forwarding(A));
+            assertEquals(1, rig.load().children());
+            rig.ack(rig.latestRequest(), 6000);
+            assertNull(rig.forwarding(A));
+            assertEquals(1, rig.messages(MessageType.ACTIVATE_ACK).size());
+            var payload = (ControlMessage.Activation) old.payload();
+            rig.activate(child, A, EPOCH, payload.subscriptionId(), payload.revision() + 1,
+                    UUID.randomUUID(), List.of("S", "B", "R", "C1"), 6000);
+            assertEquals(List.of("S", "B", "R", "C1"),
+                    rig.forwarding(A).downstreams().get("C1").expectedPath());
+            assertEquals(T, grant.validity().orElseThrow().remainingNanos(rig.clock.get()));
+        }
+    }
+
+
+    @Test
+    void r09ExpiredSuspendedInterestCannotKeepAGhostTree()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            var child = peer("C1");
+            rig.route(parent);
+            rig.up(child);
+            rig.child(child);
+            rig.ack(rig.latestRequest(), 6000);
+            down(rig, parent);
+            rig.tick(2 * T);
+            assertEquals(0, rig.load().children());
+            assertEquals(0, rig.load().trees());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r10AttemptsAndAnnouncementBurstShareOneRoundWindow()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rejectRound(rig);
+            rig.tick(1);
+            for(int sequence = 2; sequence <= 20; sequence++)
+            {
+                rig.ad(parent, sequence, 100);
+            }
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.WAITING_FOR_BUDGET, recovery(rig).phase());
+            rig.tick(T - 1);
+            assertEquals(4, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, recovery(rig).generation());
+            assertEquals(1, recovery(rig).issued());
+            assertEquals(T, recovery(rig).remainingNanos());
+        }
+    }
+
+
+    @Test
+    void r10AnAnnouncementSeenWhilePendingIsBlockedByTheFailureWatermark()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.tick(1);
+            rig.ad(parent, 2, 100);
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            rig.tick(T);
+            rig.ad(parent, 2, 100);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 3, 100);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r10ASecondConsumerAndAnnouncementDoNotExtendTheGlobalDeadline()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.tick(T - 1);
+            rig.local(A, UUID.randomUUID());
+            rig.ad(parent, 2, 100);
+            assertEquals(1, recovery(rig).remainingNanos());
+            rig.tick(1);
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(T);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r11RecoveryAckNeedsAcceptanceAndKeepsTheOriginalRequestAnchor()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            rig.tick(T);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            rig.ad(parent, 2, 100);
+            var request = rig.latestRequest();
+            rig.tick(1_000_000_000L);
+            rig.ack(request, 6000);
+            assertNull(rig.forwarding(A));
+            request.result().complete(Connection.SendResult.ACCEPTED);
+            rig.pump();
+            assertEquals(5_000_000_000L,
+                    rig.forwarding(A).upstreamLease().orElseThrow().remainingNanos(rig.clock.get()));
+        }
+    }
+
+
+    @Test
+    void r11AnAckAtTheExactDeadlineOrWithExcessLeaseCannotConfirm()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            var request = rig.latestRequest();
+            rig.ack(request, 6001);
+            assertNull(rig.forwarding(A));
+            rig.tick(T);
+            rig.ack(request, 6000);
+            assertNull(rig.forwarding(A));
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+        }
+    }
+
+
+    @Test
+    void r12NewEpochRetainsIntentButRequiresFreshAuthority()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            var token = UUID.randomUUID();
+            var ticket = rig.local(A, token);
+            var old = rig.latestRequest();
+            rig.ack(old, 6000);
+            rig.tick(T);
+            var epoch = UUID.randomUUID();
+            rig.ad(parent, A, "S", epoch, 0, 100);
+            assertNull(rig.forwarding(A));
+            assertEquals(epoch, activation(rig.latestRequest()).serverEpoch());
+            rig.ack(old, 6000);
+            assertNull(rig.forwarding(A));
+            rig.ack(rig.latestRequest(), 6000);
+            assertEquals(epoch, rig.forwarding(A).serverEpoch());
+            assertEquals(Set.of(token), rig.forwarding(A).localConsumers());
+            assertEquals(1, rig.load().locals());
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            rig.ad(parent, A, "S", EPOCH, 100, 100);
+            assertEquals(epoch, rig.forwarding(A).serverEpoch());
+        }
+    }
+
+
+    @Test
+    void r13ReleasedCapacityNeedsANewAnnouncementToReopenTerminalAdmission()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            for(int i = 0; i < 2; i++)
+            {
+                var abandoned = rig.local(A, UUID.randomUUID());
+                abandoned.cancel();
+                rig.pump();
+            }
+            var ticket = rig.local(A, UUID.randomUUID());
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, rig.load().sends());
+            rig.tick(T);
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            assertEquals(Optional.of(ErrorCode.RESOURCE_LIMIT), recovery(rig).reason());
+            rig.hold = message -> false;
+            for(var send : rig.messages(MessageType.ACTIVATE))
+            {
+                send.result().complete(Connection.SendResult.ACCEPTED);
+            }
+            rig.pump();
+            rig.tick(1);
+            assertEquals(0, rig.load().sends());
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 1, 100);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 2, 100);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(rig.latestRequest(), 6000);
+            assertNotNull(rig.forwarding(A));
+            assertEquals(1, rig.load().locals());
+            assertEquals(SubscriptionState.TIMEOUT, result(ticket).state());
+            rig.ad(parent, 2, 100);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r14NewSessionsAndEpochsCannotEscapeTheCanonicalPhysicalStreamLimit()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            rig.route(first);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            rig.local(A, UUID.randomUUID());
+            down(rig, first);
+            rig.tick(T);
+            var second = peer("B");
+            rig.route(second);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            down(rig, second);
+            rig.tick(T);
+            var third = peer("C2");
+            rig.route(third);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, rig.load().sends());
+            rig.messages(MessageType.ACTIVATE).getFirst().result().complete(Connection.SendResult.ACCEPTED);
+            rig.pump();
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(third, rig.latestRequest().peer());
+            assertEquals(2, rig.load().sends());
+        }
+    }
+
+
+    @Test
+    void r15ShutdownDoesNotReleaseHeldCallbacksOrAdmitNewRecovery()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            var ticket = rig.local(A, UUID.randomUUID());
+            var held = rig.latestRequest();
+            ticket.cancel();
+            rig.pump();
+            rig.router.requestClose();
+            rig.owner.drain();
+            assertFalse(rig.router.awaitTermination(Duration.ZERO));
+            assertEquals(1, rig.load().sends());
+            rig.ad(parent, 2, 100);
+            held.result().complete(Connection.SendResult.ACCEPTED);
+            rig.owner.drain();
+            assertTrue(rig.router.awaitTermination(Duration.ofMillis(20)));
+            assertTrue(rig.router.snapshot().recoveries().isEmpty());
+            assertTrue(rig.router.snapshot().forwarding().isEmpty());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r16NoUdpSilenceEventOrMetricRefreshCreatesRecovery()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            var before = recovery(rig).generation();
+            rig.tick(1_000_000_000L);
+            rig.metric(parent, 1);
+            rig.ad(parent, 1, 100);
+            assertEquals(before, recovery(rig).generation());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            assertNotNull(rig.forwarding(A));
+        }
+    }
+
+
+    @Test
+    void r18DivergentSelectionAndRenewDenialPreserveGrantWithoutRepeatingRenew()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            var second = peer("B");
+            rig.route(first);
+            alternative(rig, second);
+            rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            rig.tick(2_000_000_000L);
+            var renewal = rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast();
+            var before = rig.forwarding(A);
+            rig.error(renewal, 14, ErrorCode.PATH_CHANGED);
+            rig.tick(2_000_000_000L);
+            assertEquals(before, rig.forwarding(A));
+            assertEquals(1, rig.messages(MessageType.SUBSCRIPTION_RENEW).size());
+            rig.ad(first, 1, 100);
+            assertEquals(1, rig.messages(MessageType.SUBSCRIPTION_RENEW).size());
+            rig.ad(second, 2, 1);
+            assertEquals(before, rig.forwarding(A));
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(2_000_000_000L);
+            assertNull(rig.forwarding(A));
+            assertEquals(second, rig.latestRequest().peer());
+            assertTrue(activation(rig.latestRequest()).revision() >= 0);
+        }
+    }
+
+
+    @Test
+    void r18FreshPostFailureGenerationAllowsLegitimateRenewOnTheSamePath()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            rig.tick(2_000_000_000L);
+            rig.error(rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 14, ErrorCode.PATH_CHANGED);
+            rig.tick(2_000_000_000L);
+            rig.ad(parent, 2, 100);
+            assertEquals(2, rig.messages(MessageType.SUBSCRIPTION_RENEW).size());
+            rig.ack(rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 6000);
+            assertEquals(6_000_000_000L,
+                    rig.forwarding(A).upstreamLease().orElseThrow().remainingNanos(rig.clock.get()));
+        }
+    }
+
+
+    @Test
+    void constructorsAndImmutableRecoveryProjectionPreserveExistingCalls()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            var snapshot = rig.router.snapshot();
+            var four = new RoutingService.Snapshot(snapshot.capturedAtNanos(), snapshot.catalog(),
+                    snapshot.routes(), snapshot.diagnostics());
+            var five = new RoutingService.Snapshot(snapshot.capturedAtNanos(), snapshot.catalog(),
+                    snapshot.routes(), snapshot.diagnostics(), snapshot.forwarding());
+            assertTrue(four.recoveries().isEmpty());
+            assertTrue(five.recoveries().isEmpty());
+            assertThrows(UnsupportedOperationException.class, () -> snapshot.recoveries().clear());
+            assertThrows(UnsupportedOperationException.class, () -> recovery(rig).pendingPath().clear());
+            assertEquals(RouteState.INACTIVE, snapshot.routes().get(A).state());
+            assertTrue(snapshot.routes().get(A).activeUpstream().isEmpty());
+        }
+    }
+
+
+    @Test
+    void r06InvalidAnnouncementsCannotGrantCreditOrPoisonTheValidatedWatermark()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            rig.tick(T);
+            var invalid = new ControlMessage.Announcement(
+                    new ControlMessage.StreamInfo(A, "S", "Video", 1, 10, EPOCH),
+                    100, 100, List.of("S", "R", "A"));
+            rig.receive(parent, new ControlMessage(MessageType.STREAM_ANNOUNCE, UUID.randomUUID(),
+                    parent.nodeId(), parent.instanceId(), invalid));
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 2, 100);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r06PeriodicAnnouncementDoesNotRearmAPermanentProtocolFailure()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.error(rig.latestRequest(), 11, ErrorCode.INVALID_MESSAGE);
+            rig.tick(T);
+            rig.ad(parent, 2, 100);
+            rig.tick(T);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            var replacement = peer("A");
+            rig.route(replacement);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r10ExpiredCoalescedCreditCannotBeSpentByALateTimer()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rejectRound(rig);
+            rig.tick(1);
+            rig.ad(parent, 2, 100);
+            rig.tick(9_000_000_000L);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            rig.ad(parent, 2, 100);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(parent, 3, 100);
+            assertEquals(4, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+    @Test
+    void r10CadenceAndWatermarkSurviveTheMonotonicClockWrap()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            rig.clock.set(Long.MAX_VALUE - 1_000_000_000L);
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            rig.tick(1);
+            rig.ad(parent, 2, 100);
+            rig.tick(T - 1);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(T, recovery(rig).remainingNanos());
+            rig.ack(rig.latestRequest(), 6000);
+            assertNotNull(rig.forwarding(A));
+        }
+    }
+
+
+    @Test
+    void r13StillFullCapacityBlocksTheNewProofAgainWithoutAHiddenRetry()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            for(int i = 0; i < 2; i++)
+            {
+                var old = rig.local(A, UUID.randomUUID());
+                old.cancel();
+                rig.pump();
+            }
+            rig.local(A, UUID.randomUUID());
+            rig.tick(T);
+            rig.tick(1);
+            rig.ad(parent, 2, 100);
+            assertEquals(Route.RecoveryPhase.ACTIVATING, recovery(rig).phase());
+            assertEquals(0, recovery(rig).issued());
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(T);
+            assertEquals(Optional.of(ErrorCode.RESOURCE_LIMIT), recovery(rig).reason());
+            rig.hold = message -> false;
+            for(var send : rig.messages(MessageType.ACTIVATE))
+            {
+                send.result().complete(Connection.SendResult.ACCEPTED);
+            }
+            rig.pump();
+            rig.ad(parent, 2, 100);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(1);
+            rig.ad(parent, 3, 100);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(rig.latestRequest(), 6000);
+            assertNotNull(rig.forwarding(A));
+        }
+    }
+
+
+    @Test
+    void r14AProcessedContinuationDoesNotReleaseItsStillRunningCallback() throws Exception
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            var first = rig.local(A, UUID.randomUUID());
+            var held = rig.latestRequest();
+            first.cancel();
+            rig.pump();
+            var second = rig.local(A, UUID.randomUUID());
+            second.cancel();
+            rig.pump();
+            rig.owner.hold = thread -> thread.getName().equals("recovery-callback-held");
+            var callback = new Thread(() -> held.result().complete(Connection.SendResult.ACCEPTED),
+                    "recovery-callback-held");
+            callback.start();
+            try
+            {
+                assertTrue(rig.owner.offered.await(5, TimeUnit.SECONDS));
+                rig.local(A, UUID.randomUUID());
+                assertEquals(2, rig.load().sends());
+                assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+                assertFalse(rig.router.awaitTermination(Duration.ZERO));
+
+            }finally{
+                rig.owner.hold = thread -> false;
+                rig.owner.resume.countDown();
+                callback.join(5000);
+            }
+            assertFalse(callback.isAlive());
+            rig.pump();
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, rig.load().sends());
+        }
+    }
+
+
+    @Test
+    void r14AnEpochReplacementSharesTheSamePhysicalReservations()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            for(int i = 0; i < 2; i++)
+            {
+                var old = rig.local(A, UUID.randomUUID());
+                old.cancel();
+                rig.pump();
+            }
+            rig.local(A, UUID.randomUUID());
+            rig.tick(T);
+            var epoch = UUID.randomUUID();
+            rig.ad(parent, A, "S", epoch, 0, 100);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, rig.load().sends());
+            rig.messages(MessageType.ACTIVATE).getFirst().result().complete(Connection.SendResult.ACCEPTED);
+            rig.pump();
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(epoch, activation(rig.latestRequest()).serverEpoch());
+        }
+    }
+
+
+    @Test
+    void r15ShutdownDiscardsBudgetCreditWithoutSubmittingAnotherOperation()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rejectRound(rig);
+            rig.tick(1);
+            rig.ad(parent, 2, 100);
+            assertEquals(Route.RecoveryPhase.WAITING_FOR_BUDGET, recovery(rig).phase());
+            rig.router.requestClose();
+            rig.owner.drain();
+            rig.tick(T);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertTrue(rig.router.snapshot().recoveries().isEmpty());
+            assertTrue(rig.router.awaitTermination(Duration.ZERO));
+        }
+    }
+
+
+    @Test
+    void r18RecoveredGrantResumesRenewalAfterItsOldIncompatibilityIsRetired()
+    {
+        try(var rig = new Rig())
+        {
+            var parent = peer("A");
+            rig.route(parent);
+            rig.local(A, UUID.randomUUID());
+            rig.ack(rig.latestRequest(), 6000);
+            rig.tick(2_000_000_000L);
+            rig.error(rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 14, ErrorCode.PATH_CHANGED);
+            rig.tick(4_000_000_000L);
+            var recovered = rig.latestRequest();
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(recovered, 6000);
+            rig.ad(parent, 2, 100);
+            rig.tick(2_000_000_000L);
+            assertEquals(2, rig.messages(MessageType.SUBSCRIPTION_RENEW).size());
+            var renewed = rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast();
+            assertEquals(activation(recovered).subscriptionId(), activation(renewed).subscriptionId());
+            assertTrue(activation(renewed).revision() > activation(recovered).revision());
+        }
+    }
+
+
+    @Test
+    void r10MetricOverflowAndRecoveryCannotReuseTheBlockedGeneration()
+    {
+        try(var rig = new Rig("R", false, 4096, 1))
+        {
+            var parent = peer("A");
+            rig.up(parent);
+            rig.metric(parent, 10);
+            rig.ad(parent, 2, Long.MAX_VALUE - 1000);
+            rig.local(A, UUID.randomUUID());
+            rig.error(rig.latestRequest(), 11, ErrorCode.PATH_CHANGED);
+            rig.tick(T);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            rig.metric(parent, 2000);
+            assertTrue(rig.router.snapshot().routes().get(A).selectedCandidate().isEmpty());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.metric(parent, 10);
+            assertTrue(rig.router.snapshot().routes().get(A).selectedCandidate().isPresent());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+        }
+    }
+
+
+    @Test
+    void r10AnAlternativeConsumedInsideTheRoundIsNotNewCreditAfterItsFailure()
+    {
+        try(var rig = new Rig())
+        {
+            var first = peer("A");
+            var second = peer("B");
+            rig.route(first);
+            alternative(rig, second);
+            rig.local(A, UUID.randomUUID());
+            var original = rig.latestRequest();
+            rig.ad(second, 2, 1);
+            rig.error(original, 11, ErrorCode.PATH_CHANGED);
+            assertEquals(second, rig.latestRequest().peer());
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            rig.error(rig.latestRequest(), 11, ErrorCode.NO_ROUTE);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(T);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, recovery(rig).phase());
+            rig.ad(second, 3, 1);
+            assertEquals(4, rig.messages(MessageType.ACTIVATE).size());
+        }
+    }
+
+
+
+    //* === Integração TCP === *
+
+    private static final class TcpPeer implements AutoCloseable
+    {
+        //* === Atributos e Variáveis === *
+        final NeighborManager.SerialOwner owner;
+        final NeighborManager manager;
+        final RoutingService router;
+        final List<ControlMessage> received = new CopyOnWriteArrayList<>();
+        final List<RoutingService.Event> failures = new CopyOnWriteArrayList<>();
+
+
+
+        //* === Construtores === *
+
+        TcpPeer(NodeConfiguration configuration)
+        {
+            owner = NeighborManager.createSerialOwner(configuration.runtime().overlay().eventsCapacity());
+            UUID instance = UUID.randomUUID();
+            var service = new AtomicReference<RoutingService>();
+            manager = new NeighborManager(configuration, instance, owner, event -> {
+                if(event instanceof NeighborManager.Received message)
+                    received.add(message.message());
+                var routing = service.get();
+                if(routing == null)
+                    return;
+                routing.onNeighborEvent(event);
+                if(event instanceof NeighborManager.NeighborUp up)
+                {
+                    var metrics = new LinkMetrics(up.session(), LinkMetrics.State.MEASURED,
+                            OptionalDouble.of(10), OptionalLong.of(10), 1, false,
+                            OptionalLong.of(System.nanoTime()), 0);
+                    routing.onMetrics(new NetworkMonitor.Updated(metrics));
+                }
+            });
+            router = new RoutingService(configuration, instance, owner, manager::send, event -> {
+                if(event.fatal())
+                    failures.add(event);
+            });
+            service.set(router);
+        }
+
+
+
+        //* === Lógica === *
+
+        void start() throws Exception
+        {
+            assertTrue(owner.offer(router::start));
+            manager.start().toCompletableFuture().get(5, TimeUnit.SECONDS);
+        }
+
+
+        Route.Confirmation forwarding()
+        {
+            return router.snapshot().forwarding().get(A);
+        }
+
+
+        public void close()
+        {
+            long began = System.nanoTime();
+            long budget = TimeUnit.SECONDS.toNanos(5);
+            router.requestClose();
+            manager.requestClose();
+            assertTrue(router.awaitTermination(Duration.ofNanos(Math.max(0, budget - (System.nanoTime() - began)))));
+            assertTrue(manager.awaitTermination(Duration.ofNanos(Math.max(0, budget - (System.nanoTime() - began)))));
+            owner.requestClose();
+            assertTrue(owner.awaitTermination(Duration.ofNanos(Math.max(0, budget - (System.nanoTime() - began)))));
+            assertTrue(failures.isEmpty(), failures.toString());
+        }
+    }
+
+
+    private static final class TcpRig implements AutoCloseable
+    {
+        //* === Atributos e Variáveis === *
+        final List<String> names;
+        final Map<String,TcpPeer> nodes = new LinkedHashMap<>();
+        final Set<String> closed = new HashSet<>();
+        final List<Integer> ports = new ArrayList<>();
+        final BootstrapServer bootstrap;
+
+
+
+        //* === Construtores === *
+
+        TcpRig(boolean trunk) throws Exception
+        {
+            names = trunk ? List.of("S", "A", "B", "R", "C") : List.of("S", "R1", "R2", "C");
+            Map<String,Set<String>> edges = trunk
+                    ? Map.of("S", Set.of("A", "B"), "A", Set.of("S", "R"), "B", Set.of("S", "R"),
+                        "R", Set.of("A", "B", "C"), "C", Set.of("R"))
+                    : Map.of("S", Set.of("R1", "R2"), "R1", Set.of("S", "C"),
+                        "R2", Set.of("S", "C"), "C", Set.of("R1", "R2"));
+            var reserved = new ArrayList<ServerSocket>();
+            try
+            {
+                for(int i = 0; i < 1 + 2 * names.size(); i++)
+                {
+                    var socket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress());
+                    reserved.add(socket);
+                    ports.add(socket.getLocalPort());
+                }
+
+            }finally{
+                for(var socket : reserved)
+                {
+                    socket.close();
+                }
+            }
+            var topology = new LinkedHashMap<String,TopologyConfiguration.Node>();
+            for(int i = 0; i < names.size(); i++)
+            {
+                String name = names.get(i);
+                var role = name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY;
+                topology.put(name, new TopologyConfiguration.Node(name, "127.0.0.1",
+                        ports.get(1 + i * 2), ports.get(2 + i * 2), role, edges.get(name)));
+            }
+            var bootConfig = new NodeConfiguration(Path.of("bootstrap"), "BOOT", NodeRole.BOOTSTRAP,
+                    "127.0.0.1", "127.0.0.1", ports.getFirst(), 0, Optional.empty(), Optional.of(Path.of("topology")),
+                    Optional.empty(), Optional.empty(), Optional.of(new TopologyConfiguration(Path.of("topology"), topology)), List.of());
+            bootstrap = new BootstrapServer(bootConfig);
+            try
+            {
+                var defaults = RuntimeConfiguration.defaults();
+                var routing = defaults.routing();
+                var runtime = new RuntimeConfiguration(defaults.control(),
+                        new RuntimeConfiguration.Overlay(Duration.ofSeconds(3), Duration.ofMillis(50), Duration.ofMillis(200), 0, 4096),
+                        new RuntimeConfiguration.Monitoring(Duration.ofMillis(100), Duration.ofMillis(100), 3, .2),
+                        new RuntimeConfiguration.Routing(Duration.ofMillis(200), Duration.ofSeconds(3),
+                            routing.cacheCapacity(), routing.cacheTtl(), routing.floodMaxPerSecond(), Duration.ofSeconds(1),
+                            routing.activateAttempts(), routing.switchImprovementPercent(), routing.switchObservations(), routing.switchMinDwell()),
+                        new RuntimeConfiguration.Subscription(Duration.ofSeconds(3), Duration.ofMillis(200)),
+                        defaults.video(), defaults.source());
+                for(int i = 0; i < names.size(); i++)
+                {
+                    String name = names.get(i);
+                    var cfg = new NodeConfiguration(Path.of(name), name, name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY,
+                            "127.0.0.1", "127.0.0.1", ports.get(1 + i * 2), ports.get(2 + i * 2),
+                            Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", ports.getFirst())),
+                            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                            name.equals("S") ? config("S", true, 4096, 3).streams() : List.of(), runtime);
+                    var node = new TcpPeer(cfg);
+                    nodes.put(name, node);
+                    node.start();
+                }
+                tcpAwait(() -> nodes.entrySet().stream().allMatch(entry ->
+                        entry.getValue().manager.snapshot().size() == edges.get(entry.getKey()).size()));
+                var consumer = nodes.get("C");
+                List<String> expected = trunk ? List.of("S", "A", "R", "C") : List.of("S", "R1", "C");
+                tcpAwait(() -> consumer.router.snapshot().routes().containsKey(A)
+                        && consumer.router.snapshot().routes().get(A).selectedCandidate()
+                        .map(candidate -> candidate.path().equals(expected)).orElse(false));
+                if(trunk)
+                {
+                    tcpAwait(() -> nodes.get("R").router.snapshot().routes().get(A).candidates().size() == 2);
+                }
+
+            }catch(Exception | AssertionError failure){
+                close();
+                throw failure;
+            }
+        }
+
+
+
+        //* === Lógica === *
+
+        void stop(String name)
+        {
+            if(closed.add(name))
+                nodes.get(name).close();
+        }
+
+
+        public void close()
+        {
+            for(int i = names.size() - 1; i >= 0; i--)
+            {
+                if(nodes.containsKey(names.get(i)))
+                    stop(names.get(i));
+            }
+            bootstrap.close();
+        }
+
+
+        void assertPortsReleased() throws Exception
+        {
+            for(int i = 0; i < 1 + 2 * names.size(); i += i == 0 ? 1 : 2)
+            {
+                try(var socket = new ServerSocket())
+                {
+                    socket.setReuseAddress(true);
+                    socket.bind(new InetSocketAddress("127.0.0.1", ports.get(i)));
+                }
+            }
+        }
+    }
+
+
+    @Test
+    @Timeout(45)
+    void r09TcpTwoRelaysAutomaticallyRenegotiateAChangedPrefixWithoutHumanRetry() throws Exception
+    {
+        var graph = new TcpRig(true);
+        try(graph)
+        {
+            var consumer = graph.nodes.get("C");
+            var relay = graph.nodes.get("R");
+            tcpAwait(() -> consumer.router.snapshot().routes().containsKey(A)
+                    && consumer.router.snapshot().routes().get(A).knownUpstream().isPresent());
+            UUID token = UUID.randomUUID();
+            var ticket = consumer.router.requestSubscription(A, token);
+            tcpAwait(() -> ticket.result().isPresent());
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            tcpAwait(() -> relay.forwarding() != null);
+            String failed = relay.forwarding().upstream().orElseThrow().nodeId();
+            assertTrue(Set.of("A", "B").contains(failed));
+            var initial = relay.received.stream().filter(message -> message.type() == MessageType.ACTIVATE
+                    && message.senderId().equals("C")).reduce((first, second) -> second).orElseThrow();
+            graph.stop(failed);
+            tcpAwait(() -> consumer.forwarding() != null && !consumer.forwarding().path().contains(failed));
+            var replacement = relay.received.stream().filter(message -> message.type() == MessageType.ACTIVATE
+                    && message.senderId().equals("C")).reduce((first, second) -> second).orElseThrow();
+            var before = (ControlMessage.Activation) initial.payload();
+            var after = (ControlMessage.Activation) replacement.payload();
+            assertEquals(before.subscriptionId(), after.subscriptionId());
+            assertTrue(after.revision() > before.revision());
+            assertNotEquals(initial.requestId(), replacement.requestId());
+            assertEquals(Set.of(token), consumer.forwarding().localConsumers());
+            assertEquals("S", consumer.forwarding().serverId());
+            assertEquals(consumer.forwarding().path().size(), Set.copyOf(consumer.forwarding().path()).size());
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            System.out.println("TCP_PREFIX_RECOVERY old=" + before + " new=" + after
+                    + " upstream=" + consumer.forwarding().upstream().orElseThrow());
+            ticket.cancel();
+            tcpAwait(() -> consumer.forwarding() == null && relay.forwarding() == null);
+        }
+        graph.assertPortsReleased();
+    }
+
+
+    @Test
+    @Timeout(45)
+    void r17TcpSequentialRelayFailuresConsumeExistingSourceClientRepairWithoutBootstrap() throws Exception
+    {
+        var graph = new TcpRig(false);
+        try(graph)
+        {
+            var source = graph.nodes.get("S");
+            var consumer = graph.nodes.get("C");
+            tcpAwait(() -> consumer.manager.candidates().toCompletableFuture().join().stream()
+                    .anyMatch(candidate -> candidate.nodeId().equals("S"))
+                    && source.manager.candidates().toCompletableFuture().join().stream()
+                    .anyMatch(candidate -> candidate.nodeId().equals("C")));
+            tcpAwait(() -> consumer.router.snapshot().routes().containsKey(A)
+                    && consumer.router.snapshot().routes().get(A).knownUpstream().isPresent());
+            var token = UUID.randomUUID();
+            var ticket = consumer.router.requestSubscription(A, token);
+            tcpAwait(() -> ticket.result().isPresent());
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            String first = consumer.forwarding().upstream().orElseThrow().nodeId();
+            String second = first.equals("R1") ? "R2" : "R1";
+            graph.bootstrap.close();
+            graph.stop(first);
+            tcpAwait(() -> consumer.forwarding() != null && !consumer.forwarding().path().contains(first));
+            graph.stop(second);
+            tcpAwait(() -> consumer.manager.snapshot().containsKey("S") && source.manager.snapshot().containsKey("C"));
+            tcpAwait(() -> consumer.forwarding() != null && consumer.forwarding().path().equals(List.of("S", "C")));
+            assertEquals(consumer.manager.snapshot().get("S"), consumer.forwarding().upstream().orElseThrow());
+            assertEquals(Set.of(token), consumer.forwarding().localConsumers());
+            assertEquals(source.forwarding().serverEpoch(), consumer.forwarding().serverEpoch());
+            assertTrue(source.received.stream().anyMatch(message -> message.type() == MessageType.ACTIVATE
+                    && message.senderId().equals("C")));
+            assertEquals(SubscriptionState.SUCCESS, result(ticket).state());
+            System.out.println("TCP_REPAIR_RECOVERY path=" + consumer.forwarding().path()
+                    + " session=" + consumer.forwarding().upstream().orElseThrow()
+                    + " epoch=" + consumer.forwarding().serverEpoch());
+            ticket.cancel();
+            tcpAwait(() -> consumer.forwarding() == null && source.forwarding() == null);
+        }
+        graph.assertPortsReleased();
+    }
+}

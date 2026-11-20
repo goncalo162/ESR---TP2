@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-18T16:15:43Z"
+last_updated: "2026-11-20T16:07:46Z"
 ---
 # Construction Log — 004-arvores
 
@@ -17,9 +17,10 @@ Inception concluído em2026-11-03T20:54:11Z;003-rotas e022-rotas complete.
 1 - ✅ **007-arvores**: complete; história001 complete/implemented=true, TASK-014
 DONE. Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863
 comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
-2 - ⏳ **023-arvores**: in-progress, Model/Design/ADR aprovados; primeiro passo de Implement por aceitar, história002 em progresso.
-Q-C-40/41/42 decididas; nenhuma execução Java/V-015.
-3 - [ ] **008-arvores**: planned; história003, recuperação de upstream.
+2 - ✅ **023-arvores**: complete; história002 complete/implemented=true, TASK-015 DONE.
+Test1379/0/0/0, Francisco30, revisão final Denji e integração4d18d1d comprovados.
+3 - ⏳ **008-arvores**: in-progress/current_stage=test; Implement/R10 aprovados;
+Test técnico1419/0/0/0, manual humano pendente; história003 não concluída.
 4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
 5 - [ ] **009-arvores**: planned; história005, segundo marco.
 
@@ -298,3 +299,115 @@ Fecho exclusivamente documental/evidência; sem Java,target,alterações alheias
 Cascata documental: apenas blocks=false em008-arvores após dependências complete;
 status planned,started=null,sem etapas/início. V-ADD inicial preserva o diagnóstico
 blocks mismatch,sem alterar o validador ou iniciar outro IMP.
+
+## IMP-013 — início exclusivo de Model
+
+Registo 2026-11-20T10:52:56Z, após seleção explícita da opção 1 pelo utilizador.
+008-arvores iniciado em Model; dependências022-rotas/023-arvores concluídas,
+Inception concluída e unidade004-arvores em progresso. Sem etapas aprovadas.
+Só modelo de domínio e registos documentais; nenhuma leitura/análise/alteração
+de fonte Java nesta etapa, sem Design/ADR/Implement/Test, Maven, commits ou push.
+Os fechos e evidências anteriores mantêm-se; nenhum outro IMP iniciado.
+
+## IMP-013 — Model preparado para revisão em 2026-11-20T11:02:52Z
+
+[Modelo](../../../../bolts/008-arvores/ddd-01-domain-model.md) com entidades,
+valores/agregados, invariantes, eventos, serviços/repositórios voláteis e linguagem.
+Q-C-43/44 propostas de interesse descendente e rondas/rearme, sem decisão aprovada.
+R01–R18/V-016 não executados.14 bolts complete,1in-progress,20planned; apenas008
+iniciado em Model. Sem fontes lidas/analisadas/alteradas, Maven, Design/ADR/Implement/
+Test, staging/commits/push. Fechos/código/evidências anteriores mantidos.
+
+
+## IMP-013 — Model aprovado, apenas Design autorizado
+
+Registo 2026-11-20T11:07:54Z: utilizador aprovou Model e Q-C-43/44. Concretizar
+novidade útil/rearme, limites das rondas e renegociação automática dos filhos,
+sem intervenção humana/extensão dos prazos antigos. Três caminhos do ADD
+preservados; ampliação só após apresentação prévia. Sem Implement, commits
+ou push; V-016/R01–R18 não executados. Fecho: testes, regressão JDK21, manual
+humano, revisão final Fillmore e integração; nenhum gate externo adicional.
+
+## IMP-013 — Design preparado para revisão em 2026-11-20T11:21:05Z
+
+[Design](../../../../bolts/008-arvores/ddd-02-technical-design.md): F/G e
+watermark/crédito, T/A e uma ronda automática por T, rebind dos filhos automático
+com11/revisão nova/requestId novo após perda efetiva, sem prolongar prazo antigo.
+Três caminhos preservados; construtores/projeção/lifecycle por conferir em ADR.
+V-016/R01–R18 não executados,1379 testes anteriores apenas históricos.
+Sem fontes lidas/analisadas/alteradas, Maven, ADR/Implement/Test, commits ou push.
+14complete/1in-progress/20planned, só Model concluído; fecho exige testes/JDK21/
+manual humano/Fillmore/integração, sem gates externos adicionais.
+
+
+## IMP-013 — ajuste exclusivo de rearme RESOURCE_LIMIT em 2026-11-20T11:34:53Z
+
+Utilizador clarifica Q-C-44: ANN novo validado posterior à falha/maior watermark
+pode permitir admissão com Session/época/path iguais após saturação temporária.
+Libertação de callback/capacidade sozinha e duplicados não reabrem terminal;
+prova anterior bloqueada mesmo sem envio. R13 inclui a sequência pedida,
+sem execução ou mudança de T/A/cadência/capacidades/restante Design.
+Design reapresentado, não aprovado; sem ADR/Implement/Java/Maven/commits/push.
+Fecho mantém V-016, regressão JDK21, manual humano, Fillmore e integração;
+nenhum gate externo adicional.
+
+## IMP-013 — Design revisto aprovado; revisão ADR preparada
+
+Registo 2026-11-20T11:45:38Z. Design revisto e clarificação de Q-C-44 aprovados
+pelo utilizador em2026-11-20T11:41:00Z; apenas revisão ADR autorizada.
+APIs reais conferidas estaticamente: announceSeq/Outcome disponíveis, watermark
+interno privado sem necessidade de API nova; intenção distinta de resultado do
+ticket, mudança de época, ACTIVATE/revisões, construtores4/5/projeções e lifecycle.
+Revisão para aprovação, sem impedimento de âmbito identificado ou nova ADR.
+A01–A08 são trabalho futuro nos mesmos três caminhos; nenhuma correção aplicada.
+V-016/R01–R18 não executados; fontes só consultadas, sem Java alterado, Maven,
+Implement/Test, fecho, staging, commits, push ou outro IMP. Negativos/provas
+anteriores preservados. Fecho exige testes, regressão JDK21, manual humano,
+revisão final Fillmore e integração, sem gates externos adicionais.
+[Revisão completa](../../../../bolts/008-arvores/adr-review.md).
+
+## IMP-013 — Implement reapresentado, sem aceitação/Test
+
+Registo 2026-11-20T12:27:18Z. Utilizador aprovou ADR e autorizou apenas Implement A01–A08
+nos três caminhos do ADD, com CODESTYLE, históricos/correlações/construtores e
+reservas físicas preservados. Implement preparado para revisão: regressão JDK21
+incremental final1414/0/0/0,20 XML,35 testes novos e1379 históricos byte intactos.
+Duas integrações TCP reais com métricas controladas passaram; negativos guardados
+separadamente, incluindo R13, prazo de fila, R18/fixture, R17 inicial sem causa
+estabelecida e alternativa consumida R10. Remoções/substituições justificadas no
+walkthrough; sem teste/asserção/prazo histórico retirado ou fundação alterada.
+Só Model/Design/ADR em stages_completed; current_stage=implement, completed=null.
+Implement ainda por aceitar; sem etapa Test, fecho, commits/push ou outro IMP.
+V-016 consolidado, regressão da etapa Test, manual humano antes de aprovar Test,
+revisão final Fillmore e integração continuam obrigatórios; sem gates novos.
+[Walkthrough e prova](../../../../bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — R10 corrigido; Implement permanece pendente
+
+Registo 2026-11-20T15:44:31Z. Implement continua pendente. Reprodução exata com G2,
+Long.MAX_VALUE-1000, métrica10→2000→10 após PATH_CHANGED/T3s: negativo preservado
+esperado1/observado2 ACTIVATEs. A transição previous==null agora confere blocked
+antes de conceder crédito; métrica isolada não reutiliza a prova bloqueada.
+Primeira medição válida, anúncio novo posterior e T/A/cadência preservados.
+11 testes R10 focados passaram; regressão JDK21 atual1419/0/0/0,20 XML,
+40 RecoveryTest (35 anteriores intactos+5 novos),1379 históricos intactos.
+Delta Java só em RoutingService e RecoveryTest; Route/fundações inalterados.
+R17 inicial mantém causa não estabelecida. Sem aceitação de Implement, Test,
+fecho, commits ou push. V-016 consolidado, manual humano, Fillmore e integração
+pendentes; sem gates externos adicionais.
+[Walkthrough atualizado](../../../../bolts/008-arvores/implementation-walkthrough.md).
+
+## IMP-013 — Test técnico, aguardar manual humano
+
+Registo 2026-11-20T16:07:46Z. Implement/R10 aprovados; apenas Test autorizado.
+Clean verify JDK21 novo1419/0/0/0,20 XML e JAR504997bytes/SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente; fontes/históricos/evidências intactos.
+Manual humano preparado:7 etapas/28 checks. Ensaio kind=agent passou no JAR
+congelado, hashes/origem/JVM conferidos; não satisfaz obrigação humana.
+Aguardar repetição pessoal antes de pedir aprovação Test. Test não aprovado;
+R17 inicial sem causa estabelecida, integração com métricas controladas não
+prova a causa. Nova correção exige reprodução/âmbito apresentados.
+Sem fecho/staging/commits/push/outro IMP; Fillmore/integração pendentes,
+sem gates externos adicionais.
+[Relatório Test](../../../../bolts/008-arvores/ddd-03-test-report.md).

@@ -1,0 +1,62 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Serviço OTT de Streaming 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 42 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 21 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.routing.RecoveryTest
+R13 before: ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=2, unbound=0, responseIntents=0, pendingChildren=0] Optional.empty Snapshot[capturedAtNanos=0, catalog=Snapshot[capturedAtNanos=0, entries={00000000-0000-0001-0000-000000000001=Entry[info=StreamInfo[streamId=00000000-0000-0001-0000-000000000001, serverId=S, title=Video, codec=1, fps=10, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f], state=INACTIVE, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], knownUpstream=Optional[SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8]], localOffer=false, remainingNanos=OptionalLong[8000000000]]}], routes={00000000-0000-0001-0000-000000000001=Route[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=Optional[6ec7e567-25ea-3de0-84a1-cef90377dd1f], localSource=false, selectedCandidate=Optional[RouteCandidate[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, upstream=SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8], path=[S, A, R], announceSeq=1, advertisedCostMicros=100, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], generationStartedAtNanos=0, candidateTtlNanos=8000000000]], selectedMetric=Optional[RouteMetric[costMicros=110, hopCount=2]], knownUpstream=Optional[SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8]], activeUpstream=Optional.empty, pendingUpstream=Optional.empty, downstreams=[], candidates=[RouteCandidate[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, upstream=SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8], path=[S, A, R], announceSeq=1, advertisedCostMicros=100, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], generationStartedAtNanos=0, candidateTtlNanos=8000000000]], state=INACTIVE, revision=2]}, diagnostics=Diagnostics[phase=RUNNING, sessions=1, bindings=1, references=1, cacheEntries=0, ledgers=0, pendingCells=0, pendingIntents=0, quotas=0, sendTickets=0, timers=1, failures=0, countersSaturated=false, lastReason=NONE], forwarding={}, recoveries={}]
+R13 after: ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=2, unbound=0, responseIntents=0, pendingChildren=0] Optional.empty Snapshot[capturedAtNanos=0, catalog=Snapshot[capturedAtNanos=0, entries={00000000-0000-0001-0000-000000000001=Entry[info=StreamInfo[streamId=00000000-0000-0001-0000-000000000001, serverId=S, title=Video, codec=1, fps=10, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f], state=INACTIVE, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], knownUpstream=Optional[SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8]], localOffer=false, remainingNanos=OptionalLong[8000000000]]}], routes={00000000-0000-0001-0000-000000000001=Route[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=Optional[6ec7e567-25ea-3de0-84a1-cef90377dd1f], localSource=false, selectedCandidate=Optional[RouteCandidate[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, upstream=SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8], path=[S, A, R], announceSeq=1, advertisedCostMicros=100, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], generationStartedAtNanos=0, candidateTtlNanos=8000000000]], selectedMetric=Optional[RouteMetric[costMicros=110, hopCount=2]], knownUpstream=Optional[SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8]], activeUpstream=Optional.empty, pendingUpstream=Optional.empty, downstreams=[], candidates=[RouteCandidate[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, upstream=SessionKey[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=60bebc3b-5101-4d23-91c4-d91ffaf5c1b8], path=[S, A, R], announceSeq=1, advertisedCostMicros=100, metric=Optional[RouteMetric[costMicros=110, hopCount=2]], generationStartedAtNanos=0, candidateTtlNanos=8000000000]], state=INACTIVE, revision=2]}, diagnostics=Diagnostics[phase=RUNNING, sessions=1, bindings=1, references=1, cacheEntries=0, ledgers=0, pendingCells=0, pendingIntents=0, quotas=0, sendTickets=0, timers=1, failures=0, countersSaturated=false, lastReason=NONE], forwarding={}, recoveries={}]
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.138 s <<< FAILURE! -- in pt.uminho.esr.ott.routing.RecoveryTest
+[ERROR] pt.uminho.esr.ott.routing.RecoveryTest.r13ReleasedCapacityNeedsANewAnnouncementToReopenTerminalAdmission -- Time elapsed: 0.115 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "pt.uminho.esr.ott.routing.Route$Recovery.phase()" because the return value of "pt.uminho.esr.ott.routing.RecoveryTest.recovery(pt.uminho.esr.ott.routing.SubscriptionLeaseTest$Rig)" is null
+	at pt.uminho.esr.ott.routing.RecoveryTest.r13ReleasedCapacityNeedsANewAnnouncementToReopenTerminalAdmission(RecoveryTest.java:488)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   RecoveryTest.r13ReleasedCapacityNeedsANewAnnouncementToReopenTerminalAdmission:488 NullPointer Cannot invoke "pt.uminho.esr.ott.routing.Route$Recovery.phase()" because the return value of "pt.uminho.esr.ott.routing.RecoveryTest.recovery(pt.uminho.esr.ott.routing.SubscriptionLeaseTest$Rig)" is null
+[INFO] 
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.494 s
+[INFO] Finished at: 2026-11-20T12:06:06Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project ott-streaming: 
+[ERROR] 
+[ERROR] See /home/luis/ESR/ESR---TP2/Projeto/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

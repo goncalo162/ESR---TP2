@@ -1,0 +1,69 @@
+CODE_SOURCE=file:/home/luis/ESR/ESR---TP2/experiments/construction/008-arvores/test-01/ott-streaming-1.0-SNAPSHOT.jar
+TEST_CODE_SOURCE=file:/home/luis/ESR/ESR---TP2/experiments/construction/008-arvores/test-01/frozen-test-classes/
+LIMITACAO_R17=negativo inicial sem causa estabelecida; métricas controladas não demonstram a causa
+
+ETAPA 1 — Perda e alternativa
+ESPERADO: Retirar forwarding logo; aguardar T; B só confirma após ACK novo.
+Prima Enter para executar e observar esta etapa.
+OBSERVADO após Down(A) ACTIVATE=1 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, phase=WAITING_FOR_BUDGET, reason=Optional.empty, detail=, generation=1, intentPresent=true, issued=1, attemptLimit=3, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=null resources=ActivationLoad[trees=1, children=0, locals=1, histories=0, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS retirada imediata da autoridade
+CHECK_PASS sem retry antes de T
+CHECK_PASS novo ACTIVATE para B
+CHECK_PASS ACCEPTED não confirma sozinho
+OBSERVADO após ACK(B) ACTIVATE=2 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, phase=CONFIRMED, reason=Optional.empty, detail=, generation=2, intentPresent=true, issued=1, attemptLimit=3, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=B, instanceId=0c363e90-cf74-3691-8569-440b33855867, connectionId=28c463f8-6f62-4e89-a3b4-95f9855b0ae1, endpoint=Endpoint[nodeId=B, instanceId=0c363e90-cf74-3691-8569-440b33855867, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, B, R], downstreams={}, localConsumers=[111b6bd3-0a7e-4714-9f74-4f871cb1860b], upstreamLease=Optional[Lease[beganNanos=3000000000, durationNanos=6000000000]], revision=5] resources=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS mesmo consumidor autorizado em B
+CHECK_PASS resultado original imutável
+
+ETAPA 2 — R10 e watermark
+ESPERADO: G2 + PATH_CHANGED + T; métrica10→2000→10 mantém1 ACTIVATE; G3 permite2.
+Prima Enter para executar e observar esta etapa.
+OBSERVADO métrica restaurada sem ANN ACTIVATE=1 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, phase=UNAVAILABLE, reason=Optional[PATH_CHANGED], detail=fixture, generation=1, intentPresent=true, issued=1, attemptLimit=1, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=null resources=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS prova G2 bloqueada continua UNAVAILABLE
+CHECK_PASS duplicado não rearma
+CHECK_PASS ANN G3 permite nova ronda
+CHECK_PASS Line mantida com revisão/request novos
+OBSERVADO recuperado por G3 ACTIVATE=2 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, phase=CONFIRMED, reason=Optional.empty, detail=, generation=2, intentPresent=true, issued=1, attemptLimit=1, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=32309248-d188-4f52-8540-3b7fb9ba4c99, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={}, localConsumers=[8e02d1c3-8f85-4a98-9d5b-17fb978014fd], upstreamLease=Optional[Lease[beganNanos=3000000000, durationNanos=6000000000]], revision=2] resources=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS confirmação nova não reescreve erro antigo
+
+ETAPA 3 — Novidade legítima
+ESPERADO: Primeira métrica válida recupera; ANN pré-falha não; ANN posterior sem métrica conserva oportunidade.
+Prima Enter para executar e observar esta etapa.
+CHECK_PASS primeira medição válida preservada
+CHECK_PASS ANN anterior à falha continua bloqueado
+CHECK_PASS ANN posterior sem métrica continua útil
+
+ETAPA 4 — Época e intenção
+ESPERADO: Época nova exige ACK; token permanece; ACK antigo/cancelamento não ressuscitam; outra origem isolada.
+Prima Enter para executar e observar esta etapa.
+CHECK_PASS época nova retira autoridade anterior
+CHECK_PASS ACK antigo não confirma época nova
+OBSERVADO época nova confirmada ACTIVATE=2 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=3cfbf170-e4e4-473f-9add-07b4f6378265, phase=CONFIRMED, reason=Optional.empty, detail=, generation=2, intentPresent=true, issued=1, attemptLimit=3, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=Confirmation[streamId=00000000-0000-0001-0000-000000000001, serverId=S, serverEpoch=3cfbf170-e4e4-473f-9add-07b4f6378265, localSource=false, upstream=Optional[Session[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, connectionId=f9b6077c-109a-4154-9b35-1055e3d1423a, endpoint=Endpoint[nodeId=A, instanceId=76747208-1781-3a41-8b8b-b6ae40cea90f, host=127.0.0.1, controlPort=19001, dataPort=19101, role=RELAY]]], path=[S, A, R], downstreams={}, localConsumers=[8a32e197-a332-4890-828b-262420201351], upstreamLease=Optional[Lease[beganNanos=3000000000, durationNanos=6000000000]], revision=6] resources=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS intenção e token conservados
+CHECK_PASS cancelamento retira procura
+CHECK_PASS outra origem permanece intacta
+
+ETAPA 5 — Capacidade e shutdown
+ESPERADO: 2 reservas entre gerações; libertar capacidade não rearma terminal; await(0) falso até fim físico.
+Prima Enter para executar e observar esta etapa.
+CHECK_PASS 2 reservas retidas bloqueiam terceira emissão
+CHECK_PASS saturação termina UNAVAILABLE
+OBSERVADO capacidade libertada ACTIVATE=2 recovery=Recovery[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=6ec7e567-25ea-3de0-84a1-cef90377dd1f, phase=UNAVAILABLE, reason=Optional[RESOURCE_LIMIT], detail=ACTIVATION_CAPACITY, generation=1, intentPresent=true, issued=0, attemptLimit=3, pendingUpstream=Optional.empty, pendingPath=[], remainingNanos=0] forwarding=null resources=ActivationLoad[trees=1, children=0, locals=1, histories=1, sends=0, unbound=0, responseIntents=0, pendingChildren=0]
+CHECK_PASS libertação não cria retry
+CHECK_PASS ANN novo admite uma emissão
+CHECK_PASS shutdown aguarda callback físico
+CHECK_PASS shutdown conclui sem rearme
+CHECK_PASS continuação não termina callback retido
+
+ETAPA 6 — TCP: prefixo com dois relays
+ESPERADO: Mesma Line C→R, revisão/request novos, consumidores recuperam automaticamente; portas disponíveis após fecho.
+Prima Enter para executar e observar esta etapa.
+TCP_PREFIX_RECOVERY old=Activation[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=c9c9effa-9ae2-48fc-84e9-edf7d2dfd565, subscriptionId=44c61fa3-42c8-41af-adac-0823dd82b63e, revision=0, leaseMs=3000, expectedPath=[S, A, R, C]] new=Activation[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=c9c9effa-9ae2-48fc-84e9-edf7d2dfd565, subscriptionId=44c61fa3-42c8-41af-adac-0823dd82b63e, revision=1, leaseMs=3000, expectedPath=[S, B, R, C]] upstream=Session[nodeId=R, instanceId=64f20a6f-fb06-4b82-9add-cde72369ba61, connectionId=687ca57b-9486-4332-8a3d-ad275a143b2c, endpoint=Endpoint[nodeId=R, instanceId=64f20a6f-fb06-4b82-9add-cde72369ba61, host=127.0.0.1, controlPort=33781, dataPort=36111, role=RELAY]]
+CHECK_PASS TCP prefixo renegociado e recursos terminados
+
+ETAPA 7 — TCP: reparação S–C
+ESPERADO: Bootstrap fechado; falhas sequenciais; path S–C e ACK novos. Sucesso não explica negativo R17 inicial.
+Prima Enter para executar e observar esta etapa.
+TCP_REPAIR_RECOVERY path=[S, C] session=Session[nodeId=S, instanceId=8399ee91-b482-4a23-81e7-35c6b1e5b7e1, connectionId=da223bbf-c5e4-4762-9f7c-bf9beabd1f20, endpoint=Endpoint[nodeId=S, instanceId=8399ee91-b482-4a23-81e7-35c6b1e5b7e1, host=127.0.0.1, controlPort=42377, dataPort=43357, role=SERVER]] epoch=8399ee91-b482-4a23-81e7-35c6b1e5b7e1
+CHECK_PASS TCP reparado sem bootstrap/retry humano e recursos terminados
+CLEANUP_COMPLETE
+MANUAL_PASS CHECKS=28

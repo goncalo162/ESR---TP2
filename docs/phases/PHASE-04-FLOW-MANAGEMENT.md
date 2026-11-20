@@ -14,7 +14,17 @@ Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
 TASK-015/IMP-012 DONE,bolt/história023-arvores complete/implemented=true após
 Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão Denji e integração4d18d1d
 comprovada. [Fecho](../../memory-bank/bolts/023-arvores/closure-walkthrough.md).
-Unidade/fase continuam em progresso; TASK-016–018 TODO,sem execução iniciada.
+IMP-013/008-arvores/TASK-016 em Test. Implement/R10 aprovados pelo utilizador;
+Model/Design/ADR/Implement concluídos, current_stage=test, completed=null.
+[Test técnico](../../memory-bank/bolts/008-arvores/ddd-03-test-report.md): clean verify JDK21 novo1419/0/0/0,20 XML e JAR SHA256
+81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d.
+V-016/R01–R18 consolidado tecnicamente,40 RecoveryTest/1379 históricos.
+Manual preparado:7 etapas/28 checks; ensaio Codex kind=agent passou e não
+substitui repetição humana. Aguardar execução pessoal antes de pedir aprovação
+Test. Código aprovado/evidências preservados; R17 inicial sem causa estabelecida,
+métricas controladas não demonstram a causa. Test não aprovado; sem fecho,
+commits/push/outro IMP. Fillmore/integração pendentes; sem gates externos novos.
+
 Sem Java,push ou outro IMP neste fecho documental.
 O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
 
@@ -32,7 +42,7 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
 |---|---|---|---|---|
 | [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
 | [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | DONE — Test1379/0/0/0,Francisco30,Denji,integração4d18d1d |
-| [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | TODO |
+| [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | IN PROGRESS |
 | [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | TODO |
 | [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | TODO |
 
