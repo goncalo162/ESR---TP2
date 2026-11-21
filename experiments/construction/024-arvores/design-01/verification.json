@@ -1,0 +1,176 @@
+{
+  "recorded_at": "2026-11-21T14:31:17Z",
+  "head": "b533279238870cb59fdcfda563dbcada769d5b6d",
+  "branch": "Denji",
+  "current_stage": "design",
+  "stages_completed": [
+    "model"
+  ],
+  "approved_decisions": [
+    "Q-C-45",
+    "Q-C-46"
+  ],
+  "design_approved": false,
+  "v_add": {
+    "command": [
+      "python3",
+      "scripts/validate-planning.py",
+      "--report",
+      "experiments/construction/024-arvores/design-01/v-add.md"
+    ],
+    "exit_code": 0,
+    "errors": 0,
+    "report": "v-add.md",
+    "scope": "documentary/structural/fixtures only; not V-017"
+  },
+  "approved_input_archive_sha256": "b07df9654249bbae3a4a8f60209bcb3026208f528c11dbf1045c708a388ddca1",
+  "approved_input_hashes_verified": 18,
+  "model_01_evidence_intact": true,
+  "java_source_read_or_analyzed": false,
+  "source_test_foundation_changes": false,
+  "historical_evidence_changes": false,
+  "maven_executed": false,
+  "v_017_executed": false,
+  "oracles_planned": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17",
+    "S18"
+  ],
+  "future_java_allowlist": [
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java"
+  ],
+  "counts": {
+    "bolts_complete": 15,
+    "bolts_in_progress": 1,
+    "bolts_planned": 19
+  },
+  "external_gates": [],
+  "commits_created": false,
+  "push_performed": false,
+  "compatibility_review": "APIs not inspected; future ADR review requires authorization; obstacles/scope changes must be presented before code changes",
+  "future_closure_requirements": [
+    "V-017",
+    "JDK21 regression",
+    "human manual before Test approval",
+    "Test approval",
+    "final Waheed review",
+    "integration"
+  ],
+  "historical_R17_limitation": "Initial IMP-013 R17 negative has no established cause; controlled-metrics integration does not demonstrate its cause.",
+  "scope_checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "b533279238870cb59fdcfda563dbcada769d5b6d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "Denji\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD",
+        "--",
+        "Projeto",
+        "CORE"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--",
+        "Projeto",
+        "CORE"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD",
+        "--",
+        "experiments/construction/007-arvores",
+        "experiments/construction/023-arvores",
+        "experiments/construction/008-arvores",
+        "experiments/construction/022-rotas",
+        "memory-bank/bolts/008-arvores",
+        "memory-bank/bolts/023-arvores",
+        "memory-bank/bolts/022-rotas"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "add.md\ndocs/13-REQUIREMENTS-TRACEABILITY.md\ndocs/15-PROJECT-PROGRESS.md\ndocs/18-CONSTRUCTION-BOLTS.md\ndocs/construction-duvidas.md\ndocs/phases/PHASE-04-FLOW-MANAGEMENT.md\ndocs/tasks/PHASE-04/TASK-017.md\nmemory-bank/bolts/024-arvores/bolt.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md\nmemory-bank/project.yaml\nmemory-bank/standards/decision-index.md\nmemory-bank/story-index.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "ls-files",
+        "--others",
+        "--exclude-standard"
+      ],
+      "exit_code": 0,
+      "stdout": "experiments/construction/024-arvores/design-01/README.md\nexperiments/construction/024-arvores/design-01/approved-model-input.tar.gz\nexperiments/construction/024-arvores/design-01/authorization.json\nexperiments/construction/024-arvores/design-01/v-add.md\nexperiments/construction/024-arvores/model-01/README.md\nexperiments/construction/024-arvores/model-01/document-hashes.sha256\nexperiments/construction/024-arvores/model-01/entry.json\nexperiments/construction/024-arvores/model-01/v-add.md\nexperiments/construction/024-arvores/model-01/verification.json\nmemory-bank/bolts/024-arvores/ddd-01-domain-model.md\nmemory-bank/bolts/024-arvores/ddd-02-technical-design.md\n",
+      "stderr": ""
+    }
+  ]
+}

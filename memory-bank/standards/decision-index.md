@@ -2,6 +2,18 @@
 
 Fonte normativa: [ADD](../../add.md).
 
+## IMP-014 — Q-C-47-B/ADR aprovadas; Implement para revisão
+
+[Walkthrough](../bolts/024-arvores/implementation-walkthrough.md), registo2026-11-21T15:36:31Z.
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.
+
 ## IMP-013 — concluído e integrado; decisões preservadas
 
 IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
@@ -9,9 +21,15 @@ Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
 V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
 aprovados. [Fecho](../bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
 R17 inicial continua sem causa estabelecida e métricas controladas não a
-demonstram. Unidade004/PHASE-04 em progresso,15 bolts complete/20planned,
-nenhum bolt em execução.024-arvores apenas desimpedido,nenhum outro IMP iniciado.
-Commit/push autorizados; sem novo código/build/manual ou gate externo.
+demonstram. O commit/push desse fecho está concluído; não autoriza publicação
+no incremento seguinte. Estado atual: unidade004/PHASE-04 em progresso,
+15 bolts complete,1 in-progress e19 planned.024-arvores/IMP-014 em Implement,
+por aprovar. Model/Q-C-45/46, Design e ADR/Q-C-47-B aprovados; cinco caminhos
+autorizados e registados antes de fontes. Regressão incremental JDK21 actual
+1449/0/0/0 (1419 históricos+30 novos),21 XML. Implement/Test não aprovados;
+V-017 por consolidar em Test, clean verify/JAR novo, regressão aprovada, manual
+humano antes de aprovar Test, Waheed e integração pendentes. Sem fecho/commit/
+push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
 
 ## IMP-012 — concluído e integrado, decisões preservadas
 

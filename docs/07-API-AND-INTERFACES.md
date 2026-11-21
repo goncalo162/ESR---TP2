@@ -928,3 +928,34 @@ sem repetir build/manual; integração aguarda autorização,sem fecho/staging/c
 [Fecho](../memory-bank/bolts/023-arvores/closure-walkthrough.md) após integração4d18d1d,
 Test1379/0/0/0,19 XML,Francisco30 e Denji. Nenhuma API/Java alterada no fecho;
 Q-C-40–42 e reservas/leases mantidas,sem CLI ou vídeo novo. Unidade/fase em progresso.
+
+## IMP-014 — Q-C-47-B aprovada, contrato de Implement
+
+Registo2026-11-21T15:03:15Z, antes de alterações Java: Event de routing recebe
+Optional<SwitchEvent> e conserva construtor2; payload imutável para apenas
+STARTED/SUCCESS/FAILURE de troca, com contexto/custos/motivo/duração, paths≤32
+e motivo≤256. Snapshot e construtores4/5/6 não mudam. Factory nomeada de
+OverlayNode recebe sink de routing, conservando construtores/factories e
+tratamento fatal. A aplicação encaminha payload só à fila limitada console.log
+existente, sem logger, I/O no owner, threads, dependências ou filas adicionais.
+Publicação de confirmação precede SUCCESS e poda. Cinco caminhos autorizados:
+RoutingService.java, RouteMetric.java, RouteSwitchTest.java, OverlayNode.java e
+OttApplication.java, com paths completos no ADD/IMP-014. Testes históricos
+preservados. Este é contrato aprovado, não afirma implementação ou execução.
+Apenas Implement; sem Test/fecho/commit/push. R17 histórico sem causa estabelecida.
+
+## IMP-014 — APIs de Implement disponíveis, aceitação pendente
+
+Event conserva (Reason,boolean) e acrescenta Optional<SwitchEvent>; payload
+imutável STARTED/SUCCESS/FAILURE. Snapshot4/5/6 e Factory de routing intactos.
+OverlayNode.withRoutingObserver acrescenta sink conservando construtores3/4/5
+e fatal no finally. A aplicação usa apenas console.log/writer existentes;
+contexto máximo/escaping/fila cheia verificados, sem I/O no owner ou fila/thread nova.
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.

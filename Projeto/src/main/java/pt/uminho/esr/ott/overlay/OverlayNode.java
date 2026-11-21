@@ -24,6 +24,7 @@ public final class OverlayNode implements AutoCloseable
     private final NetworkMonitor.Factory monitorFactory;
     private volatile NetworkMonitor monitor;
     private final RoutingService.Factory routingFactory;
+    private final RoutingService.Observer routingObserver;
     private volatile RoutingService routing;
     private final AtomicReference<Throwable> failure = new AtomicReference<>();
     private final CompletableFuture<Void> started = new CompletableFuture<>();
@@ -53,6 +54,15 @@ public final class OverlayNode implements AutoCloseable
     OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
             NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory)
     {
+        this(configuration, instanceId, observer, monitorFactory, routingFactory, event -> { });
+    }
+
+
+    private OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
+            NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory,
+            RoutingService.Observer routingObserver)
+    {
+        this.routingObserver = Objects.requireNonNull(routingObserver);
         this.configuration = Objects.requireNonNull(configuration);
         instance = Objects.requireNonNull(instanceId);
         this.observer = Objects.requireNonNull(observer);
@@ -65,6 +75,14 @@ public final class OverlayNode implements AutoCloseable
 
 
     //* === Métodos Públicos === *
+
+    public static OverlayNode withRoutingObserver(NodeConfiguration configuration, UUID instanceId,
+            NeighborManager.Observer observer, RoutingService.Observer routingObserver)
+    {
+        return new OverlayNode(configuration, instanceId, observer, NetworkMonitor::new,
+                RoutingService::new, routingObserver);
+    }
+
 
     /** Q-C-32: diagnostic delegation only, no new owner or transport. */
     public RoutingService.TraceTicket requestTrace(UUID streamId)
@@ -135,8 +153,14 @@ public final class OverlayNode implements AutoCloseable
                 routing = Objects.requireNonNull(routingFactory.create(configuration, instance, owner, service::send,
                         event ->
                         {
-                            if(event.fatal())
-                                failMonitoring(new IllegalStateException("Routing: " + event.reason()));
+                            try
+                            {
+                                routingObserver.onEvent(event);
+
+                            }finally{
+                                if(event.fatal())
+                                    failMonitoring(new IllegalStateException("Routing: " + event.reason()));
+                            }
                         }));
 
                 if(!owner.offer(() ->

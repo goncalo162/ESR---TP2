@@ -1,0 +1,1824 @@
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java
+@@ -471,7 +471,7 @@
+         UUID instance = UUID.randomUUID();
+         var reference = new AtomicReference<OverlayNode>();
+ 
+-        var node = new OverlayNode(config, instance, event ->
++        var node = OverlayNode.withRoutingObserver(config, instance, event ->
+         {
+             console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
+                     event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
+@@ -493,7 +493,8 @@
+                             + (route == null ? "UNAVAILABLE" : route.selectedMetric().map(x -> Long.toString(x.costMicros())).orElse("UNAVAILABLE")), false);
+                 }
+             }
+-        });
++        }, event -> event.routeSwitch().ifPresent(change ->
++                console.log(switchLog(config.nodeId(), instance, change), false)));
+ 
+         reference.set(node);
+ 
+@@ -550,6 +551,22 @@
+                 node.close();
+             }
+         };
++    }
++
++
++
++    private static String switchLog(String node, UUID instance, RoutingService.SwitchEvent change)
++    {
++        var before = change.previous();
++        var after = change.replacement();
++        return "ROUTE_SWITCH node=" + node + " instance=" + instance + " stream=" + change.streamId()
++                + " origin=" + change.serverId() + " epoch=" + change.serverEpoch() + " operation=" + change.operationId()
++                + " phase=" + change.phase() + " previous=" + before.nodeId() + "/" + before.instanceId() + "/" + before.connectionId()
++                + " replacement=" + after.nodeId() + "/" + after.instanceId() + "/" + after.connectionId()
++                + " previousRevision=" + change.previousRevision() + " replacementRevision=" + change.replacementRevision()
++                + " previousCostMicros=" + change.previousCostMicros() + " replacementCostMicros=" + change.replacementCostMicros()
++                + " reason=" + change.reason() + " elapsedNanos=" + change.elapsedNanos()
++                + " previousPath=" + change.previousPath() + " replacementPath=" + change.replacementPath();
+     }
+ 
+ 
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java
+@@ -24,6 +24,7 @@
+     private final NetworkMonitor.Factory monitorFactory;
+     private volatile NetworkMonitor monitor;
+     private final RoutingService.Factory routingFactory;
++    private final RoutingService.Observer routingObserver;
+     private volatile RoutingService routing;
+     private final AtomicReference<Throwable> failure = new AtomicReference<>();
+     private final CompletableFuture<Void> started = new CompletableFuture<>();
+@@ -53,6 +54,15 @@
+     OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
+             NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory)
+     {
++        this(configuration, instanceId, observer, monitorFactory, routingFactory, event -> { });
++    }
++
++
++    private OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
++            NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory,
++            RoutingService.Observer routingObserver)
++    {
++        this.routingObserver = Objects.requireNonNull(routingObserver);
+         this.configuration = Objects.requireNonNull(configuration);
+         instance = Objects.requireNonNull(instanceId);
+         this.observer = Objects.requireNonNull(observer);
+@@ -66,6 +76,14 @@
+ 
+     //* === Métodos Públicos === *
+ 
++    public static OverlayNode withRoutingObserver(NodeConfiguration configuration, UUID instanceId,
++            NeighborManager.Observer observer, RoutingService.Observer routingObserver)
++    {
++        return new OverlayNode(configuration, instanceId, observer, NetworkMonitor::new,
++                RoutingService::new, routingObserver);
++    }
++
++
+     /** Q-C-32: diagnostic delegation only, no new owner or transport. */
+     public RoutingService.TraceTicket requestTrace(UUID streamId)
+     {
+@@ -135,8 +153,14 @@
+                 routing = Objects.requireNonNull(routingFactory.create(configuration, instance, owner, service::send,
+                         event ->
+                         {
+-                            if(event.fatal())
+-                                failMonitoring(new IllegalStateException("Routing: " + event.reason()));
++                            try
++                            {
++                                routingObserver.onEvent(event);
++
++                            }finally{
++                                if(event.fatal())
++                                    failMonitoring(new IllegalStateException("Routing: " + event.reason()));
++                            }
+                         }));
+ 
+                 if(!owner.offer(() ->
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java
+@@ -26,6 +26,17 @@
+ 
+ 
+ 
++    public static boolean improves(long current, long replacement, int percent)
++    {
++        if(current < 0 || replacement < 0 || percent < 0 || percent > 100)
++            throw new IllegalArgumentException("Invalid improvement inputs");
++
++        long minimum = (current / 100) * percent + ((current % 100) * percent + 99) / 100;
++        return replacement < current && current - replacement >= minimum;
++    }
++
++
++
+     //* === Comparable Implementation === *
+ 
+     @Override
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java
+@@ -133,7 +133,52 @@
+     public enum Phase { NEW, RUNNING, STOPPED }
+     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
+         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
+-    public record Event(Reason reason, boolean fatal) { public Event { Objects.requireNonNull(reason); } }
++    public enum SwitchPhase
++    {
++        STARTED, SUCCESS, FAILURE
++    }
++
++    public record SwitchEvent(UUID streamId, String serverId, UUID serverEpoch, UUID operationId,
++            SwitchPhase phase, Neighbor.Session previous, Neighbor.Session replacement,
++            List<String> previousPath, List<String> replacementPath, long previousRevision,
++            long replacementRevision, long previousCostMicros, long replacementCostMicros,
++            String reason, long elapsedNanos)
++    {
++        public SwitchEvent
++        {
++            Objects.requireNonNull(streamId);
++            RoutingTable.nodeId(serverId);
++            Objects.requireNonNull(serverEpoch);
++            Objects.requireNonNull(operationId);
++            Objects.requireNonNull(phase);
++            Objects.requireNonNull(previous);
++            Objects.requireNonNull(replacement);
++            Objects.requireNonNull(reason);
++            if(previousPath == null || replacementPath == null || previousPath.size() > 32
++                    || replacementPath.size() > 32 || previousPath.size() < 2 || replacementPath.size() < 2
++                    || previousRevision < 0 || replacementRevision < -1 || previousCostMicros < 1
++                    || replacementCostMicros < 1 || reason.length() > 256 || elapsedNanos < 0)
++                throw new IllegalArgumentException("Invalid switch event");
++
++            previousPath = List.copyOf(previousPath);
++            replacementPath = List.copyOf(replacementPath);
++        }
++    }
++
++    public record Event(Reason reason, boolean fatal, Optional<SwitchEvent> routeSwitch)
++    {
++        public Event
++        {
++            Objects.requireNonNull(reason);
++            Objects.requireNonNull(routeSwitch);
++        }
++
++
++        public Event(Reason reason, boolean fatal)
++        {
++            this(reason, fatal, Optional.empty());
++        }
++    }
+     public record Diagnostics(Phase phase, int sessions, int bindings, int references, int cacheEntries,
+             int ledgers, int pendingCells, int pendingIntents, int quotas, int sendTickets, int timers,
+             long failures, boolean countersSaturated, Reason lastReason) { }
+@@ -188,6 +233,11 @@
+     private final LinkedHashMap<String,Neighbor.Session> sessions=new LinkedHashMap<>();
+     private final List<Neighbor.Session> peerIndex=new ArrayList<>();
+     private final Map<String,OptionalLong> costs=new HashMap<>();
++    private final Map<Neighbor.Session,MetricStamp> metricStamps = new HashMap<>();
++
++    private record MetricStamp(long count, boolean saturated, long sampledAt)
++    {
++    }
+     private final Map<Key,Ledger> ledgers=new HashMap<>();
+     private final Map<Generation,CacheEntry> cache=new HashMap<>();
+     private final Map<QuotaKey,ArrayDeque<Long>> quotas=new HashMap<>();
+@@ -397,10 +447,12 @@
+         if(originCounts.containsKey(info.serverId())&&!epoch(info.serverId(),info.serverEpoch()))return;
+         var row=existing==null?bind(info.streamId(),info.serverId()):existing;if(row==null)return;
+         if(!epoch(info.serverId(),info.serverEpoch()))return;
++        long previousSequence = row.route.candidates().stream()
++                .filter(c -> c.upstream().equals(key(session))).mapToLong(RouteCandidate::announceSeq).max().orElse(-1);
+         var outcome=root.announce(new RoutingTable.Advertisement(info.streamId(),info.serverId(),info.serverEpoch(),key(session),a.announceSeq(),a.costMicros(),path));
+         if(applied(outcome)){
+             if(row.info==null)row.info=info;
+-            activation.observeAnnouncement(session, a, now());
++            activation.observeAnnouncement(session, a, now(), a.announceSeq() > previousSequence);
+             // Catalog must be published with the newly established canonical metadata.
+             dirty();
+         }
+@@ -409,11 +461,28 @@
+         requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
+         try{
+             activation.kick();
+-            Neighbor.Session session;OptionalLong cost;
+-            if(event instanceof NetworkMonitor.Updated e){session=e.metrics().session();cost=e.metrics().costMicros();}
++            Neighbor.Session session;OptionalLong cost;boolean distinct = false;
++            if(event instanceof NetworkMonitor.Updated e)
++            {
++                session = e.metrics().session();
++                cost = e.metrics().costMicros();
++                if(!current(session))
++                    return;
++                var m = e.metrics();
++                if(m.lastSampleAtNanos().isPresent())
++                {
++                    var previous = metricStamps.get(session);
++                    long sampledAt = m.lastSampleAtNanos().orElseThrow();
++                    distinct = previous == null || m.sampleCount() > previous.count()
++                            || m.sampleCount() == Long.MAX_VALUE && previous.count() == Long.MAX_VALUE
++                                && m.sampleCountSaturated() && sampledAt - previous.sampledAt() > 0;
++                    if(distinct)
++                        metricStamps.put(session, new MetricStamp(m.sampleCount(), m.sampleCountSaturated(), sampledAt));
++                }
++            }
+             else if(event instanceof NetworkMonitor.Invalidated e){session=e.session();cost=OptionalLong.empty();}
+             else return;
+-            if(!current(session))return;traceSweep=traceOrder.size();costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
++            if(!current(session))return;traceSweep=traceOrder.size();costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));activation.observeMetric(session, distinct);drive();
+         }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
+     }
+     public void setLocalAvailable(UUID id,boolean available){
+@@ -429,6 +498,7 @@
+     }
+     private void peersChanged(){peerIndex.clear();peerIndex.addAll(sessions.values());peerCursor=0;dirty();}
+     private void retire(Neighbor.Session s){
++        metricStamps.remove(s);
+         activation.sessionDown(s);
+         var iterator=ledgers.entrySet().iterator();while(iterator.hasNext()){
+             var entry=iterator.next();if(entry.getKey().session.equals(s)){if(entry.getValue().cell)pending--;iterator.remove();}
+@@ -897,7 +967,7 @@
+         requireOwner();if(cleaned.isDone())return;stopping.set(true);scheduler.requestClose();if(alarm!=null)alarm.cancel();alarm=null;
+         closeTraces();
+         activation.close();
+-        rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
++        rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();metricStamps.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
+         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
+         publish(clock.getAsLong());cleaned.complete(null);
+         if(registration!=null){registration.remove();registration=null;}
+@@ -967,6 +1037,7 @@
+             long failedAt, renewalFailedAt, lastRoundStart, generation;
+             boolean roundStarted, lossCredit, sourceAvailable, permanent;
+             int issued;
++            final Quality quality = new Quality();
+ 
+ 
+ 
+@@ -1051,6 +1122,7 @@
+             Attempt attempt;
+             Proof rejected;
+             boolean capacityBlocked;
++            QualitySwitch switching;
+ 
+ 
+ 
+@@ -1075,8 +1147,9 @@
+         }
+         final class ResponseQuota { long began;int used;ResponseQuota(long began){this.began=began;} }
+         final class Prune {
+-            final PruneRequest request;final Line line;
+-            Prune(PruneRequest request,Line line){this.request=request;this.line=line;}
++            final PruneRequest request;final Line line;final boolean retired;
++            Prune(PruneRequest request,Line line){this(request,line,false);}
++            Prune(PruneRequest request,Line line,boolean retired){this.request=request;this.line=line;this.retired=retired;}
+         }
+         enum SendKind { REQUEST, PRUNE, ACK, ERROR, UNBOUND }
+         final class ActSend {
+@@ -1093,6 +1166,198 @@
+                     if(freed&&!stopping.get()){changed.set(true);wake();}}
+             }
+         }
++
++
++        //* === Troca por Qualidade === *
++
++        final class Quality
++        {
++            //* === Atributos e Variáveis === *
++            Proof target, blocked, anchor;
++            int observations;
++            long confirmedAt, failedAt;
++            boolean anchored, observed, initial, failed, rearm, permanent;
++        }
++
++
++        final class QualitySwitch
++        {
++            //* === Atributos e Variáveis === *
++            final UUID operation = UUID.randomUUID();
++            final Confirmed previous;
++            final Line line;
++            final long revision, version, previousCost, replacementCost;
++            final Proof target;
++            long targetRevision = -1;
++            boolean started, terminal, promoted;
++
++
++
++            //* === Construtores === *
++
++            QualitySwitch(Tree tree, Proof target, long previousCost, long replacementCost)
++            {
++                previous = tree.confirmed;
++                line = tree.upstream;
++                revision = tree.submittedRevision;
++                version = tree.version;
++                this.target = target;
++                this.previousCost = previousCost;
++                this.replacementCost = replacementCost;
++            }
++        }
++
++
++        void observeMetric(Neighbor.Session session, boolean distinct)
++        {
++            if(!distinct)
++                return;
++            for(var tree : trees.values())
++            {
++                observeQuality(tree, session);
++            }
++        }
++
++
++        void observeQuality(Tree tree, Neighbor.Session session)
++        {
++            if(tree.confirmed == null || tree.confirmed.source)
++                return;
++            var proof = eligibleProof(tree, now());
++            if(session.equals(tree.confirmed.parent) || proof != null && session.equals(proof.session))
++                tree.quality.observed = true;
++        }
++
++
++        OptionalLong confirmedCost(Tree tree, long at)
++        {
++            if(!healthy(tree, at) || tree.confirmed.source)
++                return OptionalLong.empty();
++            var confirmed = tree.confirmed;
++            return row(tree.id).route.candidates().stream()
++                    .filter(candidate -> candidate.serverEpoch().equals(confirmed.epoch)
++                            && candidate.upstream().equals(key(confirmed.parent))
++                            && candidate.path().equals(confirmed.path) && candidate.metric().isPresent()
++                            && age(at, candidate.generationStartedAtNanos()) < candidate.candidateTtlNanos())
++                    .mapToLong(candidate -> candidate.metric().orElseThrow().costMicros()).findFirst();
++        }
++
++
++        boolean qualityValid(Tree tree, long at)
++        {
++            var round = tree.round;
++            if(round == null || round.switching == null || !healthy(tree, at) || !demand(tree, at))
++                return false;
++            var proof = eligibleProof(tree, at);
++            var cost = confirmedCost(tree, at);
++            var q = tree.quality;
++            return proof != null && proof.sameBranch(round.switching.target) && proof.sameBranch(q.target)
++                    && cost.isPresent() && q.observations >= config.runtime().routing().switchObservations()
++                    && age(at, q.confirmedAt) >= config.runtime().routing().switchMinDwell().toNanos()
++                    && RouteMetric.improves(cost.orElseThrow(), row(tree.id).route.selectedMetric().orElseThrow().costMicros(),
++                            config.runtime().routing().switchImprovementPercent());
++        }
++
++
++        void stepQuality(Tree tree, long at)
++        {
++            var q = tree.quality;
++            boolean observed = q.observed;
++            q.observed = false;
++            if(!healthy(tree, at) || tree.confirmed.source || !demand(tree, at))
++                return;
++            var proof = eligibleProof(tree, at);
++            var cost = confirmedCost(tree, at);
++            if(proof == null || cost.isEmpty() || proof.session.equals(tree.confirmed.parent)
++                    && proof.path.equals(tree.confirmed.path))
++            {
++                q.observations = 0;
++                q.target = null;
++                return;
++            }
++            if(!proof.sameBranch(q.target))
++            {
++                q.target = proof;
++                q.observations = 0;
++            }
++            if(q.failed)
++            {
++                if(q.permanent && q.blocked != null && proof.session.equals(q.blocked.session)
++                        && proof.epoch.equals(q.blocked.epoch))
++                    return;
++                if(observed && !proof.sameBranch(q.blocked))
++                {
++                    q.rearm = true;
++                    q.permanent = false;
++                }
++                if(!q.rearm)
++                    return;
++            }
++            boolean first = !q.initial;
++            q.initial = true;
++            long replacement = row(tree.id).route.selectedMetric().orElseThrow().costMicros();
++            if(!RouteMetric.improves(cost.orElseThrow(), replacement, config.runtime().routing().switchImprovementPercent()))
++            {
++                q.observations = 0;
++                return;
++            }
++            if((observed || first) && q.observations < config.runtime().routing().switchObservations())
++                q.observations++;
++            if(tree.round != null || tree.prune != null || !q.anchored
++                    || q.observations < config.runtime().routing().switchObservations()
++                    || age(at, q.confirmedAt) < config.runtime().routing().switchMinDwell().toNanos()
++                    || tree.roundStarted && age(at, tree.lastRoundStart) < timeout
++                    || q.failed && age(at, q.failedAt) < timeout)
++                return;
++
++            tree.lastRoundStart = at;
++            tree.roundStarted = true;
++            tree.generation = Math.incrementExact(tree.generation);
++            tree.used = proof;
++            tree.round = new Round(at);
++            tree.round.switching = new QualitySwitch(tree, proof, cost.orElseThrow(), replacement);
++            switchEvent(tree, tree.round, SwitchPhase.STARTED, "SUSTAINED_IMPROVEMENT", at);
++        }
++
++
++        long qualityDelay(Tree tree, long at)
++        {
++            var q = tree.quality;
++            if(tree.round != null || tree.prune != null || q.target == null || !q.anchored
++                    || q.failed && !q.rearm || q.permanent
++                    || q.observations < config.runtime().routing().switchObservations())
++                return Long.MAX_VALUE;
++            long remaining = Math.max(0, config.runtime().routing().switchMinDwell().toNanos() - age(at, q.confirmedAt));
++            if(q.failed)
++                remaining = Math.max(remaining, timeout - age(at, q.failedAt));
++            if(tree.roundStarted)
++                remaining = Math.max(remaining, timeout - age(at, tree.lastRoundStart));
++            return futureDelay(remaining);
++        }
++
++
++        void switchEvent(Tree tree, Round round, SwitchPhase phase, String reason, long at)
++        {
++            var change = round.switching;
++            if(change == null || change.terminal || phase == SwitchPhase.STARTED && change.started)
++                return;
++            if(phase == SwitchPhase.STARTED)
++                change.started = true;
++            else
++                change.terminal = true;
++            var event = new SwitchEvent(tree.id, tree.origin, change.target.epoch, change.operation, phase,
++                    change.previous.parent, change.target.session, change.previous.path, change.target.path,
++                    change.revision, change.targetRevision, change.previousCost, change.replacementCost,
++                    reason.length() > 256 ? reason.substring(0, 256) : reason, age(at, round.began));
++            try
++            {
++                observer.onEvent(new Event(Reason.NONE, false, Optional.of(event)));
++
++            }catch(RuntimeException error){
++                requestClose();
++            }
++        }
++
+ 
+ 
+         //* === Recuperação === *
+@@ -1157,11 +1422,20 @@
+         }
+ 
+ 
+-        void observeAnnouncement(Neighbor.Session session, ControlMessage.Announcement announcement, long at)
++        void observeAnnouncement(Neighbor.Session session, ControlMessage.Announcement announcement, long at, boolean distinct)
+         {
+             var t = trees.get(announcement.stream().streamId());
+             if(t == null || !t.epoch.equals(announcement.stream().serverEpoch()))
+                 return;
++            if(distinct)
++            {
++                observeQuality(t, session);
++                var q = t.quality;
++                var eligible = eligibleProof(t, at);
++                if(q.failed && eligible != null && eligible.session.equals(session)
++                        && eligible.sameBranch(q.blocked) && eligible.sequence > q.blocked.sequence)
++                    q.rearm = true;
++            }
+             var line = lines.get(new LineKey(true, t.id, t.epoch, session));
+             if(line != null)
+                 line.observedSequence = Math.max(line.observedSequence, announcement.announceSeq());
+@@ -1213,10 +1487,14 @@
+         {
+             if(t.confirmed == null)
+                 return;
++            boolean transferred = t.round != null && t.round.switching != null
++                    && !roundElapsed(t.round, at) && eligibleProof(t, at) != null;
++            if(transferred)
++                t.round.switching.promoted = true;
+             t.confirmed = null;
+             t.confirmedLocals.clear();
+             t.version = Math.incrementExact(t.version);
+-            t.lossCredit = true;
++            t.lossCredit = !transferred;
+             if(t.round != null && t.round.renew)
+                 fail(t, ErrorCode.NO_ROUTE, "CONFIRMATION_LOST");
+             for(var child : t.children.values())
+@@ -1541,19 +1819,71 @@
+             if(roundElapsed(a.round,at)||a.renewal!=null&&a.renewal.previousGrant().remainingNanos(at)==0){
+                 fail(t,ErrorCode.TIMEOUT,"TIMEOUT");return;
+             }
++            if(!demand(t, at))
++            {
++                retireBranch(t, at);
++                return;
++            }
++            if(t.confirmed != null && !healthy(t, at))
++                loseConfirmation(t, at);
++            if(a.round.switching != null && !a.round.switching.promoted && !qualityValid(t, at))
++            {
++                fail(t, ErrorCode.PATH_CHANGED, "QUALITY_CHANGED");
++                return;
++            }
+             if(!epochCurrent(t)||!current(a.line.key.session)||!selectedPath(t).equals(a.path)
+                     ||!row(t.id).route.knownUpstream().equals(Optional.of(key(a.line.key.session)))){
+                 failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;
+             }
+             var validity=new Subscription.Lease(a.began,Math.multiplyExact(a.early.grantedLeaseMs(),1_000_000L));
+             if(validity.remainingNanos(at)==0){failedAttempt(a,ErrorCode.TIMEOUT,"GRANT_EXPIRED");return;}
++            var previous = t.confirmed;
++            var installed = new Proof(t.epoch, a.line.key.session, a.path, -1);
++            if(!installed.sameBranch(t.quality.anchor))
++            {
++                t.quality.confirmedAt = at;
++                t.quality.anchored = true;
++                t.quality.anchor = installed;
++            }
++            if(a.round.switching != null)
++            {
++                for(var child : t.children.values())
++                {
++                    if(child.active != null && !child.active.expectedPath().subList(0,
++                            child.active.expectedPath().size() - 1).equals(a.path))
++                    {
++                        child.suspended = child.active.validity().orElseThrow();
++                        child.active = null;
++                    }
++                }
++            }
+             t.confirmed=new Confirmed(false,t.epoch,a.line.key.session,a.path,validity);
+-            t.upstream=a.line;t.renewBegan=a.began;
++            t.upstream=a.line;t.submittedRevision=a.revision;t.renewBegan=a.began;
+             t.renewPeriod=Math.min(config.runtime().subscription().renew().toNanos(),validity.durationNanos()/3);
+             t.round=null;t.failure=null;
+             t.issued = a.round.issued;
+             t.detail = "";
+             t.version=Math.incrementExact(t.version);kick();
++            if(a.round.switching != null)
++            {
++                for(var local : t.locals.values())
++                {
++                    if(!local.cancelled.get())
++                        t.confirmedLocals.add(local.key.token);
++                }
++                t.quality.observations = 0;
++                t.quality.target = null;
++                t.quality.failed = false;
++                publish(at);
++                switchEvent(t, a.round, SwitchPhase.SUCCESS, "CONFIRMED", at);
++                var old = a.round.switching;
++                if(!stopping.get() && current(old.previous.parent))
++                {
++                    var identity = new Subscription.Identity(old.previous.parent, t.id, t.epoch,
++                            old.line.id, old.revision, old.version);
++                    t.prune = new Prune(new PruneRequest(identity, UUID.randomUUID(), at, timeout), old.line, true);
++                }
++            }
+         }
+         void failedAttempt(Attempt a, ErrorCode code, String detail)
+         {
+@@ -1561,6 +1891,11 @@
+             if(t.round != a.round || a.round.attempt != a)
+                 return;
+             long at = now();
++            if(a.round.switching != null && !a.round.switching.promoted)
++            {
++                fail(t, code, detail);
++                return;
++            }
+             a.round.attempt = null;
+             if(a.round.renew && code == ErrorCode.PATH_CHANGED)
+             {
+@@ -1584,6 +1919,25 @@
+ 
+         void fail(Tree t, ErrorCode code, String detail)
+         {
++            var round = t.round;
++            if(round != null && round.switching != null)
++            {
++                t.quality.blocked = new Proof(t.epoch, round.switching.target.session,
++                        round.switching.target.path, observedSequence(t, round.switching.target));
++                t.quality.failedAt = now();
++                t.quality.failed = true;
++                t.quality.rearm = false;
++                t.quality.permanent = code == ErrorCode.INVALID_MESSAGE || code == ErrorCode.STALE_REVISION;
++                t.quality.observations = 0;
++                switchEvent(t, round, SwitchPhase.FAILURE, detail, now());
++                if(!round.switching.promoted && healthy(t, now()))
++                {
++                    t.issued = round.issued;
++                    t.round = null;
++                    kick();
++                    return;
++                }
++            }
+             if(t.round != null)
+                 t.issued = t.round.issued;
+             blockRecoveryProof(t, now());
+@@ -1638,6 +1992,8 @@
+ 
+ 
+         void retireBranch(Tree t,long at){
++            if(t.round != null && t.round.switching != null)
++                switchEvent(t, t.round, SwitchPhase.FAILURE, "CANCELLED", at);
+             t.round=null;
+             t.credit = null;
+             t.lossCredit = false;
+@@ -1681,9 +2037,10 @@
+             boolean wanted = demand(t, at);
+             if(!wanted && (t.confirmed != null || t.round != null))
+                 retireBranch(t, at);
+-            if(wanted && t.prune != null)
++            if(wanted && t.prune != null && !t.prune.retired)
+                 t.prune = null;
+             reconcileRecovery(t, at);
++            stepQuality(t, at);
+             if(wanted && healthy(t, at) && !t.confirmed.source && t.round == null
+                     && t.renewalBlocked == null && age(at, t.renewBegan) >= t.renewPeriod
+                     && compatible(t, t.confirmed.path, at))
+@@ -1866,6 +2223,13 @@
+                         ||child!=null&&(child.detached||childElapsed(child,dispatch))){
+                     synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
+                 }
++                if(attempt != null && attempt.round.switching != null && !attempt.round.switching.promoted
++                        && !qualityValid(attempt.tree, dispatch))
++                {
++                    synchronized(resources){sends.remove(send);resources.notifyAll();}
++                    fail(attempt.tree, ErrorCode.PATH_CHANGED, "QUALITY_CHANGED");
++                    return false;
++                }
+                 if(kind==SendKind.PRUNE){
+                     var payload=(ControlMessage.Deactivation)message.payload();var t=trees.get(payload.streamId());
+                     var prune=t==null?null:t.prune;
+@@ -1893,7 +2257,12 @@
+                             new ControlMessage.ActivationAck(t.id,t.epoch,child.line.id,child.payload.revision(),millis));
+                 }
+             }catch(RuntimeException error){synchronized(resources){sends.remove(send);resources.notifyAll();}throw error;}
+-            if(attempt!=null){attempt.submitted=true;attempt.round.issued++;attempt.tree.upstream=attempt.line;attempt.tree.submittedRevision=attempt.revision;}
++            if(attempt!=null){
++                attempt.submitted=true;attempt.round.issued++;
++                if(attempt.round.switching != null)
++                    attempt.round.switching.targetRevision = attempt.revision;
++                if(attempt.round.switching == null){attempt.tree.upstream=attempt.line;attempt.tree.submittedRevision=attempt.revision;}
++            }
+             try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
+             catch(RuntimeException e){send.complete(null,e);}return true;
+         }
+@@ -1962,6 +2331,7 @@
+                 if(t.round!=null)delay=Math.min(delay,futureDelay(t.round.budget-age(at,t.round.began)));
+                 if(t.confirmed!=null&&!t.confirmed.source){
+                     delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
++                    delay=Math.min(delay,qualityDelay(t,at));
+                     if(t.round==null&&t.renewalBlocked==null&&demand(t,at)&&compatible(t,t.confirmed.path,at))
+                         delay=Math.min(delay,futureDelay(t.renewPeriod-age(at,t.renewBegan)));
+                 }
+@@ -1997,6 +2367,7 @@
+         {
+             long at = now();
+             responseQuotas.remove(session);
++            metricStamps.remove(session);
+             for(var t : trees.values())
+             {
+                 var child = t.children.get(session);
+@@ -2070,6 +2441,13 @@
+             }
+             for(var t : trees.values())
+             {
++                if(t.round != null && t.round.switching != null)
++                {
++                    long at = clock.getAsLong();
++                    if(at - t.round.began < 0)
++                        at = t.round.began;
++                    switchEvent(t, t.round, SwitchPhase.FAILURE, "CLOSED", at);
++                }
+                 t.locals.clear();
+                 t.children.clear();
+                 t.confirmedLocals.clear();
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java
+@@ -0,0 +1,1113 @@
++package pt.uminho.esr.ott.routing;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.api.Timeout;
++import static org.junit.jupiter.api.Assertions.*;
++import static pt.uminho.esr.ott.routing.ActivationTest.*;
++import java.io.*;
++import java.lang.reflect.*;
++import java.net.*;
++import java.nio.file.Path;
++import java.time.Duration;
++import java.util.*;
++import java.util.concurrent.*;
++import java.util.concurrent.atomic.*;
++import java.util.function.*;
++import pt.uminho.esr.ott.app.OttApplication;
++import pt.uminho.esr.ott.bootstrap.BootstrapServer;
++import pt.uminho.esr.ott.config.*;
++import pt.uminho.esr.ott.monitoring.*;
++import pt.uminho.esr.ott.overlay.*;
++import pt.uminho.esr.ott.protocol.*;
++import pt.uminho.esr.ott.transport.Connection;
++
++@Timeout(25)
++class RouteSwitchTest
++{
++    //* === Atributos e Variáveis === *
++    private static final long SECOND = 1_000_000_000L;
++
++
++
++    //* === Auxiliar === *
++
++    private static final class Rig implements AutoCloseable
++    {
++        //* === Atributos e Variáveis === *
++        final AtomicLong clock = new AtomicLong();
++        final Owner owner = new Owner(4096);
++        final Timers timers = new Timers(clock);
++        final List<Sent> sent = new ArrayList<>();
++        final List<RoutingService.SwitchEvent> events = new ArrayList<>();
++        final Neighbor.Session a = peer("A"), b = peer("B");
++        final Map<Neighbor.Session,Long> samples = new HashMap<>();
++        final RoutingService router;
++        Predicate<ControlMessage> hold = message -> false;
++        Consumer<RoutingService.Event> sink = event -> { };
++        RoutingService.SubscriptionTicket ticket;
++
++
++
++        //* === Construtores === *
++
++        Rig()
++        {
++            router = new RoutingService(config("R", false, 4096, 3), id("R-instance"), owner, (session, message) -> {
++                assertTrue(owner.isOwnerThread());
++                if(message.type() == MessageType.DEACTIVATE && !events.isEmpty()
++                        && events.getLast().phase() == RoutingService.SwitchPhase.SUCCESS)
++                    assertEquals(events.getLast().replacement(), forwarding().upstream().orElseThrow());
++                var result = new CompletableFuture<Connection.SendResult>();
++                sent.add(new Sent(session, message, result));
++                if(!hold.test(message))
++                    result.complete(Connection.SendResult.ACCEPTED);
++                return result;
++            }, event -> {
++                assertFalse(event.fatal(), event.toString());
++                event.routeSwitch().ifPresent(change -> {
++                    if(change.phase() == RoutingService.SwitchPhase.SUCCESS)
++                        assertEquals(change.replacement(), forwarding().upstream().orElseThrow());
++                    events.add(change);
++                });
++                sink.accept(event);
++            }, clock::get, timers);
++            act(router::start);
++            up(a);
++            metric(a, 10);
++            ad(a, 1, 990);
++            ticket = router.requestSubscription(A, id("consumer"));
++            pump();
++            ack(latest(), 6000);
++            assertEquals(a, forwarding().upstream().orElseThrow());
++        }
++
++
++
++        //* === Lógica === *
++
++        void act(Runnable action)
++        {
++            owner.run(action);
++            pump();
++        }
++
++
++        void pump()
++        {
++            for(int i = 0; i < 10000; i++)
++            {
++                boolean work = owner.drain();
++                boolean alarm = timers.fire();
++                if(!work && !alarm)
++                    return;
++            }
++            fail("Unbounded quality wake loop");
++        }
++
++
++        void tick(long nanos)
++        {
++            clock.addAndGet(nanos);
++            pump();
++        }
++
++
++        void up(Neighbor.Session session)
++        {
++            act(() -> router.onNeighborEvent(new NeighborManager.NeighborUp(session)));
++        }
++
++
++        void sample(Neighbor.Session session, long cost, long count, long at, boolean saturated)
++        {
++            act(() -> router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(session,
++                    LinkMetrics.State.MEASURED, OptionalDouble.of(cost), OptionalLong.of(cost), count,
++                    saturated, OptionalLong.of(at), 0))));
++        }
++
++
++        void metric(Neighbor.Session session, long cost)
++        {
++            sample(session, cost, samples.merge(session, 1L, Long::sum), clock.get(), false);
++        }
++
++
++        void receive(Neighbor.Session session, ControlMessage message)
++        {
++            act(() -> router.onNeighborEvent(new NeighborManager.Received(session, message)));
++        }
++
++
++        void ad(Neighbor.Session session, long generation, long cost)
++        {
++            receive(session, new ControlMessage(MessageType.STREAM_ANNOUNCE, UUID.randomUUID(), session.nodeId(),
++                    session.instanceId(), new ControlMessage.Announcement(new ControlMessage.StreamInfo(A, "S",
++                        "Video", 1, 10, EPOCH), generation, cost, List.of("S", session.nodeId()))));
++        }
++
++
++        void alternative(long advertised)
++        {
++            up(b);
++            metric(b, 10);
++            ad(b, 1, advertised);
++        }
++
++
++        void qualify()
++        {
++            alternative(790);
++            metric(b, 10);
++            metric(b, 10);
++        }
++
++
++        void longGrant()
++        {
++            tick(4 * SECOND);
++            ack(messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 6000);
++            ad(a, 2, 990);
++        }
++
++
++        List<Sent> messages(MessageType type)
++        {
++            return sent.stream().filter(value -> value.message().type() == type).toList();
++        }
++
++
++        Sent latest()
++        {
++            return messages(MessageType.ACTIVATE).getLast();
++        }
++
++
++        void ack(Sent request, long lease)
++        {
++            var payload = (ControlMessage.Activation) request.message().payload();
++            receive(request.peer(), new ControlMessage(MessageType.ACTIVATE_ACK, request.message().requestId(),
++                    request.peer().nodeId(), request.peer().instanceId(), new ControlMessage.ActivationAck(
++                        payload.streamId(), payload.serverEpoch(), payload.subscriptionId(), payload.revision(), lease)));
++        }
++
++
++        void reject(Sent request)
++        {
++            receive(request.peer(), new ControlMessage(MessageType.ERROR, request.message().requestId(),
++                    request.peer().nodeId(), request.peer().instanceId(),
++                    new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, 11, "NO_ROUTE")));
++        }
++
++
++        Route.Confirmation forwarding()
++        {
++            return router.snapshot().forwarding().get(A);
++        }
++
++
++        RoutingService.ActivationLoad load()
++        {
++            var load = new AtomicReference<RoutingService.ActivationLoad>();
++            owner.run(() -> load.set(router.activationLoad()));
++            return load.get();
++        }
++
++
++        public void close()
++        {
++            router.requestClose();
++            owner.drain();
++            for(var send : sent)
++            {
++                send.result().complete(Connection.SendResult.CLOSED);
++            }
++            owner.drain();
++            assertTrue(router.awaitTermination(Duration.ofSeconds(1)));
++            owner.close();
++        }
++    }
++
++
++    private static void check(Consumer<Rig> scenario)
++    {
++        try(var rig = new Rig())
++        {
++            scenario.accept(rig);
++        }
++    }
++
++
++    @Test
++    void s01NoiseBreaksConsecutiveObservations()
++    {
++        check(rig -> {
++            rig.alternative(789);
++            rig.metric(rig.b, 12);
++            rig.metric(rig.b, 10);
++            rig.tick(5 * SECOND);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.metric(rig.b, 11);
++            rig.metric(rig.b, 10);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s02ExactThresholdDwellAndAtomicPublicationBeforeSuccessAndPrune()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND - 1);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.tick(1);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            rig.ack(rig.latest(), 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.SUCCESS),
++                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
++            assertEquals(1000, rig.events.getLast().previousCostMicros());
++            assertEquals(800, rig.events.getLast().replacementCostMicros());
++            assertEquals(rig.events.getFirst().operationId(), rig.events.getLast().operationId());
++            assertEquals(1, rig.messages(MessageType.DEACTIVATE).size());
++            assertEquals(0, rig.router.snapshot().diagnostics().failures());
++        });
++    }
++
++
++    @Test
++    void s03StrictImprovementAtZeroAndHundredPercent()
++    {
++        assertTrue(RouteMetric.improves(1, 0, 100));
++        assertFalse(RouteMetric.improves(0, 0, 0));
++        assertFalse(RouteMetric.improves(10, 10, 0));
++        assertTrue(RouteMetric.improves(10, 9, 0));
++        assertFalse(RouteMetric.improves(10, 1, 100));
++        assertThrows(IllegalArgumentException.class, () -> RouteMetric.improves(-1, 0, 20));
++        assertThrows(IllegalArgumentException.class, () -> RouteMetric.improves(10, 1, 101));
++    }
++
++
++    @Test
++    void s04ExactLargeCostWithoutOverflow()
++    {
++        long reduction = 1844674407370955162L;
++        assertTrue(RouteMetric.improves(Long.MAX_VALUE, Long.MAX_VALUE - reduction, 20));
++        assertFalse(RouteMetric.improves(Long.MAX_VALUE, Long.MAX_VALUE - reduction + 1, 20));
++        assertThrows(ArithmeticException.class, () -> RouteMetric.accumulate(Long.MAX_VALUE, 1, 1));
++        assertEquals(new RouteMetric(100, 1), RouteMetric.accumulate(90, 10, 1));
++    }
++
++
++    @Test
++    void s05DuplicateSamplesAnnouncementsAndTicksDoNotCount()
++    {
++        check(rig -> {
++            rig.alternative(790);
++            for(int i = 0; i < 4; i++)
++            {
++                rig.sample(rig.b, 10, 1, 0, false);
++                rig.ad(rig.b, 1, 790);
++            }
++            rig.tick(5 * SECOND);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.metric(rig.b, 10);
++            rig.metric(rig.b, 10);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s05SaturatedSampleCountRequiresAnAdvancingInstant()
++    {
++        check(rig -> {
++            rig.alternative(790);
++            rig.sample(rig.b, 10, Long.MAX_VALUE, 0, true);
++            rig.tick(5 * SECOND);
++            rig.sample(rig.b, 10, Long.MAX_VALUE, 0, true);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.sample(rig.b, 10, Long.MAX_VALUE, rig.clock.get(), true);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s06InvalidMetricBreaksTheSequenceWithoutInventingObservations()
++    {
++        check(rig -> {
++            rig.alternative(790);
++            rig.metric(rig.b, 10);
++            rig.act(() -> rig.router.onMetrics(new NetworkMonitor.Invalidated(rig.b, NetworkMonitor.Reason.TIMEOUT)));
++            rig.metric(rig.b, 10);
++            rig.tick(5 * SECOND);
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++            rig.metric(rig.b, 10);
++            rig.metric(rig.b, 10);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s07RenewalDoesNotMoveTheConfirmationDwellAnchor()
++    {
++        check(rig -> {
++            rig.tick(2 * SECOND);
++            rig.ack(rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 6000);
++            rig.qualify();
++            rig.tick(3 * SECOND);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s08SelectionCostCannotReplaceTheCurrentConfirmedPathCost()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.act(() -> rig.router.onMetrics(new NetworkMonitor.Invalidated(rig.a, NetworkMonitor.Reason.TIMEOUT)));
++            rig.tick(5 * SECOND);
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
++        });
++    }
++
++
++    @Test
++    void s09PruneCapturesTheOldSubmittedRenewalRevision()
++    {
++        check(rig -> {
++            rig.longGrant();
++            var old = (ControlMessage.Activation) rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast().message().payload();
++            rig.qualify();
++            rig.tick(SECOND);
++            rig.ack(rig.latest(), 6000);
++            var prune = (ControlMessage.Deactivation) rig.messages(MessageType.DEACTIVATE).getLast().message().payload();
++            assertEquals(old.subscriptionId(), prune.subscriptionId());
++            assertEquals(old.revision(), prune.revision());
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++        });
++    }
++
++
++    @Test
++    void s10EarlyAckWaitsForAcceptedAndCancellationWins()
++    {
++        check(rig -> {
++            rig.hold = message -> message.type() == MessageType.ACTIVATE;
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var pending = rig.latest();
++            rig.ack(pending, 6000);
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            rig.ticket.cancel();
++            rig.pump();
++            assertNull(rig.forwarding());
++            assertTrue(rig.load().sends() > 0);
++            pending.result().complete(Connection.SendResult.ACCEPTED);
++            rig.pump();
++            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.FAILURE),
++                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
++        });
++    }
++
++
++    @Test
++    void s11FailurePreservesTheOldGrantAndHasOneTerminalEvent()
++    {
++        check(rig -> {
++            rig.longGrant();
++            rig.qualify();
++            rig.tick(SECOND);
++            rig.reject(rig.latest());
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            assertEquals(2, rig.events.size());
++            rig.pump();
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(2, rig.events.size());
++        });
++    }
++
++
++    @Test
++    void s12MetricRecoveryCannotRearmButNewPostFailureAnnouncementCan()
++    {
++        check(rig -> {
++            rig.longGrant();
++            rig.qualify();
++            rig.tick(SECOND);
++            rig.reject(rig.latest());
++            rig.metric(rig.b, 10000);
++            rig.metric(rig.b, 10);
++            rig.tick(3 * SECOND);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            rig.ad(rig.b, 2, 790);
++            rig.metric(rig.b, 10);
++            rig.metric(rig.b, 10);
++            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
++            rig.ad(rig.b, 2, 790);
++            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
++            rig.ack(rig.latest(), 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++        });
++    }
++
++
++    @Test
++    void s13ActualLossIgnoresQualityDwell()
++    {
++        check(rig -> {
++            rig.alternative(790);
++            rig.tick(3 * SECOND);
++            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            assertTrue(rig.events.isEmpty());
++            rig.ack(rig.latest(), 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++        });
++    }
++
++
++    @Test
++    void s13LossDuringSwitchKeepsTheOriginalGlobalDeadlineAndPhysicalReservation()
++    {
++        check(rig -> {
++            rig.hold = message -> message.type() == MessageType.ACTIVATE;
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var pending = rig.latest();
++            rig.tick(SECOND);
++            assertNull(rig.forwarding());
++            rig.tick(2 * SECOND);
++            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, rig.router.snapshot().recoveries().get(A).phase());
++            assertTrue(rig.load().sends() > 0);
++            pending.result().complete(Connection.SendResult.ACCEPTED);
++            rig.pump();
++            assertNull(rig.forwarding());
++        });
++    }
++
++
++    @Test
++    void s14ObsoleteTargetCannotCommitAfterASecondImprovement()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var pending = rig.latest();
++            var other = peer("C");
++            rig.up(other);
++            rig.metric(other, 10);
++            rig.ad(other, 1, 100);
++            rig.ack(pending, 6000);
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            assertEquals(RoutingService.SwitchPhase.FAILURE, rig.events.getLast().phase());
++        });
++    }
++
++
++    @Test
++    void s15OneOfTwoConsumersCanStopWithoutCancellingTheSwitch()
++    {
++        check(rig -> {
++            UUID second = id("second");
++            var ticket = rig.router.requestSubscription(A, second);
++            rig.pump();
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            rig.ticket.cancel();
++            rig.pump();
++            rig.ack(rig.latest(), 6000);
++            assertEquals(Set.of(second), rig.forwarding().localConsumers());
++            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
++        });
++    }
++
++
++    @Test
++    void s16IncompatibleChildIsSuspendedUntilItsFreshActivation()
++    {
++        check(rig -> {
++            var child = peer("C");
++            rig.up(child);
++            UUID sub = id("child");
++            rig.receive(child, new ControlMessage(MessageType.ACTIVATE, id("request1"), child.nodeId(), child.instanceId(),
++                    new ControlMessage.Activation(A, EPOCH, sub, 0, 6000, List.of("S", "A", "R", "C"))));
++            assertEquals(1, rig.forwarding().downstreams().size());
++            int responses = rig.messages(MessageType.ACTIVATE_ACK).size();
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            rig.ack(rig.latest(), 6000);
++            assertTrue(rig.forwarding().downstreams().isEmpty());
++            assertEquals(responses, rig.messages(MessageType.ACTIVATE_ACK).size());
++            rig.receive(child, new ControlMessage(MessageType.ACTIVATE, id("request2"), child.nodeId(), child.instanceId(),
++                    new ControlMessage.Activation(A, EPOCH, sub, 1, 6000, List.of("S", "B", "R", "C"))));
++            assertEquals(1, rig.forwarding().downstreams().size());
++            assertEquals(List.of("S", "B", "R", "C"), rig.forwarding().downstreams().get("C").expectedPath());
++        });
++    }
++
++
++    @Test
++    void s17ShutdownRetainsPhysicalSendsUntilTheirCallbacksFinish()
++    {
++        check(rig -> {
++            rig.hold = message -> message.type() == MessageType.ACTIVATE;
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var held = rig.latest();
++            rig.router.requestClose();
++            rig.owner.drain();
++            assertFalse(rig.router.awaitTermination(Duration.ZERO));
++            held.result().complete(Connection.SendResult.ACCEPTED);
++            rig.owner.drain();
++            assertTrue(rig.router.awaitTermination(Duration.ofSeconds(1)));
++        });
++    }
++
++
++    @Test
++    void compatibleEventAndSnapshotConstructorsRemainAvailable() throws Exception
++    {
++        assertTrue(new RoutingService.Event(RoutingService.Reason.NONE, false).routeSwitch().isEmpty());
++        var empty = RoutingService.emptySnapshot();
++        var four = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics());
++        var five = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics(), Map.of());
++        var six = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics(), Map.of(), Map.of());
++        assertEquals(four, five);
++        assertEquals(five, six);
++        assertEquals(6, RoutingService.Snapshot.class.getRecordComponents().length);
++        assertNotNull(OverlayNode.class.getConstructor(NodeConfiguration.class, UUID.class, NeighborManager.Observer.class));
++        assertNotNull(OverlayNode.class.getDeclaredConstructor(NodeConfiguration.class, UUID.class,
++                NeighborManager.Observer.class, NetworkMonitor.Factory.class));
++        assertNotNull(OverlayNode.class.getDeclaredConstructor(NodeConfiguration.class, UUID.class,
++                NeighborManager.Observer.class, NetworkMonitor.Factory.class, RoutingService.Factory.class));
++        assertEquals(1, RoutingService.Factory.class.getDeclaredMethods().length);
++    }
++
++
++    private static Object field(Object target, String name) throws Exception
++    {
++        var field = target.getClass().getDeclaredField(name);
++        field.setAccessible(true);
++        return field.get(target);
++    }
++
++
++    private static List<Integer> ports(int count) throws Exception
++    {
++        var sockets = new ArrayList<ServerSocket>();
++        var ports = new ArrayList<Integer>();
++        try
++        {
++            for(int i = 0; i < count; i++)
++            {
++                var socket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress());
++                sockets.add(socket);
++                ports.add(socket.getLocalPort());
++            }
++
++        }finally{
++            for(var socket : sockets)
++            {
++                socket.close();
++            }
++        }
++        return ports;
++    }
++
++
++    private static void await(BooleanSupplier condition) throws Exception
++    {
++        long began = System.nanoTime();
++        while(!condition.getAsBoolean())
++        {
++            if(System.nanoTime() - began >= 10 * SECOND)
++                fail("TCP/console condition deadline");
++            Thread.sleep(2);
++        }
++    }
++
++
++    private static NodeConfiguration nodeConfig(String name, int port, int data, int bootstrap, int queue)
++    {
++        var d = RuntimeConfiguration.defaults();
++        var c = d.control();
++        var r = d.routing();
++        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(c.connectTimeout(), c.shutdownTimeout(),
++                c.maxConnections(), queue, c.bootstrapQueryTimeout()), d.overlay(),
++                new RuntimeConfiguration.Monitoring(Duration.ofSeconds(60), Duration.ofSeconds(3), 3, .2),
++                new RuntimeConfiguration.Routing(Duration.ofMillis(200), r.candidateTtl(), r.cacheCapacity(), r.cacheTtl(),
++                    r.floodMaxPerSecond(), r.activateTimeout(), r.activateAttempts(), 20, 3, Duration.ofMillis(100)),
++                d.subscription(), d.video(), d.source());
++        return new NodeConfiguration(Path.of(name), name, name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY,
++                "127.0.0.1", "127.0.0.1", port, data,
++                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", bootstrap)), Optional.empty(),
++                Optional.empty(), Optional.empty(), Optional.empty(), name.equals("S") ? config("S", true, 4096, 3).streams()
++                    : List.of(), runtime);
++    }
++
++
++    private static final class ApplicationHarness implements AutoCloseable
++    {
++        //* === Atributos e Variáveis === *
++        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
++        final List<String> writers = new CopyOnWriteArrayList<>();
++        final Object console;
++        final AutoCloseable service;
++        final OverlayNode node;
++        final RoutingService router;
++        final NeighborManager.SerialOwner owner;
++        final Thread writer;
++        final AtomicBoolean outputStopping;
++
++
++
++        //* === Construtores === *
++
++        ApplicationHarness(NodeConfiguration config, boolean startWriter) throws Exception
++        {
++            var consoleClass = Class.forName(OttApplication.class.getName() + "$Console");
++            var constructor = consoleClass.getDeclaredConstructor(InputStream.class, PrintStream.class, PrintStream.class,
++                    NodeConfiguration.class, LongSupplier.class);
++            constructor.setAccessible(true);
++            var output = new PrintStream(bytes, true, java.nio.charset.StandardCharsets.UTF_8)
++            {
++                public void println(String text)
++                {
++                    writers.add(Thread.currentThread().getName());
++                    super.println(text);
++                }
++            };
++            console = constructor.newInstance(InputStream.nullInputStream(), output, output, config,
++                    (LongSupplier) System::nanoTime);
++            writer = (Thread) field(console, "writer");
++            outputStopping = (AtomicBoolean) field(console, "outputStopping");
++            if(startWriter)
++                writer.start();
++            var open = OttApplication.class.getDeclaredMethod("open", NodeConfiguration.class, consoleClass);
++            open.setAccessible(true);
++            service = (AutoCloseable) open.invoke(null, config, console);
++            var captured = Arrays.stream(service.getClass().getDeclaredFields())
++                    .filter(value -> value.getType() == OverlayNode.class).findFirst().orElseThrow();
++            captured.setAccessible(true);
++            node = (OverlayNode) captured.get(service);
++            await(() -> node.routingSnapshot().diagnostics().phase() == RoutingService.Phase.RUNNING);
++            router = (RoutingService) field(node, "routing");
++            owner = (NeighborManager.SerialOwner) field(node, "owner");
++        }
++
++
++
++        //* === Lógica === *
++
++        String output()
++        {
++            return bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
++        }
++
++
++        void act(Runnable action) throws Exception
++        {
++            var done = new CompletableFuture<Void>();
++            assertTrue(owner.offer(() -> {
++                try
++                {
++                    action.run();
++                    done.complete(null);
++
++                }catch(Throwable error){
++                    done.completeExceptionally(error);
++                }
++            }));
++            done.get(5, TimeUnit.SECONDS);
++        }
++
++
++        public void close() throws Exception
++        {
++            try
++            {
++                service.close();
++
++            }finally{
++                outputStopping.set(true);
++                if(writer.getState() != Thread.State.NEW)
++                {
++                    writer.join(5000);
++                    assertFalse(writer.isAlive());
++                }
++            }
++        }
++    }
++
++
++    private static final class TcpPeer implements AutoCloseable
++    {
++        //* === Atributos e Variáveis === *
++        final NeighborManager.SerialOwner owner = NeighborManager.createSerialOwner(4096);
++        final NeighborManager manager;
++        final RoutingService router;
++        final List<RoutingService.Event> failures = new CopyOnWriteArrayList<>();
++
++
++
++        //* === Construtores === *
++
++        TcpPeer(NodeConfiguration config) throws Exception
++        {
++            UUID instance = UUID.randomUUID();
++            var reference = new AtomicReference<RoutingService>();
++            manager = new NeighborManager(config, instance, owner, event -> {
++                var routing = reference.get();
++                if(event instanceof NeighborManager.Received received && received.message().type() == MessageType.PROBE_PING)
++                    echo(received, instance, config.nodeId());
++                if(routing != null)
++                {
++                    routing.onNeighborEvent(event);
++                    if(event instanceof NeighborManager.NeighborUp up)
++                        routing.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(up.session(), LinkMetrics.State.MEASURED,
++                                OptionalDouble.of(10), OptionalLong.of(10), 1, false, OptionalLong.of(System.nanoTime()), 0)));
++                }
++            });
++            router = new RoutingService(config, instance, owner, manager::send, event -> {
++                if(event.fatal())
++                    failures.add(event);
++            });
++            reference.set(router);
++            assertTrue(owner.offer(router::start));
++            manager.start().toCompletableFuture().get(5, TimeUnit.SECONDS);
++        }
++
++
++
++        //* === Lógica === *
++
++        void echo(NeighborManager.Received received, UUID instance, String node)
++        {
++            manager.send(received.session(), new ControlMessage(MessageType.PROBE_PONG,
++                    received.message().requestId(), node, instance, received.message().payload()));
++        }
++
++
++        public void close()
++        {
++            router.requestClose();
++            manager.requestClose();
++            assertTrue(router.awaitTermination(Duration.ofSeconds(5)));
++            assertTrue(manager.awaitTermination(Duration.ofSeconds(5)));
++            owner.requestClose();
++            assertTrue(owner.awaitTermination(Duration.ofSeconds(5)));
++            assertTrue(failures.isEmpty(), failures.toString());
++        }
++    }
++
++
++    @Test
++    void s18RealTcpSwitchTraversesTheProductionSinkAndApplicationOutput() throws Exception
++    {
++        var port = ports(9);
++        var names = List.of("S", "A", "B", "R");
++        var edges = Map.of("S", Set.of("A", "B"), "A", Set.of("S", "R"), "B", Set.of("S", "R"),
++                "R", Set.of("A", "B"));
++        var topology = new LinkedHashMap<String,TopologyConfiguration.Node>();
++        for(int i = 0; i < names.size(); i++)
++        {
++            String name = names.get(i);
++            topology.put(name, new TopologyConfiguration.Node(name, "127.0.0.1", port.get(1 + i * 2),
++                    port.get(2 + i * 2), name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY, edges.get(name)));
++        }
++        var bootConfig = new NodeConfiguration(Path.of("bootstrap"), "BOOT", NodeRole.BOOTSTRAP,
++                "127.0.0.1", "127.0.0.1", port.getFirst(), 0, Optional.empty(), Optional.of(Path.of("topology")),
++                Optional.empty(), Optional.empty(), Optional.of(new TopologyConfiguration(Path.of("topology"), topology)), List.of());
++        try(var bootstrap = new BootstrapServer(bootConfig);
++                var source = new TcpPeer(nodeConfig("S", port.get(1), port.get(2), port.getFirst(), 256));
++                var a = new TcpPeer(nodeConfig("A", port.get(3), port.get(4), port.getFirst(), 256));
++                var b = new TcpPeer(nodeConfig("B", port.get(5), port.get(6), port.getFirst(), 256));
++                var app = new ApplicationHarness(nodeConfig("R", port.get(7), port.get(8), port.getFirst(), 256), true))
++        {
++            await(() -> app.node.monitoringSnapshot().links().size() == 2
++                    && app.node.monitoringSnapshot().links().values().stream().allMatch(link -> link.sampleCount() > 0));
++            app.act(() -> {
++                for(var link : app.node.monitoringSnapshot().links().values())
++                {
++                    long cost = link.session().nodeId().equals("A") ? 10 : 1000;
++                    app.router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(link.session(), LinkMetrics.State.MEASURED,
++                            OptionalDouble.of(cost), OptionalLong.of(cost), 100, false, OptionalLong.of(System.nanoTime()), 0)));
++                }
++            });
++            await(() -> app.router.snapshot().routes().get(A) != null
++                    && app.router.snapshot().routes().get(A).knownUpstream().map(value -> value.nodeId().equals("A")).orElse(false));
++            var ticket = app.router.requestSubscription(A, UUID.randomUUID());
++            await(() -> ticket.result().isPresent());
++            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
++            var manager = (NeighborManager) field(app.node, "manager");
++            var target = manager.snapshot().get("B");
++            app.act(() -> {
++                for(int i = 0; i < 3; i++)
++                {
++                    app.router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(target, LinkMetrics.State.MEASURED,
++                            OptionalDouble.of(1), OptionalLong.of(1), 101 + i, false,
++                            OptionalLong.of(System.nanoTime()), 0)));
++                }
++            });
++            await(() -> app.router.snapshot().forwarding().get(A) != null
++                    && app.router.snapshot().forwarding().get(A).upstream().orElseThrow().nodeId().equals("B"));
++            await(() -> app.output().contains("phase=SUCCESS"));
++            var lines = app.output().lines().filter(line -> line.startsWith("ROUTE_SWITCH ")).toList();
++            assertEquals(2, lines.size(), app.output());
++            assertTrue(lines.getFirst().contains("phase=STARTED"));
++            assertTrue(lines.getLast().contains("previousCostMicros=20"));
++            assertTrue(lines.getLast().contains("replacementCostMicros=11"));
++            assertTrue(lines.getLast().contains("reason=CONFIRMED"));
++            assertTrue(lines.getLast().contains("elapsedNanos="));
++            assertTrue(app.writers.stream().allMatch(thread -> thread.equals("ott-cli-output")));
++            assertFalse(app.router.snapshot().forwarding().containsKey(B));
++            assertTrue(app.node.failure().isEmpty());
++            System.out.println("APPLICATION_SWITCH_OUTPUT " + String.join(" | ", lines));
++        }
++    }
++
++
++    @Test
++    void payloadIsDefensiveAndRejectsOversizedContext()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var event = rig.events.getFirst();
++            assertThrows(UnsupportedOperationException.class, () -> event.previousPath().add("X"));
++            assertThrows(IllegalArgumentException.class, () -> new RoutingService.SwitchEvent(A, "S", EPOCH,
++                    event.operationId(), event.phase(), event.previous(), event.replacement(),
++                    Collections.nCopies(33, "X"), event.replacementPath(), event.previousRevision(), -1,
++                    1000, 800, "BOUND", 0));
++            assertThrows(IllegalArgumentException.class, () -> new RoutingService.SwitchEvent(A, "S", EPOCH,
++                    event.operationId(), event.phase(), event.previous(), event.replacement(), event.previousPath(),
++                    event.replacementPath(), event.previousRevision(), -1, 1000, 800, "X".repeat(257), 0));
++        });
++    }
++
++
++    private interface AppScenario
++    {
++        void run(ApplicationHarness app) throws Exception;
++    }
++
++
++    private static void withApplication(boolean writer, AppScenario scenario) throws Exception
++    {
++        var port = ports(5);
++        var topology = Map.of("R", new TopologyConfiguration.Node("R", "127.0.0.1", port.get(1), port.get(2),
++                NodeRole.RELAY, Set.of("X")), "X", new TopologyConfiguration.Node("X", "127.0.0.1", port.get(3),
++                    port.get(4), NodeRole.RELAY, Set.of("R")));
++        var boot = new NodeConfiguration(Path.of("boot"), "BOOT", NodeRole.BOOTSTRAP, "127.0.0.1", "127.0.0.1",
++                port.getFirst(), 0, Optional.empty(), Optional.of(Path.of("topology")), Optional.empty(), Optional.empty(),
++                Optional.of(new TopologyConfiguration(Path.of("topology"), topology)), List.of());
++        try(var bootstrap = new BootstrapServer(boot);
++                var peer = new TcpPeer(nodeConfig("X", port.get(3), port.get(4), port.getFirst(), 256));
++                var app = new ApplicationHarness(nodeConfig("R", port.get(1), port.get(2), port.getFirst(), 256), writer))
++        {
++            await(() -> app.node.monitoringSnapshot().links().size() == 1
++                    && app.node.monitoringSnapshot().links().values().stream().allMatch(link -> link.sampleCount() > 0));
++            app.act(() -> { });
++            scenario.run(app);
++        }
++    }
++
++
++    private static RoutingService.SwitchEvent sampleEvent()
++    {
++        try(var rig = new Rig())
++        {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            return rig.events.getFirst();
++        }
++    }
++
++
++    @Test
++    void routingSinkUsesOnlyTheExistingBoundedOutputQueue() throws Exception
++    {
++        var change = sampleEvent();
++        withApplication(false, app -> {
++            var queue = (BlockingQueue<?>) field(app.console, "outputs");
++            await(() -> queue.toString().contains("READY"));
++            assertFalse(((AtomicBoolean) field(app.console, "failed")).get());
++            var log = app.console.getClass().getDeclaredMethod("log", String.class, boolean.class);
++            log.setAccessible(true);
++            while(queue.remainingCapacity() > 0)
++            {
++                log.invoke(app.console, "FILL", false);
++            }
++            var observer = (RoutingService.Observer) field(app.router, "observer");
++            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(change))));
++            assertTrue(((AtomicBoolean) field(app.console, "failed")).get());
++            assertEquals(256, queue.size());
++            assertEquals("", app.output());
++            assertTrue(app.writers.isEmpty());
++            assertSame(queue, field(app.console, "outputs"));
++        });
++    }
++
++
++    @Test
++    void fatalRoutingStillStopsTheNodeThroughTheExistingApplicationComposition() throws Exception
++    {
++        withApplication(true, app -> {
++            var observer = (RoutingService.Observer) field(app.router, "observer");
++            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.CLOCK_ERROR, true)));
++            assertTrue(app.node.failure().isPresent());
++            assertTrue(app.node.failure().orElseThrow().getMessage().contains("CLOCK_ERROR"));
++            assertFalse(app.output().contains("ROUTE_SWITCH"));
++        });
++    }
++
++
++    @Test
++    void routingPayloadEscapesIntoOnePhysicalOutputLine() throws Exception
++    {
++        var event = sampleEvent();
++        var hostile = new RoutingService.SwitchEvent(event.streamId(), event.serverId(), event.serverEpoch(),
++                event.operationId(), event.phase(), event.previous(), event.replacement(), event.previousPath(),
++                event.replacementPath(), event.previousRevision(), -1, 1000, 800, "line1\nline2", 17);
++        withApplication(true, app -> {
++            var observer = (RoutingService.Observer) field(app.router, "observer");
++            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(hostile))));
++            await(() -> app.output().contains("ROUTE_SWITCH"));
++            var lines = app.output().lines().filter(line -> line.startsWith("ROUTE_SWITCH")).toList();
++            assertEquals(1, lines.size());
++            assertTrue(lines.getFirst().contains("reason=line1\\nline2"));
++            assertTrue(lines.getFirst().contains("elapsedNanos=17"));
++            assertTrue(lines.getFirst().length() <= OttApplication.MAX_LOG_CHARS);
++            assertTrue(app.writers.stream().allMatch(thread -> thread.equals("ott-cli-output")));
++        });
++    }
++
++
++    @Test
++    void maximumContextRetainsCostsReasonAndDurationWithinTheExistingLogLimit() throws Exception
++    {
++        var event = sampleEvent();
++        var previous = new ArrayList<String>();
++        var replacement = new ArrayList<String>();
++        previous.add("S");
++        replacement.add("S");
++        for(int i = 0; i < 29; i++)
++        {
++            previous.add("P" + String.format("%02d", i) + "X".repeat(29));
++            replacement.add("Q" + String.format("%02d", i) + "Y".repeat(29));
++        }
++        previous.addAll(List.of("A", "R"));
++        replacement.addAll(List.of("B", "R"));
++        var maximum = new RoutingService.SwitchEvent(event.streamId(), event.serverId(), event.serverEpoch(),
++                event.operationId(), event.phase(), event.previous(), event.replacement(), previous, replacement,
++                event.previousRevision(), -1, 1000, 800, "\n".repeat(256), Long.MAX_VALUE);
++        previous.clear();
++        assertEquals(32, maximum.previousPath().size());
++        withApplication(true, app -> {
++            var observer = (RoutingService.Observer) field(app.router, "observer");
++            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(maximum))));
++            await(() -> app.output().contains("ROUTE_SWITCH"));
++            var line = app.output().lines().filter(value -> value.startsWith("ROUTE_SWITCH")).findFirst().orElseThrow();
++            assertTrue(line.length() <= OttApplication.MAX_LOG_CHARS);
++            assertFalse(line.contains("[truncated]"));
++            assertTrue(line.contains("previousCostMicros=1000 replacementCostMicros=800"));
++            assertTrue(line.contains("elapsedNanos=" + Long.MAX_VALUE));
++            assertTrue(line.endsWith(replacement.toString()));
++        });
++    }
++
++
++    @Test
++    void s13TransferredLossCannotGiveTheSameExhaustedRoundAnotherCredit()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            rig.ad(rig.b, 2, 790);
++            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
++            for(int i = 0; i < 3; i++)
++            {
++                rig.reject(rig.latest());
++            }
++            assertEquals(4, rig.messages(MessageType.ACTIVATE).size());
++            rig.tick(3 * SECOND);
++            assertEquals(4, rig.messages(MessageType.ACTIVATE).size(), "A transferred incident is consumed by the existing round");
++            assertEquals(Route.RecoveryPhase.UNAVAILABLE, rig.router.snapshot().recoveries().get(A).phase());
++            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.FAILURE),
++                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
++        });
++    }
++
++
++    @Test
++    void s18AnotherOriginAndStreamKeepTheirOwnConfirmedBranch()
++    {
++        check(rig -> {
++            var other = peer("X");
++            UUID epoch = id("T-instance");
++            rig.up(other);
++            rig.metric(other, 10);
++            rig.receive(other, new ControlMessage(MessageType.STREAM_ANNOUNCE, UUID.randomUUID(), other.nodeId(),
++                    other.instanceId(), new ControlMessage.Announcement(new ControlMessage.StreamInfo(B, "T", "Other", 1, 10,
++                        epoch), 1, 90, List.of("T", "X"))));
++            var ticket = rig.router.requestSubscription(B, id("other-consumer"));
++            rig.pump();
++            rig.ack(rig.latest(), 6000);
++            var before = rig.router.snapshot().forwarding().get(B);
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            rig.ack(rig.latest(), 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++            assertEquals(before, rig.router.snapshot().forwarding().get(B));
++            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
++            assertTrue(rig.events.stream().allMatch(event -> event.streamId().equals(A)));
++        });
++    }
++
++
++    @Test
++    void s18RenewalTraceAndWrongSessionErrorsCannotCompleteTheQualityAttempt()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            var pending = rig.latest();
++            for(int related : List.of(14, 15))
++            {
++                rig.receive(rig.b, new ControlMessage(MessageType.ERROR, pending.message().requestId(), rig.b.nodeId(),
++                        rig.b.instanceId(), new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, related, "unrelated")));
++            }
++            var payload = (ControlMessage.Activation) pending.message().payload();
++            rig.receive(rig.a, new ControlMessage(MessageType.ACTIVATE_ACK, pending.message().requestId(), rig.a.nodeId(),
++                    rig.a.instanceId(), new ControlMessage.ActivationAck(A, EPOCH, payload.subscriptionId(), payload.revision(), 6000)));
++            assertEquals(1, rig.events.size());
++            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
++            rig.ack(pending, 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++            assertEquals(RoutingService.SwitchPhase.SUCCESS, rig.events.getLast().phase());
++        });
++    }
++
++
++    @Test
++    void s13LossAtAnAlreadyExpiredSwitchDeadlineRetainsItsFreshIncidentCredit()
++    {
++        check(rig -> {
++            rig.qualify();
++            rig.tick(5 * SECOND);
++            rig.ad(rig.b, 2, 790);
++            rig.clock.addAndGet(3 * SECOND);
++            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
++            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
++            rig.ack(rig.latest(), 6000);
++            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
++        });
++    }
++}

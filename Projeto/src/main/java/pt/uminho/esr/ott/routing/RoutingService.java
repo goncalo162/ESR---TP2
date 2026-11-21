@@ -133,7 +133,52 @@ public final class RoutingService implements AutoCloseable {
     public enum Phase { NEW, RUNNING, STOPPED }
     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
-    public record Event(Reason reason, boolean fatal) { public Event { Objects.requireNonNull(reason); } }
+    public enum SwitchPhase
+    {
+        STARTED, SUCCESS, FAILURE
+    }
+
+    public record SwitchEvent(UUID streamId, String serverId, UUID serverEpoch, UUID operationId,
+            SwitchPhase phase, Neighbor.Session previous, Neighbor.Session replacement,
+            List<String> previousPath, List<String> replacementPath, long previousRevision,
+            long replacementRevision, long previousCostMicros, long replacementCostMicros,
+            String reason, long elapsedNanos)
+    {
+        public SwitchEvent
+        {
+            Objects.requireNonNull(streamId);
+            RoutingTable.nodeId(serverId);
+            Objects.requireNonNull(serverEpoch);
+            Objects.requireNonNull(operationId);
+            Objects.requireNonNull(phase);
+            Objects.requireNonNull(previous);
+            Objects.requireNonNull(replacement);
+            Objects.requireNonNull(reason);
+            if(previousPath == null || replacementPath == null || previousPath.size() > 32
+                    || replacementPath.size() > 32 || previousPath.size() < 2 || replacementPath.size() < 2
+                    || previousRevision < 0 || replacementRevision < -1 || previousCostMicros < 1
+                    || replacementCostMicros < 1 || reason.length() > 256 || elapsedNanos < 0)
+                throw new IllegalArgumentException("Invalid switch event");
+
+            previousPath = List.copyOf(previousPath);
+            replacementPath = List.copyOf(replacementPath);
+        }
+    }
+
+    public record Event(Reason reason, boolean fatal, Optional<SwitchEvent> routeSwitch)
+    {
+        public Event
+        {
+            Objects.requireNonNull(reason);
+            Objects.requireNonNull(routeSwitch);
+        }
+
+
+        public Event(Reason reason, boolean fatal)
+        {
+            this(reason, fatal, Optional.empty());
+        }
+    }
     public record Diagnostics(Phase phase, int sessions, int bindings, int references, int cacheEntries,
             int ledgers, int pendingCells, int pendingIntents, int quotas, int sendTickets, int timers,
             long failures, boolean countersSaturated, Reason lastReason) { }
@@ -188,6 +233,11 @@ public final class RoutingService implements AutoCloseable {
     private final LinkedHashMap<String,Neighbor.Session> sessions=new LinkedHashMap<>();
     private final List<Neighbor.Session> peerIndex=new ArrayList<>();
     private final Map<String,OptionalLong> costs=new HashMap<>();
+    private final Map<Neighbor.Session,MetricStamp> metricStamps = new HashMap<>();
+
+    private record MetricStamp(long count, boolean saturated, long sampledAt, boolean invalidated)
+    {
+    }
     private final Map<Key,Ledger> ledgers=new HashMap<>();
     private final Map<Generation,CacheEntry> cache=new HashMap<>();
     private final Map<QuotaKey,ArrayDeque<Long>> quotas=new HashMap<>();
@@ -397,25 +447,87 @@ public final class RoutingService implements AutoCloseable {
         if(originCounts.containsKey(info.serverId())&&!epoch(info.serverId(),info.serverEpoch()))return;
         var row=existing==null?bind(info.streamId(),info.serverId()):existing;if(row==null)return;
         if(!epoch(info.serverId(),info.serverEpoch()))return;
+        long previousSequence = row.route.candidates().stream()
+                .filter(c -> c.upstream().equals(key(session))).mapToLong(RouteCandidate::announceSeq).max().orElse(-1);
         var outcome=root.announce(new RoutingTable.Advertisement(info.streamId(),info.serverId(),info.serverEpoch(),key(session),a.announceSeq(),a.costMicros(),path));
         if(applied(outcome)){
             if(row.info==null)row.info=info;
-            activation.observeAnnouncement(session, a, now());
+            activation.observeAnnouncement(session, a, now(), a.announceSeq() > previousSequence);
             // Catalog must be published with the newly established canonical metadata.
             dirty();
         }
     }
-    public void onMetrics(NetworkMonitor.Event event){
-        requireOwner();Objects.requireNonNull(event);if(phase!=Phase.RUNNING||stopping.get())return;
-        try{
+    public void onMetrics(NetworkMonitor.Event event)
+    {
+        requireOwner();
+        Objects.requireNonNull(event);
+        if(phase != Phase.RUNNING || stopping.get())
+            return;
+        try
+        {
+            Neighbor.Session session;
+            OptionalLong cost;
+            boolean distinct = false;
+            if(event instanceof NetworkMonitor.Updated updated)
+            {
+                var metrics = updated.metrics();
+                session = metrics.session();
+                if(!current(session))
+                    return;
+                var previous = metricStamps.get(session);
+                if(supersededMeasurement(metrics, previous))
+                    return;
+                cost = metrics.costMicros();
+                if(metrics.lastSampleAtNanos().isPresent())
+                {
+                    long sampledAt = metrics.lastSampleAtNanos().orElseThrow();
+                    distinct = previous == null || metrics.sampleCount() > previous.count()
+                            || metrics.sampleCount() == Long.MAX_VALUE && metrics.sampleCountSaturated()
+                                && sampledAt - previous.sampledAt() > 0;
+                    metricStamps.put(session, new MetricStamp(metrics.sampleCount(), metrics.sampleCountSaturated(),
+                            sampledAt, false));
+                }
+
+            }else if(event instanceof NetworkMonitor.Invalidated invalidated){
+                session = invalidated.session();
+                if(!current(session))
+                    return;
+                cost = OptionalLong.empty();
+                var previous = metricStamps.get(session);
+                if(previous != null)
+                    metricStamps.put(session, new MetricStamp(previous.count(), previous.saturated(), previous.sampledAt(), true));
+
+            }else{
+                return;
+            }
+
             activation.kick();
-            Neighbor.Session session;OptionalLong cost;
-            if(event instanceof NetworkMonitor.Updated e){session=e.metrics().session();cost=e.metrics().costMicros();}
-            else if(event instanceof NetworkMonitor.Invalidated e){session=e.session();cost=OptionalLong.empty();}
-            else return;
-            if(!current(session))return;traceSweep=traceOrder.size();costs.put(session.nodeId(),cost);applied(root.setLinkCost(key(session),cost));drive();
-        }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
+            traceSweep = traceOrder.size();
+            costs.put(session.nodeId(), cost);
+            applied(root.setLinkCost(key(session), cost));
+            activation.observeMetric(session, distinct);
+            drive();
+
+        }catch(RuntimeException error){
+            note(Reason.CLOCK_ERROR, true);
+        }
     }
+
+
+    private boolean supersededMeasurement(LinkMetrics metrics, MetricStamp previous)
+    {
+        if(previous == null)
+            return false;
+        if(metrics.sampleCount() < previous.count() || metrics.lastSampleAtNanos().isEmpty())
+            return true;
+        long elapsed = metrics.lastSampleAtNanos().orElseThrow() - previous.sampledAt();
+        if(elapsed < 0 || previous.saturated() && !metrics.sampleCountSaturated())
+            return true;
+        return previous.invalidated() && metrics.sampleCount() == previous.count() && elapsed == 0
+                && metrics.sampleCountSaturated() == previous.saturated();
+    }
+
+
     public void setLocalAvailable(UUID id,boolean available){
         requireOwner();if(stopping.get())return;var row=rows.get(Objects.requireNonNull(id));
         if(row==null||!row.local)throw new IllegalArgumentException("Configured local stream required");
@@ -429,6 +541,7 @@ public final class RoutingService implements AutoCloseable {
     }
     private void peersChanged(){peerIndex.clear();peerIndex.addAll(sessions.values());peerCursor=0;dirty();}
     private void retire(Neighbor.Session s){
+        metricStamps.remove(s);
         activation.sessionDown(s);
         var iterator=ledgers.entrySet().iterator();while(iterator.hasNext()){
             var entry=iterator.next();if(entry.getKey().session.equals(s)){if(entry.getValue().cell)pending--;iterator.remove();}
@@ -897,7 +1010,7 @@ public final class RoutingService implements AutoCloseable {
         requireOwner();if(cleaned.isDone())return;stopping.set(true);scheduler.requestClose();if(alarm!=null)alarm.cancel();alarm=null;
         closeTraces();
         activation.close();
-        rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
+        rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();metricStamps.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
         publish(clock.getAsLong());cleaned.complete(null);
         if(registration!=null){registration.remove();registration=null;}
@@ -967,6 +1080,7 @@ public final class RoutingService implements AutoCloseable {
             long failedAt, renewalFailedAt, lastRoundStart, generation;
             boolean roundStarted, lossCredit, sourceAvailable, permanent;
             int issued;
+            final Quality quality = new Quality();
 
 
 
@@ -1051,6 +1165,7 @@ public final class RoutingService implements AutoCloseable {
             Attempt attempt;
             Proof rejected;
             boolean capacityBlocked;
+            QualitySwitch switching;
 
 
 
@@ -1075,8 +1190,9 @@ public final class RoutingService implements AutoCloseable {
         }
         final class ResponseQuota { long began;int used;ResponseQuota(long began){this.began=began;} }
         final class Prune {
-            final PruneRequest request;final Line line;
-            Prune(PruneRequest request,Line line){this.request=request;this.line=line;}
+            final PruneRequest request;final Line line;final boolean retired;
+            Prune(PruneRequest request,Line line){this(request,line,false);}
+            Prune(PruneRequest request,Line line,boolean retired){this.request=request;this.line=line;this.retired=retired;}
         }
         enum SendKind { REQUEST, PRUNE, ACK, ERROR, UNBOUND }
         final class ActSend {
@@ -1093,6 +1209,198 @@ public final class RoutingService implements AutoCloseable {
                     if(freed&&!stopping.get()){changed.set(true);wake();}}
             }
         }
+
+
+        //* === Troca por Qualidade === *
+
+        final class Quality
+        {
+            //* === Atributos e Variáveis === *
+            Proof target, blocked, anchor;
+            int observations;
+            long confirmedAt, failedAt;
+            boolean anchored, observed, initial, failed, rearm, permanent;
+        }
+
+
+        final class QualitySwitch
+        {
+            //* === Atributos e Variáveis === *
+            final UUID operation = UUID.randomUUID();
+            final Confirmed previous;
+            final Line line;
+            final long revision, version, previousCost, replacementCost;
+            final Proof target;
+            long targetRevision = -1;
+            boolean started, terminal, promoted;
+
+
+
+            //* === Construtores === *
+
+            QualitySwitch(Tree tree, Proof target, long previousCost, long replacementCost)
+            {
+                previous = tree.confirmed;
+                line = tree.upstream;
+                revision = tree.submittedRevision;
+                version = tree.version;
+                this.target = target;
+                this.previousCost = previousCost;
+                this.replacementCost = replacementCost;
+            }
+        }
+
+
+        void observeMetric(Neighbor.Session session, boolean distinct)
+        {
+            if(!distinct)
+                return;
+            for(var tree : trees.values())
+            {
+                observeQuality(tree, session);
+            }
+        }
+
+
+        void observeQuality(Tree tree, Neighbor.Session session)
+        {
+            if(tree.confirmed == null || tree.confirmed.source)
+                return;
+            var proof = eligibleProof(tree, now());
+            if(session.equals(tree.confirmed.parent) || proof != null && session.equals(proof.session))
+                tree.quality.observed = true;
+        }
+
+
+        OptionalLong confirmedCost(Tree tree, long at)
+        {
+            if(!healthy(tree, at) || tree.confirmed.source)
+                return OptionalLong.empty();
+            var confirmed = tree.confirmed;
+            return row(tree.id).route.candidates().stream()
+                    .filter(candidate -> candidate.serverEpoch().equals(confirmed.epoch)
+                            && candidate.upstream().equals(key(confirmed.parent))
+                            && candidate.path().equals(confirmed.path) && candidate.metric().isPresent()
+                            && age(at, candidate.generationStartedAtNanos()) < candidate.candidateTtlNanos())
+                    .mapToLong(candidate -> candidate.metric().orElseThrow().costMicros()).findFirst();
+        }
+
+
+        boolean qualityValid(Tree tree, long at)
+        {
+            var round = tree.round;
+            if(round == null || round.switching == null || !healthy(tree, at) || !demand(tree, at))
+                return false;
+            var proof = eligibleProof(tree, at);
+            var cost = confirmedCost(tree, at);
+            var q = tree.quality;
+            return proof != null && proof.sameBranch(round.switching.target) && proof.sameBranch(q.target)
+                    && cost.isPresent() && q.observations >= config.runtime().routing().switchObservations()
+                    && age(at, q.confirmedAt) >= config.runtime().routing().switchMinDwell().toNanos()
+                    && RouteMetric.improves(cost.orElseThrow(), row(tree.id).route.selectedMetric().orElseThrow().costMicros(),
+                            config.runtime().routing().switchImprovementPercent());
+        }
+
+
+        void stepQuality(Tree tree, long at)
+        {
+            var q = tree.quality;
+            boolean observed = q.observed;
+            q.observed = false;
+            if(!healthy(tree, at) || tree.confirmed.source || !demand(tree, at))
+                return;
+            var proof = eligibleProof(tree, at);
+            var cost = confirmedCost(tree, at);
+            if(proof == null || cost.isEmpty() || proof.session.equals(tree.confirmed.parent)
+                    && proof.path.equals(tree.confirmed.path))
+            {
+                q.observations = 0;
+                q.target = null;
+                return;
+            }
+            if(!proof.sameBranch(q.target))
+            {
+                q.target = proof;
+                q.observations = 0;
+            }
+            if(q.failed)
+            {
+                if(q.permanent && q.blocked != null && proof.session.equals(q.blocked.session)
+                        && proof.epoch.equals(q.blocked.epoch))
+                    return;
+                if(observed && !proof.sameBranch(q.blocked))
+                {
+                    q.rearm = true;
+                    q.permanent = false;
+                }
+                if(!q.rearm)
+                    return;
+            }
+            boolean first = !q.initial;
+            q.initial = true;
+            long replacement = row(tree.id).route.selectedMetric().orElseThrow().costMicros();
+            if(!RouteMetric.improves(cost.orElseThrow(), replacement, config.runtime().routing().switchImprovementPercent()))
+            {
+                q.observations = 0;
+                return;
+            }
+            if((observed || first) && q.observations < config.runtime().routing().switchObservations())
+                q.observations++;
+            if(tree.round != null || tree.prune != null || !q.anchored
+                    || q.observations < config.runtime().routing().switchObservations()
+                    || age(at, q.confirmedAt) < config.runtime().routing().switchMinDwell().toNanos()
+                    || tree.roundStarted && age(at, tree.lastRoundStart) < timeout
+                    || q.failed && age(at, q.failedAt) < timeout)
+                return;
+
+            tree.lastRoundStart = at;
+            tree.roundStarted = true;
+            tree.generation = Math.incrementExact(tree.generation);
+            tree.used = proof;
+            tree.round = new Round(at);
+            tree.round.switching = new QualitySwitch(tree, proof, cost.orElseThrow(), replacement);
+            switchEvent(tree, tree.round, SwitchPhase.STARTED, "SUSTAINED_IMPROVEMENT", at);
+        }
+
+
+        long qualityDelay(Tree tree, long at)
+        {
+            var q = tree.quality;
+            if(tree.round != null || tree.prune != null || q.target == null || !q.anchored
+                    || q.failed && !q.rearm || q.permanent
+                    || q.observations < config.runtime().routing().switchObservations())
+                return Long.MAX_VALUE;
+            long remaining = Math.max(0, config.runtime().routing().switchMinDwell().toNanos() - age(at, q.confirmedAt));
+            if(q.failed)
+                remaining = Math.max(remaining, timeout - age(at, q.failedAt));
+            if(tree.roundStarted)
+                remaining = Math.max(remaining, timeout - age(at, tree.lastRoundStart));
+            return futureDelay(remaining);
+        }
+
+
+        void switchEvent(Tree tree, Round round, SwitchPhase phase, String reason, long at)
+        {
+            var change = round.switching;
+            if(change == null || change.terminal || phase == SwitchPhase.STARTED && change.started)
+                return;
+            if(phase == SwitchPhase.STARTED)
+                change.started = true;
+            else
+                change.terminal = true;
+            var event = new SwitchEvent(tree.id, tree.origin, change.target.epoch, change.operation, phase,
+                    change.previous.parent, change.target.session, change.previous.path, change.target.path,
+                    change.revision, change.targetRevision, change.previousCost, change.replacementCost,
+                    reason.length() > 256 ? reason.substring(0, 256) : reason, age(at, round.began));
+            try
+            {
+                observer.onEvent(new Event(Reason.NONE, false, Optional.of(event)));
+
+            }catch(RuntimeException error){
+                requestClose();
+            }
+        }
+
 
 
         //* === Recuperação === *
@@ -1157,11 +1465,20 @@ public final class RoutingService implements AutoCloseable {
         }
 
 
-        void observeAnnouncement(Neighbor.Session session, ControlMessage.Announcement announcement, long at)
+        void observeAnnouncement(Neighbor.Session session, ControlMessage.Announcement announcement, long at, boolean distinct)
         {
             var t = trees.get(announcement.stream().streamId());
             if(t == null || !t.epoch.equals(announcement.stream().serverEpoch()))
                 return;
+            if(distinct)
+            {
+                observeQuality(t, session);
+                var q = t.quality;
+                var eligible = eligibleProof(t, at);
+                if(q.failed && eligible != null && eligible.session.equals(session)
+                        && eligible.sameBranch(q.blocked) && eligible.sequence > q.blocked.sequence)
+                    q.rearm = true;
+            }
             var line = lines.get(new LineKey(true, t.id, t.epoch, session));
             if(line != null)
                 line.observedSequence = Math.max(line.observedSequence, announcement.announceSeq());
@@ -1213,10 +1530,14 @@ public final class RoutingService implements AutoCloseable {
         {
             if(t.confirmed == null)
                 return;
+            boolean transferred = t.round != null && t.round.switching != null
+                    && !roundElapsed(t.round, at) && eligibleProof(t, at) != null;
+            if(transferred)
+                t.round.switching.promoted = true;
             t.confirmed = null;
             t.confirmedLocals.clear();
             t.version = Math.incrementExact(t.version);
-            t.lossCredit = true;
+            t.lossCredit = !transferred;
             if(t.round != null && t.round.renew)
                 fail(t, ErrorCode.NO_ROUTE, "CONFIRMATION_LOST");
             for(var child : t.children.values())
@@ -1541,19 +1862,71 @@ public final class RoutingService implements AutoCloseable {
             if(roundElapsed(a.round,at)||a.renewal!=null&&a.renewal.previousGrant().remainingNanos(at)==0){
                 fail(t,ErrorCode.TIMEOUT,"TIMEOUT");return;
             }
+            if(!demand(t, at))
+            {
+                retireBranch(t, at);
+                return;
+            }
+            if(t.confirmed != null && !healthy(t, at))
+                loseConfirmation(t, at);
+            if(a.round.switching != null && !a.round.switching.promoted && !qualityValid(t, at))
+            {
+                fail(t, ErrorCode.PATH_CHANGED, "QUALITY_CHANGED");
+                return;
+            }
             if(!epochCurrent(t)||!current(a.line.key.session)||!selectedPath(t).equals(a.path)
                     ||!row(t.id).route.knownUpstream().equals(Optional.of(key(a.line.key.session)))){
                 failedAttempt(a,ErrorCode.PATH_CHANGED,"PATH_CHANGED");return;
             }
             var validity=new Subscription.Lease(a.began,Math.multiplyExact(a.early.grantedLeaseMs(),1_000_000L));
             if(validity.remainingNanos(at)==0){failedAttempt(a,ErrorCode.TIMEOUT,"GRANT_EXPIRED");return;}
+            var previous = t.confirmed;
+            var installed = new Proof(t.epoch, a.line.key.session, a.path, -1);
+            if(!installed.sameBranch(t.quality.anchor))
+            {
+                t.quality.confirmedAt = at;
+                t.quality.anchored = true;
+                t.quality.anchor = installed;
+            }
+            if(a.round.switching != null)
+            {
+                for(var child : t.children.values())
+                {
+                    if(child.active != null && !child.active.expectedPath().subList(0,
+                            child.active.expectedPath().size() - 1).equals(a.path))
+                    {
+                        child.suspended = child.active.validity().orElseThrow();
+                        child.active = null;
+                    }
+                }
+            }
             t.confirmed=new Confirmed(false,t.epoch,a.line.key.session,a.path,validity);
-            t.upstream=a.line;t.renewBegan=a.began;
+            t.upstream=a.line;t.submittedRevision=a.revision;t.renewBegan=a.began;
             t.renewPeriod=Math.min(config.runtime().subscription().renew().toNanos(),validity.durationNanos()/3);
             t.round=null;t.failure=null;
             t.issued = a.round.issued;
             t.detail = "";
             t.version=Math.incrementExact(t.version);kick();
+            if(a.round.switching != null)
+            {
+                for(var local : t.locals.values())
+                {
+                    if(!local.cancelled.get())
+                        t.confirmedLocals.add(local.key.token);
+                }
+                t.quality.observations = 0;
+                t.quality.target = null;
+                t.quality.failed = false;
+                publish(at);
+                switchEvent(t, a.round, SwitchPhase.SUCCESS, "CONFIRMED", at);
+                var old = a.round.switching;
+                if(!stopping.get() && current(old.previous.parent))
+                {
+                    var identity = new Subscription.Identity(old.previous.parent, t.id, t.epoch,
+                            old.line.id, old.revision, old.version);
+                    t.prune = new Prune(new PruneRequest(identity, UUID.randomUUID(), at, timeout), old.line, true);
+                }
+            }
         }
         void failedAttempt(Attempt a, ErrorCode code, String detail)
         {
@@ -1561,6 +1934,11 @@ public final class RoutingService implements AutoCloseable {
             if(t.round != a.round || a.round.attempt != a)
                 return;
             long at = now();
+            if(a.round.switching != null && !a.round.switching.promoted)
+            {
+                fail(t, code, detail);
+                return;
+            }
             a.round.attempt = null;
             if(a.round.renew && code == ErrorCode.PATH_CHANGED)
             {
@@ -1584,6 +1962,25 @@ public final class RoutingService implements AutoCloseable {
 
         void fail(Tree t, ErrorCode code, String detail)
         {
+            var round = t.round;
+            if(round != null && round.switching != null)
+            {
+                t.quality.blocked = new Proof(t.epoch, round.switching.target.session,
+                        round.switching.target.path, observedSequence(t, round.switching.target));
+                t.quality.failedAt = now();
+                t.quality.failed = true;
+                t.quality.rearm = false;
+                t.quality.permanent = code == ErrorCode.INVALID_MESSAGE || code == ErrorCode.STALE_REVISION;
+                t.quality.observations = 0;
+                switchEvent(t, round, SwitchPhase.FAILURE, detail, now());
+                if(!round.switching.promoted && healthy(t, now()))
+                {
+                    t.issued = round.issued;
+                    t.round = null;
+                    kick();
+                    return;
+                }
+            }
             if(t.round != null)
                 t.issued = t.round.issued;
             blockRecoveryProof(t, now());
@@ -1638,6 +2035,8 @@ public final class RoutingService implements AutoCloseable {
 
 
         void retireBranch(Tree t,long at){
+            if(t.round != null && t.round.switching != null)
+                switchEvent(t, t.round, SwitchPhase.FAILURE, "CANCELLED", at);
             t.round=null;
             t.credit = null;
             t.lossCredit = false;
@@ -1681,9 +2080,10 @@ public final class RoutingService implements AutoCloseable {
             boolean wanted = demand(t, at);
             if(!wanted && (t.confirmed != null || t.round != null))
                 retireBranch(t, at);
-            if(wanted && t.prune != null)
+            if(wanted && t.prune != null && !t.prune.retired)
                 t.prune = null;
             reconcileRecovery(t, at);
+            stepQuality(t, at);
             if(wanted && healthy(t, at) && !t.confirmed.source && t.round == null
                     && t.renewalBlocked == null && age(at, t.renewBegan) >= t.renewPeriod
                     && compatible(t, t.confirmed.path, at))
@@ -1866,6 +2266,13 @@ public final class RoutingService implements AutoCloseable {
                         ||child!=null&&(child.detached||childElapsed(child,dispatch))){
                     synchronized(resources){sends.remove(send);resources.notifyAll();}return false;
                 }
+                if(attempt != null && attempt.round.switching != null && !attempt.round.switching.promoted
+                        && !qualityValid(attempt.tree, dispatch))
+                {
+                    synchronized(resources){sends.remove(send);resources.notifyAll();}
+                    fail(attempt.tree, ErrorCode.PATH_CHANGED, "QUALITY_CHANGED");
+                    return false;
+                }
                 if(kind==SendKind.PRUNE){
                     var payload=(ControlMessage.Deactivation)message.payload();var t=trees.get(payload.streamId());
                     var prune=t==null?null:t.prune;
@@ -1893,7 +2300,12 @@ public final class RoutingService implements AutoCloseable {
                             new ControlMessage.ActivationAck(t.id,t.epoch,child.line.id,child.payload.revision(),millis));
                 }
             }catch(RuntimeException error){synchronized(resources){sends.remove(send);resources.notifyAll();}throw error;}
-            if(attempt!=null){attempt.submitted=true;attempt.round.issued++;attempt.tree.upstream=attempt.line;attempt.tree.submittedRevision=attempt.revision;}
+            if(attempt!=null){
+                attempt.submitted=true;attempt.round.issued++;
+                if(attempt.round.switching != null)
+                    attempt.round.switching.targetRevision = attempt.revision;
+                if(attempt.round.switching == null){attempt.tree.upstream=attempt.line;attempt.tree.submittedRevision=attempt.revision;}
+            }
             try{Objects.requireNonNull(control.send(session,message)).whenComplete(send::complete);}
             catch(RuntimeException e){send.complete(null,e);}return true;
         }
@@ -1962,6 +2374,7 @@ public final class RoutingService implements AutoCloseable {
                 if(t.round!=null)delay=Math.min(delay,futureDelay(t.round.budget-age(at,t.round.began)));
                 if(t.confirmed!=null&&!t.confirmed.source){
                     delay=Math.min(delay,futureDelay(t.confirmed.lease.remainingNanos(at)));
+                    delay=Math.min(delay,qualityDelay(t,at));
                     if(t.round==null&&t.renewalBlocked==null&&demand(t,at)&&compatible(t,t.confirmed.path,at))
                         delay=Math.min(delay,futureDelay(t.renewPeriod-age(at,t.renewBegan)));
                 }
@@ -1997,6 +2410,7 @@ public final class RoutingService implements AutoCloseable {
         {
             long at = now();
             responseQuotas.remove(session);
+            metricStamps.remove(session);
             for(var t : trees.values())
             {
                 var child = t.children.get(session);
@@ -2070,6 +2484,13 @@ public final class RoutingService implements AutoCloseable {
             }
             for(var t : trees.values())
             {
+                if(t.round != null && t.round.switching != null)
+                {
+                    long at = clock.getAsLong();
+                    if(at - t.round.began < 0)
+                        at = t.round.began;
+                    switchEvent(t, t.round, SwitchPhase.FAILURE, "CLOSED", at);
+                }
                 t.locals.clear();
                 t.children.clear();
                 t.confirmedLocals.clear();

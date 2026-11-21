@@ -26,6 +26,17 @@ public record RouteMetric(long costMicros, int hopCount) implements Comparable<R
 
 
 
+    public static boolean improves(long current, long replacement, int percent)
+    {
+        if(current < 0 || replacement < 0 || percent < 0 || percent > 100)
+            throw new IllegalArgumentException("Invalid improvement inputs");
+
+        long minimum = (current / 100) * percent + ((current % 100) * percent + 99) / 100;
+        return replacement < current && current - replacement >= minimum;
+    }
+
+
+
     //* === Comparable Implementation === *
 
     @Override

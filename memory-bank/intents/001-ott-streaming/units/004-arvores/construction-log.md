@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-20T16:24:13Z"
+last_updated: "2026-11-21T16:01:32Z"
 ---
 # Construction Log — 004-arvores
 
@@ -21,7 +21,7 @@ comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
 Test1379/0/0/0, Francisco30, revisão final Denji e integração4d18d1d comprovados.
 3 - ✅ **008-arvores**: complete; Test1419/0/0/0,Luis7/28,Fillmore e integração447ae4b
 comprovados; história003 complete/implemented=true,TASK-016 DONE.
-4 - [ ] **024-arvores**: planned; história004, adaptação por RTT.
+4 - [ ] **024-arvores**: in-progress; Model/Design/ADR/Q-C-47-B aprovados; Implement para revisão, 1459/0/0/0 JDK21; história004 planned, V-017 por consolidar em Test.
 5 - [ ] **009-arvores**: planned; história005, segundo marco.
 
 ## Histórico de execução
@@ -420,3 +420,64 @@ Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progress
 Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
 iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
 [Fecho](../../../../bolts/008-arvores/closure-walkthrough.md).
+
+## IMP-014 — início exclusivo de Model
+
+Registo 2026-11-21T14:10:07Z:024-arvores iniciado por seleção explícita, apenas Model.
+Dependências008/022 complete; unidade004/PHASE-04 continuam em progresso.
+Sem fontes Java/testes lidos/analisados/alterados, Maven, Design/ADR/Implement/
+Test, commits/push/outro IMP. Revisor final Waheed atribuído; sem gate externo novo.
+
+- **2026-11-21T14:13:30Z**: [Model de IMP-014](../../../../bolts/024-arvores/ddd-01-domain-model.md)
+  proposto para revisão, incluindo Q-C-45/46 (observações/permanência e troca/
+  backoff/continuidade). V-017/S01–S18 planeados, não executados. Preservado
+  âmbito futuro de três caminhos; nenhuma leitura/análise/alteração Java,
+  Maven, Design/ADR/Implement/Test, commits ou push. R17 inicial de IMP-013
+  continua sem causa estabelecida. Sem gate externo adicional; Waheed antes
+  de integração/DONE, após testes/regressão JDK21 e manual humano futuros.
+
+- **2026-11-21T14:21:52Z**: utilizador aprova Model/Q-C-45/46 de024-arvores e autoriza
+  apenas Design. Model concluído, current_stage=design; V-017/S01–S18 por executar.
+  Preservar âmbito/testes/R17; sem Implement/commits/push ou gate externo novo.
+
+- **2026-11-21T14:29:02Z**: [Design de024-arvores](../../../../bolts/024-arvores/ddd-02-technical-design.md)
+  preparado para revisão humana, sem aprovação presumida. Identidades M/A,
+  cálculo exacto, D, confirmação/poda/renegociação e coordenação14/11/recuperação
+  detalhados. T/A/capacidade físicos partilhados, três caminhos preservados.
+  V-017/S01–S18 não executados. Sem ADR/Implement/Test, Java/Maven, commits/push
+  ou outro IMP; sem gates externos novos. R17 histórico sem causa estabelecida.
+
+- **2026-11-21T14:46:03Z**: Design de024-arvores aprovado explicitamente; apenas revisão
+  ADR autorizada para conferir APIs reais. Sem Implement, commits/push ou novo
+  IMP; três caminhos/testes/negativos e R17 preservados, V-017 não executado.
+
+- **2026-11-21T14:54:50Z**: revisão ADR de024-arvores preparada com APIs reais. A01–A07
+  cabem nos três caminhos; impedimento de observabilidade documentado em Q-C-47
+  (propostas não aprovadas, nenhuma ampliação aplicada). Apenas Model/Design
+  concluídos; sem Implement/Maven/commits/push. V-017 não executado e R17 intacto.
+
+- **2026-11-21T15:03:15Z**: Q-C-47-B/revisão ADR aprovadas, cinco caminhos registados no ADD/
+  Design/contratos antes de fontes. Apenas Implement autorizado; estilo consultado.
+  Sem Test/fecho/commits/push; preservar históricos/fatal e limitação R17.
+
+- **2026-11-21T15:36:31Z**: [Implement preparado](../../../../bolts/024-arvores/implementation-walkthrough.md).
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.
+
+- **2026-11-21T16:01:32Z**: [Tratamento de medições ultrapassadas corrigido em Implement](../../../../bolts/024-arvores/implementation-walkthrough.md).
+Reprodução no rig de RouteSwitchTest com controlo sem repetição (passa) e negativo funcional
+com repetição de amostra antiga (falhava por substituição indevida de custo no grafo).
+Implementada validação estrita de proveniência em `supersededMeasurement` antes de alterar
+custos ou projecções em RoutingService. Preservados o tratamento de SUSPECT actual,
+invalidação sem ressurreição por replay, amostras novas, saturação temporal estrita
+e Session substituta. 63 testes pertinentes passaram (S05/S06, negativos R10 históricos,
+RoutingServiceTest). Regressão incremental completa JDK21.0.13.1: **1459/0/0/0**, 21 suites:
+1419 históricos intactos + 40 novos. Implement permanece pendente de aprovação humana;
+sem avanço para Test, fecho, commits/push ou outro IMP. Evidência em
+[implement-02-stale-metrics](../../../../experiments/construction/024-arvores/implement-02-stale-metrics/README.md).

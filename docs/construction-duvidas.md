@@ -1739,3 +1739,213 @@ Bolt/história complete,implemented=true,TASK-016 DONE; unidade/fase em progress
 Negativos e limitação R17 preservados,sem causa estabelecida. Nenhum outro IMP
 iniciado;024 apenas desimpedido. Commit/push autorizados,sem Java/build/manual novo.
 [Fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md).
+
+## Q-C-45 — IMP-014: melhoria, observações e permanência
+
+- **Estado:** APROVADA explicitamente pelo utilizador; registo 2026-11-21T14:21:52Z.
+  Proposta original de2026-11-21T14:13:30Z preservada abaixo; apenas Design autorizado.
+- **Questão:** 20%/três observações/cinco segundos estão no ADD; importa definir
+  comparação, consecutividade e âncora sem contar duplicados como estabilidade.
+- **Proposta:** comparar custo contemporâneo do caminho confirmado com a
+  alternativa válida: N<C e100×(C−N)≥P×C, sem overflow/arredondamento. Ausência
+  não é zero; hops só desempata. Contar entradas reais distintas de métrica ou
+  ANN de geração nova, uma vez por evento; valores iguais de medições distintas
+  podem contar. Snapshot/tick/callback/ANN duplicado não contam.
+- **Sequência:** mesmo F=(stream/origem/época/Session completa/path), contador
+  saturado em O; invalidade, falta de melhoria ou mudança de alternativa/F
+  reinicia. Primeira comparação válida conta uma vez; retorno de elegibilidade
+  não ressuscita uma prova bloqueada. G novo do mesmo F pode continuar sequência.
+- **Permanência proposta:** primeira confirmação e cada troca confirmada
+  ancoram D; renovação do mesmo ramo, tentativa falhada ou seleção não reancoram.
+  Qualificação pode acumular antes de D, mas tem de continuar válida ao admitir
+  troca. Timer não inventa observação. Falha real ignora P/O/D.
+- **Limites:** defaults e domínios centrais preservados; sem parâmetro, wire,
+  histórico ilimitado ou gate externo novo. Conferência de APIs reais apenas
+  na etapa apropriada, sem leitura de fontes neste Model.
+- **Modelo/oráculos:** [Model](../memory-bank/bolts/024-arvores/ddd-01-domain-model.md),
+  V-017/S01–S08 planeados, não executados. Aprovar ou ajustar antes de Design.
+
+## Q-C-46 — IMP-014: troca limitada, backoff e continuidade
+
+- **Estado:** APROVADA explicitamente pelo utilizador; registo 2026-11-21T14:21:52Z.
+  Proposta original de2026-11-21T14:13:30Z preservada abaixo; apenas Design autorizado.
+- **Questão:** coordenar melhoria e recuperação preservando o parent saudável,
+  a intenção e as reservas, sem repetir uma ativação falhada com a mesma prova.
+- **Proposta:** uma troca pendente por árvore, com T/A e reservas físicas
+  partilhadas já existentes; manter grant antigo enquanto válido até confirmação
+  nova compatível e barreira de envio. Publicar uma confirmação atómica, depois
+  podar apenas a revisão antiga capturada. Não copiar grants para prefixo novo;
+  filhos renegociam automaticamente pela intenção admitida, sem alargar prazos.
+- **Backoff proposto:** terminal de qualidade reinicia qualificação e bloqueia
+  F/G; aguardar T existente desde esse terminal. Nova troca requer prova útil
+  posterior (F novo válido ou ANN validado com G superior ao watermark) e nova
+  sequência de O observações, além de D/capacidade/cadência. Não propor outro
+  parâmetro. Timer, capacidade libertada ou métrica inválida que volta a válida
+  não desbloqueiam prova. O ANN novo pode contar como primeira observação.
+- **Falha real:** não espera histerese/backoff de qualidade; usar recuperação
+  IMP-013, sem prorrogar tentativa pendente, duplicar orçamento ou apagar os
+  bloqueios/créditos Q-C-44/R10. Cancelamento/timeout lógico não liberta reservas
+  físicas; shutdown continua a aguardá-las no lifecycle existente.
+- **Âmbito:** os três caminhos do ADD/IMP-014; NetworkMonitor legado não autoriza
+  mudança adicional. Qualquer impedimento/ampliação será apresentado previamente.
+- **Modelo/oráculos:** [Model](../memory-bank/bolts/024-arvores/ddd-01-domain-model.md),
+  V-017/S09–S18 planeados, não executados. Sem Design/ADR/Implement/Test.
+
+## IMP-014 — checkpoint Model, apenas documentação
+
+024-arvores iniciado por opção1 em2026-11-21T14:10:07Z. Model/Q-C-45/46
+propostos para revisão, não aprovados. V-017/S01–S18 não executados.
+Sem fontes Java lidas/analisadas/alteradas, Maven, commits, push ou outro IMP.
+R17 inicial de IMP-013 permanece sem causa estabelecida; integração com métricas
+controladas não demonstra a causa. Evidência e hashes anteriores preservados.
+Revisão final Waheed, testes/regressão JDK21, manual humano e integração continuam
+obrigatórios para fecho futuro; sem gates externos adicionais.
+
+## IMP-014 — Model/Q-C-45/46 aprovados; apenas Design
+
+Registo 2026-11-21T14:21:52Z: aprovação explícita do utilizador. Concretizar identidade
+das observações, cálculo exato, permanência/revalidação, confirmação atómica,
+poda antiga, renegociação dos filhos e coordenação com renovação/recuperação.
+T/A e reservas físicas partilhados; falha efetiva não espera histerese/backoff
+de qualidade. Três caminhos do ADD e testes históricos preservados.
+V-017/S01–S18 não executados; sem Implement, commits ou push. Manual humano
+antes de aprovar Test, regressão JDK21, Waheed e integração obrigatórios; sem
+gates externos adicionais. Limitação histórica de R17 preservada.
+
+## Q-C-45/46 — concretização proposta em Design
+
+Registo 2026-11-21T14:29:02Z: Model/Q-C-45/46 aprovados; apenas Design.
+[Design para revisão](../memory-bank/bolts/024-arvores/ddd-02-technical-design.md):
+
+- M=(Session completa,sampleCount,sampleCountSaturated,lastSampleAtNanos);
+  contagem crescente ou, após saturação, instante monotónico que avança.
+  A=(F,G) após validação/aplicação, G novo; APPLIED com G igual não basta.
+  Uma entrada conta uma vez por Tree; coalescência pode subcontar, nunca
+  multiplicar. Primeira comparação conta uma vez, não por recriação de cursor.
+- Melhoria exacta: q=C/100,r=C%100; redução mínima=q×P+(r×P+99)/100.
+  Exigir N<C e C−N≥mínimo; sem overflow/double. D na primeira confirmação
+  e mudança efectiva de ramo, não em14/tentativa falhada. Revalidar antes
+  de enviar e antes do commit; timer não cria observação.
+- Ramo antigo congelado antes da nova11, incluindo maior11/14 submetida.
+  Confirmar novo apenas com ACK12 actual+ACCEPTED, lease ancorado no início
+  da tentativa; publicar atomicamente e depois podar a revisão antiga exacta.
+  Fallback é lease remoto, nunca poda aproximada que remova revisão nova.
+- Filhos incompatíveis ficam sem forwarding pelo novo prefixo; interesse
+  conserva deadline antigo. Renegociação automática por ACTIVATE fresco,
+  sem ACK espontâneo/novo play humano/extensão de lease antigo.
+- Uma operação upstream lógica:14 pendente mantém prazo original;11 por
+  qualidade/recuperação partilha cursor T/A e reservas físicas canónicas.
+  Falha efectiva retira autoridade e ignora P/O/D/backoff de qualidade;
+  tentativa útil continua sem reiniciar T/A. Callback/timeout lógico não
+  liberta físico. Shutdown usa o primeiro budget existente.
+
+Três caminhos do ADD e testes históricos preservados. Viabilidade nas APIs
+reais ainda por conferir na futura revisão ADR autorizada, sem leitura de
+fontes nesta etapa. V-017/S01–S18 por executar. Manual humano antes de aprovar
+Test, regressão JDK21, Waheed e integração obrigatórios; sem gate externo novo.
+R17 histórico sem causa estabelecida, não explicado pela integração controlada.
+Sem Implement, commits/push ou outro IMP. Design não aprovado por este registo.
+
+## Q-C-47 — IMP-014: observabilidade real e contrato de entrega
+
+- **Estado:** APROVADA alternativa B e revisão ADR pelo utilizador; registo de aprovação 2026-11-21T15:03:15Z.
+  Proposta original preservada abaixo. Registo 2026-11-21T14:54:50Z. Model/Design
+  aprovados; apenas revisão ADR autorizada, sem Implement ou ampliação de âmbito.
+- **Impedimento sustentado:** RoutingService.Event só tem Reason/fatal
+  (RoutingService136), note conta falhas (884–887), e o adaptador de routing
+  em OverlayNode135–140 ignora eventos não fatais. Diagnostics não transporta
+  stream/custos/motivo/duração da troca. O `recovery` da aplicação é o estado
+  de descoberta OverlayRecovery, não a recuperação de árvores. Os mecanismos
+  existentes não satisfazem os logs de troca previstos em TASK-017/Design.
+- **Prova e adaptações A01–A08:** [revisão ADR](../memory-bank/bolts/024-arvores/adr-review.md).
+  Nenhum ficheiro Java foi alterado ou patch aplicado para contornar a lacuna.
+
+### Proposta A — conservar os três caminhos, alterar explicitamente a observabilidade
+
+Acrescentar em RoutingService o valor aninhado imutável SwitchDiagnostics e
+um mapa `Snapshot.switches`, no máximo uma entrada por Tree/slot C. Propõe-se
+sétimo componente no record Snapshot e overload de seis argumentos com esse
+mapa vazio; preservar os overloads4/5 e o construtor6 actualmente canónico,
+bem como accessors e semântica de catálogo/routes/forwarding/recoveries.
+A compatibilidade proposta é de chamadas Java; o formato completo de
+record/toString/equals passa a incluir o novo mapa e não é declarado inalterado.
+
+| Grupo de dados | Contrato proposto, limitado por Tree |
+|---|---|
+| Contexto | stream/origem/época, operação opcional, fase interna e motivo local; não reutilizar ErrorCode/failure para sucesso |
+| Ramos | Session completa/path antigo e alvo, até32 IDs cada; revisão antiga submetida e revisão alvo, opcionais quando não aplicáveis |
+| Política/prova | custos opcionais actuais, P/O/D, contagem≤O, G observado/bloqueado e indicação de prova suficiente; ausente não é zero |
+| Tempo | capturado no mesmo turno; restante de D/backoff/operação e duração decorrida, sem renovar prazos pela leitura |
+| Totais | inícios/sucessos/falhas saturados e flag de saturação; um último estado, sem lista de incidentes/amostras |
+
+Publicar defensivamente no mesmo owner, dentro de C, sem tocar em Route.java,
+CLI, logger, dependências, threads, wire ou reservas. Dados de qualidade não
+autorizam forwarding nem mudam a projecção de recuperação de IMP-013. Remover
+com o estado lógico correspondente; sem segundo ledger/TTL ou histórico global.
+Usar RouteSwitchTest para valores/copias/limites e construtores4/5/6/7, sem
+alterar testes históricos. A evidência/manual futuro poderá consultar a API
+por harness; o CLI actual **não** passa a mostrar o mapa automaticamente.
+
+**Alteração que precisa de aprovação:** substituir a promessa de custos/motivos
+logados automaticamente por diagnóstico consultável nesta entrega e aceitar
+a extensão do Snapshot. Isto ajusta o Design/TASK-017 expressamente; não
+considerar equivalência implícita nem adiar a obrigação sem decisão humana.
+Nenhuma alteração normativa dessas foi aplicada. Os três caminhos mantêm-se.
+
+### Alternativa B — manter logs automáticos, com excepção prévia de âmbito
+
+Preservar Snapshot4/5/6. Acrescentar payload imutável de troca ao RoutingService.Event,
+com overload2 compatível para todos os emissores anteriores, e emitir apenas
+transições de início/fim/falha (sem log por observação ou nota de falha falsa).
+Em OverlayNode, adicionar sink de routing explícito por factory nomeada,
+preservando construtores/factories anteriores e tratamento fatal. Em
+OttApplication, ligar esse sink à fila limitada existente `console.log`.
+Sem logger/worker/fila nova, I/O no owner, mensagem fictícia ou alteração dos
+eventos sealed de NeighborManager. Confirmar a publicação nova antes do evento
+de sucesso e da poda; falha/overflow de saída mantém shutdown existente.
+
+Esta alternativa exige autorização de **dois caminhos adicionais** de produção:
+
+- `Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java`;
+- `Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java`.
+
+A prova futura pode ficar em RouteSwitchTest (sink controlado e integração TCP/
+console pertinente), preservando os testes históricos. Não acrescentar qualquer
+outro caminho por inferência; se esse teste revelar impedimento, apresentar
+antes. Contrato Observer continua funcional; o payload e o sink são extensões
+locais propostas, não APIs já implementadas. Esta opção **não está autorizada**,
+não integra a allowlist nem foi aplicada; o ADD mantém os três caminhos.
+
+### Estado e decisão requerida
+
+Escolher A, B ou indicar outra política antes de alterar contrato/âmbito/código.
+A revisão ADR fica pendente desta decisão e de aprovação humana, sem Implement.
+Não é gate externo novo: é a apresentação prévia de impedimento exigida pelo
+utilizador e ADR-024. V-017/S01–S18 continuam por executar; regressão JDK21,
+manual humano antes de aprovar Test, Waheed e integração continuam obrigatórios.
+R17 inicial de IMP-013 sem causa estabelecida; integração com métricas controladas
+não demonstra essa causa. Negativos e hashes anteriores preservados.
+
+## Q-C-47-B — aplicação autorizada apenas em Implement
+
+Registo2026-11-21T15:03:15Z: ADD, Design e contratos actualizados antes de código.
+Cinco caminhos, Snapshot/construtores/factories/fatal preservados; payload e
+sink usam exclusivamente console.log limitado. Sem Test/fecho/commit/push.
+
+## IMP-014 — Implement e negativo de transferência
+
+[Walkthrough](../memory-bank/bolts/024-arvores/implementation-walkthrough.md), registo2026-11-21T15:36:31Z.
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.
+
+S13-transfer: lossCredit ficava vivo depois de transferir a ronda, permitindo
+uma quinta ACTIVATE sem ANN novo. Crédito agora consumido só quando existe
+ronda ainda válida e prova elegível; perda após prazo conserva incidente fresco.
+Negativo/fonte anterior, teste dos dois lados da fronteira e regressão preservados.
+Nenhuma decisão de contrato/âmbito por inferência nesta correcção interna.

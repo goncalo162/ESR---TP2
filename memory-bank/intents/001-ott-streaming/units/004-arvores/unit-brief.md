@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-04"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-20T16:24:13Z"
+updated: "2026-11-21T15:36:31Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-007", "REQ-009", "REQ-011", "NFR-003", "REQ-017"]
@@ -28,11 +28,21 @@ Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
 V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
 aprovados. [Fecho](../../../../bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
 R17 inicial continua sem causa estabelecida e métricas controladas não a
-demonstram. Unidade004/PHASE-04 em progresso,15 bolts complete/20planned,
-nenhum bolt em execução.024-arvores apenas desimpedido,nenhum outro IMP iniciado.
-Commit/push autorizados; sem novo código/build/manual ou gate externo.
+demonstram. O commit/push desse fecho está concluído; não autoriza publicação
+no incremento seguinte. Estado atual: unidade004/PHASE-04 em progresso,
+15 bolts complete,1 in-progress e19 planned.024-arvores/IMP-014 em Implement,
+por aprovar. Model/Q-C-45/46, Design e ADR/Q-C-47-B aprovados; cinco caminhos
+autorizados e registados antes de fontes. Regressão incremental JDK21 actual
+1449/0/0/0 (1419 históricos+30 novos),21 XML. Implement/Test não aprovados;
+V-017 por consolidar em Test, clean verify/JAR novo, regressão aprovada, manual
+humano antes de aprovar Test, Waheed e integração pendentes. Sem fecho/commit/
+push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
 
 Registos anteriores de Q-C-40–42 mantêm caráter histórico; código/JAR/evidência preservados.
+
+Model/Design/ADR e Q-C-47-B aprovados; [Implement de024-arvores para revisão](../../../../bolts/024-arvores/implementation-walkthrough.md).
+História004 continua planned, sem implementação.009-arvores aguarda conclusão
+de024; revisão final de IMP-014 atribuída a Waheed, sem gate externo adicional.
 
 ## Requisitos atribuídos
 

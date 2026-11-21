@@ -1,0 +1,235 @@
+{
+  "recorded_at": "2026-11-21T15:39:49Z",
+  "head": "b533279238870cb59fdcfda563dbcada769d5b6d",
+  "branch": "Denji",
+  "current_stage": "implement",
+  "stages_completed": [
+    "model",
+    "design",
+    "adr"
+  ],
+  "implement_approved": false,
+  "test_stage_started": false,
+  "scope": {
+    "authorized_java_paths": [
+      "Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+      "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java"
+    ],
+    "modified_existing": [
+      "Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java",
+      "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java"
+    ],
+    "added": [
+      "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java"
+    ],
+    "historical_source_files_unchanged": 59,
+    "historical_test_files_unchanged": 21,
+    "Snapshot_source_region_unchanged": true,
+    "contract_and_scope_recorded_before_java_edits": "2026-11-21T15:03:15Z",
+    "tracked_generated_maven_lists": "preserved under generated-target and restored to HEAD"
+  },
+  "regression_final": {
+    "totals": {
+      "tests": 1449,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "xml_suites": 21,
+    "historical_tests": 1419,
+    "new_tests": 30,
+    "java.version": [
+      "21.0.13.1"
+    ],
+    "log": "regression-02.log",
+    "sources": "regression-02-source.json"
+  },
+  "runs": [
+    {
+      "id": "focused-02",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "focused-03",
+      "tests": 22,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "focused-04",
+      "tests": 22,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "25.0.5.1"
+    },
+    {
+      "id": "focused-05",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "focused-06",
+      "tests": 25,
+      "failures": 0,
+      "errors": 3,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "focused-07",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "transfer-negative-01",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    },
+    {
+      "id": "transfer-fixed-01",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "java.version": "21.0.13.1"
+    }
+  ],
+  "new_functional_negative": {
+    "id": "S13-transfer",
+    "log": "transfer-negative-01.log",
+    "cause": "lossCredit retained after a live switch round took over the incident",
+    "fix": "consume credit only for a still-live round and eligible proof; expired-round loss keeps fresh credit",
+    "relevant_tests": "transfer-fixed-01.log"
+  },
+  "prior_R17_limitation": "Initial IMP-013 R17 negative remains without established cause; controlled-metrics integration and S13 correction do not explain it.",
+  "archived_input_hashes_verified": {
+    "adr-review-01": 22,
+    "design-01": 20,
+    "model-01": 18
+  },
+  "previous_evidence_intact": true,
+  "clean_verify_executed": false,
+  "new_delivery_jar": false,
+  "v_017_formally_consolidated": false,
+  "v_add_errors": 0,
+  "staging_performed": false,
+  "commits_created": false,
+  "push_performed": false,
+  "external_gates": [],
+  "remaining": [
+    "Implement review",
+    "Test/V-017 formal consolidation",
+    "clean verify/new delivery JAR",
+    "approved regression",
+    "human manual before Test approval",
+    "final Waheed review",
+    "integration"
+  ],
+  "scope_checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "b533279238870cb59fdcfda563dbcada769d5b6d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "Denji\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD",
+        "--",
+        "CORE",
+        "Projeto/target",
+        "docs/style/CODESTYLE.md",
+        "experiments/construction/007-arvores",
+        "experiments/construction/023-arvores",
+        "experiments/construction/008-arvores",
+        "experiments/construction/022-rotas",
+        "memory-bank/bolts/008-arvores",
+        "memory-bank/bolts/023-arvores",
+        "memory-bank/bolts/022-rotas"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "Projeto/src/main/java/pt/uminho/esr/ott/app/OttApplication.java\nProjeto/src/main/java/pt/uminho/esr/ott/overlay/OverlayNode.java\nProjeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java\nProjeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java\nadd.md\ndocs/07-API-AND-INTERFACES.md\ndocs/13-REQUIREMENTS-TRACEABILITY.md\ndocs/15-PROJECT-PROGRESS.md\ndocs/18-CONSTRUCTION-BOLTS.md\ndocs/construction-duvidas.md\ndocs/phases/PHASE-04-FLOW-MANAGEMENT.md\ndocs/tasks/PHASE-04/TASK-017.md\nmemory-bank/bolts/024-arvores/bolt.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md\nmemory-bank/project.yaml\nmemory-bank/standards/decision-index.md\nmemory-bank/story-index.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "ls-files",
+        "--others",
+        "--exclude-standard"
+      ],
+      "exit_code": 0,
+      "stdout": "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java\nexperiments/construction/024-arvores/adr-review-01/README.md\nexperiments/construction/024-arvores/adr-review-01/approved-design-input.tar.gz\nexperiments/construction/024-arvores/adr-review-01/authorization.json\nexperiments/construction/024-arvores/adr-review-01/document-hashes.sha256\nexperiments/construction/024-arvores/adr-review-01/source-inventory.json\nexperiments/construction/024-arvores/adr-review-01/v-add.md\nexperiments/construction/024-arvores/adr-review-01/verification.json\nexperiments/construction/024-arvores/design-01/README.md\nexperiments/construction/024-arvores/design-01/approved-model-input.tar.gz\nexperiments/construction/024-arvores/design-01/authorization.json\nexperiments/construction/024-arvores/design-01/document-hashes.sha256\nexperiments/construction/024-arvores/design-01/v-add.md\nexperiments/construction/024-arvores/design-01/verification.json\nexperiments/construction/024-arvores/implement-01/README.md\nexperiments/construction/024-arvores/implement-01/RouteMetric.java.input\nexperiments/construction/024-arvores/implement-01/RoutingService.java.input\nexperiments/construction/024-arvores/implement-01/approved-adr-input.tar.gz\nexperiments/construction/024-arvores/implement-01/authorization.json\nexperiments/construction/024-arvores/implement-01/before-transfer-fix.java.input\nexperiments/construction/024-arvores/implement-01/compile.log\nexperiments/construction/024-arvores/implement-01/focused-01.log\nexperiments/construction/024-arvores/implement-01/focused-02.log\nexperiments/construction/024-arvores/implement-01/focused-02.xml\nexperiments/construction/024-arvores/implement-01/focused-03.log\nexperiments/construction/024-arvores/implement-01/focused-03.xml\nexperiments/construction/024-arvores/implement-01/focused-04.log\nexperiments/construction/024-arvores/implement-01/focused-04.xml\nexperiments/construction/024-arvores/implement-01/focused-05.log\nexperiments/construction/024-arvores/implement-01/focused-05.xml\nexperiments/construction/024-arvores/implement-01/focused-06.log\nexperiments/construction/024-arvores/implement-01/focused-06.xml\nexperiments/construction/024-arvores/implement-01/focused-07.log\nexperiments/construction/024-arvores/implement-01/focused-07.xml\nexperiments/construction/024-arvores/implement-01/generated-target/createdFiles.lst\nexperiments/construction/024-arvores/implement-01/generated-target/inputFiles.lst\nexperiments/construction/024-arvores/implement-01/regression-01-source.json\nexperiments/construction/024-arvores/implement-01/regression-01.log\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.RecoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.RouteSwitchTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/TEST-pt.uminho.esr.ott.transport.TransportTest.xml\nexperiments/construction/024-arvores/implement-01/regression-01/suites.json\nexperiments/construction/024-arvores/implement-01/regression-02-source.json\nexperiments/construction/024-arvores/implement-01/regression-02.log\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.app.OttApplicationTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.bootstrap.BootstrapServerTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.config.ConfigurationLoaderTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.monitoring.NetworkMonitorTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.CandidateCacheTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborDiscoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.NeighborManagerTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.overlay.OverlayRecoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.protocol.DiscoveryCodecTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.protocol.MessageCodecTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.ActivationTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.RecoveryTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.RouteSwitchTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.RouteTraceTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.RoutingServiceTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.RoutingTableTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.routing.SubscriptionLeaseTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/TEST-pt.uminho.esr.ott.transport.TransportTest.xml\nexperiments/construction/024-arvores/implement-01/regression-02/suites.json\nexperiments/construction/024-arvores/implement-01/source-before.json\nexperiments/construction/024-arvores/implement-01/transfer-fixed-01.log\nexperiments/construction/024-arvores/implement-01/transfer-fixed-01.xml\nexperiments/construction/024-arvores/implement-01/transfer-negative-01.log\nexperiments/construction/024-arvores/implement-01/transfer-negative-01.xml\nexperiments/construction/024-arvores/implement-01/v-add.md\nexperiments/construction/024-arvores/model-01/README.md\nexperiments/construction/024-arvores/model-01/document-hashes.sha256\nexperiments/construction/024-arvores/model-01/entry.json\nexperiments/construction/024-arvores/model-01/v-add.md\nexperiments/construction/024-arvores/model-01/verification.json\nmemory-bank/bolts/024-arvores/adr-review.md\nmemory-bank/bolts/024-arvores/ddd-01-domain-model.md\nmemory-bank/bolts/024-arvores/ddd-02-technical-design.md\nmemory-bank/bolts/024-arvores/implementation-walkthrough.md\n",
+      "stderr": ""
+    }
+  ]
+}

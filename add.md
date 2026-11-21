@@ -1226,7 +1226,7 @@ Commit/push autorizados; sem novo código/build/manual ou gate externo.
 - **Descrição/entrega:** Trocar parent com histerese. Produzir este incremento e a sua prova, preservando os restantes componentes.
 - **Fase/unidade/tamanho:** PHASE-04 / 004-arvores / M.
 - **Bolt/origem:** [024-arvores](memory-bank/bolts/024-arvores/bolt.md); TASK-017.
-- **Ficheiros:** `routing/RoutingService.java`, `routing/RouteMetric.java`, `routing/RouteSwitchTest.java`.
+- **Ficheiros:** `routing/RoutingService.java`, `routing/RouteMetric.java`, `routing/RouteSwitchTest.java`, `overlay/OverlayNode.java`, `app/OttApplication.java` (excepção Q-C-47-B aprovada).
 - **Dependências:** IMP-013 (008-arvores), IMP-010 (022-rotas).
 - **ADR:** ADR-005, ADR-016, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, NFR-001, NFR-003, REQ-009, REQ-014.
@@ -1238,6 +1238,34 @@ Commit/push autorizados; sem novo código/build/manual ou gate externo.
   - [ ] Um upstream é confirmado no snapshot.
   - [ ] Tráfego transitório e limites da troca são explicitados.
   - [ ] Validação V-017 executada e evidência ligada no progresso.
+
+Checkpoint anterior ADR (histórico, substituído por Q-C-47-B)2026-11-21T14:56:21Z: Model/Q-C-45/46 e Design aprovados.
+Apenas [revisão ADR](memory-bank/bolts/024-arvores/adr-review.md) autorizada/preparada;
+APIs reais conferidas. [Q-C-47](docs/construction-duvidas.md) apresenta impedimento
+de observabilidade e propostas não aprovadas. Os três caminhos acima e contratos
+normativos mantêm-se, sem aplicação das propostas. Sem Implement/Test/Maven,
+alterações Java, commits/push ou outro IMP; V-017/S01–S18 não executados.
+Regressão JDK21, manual humano antes da aprovação Test, Waheed e integração
+necessários ao fecho; sem gate externo adicional. R17 histórico sem causa estabelecida.
+
+Q-C-47-B/ADR aprovados explicitamente em registo2026-11-21T15:03:15Z: cinco caminhos
+autorizados acima. Payload imutável de início/sucesso/falha de troca em
+RoutingService.Event, sink explícito em OverlayNode e ligação à fila limitada
+console.log de OttApplication. Snapshot/construtores/factories anteriores e
+tratamento fatal preservados. Confirmação publicada antes de sucesso/poda.
+Sem log por amostra, I/O bloqueante no owner, dependência/thread/fila nova.
+Apenas Implement autorizado; sem Test/fecho/commit/push. V-017 ainda por consolidar;
+R17 inicial sem causa estabelecida. O checkpoint ADR anterior é histórico.
+
+Checkpoint Implement2026-11-21T15:36:31Z: [walkthrough para revisão](memory-bank/bolts/024-arvores/implementation-walkthrough.md).
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.
 
 <a id="imp-015"></a>
 ### IMP-015 — Demonstrar o segundo marco

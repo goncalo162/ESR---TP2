@@ -1,0 +1,1148 @@
+package pt.uminho.esr.ott.routing;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import static org.junit.jupiter.api.Assertions.*;
+import static pt.uminho.esr.ott.routing.ActivationTest.*;
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
+import pt.uminho.esr.ott.app.OttApplication;
+import pt.uminho.esr.ott.bootstrap.BootstrapServer;
+import pt.uminho.esr.ott.config.*;
+import pt.uminho.esr.ott.monitoring.*;
+import pt.uminho.esr.ott.overlay.*;
+import pt.uminho.esr.ott.protocol.*;
+import pt.uminho.esr.ott.transport.Connection;
+
+@Timeout(25)
+class RouteSwitchTest
+{
+    //* === Atributos e Variáveis === *
+    private static final long SECOND = 1_000_000_000L;
+
+
+
+    //* === Auxiliar === *
+
+    private static final class Rig implements AutoCloseable
+    {
+        //* === Atributos e Variáveis === *
+        final AtomicLong clock = new AtomicLong();
+        final Owner owner = new Owner(4096);
+        final Timers timers = new Timers(clock);
+        final List<Sent> sent = new ArrayList<>();
+        final List<RoutingService.SwitchEvent> events = new ArrayList<>();
+        final Neighbor.Session a = peer("A"), b = peer("B");
+        final Map<Neighbor.Session,Long> samples = new HashMap<>();
+        final RoutingService router;
+        Predicate<ControlMessage> hold = message -> false;
+        Consumer<RoutingService.Event> sink = event -> { };
+        RoutingService.SubscriptionTicket ticket;
+
+
+
+        //* === Construtores === *
+
+        Rig()
+        {
+            router = new RoutingService(config("R", false, 4096, 3), id("R-instance"), owner, (session, message) -> {
+                assertTrue(owner.isOwnerThread());
+                if(message.type() == MessageType.DEACTIVATE && !events.isEmpty()
+                        && events.getLast().phase() == RoutingService.SwitchPhase.SUCCESS)
+                    assertEquals(events.getLast().replacement(), forwarding().upstream().orElseThrow());
+                var result = new CompletableFuture<Connection.SendResult>();
+                sent.add(new Sent(session, message, result));
+                if(!hold.test(message))
+                    result.complete(Connection.SendResult.ACCEPTED);
+                return result;
+            }, event -> {
+                assertFalse(event.fatal(), event.toString());
+                event.routeSwitch().ifPresent(change -> {
+                    if(change.phase() == RoutingService.SwitchPhase.SUCCESS)
+                        assertEquals(change.replacement(), forwarding().upstream().orElseThrow());
+                    events.add(change);
+                });
+                sink.accept(event);
+            }, clock::get, timers);
+            act(router::start);
+            up(a);
+            metric(a, 10);
+            ad(a, 1, 990);
+            ticket = router.requestSubscription(A, id("consumer"));
+            pump();
+            ack(latest(), 6000);
+            assertEquals(a, forwarding().upstream().orElseThrow());
+        }
+
+
+
+        //* === Lógica === *
+
+        void act(Runnable action)
+        {
+            owner.run(action);
+            pump();
+        }
+
+
+        void pump()
+        {
+            for(int i = 0; i < 10000; i++)
+            {
+                boolean work = owner.drain();
+                boolean alarm = timers.fire();
+                if(!work && !alarm)
+                    return;
+            }
+            fail("Unbounded quality wake loop");
+        }
+
+
+        void tick(long nanos)
+        {
+            clock.addAndGet(nanos);
+            pump();
+        }
+
+
+        void up(Neighbor.Session session)
+        {
+            act(() -> router.onNeighborEvent(new NeighborManager.NeighborUp(session)));
+        }
+
+
+        void sample(Neighbor.Session session, long cost, long count, long at, boolean saturated)
+        {
+            act(() -> router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(session,
+                    LinkMetrics.State.MEASURED, OptionalDouble.of(cost), OptionalLong.of(cost), count,
+                    saturated, OptionalLong.of(at), 0))));
+        }
+
+
+        void metric(Neighbor.Session session, long cost)
+        {
+            sample(session, cost, samples.merge(session, 1L, Long::sum), clock.get(), false);
+        }
+
+
+        void receive(Neighbor.Session session, ControlMessage message)
+        {
+            act(() -> router.onNeighborEvent(new NeighborManager.Received(session, message)));
+        }
+
+
+        void ad(Neighbor.Session session, long generation, long cost)
+        {
+            receive(session, new ControlMessage(MessageType.STREAM_ANNOUNCE, UUID.randomUUID(), session.nodeId(),
+                    session.instanceId(), new ControlMessage.Announcement(new ControlMessage.StreamInfo(A, "S",
+                        "Video", 1, 10, EPOCH), generation, cost, List.of("S", session.nodeId()))));
+        }
+
+
+        void alternative(long advertised)
+        {
+            up(b);
+            metric(b, 10);
+            ad(b, 1, advertised);
+        }
+
+
+        void qualify()
+        {
+            alternative(790);
+            metric(b, 10);
+            metric(b, 10);
+        }
+
+
+        void longGrant()
+        {
+            tick(4 * SECOND);
+            ack(messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 6000);
+            ad(a, 2, 990);
+        }
+
+
+        List<Sent> messages(MessageType type)
+        {
+            return sent.stream().filter(value -> value.message().type() == type).toList();
+        }
+
+
+        Sent latest()
+        {
+            return messages(MessageType.ACTIVATE).getLast();
+        }
+
+
+        void ack(Sent request, long lease)
+        {
+            var payload = (ControlMessage.Activation) request.message().payload();
+            receive(request.peer(), new ControlMessage(MessageType.ACTIVATE_ACK, request.message().requestId(),
+                    request.peer().nodeId(), request.peer().instanceId(), new ControlMessage.ActivationAck(
+                        payload.streamId(), payload.serverEpoch(), payload.subscriptionId(), payload.revision(), lease)));
+        }
+
+
+        void reject(Sent request)
+        {
+            receive(request.peer(), new ControlMessage(MessageType.ERROR, request.message().requestId(),
+                    request.peer().nodeId(), request.peer().instanceId(),
+                    new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, 11, "NO_ROUTE")));
+        }
+
+
+        Route.Confirmation forwarding()
+        {
+            return router.snapshot().forwarding().get(A);
+        }
+
+
+        RoutingService.ActivationLoad load()
+        {
+            var load = new AtomicReference<RoutingService.ActivationLoad>();
+            owner.run(() -> load.set(router.activationLoad()));
+            return load.get();
+        }
+
+
+        public void close()
+        {
+            router.requestClose();
+            owner.drain();
+            for(var send : sent)
+            {
+                send.result().complete(Connection.SendResult.CLOSED);
+            }
+            owner.drain();
+            assertTrue(router.awaitTermination(Duration.ofSeconds(1)));
+            owner.close();
+        }
+    }
+
+
+    private static void check(Consumer<Rig> scenario)
+    {
+        try(var rig = new Rig())
+        {
+            scenario.accept(rig);
+        }
+    }
+
+
+    @Test
+    void s01NoiseBreaksConsecutiveObservations()
+    {
+        check(rig -> {
+            rig.alternative(789);
+            rig.metric(rig.b, 12);
+            rig.metric(rig.b, 10);
+            rig.tick(5 * SECOND);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.metric(rig.b, 11);
+            rig.metric(rig.b, 10);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s02ExactThresholdDwellAndAtomicPublicationBeforeSuccessAndPrune()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND - 1);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(1);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            rig.ack(rig.latest(), 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.SUCCESS),
+                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
+            assertEquals(1000, rig.events.getLast().previousCostMicros());
+            assertEquals(800, rig.events.getLast().replacementCostMicros());
+            assertEquals(rig.events.getFirst().operationId(), rig.events.getLast().operationId());
+            assertEquals(1, rig.messages(MessageType.DEACTIVATE).size());
+            assertEquals(0, rig.router.snapshot().diagnostics().failures());
+        });
+    }
+
+
+    @Test
+    void s03StrictImprovementAtZeroAndHundredPercent()
+    {
+        assertTrue(RouteMetric.improves(1, 0, 100));
+        assertFalse(RouteMetric.improves(0, 0, 0));
+        assertFalse(RouteMetric.improves(10, 10, 0));
+        assertTrue(RouteMetric.improves(10, 9, 0));
+        assertFalse(RouteMetric.improves(10, 1, 100));
+        assertThrows(IllegalArgumentException.class, () -> RouteMetric.improves(-1, 0, 20));
+        assertThrows(IllegalArgumentException.class, () -> RouteMetric.improves(10, 1, 101));
+    }
+
+
+    @Test
+    void s04ExactLargeCostWithoutOverflow()
+    {
+        long reduction = 1844674407370955162L;
+        assertTrue(RouteMetric.improves(Long.MAX_VALUE, Long.MAX_VALUE - reduction, 20));
+        assertFalse(RouteMetric.improves(Long.MAX_VALUE, Long.MAX_VALUE - reduction + 1, 20));
+        assertThrows(ArithmeticException.class, () -> RouteMetric.accumulate(Long.MAX_VALUE, 1, 1));
+        assertEquals(new RouteMetric(100, 1), RouteMetric.accumulate(90, 10, 1));
+    }
+
+
+    @Test
+    void s05DuplicateSamplesAnnouncementsAndTicksDoNotCount()
+    {
+        check(rig -> {
+            rig.alternative(790);
+            for(int i = 0; i < 4; i++)
+            {
+                rig.sample(rig.b, 10, 1, 0, false);
+                rig.ad(rig.b, 1, 790);
+            }
+            rig.tick(5 * SECOND);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.metric(rig.b, 10);
+            rig.metric(rig.b, 10);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s05SaturatedSampleCountRequiresAnAdvancingInstant()
+    {
+        check(rig -> {
+            rig.alternative(790);
+            rig.sample(rig.b, 10, Long.MAX_VALUE, 0, true);
+            rig.tick(5 * SECOND);
+            rig.sample(rig.b, 10, Long.MAX_VALUE, 0, true);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.sample(rig.b, 10, Long.MAX_VALUE, rig.clock.get(), true);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s06InvalidMetricBreaksTheSequenceWithoutInventingObservations()
+    {
+        check(rig -> {
+            rig.alternative(790);
+            rig.metric(rig.b, 10);
+            rig.act(() -> rig.router.onMetrics(new NetworkMonitor.Invalidated(rig.b, NetworkMonitor.Reason.TIMEOUT)));
+            rig.metric(rig.b, 10);
+            rig.tick(5 * SECOND);
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+            rig.metric(rig.b, 10);
+            rig.metric(rig.b, 10);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s07RenewalDoesNotMoveTheConfirmationDwellAnchor()
+    {
+        check(rig -> {
+            rig.tick(2 * SECOND);
+            rig.ack(rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast(), 6000);
+            rig.qualify();
+            rig.tick(3 * SECOND);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s08SelectionCostCannotReplaceTheCurrentConfirmedPathCost()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.act(() -> rig.router.onMetrics(new NetworkMonitor.Invalidated(rig.a, NetworkMonitor.Reason.TIMEOUT)));
+            rig.tick(5 * SECOND);
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            assertEquals(1, rig.messages(MessageType.ACTIVATE).size());
+        });
+    }
+
+
+    @Test
+    void s09PruneCapturesTheOldSubmittedRenewalRevision()
+    {
+        check(rig -> {
+            rig.longGrant();
+            var old = (ControlMessage.Activation) rig.messages(MessageType.SUBSCRIPTION_RENEW).getLast().message().payload();
+            rig.qualify();
+            rig.tick(SECOND);
+            rig.ack(rig.latest(), 6000);
+            var prune = (ControlMessage.Deactivation) rig.messages(MessageType.DEACTIVATE).getLast().message().payload();
+            assertEquals(old.subscriptionId(), prune.subscriptionId());
+            assertEquals(old.revision(), prune.revision());
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+        });
+    }
+
+
+    @Test
+    void s10EarlyAckWaitsForAcceptedAndCancellationWins()
+    {
+        check(rig -> {
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var pending = rig.latest();
+            rig.ack(pending, 6000);
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            rig.ticket.cancel();
+            rig.pump();
+            assertNull(rig.forwarding());
+            assertTrue(rig.load().sends() > 0);
+            pending.result().complete(Connection.SendResult.ACCEPTED);
+            rig.pump();
+            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.FAILURE),
+                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
+        });
+    }
+
+
+    @Test
+    void s11FailurePreservesTheOldGrantAndHasOneTerminalEvent()
+    {
+        check(rig -> {
+            rig.longGrant();
+            rig.qualify();
+            rig.tick(SECOND);
+            rig.reject(rig.latest());
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            assertEquals(2, rig.events.size());
+            rig.pump();
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(2, rig.events.size());
+        });
+    }
+
+
+    @Test
+    void s12MetricRecoveryCannotRearmButNewPostFailureAnnouncementCan()
+    {
+        check(rig -> {
+            rig.longGrant();
+            rig.qualify();
+            rig.tick(SECOND);
+            rig.reject(rig.latest());
+            rig.metric(rig.b, 10000);
+            rig.metric(rig.b, 10);
+            rig.tick(3 * SECOND);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(rig.b, 2, 790);
+            rig.metric(rig.b, 10);
+            rig.metric(rig.b, 10);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ad(rig.b, 2, 790);
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(rig.latest(), 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+        });
+    }
+
+
+    @Test
+    void s13ActualLossIgnoresQualityDwell()
+    {
+        check(rig -> {
+            rig.alternative(790);
+            rig.tick(3 * SECOND);
+            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertTrue(rig.events.isEmpty());
+            rig.ack(rig.latest(), 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+        });
+    }
+
+
+    @Test
+    void s13LossDuringSwitchKeepsTheOriginalGlobalDeadlineAndPhysicalReservation()
+    {
+        check(rig -> {
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var pending = rig.latest();
+            rig.tick(SECOND);
+            assertNull(rig.forwarding());
+            rig.tick(2 * SECOND);
+            assertEquals(2, rig.messages(MessageType.ACTIVATE).size());
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, rig.router.snapshot().recoveries().get(A).phase());
+            assertTrue(rig.load().sends() > 0);
+            pending.result().complete(Connection.SendResult.ACCEPTED);
+            rig.pump();
+            assertNull(rig.forwarding());
+        });
+    }
+
+
+    @Test
+    void s14ObsoleteTargetCannotCommitAfterASecondImprovement()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var pending = rig.latest();
+            var other = peer("C");
+            rig.up(other);
+            rig.metric(other, 10);
+            rig.ad(other, 1, 100);
+            rig.ack(pending, 6000);
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            assertEquals(RoutingService.SwitchPhase.FAILURE, rig.events.getLast().phase());
+        });
+    }
+
+
+    @Test
+    void s15OneOfTwoConsumersCanStopWithoutCancellingTheSwitch()
+    {
+        check(rig -> {
+            UUID second = id("second");
+            var ticket = rig.router.requestSubscription(A, second);
+            rig.pump();
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            rig.ticket.cancel();
+            rig.pump();
+            rig.ack(rig.latest(), 6000);
+            assertEquals(Set.of(second), rig.forwarding().localConsumers());
+            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
+        });
+    }
+
+
+    @Test
+    void s16IncompatibleChildIsSuspendedUntilItsFreshActivation()
+    {
+        check(rig -> {
+            var child = peer("C");
+            rig.up(child);
+            UUID sub = id("child");
+            rig.receive(child, new ControlMessage(MessageType.ACTIVATE, id("request1"), child.nodeId(), child.instanceId(),
+                    new ControlMessage.Activation(A, EPOCH, sub, 0, 6000, List.of("S", "A", "R", "C"))));
+            assertEquals(1, rig.forwarding().downstreams().size());
+            int responses = rig.messages(MessageType.ACTIVATE_ACK).size();
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            rig.ack(rig.latest(), 6000);
+            assertTrue(rig.forwarding().downstreams().isEmpty());
+            assertEquals(responses, rig.messages(MessageType.ACTIVATE_ACK).size());
+            rig.receive(child, new ControlMessage(MessageType.ACTIVATE, id("request2"), child.nodeId(), child.instanceId(),
+                    new ControlMessage.Activation(A, EPOCH, sub, 1, 6000, List.of("S", "B", "R", "C"))));
+            assertEquals(1, rig.forwarding().downstreams().size());
+            assertEquals(List.of("S", "B", "R", "C"), rig.forwarding().downstreams().get("C").expectedPath());
+        });
+    }
+
+
+    @Test
+    void s17ShutdownRetainsPhysicalSendsUntilTheirCallbacksFinish()
+    {
+        check(rig -> {
+            rig.hold = message -> message.type() == MessageType.ACTIVATE;
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var held = rig.latest();
+            rig.router.requestClose();
+            rig.owner.drain();
+            assertFalse(rig.router.awaitTermination(Duration.ZERO));
+            held.result().complete(Connection.SendResult.ACCEPTED);
+            rig.owner.drain();
+            assertTrue(rig.router.awaitTermination(Duration.ofSeconds(1)));
+        });
+    }
+
+
+    @Test
+    void compatibleEventAndSnapshotConstructorsRemainAvailable() throws Exception
+    {
+        assertTrue(new RoutingService.Event(RoutingService.Reason.NONE, false).routeSwitch().isEmpty());
+        var empty = RoutingService.emptySnapshot();
+        var four = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics());
+        var five = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics(), Map.of());
+        var six = new RoutingService.Snapshot(0, empty.catalog(), Map.of(), empty.diagnostics(), Map.of(), Map.of());
+        assertEquals(four, five);
+        assertEquals(five, six);
+        assertEquals(6, RoutingService.Snapshot.class.getRecordComponents().length);
+        assertNotNull(OverlayNode.class.getConstructor(NodeConfiguration.class, UUID.class, NeighborManager.Observer.class));
+        assertNotNull(OverlayNode.class.getDeclaredConstructor(NodeConfiguration.class, UUID.class,
+                NeighborManager.Observer.class, NetworkMonitor.Factory.class));
+        assertNotNull(OverlayNode.class.getDeclaredConstructor(NodeConfiguration.class, UUID.class,
+                NeighborManager.Observer.class, NetworkMonitor.Factory.class, RoutingService.Factory.class));
+        assertEquals(1, RoutingService.Factory.class.getDeclaredMethods().length);
+    }
+
+
+    private static Object field(Object target, String name) throws Exception
+    {
+        var field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(target);
+    }
+
+
+    private static List<Integer> ports(int count) throws Exception
+    {
+        var sockets = new ArrayList<ServerSocket>();
+        var ports = new ArrayList<Integer>();
+        try
+        {
+            for(int i = 0; i < count; i++)
+            {
+                var socket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress());
+                sockets.add(socket);
+                ports.add(socket.getLocalPort());
+            }
+
+        }finally{
+            for(var socket : sockets)
+            {
+                socket.close();
+            }
+        }
+        return ports;
+    }
+
+
+    private static void await(BooleanSupplier condition) throws Exception
+    {
+        long began = System.nanoTime();
+        while(!condition.getAsBoolean())
+        {
+            if(System.nanoTime() - began >= 10 * SECOND)
+                fail("TCP/console condition deadline");
+            Thread.sleep(2);
+        }
+    }
+
+
+    private static NodeConfiguration nodeConfig(String name, int port, int data, int bootstrap, int queue)
+    {
+        var d = RuntimeConfiguration.defaults();
+        var c = d.control();
+        var r = d.routing();
+        var runtime = new RuntimeConfiguration(new RuntimeConfiguration.Control(c.connectTimeout(), c.shutdownTimeout(),
+                c.maxConnections(), queue, c.bootstrapQueryTimeout()), d.overlay(),
+                new RuntimeConfiguration.Monitoring(Duration.ofSeconds(60), Duration.ofSeconds(3), 3, .2),
+                new RuntimeConfiguration.Routing(Duration.ofMillis(200), r.candidateTtl(), r.cacheCapacity(), r.cacheTtl(),
+                    r.floodMaxPerSecond(), r.activateTimeout(), r.activateAttempts(), 20, 3, Duration.ofMillis(100)),
+                d.subscription(), d.video(), d.source());
+        return new NodeConfiguration(Path.of(name), name, name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY,
+                "127.0.0.1", "127.0.0.1", port, data,
+                Optional.of(new NodeConfiguration.BootstrapContact("127.0.0.1", bootstrap)), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), name.equals("S") ? config("S", true, 4096, 3).streams()
+                    : List.of(), runtime);
+    }
+
+
+    private static final class ApplicationHarness implements AutoCloseable
+    {
+        //* === Atributos e Variáveis === *
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        final List<String> writers = new CopyOnWriteArrayList<>();
+        final Object console;
+        final AutoCloseable service;
+        final OverlayNode node;
+        final RoutingService router;
+        final NeighborManager.SerialOwner owner;
+        final Thread writer;
+        final AtomicBoolean outputStopping;
+
+
+
+        //* === Construtores === *
+
+        ApplicationHarness(NodeConfiguration config, boolean startWriter) throws Exception
+        {
+            var consoleClass = Class.forName(OttApplication.class.getName() + "$Console");
+            var constructor = consoleClass.getDeclaredConstructor(InputStream.class, PrintStream.class, PrintStream.class,
+                    NodeConfiguration.class, LongSupplier.class);
+            constructor.setAccessible(true);
+            var output = new PrintStream(bytes, true, java.nio.charset.StandardCharsets.UTF_8)
+            {
+                public void println(String text)
+                {
+                    writers.add(Thread.currentThread().getName());
+                    super.println(text);
+                }
+            };
+            console = constructor.newInstance(InputStream.nullInputStream(), output, output, config,
+                    (LongSupplier) System::nanoTime);
+            writer = (Thread) field(console, "writer");
+            outputStopping = (AtomicBoolean) field(console, "outputStopping");
+            if(startWriter)
+                writer.start();
+            var open = OttApplication.class.getDeclaredMethod("open", NodeConfiguration.class, consoleClass);
+            open.setAccessible(true);
+            service = (AutoCloseable) open.invoke(null, config, console);
+            var captured = Arrays.stream(service.getClass().getDeclaredFields())
+                    .filter(value -> value.getType() == OverlayNode.class).findFirst().orElseThrow();
+            captured.setAccessible(true);
+            node = (OverlayNode) captured.get(service);
+            await(() -> node.routingSnapshot().diagnostics().phase() == RoutingService.Phase.RUNNING);
+            router = (RoutingService) field(node, "routing");
+            owner = (NeighborManager.SerialOwner) field(node, "owner");
+        }
+
+
+
+        //* === Lógica === *
+
+        String output()
+        {
+            return bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+
+        void act(Runnable action) throws Exception
+        {
+            var done = new CompletableFuture<Void>();
+            assertTrue(owner.offer(() -> {
+                try
+                {
+                    action.run();
+                    done.complete(null);
+
+                }catch(Throwable error){
+                    done.completeExceptionally(error);
+                }
+            }));
+            done.get(5, TimeUnit.SECONDS);
+        }
+
+
+        public void close() throws Exception
+        {
+            try
+            {
+                service.close();
+
+            }finally{
+                outputStopping.set(true);
+                if(writer.getState() != Thread.State.NEW)
+                {
+                    writer.join(5000);
+                    assertFalse(writer.isAlive());
+                }
+            }
+        }
+    }
+
+
+    private static final class TcpPeer implements AutoCloseable
+    {
+        //* === Atributos e Variáveis === *
+        final NeighborManager.SerialOwner owner = NeighborManager.createSerialOwner(4096);
+        final NeighborManager manager;
+        final RoutingService router;
+        final List<RoutingService.Event> failures = new CopyOnWriteArrayList<>();
+
+
+
+        //* === Construtores === *
+
+        TcpPeer(NodeConfiguration config) throws Exception
+        {
+            UUID instance = UUID.randomUUID();
+            var reference = new AtomicReference<RoutingService>();
+            manager = new NeighborManager(config, instance, owner, event -> {
+                var routing = reference.get();
+                if(event instanceof NeighborManager.Received received && received.message().type() == MessageType.PROBE_PING)
+                    echo(received, instance, config.nodeId());
+                if(routing != null)
+                {
+                    routing.onNeighborEvent(event);
+                    if(event instanceof NeighborManager.NeighborUp up)
+                        routing.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(up.session(), LinkMetrics.State.MEASURED,
+                                OptionalDouble.of(10), OptionalLong.of(10), 1, false, OptionalLong.of(System.nanoTime()), 0)));
+                }
+            });
+            router = new RoutingService(config, instance, owner, manager::send, event -> {
+                if(event.fatal())
+                    failures.add(event);
+            });
+            reference.set(router);
+            assertTrue(owner.offer(router::start));
+            manager.start().toCompletableFuture().get(5, TimeUnit.SECONDS);
+        }
+
+
+
+        //* === Lógica === *
+
+        void echo(NeighborManager.Received received, UUID instance, String node)
+        {
+            manager.send(received.session(), new ControlMessage(MessageType.PROBE_PONG,
+                    received.message().requestId(), node, instance, received.message().payload()));
+        }
+
+
+        public void close()
+        {
+            router.requestClose();
+            manager.requestClose();
+            assertTrue(router.awaitTermination(Duration.ofSeconds(5)));
+            assertTrue(manager.awaitTermination(Duration.ofSeconds(5)));
+            owner.requestClose();
+            assertTrue(owner.awaitTermination(Duration.ofSeconds(5)));
+            assertTrue(failures.isEmpty(), failures.toString());
+        }
+    }
+
+
+    @Test
+    void s18RealTcpSwitchTraversesTheProductionSinkAndApplicationOutput() throws Exception
+    {
+        var port = ports(9);
+        var names = List.of("S", "A", "B", "R");
+        var edges = Map.of("S", Set.of("A", "B"), "A", Set.of("S", "R"), "B", Set.of("S", "R"),
+                "R", Set.of("A", "B"));
+        var topology = new LinkedHashMap<String,TopologyConfiguration.Node>();
+        for(int i = 0; i < names.size(); i++)
+        {
+            String name = names.get(i);
+            topology.put(name, new TopologyConfiguration.Node(name, "127.0.0.1", port.get(1 + i * 2),
+                    port.get(2 + i * 2), name.equals("S") ? NodeRole.SERVER : NodeRole.RELAY, edges.get(name)));
+        }
+        var bootConfig = new NodeConfiguration(Path.of("bootstrap"), "BOOT", NodeRole.BOOTSTRAP,
+                "127.0.0.1", "127.0.0.1", port.getFirst(), 0, Optional.empty(), Optional.of(Path.of("topology")),
+                Optional.empty(), Optional.empty(), Optional.of(new TopologyConfiguration(Path.of("topology"), topology)), List.of());
+        try(var bootstrap = new BootstrapServer(bootConfig);
+                var source = new TcpPeer(nodeConfig("S", port.get(1), port.get(2), port.getFirst(), 256));
+                var a = new TcpPeer(nodeConfig("A", port.get(3), port.get(4), port.getFirst(), 256));
+                var b = new TcpPeer(nodeConfig("B", port.get(5), port.get(6), port.getFirst(), 256));
+                var app = new ApplicationHarness(nodeConfig("R", port.get(7), port.get(8), port.getFirst(), 256), true))
+        {
+            await(() -> app.node.monitoringSnapshot().links().size() == 2
+                    && app.node.monitoringSnapshot().links().values().stream().allMatch(link -> link.sampleCount() > 0));
+            app.act(() -> {
+                for(var link : app.node.monitoringSnapshot().links().values())
+                {
+                    long cost = link.session().nodeId().equals("A") ? 10 : 1000;
+                    app.router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(link.session(), LinkMetrics.State.MEASURED,
+                            OptionalDouble.of(cost), OptionalLong.of(cost), 100, false, OptionalLong.of(System.nanoTime()), 0)));
+                }
+            });
+            await(() -> app.router.snapshot().routes().get(A) != null
+                    && app.router.snapshot().routes().get(A).knownUpstream().map(value -> value.nodeId().equals("A")).orElse(false));
+            var ticket = app.router.requestSubscription(A, UUID.randomUUID());
+            await(() -> ticket.result().isPresent());
+            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
+            var manager = (NeighborManager) field(app.node, "manager");
+            var target = manager.snapshot().get("B");
+            app.act(() -> {
+                for(int i = 0; i < 3; i++)
+                {
+                    app.router.onMetrics(new NetworkMonitor.Updated(new LinkMetrics(target, LinkMetrics.State.MEASURED,
+                            OptionalDouble.of(1), OptionalLong.of(1), 101 + i, false,
+                            OptionalLong.of(System.nanoTime()), 0)));
+                }
+            });
+            await(() -> app.router.snapshot().forwarding().get(A) != null
+                    && app.router.snapshot().forwarding().get(A).upstream().orElseThrow().nodeId().equals("B"));
+            await(() -> app.output().contains("phase=SUCCESS"));
+            var lines = app.output().lines().filter(line -> line.startsWith("ROUTE_SWITCH ")).toList();
+            assertEquals(2, lines.size(), app.output());
+            assertTrue(lines.getFirst().contains("phase=STARTED"));
+            assertTrue(lines.getLast().contains("previousCostMicros=20"));
+            assertTrue(lines.getLast().contains("replacementCostMicros=11"));
+            assertTrue(lines.getLast().contains("reason=CONFIRMED"));
+            assertTrue(lines.getLast().contains("elapsedNanos="));
+            assertTrue(app.writers.stream().allMatch(thread -> thread.equals("ott-cli-output")));
+            assertFalse(app.router.snapshot().forwarding().containsKey(B));
+            assertTrue(app.node.failure().isEmpty());
+            System.out.println("APPLICATION_SWITCH_OUTPUT " + String.join(" | ", lines));
+        }
+    }
+
+
+    @Test
+    void payloadIsDefensiveAndRejectsOversizedContext()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var event = rig.events.getFirst();
+            assertThrows(UnsupportedOperationException.class, () -> event.previousPath().add("X"));
+            assertThrows(IllegalArgumentException.class, () -> new RoutingService.SwitchEvent(A, "S", EPOCH,
+                    event.operationId(), event.phase(), event.previous(), event.replacement(),
+                    Collections.nCopies(33, "X"), event.replacementPath(), event.previousRevision(), -1,
+                    1000, 800, "BOUND", 0));
+            assertThrows(IllegalArgumentException.class, () -> new RoutingService.SwitchEvent(A, "S", EPOCH,
+                    event.operationId(), event.phase(), event.previous(), event.replacement(), event.previousPath(),
+                    event.replacementPath(), event.previousRevision(), -1, 1000, 800, "X".repeat(257), 0));
+        });
+    }
+
+
+    private interface AppScenario
+    {
+        void run(ApplicationHarness app) throws Exception;
+    }
+
+
+    private static void withApplication(boolean writer, AppScenario scenario) throws Exception
+    {
+        var port = ports(5);
+        var topology = Map.of("R", new TopologyConfiguration.Node("R", "127.0.0.1", port.get(1), port.get(2),
+                NodeRole.RELAY, Set.of("X")), "X", new TopologyConfiguration.Node("X", "127.0.0.1", port.get(3),
+                    port.get(4), NodeRole.RELAY, Set.of("R")));
+        var boot = new NodeConfiguration(Path.of("boot"), "BOOT", NodeRole.BOOTSTRAP, "127.0.0.1", "127.0.0.1",
+                port.getFirst(), 0, Optional.empty(), Optional.of(Path.of("topology")), Optional.empty(), Optional.empty(),
+                Optional.of(new TopologyConfiguration(Path.of("topology"), topology)), List.of());
+        try(var bootstrap = new BootstrapServer(boot);
+                var peer = new TcpPeer(nodeConfig("X", port.get(3), port.get(4), port.getFirst(), 256));
+                var app = new ApplicationHarness(nodeConfig("R", port.get(1), port.get(2), port.getFirst(), 256), writer))
+        {
+            await(() -> app.node.monitoringSnapshot().links().size() == 1
+                    && app.node.monitoringSnapshot().links().values().stream().allMatch(link -> link.sampleCount() > 0));
+            app.act(() -> { });
+            scenario.run(app);
+        }
+    }
+
+
+    private static RoutingService.SwitchEvent sampleEvent()
+    {
+        try(var rig = new Rig())
+        {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            return rig.events.getFirst();
+        }
+    }
+
+
+    @Test
+    void routingSinkUsesOnlyTheExistingBoundedOutputQueue() throws Exception
+    {
+        var change = sampleEvent();
+        withApplication(false, app -> {
+            var queue = (BlockingQueue<?>) field(app.console, "outputs");
+            await(() -> queue.toString().contains("READY"));
+            assertFalse(((AtomicBoolean) field(app.console, "failed")).get());
+            var log = app.console.getClass().getDeclaredMethod("log", String.class, boolean.class);
+            log.setAccessible(true);
+            while(queue.remainingCapacity() > 0)
+            {
+                log.invoke(app.console, "FILL", false);
+            }
+            var observer = (RoutingService.Observer) field(app.router, "observer");
+            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(change))));
+            assertTrue(((AtomicBoolean) field(app.console, "failed")).get());
+            assertEquals(256, queue.size());
+            assertEquals("", app.output());
+            assertTrue(app.writers.isEmpty());
+            assertSame(queue, field(app.console, "outputs"));
+        });
+    }
+
+
+    @Test
+    void fatalRoutingStillStopsTheNodeThroughTheExistingApplicationComposition() throws Exception
+    {
+        withApplication(true, app -> {
+            var observer = (RoutingService.Observer) field(app.router, "observer");
+            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.CLOCK_ERROR, true)));
+            assertTrue(app.node.failure().isPresent());
+            assertTrue(app.node.failure().orElseThrow().getMessage().contains("CLOCK_ERROR"));
+            assertFalse(app.output().contains("ROUTE_SWITCH"));
+        });
+    }
+
+
+    @Test
+    void routingPayloadEscapesIntoOnePhysicalOutputLine() throws Exception
+    {
+        var event = sampleEvent();
+        var hostile = new RoutingService.SwitchEvent(event.streamId(), event.serverId(), event.serverEpoch(),
+                event.operationId(), event.phase(), event.previous(), event.replacement(), event.previousPath(),
+                event.replacementPath(), event.previousRevision(), -1, 1000, 800, "line1\nline2", 17);
+        withApplication(true, app -> {
+            var observer = (RoutingService.Observer) field(app.router, "observer");
+            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(hostile))));
+            await(() -> app.output().contains("ROUTE_SWITCH"));
+            var lines = app.output().lines().filter(line -> line.startsWith("ROUTE_SWITCH")).toList();
+            assertEquals(1, lines.size());
+            assertTrue(lines.getFirst().contains("reason=line1\\nline2"));
+            assertTrue(lines.getFirst().contains("elapsedNanos=17"));
+            assertTrue(lines.getFirst().length() <= OttApplication.MAX_LOG_CHARS);
+            assertTrue(app.writers.stream().allMatch(thread -> thread.equals("ott-cli-output")));
+        });
+    }
+
+
+    @Test
+    void maximumContextRetainsCostsReasonAndDurationWithinTheExistingLogLimit() throws Exception
+    {
+        var event = sampleEvent();
+        var previous = new ArrayList<String>();
+        var replacement = new ArrayList<String>();
+        previous.add("S");
+        replacement.add("S");
+        for(int i = 0; i < 29; i++)
+        {
+            previous.add("P" + String.format("%02d", i) + "X".repeat(29));
+            replacement.add("Q" + String.format("%02d", i) + "Y".repeat(29));
+        }
+        previous.addAll(List.of("A", "R"));
+        replacement.addAll(List.of("B", "R"));
+        var maximum = new RoutingService.SwitchEvent(event.streamId(), event.serverId(), event.serverEpoch(),
+                event.operationId(), event.phase(), event.previous(), event.replacement(), previous, replacement,
+                event.previousRevision(), -1, 1000, 800, "\n".repeat(256), Long.MAX_VALUE);
+        previous.clear();
+        assertEquals(32, maximum.previousPath().size());
+        withApplication(true, app -> {
+            var observer = (RoutingService.Observer) field(app.router, "observer");
+            app.act(() -> observer.onEvent(new RoutingService.Event(RoutingService.Reason.NONE, false, Optional.of(maximum))));
+            await(() -> app.output().contains("ROUTE_SWITCH"));
+            var line = app.output().lines().filter(value -> value.startsWith("ROUTE_SWITCH")).findFirst().orElseThrow();
+            assertTrue(line.length() <= OttApplication.MAX_LOG_CHARS);
+            assertFalse(line.contains("[truncated]"));
+            assertTrue(line.contains("previousCostMicros=1000 replacementCostMicros=800"));
+            assertTrue(line.contains("elapsedNanos=" + Long.MAX_VALUE));
+            assertTrue(line.endsWith(replacement.toString()));
+        });
+    }
+
+
+    @Test
+    void s13TransferredLossCannotGiveTheSameExhaustedRoundAnotherCredit()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            rig.ad(rig.b, 2, 790);
+            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
+            for(int i = 0; i < 3; i++)
+            {
+                rig.reject(rig.latest());
+            }
+            assertEquals(4, rig.messages(MessageType.ACTIVATE).size());
+            rig.tick(3 * SECOND);
+            assertEquals(4, rig.messages(MessageType.ACTIVATE).size(), "A transferred incident is consumed by the existing round");
+            assertEquals(Route.RecoveryPhase.UNAVAILABLE, rig.router.snapshot().recoveries().get(A).phase());
+            assertEquals(List.of(RoutingService.SwitchPhase.STARTED, RoutingService.SwitchPhase.FAILURE),
+                    rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
+        });
+    }
+
+
+    @Test
+    void s18AnotherOriginAndStreamKeepTheirOwnConfirmedBranch()
+    {
+        check(rig -> {
+            var other = peer("X");
+            UUID epoch = id("T-instance");
+            rig.up(other);
+            rig.metric(other, 10);
+            rig.receive(other, new ControlMessage(MessageType.STREAM_ANNOUNCE, UUID.randomUUID(), other.nodeId(),
+                    other.instanceId(), new ControlMessage.Announcement(new ControlMessage.StreamInfo(B, "T", "Other", 1, 10,
+                        epoch), 1, 90, List.of("T", "X"))));
+            var ticket = rig.router.requestSubscription(B, id("other-consumer"));
+            rig.pump();
+            rig.ack(rig.latest(), 6000);
+            var before = rig.router.snapshot().forwarding().get(B);
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            rig.ack(rig.latest(), 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+            assertEquals(before, rig.router.snapshot().forwarding().get(B));
+            assertEquals(RoutingService.SubscriptionState.SUCCESS, ticket.result().orElseThrow().state());
+            assertTrue(rig.events.stream().allMatch(event -> event.streamId().equals(A)));
+        });
+    }
+
+
+    @Test
+    void s18RenewalTraceAndWrongSessionErrorsCannotCompleteTheQualityAttempt()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            var pending = rig.latest();
+            for(int related : List.of(14, 15))
+            {
+                rig.receive(rig.b, new ControlMessage(MessageType.ERROR, pending.message().requestId(), rig.b.nodeId(),
+                        rig.b.instanceId(), new ControlMessage.ErrorPayload(ErrorCode.NO_ROUTE, related, "unrelated")));
+            }
+            var payload = (ControlMessage.Activation) pending.message().payload();
+            rig.receive(rig.a, new ControlMessage(MessageType.ACTIVATE_ACK, pending.message().requestId(), rig.a.nodeId(),
+                    rig.a.instanceId(), new ControlMessage.ActivationAck(A, EPOCH, payload.subscriptionId(), payload.revision(), 6000)));
+            assertEquals(1, rig.events.size());
+            assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+            rig.ack(pending, 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+            assertEquals(RoutingService.SwitchPhase.SUCCESS, rig.events.getLast().phase());
+        });
+    }
+
+
+    @Test
+    void s13LossAtAnAlreadyExpiredSwitchDeadlineRetainsItsFreshIncidentCredit()
+    {
+        check(rig -> {
+            rig.qualify();
+            rig.tick(5 * SECOND);
+            rig.ad(rig.b, 2, 790);
+            rig.clock.addAndGet(3 * SECOND);
+            rig.act(() -> rig.router.onNeighborEvent(new NeighborManager.NeighborDown(rig.a, NeighborManager.Reason.TRANSPORT)));
+            assertEquals(3, rig.messages(MessageType.ACTIVATE).size());
+            rig.ack(rig.latest(), 6000);
+            assertEquals(rig.b, rig.forwarding().upstream().orElseThrow());
+        });
+    }
+
+
+    private static void staleMeasurementSequence(Rig rig, boolean replay)
+    {
+        rig.longGrant();
+        assertEquals(4 * SECOND, rig.clock.get());
+        rig.up(rig.b);
+        rig.sample(rig.b, 10000, 1, 4 * SECOND, false);
+        rig.ad(rig.b, 1, 790);
+        for(int count = 2; count <= 4; count++)
+        {
+            rig.sample(rig.b, 10, count, 4 * SECOND, false);
+        }
+        if(replay)
+            rig.sample(rig.b, 10000, 1, 4 * SECOND, false);
+        rig.tick(SECOND);
+        assertEquals(2, rig.messages(MessageType.ACTIVATE).size(), "Qualified B survives a superseded measurement");
+        assertEquals("B", rig.router.snapshot().routes().get(A).knownUpstream().orElseThrow().nodeId());
+        assertEquals(rig.a, rig.forwarding().upstream().orElseThrow());
+        assertEquals(List.of(RoutingService.SwitchPhase.STARTED), rig.events.stream().map(RoutingService.SwitchEvent::phase).toList());
+    }
+
+
+    @Test
+    void s05StaleMeasurementControlWithoutReplayKeepsQualification()
+    {
+        check(rig -> staleMeasurementSequence(rig, false));
+    }
+
+
+    @Test
+    void s05SupersededMeasurementCannotReplaceCurrentCostOrQualification()
+    {
+        check(rig -> staleMeasurementSequence(rig, true));
+    }
+}

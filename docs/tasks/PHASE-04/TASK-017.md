@@ -5,7 +5,7 @@
 - ID: TASK-017
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS — Model/Design/ADR aprovados; Implement para revisão
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-016](../PHASE-04/TASK-016.md).
@@ -72,3 +72,53 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Checkpoint anterior — apenas Model (histórico)
+
+Seleção explícita da opção1 em2026-11-21T14:10:07Z.
+[Model](../../../memory-bank/bolts/024-arvores/ddd-01-domain-model.md) e
+[Q-C-45/46](../../construction-duvidas.md) propostos para revisão, não aprovados.
+A referência legada a NetworkMonitor na secção6 não amplia os três caminhos
+do ADD/IMP-014. Sem Java/Maven, Design/ADR/Implement/Test, commits/push ou
+outro IMP. V-017/S01–S18 não executados; testes/regressão JDK21, manual humano,
+revisão final Waheed e integração pendentes para futuro fecho. Sem gate externo
+adicional. Negativos/hashes anteriores preservados; R17 inicial de IMP-013
+continua sem causa estabelecida, não explicada pela integração controlada.
+
+## Checkpoint anterior — apenas Design (histórico)
+
+Model/Q-C-45/46 aprovados; registo2026-11-21T14:21:52Z.
+[Design para revisão](../../../memory-bank/bolts/024-arvores/ddd-02-technical-design.md)
+preparado em2026-11-21T14:29:02Z. V-017/S01–S18 por executar; viabilidade nas
+APIs reais por conferir em revisão ADR posteriormente autorizada. Preservados
+três caminhos/testes/históricos; sem fontes lidas/analisadas/alteradas, Maven,
+ADR/Implement/Test, commits ou push. Falha efectiva ignora histerese/backoff de
+qualidade; T/A e reservas físicos partilhados. Manual humano antes de aprovar
+Test, regressão JDK21, Waheed e integração obrigatórios, sem gate externo novo.
+R17 inicial de IMP-013 continua sem causa estabelecida; integração com métricas
+controladas não demonstra a causa desse negativo.
+
+## Checkpoint anterior — revisão ADR e impedimento (histórico)
+
+Design aprovado; registo2026-11-21T14:46:03Z.
+[Revisão ADR](../../../memory-bank/bolts/024-arvores/adr-review.md) preparada.
+APIs reais suportam o núcleo, com adaptações A01–A07 nos três caminhos;
+observabilidade prevista não está ligada na composição actual.
+[Q-C-47](../../construction-duvidas.md) apresenta alternativas antes de alterar
+contrato/âmbito; nenhuma aprovada/aplicada. Não mudar por inferência o critério
+de custos/motivos logados desta tarefa. Sem Implement/Test/Maven, Java alterado,
+commits/push ou outro IMP. V-017/S01–S18 não executados, testes/negativos intactos.
+Regressão JDK21, manual humano antes da aprovação Test, Waheed e integração
+continuam obrigatórios, sem gate externo novo; R17 histórico sem causa estabelecida.
+
+## Checkpoint actual — Implement para revisão
+
+[Walkthrough](../../../memory-bank/bolts/024-arvores/implementation-walkthrough.md), registo2026-11-21T15:36:31Z.
+Regressão incremental actual1449/0/0/0 JDK21.0.13.1,21 XML:1419 históricos
+intactos+30 novos. Q-C-47-B/ADR aprovadas; Implement em cinco caminhos para revisão,
+sem avanço a Test, fecho, commits/push ou outro IMP. Snapshot/construtores/factories
+preservados; payload/sink e fila limitada verificados até à saída real. Negativo
+S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico sem
+causa estabelecida, não explicada pela integração controlada. V-017 formal,
+clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
+Test, Waheed e integração pendentes; sem gate externo adicional.

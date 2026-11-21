@@ -1,0 +1,195 @@
+{
+  "recorded_at": "2026-11-21T14:58:27Z",
+  "head": "b533279238870cb59fdcfda563dbcada769d5b6d",
+  "branch": "Denji",
+  "current_stage": "adr",
+  "stages_completed": [
+    "model",
+    "design"
+  ],
+  "adr_approved": false,
+  "api_review": "A01-A07: internal adaptations proposed within current three paths; A08: observability impediment Q-C-47 pending user decision",
+  "proposed_decisions": [
+    {
+      "id": "Q-C-47",
+      "approved": false,
+      "A": "Retain three paths; proposed typed Snapshot observation and explicit replacement of logging promise",
+      "B": "Retain automatic logging; would need two additional production paths, not authorized"
+    }
+  ],
+  "future_java_allowlist": [
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RoutingService.java",
+    "Projeto/src/main/java/pt/uminho/esr/ott/routing/RouteMetric.java",
+    "Projeto/src/test/java/pt/uminho/esr/ott/routing/RouteSwitchTest.java"
+  ],
+  "scope_extended": false,
+  "contracts_changed": false,
+  "java_source_read": true,
+  "java_source_changes": false,
+  "java_files_hashed_equal_head": 63,
+  "historical_tests_and_evidence_unchanged": true,
+  "approved_design_archive_sha256": "a889ed4fdd7d115550cff4556748d928d09db5d1249766024c80f85e1e1707ca",
+  "approved_design_hashes_verified": 20,
+  "model_01_and_design_01_intact": true,
+  "v_add": {
+    "command": [
+      "python3",
+      "scripts/validate-planning.py",
+      "--report",
+      "experiments/construction/024-arvores/adr-review-01/v-add.md"
+    ],
+    "exit_code": 0,
+    "errors": 0,
+    "report": "v-add.md"
+  },
+  "maven_executed": false,
+  "v_017_executed": false,
+  "oracles_planned": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17",
+    "S18"
+  ],
+  "counts": {
+    "bolts_complete": 15,
+    "bolts_in_progress": 1,
+    "bolts_planned": 19
+  },
+  "external_gates": [],
+  "staging_performed": false,
+  "commits_created": false,
+  "push_performed": false,
+  "future_closure_requirements": [
+    "V-017",
+    "JDK21 regression",
+    "human manual before Test approval",
+    "Test approval",
+    "final Waheed review",
+    "integration"
+  ],
+  "historical_R17_limitation": "Initial IMP-013 R17 negative remains without established cause; controlled-metrics integration does not demonstrate its cause.",
+  "scope_checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "b533279238870cb59fdcfda563dbcada769d5b6d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "Denji\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD",
+        "--",
+        "Projeto",
+        "CORE"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--",
+        "Projeto",
+        "CORE"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--quiet",
+        "HEAD",
+        "--",
+        "experiments/construction/007-arvores",
+        "experiments/construction/023-arvores",
+        "experiments/construction/008-arvores",
+        "experiments/construction/022-rotas",
+        "memory-bank/bolts/008-arvores",
+        "memory-bank/bolts/023-arvores",
+        "memory-bank/bolts/022-rotas"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "add.md\ndocs/13-REQUIREMENTS-TRACEABILITY.md\ndocs/15-PROJECT-PROGRESS.md\ndocs/18-CONSTRUCTION-BOLTS.md\ndocs/construction-duvidas.md\ndocs/phases/PHASE-04-FLOW-MANAGEMENT.md\ndocs/tasks/PHASE-04/TASK-017.md\nmemory-bank/bolts/024-arvores/bolt.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/construction-log.md\nmemory-bank/intents/001-ott-streaming/units/004-arvores/unit-brief.md\nmemory-bank/project.yaml\nmemory-bank/standards/decision-index.md\nmemory-bank/story-index.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "ls-files",
+        "--others",
+        "--exclude-standard"
+      ],
+      "exit_code": 0,
+      "stdout": "experiments/construction/024-arvores/adr-review-01/README.md\nexperiments/construction/024-arvores/adr-review-01/approved-design-input.tar.gz\nexperiments/construction/024-arvores/adr-review-01/authorization.json\nexperiments/construction/024-arvores/adr-review-01/v-add.md\nexperiments/construction/024-arvores/design-01/README.md\nexperiments/construction/024-arvores/design-01/approved-model-input.tar.gz\nexperiments/construction/024-arvores/design-01/authorization.json\nexperiments/construction/024-arvores/design-01/document-hashes.sha256\nexperiments/construction/024-arvores/design-01/v-add.md\nexperiments/construction/024-arvores/design-01/verification.json\nexperiments/construction/024-arvores/model-01/README.md\nexperiments/construction/024-arvores/model-01/document-hashes.sha256\nexperiments/construction/024-arvores/model-01/entry.json\nexperiments/construction/024-arvores/model-01/v-add.md\nexperiments/construction/024-arvores/model-01/verification.json\nmemory-bank/bolts/024-arvores/adr-review.md\nmemory-bank/bolts/024-arvores/ddd-01-domain-model.md\nmemory-bank/bolts/024-arvores/ddd-02-technical-design.md\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -471,7 +471,7 @@ public final class OttApplication
         UUID instance = UUID.randomUUID();
         var reference = new AtomicReference<OverlayNode>();
 
-        var node = new OverlayNode(config, instance, event ->
+        var node = OverlayNode.withRoutingObserver(config, instance, event ->
         {
             console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
                     event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
@@ -493,7 +493,8 @@ public final class OttApplication
                             + (route == null ? "UNAVAILABLE" : route.selectedMetric().map(x -> Long.toString(x.costMicros())).orElse("UNAVAILABLE")), false);
                 }
             }
-        });
+        }, event -> event.routeSwitch().ifPresent(change ->
+                console.log(switchLog(config.nodeId(), instance, change), false)));
 
         reference.set(node);
 
@@ -550,6 +551,22 @@ public final class OttApplication
                 node.close();
             }
         };
+    }
+
+
+
+    private static String switchLog(String node, UUID instance, RoutingService.SwitchEvent change)
+    {
+        var before = change.previous();
+        var after = change.replacement();
+        return "ROUTE_SWITCH node=" + node + " instance=" + instance + " stream=" + change.streamId()
+                + " origin=" + change.serverId() + " epoch=" + change.serverEpoch() + " operation=" + change.operationId()
+                + " phase=" + change.phase() + " previous=" + before.nodeId() + "/" + before.instanceId() + "/" + before.connectionId()
+                + " replacement=" + after.nodeId() + "/" + after.instanceId() + "/" + after.connectionId()
+                + " previousRevision=" + change.previousRevision() + " replacementRevision=" + change.replacementRevision()
+                + " previousCostMicros=" + change.previousCostMicros() + " replacementCostMicros=" + change.replacementCostMicros()
+                + " reason=" + change.reason() + " elapsedNanos=" + change.elapsedNanos()
+                + " previousPath=" + change.previousPath() + " replacementPath=" + change.replacementPath();
     }
 
 
