@@ -3,14 +3,14 @@ id: "024-arvores"
 unit: "004-arvores"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada"]
 created: "2026-11-02T15:36:48Z"
 updated: "2026-11-21T16:01:32Z"
 started: "2026-11-21T14:10:07Z"
-completed: null
-current_stage: "implement"
-stages_completed: [{"name": "model", "completed": "2026-11-21T14:21:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-21T14:46:03Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-21T15:03:15Z", "artifact": "adr-review.md"}]
+completed: "2026-11-22T15:56:23Z"
+current_stage: "null"
+stages_completed: [{"name": "model", "completed": "2026-11-21T14:21:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-21T14:46:03Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-21T15:03:15Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-22T15:23:20Z", "artifact": "implementation-walkthrough.md"},{"name": "test", "completed": "2026-11-21T15:56:23Z"}]
 requires_bolts: ["008-arvores", "022-rotas"]
 enables_bolts: ["009-arvores"]
 requires_units: ["003-rotas"]

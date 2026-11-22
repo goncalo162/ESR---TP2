@@ -5,7 +5,7 @@
 - ID: TASK-017
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: IN PROGRESS — Model/Design/ADR aprovados; Implement para revisão
+- Estado: IN PROGRESS — Model/Design/ADR/Implement aprovados; Test para revisão
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-016](../PHASE-04/TASK-016.md).

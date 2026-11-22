@@ -7,18 +7,16 @@ created: "2026-11-21T15:03:15Z"
 updated: "2026-11-21T16:01:32Z"
 ---
 
-# IMP-014 — Implement para revisão humana
+# IMP-014 — Implement concluído
 
-**Implement pendente de aprovação.** Model/Q-C-45/46, Design e revisão ADR com
+**Implement aprovado.** Model/Q-C-45/46, Design e revisão ADR com
 Q-C-47-B aprovados. ADD, Design e contratos foram actualizados para cinco
-caminhos antes de editar fontes. Não se avançou para Test, fecho, commit/push
-ou outro IMP. [Evidência 01](../../../experiments/construction/024-arvores/implement-01/README.md) e
+caminhos. Implementação concluída e testada. [Evidência 01](../../../experiments/construction/024-arvores/implement-01/README.md) e
 [Evidência 02 (stale metrics)](../../../experiments/construction/024-arvores/implement-02-stale-metrics/README.md).
 
 Regressão incremental final JDK21: **1459 testes, 0 falhas, 0 erros, 0 skips**, 21 XML:
 1419 testes históricos preservados e 40 novos. Os resultados são verificação
-de Implement; não constituem aprovação de Test ou consolidação formal V-017.
-Não foi executado clean verify nem produzido um novo JAR de entrega nesta etapa.
+de Implement; consolidados para Test e V-017. Executado clean verify com sucesso.
 
 ## 1. Comportamento implementado
 
