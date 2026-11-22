@@ -1,0 +1,22 @@
+NODE S phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=NONE state=INACTIVE revision=2 cost=0
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=NONE path=[S] downstreams=[R2] localConsumers=[] revision=2
+  EVENT NeighborUp[session=Session[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, connectionId=231d6b0d-3038-40d3-ba91-2f9c0024a5b5, endpoint=Endpoint[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, host=127.0.0.1, controlPort=36919, dataPort=37729, role=RELAY]]]
+  EVENT NeighborUp[session=Session[nodeId=R2, instanceId=715bf784-969a-4ab0-b5b7-69fcb1eada43, connectionId=ae8a1f1e-5bc7-43d9-82c4-f138287f81d2, endpoint=Endpoint[nodeId=R2, instanceId=715bf784-969a-4ab0-b5b7-69fcb1eada43, host=127.0.0.1, controlPort=34369, dataPort=43719, role=RELAY]]]
+  EVENT NeighborDown[session=Session[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, connectionId=231d6b0d-3038-40d3-ba91-2f9c0024a5b5, endpoint=Endpoint[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, host=127.0.0.1, controlPort=36919, dataPort=37729, role=RELAY]], reason=TRANSPORT]
+NODE R1 phase=STOPPED
+  EVENT NeighborUp[session=Session[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, connectionId=69cbc425-737b-4ab5-a9a7-107506f20c96, endpoint=Endpoint[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, host=127.0.0.1, controlPort=45423, dataPort=45803, role=SERVER]]]
+  EVENT NeighborUp[session=Session[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, connectionId=b8bf0eeb-3fc1-48ba-8bc1-5b753659bce8, endpoint=Endpoint[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, host=127.0.0.1, controlPort=34015, dataPort=45131, role=CLIENT]]]
+  EVENT NeighborDown[session=Session[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, connectionId=69cbc425-737b-4ab5-a9a7-107506f20c96, endpoint=Endpoint[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, host=127.0.0.1, controlPort=45423, dataPort=45803, role=SERVER]], reason=TRANSPORT]
+  EVENT NeighborDown[session=Session[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, connectionId=b8bf0eeb-3fc1-48ba-8bc1-5b753659bce8, endpoint=Endpoint[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, host=127.0.0.1, controlPort=34015, dataPort=45131, role=CLIENT]], reason=TRANSPORT]
+NODE R2 phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=S state=INACTIVE revision=21 cost=10
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=S path=[S, R2] downstreams=[C] localConsumers=[] revision=2
+  EVENT NeighborUp[session=Session[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, connectionId=685654aa-87c4-4d4d-8722-9535ba178ad6, endpoint=Endpoint[nodeId=S, instanceId=19002158-6318-459e-bcf8-9be2a38ee041, host=127.0.0.1, controlPort=45423, dataPort=45803, role=SERVER]]]
+  EVENT NeighborUp[session=Session[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, connectionId=7ec67ef1-7a35-44df-8ed6-0861ab757ef6, endpoint=Endpoint[nodeId=C, instanceId=5ff74b99-dc24-49f4-b1f4-99d91437e944, host=127.0.0.1, controlPort=34015, dataPort=45131, role=CLIENT]]]
+NODE C phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=R2 state=INACTIVE revision=22 cost=1010
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=R2 path=[S, R2, C] downstreams=[] localConsumers=[454de2d2-5442-46e6-9c87-b307617d571b] revision=5
+  EVENT NeighborUp[session=Session[nodeId=R2, instanceId=715bf784-969a-4ab0-b5b7-69fcb1eada43, connectionId=77daf07e-6402-4bd6-ab52-ebcd2630fd43, endpoint=Endpoint[nodeId=R2, instanceId=715bf784-969a-4ab0-b5b7-69fcb1eada43, host=127.0.0.1, controlPort=34369, dataPort=43719, role=RELAY]]]
+  EVENT NeighborUp[session=Session[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, connectionId=7ff9ed44-3e26-46e1-bb43-fb7784e2f31e, endpoint=Endpoint[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, host=127.0.0.1, controlPort=36919, dataPort=37729, role=RELAY]]]
+  EVENT NeighborDown[session=Session[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, connectionId=7ff9ed44-3e26-46e1-bb43-fb7784e2f31e, endpoint=Endpoint[nodeId=R1, instanceId=4532d35a-8cea-4921-b6f0-1aa6a3a5ac54, host=127.0.0.1, controlPort=36919, dataPort=37729, role=RELAY]], reason=TRANSPORT]

@@ -185,13 +185,13 @@ Responsável: [TASK-016](tasks/PHASE-04/TASK-016.md). Requisitos: RF-002, RF-006
 
 V-017: séries temporais predeterminadas não oscilam junto do limiar; melhoria sustentada troca; falha troca sem esperar permanência; troca falhada mantém parent antigo válido.
 
-Responsável: [TASK-017](tasks/PHASE-04/TASK-017.md). Requisitos: RF-009, RF-014, RNF-001, RNF-003. Estado: NÃO EXECUTADO.
+Responsável: [TASK-017](tasks/PHASE-04/TASK-017.md). Requisitos: RF-009, RF-014, RNF-001, RNF-003. Estado: EXECUTADA com sucesso em 2026-11-22T17:47:01Z — clean verify 1459/0/0/0, 21 XML, JAR `dc192971…ab920f`; S01–S18 (34 nos grupos + 6 compat = 40 RouteSwitchTest) PASS; validador independente PASS; revisão confirmada pelo utilizador. [Evidência](../memory-bank/bolts/024-arvores/ddd-03-test-report.md). TASK-017 DONE. Integração em main pendente de autorização.
 
 ### V-018 — Preparar o segundo marco com árvores e adaptação
 
 V-018: reprodução independente da ativação/poda/failover usando logs e snapshots; revisão do material contra os critérios de gestão de fluxos e controlo do PDF.
 
-Responsável: [TASK-018](tasks/PHASE-04/TASK-018.md). Requisitos: RNF-005, RC-007. Estado: NÃO EXECUTADO.
+Responsável: [TASK-018](tasks/PHASE-04/TASK-018.md). Requisitos: RNF-005, RC-007. Estado: EXECUTADA com sucesso em 2026-11-22T17:12:18Z — run `20261122T164428Z-f6n15e` PASS 44/44 (C1 isolamento 14, C2 agregada 12, C3 failover 10, C4 RTT 8), mvn test 1459/0/0/0; validador-bolt independente PASS com reexecução `20261122T165306Z-2hy8eu` (44/44); DONE autorizado pelo utilizador. [Evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md) · [Fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md).
 
 ### V-019 — Definir codec UDP e fragmentação de frames
 

@@ -2,7 +2,9 @@
 id: "005-preparar-o-segundo-marco-com-arvores-e-adaptacao"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "planned"
+status: "complete"
+implemented: true
+completed: "2026-11-22T17:12:18Z"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-018"]
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-015](../../../../../../add.md#imp-015); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Demonstração mostra isolamento entre fluxos e procura agregada.
-- [ ] Falha e alteração de RTT têm evidência verificável.
-- [ ] Conteúdo e estado do marco estão registados.
-- [ ] Validação V-018 executada e evidência ligada no progresso.
+- [x] Demonstração mostra isolamento entre fluxos e procura agregada.
+- [x] Falha e alteração de RTT têm evidência verificável.
+- [x] Conteúdo e estado do marco estão registados.
+- [x] Validação V-018 executada e evidência ligada no progresso.
 
 ## Testes
 

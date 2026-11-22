@@ -117,13 +117,13 @@ push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
 
 ## 004-arvores/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md ✅ GENERATED
 
-**Tarefa:** IMP-014. **Estado:** planned, ainda não implementada. **Bolt:** 024-arvores in-progress, apenas Implement.
+**Tarefa:** IMP-014. **Estado:** complete/implemented=true, TASK-017 DONE em 2026-11-22T17:47:01Z após Test com JAR novo (1459/0/0/0, V-017 S01–S18 PASS), validador PASS e revisão confirmada pelo utilizador. **Bolt:** 024-arvores complete. [Test](bolts/024-arvores/ddd-03-test-report.md).
 Model/Design/ADR e Q-C-47-B aprovados; [Implement para revisão](bolts/024-arvores/implementation-walkthrough.md),1449/0/0/0 JDK21; V-017 por consolidar em Test.
 **Ficheiro:** [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](intents/001-ott-streaming/units/004-arvores/stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md).
 
 ## 004-arvores/005-preparar-o-segundo-marco-com-arvores-e-adaptacao.md ✅ GENERATED
 
-**Tarefa:** IMP-015. **Estado:** planned. **Bolt:** 009-arvores.
+**Tarefa:** IMP-015. **Estado:** complete/implemented=true, TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS (run 20261122T164428Z-f6n15e 44/44 + reexecução 20261122T165306Z-2hy8eu). **Bolt:** 009-arvores complete. [Fecho](bolts/009-arvores/closure-walkthrough.md).
 **Ficheiro:** [005-preparar-o-segundo-marco-com-arvores-e-adaptacao](intents/001-ott-streaming/units/004-arvores/stories/005-preparar-o-segundo-marco-com-arvores-e-adaptacao.md).
 
 ## 005-video/001-definir-codec-udp-e-fragmentacao-de-frames.md ✅ GENERATED

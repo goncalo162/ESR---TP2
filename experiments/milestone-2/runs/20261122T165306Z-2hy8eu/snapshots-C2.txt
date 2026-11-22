@@ -1,0 +1,18 @@
+NODE S phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=NONE state=INACTIVE revision=2 cost=0
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=NONE path=[S] downstreams=[R] localConsumers=[] revision=2
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, connectionId=e580531e-ac35-48f2-bb52-498c3a8c5de4, endpoint=Endpoint[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, host=127.0.0.1, controlPort=34737, dataPort=46761, role=RELAY]]]
+NODE R phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=S state=INACTIVE revision=2 cost=10
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=S path=[S, R] downstreams=[C2, C1] localConsumers=[] revision=3
+  EVENT NeighborUp[session=Session[nodeId=S, instanceId=61f10b97-69a9-4426-869c-7603076f6419, connectionId=2698583d-6bbb-48e6-83c1-15b3c1c74059, endpoint=Endpoint[nodeId=S, instanceId=61f10b97-69a9-4426-869c-7603076f6419, host=127.0.0.1, controlPort=41541, dataPort=45297, role=SERVER]]]
+  EVENT NeighborUp[session=Session[nodeId=C1, instanceId=feb23d62-76b5-4331-a49e-3f17a85718d9, connectionId=5e183f92-89cc-4d2c-92b9-6e31f0c3e6c6, endpoint=Endpoint[nodeId=C1, instanceId=feb23d62-76b5-4331-a49e-3f17a85718d9, host=127.0.0.1, controlPort=39625, dataPort=37231, role=CLIENT]]]
+  EVENT NeighborUp[session=Session[nodeId=C2, instanceId=132a215a-1ee2-4a7f-8685-12b23f211695, connectionId=6a366759-7dc3-446d-a6c3-5b597de454a5, endpoint=Endpoint[nodeId=C2, instanceId=132a215a-1ee2-4a7f-8685-12b23f211695, host=127.0.0.1, controlPort=38315, dataPort=37217, role=CLIENT]]]
+NODE C1 phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=R state=INACTIVE revision=2 cost=20
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=R path=[S, R, C1] downstreams=[] localConsumers=[5da8e163-7148-4a63-8746-523a8907a06d] revision=2
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, connectionId=b159bd0d-397d-46e0-b1f3-f29194262af1, endpoint=Endpoint[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, host=127.0.0.1, controlPort=34737, dataPort=46761, role=RELAY]]]
+NODE C2 phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=R state=INACTIVE revision=2 cost=20
+  FORWARD stream=00000000-0000-4000-8000-00000000000a origin=S upstream=R path=[S, R, C2] downstreams=[] localConsumers=[31778d84-82aa-40a3-a6ee-1d4fd56cee0f] revision=2
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, connectionId=6630f2d8-a9c7-4e79-927a-edae8daa7faa, endpoint=Endpoint[nodeId=R, instanceId=ae53ae31-9769-48f1-883d-77e95c681638, host=127.0.0.1, controlPort=34737, dataPort=46761, role=RELAY]]]

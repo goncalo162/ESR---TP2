@@ -1,6 +1,6 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 IN PROGRESS (Test para revisão); PHASE-05–07 e TASK-018–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
@@ -100,7 +100,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
-| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | IN PROGRESS — TASK-014–016 DONE; TASK-017 Implement; TASK-018 TODO | PHASE-03 DONE |
+| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | IN PROGRESS — todas as tarefas TASK-014–018 DONE; pendente apenas fecho de coordenação da fase | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
 | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
 | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
@@ -128,8 +128,8 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-014](tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | DONE | Test1328/0/0/0, manual Francisco24, revisão final Waheed e integração37fa863; [fecho](../memory-bank/bolts/007-arvores/closure-walkthrough.md) |
 | [TASK-015](tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | DONE | [Fecho IMP-012](../memory-bank/bolts/023-arvores/closure-walkthrough.md):1379/0/0/0,19 XML,Francisco30,Denji,integração4d18d1d |
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | DONE | V-016/Test1419,Luis7/28,Fillmore,integração447ae4b; [fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md) |
-| [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | IN PROGRESS — Test por aprovar | 1459/0/0/0 JDK21; V-017 por consolidar; [Implement](../memory-bank/bolts/024-arvores/implementation-walkthrough.md) |
-| [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | TODO | V-018: NÃO EXECUTADO |
+| [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
+| [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
 | [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | TODO | V-019: NÃO EXECUTADO |
 | [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
 | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
@@ -1307,3 +1307,56 @@ usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
 Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
 desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
 o resultado de publicação só será declarado após execução e conferência remota.
+
+## Handoff — IMP-015 / 009-arvores / TASK-018 (2026-11-22)
+
+~~~text
+Data e revisão do repositório: 2026-11-22, branch Waheed, HEAD 15c74b1; git sujo apenas em artefactos não fonte (Projeto/.idea/ não tracked e createdFiles.lst de build).
+Fase e tarefa atual / estado: PHASE-04 IN PROGRESS; TASK-018 IN PROGRESS — bolt 009-arvores current_stage=test, plan/implement/test executadas.
+Ficheiros alterados e objetivo: experiments/milestone-2/ (README.md, Milestone2.java, run-milestone2.py, runs/ com 3 runs), memory-bank/bolts/009-arvores/{implementation-plan.md, implementation-walkthrough.md, test-walkthrough.md, bolt.md}, docs/13, docs/15, docs/tasks/PHASE-04/TASK-018.md. Objetivo: demonstrar o 2.º marco (V-018) sem código de produção novo.
+Requisitos e decisões aplicados: ADR-008/023/024, ADR-013 (bootstrap só localização inicial); V-018 via logs+snapshots; RNF-005/RC-007 parciais.
+Comandos executados e resultados: mvn -B -ntp clean verify 1459/0/0/0 BUILD SUCCESS (JAR dc192971…ab920f); mvn -B -ntp test 1459/0/0/0 (2026-11-22T16:47:24Z); run-milestone2.py → run 20261122T164428Z-f6n15e PASS 44/44 checks exit 0 (C1=14, C2=12, C3=10, C4=8); validador-bolt PASS com reexecução 20261122T165306Z-2hy8eu 44/44.
+Critérios já verificados e ainda pendentes: 4 cenários V-018 com evidência (run PASS) verificados; pendente validação independente (validador-bolt), revisão humana atribuída (Waheed) e integração; TASK-018 não fica DONE.
+Bloqueios e condição de desbloqueio: nenhum; G-ASSESSMENTS pendente de informação docente (data/conteúdo da 2.ª avaliação).
+Próxima ação concreta e ficheiro a abrir: spawn validador-bolt sobre memory-bank/bolts/009-arvores/ + experiments/milestone-2/ segundo docs/09; depois revisão/integração antes de DONE.
+Alterações do utilizador a preservar: nenhuma pendente; Projeto/.idea/ não tocado.
+~~~
+
+
+## Fecho — IMP-015 / 009-arvores / TASK-018 DONE (2026-11-22T17:12:18Z)
+
+~~~text
+Data e revisão: 2026-11-22T17:12:18Z, branch Waheed, HEAD 15c74b1.
+Fase/tarefa: PHASE-04 IN PROGRESS; TASK-018 DONE; bolt 009-arvores complete, história 005 complete/implemented=true.
+Ficheiros alterados no fecho: docs/09 (V-018 EXECUTADA), docs/13, docs/15, docs/tasks/PHASE-04/TASK-018.md, memory-bank/bolts/009-arvores/bolt.md e closure-walkthrough.md, memory-bank/story-index.md, história 005. Evidência preservada em experiments/milestone-2/ (4 runs).
+Verificação que sustenta o DONE: run 20261122T164428Z-f6n15e PASS 44/44 exit 0; mvn -B -ntp test 1459/0/0/0; validador-bolt independente PASS global com reexecução própria 20261122T165306Z-2hy8eu 44/44; hash do JAR dc192971…ab920f conferido; 7 achados documentais do validador corrigidos antes do fecho.
+Decisão: DONE autorizado explicitamente pelo utilizador ("está verificado mete como done") após o PASS do validador-bolt.
+Limites: sem vídeo/GUI/CORE/UDP; G-ASSESSMENTS pendente (data da 2.ª avaliação por confirmar).
+Sem commits/push nesta sessão (não autorizados); integração em main fica pendente de autorização explícita.
+Próxima ação: TASK-017 (024-arvores) continua em Test para revisão; PHASE-04 fecha quando TASK-017 fechar.
+~~~
+
+
+## Handoff — IMP-014 / 024-arvores Test técnico (2026-11-22T17:40:00Z)
+
+~~~text
+Data e revisão: 2026-11-22T17:40:00Z, branch Waheed, HEAD 15c74b1.
+Fase/tarefa: PHASE-04 IN PROGRESS; TASK-017 IN PROGRESS (etapa test técnica concluída); TASK-018 DONE.
+Ficheiros alterados: memory-bank/bolts/024-arvores/{bolt.md, ddd-03-test-report.md}, experiments/construction/024-arvores/test-01/ (clean-verify.log, clean-verify-result.json, v017-oracles.json, JAR congelado, jar.sha256, 21 XML), docs/09 (V-017), docs/15.
+Comandos e resultados: mvn -B -ntp clean verify → exit 0, 1459/0/0/0, 21 XML, 2026-11-22T17:35:12Z; JAR SHA-256 dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f (517927 bytes); V-017 S01–S18 = 40 métodos RouteSwitchTest PASS (v017-oracles.json).
+Pendentes para DONE da TASK-017: manual humano, aprovação de Test pelo utilizador, revisão final Waheed, integração em main. R17 continua sem causa estabelecida.
+Sem commits/push nesta sessão.
+~~~
+
+
+## Fecho — IMP-014 / 024-arvores / TASK-017 DONE (2026-11-22T17:47:01Z)
+
+~~~text
+Data e revisão: 2026-11-22T17:47:01Z, branch Waheed, HEAD 15c74b1.
+Fase/tarefa: PHASE-04 — todas as tarefas TASK-014–018 DONE; fase pendente apenas de fecho de coordenação (Fillmore + revisão dos três membros). TASK-017 DONE; bolt 024-arvores complete; história 004 complete/implemented=true.
+Ficheiros alterados no fecho: docs/tasks/PHASE-04/TASK-017.md, memory-bank/bolts/024-arvores/bolt.md, história 004, memory-bank/story-index.md, docs/09 (V-017 EXECUTADA), docs/13, docs/15, docs/phases/PHASE-04-FLOW-MANAGEMENT.md.
+Verificação que sustenta o DONE: clean verify com JAR novo 1459/0/0/0 (21 XML, 2026-11-22T17:35:12Z), JAR dc192971…ab920f congelado; V-017 S01–S18 34/34 PASS + 6 compat (v017-oracles.json); validador-v017 PASS global com reexecução; revisão confirmada pelo utilizador ("Já revi").
+Limites: R17 continua sem causa estabelecida; métricas S18 controladas; sem vídeo/GUI/CORE.
+Sem commits/push nesta sessão; integração em main pendente de autorização explícita.
+Próxima ação: fecho de coordenação da PHASE-04 (docs/phases/PHASE-04-FLOW-MANAGEMENT.md §12) e depois PHASE-05 (TASK-019, gate PHASE-04 DONE).
+~~~

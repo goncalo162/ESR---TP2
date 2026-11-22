@@ -5,7 +5,7 @@
 - ID: TASK-018
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: DONE — bolt 009-arvores/IMP-015 complete em 2026-11-22T17:12:18Z; V-018 EXECUTADA com sucesso (run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0); validação independente validador-bolt PASS com reexecução 20261122T165306Z-2hy8eu 44/44; DONE autorizado explicitamente pelo utilizador após verificação
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-009](../PHASE-02/TASK-009.md), [TASK-013](../PHASE-03/TASK-013.md), [TASK-015](../PHASE-04/TASK-015.md), [TASK-016](../PHASE-04/TASK-016.md), [TASK-017](../PHASE-04/TASK-017.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Preparar roteiro com caminhos e resultados esperados.
-- [ ] Executar cenário de controlo e guardar logs correlacionados.
-- [ ] Relacionar snapshots antes/depois e estados de subscrição.
-- [ ] Registar feedback e limitações para fase de vídeo.
+- [x] Preparar roteiro com caminhos e resultados esperados.
+- [x] Executar cenário de controlo e guardar logs correlacionados.
+- [x] Relacionar snapshots antes/depois e estados de subscrição.
+- [x] Registar feedback e limitações para fase de vídeo.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Demonstração mostra isolamento entre fluxos e procura agregada.
-- [ ] Falha e alteração de RTT têm evidência verificável.
-- [ ] Conteúdo e estado do marco estão registados.
-- [ ] Validação V-018 executada e evidência ligada no progresso.
+- [x] Demonstração mostra isolamento entre fluxos e procura agregada.
+- [x] Falha e alteração de RTT têm evidência verificável.
+- [x] Conteúdo e estado do marco estão registados.
+- [x] Validação V-018 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 

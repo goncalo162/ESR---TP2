@@ -1,0 +1,79 @@
+RUN_ID 20261122T163820Z-7as5rr
+JAVA 21.0.13.0.3 Arch Linux
+SCENARIO_BEGIN C1
+CHECK_PASS scenario=C1 check=converged detail=todos os nodos ACTIVE
+CHECK_PASS scenario=C1 check=routes-flooded detail=catalogo com A e B em R e consumidores
+CHECK_PASS scenario=C1 check=subscribe-A-C1 detail=ticket C1 stream A
+CHECK_PASS scenario=C1 check=subscribe-A-C3 detail=ticket C3 stream A
+CHECK_PASS scenario=C1 check=subscribe-B-C2 detail=ticket C2 stream B
+CHECK_PASS scenario=C1 check=subscribe-B-C4 detail=ticket C4 stream B
+CHECK_PASS scenario=C1 check=isolation-C1-only-A detail=forwarding C1=[00000000-0000-4000-8000-00000000000a]
+CHECK_PASS scenario=C1 check=isolation-C2-only-B detail=forwarding C2=[00000000-0000-4000-8000-00000000000b]
+CHECK_PASS scenario=C1 check=relay-has-both-streams detail=forwarding R A=true B=true
+CHECK_PASS scenario=C1 check=cancel-C1-keeps-C3-on-A detail=C3 forwarding A apos cancel de C1
+CHECK_PASS scenario=C1 check=cancel-C1-keeps-B-consumers detail=C2/C4 forwarding B preservado
+CHECK_PASS scenario=C1 check=relay-keeps-A-for-C3 detail=R mantem A enquanto C3 activo
+CHECK_PASS scenario=C1 check=origin-S1-down-drops-A detail=C3 deixou de ter forwarding A
+CHECK_PASS scenario=C1 check=origin-S1-down-preserves-B detail=C2/C4 continuam com B
+SCENARIO_END C1 failedDelta=0
+SCENARIO_BEGIN C2
+CHECK_PASS scenario=C2 check=routes-flooded detail=rota A em R/C1/C2
+CHECK_PASS scenario=C2 check=both-consumers-success detail=C1 e C2 SUCCESS no mesmo stream
+CHECK_PASS scenario=C2 check=single-activate-on-trunk detail=ACTIVATE R->S=1 (esperado 1, RF-011)
+CHECK_PASS scenario=C2 check=server-single-downstream detail=downstreams em S=[R]
+CHECK_FAIL scenario=C2 check=relay-two-local-consumers detail=localConsumers em R=[]
+CHECK_PASS scenario=C2 check=one-leaves-other-keeps detail=C2 e R mantem A apos C1 sair
+CHECK_PASS scenario=C2 check=no-new-activate-after-leave detail=ACTIVATE R->S continua 1
+CHECK_PASS scenario=C2 check=last-leave-prunes detail=R removeu forwarding A apos ultimo consumidor
+CHECK_PASS scenario=C2 check=deactivate-sent-upstream detail=DEACTIVATE R->S=1
+CHECK_PASS scenario=C2 check=consumer-forwarding-removed detail=C2 sem forwarding A
+SCENARIO_END C2 failedDelta=1
+SCENARIO_BEGIN C3
+CHECK_PASS scenario=C3 check=route-known detail=rota A em C
+CHECK_PASS scenario=C3 check=subscribe-success detail=C subscreveu A
+CHECK_PASS scenario=C3 check=confirmed-via-R1 detail=upstream=R1
+CHECK_PASS scenario=C3 check=failover-to-R2 detail=upstream apos morte de R1=R2
+CHECK_PASS scenario=C3 check=neighbordown-observed detail=evento NeighborDown em C
+CHECK_PASS scenario=C3 check=subscription-still-success detail=ticket permanece SUCCESS
+CHECK_PASS scenario=C3 check=chain-subscribe-success detail=C subscreveu A em cadeia
+CHECK_PASS scenario=C3 check=chain-via-R1 detail=upstream=R1
+CHECK_PASS scenario=C3 check=no-alternative-unavailable detail=C sem forwarding A sem alternativa
+CHECK_PASS scenario=C3 check=router-still-running detail=router C continua RUNNING (falha explicita, nao fatal)
+SCENARIO_END C3 failedDelta=0
+SCENARIO_BEGIN C4
+CHECK_PASS scenario=C4 check=route-known detail=rota A em R
+CHECK_PASS scenario=C4 check=selected-via-A detail=candidato seleccionado A
+CHECK_PASS scenario=C4 check=subscribe-success detail=R subscreveu A
+CHECK_PASS scenario=C4 check=confirmed-via-A detail=upstream=A
+CHECK_PASS scenario=C4 check=switched-to-better-path detail=upstream apos melhoria=B
+CHECK_PASS scenario=C4 check=switch-event-confirmed detail=eventos SUCCESS=1 switches=[SwitchEvent[streamId=00000000-0000-4000-8000-00000000000a, serverId=S, serverEpoch=9397196a-028a-4007-ab9b-d5ee317ccb56, operationId=1c22206a-62b2-435b-93fb-f4b37a6a3ca8, phase=STARTED, previous=Session[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, connectionId=cee28310-58c9-4569-a819-4f792f1b4fb4, endpoint=Endpoint[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, host=127.0.0.1, controlPort=46573, dataPort=41383, role=RELAY]], replacement=Session[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, connectionId=92cd0328-ecdd-41aa-af98-1cba8dd350f9, endpoint=Endpoint[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, host=127.0.0.1, controlPort=34339, dataPort=42143, role=RELAY]], previousPath=[S, A, R], replacementPath=[S, B, R], previousRevision=0, replacementRevision=-1, previousCostMicros=20, replacementCostMicros=11, reason=SUSTAINED_IMPROVEMENT, elapsedNanos=0], SwitchEvent[streamId=00000000-0000-4000-8000-00000000000a, serverId=S, serverEpoch=9397196a-028a-4007-ab9b-d5ee317ccb56, operationId=1c22206a-62b2-435b-93fb-f4b37a6a3ca8, phase=SUCCESS, previous=Session[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, connectionId=cee28310-58c9-4569-a819-4f792f1b4fb4, endpoint=Endpoint[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, host=127.0.0.1, controlPort=46573, dataPort=41383, role=RELAY]], replacement=Session[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, connectionId=92cd0328-ecdd-41aa-af98-1cba8dd350f9, endpoint=Endpoint[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, host=127.0.0.1, controlPort=34339, dataPort=42143, role=RELAY]], previousPath=[S, A, R], replacementPath=[S, B, R], previousRevision=0, replacementRevision=0, previousCostMicros=20, replacementCostMicros=11, reason=CONFIRMED, elapsedNanos=7397735]]
+SWITCH_DETAIL scenario=C4 [SwitchEvent[streamId=00000000-0000-4000-8000-00000000000a, serverId=S, serverEpoch=9397196a-028a-4007-ab9b-d5ee317ccb56, operationId=1c22206a-62b2-435b-93fb-f4b37a6a3ca8, phase=STARTED, previous=Session[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, connectionId=cee28310-58c9-4569-a819-4f792f1b4fb4, endpoint=Endpoint[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, host=127.0.0.1, controlPort=46573, dataPort=41383, role=RELAY]], replacement=Session[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, connectionId=92cd0328-ecdd-41aa-af98-1cba8dd350f9, endpoint=Endpoint[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, host=127.0.0.1, controlPort=34339, dataPort=42143, role=RELAY]], previousPath=[S, A, R], replacementPath=[S, B, R], previousRevision=0, replacementRevision=-1, previousCostMicros=20, replacementCostMicros=11, reason=SUSTAINED_IMPROVEMENT, elapsedNanos=0], SwitchEvent[streamId=00000000-0000-4000-8000-00000000000a, serverId=S, serverEpoch=9397196a-028a-4007-ab9b-d5ee317ccb56, operationId=1c22206a-62b2-435b-93fb-f4b37a6a3ca8, phase=SUCCESS, previous=Session[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, connectionId=cee28310-58c9-4569-a819-4f792f1b4fb4, endpoint=Endpoint[nodeId=A, instanceId=0139ecfb-f11e-4727-80ea-f42c1b792b07, host=127.0.0.1, controlPort=46573, dataPort=41383, role=RELAY]], replacement=Session[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, connectionId=92cd0328-ecdd-41aa-af98-1cba8dd350f9, endpoint=Endpoint[nodeId=B, instanceId=d397ae12-ced9-4c45-b688-9de2412c7a36, host=127.0.0.1, controlPort=34339, dataPort=42143, role=RELAY]], previousPath=[S, A, R], replacementPath=[S, B, R], previousRevision=0, replacementRevision=0, previousCostMicros=20, replacementCostMicros=11, reason=CONFIRMED, elapsedNanos=7397735]]
+CHECK_FAIL scenario=C4 check=scenario-completed detail=java.util.concurrent.ExecutionException: java.lang.IllegalArgumentException: Inconsistent measurement snapshot
+SCENARIO_END C4 failedDelta=1
+SUMMARY passed=39 failed=2
+{
+  "run_id": "20261122T163820Z-7as5rr",
+  "created_utc": "20261122T163820Z",
+  "bolt": "009-arvores",
+  "imp": "IMP-015",
+  "validation": "V-018",
+  "git_commit": "15c74b13c735e80c70b01ad5af17cff9be6e74c7",
+  "git_branch": "Waheed",
+  "jar": "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar",
+  "jar_sha256": "dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f",
+  "jar_bytes": 517927,
+  "java": [
+    "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "OpenJDK Runtime Environment (build 21.0.13.0.3+1)",
+    "OpenJDK 64-Bit Server VM (build 21.0.13.0.3+1, mixed mode, sharing)"
+  ],
+  "python": "3.14.9",
+  "command": [
+    "java",
+    "--class-path",
+    "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar",
+    "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/experiments/milestone-2/Milestone2.java",
+    "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/experiments/milestone-2/runs/20261122T163820Z-7as5rr"
+  ],
+  "note": "Auxiliar de demonstracao executado em modo fonte contra o JAR; sem video/GUI/CORE/UDP."
+}
