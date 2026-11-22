@@ -6,31 +6,11 @@ Ativar e podar árvores por procura, recuperar de falhas e mudar de rota com his
 
 ## 2. Contexto
 
-Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md).
 
-Estado atual: **IN PROGRESS (todas as tarefas DONE; pendente fecho de coordenação da fase)**. TASK-014/IMP-011/007-arvores DONE após
-Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
-37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
-TASK-015/IMP-012 DONE,bolt/história023-arvores complete/implemented=true após
-Test1379/0/0/0,19 XML,V-ADD,manual Francisco30,revisão Denji e integração4d18d1d
-comprovada. [Fecho](../../memory-bank/bolts/023-arvores/closure-walkthrough.md).
-IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
-Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
-V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
-aprovados. [Fecho](../../memory-bank/bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
-R17 inicial continua sem causa estabelecida e métricas controladas não a
-demonstram. O commit/push desse fecho está concluído; não autoriza publicação
-no incremento seguinte. Estado atual: unidade004/PHASE-04 em progresso,
-15 bolts complete,1 in-progress e19 planned.024-arvores/IMP-014 em Implement,
-por aprovar. Model/Q-C-45/46, Design e ADR/Q-C-47-B aprovados; cinco caminhos
-autorizados e registados antes de fontes. Regressão incremental JDK21 actual
-1449/0/0/0 (1419 históricos+30 novos),21 XML. Implement/Test não aprovados;
-V-017 por consolidar em Test, clean verify/JAR novo, regressão aprovada, manual
-humano antes de aprovar Test, Waheed e integração pendentes. Sem fecho/commit/
-push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
 
-O registo anterior de fecho documental de TASK-014 não incluía Java,push ou outro IMP.
-O fecho de TASK-014 não conclui renovação/poda, recuperação, adaptação ou marco.
+[Revisão de fecho e limites](PHASE-04-CLOSURE-REVIEW.md).
 
 ## 3. Pré-requisitos
 
@@ -72,12 +52,12 @@ Executar as validações da tabela nas tarefas correspondentes e a demonstraçã
 
 ## 11. Critérios de aceitação
 
-- [ ] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
-- [ ] Dois consumidores partilham uma subscrição no tronco e a última saída poda o ramo.
-- [ ] Falha e mudança sustentada de RTT recuperam ou trocam parent com ACK, sem ciclo persistente.
-- [ ] O resultado «Dois consumidores partilham ativação, remoção de um preserva o outro, falha troca upstream e segundo marco fica reproduzível.» é demonstrável no ambiente da fase.
-- [ ] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
-- [ ] Não há regressão nos componentes anteriores afetados pelas alterações.
+- [x] Cada tarefa da tabela está DONE com critérios individuais satisfeitos.
+- [x] Dois consumidores partilham uma subscrição no tronco e a última saída poda o ramo.
+- [x] Falha e mudança sustentada de RTT recuperam ou trocam parent com ACK, sem ciclo persistente.
+- [x] O resultado «Dois consumidores partilham ativação, remoção de um preserva o outro, falha troca upstream e segundo marco fica reproduzível.» é demonstrável no ambiente da fase.
+- [x] Requisitos cobertos, limitações e recursos pendentes estão coerentes em 13 e 15.
+- [x] Não há regressão nos componentes anteriores afetados pelas alterações.
 
 ## 12. Definition of Done
 

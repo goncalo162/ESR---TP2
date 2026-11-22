@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["009-arvores"]
 enables_bolts: ["011-video", "012-video"]
 requires_units: ["004-arvores"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 2
   avg_uncertainty: 1

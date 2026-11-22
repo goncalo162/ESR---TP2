@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "complete"
 stories: ["004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-22T17:47:01Z"
+updated: "2026-11-22T23:10:04Z"
 started: "2026-11-21T14:10:07Z"
 completed: "2026-11-22T17:47:01Z"
 current_stage: null
@@ -61,7 +61,8 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 - [x] Política corresponde aos parâmetros documentados.
 - [x] Um upstream é confirmado no snapshot.
 - [x] Tráfego transitório e limites da troca são explicitados.
-- [x] Validação V-017 executada e evidência ligada no progresso (34/34 S01–S18 + 6 compat; validador PASS).
+- [x] Validação V-017 executada e evidência ligada no progresso.
+  S01–S18: 34/34 + 6 compat; validador PASS.
 
 ## Evidência e fecho
 
@@ -163,3 +164,9 @@ validador-v017 PASS global. TASK-017 DONE; história 004 complete/implemented=tr
 Evidência: [Test](ddd-03-test-report.md), [oráculos](../../../experiments/construction/024-arvores/test-01/v017-oracles.json),
 clean verify 1459/0/0/0, JAR dc192971…ab920f. R17 continua sem causa estabelecida.
 Integração em main e commits/push pendentes de autorização explícita.
+
+## Estado reconciliado de fecho
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+Os checkpoints datados anteriores são históricos. Datas originais de conclusão preservadas; ratificação atual sem retrodatação.

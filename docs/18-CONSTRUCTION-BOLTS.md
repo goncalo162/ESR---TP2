@@ -1,26 +1,8 @@
 # Bolts Construction alinhados com o ADD
 
-**Estado atual:** 024-arvores/IMP-014/TASK-017 **complete/DONE em 2026-11-22T17:47:01Z** (Test com JAR novo 1459/0/0/0, V-017 S01–S18 PASS, validador PASS, revisão confirmada pelo utilizador) e 009-arvores/IMP-015/TASK-018 **DONE em 2026-11-22T17:12:18Z**: V-018 EXECUTADA com sucesso (run `20261122T164428Z-f6n15e` PASS 44/44; mvn test 1459/0/0/0; validador-bolt PASS com reexecução `20261122T165306Z-2hy8eu` 44/44; DONE autorizado pelo utilizador). [Fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md). 16 bolts complete; 024-arvores/IMP-014 continua em curso. Sem commits/push nesta sessão.
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
 
-**Estado atual:**
-IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
-Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
-V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
-aprovados. [Fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
-R17 inicial continua sem causa estabelecida e métricas controladas não a
-demonstram. O commit/push desse fecho está concluído; não autoriza publicação
-no incremento seguinte. Estado atual: unidade004/PHASE-04 em progresso,
-15 bolts complete,1 in-progress e19 planned.024-arvores/IMP-014 em Implement,
-por aprovar. Model/Q-C-45/46, Design e ADR/Q-C-47-B aprovados; cinco caminhos
-autorizados e registados antes de fontes. Regressão incremental JDK21 actual
-1449/0/0/0 (1419 históricos+30 novos),21 XML. Implement/Test não aprovados;
-V-017 por consolidar em Test, clean verify/JAR novo, regressão aprovada, manual
-humano antes de aprovar Test, Waheed e integração pendentes. Sem fecho/commit/
-push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
-
-
-[Implement de024-arvores para revisão](../memory-bank/bolts/024-arvores/implementation-walkthrough.md);
-Model/Design/ADR e[Q-C-47-B](construction-duvidas.md) aprovados; sem avanço a Test.
+## Histórico de preparação e execução
 
 Arquitetura normativa: [add.md](../add.md). Requisitos: [specs.md](../specs.md).
 Respostas 1A/2A/3B/4A incorporadas. Sete unidades, 35 tarefas IMP/histórias/bolts, incluindo EXTRA-01;

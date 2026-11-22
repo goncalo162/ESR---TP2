@@ -37,7 +37,7 @@ Bolt de demonstração, sem código de produção novo: apenas
 V-010); morte de relay = corte TRANSPORT em JVM única. G-ASSESSMENTS pendente
 (data/conteúdo da 2.ª avaliação por informação docente).
 
-## Estado após o fecho
+## Estado declarado no fecho original (histórico)
 
 - TASK-018 **DONE**; bolt 009-arvores **complete**; história 005
   **complete/implemented=true**; V-018 **EXECUTADA com sucesso** (docs/09,
@@ -45,3 +45,9 @@ V-010); morte de relay = corte TRANSPORT em JVM única. G-ASSESSMENTS pendente
 - PHASE-04 permanece IN PROGRESS (TASK-017/024-arvores ainda em curso).
 - Sem commits/push nesta sessão — a integração em main requer autorização
   explícita própria, como nos fechos anteriores.
+
+## Estado atual após reconciliação
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+A revisão de Waheed é comprovada pela confirmação explícita do utilizador, não por approvals no GitHub (listas de reviews vazias). O manual humano foi confirmado como concluído; operador e run não foram indicados. Os timestamps originais dos dois fechos não provam a ordem das dependências; as condições finais são ratificadas apenas agora, depois de ambas as integrações.

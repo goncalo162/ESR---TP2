@@ -61,8 +61,8 @@ preservadas como histórico de iterações do próprio oráculo.
 - Sem vídeo: os "dados" são mensagens de controlo sintéticas, como a TASK-018
   prevê para este marco.
 
-## Estado
+## Estado atual reconciliado
 
-V-018 tem execução técnica consolidada nesta run; falta validação independente
-(validador-bolt) e atualização de docs/13/15. TASK-018 permanece IN PROGRESS até
-validação e revisão; sem fecho, commits/push ou marco de fase.
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+V-018: run aceite 20261122T164428Z-f6n15e e repetição independente 20261122T165306Z-2hy8eu, ambas 44/44. As runs e os manifestos originais são preservados.

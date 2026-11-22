@@ -1,0 +1,106 @@
+{
+  "recorded_at": "2026-11-22T23:10:04Z",
+  "scope": [
+    "024-arvores",
+    "009-arvores",
+    "004-arvores",
+    "PHASE-04"
+  ],
+  "head": "1ee8db6be28c9c9f091cb8fd90cbfb6c9bda5bc4",
+  "accepted_jar_sha256": "dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f",
+  "accepted_jar_bytes": 517927,
+  "manual": {
+    "completed": true,
+    "source": "explicit user confirmation in this conversation",
+    "statement": "O manual foi concluido. POdes marcar como feito. Corre apenas depois a suite de testes e fecha o que está por fechar",
+    "operator": null,
+    "run_or_log": null,
+    "note": "Operator and a separate manual report were not supplied; do not infer them."
+  },
+  "Test_approved": true,
+  "final_Waheed_reviews": {
+    "024-arvores": true,
+    "009-arvores": true,
+    "source": "user selected Tudo concluído — indicar operador e evidência in response to the explicit manual/Test/final-review question"
+  },
+  "phase_coordination": {
+    "confirmed": true,
+    "coordinator": "Fillmore",
+    "three_member_review": true,
+    "source": "user response: Sim, o fecho da fase já foi confirmado pela equipa"
+  },
+  "integration": [
+    {
+      "pr": 5,
+      "url": "https://github.com/goncalo162/ESR---TP2/pull/5",
+      "head": "15c74b13c735e80c70b01ad5af17cff9be6e74c7",
+      "merge": "ce76726ff5bfb4028a169c500d8c215e0f8a34f0",
+      "merged_at": "2026-11-22T16:00:42Z",
+      "github_reviews": []
+    },
+    {
+      "pr": 6,
+      "url": "https://github.com/goncalo162/ESR---TP2/pull/6",
+      "head": "03ce7ceb2a4325daa24f535239265ca5fe97de8d",
+      "merge": "1ee8db6be28c9c9f091cb8fd90cbfb6c9bda5bc4",
+      "merged_at": "2026-11-22T17:50:36Z",
+      "github_reviews": []
+    }
+  ],
+  "review_provenance": "User confirmation; GitHub PR review arrays were empty, and branch names are not review evidence.",
+  "chronology": "Original DONE timestamps preserved: 009 17:12:18Z, 024 17:47:01Z. Their ordering did not establish the dependency at the time; both integrated dependencies and approvals are verified/ratified now, not backdated.",
+  "current_regression": {
+    "command": "mvn -o -B -ntp test",
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "java": "21.0.13.1",
+    "exit_code": 0,
+    "finished_at": "2026-11-22T23:06:56Z",
+    "XML": 21,
+    "tests": 1459,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sandbox_attempt": {
+    "exit_code": 1,
+    "reason": "SocketException: Operação não permitida; sandbox blocked local sockets",
+    "XML": 21,
+    "tests": 1459,
+    "failures": 0,
+    "errors": 87,
+    "skipped": 0
+  },
+  "V017": {
+    "groups": 18,
+    "group_methods": 34,
+    "RouteSwitchTest_total": 40,
+    "all_mapped_methods_passed_in_current_run": true
+  },
+  "V018": {
+    "accepted_run": "20261122T164428Z-f6n15e",
+    "independent_run": "20261122T165306Z-2hy8eu",
+    "checks_each": 44,
+    "rerun_in_this_audit": false
+  },
+  "limitations": [
+    "Initial historical R17 cause remains unknown; controlled-metrics integration does not establish it.",
+    "No video/GUI/CORE/UDP or external submission demonstrated.",
+    "G-ASSESSMENTS teacher dates/content remain pending."
+  ],
+  "code_changes": false,
+  "new_jar_produced": false,
+  "commits_or_push_in_this_audit": false,
+  "existing_target_jar": {
+    "sha256": "81779be388778fd7dfacba5957e74ccffe5da45e86a403ea1ec5626f52c8f49d",
+    "matches_accepted_frozen_jar": false,
+    "unchanged_from_before_suite": true,
+    "note": "The pre-existing target JAR differs from the accepted frozen artifact; mvn test did not produce or replace a JAR. Acceptance refers to the frozen test-01 artifact."
+  },
+  "derived_dependency_update": {
+    "bolt": "010-video",
+    "blocks": false,
+    "status": "planned",
+    "stage_not_started": true,
+    "reason": "Both required bolts 022-rotas and 009-arvores are now complete."
+  }
+}

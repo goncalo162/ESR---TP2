@@ -1234,10 +1234,13 @@ Commit/push autorizados; sem novo código/build/manual ou gate externo.
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Política corresponde aos parâmetros documentados.
-  - [ ] Um upstream é confirmado no snapshot.
-  - [ ] Tráfego transitório e limites da troca são explicitados.
-  - [ ] Validação V-017 executada e evidência ligada no progresso.
+  - [x] Política corresponde aos parâmetros documentados.
+  - [x] Um upstream é confirmado no snapshot.
+  - [x] Tráfego transitório e limites da troca são explicitados.
+  - [x] Validação V-017 executada e evidência ligada no progresso.
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
 
 Checkpoint anterior ADR (histórico, substituído por Q-C-47-B)2026-11-21T14:56:21Z: Model/Q-C-45/46 e Design aprovados.
 Apenas [revisão ADR](memory-bank/bolts/024-arvores/adr-review.md) autorizada/preparada;
@@ -1281,10 +1284,13 @@ Test, Waheed e integração pendentes; sem gate externo adicional.
 - **Gates:** G-ASSESSMENTS.
 - **Critérios de aceitação:**
 
-  - [ ] Demonstração mostra isolamento entre fluxos e procura agregada.
-  - [ ] Falha e alteração de RTT têm evidência verificável.
-  - [ ] Conteúdo e estado do marco estão registados.
-  - [ ] Validação V-018 executada e evidência ligada no progresso.
+  - [x] Demonstração mostra isolamento entre fluxos e procura agregada.
+  - [x] Falha e alteração de RTT têm evidência verificável.
+  - [x] Conteúdo e estado do marco estão registados.
+  - [x] Validação V-018 executada e evidência ligada no progresso.
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
 
 <a id="imp-016"></a>
 ### IMP-016 — Codificar datagramas e fragmentos

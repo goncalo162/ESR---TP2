@@ -5,7 +5,7 @@
 - ID: TASK-018
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: DONE — bolt 009-arvores/IMP-015 complete em 2026-11-22T17:12:18Z; V-018 EXECUTADA com sucesso (run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0); validação independente validador-bolt PASS com reexecução 20261122T165306Z-2hy8eu 44/44; DONE autorizado explicitamente pelo utilizador após verificação
+- Estado: DONE — fecho reconciliado em 2026-11-22T23:10:04Z; Test/manual e Waheed confirmados, integração em main 1ee8db6; regressão JDK21 1459/0/0/0.
 - Responsável: [Denji](../../team/DENJI.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-009](../PHASE-02/TASK-009.md), [TASK-013](../PHASE-03/TASK-013.md), [TASK-015](../PHASE-04/TASK-015.md), [TASK-016](../PHASE-04/TASK-016.md), [TASK-017](../PHASE-04/TASK-017.md).
@@ -72,3 +72,9 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## Reconciliação do fecho
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+As notas e handoffs datados anteriores são históricos; a presente reconciliação atualiza a integração e as aprovações.

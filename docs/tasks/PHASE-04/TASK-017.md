@@ -5,7 +5,7 @@
 - ID: TASK-017
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: DONE — em 2026-11-22T17:47:01Z. Test executado com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 PASS + 6 compat), validador-v017 PASS global; revisão confirmada pelo utilizador („Já revi“), DONE autorizado. Integração/commit pendentes de autorização explícita
+- Estado: DONE — fecho reconciliado em 2026-11-22T23:10:04Z; Test/manual e Waheed confirmados, integração em main ce76726; regressão JDK21 1459/0/0/0.
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-016](../PHASE-04/TASK-016.md).
@@ -122,3 +122,9 @@ S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico s
 causa estabelecida, não explicada pela integração controlada. V-017 formal,
 clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
 Test, Waheed e integração pendentes; sem gate externo adicional.
+
+## Reconciliação do fecho
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+As notas e handoffs datados anteriores são históricos; a presente reconciliação atualiza a integração e as aprovações.

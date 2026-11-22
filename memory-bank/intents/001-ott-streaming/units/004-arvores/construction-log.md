@@ -2,7 +2,7 @@
 unit: "004-arvores"
 intent: "001-ott-streaming"
 created: "2026-11-17T15:29:06Z"
-last_updated: "2026-11-21T16:01:32Z"
+last_updated: "2026-11-22T23:10:04Z"
 ---
 # Construction Log — 004-arvores
 
@@ -21,8 +21,8 @@ comprovada. [Fecho](../../../../bolts/007-arvores/closure-walkthrough.md).
 Test1379/0/0/0, Francisco30, revisão final Denji e integração4d18d1d comprovados.
 3 - ✅ **008-arvores**: complete; Test1419/0/0/0,Luis7/28,Fillmore e integração447ae4b
 comprovados; história003 complete/implemented=true,TASK-016 DONE.
-4 - [ ] **024-arvores**: in-progress; Model/Design/ADR/Q-C-47-B aprovados; Implement para revisão, 1459/0/0/0 JDK21; história004 planned, V-017 por consolidar em Test.
-5 - [ ] **009-arvores**: planned; história005, segundo marco.
+4 - ✅ **024-arvores**: complete; história004 complete/implemented=true, TASK-017 DONE; V-017 e manual/Test/Waheed aprovados, integração ce76726.
+5 - ✅ **009-arvores**: complete; história005 complete/implemented=true, TASK-018 DONE; V-018 44/44 em duas runs, Waheed confirmado, integração 1ee8db6.
 
 ## Histórico de execução
 
@@ -480,4 +480,10 @@ e Session substituta. 63 testes pertinentes passaram (S05/S06, negativos R10 his
 RoutingServiceTest). Regressão incremental completa JDK21.0.13.1: **1459/0/0/0**, 21 suites:
 1419 históricos intactos + 40 novos. Implement permanece pendente de aprovação humana;
 sem avanço para Test, fecho, commits/push ou outro IMP. Evidência em
-[implement-02-stale-metrics](../../../../experiments/construction/024-arvores/implement-02-stale-metrics/README.md).
+[implement-02-stale-metrics](../../../../../experiments/construction/024-arvores/implement-02-stale-metrics/README.md).
+
+## Reconciliação e fecho da unidade — 2026-11-22T23:10:04Z
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+Datas antigas dos bolts preservadas como declarações históricas; a confirmação atual não é retrodatada. Manual confirmado sem indicação de operador/run. Coordenação da fase confirmada pela equipa através do utilizador.

@@ -1,24 +1,16 @@
 # Progresso do projeto
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 IN PROGRESS, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
-**Última tarefa/incremento concluído:**
+**Fechos anteriores e estado reconciliado:**
 IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
 Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,
 V-016/R01–R18,manual humano Luis7etapas/28checks e revisão final Fillmore
 aprovados. [Fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md). Código/JAR/hashes/negativos preservados;
 R17 inicial continua sem causa estabelecida e métricas controladas não a
-demonstram. O commit/push desse fecho está concluído; não autoriza publicação
-no incremento seguinte. Estado atual: unidade004/PHASE-04 em progresso,
-15 bolts complete,1 in-progress e19 planned.024-arvores/IMP-014 em Implement,
-por aprovar. Model/Q-C-45/46, Design e ADR/Q-C-47-B aprovados; cinco caminhos
-autorizados e registados antes de fontes. Regressão incremental JDK21 actual
-1449/0/0/0 (1419 históricos+30 novos),21 XML. Implement/Test não aprovados;
-V-017 por consolidar em Test, clean verify/JAR novo, regressão aprovada, manual
-humano antes de aprovar Test, Waheed e integração pendentes. Sem fecho/commit/
-push/outro IMP ou gate externo adicional. R17 histórico sem causa estabelecida.
+demonstram. Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
 
 
 **Histórico anterior de fechos:** [TASK-034](tasks/PHASE-02/TASK-034.md), DONE. IMP-035/V-034:1113 testes, manual Luis66 e aceitação final; versão15efdf2/documentaçãoff0ef0b integradas em main antes do fecho. [Fecho](../memory-bank/bolts/035-overlay-extra/closure-walkthrough.md). Último fecho:005-rotas/IMP-007/TASK-010, integração local f990503, Test1176/manual02/revisão final Fillmore cumpridos; Q-C-25 resolvida. Atual:021-rotas/IMP-008 fechado após integração comprovada; TASK-011 DONE.
@@ -34,6 +26,10 @@ Distribuição de trabalho: [coordenação e matriz completa](team/00-COORDINATI
 Handoff da distribuição (27-10-2026, base 2e58ef5): criados quatro Markdown em docs/team/, metadados nas 27 TASK futuras e ligações/regras de revisão nos documentos gerais/fases. Validação documental confirmou cobertura, atribuições sem auto-revisão, dependências sem ciclos e referências válidas; código/CORE preservados. Não foram executados build/testes Java nesta alteração exclusivamente documental. Não há implementação em curso por efeito desta distribuição.
 
 ## Fases
+
+Estado atual: PHASE-01–04 DONE; PHASE-05–07 TODO. Os relatos datados seguintes preservam a sequência histórica.
+
+### Histórico dos fechos anteriores
 
 Estado Construction atual — IMP-001: Plan/Implement/Test concluídos e resultados
 do checkpoint 4 aprovados pelo utilizador, com registo em 2026-11-03T21:40:56Z.
@@ -100,7 +96,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [PHASE-01](phases/PHASE-01-FOUNDATION.md) | TASK-001–TASK-004 | DONE | quatro tarefas e critérios da fase concluídos |
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
-| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | IN PROGRESS — todas as tarefas TASK-014–018 DONE; pendente apenas fecho de coordenação da fase | PHASE-03 DONE |
+| [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | DONE — TASK-014–018, manual/Test/Waheed, coordenação e integração confirmados; regressão atual 1459/0/0/0 | PHASE-03 DONE |
 | [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
 | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
 | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
@@ -1360,3 +1356,9 @@ Limites: R17 continua sem causa estabelecida; métricas S18 controladas; sem ví
 Sem commits/push nesta sessão; integração em main pendente de autorização explícita.
 Próxima ação: fecho de coordenação da PHASE-04 (docs/phases/PHASE-04-FLOW-MANAGEMENT.md §12) e depois PHASE-05 (TASK-019, gate PHASE-04 DONE).
 ~~~
+
+## Reconciliação de 024/009 e fecho PHASE-04 — 2026-11-22T23:10:04Z
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+Não se reescrevem as runs anteriores: os campos pending/false nos JSON de execução descrevem o momento de recolha, anterior às confirmações humanas agora registadas. Datas declaradas de 009 e 024 têm ordem incompatível com a dependência; o fecho é ratificado agora, após ambas as integrações, sem retrodatação. PHASE-05 permanece TODO, sem início de outro IMP.

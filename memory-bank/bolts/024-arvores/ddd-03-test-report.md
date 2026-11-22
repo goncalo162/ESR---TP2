@@ -2,14 +2,13 @@
 unit: "004-arvores"
 bolt: "024-arvores"
 stage: "test"
-status: "in-progress"
+status: "complete"
 created: "2026-11-22T17:40:00Z"
 ---
 # IMP-014 — Test executado com JAR novo / V-017 consolidada tecnicamente
 
 Etapa Test do bolt 024-arvores (TASK-017, V-017) executada em 2026-11-22 com o
-JAR novo do clean verify. **Manual humano e aprovação de Test continuam
-pendentes**; este relatório consolida a prova técnica.
+JAR novo do clean verify. **Manual humano concluído e Test aprovado**, confirmados pelo utilizador na reconciliação de fecho; este relatório preserva a prova técnica original e acrescenta o estado atual.
 
 ## 1. Clean verify e JAR novo
 
@@ -23,8 +22,7 @@ JAR congelado: [ott-streaming-1.0-SNAPSHOT.jar](../../../experiments/constructio
 517927 bytes; SHA-256
 `dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f`
 ([jar.sha256](../../../experiments/construction/024-arvores/test-01/jar.sha256)).
-Composição: 1419 testes históricos (incl. 1379 anteriores + 40 novos do
-IMP-014 em `RouteSwitchTest`). Nenhum teste histórico, asserção ou prazo foi
+Composição: 1419 testes históricos (1379 anteriores + 40 de IMP-013) e 40 novos do IMP-014 em `RouteSwitchTest`: 1459 no total. Nenhum teste histórico, asserção ou prazo foi
 alterado; os negativos S13/S05-S06 reproduzidos no Implement foram corrigidos
 e preservados com os seus controlos.
 
@@ -63,6 +61,10 @@ XML frescos preservados em `test-01/xml/` (21 ficheiros).
   não se afirma medição de ruído real nem explicação do negativo histórico R17
   (continua sem causa estabelecida).
 - Sem vídeo/GUI/CORE/UDP; sem reroute por perda exclusiva UDP.
-- **Manual humano pendente** (obrigação humana, não substituível por ensaio do
-  agente); **aprovação de Test pelo utilizador pendente**; revisão final
-  **Waheed** e integração em main pendentes. Sem fecho/commits/push.
+- Manual humano e Test aprovados pelo utilizador; revisão final Waheed confirmada para a versão final e integração em main comprovada. Operador e ficheiro separado do manual não indicados; a confirmação humana está preservada no registo de reconciliação.
+
+## Reconciliação e regressão atual
+
+Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+
+O JAR de entrega dc192971…ab920f e os XML/logs originais são preservados. A regressão atual executou `mvn -o -B -ntp test`, sem gerar um novo JAR. Os JSON originais conservam o estado pendente que tinham no momento de execução; as aceitações posteriores estão registadas separadamente.
