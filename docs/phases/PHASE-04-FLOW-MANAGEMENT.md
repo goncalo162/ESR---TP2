@@ -8,7 +8,7 @@ Ativar e podar árvores por procura, recuperar de falhas e mudar de rota com his
 
 Incremento 4 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
 
-Estado atual: **IN PROGRESS**. TASK-014/IMP-011/007-arvores DONE após
+Estado atual: **IN PROGRESS (todas as tarefas DONE; pendente fecho de coordenação da fase)**. TASK-014/IMP-011/007-arvores DONE após
 Test1328/0/0/0, manual humano Francisco24, revisão final Waheed e integração
 37fa863 comprovada. [Fecho](../../memory-bank/bolts/007-arvores/closure-walkthrough.md).
 TASK-015/IMP-012 DONE,bolt/história023-arvores complete/implemented=true após
@@ -47,8 +47,8 @@ RF-002, RF-005, RF-006, RF-007, RF-009, RF-011, RF-014, RNF-001, RNF-003, RNF-00
 | [TASK-014](../tasks/PHASE-04/TASK-014.md) | Ativar árvores com ACK e procura agregada | TASK-011, TASK-012, TASK-013 | V-014 | DONE — Test1328/0/0/0, Francisco24, Waheed, integração37fa863 |
 | [TASK-015](../tasks/PHASE-04/TASK-015.md) | Podar ramos, renovar leases e remover procura abandonada | TASK-010, TASK-014 | V-015 | DONE — Test1379/0/0/0,Francisco30,Denji,integração4d18d1d |
 | [TASK-016](../tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | V-016 | DONE |
-| [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | IN PROGRESS — Implement para revisão,1449/0/0/0 JDK21; sem Test |
-| [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | TODO |
+| [TASK-017](../tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | V-017 | DONE em 2026-11-22T17:47:01Z — clean verify 1459/0/0/0, JAR dc192971…ab920f, V-017 S01–S18 PASS, validador PASS, revisão confirmada pelo utilizador |
+| [TASK-018](../tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | V-018 | DONE em 2026-11-22T17:12:18Z — run 20261122T164428Z-f6n15e PASS 44/44, validador-bolt PASS, V-018 EXECUTADA |
 
 ## 6. Ordem de execução
 

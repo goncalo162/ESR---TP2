@@ -2,7 +2,9 @@
 id: "004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada"
 unit: "004-arvores"
 intent: "001-ott-streaming"
-status: "planned"
+status: "complete"
+implemented: true
+completed: "2026-11-22T17:47:01Z"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-017"]

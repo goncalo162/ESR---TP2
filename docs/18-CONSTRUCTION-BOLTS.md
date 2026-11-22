@@ -1,5 +1,7 @@
 # Bolts Construction alinhados com o ADD
 
+**Estado atual:** 024-arvores/IMP-014/TASK-017 **complete/DONE em 2026-11-22T17:47:01Z** (Test com JAR novo 1459/0/0/0, V-017 S01–S18 PASS, validador PASS, revisão confirmada pelo utilizador) e 009-arvores/IMP-015/TASK-018 **DONE em 2026-11-22T17:12:18Z**: V-018 EXECUTADA com sucesso (run `20261122T164428Z-f6n15e` PASS 44/44; mvn test 1459/0/0/0; validador-bolt PASS com reexecução `20261122T165306Z-2hy8eu` 44/44; DONE autorizado pelo utilizador). [Fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md). 16 bolts complete; 024-arvores/IMP-014 continua em curso. Sem commits/push nesta sessão.
+
 **Estado atual:**
 IMP-013/008-arvores/TASK-016 concluído após integração em main 447ae4b.
 Bolt/história complete,implemented=true,TASK-016 DONE. Test1419/0/0/0,20 XML,

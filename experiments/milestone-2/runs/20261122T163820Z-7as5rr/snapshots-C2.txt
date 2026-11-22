@@ -1,0 +1,14 @@
+NODE S phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=NONE state=INACTIVE revision=2 cost=0
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, connectionId=4c996991-4bf5-4753-941d-27a7ce6f0e96, endpoint=Endpoint[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, host=127.0.0.1, controlPort=45161, dataPort=34123, role=RELAY]]]
+NODE R phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=S state=INACTIVE revision=17 cost=10
+  EVENT NeighborUp[session=Session[nodeId=S, instanceId=077d1167-7a1a-4031-ba2b-3f0e0199693a, connectionId=0e74f001-ea74-4716-9fe7-734d6d29c964, endpoint=Endpoint[nodeId=S, instanceId=077d1167-7a1a-4031-ba2b-3f0e0199693a, host=127.0.0.1, controlPort=42499, dataPort=39739, role=SERVER]]]
+  EVENT NeighborUp[session=Session[nodeId=C1, instanceId=88d0daae-4ccc-4503-bdb9-a6532be707fa, connectionId=680d9c45-5e0e-4d7c-b087-e4e70a16ac60, endpoint=Endpoint[nodeId=C1, instanceId=88d0daae-4ccc-4503-bdb9-a6532be707fa, host=127.0.0.1, controlPort=33551, dataPort=33047, role=CLIENT]]]
+  EVENT NeighborUp[session=Session[nodeId=C2, instanceId=85af09ab-b9f6-4a00-b280-d9a69d809d0b, connectionId=b859dfcb-6981-4d43-b0fd-d86ad3b0ab77, endpoint=Endpoint[nodeId=C2, instanceId=85af09ab-b9f6-4a00-b280-d9a69d809d0b, host=127.0.0.1, controlPort=42327, dataPort=37449, role=CLIENT]]]
+NODE C1 phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=R state=INACTIVE revision=17 cost=20
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, connectionId=c5dd9153-6f4d-4ca5-bee0-63daed7672a6, endpoint=Endpoint[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, host=127.0.0.1, controlPort=45161, dataPort=34123, role=RELAY]]]
+NODE C2 phase=RUNNING
+  ROUTE stream=00000000-0000-4000-8000-00000000000a origin=S selected=R state=INACTIVE revision=17 cost=20
+  EVENT NeighborUp[session=Session[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, connectionId=8498abc8-e1e4-4d09-954a-a121a60eda7b, endpoint=Endpoint[nodeId=R, instanceId=219c8835-7d19-442f-aeb3-ad626e40ab79, host=127.0.0.1, controlPort=45161, dataPort=34123, role=RELAY]]]

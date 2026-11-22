@@ -5,7 +5,7 @@
 - ID: TASK-017
 - Fase: [PHASE-04 — Árvores de distribuição e adaptação](../../phases/PHASE-04-FLOW-MANAGEMENT.md)
 - Prioridade: P0
-- Estado: IN PROGRESS — Model/Design/ADR/Implement aprovados; Test para revisão
+- Estado: DONE — em 2026-11-22T17:47:01Z. Test executado com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 PASS + 6 compat), validador-v017 PASS global; revisão confirmada pelo utilizador („Já revi“), DONE autorizado. Integração/commit pendentes de autorização explícita
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Waheed](../../team/WAHEED.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-010](../PHASE-03/TASK-010.md), [TASK-016](../PHASE-04/TASK-016.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Implementar política de histerese configurável com relógio injetado.
-- [ ] Coordenar estado SWITCHING com procura e pedidos pendentes.
-- [ ] Trocar parent atomicamente e desativar anterior.
-- [ ] Publicar métricas de trocas, duração e motivos.
+- [x] Implementar política de histerese configurável com relógio injetado.
+- [x] Coordenar estado SWITCHING com procura e pedidos pendentes.
+- [x] Trocar parent atomicamente e desativar anterior.
+- [x] Publicar métricas de trocas, duração e motivos.
 
 ## 8. Regras e restrições
 
@@ -58,10 +58,10 @@ Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da valida�
 
 ## 11. Critérios de aceitação
 
-- [ ] Política corresponde aos parâmetros documentados.
-- [ ] Um upstream é confirmado no snapshot.
-- [ ] Tráfego transitório e limites da troca são explicitados.
-- [ ] Validação V-017 executada e evidência ligada no progresso.
+- [x] Política corresponde aos parâmetros documentados.
+- [x] Um upstream é confirmado no snapshot.
+- [x] Tráfego transitório e limites da troca são explicitados.
+- [x] Validação V-017 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 

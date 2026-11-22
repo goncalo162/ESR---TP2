@@ -6,11 +6,11 @@ type: "ddd-construction-bolt"
 status: "complete"
 stories: ["004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-21T16:01:32Z"
+updated: "2026-11-22T17:47:01Z"
 started: "2026-11-21T14:10:07Z"
-completed: "2026-11-22T15:56:23Z"
-current_stage: "null"
-stages_completed: [{"name": "model", "completed": "2026-11-21T14:21:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-21T14:46:03Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-21T15:03:15Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-22T15:23:20Z", "artifact": "implementation-walkthrough.md"},{"name": "test", "completed": "2026-11-21T15:56:23Z"}]
+completed: "2026-11-22T17:47:01Z"
+current_stage: null
+stages_completed: [{"name": "model", "completed": "2026-11-21T14:21:52Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-21T14:46:03Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-21T15:03:15Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-22T15:23:20Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-22T17:40:00Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["008-arvores", "022-rotas"]
 enables_bolts: ["009-arvores"]
 requires_units: ["003-rotas"]
@@ -41,7 +41,7 @@ Ler [IMP-014](../../../add.md#imp-014) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](../../intents/001-ott-streaming/units/004-arvores/stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md).
+- [x] [004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada](../../intents/001-ott-streaming/units/004-arvores/stories/004-adaptar-rota-por-rtt-com-histerese-e-troca-confirmada.md).
 - Dependências: [008-arvores](../008-arvores/bolt.md), [022-rotas](../022-rotas/bolt.md).
 - Unidade: [004-arvores](../../intents/001-ott-streaming/units/004-arvores/unit-brief.md).
 - Gates: nenhum adicional.
@@ -51,17 +51,17 @@ Ler [IMP-014](../../../add.md#imp-014) e as ADR aí indicadas antes de qualquer 
 1. [x] **model** → `ddd-01-domain-model.md`; validar a etapa contra IMP-014 e as ADR do ADD.
 2. [x] **design** → `ddd-02-technical-design.md`; validar a etapa contra IMP-014 e as ADR do ADD.
 3. [x] **adr** → `adr-review.md`; validar a etapa contra IMP-014 e as ADR do ADD.
-4. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-014 e as ADR do ADD.
-5. [ ] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-014 e as ADR do ADD.
+4. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-014 e as ADR do ADD.
+5. [x] **test** → `ddd-03-test-report.md`; validar a etapa contra IMP-014 e as ADR do ADD.
 
 Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
 
 ## Critérios de aceitação
 
-- [ ] Política corresponde aos parâmetros documentados.
-- [ ] Um upstream é confirmado no snapshot.
-- [ ] Tráfego transitório e limites da troca são explicitados.
-- [ ] Validação V-017 executada e evidência ligada no progresso.
+- [x] Política corresponde aos parâmetros documentados.
+- [x] Um upstream é confirmado no snapshot.
+- [x] Tráfego transitório e limites da troca são explicitados.
+- [x] Validação V-017 executada e evidência ligada no progresso (34/34 S01–S18 + 6 compat; validador PASS).
 
 ## Evidência e fecho
 
@@ -142,3 +142,24 @@ os seus controlos e oráculos (SUSPECT, invalidação, saturação estrita e Ses
 R17 histórico sem causa estabelecida, não explicada pela integração controlada. V-017 formal,
 clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
 Test, Waheed e integração pendentes; sem gate externo adicional.
+
+
+## Test executado com JAR novo — V-017 consolidada tecnicamente (2026-11-22T17:40:00Z)
+
+`mvn -B -ntp clean verify`: exit 0, **1459/0/0/0**, 21 XML, terminado em
+2026-11-22T17:35:12Z. JAR congelado SHA-256
+`dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f` (517927 bytes).
+V-017/S01–S18: 34 métodos nos 18 grupos PASS + 6 de compatibilidade = 40 de `RouteSwitchTest` PASS no clean verify
+([oráculos](../../../experiments/construction/024-arvores/test-01/v017-oracles.json)).
+[Relatório de Test](ddd-03-test-report.md). **Pendente:** manual humano,
+aprovação de Test pelo utilizador, revisão final Waheed e integração em main.
+R17 continua sem causa estabelecida. Sem fecho/commits/push.
+
+
+## Fecho — DONE em 2026-11-22T17:47:01Z
+
+Revisão confirmada pelo utilizador ("Já revi") após Test com JAR novo e
+validador-v017 PASS global. TASK-017 DONE; história 004 complete/implemented=true.
+Evidência: [Test](ddd-03-test-report.md), [oráculos](../../../experiments/construction/024-arvores/test-01/v017-oracles.json),
+clean verify 1459/0/0/0, JAR dc192971…ab920f. R17 continua sem causa estabelecida.
+Integração em main e commits/push pendentes de autorização explícita.
