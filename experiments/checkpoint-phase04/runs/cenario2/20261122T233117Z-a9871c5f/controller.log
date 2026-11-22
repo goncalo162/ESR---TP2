@@ -1,0 +1,18 @@
+RUN /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261122T233117Z-a9871c5f
+DASHBOARD file:///home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261122T233117Z-a9871c5f/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=482002
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_FAIL production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+DEMO_FAIL java.lang.IllegalStateException: production-CLI-diagnostics-and-play
+java.lang.IllegalStateException: production-CLI-diagnostics-and-play
+	at demo.CheckpointDemo.require(CheckpointDemo.java:622)
+	at demo.CheckpointDemo.cliCheck(CheckpointDemo.java:537)
+	at demo.CheckpointDemo.activate(CheckpointDemo.java:379)
+	at demo.CheckpointDemo.next(CheckpointDemo.java:364)
+	at demo.CheckpointDemo.main(CheckpointDemo.java:129)
+RESULT FAIL /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261122T233117Z-a9871c5f/result.json

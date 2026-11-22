@@ -1,0 +1,35 @@
+RUN /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T233033Z-a3583f1e
+DASHBOARD file:///home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T233033Z-a3583f1e/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=480704
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=e40f9a12-7e40-4ca4-9b75-4af823723e9d, serverEpoch=0ad95a7a-2149-4e32-99f9-48d319ba43a1, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=17041122}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-mapped-to-cenario2 Scenario 1 has one configured path; RTT switch demonstrated in scenario 2 and V-017/S01-S18
+CHECK_PASS candidate-cache-before-failure [{nodeId=S1, state=AVAILABLE, endpoint={nodeId=S1, host=127.0.0.1, controlPort=33759, dataPort=33760, role=SERVER}, sources=[{source={nodeId=R1, instanceId=d6af7237-be5b-4d6a-9869-a6268438ab17, connectionId=8d0863a2-3de6-407b-a8ac-3a844a3e98f8, helloRequestId=2c17cecc-d063-429e-ac92-424780df9668}, generation=4, advertised={nodeId=S1, host=127.0.0.1, controlPort=33759, dataPort=33760, role=SERVER}, observedInstance=0ad95a7a-2149-4e32-99f9-48d319ba43a1, queryStartedNanos=34737485913055, learnedNanos=34737499768476, ttlNanos=60000000000}]}, {nodeId=C2, state=AVAILABLE, endpoint={nodeId=C2, host=127.0.0.4, controlPort=40705, dataPort=40706, role=CLIENT}, sources=[{source={nodeId=R1, instanceId=d6af7237-be5b-4d6a-9869-a6268438ab17, connectionId=8d0863a2-3de6-407b-a8ac-3a844a3e98f8, helloRequestId=2c17cecc-d063-429e-ac92-424780df9668}, generation=4, advertised={nodeId=C2, host=127.0.0.4, controlPort=40705, dataPort=40706, role=CLIENT}, observedInstance=4c2e6d44-778b-4517-b64c-e263c0095288, queryStartedNanos=34737485913055, learnedNanos=34737499768476, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R1 Owned JVM pid=480785 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=90c163f2-c21f-4f5a-b106-01ca2bbe5d64, serverEpoch=0ad95a7a-2149-4e32-99f9-48d319ba43a1, state=SUCCESS, errorCode=null, detail=, visited=[C1, S1], elapsedNanos=11819008}}
+CHECK_PASS bootstrap-running pid=481322
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=481101 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T233033Z-a3583f1e/result.json

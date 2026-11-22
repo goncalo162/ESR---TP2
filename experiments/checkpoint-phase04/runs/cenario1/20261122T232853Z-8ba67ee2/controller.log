@@ -1,0 +1,24 @@
+RUN /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T232853Z-8ba67ee2
+DASHBOARD file:///home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T232853Z-8ba67ee2/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=478396
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=43d15f0a-8802-4146-a0c4-0de7fcda4f1d, serverEpoch=bf891883-9ab9-4096-83a9-b9c8ea52388b, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=16700929}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_FAIL renewal-on-real-wire ACTIVATE revisions and matching ACKs in wire.jsonl
+DEMO_FAIL java.lang.IllegalStateException: renewal-on-real-wire
+java.lang.IllegalStateException: renewal-on-real-wire
+	at demo.CheckpointDemo.require(CheckpointDemo.java:619)
+	at demo.CheckpointDemo.renew(CheckpointDemo.java:407)
+	at demo.CheckpointDemo.next(CheckpointDemo.java:365)
+	at demo.CheckpointDemo.main(CheckpointDemo.java:129)
+RESULT FAIL /home/luis/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261122T232853Z-8ba67ee2/result.json
