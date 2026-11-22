@@ -1,5 +1,19 @@
 # Progresso do projeto
 
+**Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
+[DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
+separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido
+do utilizador**, para continuar noutra iteração. Código da ferramenta em demo/,
+sem alteração a produção/testes/CORE. Cenário1: uma run PASS31/31; cenário2:
+última run FAIL (STARTED→FAILURE PATH_CHANGED, sem SUCCESS da troca por qualidade),
+com cleanup completo; cenário3 não executado. Não há três runs consecutivas
+da versão final nem aceitação da demo. Negativo NO_ROUTE da CLI preservado,
+causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
+[Guião preliminar](../demo/DEMO.md) · [Matriz](../demo/MATRIX.md) ·
+[Retoma e evidência](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
+PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
+
+
 Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.

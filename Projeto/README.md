@@ -4,6 +4,19 @@ TP2 de ESR, Mestrado em Engenharia Informática, Universidade do Minho, 2026/202
 
 ## Estado
 
+PHASE-01–04 concluídas: configuração, controlo TCPv2, bootstrap, overlay,
+cache/reparação, RTT, anúncios/catálogo/path-vector, trace, ativação/leases/poda,
+recuperação e adaptação por RTT. A baseline atual tem1459 testes. O mesmo JAR
+serve BOOTSTRAP/SERVER/RELAY/CLIENT. Vídeo/UDP/MJPEG/player e PHASE-05–07 ainda
+não implementados; `play` continua NOT_IMPLEMENTED. [Estado e evidência](../docs/15-PROJECT-PROGRESS.md).
+
+Há um [protótipo de demo de checkpoint](../demo/DEMO.md), separado do sistema,
+pausado por pedido do utilizador: cenário1 com uma run PASS, cenário2 com
+negativo de adaptação preservado; não está aceite para apresentação.
+[Handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
+
+### Histórico do fecho da fase2
+
 A base das fases 1/2 tem configuração, bootstrap inicial, vizinhos TCP persistentes e CLI. IMP-034 está concluído após Test, revisão técnica e integração local em main: todo o controlo TCP usa exclusivamente v2, com descoberta obrigatória e aprendizagem de candidatos. O mesmo programa/JAR serve BOOTSTRAP/SERVER/RELAY/CLIENT. Não há modo opcional, runtime TCP v1 ou fallback.
 
 IMP-035 está concluído e a fase2 de controlo está fechada: quando fica sem vizinhos ACTIVE, usa candidatos aprendidos para formar uma ligação reparadora na mesma sessão TCP v2. A negociação exige DISCOVERY|REPAIR (máscara3). O clean verify atual passou1113 testes; o manual Codex passou68 checks com mortes reais dos relays nos dois grafos e S–R1 preservada. O JAR/hash está no relatório de Test. Luis repetiu o manual com66 checks/MANUAL_PASS, aprovou Test e a versão15efdf2 foi integrada em main local. O utilizador autorizou o fecho do bolt e da fase2 após a integração. Routing/streaming/vídeo permanecem nos seus incrementos.
@@ -40,7 +53,7 @@ java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplicat
 java -cp target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config src/main/resources/config/client.properties
 ```
 
-Introduzir neighbors em cada nó e conferir as adjacências ACTIVE previstas; READY local por si só não prova todas as ligações. Depois de as estabelecer, quit no bootstrap não deve parar os nós: repetir neighbors e confirmar os sobreviventes. quit/EOF encerram o processo com prazo. A ajuda é uma invocação separada com --help; os comandos interativos implementados são neighbors e quit.
+Introduzir neighbors em cada nó e conferir as adjacências ACTIVE previstas; READY local por si só não prova todas as ligações. Depois de as estabelecer, quit no bootstrap não deve parar os nós: repetir neighbors e confirmar os sobreviventes. quit/EOF encerram o processo com prazo. A ajuda é uma invocação separada com --help; os comandos interativos de diagnóstico implementados são neighbors, recovery, routes, catalog, metrics, trace UUID e quit. play responde NOT_IMPLEMENTED; não existe subscribe/cancel na CLI de produção.
 
 A cache de candidatos está disponível pela API assíncrona OverlayNode.candidates()/NeighborManager.candidates() e pelos testes; não existe comando CLI novo para reparar a overlay. A descoberta só usa sessões ACTIVE atuais. Os cenários S–R1/R2–C e S–R1–R2/R3–C são testados para aprendizagem/retenção, sem criar S–C/R1–C neste IMP.
 
