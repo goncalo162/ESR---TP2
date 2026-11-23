@@ -14,7 +14,7 @@ antes de usar perante o docente.
 - Numa shell da raiz:
 
 ```sh
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"  # qualquer JDK 21
 export PATH="$JAVA_HOME/bin:$PATH"
 ./demo/run.sh cenario2
 ```
@@ -40,14 +40,21 @@ própria da CLI executam a main real `OttApplication`.
 `subscribe`/`cancel` são comandos **do auxiliar**, porque a CLI de produção
 ainda não os oferece. A etapa da CLI mostra neighbors/recovery/routes/catalog/
 metrics/trace/play/quit. O resultado negativo de trace observado antes de ACK
-é preservado; um trace positivo por vários saltos é exigido separadamente
-depois da ativação. A causa dessa divergência continua por investigar.
+é preservado (a rota pode estar momentaneamente withdrawna quando a CLI substitui
+o adaptador); um trace positivo por vários saltos é exigido separadamente depois
+de ACK, observado numa janela com prazo como as restantes condições.
 
 Os endereços anunciados 127.0.0.N passam pelo proxy e os listeners reais usam
 127.0.1.N. O bootstrap usa 127.0.0.200. A identificação de cada ligação é lida
-do HELLO v2. O proxy atrasa **bytes reais de todos os frames** nos dois sentidos;
-não injeta `LinkMetrics` e não chama `onMetrics`. Há head-of-line blocking TCP:
-o custo medido inclui filas e scheduling, não só duas vezes o atraso configurado.
+do HELLO v2. O proxy atrasa **bytes reais de todos os frames** nos dois sentidos:
+cada frame é agendado para `chegada + atraso` por direção, sem fila de
+serialização entre frames (um burst não atrasa os seguintes para além do seu
+próprio atraso) e preservando a ordenação TCP. Não injeta `LinkMetrics` e não
+chama `onMetrics`; o custo medido é aproximadamente duas vezes o atraso
+configurado mais scheduling real da JVM/TCP. Nas iterações anteriores o proxy
+dormia no ciclo de leitura, o que enfileirava frames e inflava o custo medido
+(>900ms com atraso de 120ms); esse artefacto da ferramenta foi removido e os
+negativos preservados não lhe são atribuídos sem prova.
 
 ## Guião previsto — 10–15 minutos
 

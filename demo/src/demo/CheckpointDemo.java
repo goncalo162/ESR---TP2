@@ -395,9 +395,34 @@ public final class CheckpointDemo
                 "one-initial-ACTIVATE-on-shared-trunk", "V-018/C2: exactly one initial ACTIVATE for stream A from " + trunk);
         require(forward(client(0), STREAM_B) == null && forward(client(1), STREAM_B) != null,
                 "two-stream-intent-isolation", "V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding");
-        Object trace = children.get(client(0)).request("trace " + STREAM_A);
-        Files.writeString(run.resolve("trace-before.json"), Json.write(trace));
-        require("SUCCESS".equals(map(map(trace).get("trace")).get("state")), "trace-before-SUCCESS", trace.toString());
+        awaitTrace(client(0), "trace-before.json", "trace-before-SUCCESS", 15);
+    }
+
+
+    /**
+     * Positive multi-hop trace is a deadline-based observation after ACK: the
+     * terminal answer of any individual attempt (including NO_ROUTE while
+     * announcements settle) is preserved in the evidence file, but the oracle
+     * requires one real SUCCESS within the window, not a single lucky attempt.
+     */
+    private void awaitTrace(String node, String evidenceFile, String label, int seconds) throws Exception
+    {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(seconds);
+        Object trace = null;
+        do
+        {
+            refresh();
+            trace = children.get(node).request("trace " + STREAM_A);
+            Files.writeString(run.resolve(evidenceFile), Json.write(trace));
+            if("SUCCESS".equals(map(map(trace).get("trace")).get("state")))
+            {
+                require(true, label, trace.toString());
+                return;
+            }
+            Thread.sleep(200);
+        }while(System.nanoTime() < deadline);
+        save("FAILED-" + label);
+        require(false, label, String.valueOf(trace));
     }
 
 
@@ -435,14 +460,23 @@ public final class CheckpointDemo
                 "transient-delay-no-oscillation", "150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged");
         setDelay(key, 120);
         await("real-RTT-confirmed-switch", () -> replacement.equals(upstream(node, STREAM_A)) && switchCount(node) > successes, 25);
+        // Atomicidade confirmação/publicação: no evento SUCCESS, a forwarding já
+        // publicada (observada no instante do evento) deve mostrar o upstream e o
+        // caminho novos com revisão superior à anterior. replacementRevision é a
+        // revisão do ACTIVATE na nova linha (espaço próprio), não a revisão da
+        // árvore, pelo que não pode comparar-se com publishedRevision.
         var events = list(views.get(node).get("events"));
         boolean atomic = events.stream().map(Json::object).filter(e -> e.get("kind").equals("switch"))
                 .map(e -> map(e.get("value"))).anyMatch(e ->
                 {
                     var change = map(e.get("change"));
-                    return "SUCCESS".equals(change.get("phase")) && number(e.get("publishedRevision")) == number(change.get("replacementRevision"));
+                    return "SUCCESS".equals(change.get("phase"))
+                            && map(change.get("replacement")).get("nodeId").equals(e.get("publishedUpstream"))
+                            && change.get("replacementPath").equals(e.get("publishedPath"))
+                            && number(e.get("publishedRevision")) > number(change.get("previousRevision"));
                 });
-        require(atomic, "success-after-confirmation-publication", "Observer captured replacementRevision already published at SUCCESS");
+        require(atomic, "success-after-confirmation-publication",
+                "At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision");
         long stable = switchCount(node);
         hold(3);
         require(switchCount(node) == stable && replacement.equals(upstream(node, STREAM_A)),
@@ -465,9 +499,7 @@ public final class CheckpointDemo
                 && forward(observer, STREAM_A) != null && !list(forward(observer, STREAM_A).get("path")).contains(victim), 30);
         require(!bootstrap.isAlive() && children.get(observer).process.pid() == pid,
                 "same-client-intent-and-no-bootstrap", "No new subscription, no client restart; bootstrap process is stopped");
-        Object trace = children.get(observer).request("trace " + STREAM_A);
-        Files.writeString(run.resolve("trace-after.json"), Json.write(trace));
-        require("SUCCESS".equals(map(map(trace).get("trace")).get("state")), "trace-after-SUCCESS", trace.toString());
+        awaitTrace(observer, "trace-after.json", "trace-after-SUCCESS", 15);
         save("failure-no-bootstrap");
     }
 

@@ -4,7 +4,6 @@ import pt.uminho.esr.ott.protocol.ControlMessage;
 import pt.uminho.esr.ott.protocol.MessageCodec;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -12,12 +11,20 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
-/** Frame-transparent real TCP delay. Original frame bytes are never rewritten. */
+/**
+ * Frame-transparent real TCP delay. Original frame bytes are never rewritten.
+ * Each frame is scheduled for {@code arrival + delay} per direction: the reader
+ * thread never blocks the writer, so a burst of frames does not queue behind
+ * earlier delayed frames (no artificial head-of-line serialization). TCP
+ * ordering is preserved because frames are written in arrival order.
+ */
 final class DelayProxy implements AutoCloseable
 {
     //* === Atributos e Variáveis === *
@@ -86,9 +93,10 @@ final class DelayProxy implements AutoCloseable
             byte[] first = frame(new DataInputStream(incoming.getInputStream()));
             String peer = MessageCodec.decode(first).senderId();
             incoming.setSoTimeout(0);
-            var response = Thread.startVirtualThread(() -> pump(outgoing, incoming, peer));
-            send(first, outgoing, peer);
-            pump(incoming, outgoing, peer);
+            var toServer = new LinkedBlockingQueue<DueFrame>();
+            toServer.put(new DueFrame(dueNanos(peer), first));
+            var response = Thread.startVirtualThread(() -> link(outgoing, incoming, peer, new LinkedBlockingQueue<>()));
+            link(incoming, outgoing, peer, toServer);
             response.join(1000);
         }catch(IOException | InterruptedException e){
             if(e instanceof InterruptedException)
@@ -100,38 +108,73 @@ final class DelayProxy implements AutoCloseable
     }
 
 
-    private void pump(Socket from, Socket to, String peer)
+    private long dueNanos(String peer)
     {
+        return System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(delay.applyAsInt(edge(node, peer)));
+    }
+
+
+    /**
+     * One direction of a proxied connection: a reader virtual thread enqueues
+     * frames in arrival order with their due time; the calling thread writes
+     * them in arrival order, sleeping only until each frame's own due time.
+     */
+    private void link(Socket from, Socket to, String peer, LinkedBlockingQueue<DueFrame> queue)
+    {
+        Thread.startVirtualThread(() ->
+        {
+            try
+            {
+                var input = new DataInputStream(from.getInputStream());
+                while(!closed.get())
+                {
+                    byte[] raw = frame(input);
+                    queue.put(new DueFrame(dueNanos(peer), raw));
+                }
+            }catch(IOException | InterruptedException e){
+                if(e instanceof InterruptedException)
+                    Thread.currentThread().interrupt();
+            }finally{
+                closeQuietly(from, to);
+            }
+        });
         try
         {
-            var input = new DataInputStream(from.getInputStream());
             while(!closed.get())
             {
-                send(frame(input), to, peer);
+                DueFrame item = queue.poll(200, TimeUnit.MILLISECONDS);
+                if(item == null)
+                    continue;
+                long wait = item.dueNanos() - System.nanoTime();
+                if(wait > 0)
+                    Thread.sleep(wait / 1_000_000, (int)(wait % 1_000_000));
+                to.getOutputStream().write(item.raw());
+                to.getOutputStream().flush();
+                tap.accept(MessageCodec.decode(item.raw()));
             }
         }catch(IOException | InterruptedException e){
             if(e instanceof InterruptedException)
                 Thread.currentThread().interrupt();
         }finally{
-            try
-            {
-                from.close();
-                to.close();
-            }catch(IOException ignored){
-                // Both directions are owned by this proxy connection.
-            }
+            closeQuietly(from, to);
         }
     }
 
 
-    private void send(byte[] raw, Socket to, String peer) throws IOException, InterruptedException
+    private static void closeQuietly(Socket from, Socket to)
     {
-        int millis = delay.applyAsInt(edge(node, peer));
-        if(millis > 0)
-            Thread.sleep(millis);
-        to.getOutputStream().write(raw);
-        to.getOutputStream().flush();
-        tap.accept(MessageCodec.decode(raw));
+        try
+        {
+            from.close();
+            to.close();
+        }catch(IOException ignored){
+            // Both directions are owned by this proxy connection.
+        }
+    }
+
+
+    private record DueFrame(long dueNanos, byte[] raw)
+    {
     }
 
 
