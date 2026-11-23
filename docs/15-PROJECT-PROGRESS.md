@@ -1,8 +1,8 @@
 # Progresso do projeto
 
-**Retoma do checkpoint — 2026-11-23T14:40:00Z (iteração 2 do DEMO-001):**
+**Retoma do checkpoint — 2026-11-23T15:35:00Z (iteração 2 do DEMO-001):**
 bolt de apoio [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md)
-com critérios cumpridos na versão congelada `23ddc9a` (branch Waheed): builds
+com critérios cumpridos na versão congelada `8303c0b`/HEAD `63d0c97` (branch Waheed): builds
 inicial/final `mvn -B -ntp clean verify` JDK21 **1459/0/0/0, 21 XML**, JAR
 `dc192971…` idêntico; cenário1 **3/3 PASS consecutivas** (33 checks), cenário2
 **4 PASS consecutivas** (39 checks, troca por qualidade com STARTED→SUCCESS e

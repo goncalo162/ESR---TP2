@@ -70,6 +70,13 @@ Runs na versão congelada `23ddc9a` (JAR `dc192971…`):
   (39 checks); FAIL de arranque anterior preservado (`9e1b0832`).
 - Runs FAIL nunca apagadas; runs novas com `tool-source/`+`tool-sha256.json`.
 
+Série final congelada `8303c0b` (JAR `dc192971…`): c1 3/3 PASS
+(`ff3a5f83`,`9deaebcc`,`28c6b934`), c2 3/3 PASS (`4b4adbaf`,`67a5116e`,
+`1b1daa64`) — [series-final-head.log](../../../experiments/checkpoint-phase04/series-final-head.log).
+HEAD final `63d0c97`: c1 3/3 PASS, c2 2 PASS + 1 FAIL preservado, c3 2 PASS +
+1 FAIL preservado — [series-final-head2.log](../../../experiments/checkpoint-phase04/series-final-head2.log).
+Cenário3 completo PASS repetido (`96352b48`,`73408404`,`149ff3ed`,`e135a4d5`).
+
 ## Ainda obrigatório para aceitar a demonstração
 
 Investigação dos negativos e revisão dos oráculos, cenário2 completo, três

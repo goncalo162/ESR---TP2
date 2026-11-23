@@ -66,7 +66,7 @@ funcional ou dependência à PHASE-05. Este é trabalho de apoio entre fases.
 
 - [x] Clean verify inicial e final com JDK21 e números reais preservados (1459/0/0/0, 21 XML, JAR dc192971 idêntico).
 - [x] Cenários 1 e 2 completos, três execuções consecutivas PASS de cada um
-  (c1: 2a2d667c/0b6a21a5/4fec984a; c2: b7363015/f91d87a2/049d5119/6913a902),
+  (c1: ff3a5f83/9deaebcc/28c6b934; c2: 4b4adbaf/67a5116e/1b1daa64, em 8303c0b),
   com processos terminados e listeners reutilizáveis.
 - [ ] Arranque validado, HELLO/discovery TCP v2, ACTIVE, RTT e anúncios reais.
 - [ ] Catálogo, rotas, alternativas e trace observáveis; CLI real e `play`
@@ -91,13 +91,14 @@ funcional ou dependência à PHASE-05. Este é trabalho de apoio entre fases.
 [Plano](implementation-plan.md) · [Validação](validation-plan.md) ·
 [Implement pendente](implementation-walkthrough.md) · [Handoff de retoma](HANDOFF.md).
 
-**Checkpoint atual (iteração 2, 2026-11-23): critérios cumpridos na versão
-congelada `23ddc9a`.** Cenário1 3/3 PASS consecutivas; cenário2 4 PASS
-consecutivas (39 checks, switch por qualidade com SUCCESS e publicação
-atómica) com 2 FAIL posteriores preservados (corrida residual do sistema no
-1.ª tentativa); cenário3 (11 nós) PASS completo; builds inicial/final
-1459/0/0/0. Aguardando validação externa antes de propor aceitação. PHASE-05–07
-não iniciadas.
+**Checkpoint atual (iteração 2, 2026-11-23): critérios cumpridos.** 3 PASS
+consecutivas de cada cenário na versão congelada `8303c0b` (c1
+`ff3a5f83`/`9deaebcc`/`28c6b934`; c2 `4b4adbaf`/`67a5116e`/`1b1daa64`, 39 checks,
+switch por qualidade com SUCCESS e publicação atómica); HEAD final `63d0c97`
+com c1 3/3 PASS e c3 PASS repetido (11 nós); FAILs preservados (corrida
+residual do sistema na 1.ª tentativa do switch). Builds inicial/final
+1459/0/0/0, 21 XML, JAR `dc192971` idêntico. Aguardando validação externa.
+PHASE-05–07 não iniciadas.
 
 RTT localhost tem jitter: os oráculos observam estado, amostras e eventos,
 não esperas cegas. Delay afeta todos os frames da ligação e pode causar HOL;

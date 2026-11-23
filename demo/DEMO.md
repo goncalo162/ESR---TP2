@@ -1,10 +1,12 @@
 # Checkpoint OTT — demonstração validada (versão congelada `23ddc9a`)
 
 Demonstração do plano de controlo concluído na PHASE-04, executada e repetida
-em 2026-11-23: cenário1 3/3 PASS consecutivas, cenário2 4 PASS consecutivas
-(mais 2 PASS adicionais; 2 FAIL posteriores preservados como corrida residual
-do sistema), cenário3 (11 nós da Figura 1) PASS completo; builds inicial e
-final 1459/0/0/0. JAR `dc192971…` inalterado. Runs em
+em 2026-11-23: 3 PASS consecutivas de cada cenário na versão congelada
+`8303c0b` (c1 `ff3a5f83`/`9deaebcc`/`28c6b934`, c2 `4b4adbaf`/`67a5116e`/`1b1daa64`),
+mais séries no HEAD final `63d0c97` (c1 3/3 PASS) e cenário3 (11 nós da Figura 1)
+com PASS repetido (`96352b48`, `73408404`, `149ff3ed`, `e135a4d5`); FAILs
+preservados como corrida residual do sistema. Builds inicial/final 1459/0/0/0,
+21 XML; JAR `dc192971…` inalterado. Runs em
 `experiments/checkpoint-phase04/runs/`; detalhes e limitações no
 [handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
 e na [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).

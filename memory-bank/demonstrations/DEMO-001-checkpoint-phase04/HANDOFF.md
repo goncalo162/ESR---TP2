@@ -38,25 +38,35 @@ preservadas; nenhum resultado antigo foi reescrito para PASS.
    >6 nós; 20s inalterado nos cenários 1/2). Prazos do guião (ex.: switch 25s)
    intocados.
 
-## Resultados na versão congelada `23ddc9a` (JAR `dc192971…`)
+## Resultados (JAR `dc192971…` em todas as runs novas)
 
-- **Cenário1: 3/3 PASS consecutivas** — `20261123T141917Z-2a2d667c`,
-  `20261123T141948Z-0b6a21a5`, `20261123T142029Z-4fec984a` (33 checks cada,
-  processos terminados, portas reutilizáveis).
-  [Série](../../../experiments/checkpoint-phase04/series-final2-iteration2.log).
-- **Cenário2: 4 PASS consecutivas** — `20261123T141330Z-b7363015`,
-  `20261123T141429Z-f91d87a2`, `20261123T141524Z-049d5119`,
-  `20261123T141634Z-6913a902` (39 checks cada), mais 2 PASS adicionais em
-  `series-final2`/`final3`. Todas com troca por qualidade **STARTED→SUCCESS**
-  (custos reais ~250ms→~60ms), publicação atómica confirmada, pulso de 150ms
-  sem oscilação, SIGKILL real de R2 com recuperação sem bootstrap, reinício,
-  poda seletiva e remoção de procura abandonada.
-  [Série de fiabilidade](../../../experiments/checkpoint-phase04/reliability2-cenario2-iteration2.log).
-- **Cenário3 (11 nós da Figura 1): PASS completo** — `20261123T115804Z-96352b48`
-  (39 checks, 17 processos terminados, portas reutilizáveis), com switch por
-  qualidade em O3 (aresta O2-O3 atrasada, alternativa O5), morte real de O3 e
-  recuperação sem bootstrap. A run anterior `20261123T115432Z-9e1b0832` (FAIL
-  no arranque por prazo curto) está preservada.
+**Série congelada `8303c0b` (3 consecutivas por cenário, todas PASS):**
+- Cenário1: `20261123T151115Z-ff3a5f83`, `20261123T151147Z-9deaebcc`,
+  `20261123T152225Z-28c6b934` (33 checks cada).
+- Cenário2: `20261123T151257Z-4b4adbaf`, `20261123T151421Z-67a5116e`,
+  `20261123T151525Z-1b1daa64` (39 checks cada), com troca por qualidade
+  **STARTED→SUCCESS** (custos reais ~250ms→~60ms), publicação atómica
+  confirmada, pulso de 150ms sem oscilação, SIGKILL real de R2 com recuperação
+  sem bootstrap, reinício, poda e procura abandonada.
+  [Série final em HEAD](../../../experiments/checkpoint-phase04/series-final-head.log).
+- Séries anteriores na mesma base de código (23ddc9a, idêntica em ficheiros de
+  código): c1 3/3 PASS (`2a2d667c`,`0b6a21a5`,`4fec984a`); c2 4 PASS consecutivas
+  (`b7363015`,`f91d87a2`,`049d5119`,`6913a902`) + 4 PASS adicionais.
+
+**HEAD final `63d0c97`** (escala de prazos de convergência para >6 nós e
+espera de 1s no oráculo de trace; inerte para 4/6 nós):
+[series-final-head2.log](../../../experiments/checkpoint-phase04/series-final-head2.log)
+— c1 3/3 PASS (`505e78d5`,`a7cbb419`,`8ba7e4cd`); c2 2 PASS + 1 FAIL preservado
+(`3cc7f000`, corrida residual do switch); c3 2 PASS (`149ff3ed`,`e135a4d5`) +
+1 FAIL preservado (`07e916d7`).
+
+**Cenário3 (11 nós da Figura 1): completo, PASS repetido** —
+`20261123T115804Z-96352b48`, `20261123T151646Z-73408404`,
+`20261123T152742Z-149ff3ed`, `20261123T152923Z-e135a4d5` (39 checks cada; 17
+processos terminados; portas reutilizáveis), com switch por qualidade em O3,
+morte real de O3 e recuperação sem bootstrap. FAILs de arranque/CLI
+preservados (`9e1b0832`, `6d8b9caf`, `807586fb`, `7e5ca65b`, `1ae53dad`,
+`07e916d7`).
 - Todas as runs desta iteração incluyen `tool-source/` e `tool-sha256.json`;
   as 6 runs das séries formais partilham o mesmo hash da ferramenta (1 valor
   distinto). Dashboard HTML regenerado com dados reais (sem placeholder).
