@@ -434,7 +434,9 @@ public final class CheckpointDemo
                 require(true, label, trace.toString());
                 return;
             }
-            Thread.sleep(200);
+            // Espera 1s entre tentativas: cada pedido cria uma reserva de trace no
+            // sistema; sondar depressa demais esgota TRACE_CAPACITY (RESOURCE_LIMIT).
+            Thread.sleep(1000);
         }while(System.nanoTime() < deadline);
         save("FAILED-" + label);
         require(false, label, String.valueOf(trace));
