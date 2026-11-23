@@ -2,7 +2,7 @@
 id: "001-definir-codec-udp-e-fragmentacao-de-frames"
 unit: "005-video"
 intent: "001-ott-streaming"
-status: "planned"
+status: "in-progress"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-019"]
@@ -37,3 +37,12 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
 - Bolts anteriores: 009-arvores.
 - Responsável de origem: Waheed; revisor: Denji.
 - Gates: nenhum específico adicional.
+
+## Test aprovado — revisão Denji confirmada, integração pendente
+
+Implement aprovado e Test autorizado. Clean verify1537/0/0/0,22 XML;78 U01–U08/V-019.
+Código aprovado/fixtures/históricos/demo/negativos intactos. JAR preservado.
+Manual humano Francisco24 cumprido e conferido, oito etapas sem divergências.
+História in-progress/implemented=false; Test aprovado e revisão final Denji
+confirmada pelo utilizador,sem alterações pendentes. Integração pendente. Ramo imp-016-udp,IDs locais,
+main preservado,target/ separado. Sem staging/commits/push/fecho.

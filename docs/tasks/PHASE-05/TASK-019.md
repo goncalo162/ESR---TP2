@@ -5,7 +5,7 @@
 - ID: TASK-019
 - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-004](../PHASE-01/TASK-004.md), [TASK-011](../PHASE-03/TASK-011.md), [TASK-018](../PHASE-04/TASK-018.md).
@@ -31,7 +31,7 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
 
 ## 6. Ficheiros e componentes envolvidos
 
-Existente: streaming/StreamPacket.java; planeados: streaming/StreamPacketCodec.java e StreamPacketCodecTest.java.
+Âmbito normativo do ADD/IMP-016: streaming/StreamPacket.java (placeholder existente) e streaming/StreamPacketTest.java em src/test/java (novo). Sem StreamPacketCodec.java/StreamPacketCodecTest.java adicionais.
 
 Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
 
@@ -76,3 +76,17 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
 ### Referências fixadas pela TASK-002
 
 Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.
+
+## Test aprovado — revisão Denji confirmada, integração pendente
+
+Implement aprovado; clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019.
+[Test walkthrough](../../../memory-bank/bolts/010-video/test-walkthrough.md),
+[manual](../../../experiments/construction/010-video/manual-instructions.md).
+Código aprovado/JAR/fixtures/históricos/demo/negativos preservados.
+Manual Francisco24 executado pessoalmente e conferido, oito etapas sem divergências.
+[Prova/hashes/JVM](../../../experiments/construction/010-video/manual-verification-01/README.md).
+TASK in-progress; Test aprovado e revisão final Denji confirmada pelo utilizador,
+sem alterações pendentes. [Hashes/plano](../../../experiments/construction/010-video/final-package-01/README.md).
+Integração/fecho pendentes.
+Ramo imp-016-udp,IDs locais,target/ separado,sem staging/commits/push/fecho.
+Sem gates externos adicionais.

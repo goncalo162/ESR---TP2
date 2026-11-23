@@ -1,0 +1,51 @@
+KIND=human OPERATOR=Francisco
+JAR_SHA256=588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2
+STAGE 1/8 Verifica o JAR fixado, origem das classes e versões separadas UDP/TCP — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=1
+STREAM_PACKET_ORIGIN=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/010-video/test-01/artifacts/ott-streaming-1.0-SNAPSHOT.jar
+CHECK_PASS 1 production classes loaded from pinned JAR
+CHECK_PASS 2 OTT1/UDP v1
+CHECK_PASS 3 TCP v2 remains separate
+STAGE 2/8 Confere o datagrama mínimo: 65 bytes e payload aa — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=2
+MIN_HEX=4f5454310100004000000000000040008000000000000001deadbeef000040008000000000000001000000000000000000000000000000000000000100000001aa
+CHECK_PASS 4 literal minimum equals independent fixture
+CHECK_PASS 5 encoded minimum equals literal 65 bytes
+CHECK_PASS 6 decoded identities/counters/payload
+STAGE 3/8 Confere fixture small: seq7, tempo10000, payload ABC — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=3
+CHECK_PASS 7 small metadata
+CHECK_PASS 8 small payload ABC
+CHECK_PASS 9 independent small encoding
+STAGE 4/8 Confere fronteira1137: dois fragmentos, payload1136+1 — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=4
+CHECK_PASS 10 1137 split golden bytes
+CHECK_PASS 11 fragment index/count
+CHECK_PASS 12 independent1137 recombination
+STAGE 5/8 Confere limite2MiB:1847 fragmentos, último96, datagramas até1200 — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=5
+CHECK_PASS 13 maximum count/last
+CHECK_PASS 14 all datagrams physically capped
+CHECK_PASS 15 maximum independent recombination
+STAGE 6/8 Confere rejeição dos12 negativos, u32 hostil e overflow de região — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=6
+CHECK_PASS 16 all12 independent negatives rejected
+CHECK_PASS 17 u32 maximum rejected
+CHECK_PASS 18 region integer overflow rejected
+STAGE 7/8 Confere região exata, buffer maior e byte extra — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=7
+CHECK_PASS 19 exact nonzero-offset region
+CHECK_PASS 20 whole oversized buffer rejected
+CHECK_PASS 21 surplus payload byte rejected
+STAGE 8/8 Confere cópias defensivas e lista imutável — confirma e prime Enter
+OPERATOR_CONFIRM_STAGE=8
+CHECK_PASS 22 input copied
+CHECK_PASS 23 output/receive buffer isolated
+CHECK_PASS 24 immutable fragment list
+PROBE_PASS CHECKS=24
+CLEANUP_COMPLETE
+MANUAL_PASS CHECKS=24
+JAVA_EXIT=0
+PASSED=true
+WRAPPER_EXIT=0
+REPORT=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/010-video/test-manual-runs/20261123T153332Z-e5356b3d/report.json

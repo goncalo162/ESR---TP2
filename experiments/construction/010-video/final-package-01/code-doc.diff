@@ -1,0 +1,1183 @@
+diff --git a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+index ec25e72..47d96f0 100644
+--- a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
++++ b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+@@ -548,7 +548,7 @@ status: in-progress
+ ## Relevant Prior Decisions
+ 
+ Found {n} ADR(s) that may apply to this bolt:
+-- ADR-001: Use JWT for Authentication → [View](bolts/001-auth-service/adr-001-jwt-auth.md)
++- ADR-001: Use JWT for Authentication → `bolts/001-auth-service/adr-001-jwt-auth.md`
+ 
+ These decisions may constrain or guide your approach. Proceed? (y/n)
+ ```
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java b/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
+index e69de29..d0f2854 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
+@@ -0,0 +1,123 @@
++package pt.uminho.esr.ott.streaming;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.UUID;
++import pt.uminho.esr.ott.protocol.ErrorCode;
++import pt.uminho.esr.ott.protocol.ProtocolException;
++
++/** Immutable fragment of an opaque frame, encoded as one UDP OTT1 v1 datagram. */
++public record StreamPacket(UUID streamId, UUID sessionId, long frameSeq,
++        long mediaTimeUs, long frameLength, int fragmentIndex,
++        int fragmentCount, byte[] payload) {
++
++    public static final int MAGIC = 0x4f545431;
++    public static final int VERSION = 1;
++    public static final int HEADER_BYTES = 64;
++    public static final int MAX_DATAGRAM_BYTES = 1200;
++    public static final int MAX_PAYLOAD_BYTES = 1136;
++    public static final int MAX_FRAME_BYTES = 2_097_152;
++    public static final int MAX_FRAGMENTS = 1847;
++
++    public StreamPacket {
++        validateIdentity(streamId, sessionId, frameSeq, mediaTimeUs);
++        if (payload == null) throw new IllegalArgumentException("Missing payload");
++        validateFragment(frameLength, fragmentIndex, fragmentCount, payload.length);
++        payload = payload.clone();
++    }
++
++    @Override
++    public byte[] payload() {
++        return payload.clone();
++    }
++
++    private static void validateIdentity(UUID streamId, UUID sessionId, long seq, long time) {
++        if (streamId == null || sessionId == null || seq < 0 || time < 0)
++            throw new IllegalArgumentException("Invalid identity or counter");
++    }
++
++    private static void validateFragment(long length, int index, int count, int payloadSize) {
++        // Validate bounds before arithmetic, narrowing or any payload-sized allocation.
++        if (length < 1 || length > MAX_FRAME_BYTES)
++            throw new IllegalArgumentException("Frame length outside UDP cap");
++        int expectedCount = 1 + (int) ((length - 1) / MAX_PAYLOAD_BYTES);
++        if (count < 1 || count > MAX_FRAGMENTS || count != expectedCount || index < 0 || index >= count)
++            throw new IllegalArgumentException("Invalid fragment index/count");
++        long offset = (long) index * MAX_PAYLOAD_BYTES;
++        int expectedPayload = (int) Math.min(MAX_PAYLOAD_BYTES, length - offset);
++        if (payloadSize != expectedPayload)
++            throw new IllegalArgumentException("Payload length does not match fragment");
++    }
++
++    /** Produces exactly the application datagram, without transport framing. */
++    public static byte[] encode(StreamPacket packet) throws ProtocolException {
++        if (packet == null) throw invalid("Missing packet");
++        // The validated immutable value owns its payload; avoid an accessor copy.
++        ByteBuffer output = ByteBuffer.allocate(HEADER_BYTES + packet.payload.length).order(ByteOrder.BIG_ENDIAN);
++        output.putInt(MAGIC).put((byte) VERSION).put((byte) 0).putShort((short) HEADER_BYTES);
++        output.putLong(packet.streamId.getMostSignificantBits()).putLong(packet.streamId.getLeastSignificantBits());
++        output.putLong(packet.sessionId.getMostSignificantBits()).putLong(packet.sessionId.getLeastSignificantBits());
++        output.putLong(packet.frameSeq).putLong(packet.mediaTimeUs).putInt((int) packet.frameLength);
++        output.putShort((short) packet.fragmentIndex).putShort((short) packet.fragmentCount).put(packet.payload);
++        return output.array();
++    }
++
++    public static StreamPacket decode(byte[] datagram) throws ProtocolException {
++        if (datagram == null) throw invalid("Missing datagram");
++        return decode(datagram, 0, datagram.length);
++    }
++
++    /** Parses only the declared region; surrounding receive-buffer bytes are ignored. */
++    public static StreamPacket decode(byte[] buffer, int offset, int length) throws ProtocolException {
++        if (buffer == null || offset < 0 || length < HEADER_BYTES + 1 || length > MAX_DATAGRAM_BYTES
++                || offset > buffer.length || length > buffer.length - offset)
++            throw invalid("Invalid datagram region/length");
++        ByteBuffer input = ByteBuffer.wrap(buffer, offset, length).slice().order(ByteOrder.BIG_ENDIAN);
++        if (input.getInt() != MAGIC) throw invalid("Invalid OTT1 magic");
++        if (Byte.toUnsignedInt(input.get()) != VERSION)
++            throw new ProtocolException(ErrorCode.UNSUPPORTED_VERSION, "Unsupported UDP version");
++        if (input.get() != 0 || Short.toUnsignedInt(input.getShort()) != HEADER_BYTES)
++            throw invalid("Invalid flags/header length");
++        UUID stream = new UUID(input.getLong(), input.getLong());
++        UUID session = new UUID(input.getLong(), input.getLong());
++        long seq = input.getLong();
++        long time = input.getLong();
++        long frameLength = Integer.toUnsignedLong(input.getInt());
++        int index = Short.toUnsignedInt(input.getShort());
++        int count = Short.toUnsignedInt(input.getShort());
++        try {
++            validateIdentity(stream, session, seq, time);
++            validateFragment(frameLength, index, count, length - HEADER_BYTES);
++        } catch (IllegalArgumentException ex) {
++            throw new ProtocolException(ErrorCode.INVALID_MESSAGE, ex.getMessage(), ex);
++        }
++        // No untrusted frame-sized allocation: only the fully validated fragment is copied.
++        byte[] payload = new byte[length - HEADER_BYTES];
++        input.get(payload);
++        return new StreamPacket(stream, session, seq, time, frameLength, index, count, payload);
++    }
++
++    /** Splits a bounded frame without retaining its mutable input array. */
++    public static List<StreamPacket> fragment(UUID streamId, UUID sessionId,
++            long frameSeq, long mediaTimeUs, byte[] frame) {
++        validateIdentity(streamId, sessionId, frameSeq, mediaTimeUs);
++        if (frame == null || frame.length < 1 || frame.length > MAX_FRAME_BYTES)
++            throw new IllegalArgumentException("Frame outside UDP cap");
++        int count = 1 + (frame.length - 1) / MAX_PAYLOAD_BYTES;
++        List<StreamPacket> packets = new ArrayList<>(count);
++        for (int index = 0; index < count; index++) {
++            int offset = index * MAX_PAYLOAD_BYTES;
++            int end = Math.min(frame.length, offset + MAX_PAYLOAD_BYTES);
++            packets.add(new StreamPacket(streamId, sessionId, frameSeq, mediaTimeUs,
++                    frame.length, index, count, Arrays.copyOfRange(frame, offset, end)));
++        }
++        return List.copyOf(packets);
++    }
++
++    private static ProtocolException invalid(String message) {
++        return new ProtocolException(ErrorCode.INVALID_MESSAGE, message);
++    }
++}
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 477af72..5b0eef5 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,5 +1,20 @@
+ # Progresso do projeto
+ 
++**IMP-016 / 010-video — Test aprovado, revisão Denji confirmada; integração pendente:** Implement aprovado;
++clean verify JDK21 **1537/0/0/0,22 XML**, incluindo78 casos U01–U08/V-019.
++[Test walkthrough](../memory-bank/bolts/010-video/test-walkthrough.md),
++[JAR/logs/XML](../experiments/construction/010-video/test-01/README.md) e
++[manual reproduzível](../experiments/construction/010-video/manual-instructions.md).
++Código aprovado intacto; fixtures/históricos/demo/main e negativos preservados.
++JAR SHA-256:588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
++[Manual humano Francisco24 conferido](../experiments/construction/010-video/manual-verification-01/README.md):
++oito etapas,24 checks,JAR/auxiliares/origem/JVM conferidos; SHELL_EXIT confirmado pelo utilizador.
++Test aprovado e revisão final Denji confirmada pelo utilizador,sem alterações pendentes.
++[Pacote exato/plano de integração](../experiments/construction/010-video/final-package-01/README.md).
++Integração/fecho pendentes; bolt permanece aberto.
++Ramo imp-016-udp/base b6de848, IDs locais,target/ separado,sem staging/commits/push/fecho.
++17 bolts complete,1 in-progress,17 planned. Sem gates externos adicionais.
++
+ **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
+ [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
+ separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido
+@@ -14,7 +29,7 @@ causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
+ PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
+ 
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS no checkpoint Test de TASK-019; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -111,7 +126,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+ | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
+ | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | DONE — TASK-014–018, manual/Test/Waheed, coordenação e integração confirmados; regressão atual 1459/0/0/0 | PHASE-03 DONE |
+-| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
++| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — Plan IMP-016 por aprovar | PHASE-04 DONE |
+ | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
+ | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
+ 
+@@ -140,7 +155,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | DONE | V-016/Test1419,Luis7/28,Fillmore,integração447ae4b; [fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md) |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
+-| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | TODO | V-019: NÃO EXECUTADO |
++| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | IN PROGRESS | V-019: NÃO EXECUTADO |
+ | [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
+ | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
+ | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |
+diff --git a/docs/phases/PHASE-05-STREAMING.md b/docs/phases/PHASE-05-STREAMING.md
+index 1e19b0e..8fb434a 100644
+--- a/docs/phases/PHASE-05-STREAMING.md
++++ b/docs/phases/PHASE-05-STREAMING.md
+@@ -8,6 +8,11 @@ Entregar vídeo MJPEG fragmentado a clientes, com quatro streams distintas em du
+ 
+ Incremento 5 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+ 
++Estado atual: **IN PROGRESS no checkpoint Test do IMP-016/TASK-019**,
++[Plan aprovado](../../memory-bank/bolts/010-video/implementation-plan.md).
++PHASE-04 DONE e unidade004 complete; DEMO-001 é apoio separado,não um gate.
++TASK-020–024 permanecem TODO; Implement aprovado; clean verify1537/0/0/0,22 XML. Manual Francisco24/Test aprovados,Denji confirmado; integração pendente,streaming futuro.
++
+ ## 3. Pré-requisitos
+ 
+ PHASE-04 concluída, com evidência do seu entregável; TASK-018 está DONE. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
+@@ -20,7 +25,7 @@ RF-007, RF-010, RF-011, RF-012, RF-013, RF-015, RNF-001, RNF-002, RNF-003, RP-00
+ 
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+-| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | TODO |
++| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | IN PROGRESS — Test/Denji aprovados; integração pendente |
+ | [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | TODO |
+ | [TASK-021](../tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | V-021 | TODO |
+ | [TASK-022](../tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | V-022 | TODO |
+diff --git a/docs/tasks/PHASE-05/TASK-019.md b/docs/tasks/PHASE-05/TASK-019.md
+index 56067c6..ff3b24e 100644
+--- a/docs/tasks/PHASE-05/TASK-019.md
++++ b/docs/tasks/PHASE-05/TASK-019.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-019
+ - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Waheed](../../team/WAHEED.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-004](../PHASE-01/TASK-004.md), [TASK-011](../PHASE-03/TASK-011.md), [TASK-018](../PHASE-04/TASK-018.md).
+@@ -31,7 +31,7 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
+ 
+ ## 6. Ficheiros e componentes envolvidos
+ 
+-Existente: streaming/StreamPacket.java; planeados: streaming/StreamPacketCodec.java e StreamPacketCodecTest.java.
++Âmbito normativo do ADD/IMP-016: streaming/StreamPacket.java (placeholder existente) e streaming/StreamPacketTest.java em src/test/java (novo). Sem StreamPacketCodec.java/StreamPacketCodecTest.java adicionais.
+ 
+ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
+ 
+@@ -76,3 +76,17 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
+ ### Referências fixadas pela TASK-002
+ 
+ Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.
++
++## Test aprovado — revisão Denji confirmada, integração pendente
++
++Implement aprovado; clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019.
++[Test walkthrough](../../../memory-bank/bolts/010-video/test-walkthrough.md),
++[manual](../../../experiments/construction/010-video/manual-instructions.md).
++Código aprovado/JAR/fixtures/históricos/demo/negativos preservados.
++Manual Francisco24 executado pessoalmente e conferido, oito etapas sem divergências.
++[Prova/hashes/JVM](../../../experiments/construction/010-video/manual-verification-01/README.md).
++TASK in-progress; Test aprovado e revisão final Denji confirmada pelo utilizador,
++sem alterações pendentes. [Hashes/plano](../../../experiments/construction/010-video/final-package-01/README.md).
++Integração/fecho pendentes.
++Ramo imp-016-udp,IDs locais,target/ separado,sem staging/commits/push/fecho.
++Sem gates externos adicionais.
+diff --git a/memory-bank/bolts/010-video/bolt.md b/memory-bank/bolts/010-video/bolt.md
+index 4d8c772..c3ff6f0 100644
+--- a/memory-bank/bolts/010-video/bolt.md
++++ b/memory-bank/bolts/010-video/bolt.md
+@@ -3,14 +3,14 @@ id: "010-video"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["001-definir-codec-udp-e-fragmentacao-de-frames"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-23T14:41:11Z"
++started: "2026-11-23T14:41:11Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "test"
++stages_completed: [{"name": "plan", "completed": "2026-11-23T14:54:00.061317+00:00", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-23T15:16:20Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-23T15:39:17Z", "artifact": "test-walkthrough.md"}]
+ requires_bolts: ["009-arvores"]
+ enables_bolts: ["011-video", "012-video"]
+ requires_units: ["004-arvores"]
+@@ -48,9 +48,9 @@ Ler [IMP-016](../../../add.md#imp-016) e as ADR aí indicadas antes de qualquer
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **plan** → `implementation-plan.md`; validar a etapa contra IMP-016 e as ADR do ADD.
+-2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-016 e as ADR do ADD.
+-3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-016 e as ADR do ADD.
++1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-016 e as ADR do ADD.
++2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-016 e as ADR do ADD.
++3. [x] **test** → `test-walkthrough.md`; validar a etapa contra IMP-016 e as ADR do ADD.
+ 
+ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+ 
+@@ -68,3 +68,14 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Prova futura: `experiments/construction/010-video/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## Test e revisão final aprovados — integração pendente
++
++Utilizador aprovou Test1537/0/0/0,22 XML,V-ADD e manual Francisco24 e confirmou
++revisão final Denji da implementação atual,sem alterações pendentes.
++[Revisão vinculada a hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
++[Resumo/plano/allowlist/manifesto/simulação](../../../experiments/construction/010-video/final-package-01/README.md).
++Bolt/história/unidade permanecem in-progress; implemented=false até fecho autorizado.
++Integração ainda não executada. Ramo imp-016-udp,IDs locais,demo/main preservados,
++target/ e alterações alheias excluídos. Sem staging/commits/push/fecho.
++Sem gates externos adicionais.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+index b2aff8f..18ccae7 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+@@ -2,7 +2,7 @@
+ id: "001-definir-codec-udp-e-fragmentacao-de-frames"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-019"]
+@@ -37,3 +37,12 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
+ - Bolts anteriores: 009-arvores.
+ - Responsável de origem: Waheed; revisor: Denji.
+ - Gates: nenhum específico adicional.
++
++## Test aprovado — revisão Denji confirmada, integração pendente
++
++Implement aprovado e Test autorizado. Clean verify1537/0/0/0,22 XML;78 U01–U08/V-019.
++Código aprovado/fixtures/históricos/demo/negativos intactos. JAR preservado.
++Manual humano Francisco24 cumprido e conferido, oito etapas sem divergências.
++História in-progress/implemented=false; Test aprovado e revisão final Denji
++confirmada pelo utilizador,sem alterações pendentes. Integração pendente. Ramo imp-016-udp,IDs locais,
++main preservado,target/ separado. Sem staging/commits/push/fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+index 29aef81..83b1fd9 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+@@ -1,11 +1,11 @@
+ ---
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-phase: "inception"
++phase: "construction"
+ source_phase: "PHASE-05"
+-status: "ready"
++status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T20:54:11Z"
++updated: "2026-11-23T14:41:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
+@@ -15,6 +15,13 @@ requires_units: ["004-arvores"]
+ 
+ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+ 
++Estado atual: in-progress apenas pelo [Plan do IMP-016/010-video](../../../../bolts/010-video/implementation-plan.md)
++aprovado; Implement aprovado,Test/manual Francisco24 aprovados e revisão Denji confirmada; integração pendente. Dependência004-arvores/PHASE-04 complete/DONE.
++Restantes histórias planned,sem execução. DEMO-001 é apoio separado e não bloqueia
++esta unidade. Codec em validação Test, streaming futuro; clean verify1537/0/0/0,22 XML. Sem
++staging/commits/push. Fecho da unidade não é antecipado.
++
++
+ ## Requisitos atribuídos
+ 
+ - REQ-010 — Reencaminhar dados segundo a tabela.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index e071b86..d19e9a7 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,9 +17,9 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: null
+-current_stage: null
+-next_bolt: null
++current_bolt: "010-video"
++current_stage: "test"
++next_bolt: "010-video (Test aprovado e revisao Denji confirmada; integracao pendente)"
+ phase_04_status: "complete"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+@@ -29,3 +29,4 @@ phase_03_status: "complete"
+ phase_03_completed_at: 2026-11-15T16:36:52Z
+ phase_04_completed_at: 2026-11-22T23:10:04Z
+ closure_reconciliation: "experiments/construction/024-arvores/closure-reconciliation-01/README.md"
++phase_05_status: "in-progress"
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 9ddfbf4..018581f 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,0 in-progress e18 planned; bolts:17 complete,0 in-progress,18 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,1 in-progress e17 planned; bolts:17 complete,1 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -120,7 +120,8 @@ Implement/Test e revisão final aprovados; V-017 consolidada, integração em ma
+ 
+ ## 005-video/001-definir-codec-udp-e-fragmentacao-de-frames.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-016. **Estado:** planned. **Bolt:** 010-video.
++**Tarefa:** IMP-016. **Estado:** in-progress,Test aprovado; revisão Denji confirmada; integração pendente. **Bolt:** 010-video.
++[Plan](bolts/010-video/implementation-plan.md),ramo imp-016-udp/base b6de848; clean verify1537/0/0/0,22 XML;78 casos U01–U08; Implement aprovado, manual Francisco24 cumprido; Test aprovado e Denji confirmado; integração pendente. DEMO-001 separada/não bloqueante.
+ **Ficheiro:** [001-definir-codec-udp-e-fragmentacao-de-frames](intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
+ 
+ ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java
+new file mode 100644
+index 0000000..e871bc9
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java
+@@ -0,0 +1,368 @@
++package pt.uminho.esr.ott.streaming;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.params.ParameterizedTest;
++import org.junit.jupiter.params.provider.Arguments;
++import org.junit.jupiter.params.provider.MethodSource;
++import org.junit.jupiter.params.provider.ValueSource;
++import pt.uminho.esr.ott.protocol.MessageCodec;
++import pt.uminho.esr.ott.protocol.ProtocolException;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++import java.nio.charset.StandardCharsets;
++import java.security.MessageDigest;
++import java.util.*;
++import java.util.stream.Stream;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++/** Expectations come from the reviewed UDP fixtures/literal contract, never the codec. */
++class StreamPacketTest {
++    private static final UUID STREAM = UUID.fromString("00000000-0000-4000-8000-000000000001");
++    private static final UUID SESSION = UUID.fromString("deadbeef-0000-4000-8000-000000000001");
++    private static final Map<String, String> SHA = Map.ofEntries(
++            Map.entry("min", "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7"),
++            Map.entry("small", "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5"),
++            Map.entry("split-first", "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6"),
++            Map.entry("split-last", "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1"),
++            Map.entry("invalid-short-header", "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd"),
++            Map.entry("invalid-no-payload", "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f"),
++            Map.entry("invalid-magic", "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4"),
++            Map.entry("invalid-version", "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c"),
++            Map.entry("invalid-flags", "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8"),
++            Map.entry("invalid-header-length", "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170"),
++            Map.entry("invalid-index", "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed"),
++            Map.entry("invalid-count", "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340"),
++            Map.entry("invalid-zero-frame", "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06"),
++            Map.entry("invalid-large-frame", "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b"),
++            Map.entry("invalid-negative-seq", "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1"),
++            Map.entry("invalid-datagram-size", "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0"));
++
++    private static byte[] resource(String name) throws Exception {
++        try (var input = StreamPacketTest.class.getResourceAsStream("/protocol/udp-" + name)) {
++            assertNotNull(input, "Independent resource must exist: " + name);
++            return input.readAllBytes();
++        }
++    }
++
++    private static byte[] fixture(String name) throws Exception {
++        byte[] bytes = resource(name + ".bin");
++        assertEquals(SHA.get(name), HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)));
++        String hex = new String(resource(name + ".hex"), StandardCharsets.US_ASCII).replaceAll("\\s+", "");
++        assertArrayEquals(bytes, HexFormat.of().parseHex(hex));
++        return bytes;
++    }
++
++    private static byte[] repeated(int length, int value) {
++        byte[] bytes = new byte[length];
++        Arrays.fill(bytes, (byte) value);
++        return bytes;
++    }
++
++    private static StreamPacket packet(long seq, long time, long length, int index, int count, byte[] payload) {
++        return new StreamPacket(STREAM, SESSION, seq, time, length, index, count, payload);
++    }
++
++    static Stream<Arguments> goldenModels() {
++        return Stream.of(
++                Arguments.of("min", packet(0, 0, 1, 0, 1, new byte[]{(byte) 0xaa})),
++                Arguments.of("small", packet(7, 10000, 3, 0, 1, new byte[]{0x41, 0x42, 0x43})),
++                Arguments.of("split-first", packet(8, 40000, 1137, 0, 2, repeated(1136, 0xab))),
++                Arguments.of("split-last", packet(8, 40000, 1137, 1, 2, new byte[]{(byte) 0xcd})));
++    }
++
++    @Test void U01_independentFixtureFilesRemainIntact() throws Exception {
++        assertEquals(16, SHA.size());
++        for (String name : SHA.keySet()) fixture(name);
++    }
++
++    @ParameterizedTest(name = "U01 encode golden {0}") @MethodSource("goldenModels")
++    void U01_encoderMatchesGoldenBytes(String name, StreamPacket expected) throws Exception {
++        assertArrayEquals(fixture(name), assertDoesNotThrow(() -> StreamPacket.encode(expected)),
++                "encode must produce the independent golden bytes");
++    }
++
++    @ParameterizedTest(name = "U01 decode golden {0}") @MethodSource("goldenModels")
++    void U01_decoderMatchesGoldenFields(String name, StreamPacket expected) throws Exception {
++        assertPacket(expected, assertDoesNotThrow(() -> StreamPacket.decode(fixture(name))));
++    }
++
++    private static void assertPacket(StreamPacket expected, StreamPacket actual) {
++        assertNotNull(actual, "decode must return a packet, not an unwired interface placeholder");
++        assertEquals(expected.streamId(), actual.streamId());
++        assertEquals(expected.sessionId(), actual.sessionId());
++        assertEquals(expected.frameSeq(), actual.frameSeq());
++        assertEquals(expected.mediaTimeUs(), actual.mediaTimeUs());
++        assertEquals(expected.frameLength(), actual.frameLength());
++        assertEquals(expected.fragmentIndex(), actual.fragmentIndex());
++        assertEquals(expected.fragmentCount(), actual.fragmentCount());
++        assertArrayEquals(expected.payload(), actual.payload());
++    }
++
++    @ParameterizedTest @ValueSource(strings = {"short-header", "no-payload", "magic", "version", "flags",
++            "header-length", "index", "count", "zero-frame", "large-frame", "negative-seq", "datagram-size"})
++    void U02_decoderRejectsIndependentNegativeFixtures(String name) throws Exception {
++        byte[] bytes = fixture("invalid-" + name);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes));
++    }
++
++    @Test void U03_publicConstantsPreserveUdpAndSeparateTcpVersion() {
++        assertEquals(0x4f545431, StreamPacket.MAGIC);
++        assertEquals(1, StreamPacket.VERSION);
++        assertEquals(64, StreamPacket.HEADER_BYTES);
++        assertEquals(1200, StreamPacket.MAX_DATAGRAM_BYTES);
++        assertEquals(1136, StreamPacket.MAX_PAYLOAD_BYTES);
++        assertEquals(2097152, StreamPacket.MAX_FRAME_BYTES);
++        assertEquals(1847, StreamPacket.MAX_FRAGMENTS);
++        assertEquals(2, MessageCodec.VERSION);
++    }
++
++    // Literal bytes written from the offset table; no production writer is used.
++    private static byte[] literalGolden() {
++        return HexFormat.of().parseHex("4f54543101000040"
++                + "0123456789abcdeffedcba9876543210"
++                + "112233445566778899aabbccddeeff00"
++                + "0102030405060708" + "1112131415161718"
++                + "00000001" + "0000" + "0001" + "7e");
++    }
++
++    private static StreamPacket literalModel() {
++        return new StreamPacket(UUID.fromString("01234567-89ab-cdef-fedc-ba9876543210"),
++                UUID.fromString("11223344-5566-7788-99aa-bbccddeeff00"),
++                0x0102030405060708L, 0x1112131415161718L, 1, 0, 1, new byte[]{0x7e});
++    }
++
++    @Test void U03_encoderPreservesLiteralOffsetsAndUuidBits() throws Exception {
++        assertArrayEquals(literalGolden(), assertDoesNotThrow(() -> StreamPacket.encode(literalModel())));
++    }
++
++    @Test void U03_decoderPreservesLiteralOffsetsAndUuidBits() throws Exception {
++        assertPacket(literalModel(), assertDoesNotThrow(() -> StreamPacket.decode(literalGolden())));
++    }
++
++    @Test void U03_maximumNonnegativeCountersAreRepresentable() throws Exception {
++        byte[] bytes = literalGolden();
++        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).putLong(40, Long.MAX_VALUE).putLong(48, Long.MAX_VALUE);
++        var packet = assertDoesNotThrow(() -> StreamPacket.decode(bytes));
++        assertNotNull(packet, "decode behavior is required");
++        assertEquals(Long.MAX_VALUE, packet.frameSeq());
++        assertEquals(Long.MAX_VALUE, packet.mediaTimeUs());
++    }
++
++    private static byte[] frame(int length) {
++        byte[] bytes = new byte[length];
++        for (int i = 0; i < length; i++) bytes[i] = (byte) (i * 37 + 11);
++        return bytes;
++    }
++
++    @ParameterizedTest @ValueSource(ints = {1, 1135, 1136, 1137, 2272, 2273, 99999, 2097151, 2097152})
++    void U04_fragmentationHonorsBoundariesAndRecombinesExactly(int length) throws Exception {
++        byte[] original = frame(length);
++        List<StreamPacket> packets = assertDoesNotThrow(() -> StreamPacket.fragment(STREAM, SESSION, 9, 12345, original));
++        assertNotNull(packets);
++        int count = (length + 1135) / 1136;
++        assertEquals(count, packets.size(), "fragment must cover the complete input");
++        assertTrue(packets.size() <= 1847);
++        byte[] reconstructed = new byte[length];
++        int consumed = 0;
++        for (int i = 0; i < packets.size(); i++) {
++            StreamPacket packet = packets.get(i);
++            int bytes = Math.min(1136, length - consumed);
++            assertEquals(STREAM, packet.streamId());
++            assertEquals(SESSION, packet.sessionId());
++            assertEquals(9, packet.frameSeq());
++            assertEquals(12345, packet.mediaTimeUs());
++            assertEquals(length, packet.frameLength());
++            assertEquals(i, packet.fragmentIndex());
++            assertEquals(count, packet.fragmentCount());
++            assertArrayEquals(Arrays.copyOfRange(original, consumed, consumed + bytes), packet.payload());
++            byte[] wire = assertDoesNotThrow(() -> StreamPacket.encode(packet));
++            assertEquals(64 + bytes, wire.length);
++            assertTrue(wire.length <= 1200);
++            ByteBuffer header = ByteBuffer.wrap(wire).order(ByteOrder.BIG_ENDIAN);
++            assertEquals(0x4f545431, header.getInt(0));
++            assertEquals(1, Byte.toUnsignedInt(header.get(4)));
++            assertEquals(0, Byte.toUnsignedInt(header.get(5)));
++            assertEquals(64, Short.toUnsignedInt(header.getShort(6)));
++            assertEquals(STREAM.getMostSignificantBits(), header.getLong(8));
++            assertEquals(STREAM.getLeastSignificantBits(), header.getLong(16));
++            assertEquals(SESSION.getMostSignificantBits(), header.getLong(24));
++            assertEquals(SESSION.getLeastSignificantBits(), header.getLong(32));
++            assertEquals(9, header.getLong(40));
++            assertEquals(12345, header.getLong(48));
++            assertEquals(length, Integer.toUnsignedLong(header.getInt(56)));
++            assertEquals(i, Short.toUnsignedInt(header.getShort(60)));
++            assertEquals(count, Short.toUnsignedInt(header.getShort(62)));
++            System.arraycopy(wire, 64, reconstructed, consumed, bytes);
++            consumed += bytes;
++        }
++        assertEquals(length, consumed);
++        assertArrayEquals(original, reconstructed);
++        if (length == 2097152) assertEquals(96, packets.getLast().payload().length);
++    }
++
++    @ParameterizedTest @ValueSource(ints = {0, 2097153})
++    void U04_fragmentationRejectsFrameOutsideProtocolCap(int length) {
++        byte[] bytes = new byte[length];
++        assertThrows(IllegalArgumentException.class, () -> StreamPacket.fragment(STREAM, SESSION, 0, 0, bytes));
++    }
++
++    @Test void U05_split1137MatchesBothIndependentGoldenDatagrams() throws Exception {
++        byte[] original = repeated(1137, 0xab);
++        original[1136] = (byte) 0xcd;
++        var packets = assertDoesNotThrow(() -> StreamPacket.fragment(STREAM, SESSION, 8, 40000, original));
++        assertEquals(2, packets.size());
++        assertArrayEquals(fixture("split-first"), StreamPacket.encode(packets.getFirst()));
++        assertArrayEquals(fixture("split-last"), StreamPacket.encode(packets.getLast()));
++    }
++
++    static Stream<Arguments> hostileMetadata() {
++        return Stream.of(
++                Arguments.of("u32 high bit", 56, 4, 0x80000000L),
++                Arguments.of("u32 maximum", 56, 4, 0xffffffffL),
++                Arguments.of("u32 signed maximum", 56, 4, 0x7fffffffL),
++                Arguments.of("negative media time", 48, 8, -1L),
++                Arguments.of("minimum negative sequence", 40, 8, Long.MIN_VALUE),
++                Arguments.of("unsigned count maximum", 62, 2, 65535L),
++                Arguments.of("unsigned index maximum", 60, 2, 65535L),
++                Arguments.of("header u16 maximum", 6, 2, 65535L),
++                Arguments.of("high reserved flag", 5, 1, 128L));
++    }
++
++    @ParameterizedTest(name = "U06 {0}") @MethodSource("hostileMetadata")
++    void U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String label, int offset, int width, long value)
++            throws Exception {
++        byte[] bytes = fixture("min");
++        ByteBuffer b = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
++        if (width == 8) b.putLong(offset, value);
++        else if (width == 4) b.putInt(offset, (int) value);
++        else if (width == 2) b.putShort(offset, (short) value);
++        else b.put(offset, (byte) value);
++        assertEquals(65, bytes.length);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes), label);
++    }
++
++    @Test void U06_payloadTrailingByteIsNotIgnored() throws Exception {
++        byte[] bytes = Arrays.copyOf(fixture("min"), 66);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes));
++    }
++
++    static Stream<Arguments> invalidValues() {
++        return Stream.of(
++                Arguments.of(0L, 0, 1, 0L, 0L, 1),
++                Arguments.of(2097153L, 0, 1, 0L, 0L, 1),
++                Arguments.of(4294967295L, 0, 1, 0L, 0L, 1),
++                Arguments.of(Long.MAX_VALUE, 0, 1, 0L, 0L, 1),
++                Arguments.of(1L, 1, 1, 0L, 0L, 1),
++                Arguments.of(1L, 0, 0, 0L, 0L, 1),
++                Arguments.of(1L, 0, 2, 0L, 0L, 1),
++                Arguments.of(1L, 0, 1, -1L, 0L, 1),
++                Arguments.of(1L, 0, 1, 0L, -1L, 1),
++                Arguments.of(1L, 0, 1, 0L, 0L, 0),
++                Arguments.of(1L, 0, 1, 0L, 0L, 1137),
++                Arguments.of(1137L, 0, 2, 0L, 0L, 1135),
++                Arguments.of(1137L, 1, 2, 0L, 0L, 2),
++                Arguments.of(2272L, 1, 2, 0L, 0L, 1135));
++    }
++
++    @ParameterizedTest @MethodSource("invalidValues")
++    void U06_valueRejectsInvalidMetadataBeforeCopy(long length, int index, int count, long seq, long time, int payloadSize) {
++        byte[] payload = new byte[payloadSize];
++        assertThrows(IllegalArgumentException.class, () -> packet(seq, time, length, index, count, payload));
++    }
++
++    @Test void U06_encoderRejectsAbsentValue() {
++        assertThrows(ProtocolException.class, () -> StreamPacket.encode(null));
++    }
++
++    @Test void U07_sliceDecodesOnlyItsRegionWithoutMutatingInput() throws Exception {
++        byte[] wire = fixture("small");
++        byte[] backing = repeated(1400, 0x5a);
++        System.arraycopy(wire, 0, backing, 17, wire.length);
++        byte[] before = backing.clone();
++        var packet = assertDoesNotThrow(() -> StreamPacket.decode(backing, 17, wire.length));
++        assertPacket(packet(7, 10000, 3, 0, 1, new byte[]{0x41, 0x42, 0x43}), packet);
++        assertArrayEquals(before, backing);
++    }
++
++    static Stream<Arguments> invalidRegions() {
++        return Stream.of(Arguments.of(-1, 65), Arguments.of(0, -1), Arguments.of(65, 1),
++                Arguments.of(1, 65), Arguments.of(Integer.MAX_VALUE, 1),
++                Arguments.of(1, Integer.MAX_VALUE), Arguments.of(Integer.MIN_VALUE, 65), Arguments.of(0, 64));
++    }
++
++    @ParameterizedTest @MethodSource("invalidRegions")
++    void U07_invalidRegionCannotOverflowIntoAValidRange(int offset, int length) throws Exception {
++        byte[] bytes = fixture("min");
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes, offset, length));
++    }
++
++    @Test void U07_absentDatagramIsAFormatError() {
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(null));
++    }
++
++    @Test void U08_valueCopiesInputPayload() {
++        byte[] input = {(byte) 0xaa};
++        StreamPacket value = packet(0, 0, 1, 0, 1, input);
++        input[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, value.payload());
++    }
++
++    @Test void U08_valueDoesNotExposeMutablePayload() {
++        StreamPacket value = packet(0, 0, 1, 0, 1, new byte[]{(byte) 0xaa});
++        value.payload()[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, value.payload());
++    }
++
++    @Test void U08_decoderOwnsPayloadAfterReceiveBufferReuse() throws Exception {
++        byte[] input = fixture("small");
++        StreamPacket packet = assertDoesNotThrow(() -> StreamPacket.decode(input));
++        assertNotNull(packet, "decode behavior is required before ownership can be verified");
++        input[64] = 0;
++        assertArrayEquals(new byte[]{0x41, 0x42, 0x43}, packet.payload());
++    }
++
++    @Test void U08_fragmentationOwnsPayloadAndReturnsImmutableList() {
++        byte[] original = {(byte) 0xaa};
++        List<StreamPacket> packets = StreamPacket.fragment(STREAM, SESSION, 0, 0, original);
++        assertEquals(1, packets.size());
++        original[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, packets.getFirst().payload());
++        assertThrows(UnsupportedOperationException.class, () -> packets.add(packets.getFirst()));
++    }
++
++    @Test void U06_absentIdsAndPayloadAreRejectedExplicitly() {
++        assertThrows(IllegalArgumentException.class,
++                () -> new StreamPacket(null, SESSION, 0, 0, 1, 0, 1, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> new StreamPacket(STREAM, null, 0, 0, 1, 0, 1, new byte[1]));
++        assertThrows(IllegalArgumentException.class, () -> packet(0, 0, 1, 0, 1, null));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, 0, 0, null));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(null, SESSION, 0, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, null, 0, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, -1, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, 0, -1, new byte[1]));
++    }
++
++    @Test void U07_fullArrayCannotHideTrailingBytesButExactMaxRegionIsValid() throws Exception {
++        byte[] wire = fixture("split-first");
++        byte[] backing = new byte[1219];
++        System.arraycopy(wire, 0, backing, 19, 1200);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(backing));
++        assertEquals(1136, StreamPacket.decode(backing, 19, 1200).payload().length);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(backing, 18, 1201));
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(null, 0, 65));
++        byte[] small = fixture("small");
++        byte[] extra = Arrays.copyOf(small, small.length + 1);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(extra));
++        assertArrayEquals(new byte[]{0x41, 0x42, 0x43},
++                StreamPacket.decode(extra, 0, small.length).payload());
++    }
++
++}
+diff --git a/memory-bank/bolts/010-video/implementation-plan.md b/memory-bank/bolts/010-video/implementation-plan.md
+new file mode 100644
+index 0000000..7a1bbf9
+--- /dev/null
++++ b/memory-bank/bolts/010-video/implementation-plan.md
+@@ -0,0 +1,194 @@
++---
++unit: "005-video"
++bolt: "010-video"
++stage: "plan"
++status: "complete"
++---
++# IMP-016 — Plan formal: codec UDP OTT1 e fragmentação
++
++Proposta tecnicamente aceite pelo utilizador, incluindo API mínima, imutabilidade,
++validação antes de alocar e oráculos V-019. **Plan formal aprovado pelo utilizador**. Primeiro passo de Implement aprovado; comportamentos autorizados posteriormente
++pelo utilizador nos mesmos dois ficheiros. Implement aprovado posteriormente e Test autorizado pelo utilizador. Tipo Simple: Plan → Implement → Test.
++Base operacional b6de8488f6dc99e3bf490d4cb88b31840089cb30; ramo autorizado
++imp-016-udp. Main mantém o apontador da base. Sem staging/commits/push.
++
++## 1. Objetivo, fontes e dependências
++
++Converter um frame opaco em datagramas OTT1 limitados e validar um fragmento sem
++abrir sockets, ler media, descodificar JPEG ou emitir vídeo. É codec puro, não
++reassemblagem, receção/autorização de rede, player ou integração de streaming.
++
++[ADD/IMP-016](../../../add.md#imp-016), secções2/5/6/8–12; [specs](../../../specs.md),
++[intent](../../intents/001-ott-streaming/requirements.md),
++[unidade](../../intents/001-ott-streaming/units/005-video/unit-brief.md),
++[história](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md),
++[TASK-019](../../../docs/tasks/PHASE-05/TASK-019.md),
++[contratos UDP/5 e perfil/7](../../../docs/07-API-AND-INTERFACES.md),
++[testes/V-019](../../../docs/09-TESTING-STRATEGY.md),
++[DoD](../../../docs/14-DEFINITION-OF-DONE.md) e progresso15.
++Código real inspecionado: StreamPacket placeholder de0 bytes, sem referências
++Java a consumir a sua API; StreamPacketTest ausente. MessageCodec/ProtocolException,
++RuntimeConfiguration/POM e fixtures existentes lidos, sem alterações.
++
++Dependência IMP-015/009-arvores complete e história implemented=true; TASK-018 DONE,
++unidade004/PHASE-04 complete/DONE. Fecho reconciliado em009 e progresso15 referencia
++integração1ee8db6 e confirmação humana. Não reabrir esses incrementos.
++DEMO-001 é apoio separado, não dependência/gate de PHASE-05, por instrução explícita.
++O seu handoff antigo não prevalece sobre a autorização atual para este Plan.
++
++ADR-002/006/007/009/021/024 reutilizadas; preservar ADR-026 (JUnit só em testes,
++sem nova dependência runtime,CI,linter,JaCoCo ou limiar percentual). Sem nova ADR
++ou alteração de wire/política/hard caps. Decisão aceite inviável exige parar a
++parte afetada e seguir ADD11; não há incompatibilidade material identificada aqui.
++
++## 2. Allowlist Java futura e coordenação
++
++Somente na etapa Implement, após autorização:
++
++1 - `Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java`.
++2 - `Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java`.
++
++Sem StreamPacketCodec.java ou StreamPacketCodecTest.java adicionais. A nomenclatura
++legada de TASK-019/6 é clarificada por este Plan/ADD, sem alargar o âmbito.
++Manter todas as fixtures e testes históricos; vetores adicionais necessários
++ficam como literais independentes dentro do teste autorizado.
++
++Colega não usa este diretório, conforme confirmação do utilizador. Ramo
++imp-016-udp criado por autorização explícita; sem alteração do ref main,
++checkout/reset do trabalho do colega ou integração inferida. demo/, respetivo
++HANDOFF/bolt e experiências de checkpoint permanecem intactos. Atualizações de
++estado aqui pertencem só ao IMP-016; blocos históricos da demo são preservados.
++Numeração global continua não coordenada: usar apenas IMP-016-LOCAL-01/02,
++sem reservar Q-C globais. Não contactar pessoas ou presumir acordo do colega.
++
++## 3. API mínima tecnicamente aceite
++
++StreamPacket como record imutável: streamId UUID,sessionId UUID,frameSeq long,
++mediaTimeUs long,frameLength long,fragmentIndex int,fragmentCount int,payload byte[].
++Cópia defensiva do payload na entrada e na saída; não guardar input reutilizável
++de receção. frameLength u32 é lido para long antes da validação/conversão.
++
++Assinaturas conceptuais aceites, a implementar no mesmo ficheiro:
++
++- `encode(StreamPacket)` → byte[] do datagrama completo.
++- `decode(byte[])` → StreamPacket de um datagrama exato.
++- `decode(byte[], offset, length)` → StreamPacket da região declarada.
++- `fragment(streamId, sessionId, frameSeq, mediaTimeUs, byte[])` → List<StreamPacket> imutável.
++
++[PRESSUPOSTO] Erros explícitos de formato reutilizam ProtocolException existente
++como diagnóstico local; isto não cria/envia ERROR de TCP, não decide política de
++rede e não modifica ProtocolException/ErrorCode. Valores de programação inválidos
++no construtor/argumentos são rejeitados antes das cópias. Não usar igualdade
++referencial de arrays como oráculo de conteúdo; testes comparam bytes/campos.
++
++Codec sem estado, threads, relógios, schedulers, filas, caches ou sockets.
++Não exige shutdown próprio; ownership serial/contexto ativo dos nós existentes
++não é modificado. Não introduzir ObjectInputStream ou dependências runtime.
++
++## 4. Bytes fixos UDP v1, separados do controlo TCP v2
++
++Tudo big-endian. Cada buffer representa o datagrama UDP de aplicação, sem prefixo
++de framing TCP e sem contar IP/UDP. TCP permanece v2/19 tipos/código3 rejeitado;
++UDP OTT1 permanece **version1**,flags0,header64,payload≤1136,total≤1200.
++Uma configuração não altera estes bytes/caps.
++
++| Offset | Bytes | Campo/invariante |
++|---:|---:|---|
++| 0 | 4 | magic ASCII OTT1 |
++| 4 | 1 | version=1 |
++| 5 | 1 | flags=0; reservadas rejeitadas |
++| 6 | 2 | headerLength u16=64 |
++| 8 | 16 | streamId UUID; todos os bits preservados |
++| 24 | 16 | sessionId UUID=serverEpoch |
++| 40 | 8 | frameSeq i64 não negativo |
++| 48 | 8 | mediaTimeUs i64 não negativo, timeline relativa |
++| 56 | 4 | frameLength u32,1..2097152 |
++| 60 | 2 | fragmentIndex u16,0..count−1 |
++| 62 | 2 | fragmentCount u16,1..1847 |
++| 64 | variável | payload exato,1..1136 |
++
++O codec valida sintaxe, não autentica UUID/endpoint nem determina sessão ativa.
++Comparação com HELLO/upstream/época e monotonias entre datagramas pertencem aos
++consumidores posteriores. Um datagrama não cria procura/rota ou renova lease.
++mediaTimeUs não é UTC/latência unilateral. JPEG é opaco; bytes sintéticos válidos
++não precisam de ser uma imagem. Fonte de cinco dígitos tem cap99999 em IMPs
++posteriores; codec aceita até2MiB, sem confundir limites de container e protocolo.
++
++## 5. Fragmentação, offsets e ordem de validação
++
++Com L já validado entre1 e2097152:
++count=1+(L−1)/1136; offset=index×1136 calculado com aritmética verificada;
++expectedPayload=min(1136,L−offset). count tem de coincidir exatamente com a
++fórmula. Todos os fragmentos exceto o último têm1136; último tem resto positivo,
++incluindo1136 quando L é múltiplo. No máximo2MiB:1847 fragmentos,último payload96.
++Identidades/seq/mediaTime/frameLength/count são comuns, índice0..count−1.
++
++Decoder:
++
++1 - Validar array/região sem overflow e comprimento65..1200 antes de ler campos.
++    Backing array maior é permitido só no overload com uma região válida;
++    encode/decode de datagrama inteiro nunca ignora bytes extra.
++2 - Ler magic,versão,flags,header e escalares com acessos limitados à região.
++3 - Converter unsigned corretamente; validar seq/time,frameLength,count,index,
++    count calculado,offset e payload/tamanho total exatos,sem wrap/truncagem.
++4 - Só depois criar o valor/cópia de payload limitada a1136. Nunca alocar um
++    frame/buffer com comprimento escolhido por metadados ainda não validados.
++
++Encoder valida valor e tamanho exato antes de criar datagrama limitado a1200.
++Fragmentação valida IDs,seq/time e tamanho real do array antes da lista/payloads;
++lista≤1847 e soma dos payloads≤2MiB. Sem fila ilimitada, montagens ou buffers por
++frame declarado em decode. Revisão de código confirma a ordem; rejeição de campos
++forjados é prova adicional, não uma medição de heap inventada.
++
++## 6. V-019 — oráculos planeados, ainda não executados em Java
++
++16 vetores UDP preservados,4 positivos e12 negativos. Ler os binários/hex e
++manifesto independentes; expectativas nunca geradas pelo encoder de produção.
++Cada grupo abaixo é um conjunto de casos, não promessa de contagem JUnit.
++
++| ID local | Exercício/asserções |
++|---|---|
++| U01 | Quatro positivos: decode confere todos os campos/payloads e encode do modelo esperado coincide com bin/hex golden, byte a byte |
++| U02 | Doze negativos existentes rejeitados pelas condições documentadas; nenhum byte/expected alterado para obter verde |
++| U03 | Offsets0..64,big-endian,UUID com bits altos preservados; seq/time0 e extremos válidos; literais adicionais independentes no teste |
++| U04 | Tamanhos de frame1,1135,1136,1137,2272,2273,99999,2097151,2097152; rejeitar0 e2097153; máximo1847/último96 |
++| U05 | Recombinação independente de payloads recupera exatamente o frame,padrão sintético conhecido,sem bytes perdidos/duplicados; datagramas≤1200 |
++| U06 | Campos hostis: u32 elevados/overflow,count0/incoerente/index fora da gama,seq/time negativos,versão2,flags/header inválidos,payload curto/extra |
++| U07 | Overload de região com prefixo/sufixo e offset não nulo; limites e overflow de offset/length; array maior não muda cap da região |
++| U08 | Cópias defensivas nos dois sentidos e lista imutável; inputs/outputs mutados não alteram o pacote; rejeição antes de cópias dependentes de metadados |
++
++Round-trip apenas complementar. Fronteiras de fragmentação/UUID/campos não são
++substituídas por round-trip. Sem JPEG real,frame assembler,socket ou relógio/
++transporte falso desnecessários num codec puro. Protocolos TCP/UDP testados como
++versões distintas, sem tocar MessageCodec/fixtures TCP.
++
++## 7. Sequência e condições de fecho futuras
++
++1 - Plan formal: guardar este artefacto,estado/evidência e patch autorizado;
++    executar apenas V-ADD/auditoria documental,preservar diff/hashes; parar.
++2 - Implement só após aprovação/autorização: tipos e testes significativos,
++    demonstração de falhas adequadas e comportamentos incrementais nos dois
++    ficheiros,sem enfraquecer históricos. Reapresentar Implement antes de Test.
++3 - Test só após autorização: V-019 executado,regressão JDK21 e clean verify,
++    logs/XML/JAR/hash e manual humano reproduzível com evidência/operador.
++4 - Fecho apenas com testes/validações,manual humano,revisão final Denji e
++    integração comprovados,conforme autorização do utilizador/DoD. Sem gates
++    externos adicionais no IMP-016. Sem alegar GUI/CORE/vídeo entregue por codec.
++
++Os1459 testes registados na base/DEMO/fechos anteriores são históricos,não testes
++atuais do IMP-016. Não foi executado Maven,JUnit ou Java nesta etapa.
++
++## 8. Registo local e patch autorizado
++
++IMP-016-LOCAL-01 — coordenação: utilizador confirmou colega fora deste diretório
++e autorizou ramo imp-016-udp na base b6de848. Separação local satisfeita;
++numeração global continua por coordenar. Apenas IDs locais,sem reserva Q-C.
++
++IMP-016-LOCAL-02 — ligação fictícia no template DDD: patch exato de uma linha
++aplicado por autorização explícita: representar o destino fictício como caminho
++literal em backticks,no exemplo JWT da linha551. Não altera validador/âmbito,
++não cria ADR fictícia e não altera wire. **RESOLVIDA** após V-ADD pós-patch
++com0 erros; negativo anterior preservado. [Patch/evidência](../../../experiments/construction/010-video/plan-01/README.md).
++
++Plan aprovado. O utilizador aprovou depois tipos/testes vermelhos e autorizou
++os comportamentos nos dois ficheiros. Implement aprovado; parar no checkpoint Test, manual humano pendente; sem staging/commits/push. Main preservado na base.
+diff --git a/memory-bank/bolts/010-video/implementation-walkthrough.md b/memory-bank/bolts/010-video/implementation-walkthrough.md
+new file mode 100644
+index 0000000..cb3e99c
+--- /dev/null
++++ b/memory-bank/bolts/010-video/implementation-walkthrough.md
+@@ -0,0 +1,54 @@
++---
++unit: "005-video"
++bolt: "010-video"
++stage: "implement"
++status: "complete"
++---
++# IMP-016 — Checkpoint Implement
++
++## Resumo
++
++Codec UDP OTT1 v1 e fragmentação implementados nos dois ficheiros aprovados,
++sem sockets ou emissão de vídeo. Plan e checkpoint de testes vermelhos aprovados;
++Implement aprovado pelo utilizador; Test autorizado e em curso.
++
++## Estrutura e trabalho realizado
++
++- [x] StreamPacket.java: valor validado e imutável, cópias defensivas, codificação/descodificação de datagramas exatos e fragmentação limitada.
++- [x] StreamPacketTest.java: U01–U08 com bytes/expectativas independentes, fronteiras, negativos, regiões e propriedade dos buffers.
++
++As substituições limitam-se aos stubs: invariantes/cópias cumprem U06/U08;
++encode/decode cumprem U01–U03/U06/U07; fragmentação cumpre U04/U05/U08.
++Nenhum comportamento de componentes anteriores foi substituído. Os testes
++iniciais foram preservados integralmente e dois testes adicionais cobrem nulos e
++região máxima/exata versus buffer inteiro. Sem desvio do Plan nem dependências novas.
++
++## Decisões e limites
++
++Caps fixos64/1200/1136 e2MiB/1847; UDP v1 separado do TCP v2/19 tipos.
++Região, metadados e tamanhos são validados antes de cópias dependentes dos dados.
++Decode nunca aloca frame por comprimento declarado; encode usa valor validado.
++Fragmentação retém no máximo2MiB de payload em1847 fragmentos. Diagnósticos locais
++ProtocolException não emitem ERROR TCP. Arrays não escapam ao valor; lista imutável.
++Sem filas, threads, sockets ou estado de rede novo. Sem medição de heap alegada.
++[Revisão da ordem de validação](../../../experiments/construction/010-video/implement-behavior-01/review.md).
++
++## Resultados reais
++
++Primeiro incremento:76/0/0/0 após implementar os stubs. Versão final:78 casos U01–U08
++passam na regressão completa JDK21: **1537/0/0/0,22 XML**, Maven test (não clean verify).
++A primeira regressão restrita falhou por sockets bloqueados; log/XML preservados.
++Repetição com sockets locais permitidos passou sem mudar código/testes/prazos.
++Negativo anterior76/74/0/0 e todas as evidências anteriores preservados.
++[V-019/U01–U08, logs, hashes, XML e diffs](../../../experiments/construction/010-video/implement-behavior-01/README.md).
++
++## Preservação e pendências
++
++234 ficheiros anteriores de código/recursos,380 ficheiros protegidos da demo e
++artefactos e36 ficheiros de evidência anterior intactos por hash. Testes históricos,
++fixtures, ADD/specs, POM, validador e Q-C global preservados. IDs apenas locais.
++Main/HEAD b6de848, ramo imp-016-udp; target/ separado, sem staging/commits/push.
++Implement aprovado. Clean verify/JAR final e consolidação técnica Test executados
++posteriormente no test-walkthrough. Manual humano Francisco24 cumprido e conferido; Test aprovado e revisão final
++Denji confirmada pelo utilizador. Integração pendente. Sem gates externos
++adicionais. Não se alega vídeo, GUI/CORE ou aceitação final por estes testes.
+diff --git a/memory-bank/bolts/010-video/test-walkthrough.md b/memory-bank/bolts/010-video/test-walkthrough.md
+new file mode 100644
+index 0000000..a3e627e
+--- /dev/null
++++ b/memory-bank/bolts/010-video/test-walkthrough.md
+@@ -0,0 +1,60 @@
++---
++unit: "005-video"
++bolt: "010-video"
++stage: "test"
++status: "complete"
++---
++# IMP-016 — Checkpoint Test: Test aprovado e revisão final confirmada; integração pendente
++
++## Resultado
++
++Implement aprovado; clean verify JDK21 executado em Projeto/: **1537 testes,
++0 falhas,0 erros,0 ignorados,22 XML**. Inclui78 casos U01–U08/V-019; os1459 testes
++históricos restantes também passaram nesta execução. Nenhuma alteração ao código
++aprovado de produção/testes. JAR e XML preservados fora de target/.
++
++[Log/inventário/JAR/hashes/preservação](../../../experiments/construction/010-video/test-01/README.md).
++JAR SHA-256:588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
++Classe StreamPacket no JAR coincide por hash com a saída clean verify; major65.
++Origem efetiva confirmada no manual humano: StreamPacket e MessageCodec carregados
++do JAR fixado, pelo CHECK_PASS1 do auxiliar preservado.
++
++## V-019 / oráculos independentes
++
++| Oráculo | Casos reais | Prova |
++|---|---:|---|
++| U01 |9|16 referências íntegras; quatro golden encode/decode com expectativas independentes |
++| U02 |12|Rejeição dos negativos fixados, sem alterar bytes |
++| U03 |4|Offsets/big-endian, bits UUID, extremos de contadores e UDP/TCP separados |
++| U04 |11|Fronteiras1..2MiB,1847 fragmentos/último96 e recombinação independente |
++| U05 |1|1137 bytes: dois golden datagramas independentes |
++| U06 |26|Metadados hostis, invariantes/nulos, payload exato e validação antes da cópia |
++| U07 |11|Região exata/offset, buffer maior, caps e overflow |
++| U08 |4|Cópias defensivas de entrada/saída/receção e lista imutável |
++
++Fixtures independentes preservadas, incluindo16 UDP OTT1 e62 TCP v2 operacionais.
++Ordem de validação antes de copiar/alocar revista em Implement; os testes hostis
++não são medições de heap. Recombinação lê payloads/offsets independentemente,
++sem usar round-trip como único oráculo. Sem sockets de streaming/vídeo/GUI/CORE.
++
++## Manual humano e limites de aceitação
++
++[Manual reproduzível](../../../experiments/construction/010-video/manual-instructions.md):
++executado pessoalmente por Francisco, oito etapas/24 checks, sem divergências
++observadas conforme confirmação explícita do utilizador. [Conferência e hashes](../../../experiments/construction/010-video/manual-verification-01/README.md).
++Relatório original em test-manual-runs/20261123T153332Z-e5356b3d/report.json.
++PROBE_PASS/MANUAL_PASS,CLEANUP_COMPLETE,PASSED=true,JAVA_EXIT=0 e WRAPPER_EXIT=0
++conferidos nos originais; SHELL_EXIT=0 confirmado apenas pelo utilizador.
++JVM terminada após wait real do runner; pasta temporária ausente. JAR/código/
++fixtures/auxiliares intactos. Sem repetir build ou manual, pois o código não mudou.
++**Test aprovado pelo utilizador**; revisão final Denji confirmada pelo utilizador,
++sem alterações pendentes. [Confirmação vinculada aos hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
++Integração pendente.
++Sem gates externos adicionais.
++
++## Estado
++
++Test aprovado, bolt/história/unidade em progresso até integração e fecho autorizados. Negativos/logs anteriores,
++fixtures, testes históricos e demo preservados por hash; código aprovado intacto.
++V-ADD executado nesta etapa, relatório na evidência. Ramo imp-016-udp,
++IDs locais,main intacto,target/ fora da entrega. Sem staging/commits/push/fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+new file mode 100644
+index 0000000..1f4ed68
+--- /dev/null
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+@@ -0,0 +1,63 @@
++# Construction log — unidade005-video
++
++## IMP-016 / 010-video — Plan formal preparado
++
++Registo 2026-11-23T14:41:11Z: utilizador aceitou tecnicamente proposta/API/imutabilidade/
++validação/oráculos; autorizou gravação de Plan/documentação/evidência e patch
++exato de uma linha no template,após confirmar colega fora deste diretório.
++Ramo imp-016-udp criado explicitamente a partir de b6de848; main conserva esse ref.
++[Plan](../../../../bolts/010-video/implementation-plan.md) formal por aprovar;
++sem etapas concluídas,Implement/Test/Java/testes Java/staging/commits/push.
++Dependência009-arvores/unidade004/PHASE-04 fechada; DEMO-001 é apoio separado,
++não um gate. demo/artefactos/negativos preservados. IDs IMP-016-LOCAL,sem reserva
++Q-C global. [V-ADD/diff/preservação](../../../../../experiments/construction/010-video/plan-01/README.md).
++V-019 e regressão/manual/revisão/integração futuros,sem gates externos adicionais.
++
++## 2026-11-23T14:54:00.061317+00:00 — Plan aprovado / primeiro passo Implement
++
++Autorização do utilizador: tipos/interfaces e testes vermelhos, sem comportamentos.
++Novos76/74/0/0; históricos TCP/discovery120/0/0/0. Compilação passou.
++[Walkthrough](../../../../bolts/010-video/implementation-walkthrough.md).
++Sem Test/staging/commits/push; critérios e fecho pendentes. IDs locais/demo preservados.
++
++## 2026-11-23T15:02:58.277544+00:00 — Comportamentos autorizados / Implement por aceitar
++
++Codec/fragmentação nos dois caminhos aprovados. Primeiro verde76/0/0/0; regressão
++final JDK21 1537/0/0/0,22 XML, incluindo78 casos U01–U08/V-019. Execução restrita
++com sockets bloqueados preservada; repetição fora da sandbox passou sem alterações.
++[Walkthrough](../../../../bolts/010-video/implementation-walkthrough.md).
++Main/demo/históricos/negativos preservados; IDs locais, target/ separado.
++Test não autorizado; clean verify/JAR/manual/Denji/integração pendentes.
++Sem staging/commits/push ou gates externos adicionais.
++
++## 2026-11-23T15:16:20Z — Implement aprovado / checkpoint Test
++
++Utilizador aprovou Implement e autorizou Test. Clean verify atual1537/0/0/0,
++22 XML;78 U01–U08/V-019. JAR preservado SHA-256
++588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
++[Test](../../../../bolts/010-video/test-walkthrough.md). Código aprovado intacto;
++negativos,históricos,fixtures,demo/main preservados. Manual preparado,não executado.
++Test por aprovar; manual humano,Denji e integração pendentes. IDs locais,
++target/ separado; sem staging/commits/push/fecho ou gates externos adicionais.
++
++## 2026-11-23T15:35:42Z — Manual humano Francisco24 cumprido e conferido
++
++Utilizador confirmou execução pessoal das oito etapas,sem divergências observadas.
++24 CHECK_PASS,8 confirmações,PROBE_PASS/MANUAL_PASS,CLEANUP_COMPLETE,
++JAVA_EXIT=0,PASSED=true,WRAPPER_EXIT=0 conferidos nos originais. SHELL_EXIT=0
++é confirmação explícita do utilizador,não consta do log/JSON. Hashes JAR/código/
++fixtures/auxiliares íntegros; origem das classes no JAR confirmada; JVM terminada
++pelo wait do runner e pasta temporária ausente. Sem repetir build/manual.
++[Conferência](../../../../../experiments/construction/010-video/manual-verification-01/README.md).
++Test reapresentado por aprovar; Denji e integração pendentes. Sem staging/commits/
++push/fecho,IDs locais,imp-016-udp,demo/main preservados,target/ excluído.
++
++## 2026-11-23T15:39:17Z — Test aprovado / revisão final Denji confirmada
++
++Utilizador aprovou clean verify1537/0/0/0,22 XML,V-ADD e manual Francisco24,
++sem divergências observadas. Confirmou revisão final Denji da implementação atual,
++sem alterações pendentes. [Confirmação e hashes código/JAR](../../../../../experiments/construction/010-video/final-package-01/final-review.json).
++[Pacote/plano/simulação](../../../../../experiments/construction/010-video/final-package-01/README.md).
++Main local continua b6de848,sem divergência entre ramos; remotos não consultados.
++Sem repetir build/manual; integração e fecho pendentes. Bolt/história/unidade abertos,
++IDs locais,demo preservada,target/ excluído,sem staging/commits/push/fecho.

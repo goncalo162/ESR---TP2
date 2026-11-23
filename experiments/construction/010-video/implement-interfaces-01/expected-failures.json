@@ -1,0 +1,459 @@
+{
+  "causes": {
+    "fragment produces no fragments": 11,
+    "fragment does not reject invalid frame length": 2,
+    "payload defensive copies not implemented": 2,
+    "decode returns no packet": 8,
+    "decode does not reject malformed input": 31,
+    "encode returns no wire bytes": 5,
+    "encode does not reject absent value": 1,
+    "record constructor has no invariant checks yet": 14
+  },
+  "details": [
+    {
+      "test": "U05_split1137MatchesBothIndependentGoldenDatagrams",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "expected: <2> but was: <0>"
+    },
+    {
+      "test": "U08_fragmentationOwnsPayloadAndReturnsImmutableList",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "expected: <1> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationRejectsFrameOutsideProtocolCap(int)[1]",
+      "cause": "fragment does not reject invalid frame length",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U04_fragmentationRejectsFrameOutsideProtocolCap(int)[2]",
+      "cause": "fragment does not reject invalid frame length",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U08_valueDoesNotExposeMutablePayload",
+      "cause": "payload defensive copies not implemented",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "array contents differ at index [0], expected: <-86> but was: <0>"
+    },
+    {
+      "test": "U08_valueCopiesInputPayload",
+      "cause": "payload defensive copies not implemented",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "array contents differ at index [0], expected: <-86> but was: <0>"
+    },
+    {
+      "test": "U03_maximumNonnegativeCountersAreRepresentable",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode behavior is required ==> expected: not <null>"
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[1]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[2]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[3]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[4]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[5]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[6]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[7]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_invalidRegionCannotOverflowIntoAValidRange(int, int)[8]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[1]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[2]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[3]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[4]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[5]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[6]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[7]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[8]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[9]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[10]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[11]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U02_decoderRejectsIndependentNegativeFixtures(String)[12]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U01_encoderMatchesGoldenBytes(String, StreamPacket)[1]",
+      "cause": "encode returns no wire bytes",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "encode must produce the independent golden bytes ==> array lengths differ, expected: <65> but was: <0>"
+    },
+    {
+      "test": "U01_encoderMatchesGoldenBytes(String, StreamPacket)[2]",
+      "cause": "encode returns no wire bytes",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "encode must produce the independent golden bytes ==> array lengths differ, expected: <67> but was: <0>"
+    },
+    {
+      "test": "U01_encoderMatchesGoldenBytes(String, StreamPacket)[3]",
+      "cause": "encode returns no wire bytes",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "encode must produce the independent golden bytes ==> array lengths differ, expected: <1200> but was: <0>"
+    },
+    {
+      "test": "U01_encoderMatchesGoldenBytes(String, StreamPacket)[4]",
+      "cause": "encode returns no wire bytes",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "encode must produce the independent golden bytes ==> array lengths differ, expected: <65> but was: <0>"
+    },
+    {
+      "test": "U06_encoderRejectsAbsentValue",
+      "cause": "encode does not reject absent value",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_sliceDecodesOnlyItsRegionWithoutMutatingInput",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[1]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "u32 high bit ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[2]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "u32 maximum ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[3]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "u32 signed maximum ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[4]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "negative media time ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[5]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "minimum negative sequence ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[6]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "unsigned count maximum ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[7]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "unsigned index maximum ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[8]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "header u16 maximum ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String, int, int, long)[9]",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "high reserved flag ==> Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_payloadTrailingByteIsNotIgnored",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U07_absentDatagramIsAFormatError",
+      "cause": "decode does not reject malformed input",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected pt.uminho.esr.ott.protocol.ProtocolException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U03_encoderPreservesLiteralOffsetsAndUuidBits",
+      "cause": "encode returns no wire bytes",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "array lengths differ, expected: <65> but was: <0>"
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[1]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[2]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[3]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[4]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[5]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[6]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[7]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[8]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[9]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[10]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[11]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[12]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[13]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U06_valueRejectsInvalidMetadataBeforeCopy(long, int, int, long, long, int)[14]",
+      "cause": "record constructor has no invariant checks yet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown."
+    },
+    {
+      "test": "U08_decoderOwnsPayloadAfterReceiveBufferReuse",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode behavior is required before ownership can be verified ==> expected: not <null>"
+    },
+    {
+      "test": "U01_decoderMatchesGoldenFields(String, StreamPacket)[1]",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    },
+    {
+      "test": "U01_decoderMatchesGoldenFields(String, StreamPacket)[2]",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    },
+    {
+      "test": "U01_decoderMatchesGoldenFields(String, StreamPacket)[3]",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    },
+    {
+      "test": "U01_decoderMatchesGoldenFields(String, StreamPacket)[4]",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[1]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[2]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[3]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <1> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[4]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <2> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[5]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <2> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[6]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <3> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[7]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <89> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[8]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <1847> but was: <0>"
+    },
+    {
+      "test": "U04_fragmentationHonorsBoundariesAndRecombinesExactly(int)[9]",
+      "cause": "fragment produces no fragments",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "fragment must cover the complete input ==> expected: <1847> but was: <0>"
+    },
+    {
+      "test": "U03_decoderPreservesLiteralOffsetsAndUuidBits",
+      "cause": "decode returns no packet",
+      "failure_type": "org.opentest4j.AssertionFailedError",
+      "message": "decode must return a packet, not an unwired interface placeholder ==> expected: not <null>"
+    }
+  ],
+  "note": "Tests assert observable Plan contracts. Stubs/default record are intentional; assertions after first missing behavior are not yet reached. No failure is compilation or setup error."
+}

@@ -1,0 +1,485 @@
+diff --git a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+index ec25e72..47d96f0 100644
+--- a/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
++++ b/.specsmd/aidlc/templates/construction/bolt-types/ddd-construction-bolt.md
+@@ -548,7 +548,7 @@ status: in-progress
+ ## Relevant Prior Decisions
+ 
+ Found {n} ADR(s) that may apply to this bolt:
+-- ADR-001: Use JWT for Authentication → [View](bolts/001-auth-service/adr-001-jwt-auth.md)
++- ADR-001: Use JWT for Authentication → `bolts/001-auth-service/adr-001-jwt-auth.md`
+ 
+ These decisions may constrain or guide your approach. Proceed? (y/n)
+ ```
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 477af72..15be06c 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,5 +1,15 @@
+ # Progresso do projeto
+ 
++**IMP-016 / 010-video — Plan formal por aprovar:** proposta tecnicamente aceite,
++gravação autorizada no ramo imp-016-udp,base b6de848; main preservado nesse ref.
++[Plan](../memory-bank/bolts/010-video/implementation-plan.md) e
++[evidência documental](../experiments/construction/010-video/plan-01/README.md).
++IMP-015/009-arvores e PHASE-04 concluídos; PHASE-05/unidade005 em progresso apenas
++no Plan. DEMO-001 é apoio separado,não bloqueia PHASE-05; o bloco datado seguinte
++é histórico e permanece preservado. Identificadores apenas IMP-016-LOCAL,sem
++Q-C global. Sem Java/testes Java/Implement/staging/commits/push. Total atual:
++17 bolts complete,1 in-progress,17 planned. Contagens de1459 testes são históricas.
++
+ **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
+ [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
+ separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido
+@@ -14,7 +24,7 @@ causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
+ PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
+ 
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05–07 e TASK-019–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS apenas no Plan de TASK-019; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -111,7 +121,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+ | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
+ | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | DONE — TASK-014–018, manual/Test/Waheed, coordenação e integração confirmados; regressão atual 1459/0/0/0 | PHASE-03 DONE |
+-| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | TODO | PHASE-04 DONE |
++| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — Plan IMP-016 por aprovar | PHASE-04 DONE |
+ | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
+ | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
+ 
+@@ -140,7 +150,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | DONE | V-016/Test1419,Luis7/28,Fillmore,integração447ae4b; [fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md) |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
+-| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | TODO | V-019: NÃO EXECUTADO |
++| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | IN PROGRESS | V-019: NÃO EXECUTADO |
+ | [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
+ | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
+ | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |
+diff --git a/docs/phases/PHASE-05-STREAMING.md b/docs/phases/PHASE-05-STREAMING.md
+index 1e19b0e..14cc24b 100644
+--- a/docs/phases/PHASE-05-STREAMING.md
++++ b/docs/phases/PHASE-05-STREAMING.md
+@@ -8,6 +8,11 @@ Entregar vídeo MJPEG fragmentado a clientes, com quatro streams distintas em du
+ 
+ Incremento 5 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+ 
++Estado atual: **IN PROGRESS apenas no Plan do IMP-016/TASK-019**,
++[checkpoint formal por aprovar](../../memory-bank/bolts/010-video/implementation-plan.md).
++PHASE-04 DONE e unidade004 complete; DEMO-001 é apoio separado,não um gate.
++TASK-020–024 permanecem TODO; sem Java/streaming/testes Java nesta etapa.
++
+ ## 3. Pré-requisitos
+ 
+ PHASE-04 concluída, com evidência do seu entregável; TASK-018 está DONE. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
+@@ -20,7 +25,7 @@ RF-007, RF-010, RF-011, RF-012, RF-013, RF-015, RNF-001, RNF-002, RNF-003, RP-00
+ 
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+-| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | TODO |
++| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | IN PROGRESS — Plan por aprovar |
+ | [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | TODO |
+ | [TASK-021](../tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | V-021 | TODO |
+ | [TASK-022](../tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | V-022 | TODO |
+diff --git a/docs/tasks/PHASE-05/TASK-019.md b/docs/tasks/PHASE-05/TASK-019.md
+index 56067c6..aa7c0b5 100644
+--- a/docs/tasks/PHASE-05/TASK-019.md
++++ b/docs/tasks/PHASE-05/TASK-019.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-019
+ - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Waheed](../../team/WAHEED.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-004](../PHASE-01/TASK-004.md), [TASK-011](../PHASE-03/TASK-011.md), [TASK-018](../PHASE-04/TASK-018.md).
+@@ -31,7 +31,7 @@ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md
+ 
+ ## 6. Ficheiros e componentes envolvidos
+ 
+-Existente: streaming/StreamPacket.java; planeados: streaming/StreamPacketCodec.java e StreamPacketCodecTest.java.
++Âmbito normativo do ADD/IMP-016: streaming/StreamPacket.java (placeholder existente) e streaming/StreamPacketTest.java em src/test/java (novo). Sem StreamPacketCodec.java/StreamPacketCodecTest.java adicionais.
+ 
+ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/uminho/esr/ott ou, nos testes, Projeto/src/test/java/pt/uminho/esr/ott, salvo prefixo explícito. Caminhos marcados planeados não existem necessariamente. Confirmar antes de editar e preservar alterações alheias.
+ 
+@@ -76,3 +76,14 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
+ ### Referências fixadas pela TASK-002
+ 
+ Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.
++
++## Plan formal em preparação — checkpoint por aprovar
++
++Proposta tecnicamente aceite; gravação autorizada no ramo imp-016-udp,base b6de848.
++[Plan](../../../memory-bank/bolts/010-video/implementation-plan.md): UDP OTT1/v1,
++64/1200/1136,2MiB/1847,offsets/validação antes de alocar e V-019/U01–U08.
++IMP-015/009-arvores e PHASE-04 concluídos; DEMO-001 é apoio separado sem bloqueio.
++Sem Java/testes Java/Implement/Test; V-019 NÃO EXECUTADO. IDs IMP-016-LOCAL,
++sem Q-C global. Evidência de Plan/diff/preservação em experiments/construction/010-video/.
++Fecho só com V-019,regressão,manual humano,revisão final Denji e integração.
++Sem staging/commits/push ou gates externos adicionais.
+diff --git a/memory-bank/bolts/010-video/bolt.md b/memory-bank/bolts/010-video/bolt.md
+index 4d8c772..67935ce 100644
+--- a/memory-bank/bolts/010-video/bolt.md
++++ b/memory-bank/bolts/010-video/bolt.md
+@@ -3,13 +3,13 @@ id: "010-video"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["001-definir-codec-udp-e-fragmentacao-de-frames"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-23T14:41:11Z"
++started: "2026-11-23T14:41:11Z"
+ completed: null
+-current_stage: null
++current_stage: "plan"
+ stages_completed: []
+ requires_bolts: ["009-arvores"]
+ enables_bolts: ["011-video", "012-video"]
+@@ -68,3 +68,15 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Prova futura: `experiments/construction/010-video/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## Checkpoint Plan formal — por aprovar
++
++Proposta tecnicamente aceite pelo utilizador; gravação/estado/evidência e patch
++IMP-016-LOCAL-02 autorizados no ramo imp-016-udp,base b6de848. [Plan](implementation-plan.md)
++formal por aprovar,stages_completed=[]; sem autorização Implement/Test/Java.
++Dependência009-arvores/unidade004/PHASE-04 concluída; DEMO-001 é apoio separado,
++sem gate/dependência PHASE-05. Colega não usa este diretório,por confirmação do
++utilizador; demo/artefactos intactos e main mantém o ref. IDs apenas locais.
++[Preservação/diff/V-ADD](../../../experiments/construction/010-video/plan-01/README.md).
++Sem staging/commits/push. Fecho futuro exige V-019,regressão,manual humano,
++revisão e integração; nenhum gate externo adicional.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+index b2aff8f..f519b28 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+@@ -2,7 +2,7 @@
+ id: "001-definir-codec-udp-e-fragmentacao-de-frames"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-019"]
+@@ -37,3 +37,12 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
+ - Bolts anteriores: 009-arvores.
+ - Responsável de origem: Waheed; revisor: Denji.
+ - Gates: nenhum específico adicional.
++
++## Estado de Plan — sem implementação
++
++IMP-016 no ramo imp-016-udp,base b6de848; [Plan formal](../../../../../bolts/010-video/implementation-plan.md)
++para aprovação,após aceitação técnica da proposta. História in-progress,
++sem implemented=true,sem critérios marcados como cumpridos. Dependências fechadas,
++DEMO-001 separada/não bloqueante. Somente dois caminhos Java futuros do ADD;
++nenhuma alteração Java/teste executado. IDs IMP-016-LOCAL,sem reserva global.
++Sem Implement/Test/staging/commits/push nesta autorização.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+index 29aef81..19b5310 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+@@ -1,11 +1,11 @@
+ ---
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-phase: "inception"
++phase: "construction"
+ source_phase: "PHASE-05"
+-status: "ready"
++status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-03T20:54:11Z"
++updated: "2026-11-23T14:41:11Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
+@@ -15,6 +15,13 @@ requires_units: ["004-arvores"]
+ 
+ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+ 
++Estado atual: in-progress apenas pelo [Plan do IMP-016/010-video](../../../../bolts/010-video/implementation-plan.md)
++em preparação formal para aprovação. Dependência004-arvores/PHASE-04 complete/DONE.
++Restantes histórias planned,sem execução. DEMO-001 é apoio separado e não bloqueia
++esta unidade. Não há código/streaming entregue por este registo,sem testes Java,
++staging/commits/push. Fecho da unidade não é antecipado.
++
++
+ ## Requisitos atribuídos
+ 
+ - REQ-010 — Reencaminhar dados segundo a tabela.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index e071b86..23537b7 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,9 +17,9 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: null
+-current_stage: null
+-next_bolt: null
++current_bolt: "010-video"
++current_stage: "plan"
++next_bolt: "010-video (Plan formal por aprovar; sem Implement autorizado)"
+ phase_04_status: "complete"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+@@ -29,3 +29,4 @@ phase_03_status: "complete"
+ phase_03_completed_at: 2026-11-15T16:36:52Z
+ phase_04_completed_at: 2026-11-22T23:10:04Z
+ closure_reconciliation: "experiments/construction/024-arvores/closure-reconciliation-01/README.md"
++phase_05_status: "in-progress"
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 9ddfbf4..768da87 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,0 in-progress e18 planned; bolts:17 complete,0 in-progress,18 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,1 in-progress e17 planned; bolts:17 complete,1 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -120,7 +120,8 @@ Implement/Test e revisão final aprovados; V-017 consolidada, integração em ma
+ 
+ ## 005-video/001-definir-codec-udp-e-fragmentacao-de-frames.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-016. **Estado:** planned. **Bolt:** 010-video.
++**Tarefa:** IMP-016. **Estado:** in-progress,Plan formal por aprovar. **Bolt:** 010-video.
++[Plan](bolts/010-video/implementation-plan.md),ramo imp-016-udp/base b6de848,sem Java/Implement/testes Java. DEMO-001 separada/não bloqueante.
+ **Ficheiro:** [001-definir-codec-udp-e-fragmentacao-de-frames](intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
+ 
+ ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED
+diff --git a/memory-bank/bolts/010-video/implementation-plan.md b/memory-bank/bolts/010-video/implementation-plan.md
+new file mode 100644
+index 0000000..d110670
+--- /dev/null
++++ b/memory-bank/bolts/010-video/implementation-plan.md
+@@ -0,0 +1,195 @@
++---
++unit: "005-video"
++bolt: "010-video"
++stage: "plan"
++status: "in-progress"
++---
++# IMP-016 — Plan formal: codec UDP OTT1 e fragmentação
++
++Proposta tecnicamente aceite pelo utilizador, incluindo API mínima, imutabilidade,
++validação antes de alocar e oráculos V-019. **Plan formal por aprovar**, sem etapa
++concluída e sem autorização Implement/Test. Tipo Simple: Plan → Implement → Test.
++Base operacional b6de8488f6dc99e3bf490d4cb88b31840089cb30; ramo autorizado
++imp-016-udp. Main mantém o apontador da base. Sem staging/commits/push.
++
++## 1. Objetivo, fontes e dependências
++
++Converter um frame opaco em datagramas OTT1 limitados e validar um fragmento sem
++abrir sockets, ler media, descodificar JPEG ou emitir vídeo. É codec puro, não
++reassemblagem, receção/autorização de rede, player ou integração de streaming.
++
++[ADD/IMP-016](../../../add.md#imp-016), secções2/5/6/8–12; [specs](../../../specs.md),
++[intent](../../intents/001-ott-streaming/requirements.md),
++[unidade](../../intents/001-ott-streaming/units/005-video/unit-brief.md),
++[história](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md),
++[TASK-019](../../../docs/tasks/PHASE-05/TASK-019.md),
++[contratos UDP/5 e perfil/7](../../../docs/07-API-AND-INTERFACES.md),
++[testes/V-019](../../../docs/09-TESTING-STRATEGY.md),
++[DoD](../../../docs/14-DEFINITION-OF-DONE.md) e progresso15.
++Código real inspecionado: StreamPacket placeholder de0 bytes, sem referências
++Java a consumir a sua API; StreamPacketTest ausente. MessageCodec/ProtocolException,
++RuntimeConfiguration/POM e fixtures existentes lidos, sem alterações.
++
++Dependência IMP-015/009-arvores complete e história implemented=true; TASK-018 DONE,
++unidade004/PHASE-04 complete/DONE. Fecho reconciliado em009 e progresso15 referencia
++integração1ee8db6 e confirmação humana. Não reabrir esses incrementos.
++DEMO-001 é apoio separado, não dependência/gate de PHASE-05, por instrução explícita.
++O seu handoff antigo não prevalece sobre a autorização atual para este Plan.
++
++ADR-002/006/007/009/021/024 reutilizadas; preservar ADR-026 (JUnit só em testes,
++sem nova dependência runtime,CI,linter,JaCoCo ou limiar percentual). Sem nova ADR
++ou alteração de wire/política/hard caps. Decisão aceite inviável exige parar a
++parte afetada e seguir ADD11; não há incompatibilidade material identificada aqui.
++
++## 2. Allowlist Java futura e coordenação
++
++Somente na etapa Implement, após autorização:
++
++1 - `Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java`.
++2 - `Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java`.
++
++Sem StreamPacketCodec.java ou StreamPacketCodecTest.java adicionais. A nomenclatura
++legada de TASK-019/6 é clarificada por este Plan/ADD, sem alargar o âmbito.
++Manter todas as fixtures e testes históricos; vetores adicionais necessários
++ficam como literais independentes dentro do teste autorizado.
++
++Colega não usa este diretório, conforme confirmação do utilizador. Ramo
++imp-016-udp criado por autorização explícita; sem alteração do ref main,
++checkout/reset do trabalho do colega ou integração inferida. demo/, respetivo
++HANDOFF/bolt e experiências de checkpoint permanecem intactos. Atualizações de
++estado aqui pertencem só ao IMP-016; blocos históricos da demo são preservados.
++Numeração global continua não coordenada: usar apenas IMP-016-LOCAL-01/02,
++sem reservar Q-C globais. Não contactar pessoas ou presumir acordo do colega.
++
++## 3. API mínima tecnicamente aceite
++
++StreamPacket como record imutável: streamId UUID,sessionId UUID,frameSeq long,
++mediaTimeUs long,frameLength long,fragmentIndex int,fragmentCount int,payload byte[].
++Cópia defensiva do payload na entrada e na saída; não guardar input reutilizável
++de receção. frameLength u32 é lido para long antes da validação/conversão.
++
++Assinaturas conceptuais aceites, a implementar no mesmo ficheiro:
++
++- `encode(StreamPacket)` → byte[] do datagrama completo.
++- `decode(byte[])` → StreamPacket de um datagrama exato.
++- `decode(byte[], offset, length)` → StreamPacket da região declarada.
++- `fragment(streamId, sessionId, frameSeq, mediaTimeUs, byte[])` → List<StreamPacket> imutável.
++
++[PRESSUPOSTO] Erros explícitos de formato reutilizam ProtocolException existente
++como diagnóstico local; isto não cria/envia ERROR de TCP, não decide política de
++rede e não modifica ProtocolException/ErrorCode. Valores de programação inválidos
++no construtor/argumentos são rejeitados antes das cópias. Não usar igualdade
++referencial de arrays como oráculo de conteúdo; testes comparam bytes/campos.
++
++Codec sem estado, threads, relógios, schedulers, filas, caches ou sockets.
++Não exige shutdown próprio; ownership serial/contexto ativo dos nós existentes
++não é modificado. Não introduzir ObjectInputStream ou dependências runtime.
++
++## 4. Bytes fixos UDP v1, separados do controlo TCP v2
++
++Tudo big-endian. Cada buffer representa o datagrama UDP de aplicação, sem prefixo
++de framing TCP e sem contar IP/UDP. TCP permanece v2/19 tipos/código3 rejeitado;
++UDP OTT1 permanece **version1**,flags0,header64,payload≤1136,total≤1200.
++Uma configuração não altera estes bytes/caps.
++
++| Offset | Bytes | Campo/invariante |
++|---:|---:|---|
++| 0 | 4 | magic ASCII OTT1 |
++| 4 | 1 | version=1 |
++| 5 | 1 | flags=0; reservadas rejeitadas |
++| 6 | 2 | headerLength u16=64 |
++| 8 | 16 | streamId UUID; todos os bits preservados |
++| 24 | 16 | sessionId UUID=serverEpoch |
++| 40 | 8 | frameSeq i64 não negativo |
++| 48 | 8 | mediaTimeUs i64 não negativo, timeline relativa |
++| 56 | 4 | frameLength u32,1..2097152 |
++| 60 | 2 | fragmentIndex u16,0..count−1 |
++| 62 | 2 | fragmentCount u16,1..1847 |
++| 64 | variável | payload exato,1..1136 |
++
++O codec valida sintaxe, não autentica UUID/endpoint nem determina sessão ativa.
++Comparação com HELLO/upstream/época e monotonias entre datagramas pertencem aos
++consumidores posteriores. Um datagrama não cria procura/rota ou renova lease.
++mediaTimeUs não é UTC/latência unilateral. JPEG é opaco; bytes sintéticos válidos
++não precisam de ser uma imagem. Fonte de cinco dígitos tem cap99999 em IMPs
++posteriores; codec aceita até2MiB, sem confundir limites de container e protocolo.
++
++## 5. Fragmentação, offsets e ordem de validação
++
++Com L já validado entre1 e2097152:
++count=1+(L−1)/1136; offset=index×1136 calculado com aritmética verificada;
++expectedPayload=min(1136,L−offset). count tem de coincidir exatamente com a
++fórmula. Todos os fragmentos exceto o último têm1136; último tem resto positivo,
++incluindo1136 quando L é múltiplo. No máximo2MiB:1847 fragmentos,último payload96.
++Identidades/seq/mediaTime/frameLength/count são comuns, índice0..count−1.
++
++Decoder:
++
++1 - Validar array/região sem overflow e comprimento65..1200 antes de ler campos.
++    Backing array maior é permitido só no overload com uma região válida;
++    encode/decode de datagrama inteiro nunca ignora bytes extra.
++2 - Ler magic,versão,flags,header e escalares com acessos limitados à região.
++3 - Converter unsigned corretamente; validar seq/time,frameLength,count,index,
++    count calculado,offset e payload/tamanho total exatos,sem wrap/truncagem.
++4 - Só depois criar o valor/cópia de payload limitada a1136. Nunca alocar um
++    frame/buffer com comprimento escolhido por metadados ainda não validados.
++
++Encoder valida valor e tamanho exato antes de criar datagrama limitado a1200.
++Fragmentação valida IDs,seq/time e tamanho real do array antes da lista/payloads;
++lista≤1847 e soma dos payloads≤2MiB. Sem fila ilimitada, montagens ou buffers por
++frame declarado em decode. Revisão de código confirma a ordem; rejeição de campos
++forjados é prova adicional, não uma medição de heap inventada.
++
++## 6. V-019 — oráculos planeados, ainda não executados em Java
++
++16 vetores UDP preservados,4 positivos e12 negativos. Ler os binários/hex e
++manifesto independentes; expectativas nunca geradas pelo encoder de produção.
++Cada grupo abaixo é um conjunto de casos, não promessa de contagem JUnit.
++
++| ID local | Exercício/asserções |
++|---|---|
++| U01 | Quatro positivos: decode confere todos os campos/payloads e encode do modelo esperado coincide com bin/hex golden, byte a byte |
++| U02 | Doze negativos existentes rejeitados pelas condições documentadas; nenhum byte/expected alterado para obter verde |
++| U03 | Offsets0..64,big-endian,UUID com bits altos preservados; seq/time0 e extremos válidos; literais adicionais independentes no teste |
++| U04 | Tamanhos de frame1,1135,1136,1137,2272,2273,99999,2097151,2097152; rejeitar0 e2097153; máximo1847/último96 |
++| U05 | Recombinação independente de payloads recupera exatamente o frame,padrão sintético conhecido,sem bytes perdidos/duplicados; datagramas≤1200 |
++| U06 | Campos hostis: u32 elevados/overflow,count0/incoerente/index fora da gama,seq/time negativos,versão2,flags/header inválidos,payload curto/extra |
++| U07 | Overload de região com prefixo/sufixo e offset não nulo; limites e overflow de offset/length; array maior não muda cap da região |
++| U08 | Cópias defensivas nos dois sentidos e lista imutável; inputs/outputs mutados não alteram o pacote; rejeição antes de cópias dependentes de metadados |
++
++Round-trip apenas complementar. Fronteiras de fragmentação/UUID/campos não são
++substituídas por round-trip. Sem JPEG real,frame assembler,socket ou relógio/
++transporte falso desnecessários num codec puro. Protocolos TCP/UDP testados como
++versões distintas, sem tocar MessageCodec/fixtures TCP.
++
++## 7. Sequência e condições de fecho futuras
++
++1 - Plan formal: guardar este artefacto,estado/evidência e patch autorizado;
++    executar apenas V-ADD/auditoria documental,preservar diff/hashes; parar.
++2 - Implement só após aprovação/autorização: tipos e testes significativos,
++    demonstração de falhas adequadas e comportamentos incrementais nos dois
++    ficheiros,sem enfraquecer históricos. Reapresentar Implement antes de Test.
++3 - Test só após autorização: V-019 executado,regressão JDK21 e clean verify,
++    logs/XML/JAR/hash e manual humano reproduzível com evidência/operador.
++4 - Fecho apenas com testes/validações,manual humano,revisão final Denji e
++    integração comprovados,conforme autorização do utilizador/DoD. Sem gates
++    externos adicionais no IMP-016. Sem alegar GUI/CORE/vídeo entregue por codec.
++
++Os1459 testes registados na base/DEMO/fechos anteriores são históricos,não testes
++atuais do IMP-016. Não foi executado Maven,JUnit ou Java nesta etapa.
++
++## 8. Registo local e patch autorizado
++
++IMP-016-LOCAL-01 — coordenação: utilizador confirmou colega fora deste diretório
++e autorizou ramo imp-016-udp na base b6de848. Separação local satisfeita;
++numeração global continua por coordenar. Apenas IDs locais,sem reserva Q-C.
++
++IMP-016-LOCAL-02 — ligação fictícia no template DDD: patch exato de uma linha
++aplicado por autorização explícita: representar o destino fictício como caminho
++literal em backticks,no exemplo JWT da linha551. Não altera validador/âmbito,
++não cria ADR fictícia e não altera wire. **RESOLVIDA** após V-ADD pós-patch
++com0 erros; negativo anterior preservado. [Patch/evidência](../../../experiments/construction/010-video/plan-01/README.md).
++
++Parar no checkpoint Plan formal: status in-progress,current_stage=plan,
++stages_completed=[],nenhum critério de aceitação marcado como cumprido.
++Sem Java/Implement/Test/staging/commits/push. Main preservado na base.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+new file mode 100644
+index 0000000..e0b69c7
+--- /dev/null
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+@@ -0,0 +1,14 @@
++# Construction log — unidade005-video
++
++## IMP-016 / 010-video — Plan formal preparado
++
++Registo 2026-11-23T14:41:11Z: utilizador aceitou tecnicamente proposta/API/imutabilidade/
++validação/oráculos; autorizou gravação de Plan/documentação/evidência e patch
++exato de uma linha no template,após confirmar colega fora deste diretório.
++Ramo imp-016-udp criado explicitamente a partir de b6de848; main conserva esse ref.
++[Plan](../../../../bolts/010-video/implementation-plan.md) formal por aprovar;
++sem etapas concluídas,Implement/Test/Java/testes Java/staging/commits/push.
++Dependência009-arvores/unidade004/PHASE-04 fechada; DEMO-001 é apoio separado,
++não um gate. demo/artefactos/negativos preservados. IDs IMP-016-LOCAL,sem reserva
++Q-C global. [V-ADD/diff/preservação](../../../../../experiments/construction/010-video/plan-01/README.md).
++V-019 e regressão/manual/revisão/integração futuros,sem gates externos adicionais.

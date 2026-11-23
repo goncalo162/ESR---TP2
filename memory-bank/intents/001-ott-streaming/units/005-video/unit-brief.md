@@ -1,11 +1,11 @@
 ---
 unit: "005-video"
 intent: "001-ott-streaming"
-phase: "inception"
+phase: "construction"
 source_phase: "PHASE-05"
-status: "ready"
+status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T20:54:11Z"
+updated: "2026-11-23T14:41:11Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
@@ -14,6 +14,13 @@ requires_units: ["004-arvores"]
 # Unidade — 005-video
 
 Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+
+Estado atual: in-progress apenas pelo [Plan do IMP-016/010-video](../../../../bolts/010-video/implementation-plan.md)
+aprovado; Implement aprovado,Test/manual Francisco24 aprovados e revisão Denji confirmada; integração pendente. Dependência004-arvores/PHASE-04 complete/DONE.
+Restantes histórias planned,sem execução. DEMO-001 é apoio separado e não bloqueia
+esta unidade. Codec em validação Test, streaming futuro; clean verify1537/0/0/0,22 XML. Sem
+staging/commits/push. Fecho da unidade não é antecipado.
+
 
 ## Requisitos atribuídos
 
