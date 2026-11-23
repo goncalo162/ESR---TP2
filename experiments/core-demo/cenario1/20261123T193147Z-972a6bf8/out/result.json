@@ -1,0 +1,105 @@
+{
+ "finishedAt": "2026-11-23T19:32:39.384380+00:00",
+ "verdict": "FAIL",
+ "transport": "CORE coreemu (gRPC), netem via edit_link, JVM por n\u00f3 em namespace",
+ "scenario": "cenario1",
+ "session": 1,
+ "checks": [
+  {
+   "at": "2026-11-23T19:31:48.374904+00:00",
+   "check": "core-connectivity-client-to-server",
+   "passed": true,
+   "detail": "ok"
+  },
+  {
+   "at": "2026-11-23T19:31:49.011464+00:00",
+   "check": "bootstrap-running",
+   "passed": true,
+   "detail": "pid=24"
+  },
+  {
+   "at": "2026-11-23T19:31:50.309366+00:00",
+   "check": "all-configured-edges-ACTIVE",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T19:31:50.425883+00:00",
+   "check": "real-RTT-and-catalog",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T19:31:50.425974+00:00",
+   "check": "discovery-observed-ACTIVE-neighbors-v2",
+   "passed": true,
+   "detail": "neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap"
+  },
+  {
+   "at": "2026-11-23T19:32:34.123997+00:00",
+   "check": "production-CLI-exit0",
+   "passed": false,
+   "detail": "OttApplication.main no mesmo JAR e perfil; quit\u2192SHUTDOWN no log; sa\u00edda for\u00e7ada (SIGTERM/SIGKILL) ap\u00f3s 20s no CORE"
+  },
+  {
+   "at": "2026-11-23T19:32:39.250116+00:00",
+   "check": "run-completed",
+   "passed": false,
+   "detail": "production-CLI-exit0"
+  }
+ ],
+ "processes": {
+  "S1": {
+   "pid": "213",
+   "alive": true,
+   "gen": 1
+  },
+  "R1": {
+   "pid": "220",
+   "alive": true,
+   "gen": 1
+  },
+  "C1": {
+   "pid": "164",
+   "alive": true,
+   "gen": 1
+  },
+  "C2": {
+   "pid": "2725",
+   "alive": true,
+   "gen": 1
+  },
+  "BOOT": {
+   "pid": "224",
+   "alive": true,
+   "gen": 1
+  }
+ },
+ "leftoverProcesses": [
+  {
+   "Servidor": "235"
+  },
+  {
+   "Router1": "231"
+  },
+  {
+   "Cliente2": "2736"
+  },
+  {
+   "Cliente1": "175"
+  }
+ ],
+ "evidence": {
+  "pcap": "out/wire.pcap",
+  "snapshots": "out/snapshots/",
+  "logs": "logs/"
+ },
+ "outsideScope": [
+  "UDP",
+  "MJPEG",
+  "video",
+  "Swing player",
+  "PHASE-05..07"
+ ],
+ "note": "Contagem de frames de controlo (HELLO/ACTIVATE/SUBSCRIPTION_RENEW/DEACTIVATE) n\u00e3o \u00e9 descodificada no CORE; preservada como pcap cru e substitu\u00edda por estado observado em snapshots + contadores de interface."
+}

@@ -1,0 +1,12 @@
+SESSION 1 RUNTIME nodes=4 links=3
+CHECK_PASS core-connectivity-client-to-server ok
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_FAIL production-CLI-exit0 OttApplication.main no mesmo JAR e perfil
+DEMO_FAIL production-CLI-exit0
+RESULT FAIL
+
+---STDERR---

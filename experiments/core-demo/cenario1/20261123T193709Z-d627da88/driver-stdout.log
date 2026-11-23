@@ -1,0 +1,36 @@
+SESSION 1 RUNTIME nodes=4 links=3
+CHECK_PASS core-connectivity-client-to-server ok
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk source has one confirmed downstream for multiple clients
+CHECK_PASS two-stream-intent-isolation C1 só A; C2 A+B
+CHECK_PASS trace-before-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "8261e030-9833-4392-812f-691c3628cef4", "serverEpoch": "da7e0721-c664-42af-9110-7b394a3a6db0", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "R1", "S1"], "elapsedNanos": 10559274}}
+CHECK_PASS lease-renewed-past-original-6s intents confirmados para lá do grant original de 6s
+CHECK_PASS renewal-on-real-wire contadores de interface / pcap em out/wire.pcap durante a janela de renew
+CHECK_PASS quality-mapped-to-cenario2 cenario1 tem um caminho configurado; switch RTT no cenario2
+CHECK_PASS candidate-cache-before-failure [{"nodeId": "C2", "state": "AVAILABLE", "endpoint": {"nodeId": "C2", "host": "10.0.1.20", "controlPort": 43097, "dataPort": 43098, "role": "CLIENT"}, "sources": [{"source": {"nodeId": "R1", "instanceI
+CHECK_PASS bootstrap-stopped pid=24
+CHECK_PASS SIGKILL-R1 JVM pid=85 terminada
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap sem nova subscrição nem restart do cliente; bootstrap parado
+CHECK_PASS trace-after-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "e41c92ad-70b5-4e95-a9c5-9d50772dd0ea", "serverEpoch": "da7e0721-c664-42af-9110-7b394a3a6db0", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "S1"], "elapsedNanos": 3817823}}
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished só o JVM novo faz descoberta inicial; a reparação sem bootstrap foi observada antes
+CHECK_PASS one-client-exits-other-preserved cancel A em C1 preserva C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-state-observed forwarding A removido após último consumidor e B após morte real do cliente; frames DEACTIVATE preservados no pcap (não descodificados no CORE)
+Guião concluído
+RESULT PASS
+
+---STDERR---

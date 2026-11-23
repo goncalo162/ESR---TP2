@@ -1,0 +1,13 @@
+SESSION 1 RUNTIME nodes=6 links=6
+CHECK_FAIL core-connectivity-client-to-server fail
+DEMO_FAIL core-connectivity-client-to-server
+
+---STDERR---
+Traceback (most recent call last):
+  File "/volume/ott/20261123T193750Z-1a20d186/driver.py", line 749, in <module>
+    main()
+  File "/volume/ott/20261123T193750Z-1a20d186/driver.py", line 743, in main
+    success = drv.finish(success and all(c["passed"] for c in drv.checks))
+  File "/volume/ott/20261123T193750Z-1a20d186/driver.py", line 696, in finish
+    for cid, ch in list(self.children.items()) + [("BOOT", self.boot)]:
+AttributeError: 'Driver' object has no attribute 'boot'

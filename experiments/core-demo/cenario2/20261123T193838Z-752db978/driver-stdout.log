@@ -1,0 +1,47 @@
+SESSION 1 RUNTIME nodes=6 links=6
+CHECK_PASS core-connectivity-client-to-server ping C1→10.0.0.20
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk source has one confirmed downstream for multiple clients
+CHECK_PASS two-stream-intent-isolation C1 só A; C2 A+B
+CHECK_PASS trace-before-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "1adb9692-1a8a-4fef-a0d4-12862728ee9e", "serverEpoch": "cf9eacd7-2cb3-48f6-8556-1904b6791a01", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "R2", "R1", "S1"], "elapsedNanos": 15291553}}
+CHECK_PASS lease-renewed-past-original-6s intents confirmados para lá do grant original de 6s
+CHECK_PASS renewal-on-real-wire contadores de interface / pcap em out/wire.pcap durante a janela de renew
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DEMO_FAIL <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.UNKNOWN
+	details = "Exception calling application: there is no link for node(Router1):interface(0) node(Router2):interface(0)"
+	debug_error_string = "UNKNOWN:Error received from peer  {created_time:"2026-11-23T19:39:09.721383428+00:00", grpc_status:2, grpc_message:"Exception calling application: there is no link for node(Router1):interface(0) node(Router2):interface(0)"}"
+>
+RESULT FAIL
+
+---STDERR---
+Traceback (most recent call last):
+  File "/volume/ott/20261123T193838Z-752db978/driver.py", line 734, in main
+    while drv.next_stage():
+  File "/volume/ott/20261123T193838Z-752db978/driver.py", line 681, in next_stage
+    stages[self.stage_no]()
+  File "/volume/ott/20261123T193838Z-752db978/driver.py", line 587, in quality
+    self.set_delay(edge, 120)
+  File "/volume/ott/20261123T193838Z-752db978/driver.py", line 351, in set_delay
+    ok = self.client.edit_link(self.session, link)
+  File "/opt/core/daemon/core/api/grpc/client.py", line 636, in edit_link
+    response = self.stub.EditLink(request)
+  File "/opt/core/venv/lib/python3.10/site-packages/grpc/_channel.py", line 1181, in __call__
+    return _end_unary_response_blocking(state, call, False, None)
+  File "/opt/core/venv/lib/python3.10/site-packages/grpc/_channel.py", line 1006, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.UNKNOWN
+	details = "Exception calling application: there is no link for node(Router1):interface(0) node(Router2):interface(0)"
+	debug_error_string = "UNKNOWN:Error received from peer  {created_time:"2026-11-23T19:39:09.721383428+00:00", grpc_status:2, grpc_message:"Exception calling application: there is no link for node(Router1):interface(0) node(Router2):interface(0)"}"
+>

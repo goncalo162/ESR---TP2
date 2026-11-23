@@ -1,0 +1,54 @@
+{
+ "runId": "20261123T193838Z-752db978",
+ "scenario": "cenario2",
+ "stageDir": "/volume/ott/20261123T193838Z-752db978",
+ "xml": "/root/.coregui/xmls/topologies/cenario2.xml",
+ "deviceMap": {
+  "Servidor": "S1",
+  "Router1": "R1",
+  "Router2": "R2",
+  "Router3": "R3",
+  "Cliente1": "C1",
+  "Cliente2": "C2"
+ },
+ "deviceIp": {
+  "Router1": "10.0.3.1",
+  "Servidor": "10.0.0.20",
+  "Router3": "10.0.5.1",
+  "Router2": "10.0.4.1",
+  "Cliente1": "10.0.4.20",
+  "Cliente2": "10.0.5.20"
+ },
+ "serverIp": "10.0.0.20",
+ "scenarioProps": {
+  "nodes": "S1,R1,R2,R3,C1,C2",
+  "servers": "S1",
+  "clients": "C1,C2",
+  "edges": "S1-R1,R1-R2,R1-R3,R2-R3,R2-C1,R3-C2",
+  "kill": "R2",
+  "observer": "C1",
+  "quality.node": "R2",
+  "quality.edge": "R1-R2",
+  "quality.alternative": "R3",
+  "delay.R1-R2": "4",
+  "delay.R1-R3": "4",
+  "delay.R2-R3": "20"
+ },
+ "roles": {
+  "S1": "SERVER",
+  "R1": "RELAY",
+  "R2": "RELAY",
+  "R3": "RELAY",
+  "C1": "CLIENT",
+  "C2": "CLIENT"
+ },
+ "delaysMs": {
+  "R1-R2": 4,
+  "R1-R3": 4,
+  "R2-R3": 20
+ },
+ "gitHead": "a7c07892456a1bf916f062ffc7fa96ffb51a6011",
+ "jdk": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+ "jarSha256": "dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f",
+ "sourceRun": "experiments/checkpoint-phase04/runs/cenario2/20261123T151525Z-1b1daa64"
+}
