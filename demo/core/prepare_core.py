@@ -67,30 +67,20 @@ def write_props(path, props, comment):
     Path(path).write_text("\n".join(lines) + "\n")
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--scenario", required=True, choices=sorted(DEVICE_MAP))
-    ap.add_argument("--run", required=True, help="id da run em runs/<cenario>/")
-    ap.add_argument("--runs-dir", default="experiments/checkpoint-phase04/runs")
-    ap.add_argument("--xml", required=True)
-    ap.add_argument("--jar", required=True)
-    ap.add_argument("--out", required=True)
-    ap.add_argument("--classes", default="demo/.classes", help="classes do adaptador DemoNode")
-    args = ap.parse_args()
-
-    root = Path(__file__).resolve().parents[2]
-    run_dir = root / args.runs_dir / args.scenario / args.run
+def build_deployment(root, scenario, run_dir, xml_path, jar, classes, out):
+    """Gera o deployment na pasta out; devolve o manifest. Reutilizado por run_core.py."""
+    run_dir = Path(run_dir)
     cfg = run_dir / "config"
     if not cfg.is_dir():
         raise SystemExit(f"config da run não encontrada: {cfg}")
 
-    name_to_ip, edges = parse_xml(root / args.xml)
-    mapping = DEVICE_MAP[args.scenario]
+    name_to_ip, edges = parse_xml(xml_path)
+    mapping = DEVICE_MAP[scenario]
     missing = [d for d in mapping if d not in name_to_ip]
     if missing:
-        raise SystemExit(f"dispositivos em falta no XML {args.xml}: {missing}")
+        raise SystemExit(f"dispositivos em falta no XML {xml_path}: {missing}")
 
-    out = Path(args.out)
+    out = Path(out)
     (out / "nodes").mkdir(parents=True, exist_ok=True)
 
     # topologia da run -> IPs CORE
@@ -129,9 +119,11 @@ def main():
         "\n".join(f"{k}={v}" for k, v in sorted(out_topo.items())) + "\n")
     for extra in ("streams.properties",):
         (out / extra).write_text((cfg / extra).read_text())
+        # os perfis em nodes/ resolvem streams.file relativamente à própria pasta
+        (out / "nodes" / extra).write_text((cfg / extra).read_text())
 
-    jar = (root / args.jar).resolve()
-    classes = (root / args.classes).resolve()
+    jar = Path(jar).resolve()
+    classes = Path(classes).resolve()
     cp = f"{jar}:{classes}"
     commands = {"BOOT": f"java -cp {jar} pt.uminho.esr.ott.app.OttApplication --role BOOTSTRAP --config BOOT.properties"}
     for node in node_ids:
@@ -139,9 +131,9 @@ def main():
         commands[node] = (f"java -cp {cp} pt.uminho.esr.ott.overlay.DemoNode nodes/{node}.properties {role}"
                           f"   # ou CLI: java -cp {jar} pt.uminho.esr.ott.app.OttApplication --role {role} --config nodes/{node}.properties")
     manifest = {
-        "scenario": args.scenario,
-        "sourceRun": str(run_dir.relative_to(root)),
-        "xml": args.xml,
+        "scenario": scenario,
+        "sourceRun": str(run_dir.relative_to(root)) if str(run_dir).startswith(str(root)) else str(run_dir),
+        "xml": str(xml_path),
         "deviceMap": mapping,
         "deviceIp": name_to_ip,
         "coreEdges": edges,
@@ -154,16 +146,34 @@ def main():
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
     (out / "README.md").write_text(
-        f"# Deployment no CORE — {args.scenario} (run {args.run})\n\n"
-        f"1. No CORE GUI, abrir a topologia `{args.xml}` e confirmar IPs (manifest.json → deviceIp).\n"
-        f"2. Copiar esta pasta para `CORE/volume/ott/{args.scenario}/` (volume montado em /volume).\n"
+        f"# Deployment no CORE — {scenario} (run {run_dir.name})\n\n"
+        f"1. No CORE GUI, abrir a topologia `{xml_path}` e confirmar IPs (manifest.json → deviceIp).\n"
+        f"2. Copiar esta pasta para `CORE/volume/ott/{scenario}/` (volume montado em /volume).\n"
         f"3. No host de {server_node} ({server_ip}): arrancar o bootstrap (comando em manifest.json → BOOT).\n"
-        f"4. Em cada nó: `cd /volume/ott/{args.scenario} && <comando do manifest.json para o nó>`.\n"
+        f"4. Em cada nó: `cd /volume/ott/{scenario} && <comando do manifest.json para o nó>`.\n"
         f"5. Validar com a CLI real (`OttApplication`) ou com o adaptador DemoNode (subscribe/trace/snapshot).\n"
         f"6. Recolher logs em experiments/ segundo docs/09-TESTING-STRATEGY.md.\n\n"
         f"Gerado por prepare_core.py; ver demo/GUIA-DEMO.md para o guia completo.\n")
+    return manifest
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--scenario", required=True, choices=sorted(DEVICE_MAP))
+    ap.add_argument("--run", required=True, help="id da run em runs/<cenario>/")
+    ap.add_argument("--runs-dir", default="experiments/checkpoint-phase04/runs")
+    ap.add_argument("--xml", required=True)
+    ap.add_argument("--jar", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--classes", default="demo/.classes", help="classes do adaptador DemoNode")
+    args = ap.parse_args()
+
+    root = Path(__file__).resolve().parents[2]
+    manifest = build_deployment(root, args.scenario, root / args.runs_dir / args.scenario / args.run,
+                                root / args.xml, root / args.jar, root / args.classes, args.out)
+    out = Path(args.out)
     print(f"OK {out}")
-    print(json.dumps({"server": manifest["server"], "nodes": {n: name_to_ip[next(d for d, m in mapping.items() if m == n)] for n in node_ids}}, indent=1))
+    print(json.dumps({"server": manifest["server"], "nodes": manifest["deviceIp"]}, indent=1))
 
 
 if __name__ == "__main__":
