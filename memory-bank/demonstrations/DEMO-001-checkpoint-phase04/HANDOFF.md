@@ -1,7 +1,7 @@
 # Retoma — DEMO-001-checkpoint-phase04 (iteração 2 concluída)
 
-**Estado: critérios de aceitação do bolt cumpridos na versão congelada
-`23ddc9a`; demonstração pronta para validação/aceitação. PHASE-05–07
+**Estado: critérios de aceitação do bolt cumpridos na série formal congelada
+`8303c0b`;demonstração pronta para validação/aceitação. PHASE-05–07
 continuam TODO — não foram iniciadas.** Todas as runs FAIL (antigas e novas)
 preservadas; nenhum resultado antigo foi reescrito para PASS.
 

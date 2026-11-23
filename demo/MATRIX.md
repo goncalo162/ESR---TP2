@@ -1,7 +1,7 @@
 # Funcionalidade → demonstração → evidência
 
 Esta matriz é uma base para o artigo, não uma declaração de avaliação CORE ou
-vídeo. Execuções de 2026-11-23 em `8303c0b`/`63d0c97` (JAR `dc192971…`; código demo idêntico entre elas).
+vídeo. Execuções de 2026-11-23 na série formal congelada `8303c0b` e no HEAD final `63d0c97` (JAR `dc192971…` inalterado em ambas; o código demo difere só nos prazos de convergência e na espera do oráculo de trace).
 Runs FAIL e limitações preservadas no [handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
 
 | Funcionalidade concluída | Onde observar | Teste/evidência e limite |

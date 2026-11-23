@@ -1,4 +1,4 @@
-# Checkpoint OTT — demonstração validada (versão congelada `23ddc9a`)
+# Checkpoint OTT — demonstração validada (série formal congelada `8303c0b`)
 
 Demonstração do plano de controlo concluído na PHASE-04, executada e repetida
 em 2026-11-23: 3 PASS consecutivas de cada cenário na versão congelada
@@ -119,8 +119,10 @@ Em `experiments/checkpoint-phase04/runs/<cenario>/<utc-id>/`: manifest.json
 (commit/JDK/JAR), tool-source/ e tool-sha256.json nas versões recentes,
 config/, validation.log, wire.jsonl com frames descodificados sem alteração,
 logs por JVM, snapshots por passo, latest.json, dashboard.html e result.json
-com checks/PIDs/saídas/portas. `controller.log` é copiado nas execuções desta
-iteração. Não apagar runs FAIL.
+com checks/PIDs/saídas/portas. Nas execuções da iteração 2 o output do controlador fica nos logs das séries
+(`experiments/checkpoint-phase04/series-*.log`); duas runs interrompidas por
+operador (`3206fc30`, `3b24ba01`) não têm `result.json` e estão preservadas sem
+verdict. Não apagar runs FAIL.
 
 `quit`, EOF e SIGTERM do controlador acionam a limpeza; só são terminados
 processos que a ferramenta criou. SIGKILL do próprio controlador não executa

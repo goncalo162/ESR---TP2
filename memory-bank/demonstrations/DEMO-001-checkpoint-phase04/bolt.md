@@ -2,7 +2,7 @@
 id: "DEMO-001-checkpoint-phase04"
 type: "simple-construction-bolt"
 category: "demonstration-support"
-status: "in-progress"  # aguardando validação externa; critérios cumpridos em 23ddc9a
+status: "in-progress"  # aguardando validação externa; critérios cumpridos em 8303c0b (série formal)
 functional_increment: false
 source_phase: null
 demonstrated_phases: ["PHASE-01", "PHASE-02", "PHASE-03", "PHASE-04"]
