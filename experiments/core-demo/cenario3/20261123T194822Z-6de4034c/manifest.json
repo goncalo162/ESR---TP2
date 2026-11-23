@@ -1,0 +1,187 @@
+{
+ "scenario": "cenario3",
+ "sourceRun": "experiments/checkpoint-phase04/runs/cenario3/20261123T152923Z-e135a4d5",
+ "xml": "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/CORE/topologies/cenario3.xml",
+ "deviceMap": {
+  "Servidor": "O1",
+  "Router1": "O2",
+  "Router2": "O3",
+  "Router3": "O5",
+  "Router4": "O6",
+  "Router5": "O7",
+  "Cliente1": "O4",
+  "Cliente2": "O8",
+  "Cliente3": "O9",
+  "Cliente4": "O10",
+  "Cliente5": "O11"
+ },
+ "deviceIp": {
+  "Cliente1": "10.0.0.20",
+  "Servidor": "10.0.0.21",
+  "Cliente2": "10.0.1.20",
+  "Cliente3": "10.0.1.21",
+  "Cliente4": "10.0.2.20",
+  "Cliente5": "10.0.2.21",
+  "Cliente6": "10.0.3.20",
+  "Cliente7": "10.0.3.21",
+  "Cliente8": "10.0.4.20",
+  "Cliente9": "10.0.4.21",
+  "Router10": "10.0.18.2",
+  "Router3": "10.0.17.2",
+  "Router5": "10.0.14.2",
+  "Router8": "10.0.13.2",
+  "Router1": "10.0.9.1",
+  "Router9": "10.0.20.2",
+  "Router2": "10.0.19.2",
+  "Router4": "10.0.12.1",
+  "Router7": "10.0.16.1",
+  "Router6": "10.0.20.1"
+ },
+ "coreEdges": [
+  [
+   "Cliente1",
+   "15"
+  ],
+  [
+   "15",
+   "Servidor"
+  ],
+  [
+   "Cliente2",
+   "13"
+  ],
+  [
+   "13",
+   "Cliente3"
+  ],
+  [
+   "Cliente4",
+   "11"
+  ],
+  [
+   "11",
+   "Cliente5"
+  ],
+  [
+   "12",
+   "Cliente6"
+  ],
+  [
+   "12",
+   "Cliente7"
+  ],
+  [
+   "Cliente8",
+   "14"
+  ],
+  [
+   "14",
+   "Cliente9"
+  ],
+  [
+   "14",
+   "Router10"
+  ],
+  [
+   "13",
+   "Router3"
+  ],
+  [
+   "11",
+   "Router5"
+  ],
+  [
+   "12",
+   "Router8"
+  ],
+  [
+   "15",
+   "Router1"
+  ],
+  [
+   "Router8",
+   "Router5"
+  ],
+  [
+   "Router8",
+   "Router10"
+  ],
+  [
+   "Router10",
+   "Router9"
+  ],
+  [
+   "Router9",
+   "Router1"
+  ],
+  [
+   "Router1",
+   "Router2"
+  ],
+  [
+   "Router2",
+   "Router3"
+  ],
+  [
+   "Router3",
+   "Router4"
+  ],
+  [
+   "Router4",
+   "Router5"
+  ],
+  [
+   "Router7",
+   "Router8"
+  ],
+  [
+   "Router7",
+   "Router5"
+  ],
+  [
+   "Router7",
+   "Router10"
+  ],
+  [
+   "Router7",
+   "Router3"
+  ],
+  [
+   "Router6",
+   "Router3"
+  ],
+  [
+   "Router6",
+   "Router10"
+  ],
+  [
+   "Router6",
+   "Router2"
+  ],
+  [
+   "Router6",
+   "Router9"
+  ]
+ ],
+ "server": {
+  "node": "O1",
+  "ip": "10.0.0.21"
+ },
+ "jar": "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar",
+ "jarSha256": "dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f",
+ "commands": {
+  "BOOT": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role BOOTSTRAP --config BOOT.properties",
+  "O1": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O1.properties SERVER   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role SERVER --config nodes/O1.properties",
+  "O2": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O2.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/O2.properties",
+  "O3": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O3.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/O3.properties",
+  "O4": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O4.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/O4.properties",
+  "O5": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O5.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/O5.properties",
+  "O6": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O6.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/O6.properties",
+  "O7": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O7.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/O7.properties",
+  "O8": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O8.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/O8.properties",
+  "O9": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O9.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/O9.properties",
+  "O10": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O10.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/O10.properties",
+  "O11": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/O11.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/O11.properties"
+ },
+ "note": "Control-plane only. Video/UDP/player is PHASE-05 (TASK-019..024) and not part of this demo. Copy this folder to CORE/volume/ott/<scenario>/ and run the commands on each CORE device."
+}

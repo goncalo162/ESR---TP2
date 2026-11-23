@@ -1,5 +1,44 @@
 # Progresso do projeto
 
+**Retoma do checkpoint — 2026-11-23T15:35:00Z (iteração 2 do DEMO-001):**
+bolt de apoio [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md)
+com critérios cumpridos na versão congelada `8303c0b`/HEAD `63d0c97` (branch Waheed): builds
+inicial/final `mvn -B -ntp clean verify` JDK21 **1459/0/0/0, 21 XML**, JAR
+`dc192971…` idêntico; cenário1 **3/3 PASS consecutivas** (33 checks), cenário2
+**4 PASS consecutivas** (39 checks, troca por qualidade com STARTED→SUCCESS e
+  publicação atómica, pulso sem oscilação, morte real de relay + recuperação sem
+  bootstrap, reinício, poda e procura abandonada) com 2 FAIL posteriores
+  preservados (corrida residual do sistema na 1.ª tentativa do switch, ~20%
+  das runs); cenário3 (11 nós da Figura 1) **PASS completo** (39 checks).
+  Todas as runs com processos terminados e portas reutilizáveis; runs FAIL
+  antigas e novas preservadas; só a ferramenta em demo/ foi alterada (commits
+  `94300b2`…`23ddc9a`), sem tocar em produção/testes/CORE. Causas dos negativos
+  (NO_ROUTE da CLI = corrida de prontidão; falha do switch = corrida do JAR)
+  estabelecidas em [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).
+  R17 histórico continua sem causa estabelecida. PHASE-01–04 DONE e PHASE-05–07 TODO
+  mantidos; a demo aguarda validação externa e não é aprovação docente. [Handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
+  · [DEMO.md](../demo/DEMO.md) · [MATRIZ](../demo/MATRIX.md).
+
+**Ferramenta demo→CORE preparada — 2026-11-23T16:10:00Z:** `demo/core/prepare_core.py`
+gera artefactos de deployment no CORE (perfis por nó com IPs de
+`CORE/topologies/cenario{1,2,3}.xml`, bootstrap no servidor, manifesto e
+comandos) a partir de uma run local; guia em `demo/GUIA-DEMO.md`.
+
+**Demo executada no CORE (plano de controlo) — 2026-11-23T19:51:00Z:**
+`demo/core/run_core.py` (host) + `demo/core/driver.py` (dentro do contentor
+`core`, daemon gRPC) criam a sessão a partir dos XML do CORE, arrancam
+bootstrap + uma JVM `DemoNode` por nó no namespace de cada dispositivo e
+correm o guião de 6 passos com a CLI real (`OttApplication`); a troca por
+qualidade usa `edit_link`/netem e o kill é SIGKILL real no JVM do nó.
+**PASS em cenario1 (2× consecutivos), cenario2 e cenario3** — evidência em
+`experiments/core-demo/cenario{1,2,3}/2026*/` (result.json, snapshots,
+production-cli.log, wire.pcap, actions.jsonl). Guia: `demo/GUIA-DEMO.md` §5.
+Isto não é a validação formal PHASE-06 (gate: PHASE-05 DONE) nem PHASE-07.
+**PHASE-05–07 continuam TODO**: PHASE-05 é incremento funcional de vídeo
+(TASK-019–024, com os seus próprios bolts/revisores) e é gate da PHASE-06; a
+PHASE-07 depende de informação docente (G-ASSESSMENTS) e de submissão externa
+autorizada. Nada disso foi executado ou submetido. Só a ferramenta em `demo/`
+foi alterada; produção/testes/CORE intocados.
 **IMP-016 / 010-video / TASK-019 — concluído:** integrado localmente em main72c9f92;
 bolt/história complete,implemented=true,TASK-019 DONE por autorização de fecho.
 [Fecho](../memory-bank/bolts/010-video/closure-walkthrough.md),

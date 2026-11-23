@@ -1,0 +1,276 @@
+{
+ "finishedAt": "2026-11-23T21:43:49.693522+00:00",
+ "verdict": "PASS",
+ "transport": "CORE coreemu (gRPC), netem via edit_link, JVM por n\u00f3 em namespace",
+ "scenario": "cenario2",
+ "session": 1,
+ "checks": [
+  {
+   "at": "2026-11-23T21:42:47.260729+00:00",
+   "check": "core-connectivity-client-to-server",
+   "passed": true,
+   "detail": "ping C1\u219210.0.0.20"
+  },
+  {
+   "at": "2026-11-23T21:42:47.914663+00:00",
+   "check": "bootstrap-running",
+   "passed": true,
+   "detail": "pid=24"
+  },
+  {
+   "at": "2026-11-23T21:42:49.763661+00:00",
+   "check": "all-configured-edges-ACTIVE",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:42:54.872308+00:00",
+   "check": "real-RTT-and-catalog",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:42:54.872435+00:00",
+   "check": "discovery-observed-ACTIVE-neighbors-v2",
+   "passed": true,
+   "detail": "neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap"
+  },
+  {
+   "at": "2026-11-23T21:42:57.509794+00:00",
+   "check": "production-CLI-exit0",
+   "passed": true,
+   "detail": "OttApplication.main no mesmo JAR e perfil; quit\u2192SHUTDOWN no log; sa\u00edda natural"
+  },
+  {
+   "at": "2026-11-23T21:42:57.521181+00:00",
+   "check": "production-CLI-diagnostics-and-play",
+   "passed": true,
+   "detail": "logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED"
+  },
+  {
+   "at": "2026-11-23T21:42:57.521237+00:00",
+   "check": "production-CLI-trace-terminal-recorded",
+   "passed": true,
+   "detail": "TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK"
+  },
+  {
+   "at": "2026-11-23T21:42:58.782123+00:00",
+   "check": "CLI-check-returned-to-tool-adapter",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:42:59.720491+00:00",
+   "check": "routes-ready-before-subscription",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:06.642767+00:00",
+   "check": "clients-ACK-SUCCESS",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:06.971012+00:00",
+   "check": "one-shared-trunk",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:07.322760+00:00",
+   "check": "two-stream-intent-isolation",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:10.492359+00:00",
+   "check": "trace-before-SUCCESS",
+   "passed": true,
+   "detail": "{\"trace\": {\"streamId\": \"00000000-0000-4000-8000-00000000000a\", \"traceId\": \"0e28d98a-923a-49f5-beef-00c47cacef9b\", \"serverEpoch\": \"4ad8d707-3e65-4abd-add8-d07480058280\", \"state\": \"SUCCESS\", \"errorCode\": null, \"detail\": \"\", \"visited\": [\"C1\", \"R2\", \"R1\", \"S1\"], \"elapsedNanos\": 39871555}}"
+  },
+  {
+   "at": "2026-11-23T21:43:18.268066+00:00",
+   "check": "lease-renewed-past-original-6s",
+   "passed": true,
+   "detail": "intents confirmados para l\u00e1 do grant original de 6s"
+  },
+  {
+   "at": "2026-11-23T21:43:18.278048+00:00",
+   "check": "renewal-on-real-wire",
+   "passed": true,
+   "detail": "contadores de interface / pcap em out/wire.pcap durante a janela de renew"
+  },
+  {
+   "at": "2026-11-23T21:43:18.959496+00:00",
+   "check": "quality-baseline-confirmed",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:21.322221+00:00",
+   "check": "transient-delay-no-oscillation",
+   "passed": true,
+   "detail": "pulso 150ms; pol\u00edtica 20%/3 amostras/5s inalterada"
+  },
+  {
+   "at": "2026-11-23T21:43:21.658909+00:00",
+   "check": "post-pulse-restabilized",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:27.771353+00:00",
+   "check": "restabilized-before-sustained-delay",
+   "passed": true,
+   "detail": "caminho anterior confirmado e est\u00e1vel na janela de dwell"
+  },
+  {
+   "at": "2026-11-23T21:43:31.914213+00:00",
+   "check": "real-RTT-confirmed-switch",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:31.914283+00:00",
+   "check": "success-after-confirmation-publication",
+   "passed": true,
+   "detail": "no evento SUCCESS a forwarding publicada j\u00e1 mostra o novo upstream/caminho com revis\u00e3o superior"
+  },
+  {
+   "at": "2026-11-23T21:43:34.920010+00:00",
+   "check": "stable-after-quality-switch",
+   "passed": true,
+   "detail": "sem switch adicional na janela de estabilidade"
+  },
+  {
+   "at": "2026-11-23T21:43:35.278648+00:00",
+   "check": "candidate-cache-before-failure",
+   "passed": true,
+   "detail": "[{\"nodeId\": \"R3\", \"state\": \"AVAILABLE\", \"endpoint\": {\"nodeId\": \"R3\", \"host\": \"10.0.5.1\", \"controlPort\": 43907, \"dataPort\": 43908, \"role\": \"RELAY\"}, \"sources\": [{\"source\": {\"nodeId\": \"R2\", \"instanceId\""
+  },
+  {
+   "at": "2026-11-23T21:43:35.325516+00:00",
+   "check": "bootstrap-stopped",
+   "passed": true,
+   "detail": "pid=24"
+  },
+  {
+   "at": "2026-11-23T21:43:35.375024+00:00",
+   "check": "SIGKILL-R2",
+   "passed": true,
+   "detail": "JVM pid=87 terminada"
+  },
+  {
+   "at": "2026-11-23T21:43:35.641694+00:00",
+   "check": "NeighborDown-after-real-JVM-kill",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:36.843001+00:00",
+   "check": "automatic-tree-recovery-with-bootstrap-stopped",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:36.860745+00:00",
+   "check": "same-client-intent-and-no-bootstrap",
+   "passed": true,
+   "detail": "sem nova subscri\u00e7\u00e3o nem restart do cliente; bootstrap parado"
+  },
+  {
+   "at": "2026-11-23T21:43:38.751436+00:00",
+   "check": "trace-after-SUCCESS",
+   "passed": true,
+   "detail": "{\"trace\": {\"streamId\": \"00000000-0000-4000-8000-00000000000a\", \"traceId\": \"ac730883-fa14-40e2-ae96-381107314850\", \"serverEpoch\": \"4ad8d707-3e65-4abd-add8-d07480058280\", \"state\": \"SUCCESS\", \"errorCode\": null, \"detail\": \"\", \"visited\": [\"C1\", \"R1\", \"S1\"], \"elapsedNanos\": 246820086}}"
+  },
+  {
+   "at": "2026-11-23T21:43:45.760636+00:00",
+   "check": "restarted-node-configured-edges-ACTIVE",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:45.760701+00:00",
+   "check": "restart-initial-bootstrap-distinguished",
+   "passed": true,
+   "detail": "s\u00f3 o JVM novo faz descoberta inicial; a repara\u00e7\u00e3o sem bootstrap foi observada antes"
+  },
+  {
+   "at": "2026-11-23T21:43:47.423170+00:00",
+   "check": "one-client-exits-other-preserved",
+   "passed": true,
+   "detail": "cancel A em C1 preserva C2 A+B"
+  },
+  {
+   "at": "2026-11-23T21:43:48.308119+00:00",
+   "check": "last-A-consumer-prunes-A-only",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:49.094022+00:00",
+   "check": "abandoned-B-demand-removed-after-client-death",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T21:43:49.094071+00:00",
+   "check": "prune-state-observed",
+   "passed": true,
+   "detail": "forwarding A removido ap\u00f3s \u00faltimo consumidor e B ap\u00f3s morte real do cliente; frames DEACTIVATE preservados no pcap (n\u00e3o descodificados no CORE)"
+  }
+ ],
+ "processes": {
+  "S1": {
+   "pid": null,
+   "alive": false,
+   "gen": 1
+  },
+  "R1": {
+   "pid": null,
+   "alive": false,
+   "gen": 1
+  },
+  "R2": {
+   "pid": null,
+   "alive": false,
+   "gen": 2
+  },
+  "R3": {
+   "pid": null,
+   "alive": false,
+   "gen": 1
+  },
+  "C1": {
+   "pid": null,
+   "alive": false,
+   "gen": 1
+  },
+  "C2": {
+   "pid": null,
+   "alive": false,
+   "gen": 2
+  },
+  "BOOT": {
+   "pid": null,
+   "alive": false,
+   "gen": 2
+  }
+ },
+ "leftoverProcesses": [],
+ "evidence": {
+  "pcap": "out/wire.pcap",
+  "snapshots": "out/snapshots/",
+  "logs": "logs/"
+ },
+ "outsideScope": [
+  "UDP",
+  "MJPEG",
+  "video",
+  "Swing player",
+  "PHASE-05..07"
+ ],
+ "note": "Contagem de frames de controlo (HELLO/ACTIVATE/SUBSCRIPTION_RENEW/DEACTIVATE) n\u00e3o \u00e9 descodificada no CORE; preservada como pcap cru e substitu\u00edda por estado observado em snapshots + contadores de interface."
+}

@@ -1,0 +1,19 @@
+DEMO_FAIL KeyError('15')
+
+---STDERR---
+Traceback (most recent call last):
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 741, in main
+    drv.start()
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 445, in start
+    self.build_session()
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 382, in build_session
+    n1, n2 = devices[link.get("node1")].get("name"), devices[link.get("node2")].get("name")
+KeyError: '15'
+Traceback (most recent call last):
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 764, in <module>
+    main()
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 758, in main
+    success = drv.finish(success and all(c["passed"] for c in drv.checks))
+  File "/volume/ott/20261123T194822Z-6de4034c/driver.py", line 711, in finish
+    for cid, ch in list(self.children.items()) + [("BOOT", self.boot)]:
+AttributeError: 'Driver' object has no attribute 'boot'

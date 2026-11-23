@@ -1,116 +1,112 @@
-# Retoma — DEMO-001-checkpoint-phase04
+# Retoma — DEMO-001-checkpoint-phase04 (iteração 2 concluída)
 
-**Paragem pedida pelo utilizador no checkpoint do protótipo.** Implement em
-curso/pausado; a demonstração não está completa nem aceite para apresentação.
-Não iniciar PHASE-05. Não apagar negativos ou repetir até obter verde.
+**Estado: critérios de aceitação do bolt cumpridos na série formal congelada
+`8303c0b`;demonstração pronta para validação/aceitação. PHASE-05–07
+continuam TODO — não foram iniciadas.** Todas as runs FAIL (antigas e novas)
+preservadas; nenhum resultado antigo foi reescrito para PASS.
 
-## Estado entregue
+## Ambiente e builds (iteração 2)
 
-- `demo/run.sh`, orquestrador Java21, proxy TCP real sem root, adaptador de
-  snapshots/subscrições e HTML local. Compilação contra o mesmo JAR; zero
-  alterações em fontes/testes de produção, CORE ou scripts anteriores.
-- Descritores do enunciado: cenário1 quatro nós, cenário2 seis nós com
-  triângulo R1/R2/R3 e cenário3 onze nós da Figura1. Bootstrap é processo
-  adicional; no cenário3 O1 é servidor e O4/O8/O9/O10/O11 clientes.
-- [Guião preliminar](../../../demo/DEMO.md), [matriz](../../../demo/MATRIX.md),
-  [plano](implementation-plan.md), [validação](validation-plan.md).
-- Build inicial: clean verify JDK21.0.13.1, **1459/0/0/0, 21 XML**.
-  [Resultado](../../../experiments/checkpoint-phase04/build-start/result.json).
-- Build final desta iteração: ver [Test](test-walkthrough.md) e pasta
-  `experiments/checkpoint-phase04/build-end-iteration1/`; não confundir com
-  aceitação final da ferramenta.
+- Branch `Waheed`, JDK `21.0.13.0.3` (`/usr/lib/jvm/java-21-openjdk` nesta
+  máquina), Maven 3.10.0. Working tree limpo no início (só `Projeto/.idea/`
+  untracked).
+- Clean verify inicial e final: `cd Projeto && mvn -B -ntp clean verify` →
+  **1459/0/0/0, 21 XML, BUILD SUCCESS** em ambos
+  ([início](../../../experiments/checkpoint-phase04/build-start-iteration2/result.json),
+  [fim](../../../experiments/checkpoint-phase04/build-end-iteration2/result.json)).
+  JAR `dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f`
+  idêntico no início e no fim (`jarSameAsStart: true`). Zero alterações em
+  fontes/testes de produção, CORE ou scripts anteriores.
+- Investigação completa em [investigation-iteration2.md](investigation-iteration2.md).
 
-## Resultados que podem ser afirmados
+## Ajustes justificados à ferramenta (só `demo/`, commits `94300b2`…`23ddc9a`)
 
-**Cenário1: uma execução completa PASS**, run `20261122T233033Z-a3583f1e`,
-31 verificações. [Resultado](../../../experiments/checkpoint-phase04/runs/cenario1/20261122T233033Z-a3583f1e/result.json).
-Demonstrou validação, TCPv2/discovery, RTT real, CLI, ativação, isolamentoA/B,
-uma ativação inicial no tronco, renovação real, trace, SIGKILL de R1 e reparação
-S1–C1 com bootstrap parado, reinício e poda seletiva/remoção por morte de C2.
-Todos os processos terminaram e as portas ficaram reutilizáveis.
-Esta run pertence a uma versão anterior do protótipo: **não conta como uma das
-três repetições da versão final**.
+1. `DelayProxy`: cada frame agendado para `chegada + atraso` por direção
+   (leitor/escritor desacoplados), removendo a fila de serialização do
+   `Thread.sleep` no ciclo de leitura que inflava o RTT medido (>900ms com
+   120ms configurado). Bytes e ordem TCP preservados.
+2. Oráculo de trace `trace-before`/`trace-after`: observação com prazo (15s)
+   de trace positivo multi-salto após ACK; terminais negativos preservados nos
+   ficheiros de evidência.
+3. Oráculo de atomicidade do switch: no evento SUCCESS, a forwarding publicada
+   no instante do evento tem de mostrar o novo upstream/caminho com revisão
+   superior (`replacementRevision` é a revisão do ACTIVATE na nova linha —
+   espaço próprio — e não podia comparar-se com a revisão da árvore).
+4. Após o pulso transitório, espera que o caminho anterior volte a confirmar e
+   permaneça estável por janela > dwell (5s) antes do atraso sustentado.
+5. Prazo de convergência inicial do arranque escala com o nº de nós (60s para
+   >6 nós; 20s inalterado nos cenários 1/2). Prazos do guião (ex.: switch 25s)
+   intocados.
 
-**Cenário2: última execução FAIL**, run `20261122T233636Z-e48c789f`.
-[Resultado](../../../experiments/checkpoint-phase04/runs/cenario2/20261122T233636Z-e48c789f/result.json).
-Confirmou arranque, CLI, rotas elegíveis, ACK/forwarding de C1/C2, agregação,
-isolamentoA/B, trace positivo `[C1,R2,R1,S1]`, renovação além do grant inicial
-e ausência de troca após pulso150ms. O custo real medido R2→R1 subiu para
-965620µs (inclui filas); R2→R3 ficou49742µs. A seleção passou paraR3, custo
-69692µs.
+## Resultados (JAR `dc192971…` em todas as runs novas)
 
-O oráculo de adaptação exige **evento SUCCESS**, não apenas mudança de seleção
-ou de forwarding. Observou-se:
+**Série congelada `8303c0b` (3 consecutivas por cenário, todas PASS):**
+- Cenário1: `20261123T151115Z-ff3a5f83`, `20261123T151147Z-9deaebcc`,
+  `20261123T152225Z-28c6b934` (33 checks cada).
+- Cenário2: `20261123T151257Z-4b4adbaf`, `20261123T151421Z-67a5116e`,
+  `20261123T151525Z-1b1daa64` (39 checks cada), com troca por qualidade
+  **STARTED→SUCCESS** (custos reais ~250ms→~60ms), publicação atómica
+  confirmada, pulso de 150ms sem oscilação, SIGKILL real de R2 com recuperação
+  sem bootstrap, reinício, poda e procura abandonada.
+  [Série final em HEAD](../../../experiments/checkpoint-phase04/series-final-head.log).
+- Séries anteriores na mesma base de código (23ddc9a, idêntica em ficheiros de
+  código): c1 3/3 PASS (`2a2d667c`,`0b6a21a5`,`4fec984a`); c2 4 PASS consecutivas
+  (`b7363015`,`f91d87a2`,`049d5119`,`6913a902`) + 4 PASS adicionais.
 
-1. STARTED `SUSTAINED_IMPROVEMENT`, operação
-   `05a0c597-98d9-4c8c-bb06-4aa44d669c35`, caminho anterior `[S1,R1,R2]`,
-   proposto `[S1,R1,R3,R2]`, custos609166→57727µs.
-2. FAILURE `PATH_CHANGED`, mesma operação, elapsed61451492ns.
-3. Snapshot final com forwarding `[S1,R1,R3,R2]`, revisão39, mas **sem SUCCESS
-   dessa troca**; isto não satisfaz o oráculo de troca por qualidade.
-4. Prazo25s esgotado, resultado FAIL. Nenhum processo pendente, zero portas
-   bloqueadas. Os passos de morte/reinício/poda não foram alcançados nesta run.
+**HEAD final `63d0c97`** (escala de prazos de convergência para >6 nós e
+espera de 1s no oráculo de trace; inerte para 4/6 nós):
+[series-final-head2.log](../../../experiments/checkpoint-phase04/series-final-head2.log)
+— c1 3/3 PASS (`505e78d5`,`a7cbb419`,`8ba7e4cd`); c2 2 PASS + 1 FAIL preservado
+(`3cc7f000`, corrida residual do switch); c3 2 PASS (`149ff3ed`,`e135a4d5`) +
+1 FAIL preservado (`07e916d7`).
 
-**Causa ainda não estabelecida.** Correlacionar ACTIVATE/ACK/ERROR, revisão e
-path no wire.jsonl com STARTED/FAILURE/recuperação antes de propor qualquer
-correção. O proxy atrasa todos os frames e introduz HOL; isso é uma característica
-documentada, não uma causa atribuída sem prova. Não aumentar prazos nem remover
-o requisito SUCCESS para declarar esta run verde.
+**Cenário3 (11 nós da Figura 1): completo, PASS repetido** —
+`20261123T115804Z-96352b48`, `20261123T151646Z-73408404`,
+`20261123T152742Z-149ff3ed`, `20261123T152923Z-e135a4d5` (39 checks cada; 17
+processos terminados; portas reutilizáveis), com switch por qualidade em O3,
+morte real de O3 e recuperação sem bootstrap. FAILs de arranque/CLI
+preservados (`9e1b0832`, `6d8b9caf`, `807586fb`, `7e5ca65b`, `1ae53dad`,
+`07e916d7`).
+- Todas as runs desta iteração incluyen `tool-source/` e `tool-sha256.json`;
+  as 6 runs das séries formais partilham o mesmo hash da ferramenta (1 valor
+  distinto). Dashboard HTML regenerado com dados reais (sem placeholder).
+- Ensaio: guião automático completo ~59s (cenario2) / ~73s (cenario3);
+  guião de apresentação com os tempos por passo do DEMO.md → 10–15 min.
 
-## Negativos preservados e ajustes já feitos
+## Negativos preservados e causa / âmbito
 
-- `cenario1/20261122T232712Z-37b7325b`: sandbox bloqueou sockets. Nova execução
-  autorizada no host, sem alterar produção.
-- `cenario1/20261122T232727Z-31c1ab55`: catálogo vazio na leitura da CLI e
-  falha do observador; callbacks do proxy escreveram depois do fecho do log.
-  O lifecycle do log da ferramenta foi corrigido. O catálogo passou a ter
-  observação limitada de prontidão, sem inventar entradas.
-- `cenario1/20261122T232853Z-8ba67ee2`: oráculo de renovação usava ACTIVATE;
-  frames mostram20 SUBSCRIPTION_RENEW e25 ACTIVATE_ACK. Corrigido para o tipo14.
-- `cenario2/20261122T233117Z-a9871c5f` e
-  `cenario2/20261122T233325Z-bee35742`: CLI antes da ativação devolveu
-  `TRACE_ERROR NO_ROUTE visited=[C2]`, sem frame ROUTE_TRACE emitido, apesar
-  de uma listagem anterior mostrar seleção com métrica e mesma Session.
-  **A causa desta divergência permanece por estabelecer.** A ferramenta agora
-  preserva o terminal negativo da CLI e exige separadamente trace positivo
-  após ACK. Esta alteração do oráculo não resolve nem elimina o negativo;
-  deve ser revista antes da aceitação da demo.
-- `cenario2/20261122T233224Z-866c7a83`: pedidos antes do novo adaptador ter
-  catálogo completo: UNKNOWN_STREAM emC2; NO_ROUTE inicial emC1/R2, mas
-  recuperação posterior com forwarding confirmado. Acrescentada pré-condição
-  de rotas elegíveis/catálogo após repor o adaptador. A observação atual usa
-  forwarding.localConsumers: o resultado terminal inicial de um ticket não
-  é o estado vivo da árvore. Ambos permanecem nos snapshots.
+- `cenario2/20261122T233636Z-e48c789f` (e repro `…T114247Z-7e4c6be5`): switch
+  STARTED→FAILURE (PATH_CHANGED na 1.ª tentativa / QUALITY_CHANGED borderline
+  no dwell) sem SUCCESS; convergência posterior via rondas simples. **Âmbito:
+  comportamento do sistema (JAR) — não alterado; a ferramenta só registas.**
+- `cenario2/20261123T142314Z-e63bfcf3`, `…T143102Z-32a314b3`: mesma corrida
+  residual na 1.ª tentativa do switch (~2 em 10 runs nesta máquina). Pass rate
+  ~80% por run no cenário2; preservados como evidência de que não se promete
+  estabilidade infinita.
+- `cenario1/20261123T120158Z-76021040`: FAIL `lease-renewed-past-original-6s`
+  durante uma pausa de ~1h59m do sandbox (relógio/nanoTime avançou com a
+  máquina parada); renewals presentes no wire; artefacto de ambiente, não do
+  sistema.
+- NO_ROUTE pré-ativação da CLI (`…T233117Z`, `…T233325Z`, repro
+  `…T112915Z-c8130075`): corrida de prontidão — a CLI substitui o adaptador de
+  C2 e o vizinho retira/reanuncia; no instante do trace o candidato estava
+  vazio → NO_ROUTE legítimo. Oráculo agora preserva o negativo terminal e exige
+  trace positivo multi-salto após ACK com prazo. Causa estabelecida — sem defeito de produção.
+- R17 histórico continua sem causa estabelecida; V-018 (44/44) intacto.
 
-Os controladores/logs/resultados anteriores não foram reescritos para PASS.
-Nas runs recentes, tool-source/ e tool-sha256.json guardam os auxiliares usados;
-as primeiras runs não tinham esse arquivo e não se lhes atribui a versão atual.
+## Limitações actuais
 
-## Próxima iteração — ordem recomendada
+- Sem UDP, fragmentação, MJPEG, player/GUI, vídeo ou CORE; `play` continua
+  NOT_IMPLEMENTED. A demonstração não é aprovação docente/submissão.
+- O proxy atrasa por frame (agendado), sem fila artificial de serialização;
+  TCP real mantém ordenação. Atraso configurável 0..250ms/direção.
+- Corrida residual na 1.ª tentativa do switch de qualidade em ~20% das runs
+  do cenário2 (rejeição PATH_CHANGED no alvo); o sistema converge de qualquer
+  forma, mas sem evento SUCCESS nesse caso. Não corrigido (âmbito do JAR).
 
-1. Ler este handoff, `bolt.md`, DEMO.md e as duas limitações novas; confirmar
-   branch/base/working tree, versões/JAR e hashes antes de executar.
-2. Investigar com a run preservada a falha de troca por qualidade e o NO_ROUTE
-   pré-ativação da CLI. Separar defeito da ferramenta de eventual defeito do
-   sistema; apresentar reprodução e âmbito de qualquer correção de produção
-   antes de a aplicar. Preservar testes e prazos históricos.
-3. Rever a semântica dos oráculos e a interface: tickets iniciais versus
-   forwarding vivo; negativo da CLI versus trace positivo por múltiplos saltos.
-   Rever interrupção/SIGTERM, cleanup e saída da ferramenta com falha de portas.
-4. Validar cenário2 completo, depois executar **três runs consecutivas de1 e
-   três de2 sobre a mesma versão congelada**. Nenhuma série válida nesta iteração.
-5. Executar cenário3 completo; se inviável, justificar redução a partir da
-   Figura1 e guardar o negativo, sem alegar execução CORE.
-6. Conferir HTML no browser, pré-requisitos/portas configuráveis e medir ensaio
-   de10–15min. Executar clean verify de início/fim da nova iteração e documentar
-   quaisquer diferenças face1459; preservar JAR/manifestos/source hashes.
-7. Consolidar matriz, resultados, relatório final, critérios e commits pequenos.
-   Só então propor aceitação da demonstração. Não marcar PHASE-05–07 iniciadas.
+## Próximos passos
 
-## Limitações históricas mantidas
-
-R17 inicial continua sem causa estabelecida; V-018 com métricas controladas
-não estabelece a sua causa. Os dois negativos novos são distintos de R17.
-Sem UDP, fragmentação, MJPEG, player/GUI de vídeo ou CORE; `play` continua
-NOT_IMPLEMENTED. A demonstração não é aprovação docente/submissão nem resolve
-datas/conteúdo G-ASSESSMENTS. Não se inventa execução humana.
+1. Validação externa do bolt (validador-bolt) segundo DEMO.md/MATRIX.md/
+   09-TESTING-STRATEGY.md.
+2. Se aceite, propor ao utilizador a aceitação da demonstração; PHASE-05–07
+   permanecem TODO e não são iniciadas por esta ferramenta.

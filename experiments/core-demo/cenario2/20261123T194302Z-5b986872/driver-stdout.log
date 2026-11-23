@@ -1,0 +1,27 @@
+SESSION 1 RUNTIME nodes=6 links=6
+CHECK_PASS core-connectivity-client-to-server ping C1→10.0.0.20
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk Observed actual snapshots
+CHECK_PASS two-stream-intent-isolation Observed actual snapshots
+CHECK_PASS trace-before-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "e4457229-e48c-4553-aa40-ddea28abd0af", "serverEpoch": "2c2790ce-f416-4e33-bf9e-abdcba98ff0e", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "R2", "R1", "S1"], "elapsedNanos": 13859690}}
+CHECK_PASS lease-renewed-past-original-6s intents confirmados para lá do grant original de 6s
+CHECK_PASS renewal-on-real-wire contadores de interface / pcap em out/wire.pcap durante a janela de renew
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY R1-R2 120ms/direction edit_link=True
+DELAY R1-R2 4ms/direction edit_link=True
+CHECK_PASS transient-delay-no-oscillation pulso 150ms; política 20%/3 amostras/5s inalterada
+CHECK_FAIL post-pulse-restabilized Condition not observed within 15s
+DEMO_FAIL post-pulse-restabilized
+RESULT FAIL
+
+---STDERR---

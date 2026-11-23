@@ -1,0 +1,18 @@
+SESSION 1 RUNTIME nodes=6 links=6
+CHECK_PASS core-connectivity-client-to-server ping C1→10.0.0.20
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_FAIL one-shared-trunk source has one confirmed downstream for multiple clients
+DEMO_FAIL one-shared-trunk
+RESULT FAIL
+
+---STDERR---

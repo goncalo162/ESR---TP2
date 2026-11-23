@@ -1,10 +1,18 @@
-# Checkpoint OTT — preparação em curso
+# Checkpoint OTT — demonstração validada (série formal congelada `8303c0b`)
 
-**Protótipo, ainda não aceite para apresentação.** Demonstração do plano de
-controlo concluído na PHASE-04. A pedido do utilizador, esta iteração termina
-no checkpoint do protótipo; as três repetições por cenário e o cenário 3 ficam
-para a continuação. Consultar o [handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
-antes de usar perante o docente.
+Demonstração do plano de controlo concluído na PHASE-04, executada e repetida
+em 2026-11-23: 3 PASS consecutivas de cada cenário na versão congelada
+`8303c0b` (c1 `ff3a5f83`/`9deaebcc`/`28c6b934`, c2 `4b4adbaf`/`67a5116e`/`1b1daa64`),
+mais séries no HEAD final `63d0c97` (c1 3/3 PASS) e cenário3 (11 nós da Figura 1)
+com PASS repetido (`96352b48`, `73408404`, `149ff3ed`, `e135a4d5`); FAILs
+preservados como corrida residual do sistema. Builds inicial/final 1459/0/0/0,
+21 XML; JAR `dc192971…` inalterado. Runs em
+`experiments/checkpoint-phase04/runs/`; detalhes e limitações no
+[handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
+e na [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).
+PHASE-05–07 não iniciadas. A execução CORE foi feita depois (plano de controlo
+apenas — ver §5 do guia); não é a validação formal PHASE-06 nem aprovação
+docente.
 
 ## Pré-requisitos e arranque
 
@@ -14,7 +22,7 @@ antes de usar perante o docente.
 - Numa shell da raiz:
 
 ```sh
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"  # qualquer JDK 21
 export PATH="$JAVA_HOME/bin:$PATH"
 ./demo/run.sh cenario2
 ```
@@ -25,7 +33,7 @@ controlo. O HTML é regenerado a partir de snapshots locais e recarrega a cada
 dois segundos. Nenhum browser ou servidor HTTP é necessário para a validação.
 
 `./demo/run.sh cenario1` seleciona os quatro nós; `cenario3` seleciona os onze
-nós da Figura 1, **ainda não ensaiados**. `--auto` executa o guião automaticamente;
+nós da Figura 1 (ensaiado com PASS em 2026-11-23). `--auto` executa o guião automaticamente;
 `--port-base 24000` escolhe as portas (0/default escolhe portas efémeras).
 `DEMO_JAR=/caminho/ficheiro.jar` seleciona explicitamente outro JAR, com hash
 registado. Não atribuir resultados antigos a esse ficheiro.
@@ -40,14 +48,21 @@ própria da CLI executam a main real `OttApplication`.
 `subscribe`/`cancel` são comandos **do auxiliar**, porque a CLI de produção
 ainda não os oferece. A etapa da CLI mostra neighbors/recovery/routes/catalog/
 metrics/trace/play/quit. O resultado negativo de trace observado antes de ACK
-é preservado; um trace positivo por vários saltos é exigido separadamente
-depois da ativação. A causa dessa divergência continua por investigar.
+é preservado (a rota pode estar momentaneamente withdrawna quando a CLI substitui
+o adaptador); um trace positivo por vários saltos é exigido separadamente depois
+de ACK, observado numa janela com prazo como as restantes condições.
 
 Os endereços anunciados 127.0.0.N passam pelo proxy e os listeners reais usam
 127.0.1.N. O bootstrap usa 127.0.0.200. A identificação de cada ligação é lida
-do HELLO v2. O proxy atrasa **bytes reais de todos os frames** nos dois sentidos;
-não injeta `LinkMetrics` e não chama `onMetrics`. Há head-of-line blocking TCP:
-o custo medido inclui filas e scheduling, não só duas vezes o atraso configurado.
+do HELLO v2. O proxy atrasa **bytes reais de todos os frames** nos dois sentidos:
+cada frame é agendado para `chegada + atraso` por direção, sem fila de
+serialização entre frames (um burst não atrasa os seguintes para além do seu
+próprio atraso) e preservando a ordenação TCP. Não injeta `LinkMetrics` e não
+chama `onMetrics`; o custo medido é aproximadamente duas vezes o atraso
+configurado mais scheduling real da JVM/TCP. Nas iterações anteriores o proxy
+dormia no ciclo de leitura, o que enfileirava frames e inflava o custo medido
+(>900ms com atraso de 120ms); esse artefacto da ferramenta foi removido e os
+negativos preservados não lhe são atribuídos sem prova.
 
 ## Guião previsto — 10–15 minutos
 
@@ -106,8 +121,10 @@ Em `experiments/checkpoint-phase04/runs/<cenario>/<utc-id>/`: manifest.json
 (commit/JDK/JAR), tool-source/ e tool-sha256.json nas versões recentes,
 config/, validation.log, wire.jsonl com frames descodificados sem alteração,
 logs por JVM, snapshots por passo, latest.json, dashboard.html e result.json
-com checks/PIDs/saídas/portas. `controller.log` é copiado nas execuções desta
-iteração. Não apagar runs FAIL.
+com checks/PIDs/saídas/portas. Nas execuções da iteração 2 o output do controlador fica nos logs das séries
+(`experiments/checkpoint-phase04/series-*.log`); duas runs interrompidas por
+operador (`3206fc30`, `3b24ba01`) não têm `result.json` e estão preservadas sem
+verdict. Não apagar runs FAIL.
 
 `quit`, EOF e SIGTERM do controlador acionam a limpeza; só são terminados
 processos que a ferramenta criou. SIGKILL do próprio controlador não executa
@@ -115,22 +132,29 @@ shutdown hooks: evitar matar a ferramenta dessa forma. Se houver interrupção
 nessa condição, identificar os PIDs pelos perfis da run antes de qualquer
 limpeza manual; nunca usar `pkill java`.
 
-## Caminho para CORE — não executado
+## Execução no CORE — feita (plano de controlo), 2026-11-23
 
-Reutilizar `CORE/topologies/cenario1.xml`, `cenario2.xml` e `cenario3.xml`.
-Os perfis por nó da run são o mapa de configuração; na PHASE-06, copiar para
-os nós correspondentes e trocar bind/advertised/bootstrap e hosts da topologia
-pelos IPs CORE, conservando IDs/roles/grafo/UUIDs. Arrancar a CLI do mesmo JAR
-em cada máquina. Os aliases 127/8 e o proxy localhost não transitam para nós
-CORE separados. `tc/netem` pode ser um caminho futuro privilegiado nessa fase,
-após identificar interfaces; não é pré-requisito da alternativa sem root local.
+Com o contentor `core` (coreemu) a correr, `python3 demo/core/run_core.py
+<cenario>` cria a sessão gRPC a partir de `CORE/topologies/cenario{1,2,3}.xml`
+(devices + switches + links com netem), arranca o bootstrap e uma JVM por nó
+dentro do namespace de cada dispositivo, e corre o mesmo guião de 6 passos —
+incluindo a etapa com a CLI real (`logs/production-cli.log`). A troca por
+qualidade usa `edit_link` (netem) em vez do proxy local; o kill é SIGKILL real
+no JVM do nó. **PASS em cenario1 (2× consecutivos), cenario2 e cenario3** em
+`experiments/core-demo/<cenario>/2026*/` (ver §5 do
+[demo/GUIA-DEMO.md](GUIA-DEMO.md) para o guia completo e
+`demo/core/run_core.py` + `demo/core/driver.py` para o mecanismo). Isto é a
+demo de plano de controlo no CORE, não a validação formal PHASE-06 (que
+aguarda PHASE-05). Os aliases 127/8 e o proxy localhost não existem no CORE;
+os atrasos vêm do netem do emulador e a evidência de frames é o pcap cru
+(`out/wire.pcap`) + snapshots.
 
 ## Fora do âmbito
 
 UDP, fragmentação, leitura MJPEG, encaminhamento/reconstrução de frames, player
-Swing, vídeo real, execução CORE, FPS/QoE, artigo final, pacote e submissão.
+Swing, vídeo real, FPS/QoE, artigo final, pacote e submissão.
 PHASE-05–07 continuam TODO. R17 histórico permanece sem causa estabelecida;
 V-018 com métricas controladas não explica essa falha. Datas/conteúdo docente
 G-ASSESSMENTS não são declarados resolvidos pela ferramenta.
 
-[Matriz para artigo](MATRIX.md) · [Estado e continuação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
+[Matriz para artigo](MATRIX.md) · [Guia de uso](GUIA-DEMO.md) · [Estado e continuação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).

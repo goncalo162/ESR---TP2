@@ -1,0 +1,105 @@
+{
+ "finishedAt": "2026-11-23T19:21:05.582870+00:00",
+ "verdict": "FAIL",
+ "transport": "CORE coreemu (gRPC), netem via edit_link, JVM por n\u00f3 em namespace",
+ "scenario": "cenario1",
+ "session": 1,
+ "checks": [
+  {
+   "at": "2026-11-23T19:20:35.042930+00:00",
+   "check": "core-connectivity-client-to-server",
+   "passed": true,
+   "detail": "ok"
+  },
+  {
+   "at": "2026-11-23T19:20:35.666445+00:00",
+   "check": "bootstrap-running",
+   "passed": true,
+   "detail": "pid=24"
+  },
+  {
+   "at": "2026-11-23T19:20:36.865867+00:00",
+   "check": "all-configured-edges-ACTIVE",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T19:20:36.959159+00:00",
+   "check": "real-RTT-and-catalog",
+   "passed": true,
+   "detail": "Observed actual snapshots"
+  },
+  {
+   "at": "2026-11-23T19:20:36.959243+00:00",
+   "check": "discovery-observed-ACTIVE-neighbors-v2",
+   "passed": true,
+   "detail": "neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap"
+  },
+  {
+   "at": "2026-11-23T19:21:00.382834+00:00",
+   "check": "production-CLI-exit0",
+   "passed": false,
+   "detail": "OttApplication.main no mesmo JAR e perfil"
+  },
+  {
+   "at": "2026-11-23T19:21:05.472399+00:00",
+   "check": "run-completed",
+   "passed": false,
+   "detail": "production-CLI-exit0"
+  }
+ ],
+ "processes": {
+  "S1": {
+   "pid": "129",
+   "alive": true,
+   "gen": 1
+  },
+  "R1": {
+   "pid": "150",
+   "alive": true,
+   "gen": 1
+  },
+  "C1": {
+   "pid": "90",
+   "alive": true,
+   "gen": 1
+  },
+  "C2": {
+   "pid": "546",
+   "alive": true,
+   "gen": 1
+  },
+  "BOOT": {
+   "pid": "134",
+   "alive": true,
+   "gen": 1
+  }
+ },
+ "leftoverProcesses": [
+  {
+   "Servidor": "139"
+  },
+  {
+   "Router1": "155"
+  },
+  {
+   "Cliente2": "551"
+  },
+  {
+   "Cliente1": "95"
+  }
+ ],
+ "evidence": {
+  "pcap": "out/wire.pcap",
+  "snapshots": "out/snapshots/",
+  "logs": "logs/"
+ },
+ "outsideScope": [
+  "UDP",
+  "MJPEG",
+  "video",
+  "Swing player",
+  "PHASE-05..07"
+ ],
+ "note": "Contagem de frames de controlo (HELLO/ACTIVATE/SUBSCRIPTION_RENEW/DEACTIVATE) n\u00e3o \u00e9 descodificada no CORE; preservada como pcap cru e substitu\u00edda por estado observado em snapshots + contadores de interface."
+}

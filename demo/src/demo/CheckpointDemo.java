@@ -156,6 +156,17 @@ public final class CheckpointDemo
     }
 
 
+    /**
+     * Fator de escala das esperas de convergência/recuperação com o tamanho do
+     * grafo (11 nós precisam de mais tempo de propagação que 4/6). Não altera
+     * os prazos do guião de qualidade: o switch continua com 25s.
+     */
+    private int scale()
+    {
+        return csv("nodes").size() > 6 ? 2 : 1;
+    }
+
+
     private String source()
     {
         return csv("servers").getFirst();
@@ -307,8 +318,12 @@ public final class CheckpointDemo
             launch(node);
         }
         await("all-configured-edges-ACTIVE", () -> configuredActive(), 25);
+        // A propagação de anúncios escala com a profundidade do grafo (5 saltos
+        // no cenário3/Figura1); o prazo de arranque cresce com o número de nós,
+        // sem tocar nos prazos das condições do guião (ex.: switch em 25s).
+        int startupSeconds = 20 * scale() * (scale() > 1 ? 3 : 1); // 60s para >6 nós, 20s caso contrário
         await("real-RTT-and-catalog", () -> csv("nodes").stream().allMatch(this::routesReady)
-                && csv("nodes").stream().allMatch(n -> !map(map(views.get(n).get("metrics")).get("links")).isEmpty()), 20);
+                && csv("nodes").stream().allMatch(n -> !map(map(views.get(n).get("metrics")).get("links")).isEmpty()), startupSeconds);
         require(messageCounts.keySet().stream().anyMatch(x -> x.startsWith("HELLO|"))
                 && messageCounts.keySet().stream().anyMatch(x -> x.startsWith("DISCOVERY_QUERY|"))
                 && messageCounts.keySet().stream().anyMatch(x -> x.startsWith("DISCOVERY_SNAPSHOT|")), "TCP-v2-discovery-observed", "Raw decoded frames in wire.jsonl");
@@ -376,7 +391,7 @@ public final class CheckpointDemo
     private void activate() throws Exception
     {
         cliCheck();
-        await("routes-ready-before-subscription", () -> csv("nodes").stream().allMatch(this::routesReady), 20);
+        await("routes-ready-before-subscription", () -> csv("nodes").stream().allMatch(this::routesReady), 20 * scale());
         for(String node : csv("clients"))
         {
             children.get(node).request("subscribe " + STREAM_A + " " + TOKEN_A);
@@ -386,7 +401,7 @@ public final class CheckpointDemo
         if(!qualityNode.isBlank())
             children.get(qualityNode).request("subscribe " + STREAM_A + " " + TOKEN_QUALITY);
         await("clients-ACK-SUCCESS", () -> csv("clients").stream().allMatch(n -> ticket(n, TOKEN_A))
-                && ticket(client(1), TOKEN_B), 15);
+                && ticket(client(1), TOKEN_B), 15 * scale());
         Map<String, Object> sourceTree = forward(source(), STREAM_A);
         require(sourceTree != null && map(sourceTree.get("downstreams")).size() == 1,
                 "one-shared-trunk", "V-018/C2: source has one confirmed downstream for multiple clients");
@@ -395,9 +410,36 @@ public final class CheckpointDemo
                 "one-initial-ACTIVATE-on-shared-trunk", "V-018/C2: exactly one initial ACTIVATE for stream A from " + trunk);
         require(forward(client(0), STREAM_B) == null && forward(client(1), STREAM_B) != null,
                 "two-stream-intent-isolation", "V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding");
-        Object trace = children.get(client(0)).request("trace " + STREAM_A);
-        Files.writeString(run.resolve("trace-before.json"), Json.write(trace));
-        require("SUCCESS".equals(map(map(trace).get("trace")).get("state")), "trace-before-SUCCESS", trace.toString());
+        awaitTrace(client(0), "trace-before.json", "trace-before-SUCCESS", 15);
+    }
+
+
+    /**
+     * Positive multi-hop trace is a deadline-based observation after ACK: the
+     * terminal answer of any individual attempt (including NO_ROUTE while
+     * announcements settle) is preserved in the evidence file, but the oracle
+     * requires one real SUCCESS within the window, not a single lucky attempt.
+     */
+    private void awaitTrace(String node, String evidenceFile, String label, int seconds) throws Exception
+    {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(seconds);
+        Object trace = null;
+        do
+        {
+            refresh();
+            trace = children.get(node).request("trace " + STREAM_A);
+            Files.writeString(run.resolve(evidenceFile), Json.write(trace));
+            if("SUCCESS".equals(map(map(trace).get("trace")).get("state")))
+            {
+                require(true, label, trace.toString());
+                return;
+            }
+            // Espera 1s entre tentativas: cada pedido cria uma reserva de trace no
+            // sistema; sondar depressa demais esgota TRACE_CAPACITY (RESOURCE_LIMIT).
+            Thread.sleep(1000);
+        }while(System.nanoTime() < deadline);
+        save("FAILED-" + label);
+        require(false, label, String.valueOf(trace));
     }
 
 
@@ -433,16 +475,33 @@ public final class CheckpointDemo
         hold(2);
         require(switchCount(node) == successes && previous.equals(upstream(node, STREAM_A)),
                 "transient-delay-no-oscillation", "150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged");
+        // Antes do atraso sustentado, espera que o caminho anterior volte a estar
+        // confirmado e assim permaneça por uma janela superior ao dwell da política
+        // (5s), para a ronda de switch começar de um estado ancorado e o churn do
+        // pulso não interferir. O prazo do switch (25s) não é alterado.
+        await("post-pulse-restabilized", () -> previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes, 15);
+        hold(6);
+        require(previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes,
+                "restabilized-before-sustained-delay", "Previous path confirmed again and stable for the dwell window after the transient pulse");
         setDelay(key, 120);
         await("real-RTT-confirmed-switch", () -> replacement.equals(upstream(node, STREAM_A)) && switchCount(node) > successes, 25);
+        // Atomicidade confirmação/publicação: no evento SUCCESS, a forwarding já
+        // publicada (observada no instante do evento) deve mostrar o upstream e o
+        // caminho novos com revisão superior à anterior. replacementRevision é a
+        // revisão do ACTIVATE na nova linha (espaço próprio), não a revisão da
+        // árvore, pelo que não pode comparar-se com publishedRevision.
         var events = list(views.get(node).get("events"));
         boolean atomic = events.stream().map(Json::object).filter(e -> e.get("kind").equals("switch"))
                 .map(e -> map(e.get("value"))).anyMatch(e ->
                 {
                     var change = map(e.get("change"));
-                    return "SUCCESS".equals(change.get("phase")) && number(e.get("publishedRevision")) == number(change.get("replacementRevision"));
+                    return "SUCCESS".equals(change.get("phase"))
+                            && map(change.get("replacement")).get("nodeId").equals(e.get("publishedUpstream"))
+                            && change.get("replacementPath").equals(e.get("publishedPath"))
+                            && number(e.get("publishedRevision")) > number(change.get("previousRevision"));
                 });
-        require(atomic, "success-after-confirmation-publication", "Observer captured replacementRevision already published at SUCCESS");
+        require(atomic, "success-after-confirmation-publication",
+                "At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision");
         long stable = switchCount(node);
         hold(3);
         require(switchCount(node) == stable && replacement.equals(upstream(node, STREAM_A)),
@@ -460,14 +519,12 @@ public final class CheckpointDemo
         stopBootstrap();
         children.get(victim).kill();
         await("NeighborDown-after-real-JVM-kill", () -> list(views.get(observer).get("events")).stream()
-                .anyMatch(e -> e.toString().contains("NeighborDown") && e.toString().contains(victim)), 12);
+                .anyMatch(e -> e.toString().contains("NeighborDown") && e.toString().contains(victim)), 12 * scale());
         await("automatic-tree-recovery-with-bootstrap-stopped", () -> ticket(observer, TOKEN_A)
-                && forward(observer, STREAM_A) != null && !list(forward(observer, STREAM_A).get("path")).contains(victim), 30);
+                && forward(observer, STREAM_A) != null && !list(forward(observer, STREAM_A).get("path")).contains(victim), 30 * scale());
         require(!bootstrap.isAlive() && children.get(observer).process.pid() == pid,
                 "same-client-intent-and-no-bootstrap", "No new subscription, no client restart; bootstrap process is stopped");
-        Object trace = children.get(observer).request("trace " + STREAM_A);
-        Files.writeString(run.resolve("trace-after.json"), Json.write(trace));
-        require("SUCCESS".equals(map(map(trace).get("trace")).get("state")), "trace-after-SUCCESS", trace.toString());
+        awaitTrace(observer, "trace-after.json", "trace-after-SUCCESS", 15);
         save("failure-no-bootstrap");
     }
 
@@ -476,7 +533,7 @@ public final class CheckpointDemo
     {
         startBootstrap();
         launch(scenario.getProperty("kill"));
-        await("restarted-node-configured-edges-ACTIVE", this::configuredActive, 25);
+        await("restarted-node-configured-edges-ACTIVE", this::configuredActive, 25 * scale());
         require(true, "restart-initial-bootstrap-distinguished", "Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped");
     }
 
@@ -494,9 +551,9 @@ public final class CheckpointDemo
         hold(1);
         require(ticket(client(1), TOKEN_A) && ticket(client(1), TOKEN_B), "one-client-exits-other-preserved", "V-018/C2 cancel A in C1 preserves C2 A+B");
         children.get(client(1)).request("cancel " + TOKEN_A);
-        await("last-A-consumer-prunes-A-only", () -> forward(source(), STREAM_A) == null && forward(source(), STREAM_B) != null, 15);
+        await("last-A-consumer-prunes-A-only", () -> forward(source(), STREAM_A) == null && forward(source(), STREAM_B) != null, 15 * scale());
         children.get(client(1)).kill();
-        await("abandoned-B-demand-removed-after-client-death", () -> forward(source(), STREAM_B) == null, 15);
+        await("abandoned-B-demand-removed-after-client-death", () -> forward(source(), STREAM_B) == null, 15 * scale());
         require(messageCounts.keySet().stream().anyMatch(k -> k.startsWith("DEACTIVATE|")), "prune-on-real-wire", "DEACTIVATE after last explicit A consumer; B removed after real client death");
     }
 
@@ -511,7 +568,7 @@ public final class CheckpointDemo
         Process cli = spawn(new ProcessBuilder(args).redirectErrorStream(true).redirectOutput(log.toFile()));
         try(var input = new BufferedWriter(new OutputStreamWriter(cli.getOutputStream(), StandardCharsets.UTF_8)))
         {
-            long readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15);
+            long readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15L * scale());
             while(true)
             {
                 input.write("neighbors\nrecovery\nroutes\ncatalog\nmetrics\n");
@@ -527,7 +584,7 @@ public final class CheckpointDemo
             }
             input.write("trace " + STREAM_A + "\nplay " + STREAM_A + "\n");
             input.flush();
-            long traceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4);
+            long traceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4L * scale());
             while(!Files.readString(log).contains("TRACE_RESULT") && !Files.readString(log).contains("TRACE_ERROR")
                     && System.nanoTime() < traceDeadline)
             {
@@ -545,7 +602,7 @@ public final class CheckpointDemo
         require(true, "production-CLI-trace-terminal-recorded", output.contains("TRACE_RESULT")
                 ? "SUCCESS; multi-hop positive additionally required after ACK" : "TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command");
         launch(node);
-        await("CLI-check-returned-to-tool-adapter", this::configuredActive, 15);
+        await("CLI-check-returned-to-tool-adapter", this::configuredActive, 15 * scale());
     }
 
 

@@ -1,0 +1,43 @@
+SESSION 1 RUNTIME nodes=4 links=3
+CHECK_PASS core-connectivity-client-to-server ok
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+DEMO_FAIL FileNotFoundError(2, 'No such file or directory')
+
+---STDERR---
+Traceback (most recent call last):
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 697, in main
+    drv.start()
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 444, in start
+    self.save("00-stable")
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 269, in save
+    (self.out / "snapshots" / f"{label}.json").write_text((self.out / "latest.json").read_text())
+  File "/usr/lib/python3.10/pathlib.py", line 1154, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+  File "/usr/lib/python3.10/pathlib.py", line 1119, in open
+    return self._accessor.open(self, mode, buffering, encoding, errors,
+FileNotFoundError: [Errno 2] No such file or directory: '/volume/ott/20261123T191800Z-898916a8/out/snapshots/00-stable.json'
+Traceback (most recent call last):
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 719, in <module>
+    main()
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 714, in main
+    success = drv.finish(success and all(c["passed"] for c in drv.checks))
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 666, in finish
+    procs[cid] = {"pid": ch.pid(), "alive": ch.alive(), "gen": ch.gen}
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 166, in pid
+    rc, out = self.drv.cmd(self.node_id, f"pgrep -f '{self.pattern}' | head -1")
+  File "/volume/ott/20261123T191800Z-898916a8/driver.py", line 221, in cmd
+    rc, out = self.client.node_command(self.session, node_id, command, shell=True)
+  File "/opt/core/daemon/core/api/grpc/client.py", line 575, in node_command
+    response = self.stub.NodeCommand(request)
+  File "/opt/core/venv/lib/python3.10/site-packages/grpc/_channel.py", line 1181, in __call__
+    return _end_unary_response_blocking(state, call, False, None)
+  File "/opt/core/venv/lib/python3.10/site-packages/grpc/_channel.py", line 1006, in _end_unary_response_blocking
+    raise _InactiveRpcError(state)  # pytype: disable=not-instantiable
+grpc._channel._InactiveRpcError: <_InactiveRpcError of RPC that terminated with:
+	status = StatusCode.NOT_FOUND
+	details = "session 1 not found"
+	debug_error_string = "UNKNOWN:Error received from peer  {created_time:"2026-11-23T19:18:02.056419777+00:00", grpc_status:5, grpc_message:"session 1 not found"}"
+>

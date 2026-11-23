@@ -1,0 +1,45 @@
+SESSION 1 RUNTIME nodes=6 links=6
+CHECK_PASS core-connectivity-client-to-server ping C1→10.0.0.20
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preservado; multi-hop positivo exigido separadamente depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk Observed actual snapshots
+CHECK_PASS two-stream-intent-isolation Observed actual snapshots
+CHECK_PASS trace-before-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "ca07bee9-e5a9-4901-82ab-2437c972efd0", "serverEpoch": "235587f7-35b5-48de-ae75-47a8ea1d8aeb", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "R2", "R1", "S1"], "elapsedNanos": 24958051}}
+CHECK_PASS lease-renewed-past-original-6s intents confirmados para lá do grant original de 6s
+CHECK_PASS renewal-on-real-wire contadores de interface / pcap em out/wire.pcap durante a janela de renew
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY R1-R2 120ms/direction edit_link=True
+DELAY R1-R2 4ms/direction edit_link=True
+CHECK_PASS transient-delay-no-oscillation pulso 150ms; política 20%/3 amostras/5s inalterada
+CHECK_PASS post-pulse-restabilized Observed actual snapshots
+CHECK_PASS restabilized-before-sustained-delay caminho anterior confirmado e estável na janela de dwell
+DELAY R1-R2 120ms/direction edit_link=True
+CHECK_PASS real-RTT-confirmed-switch Observed actual snapshots
+CHECK_PASS success-after-confirmation-publication no evento SUCCESS a forwarding publicada já mostra o novo upstream/caminho com revisão superior
+CHECK_PASS stable-after-quality-switch sem switch adicional na janela de estabilidade
+CHECK_PASS candidate-cache-before-failure [{"nodeId": "R1", "state": "AVAILABLE", "endpoint": {"nodeId": "R1", "host": "10.0.3.1", "controlPort": 45685, "dataPort": 45686, "role": "RELAY"}, "sources": [{"source": {"nodeId": "R2", "instanceId"
+CHECK_PASS bootstrap-stopped pid=24
+CHECK_PASS SIGKILL-R2 JVM pid=87 terminada
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap sem nova subscrição nem restart do cliente; bootstrap parado
+CHECK_PASS trace-after-SUCCESS {"trace": {"streamId": "00000000-0000-4000-8000-00000000000a", "traceId": "b5de7708-7af1-4338-bdf8-f254a2f570ee", "serverEpoch": "235587f7-35b5-48de-ae75-47a8ea1d8aeb", "state": "SUCCESS", "errorCode": null, "detail": "", "visited": ["C1", "R1", "S1"], "elapsedNanos": 246688472}}
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished só o JVM novo faz descoberta inicial; a reparação sem bootstrap foi observada antes
+CHECK_PASS one-client-exits-other-preserved cancel A em C1 preserva C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-state-observed forwarding A removido após último consumidor e B após morte real do cliente; frames DEACTIVATE preservados no pcap (não descodificados no CORE)
+Guião concluído
+RESULT PASS
+
+---STDERR---

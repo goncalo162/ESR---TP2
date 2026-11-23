@@ -1,0 +1,20 @@
+SESSION 1 RUNTIME nodes=4 links=3
+CHECK_PASS core-connectivity-client-to-server ok
+CHECK_PASS bootstrap-running pid=24
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS discovery-observed-ACTIVE-neighbors-v2 neighbors ACTIVE + discovery v2 em snapshots; pcap preservado em out/wire.pcap
+READY guião automático
+CHECK_PASS production-CLI-exit0 OttApplication.main no mesmo JAR e perfil; quit→SHUTDOWN no log; saída natural
+CHECK_PASS production-CLI-diagnostics-and-play logs/production-cli.log; play deliberadamente NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded SUCCESS; multi-hop positivo exigido depois de ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk source has one confirmed downstream for multiple clients
+CHECK_PASS two-stream-intent-isolation C1 só A; C2 A+B
+CHECK_FAIL trace-before-SUCCESS {"pid": 26, "instance": "a599c734-16b7-4610-a6b6-fb659784b250", "neighbors": {"R1": {"nodeId": "R1", "configured": {"nodeId": "R1", "instanceId": "00000000-0000-0000-0000-000000000000", "host": "10.0.2.1", "controlPort": 40069, "dataPort": 40070, "role": "RELAY"}, "state": "ACTIVE", "session": {"nod
+DEMO_FAIL trace-before-SUCCESS
+RESULT FAIL
+
+---STDERR---

@@ -1,0 +1,344 @@
+=== FINAL-HEAD cenario1 run 1 2026-11-23T15:11:10Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151115Z-ff3a5f83
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151115Z-ff3a5f83/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=107573
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded SUCCESS; multi-hop positive additionally required after ACK
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=05c5fba7-076d-4222-9159-4ec59409eb53, serverEpoch=9786a873-3b52-47c2-919c-59b2a6488786, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=57201569}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-mapped-to-cenario2 Scenario 1 has one configured path; RTT switch demonstrated in scenario 2 and V-017/S01-S18
+CHECK_PASS candidate-cache-before-failure [{nodeId=S1, state=AVAILABLE, endpoint={nodeId=S1, host=127.0.0.1, controlPort=39983, dataPort=39984, role=SERVER}, sources=[{source={nodeId=R1, instanceId=c6a1e2ce-dd37-453d-b5f5-a60baf4315fd, connectionId=f126381f-ebcb-423f-aa24-14b42490880e, helloRequestId=b1245a01-6bad-4a34-89f5-3721a662d85e}, generation=3, advertised={nodeId=S1, host=127.0.0.1, controlPort=39983, dataPort=39984, role=SERVER}, observedInstance=9786a873-3b52-47c2-919c-59b2a6488786, queryStartedNanos=8860766474289, learnedNanos=8860782841494, ttlNanos=60000000000}]}, {nodeId=C2, state=AVAILABLE, endpoint={nodeId=C2, host=127.0.0.4, controlPort=43097, dataPort=43098, role=CLIENT}, sources=[{source={nodeId=R1, instanceId=c6a1e2ce-dd37-453d-b5f5-a60baf4315fd, connectionId=f126381f-ebcb-423f-aa24-14b42490880e, helloRequestId=b1245a01-6bad-4a34-89f5-3721a662d85e}, generation=3, advertised={nodeId=C2, host=127.0.0.4, controlPort=43097, dataPort=43098, role=CLIENT}, observedInstance=6bb9a720-5b21-4bf4-8967-c6948fbde7a9, queryStartedNanos=8860766474289, learnedNanos=8860782841494, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R1 Owned JVM pid=107664 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=cd135607-fa9e-4b53-a1ae-d68fb5fdf489, serverEpoch=9786a873-3b52-47c2-919c-59b2a6488786, state=SUCCESS, errorCode=null, detail=, visited=[C1, S1], elapsedNanos=12239109}}
+CHECK_PASS bootstrap-running pid=108081
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=107899 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151115Z-ff3a5f83/result.json
+EXIT=0
+=== FINAL-HEAD cenario1 run 2 2026-11-23T15:11:41Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151147Z-9deaebcc
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151147Z-9deaebcc/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=108377
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=c34baed8-dfb2-4f8d-827f-4270554e2ea9, serverEpoch=f8c25576-0e86-43bb-a72e-450315783885, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=85376424}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-mapped-to-cenario2 Scenario 1 has one configured path; RTT switch demonstrated in scenario 2 and V-017/S01-S18
+CHECK_PASS candidate-cache-before-failure [{nodeId=S1, state=AVAILABLE, endpoint={nodeId=S1, host=127.0.0.1, controlPort=40737, dataPort=40738, role=SERVER}, sources=[{source={nodeId=R1, instanceId=3daf391d-e519-4ae1-81a0-7f0bf5417fd2, connectionId=f7bc8963-530c-412b-9b78-03d30a28275a, helloRequestId=e2ce79d9-4fa3-4fda-9311-f5926f2602ec}, generation=5, advertised={nodeId=S1, host=127.0.0.1, controlPort=40737, dataPort=40738, role=SERVER}, observedInstance=f8c25576-0e86-43bb-a72e-450315783885, queryStartedNanos=8902873215265, learnedNanos=8902884826181, ttlNanos=60000000000}]}, {nodeId=C2, state=AVAILABLE, endpoint={nodeId=C2, host=127.0.0.4, controlPort=45579, dataPort=45580, role=CLIENT}, sources=[{source={nodeId=R1, instanceId=3daf391d-e519-4ae1-81a0-7f0bf5417fd2, connectionId=f7bc8963-530c-412b-9b78-03d30a28275a, helloRequestId=e2ce79d9-4fa3-4fda-9311-f5926f2602ec}, generation=5, advertised={nodeId=C2, host=127.0.0.4, controlPort=45579, dataPort=45580, role=CLIENT}, observedInstance=1158fd0f-4de7-4176-96eb-9386bc96f990, queryStartedNanos=8902873215265, learnedNanos=8902884826181, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R1 Owned JVM pid=108468 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=f3ebdeb9-aa1f-473d-b211-4d1f91e07400, serverEpoch=f8c25576-0e86-43bb-a72e-450315783885, state=SUCCESS, errorCode=null, detail=, visited=[C1, S1], elapsedNanos=22967542}}
+CHECK_PASS bootstrap-running pid=109079
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=108765 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151147Z-9deaebcc/result.json
+EXIT=0
+=== FINAL-HEAD cenario1 run 3 2026-11-23T15:12:20Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151225Z-28c6b934
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151225Z-28c6b934/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=109391
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=e0763c2a-ebb9-4a97-bed1-402aa338986c, serverEpoch=73c7a898-e561-4fb3-a897-97d2d68f7221, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=132294331}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-mapped-to-cenario2 Scenario 1 has one configured path; RTT switch demonstrated in scenario 2 and V-017/S01-S18
+CHECK_PASS candidate-cache-before-failure [{nodeId=S1, state=AVAILABLE, endpoint={nodeId=S1, host=127.0.0.1, controlPort=40749, dataPort=40750, role=SERVER}, sources=[{source={nodeId=R1, instanceId=923b73ee-9250-440b-88c4-e8a276c081ec, connectionId=87904580-0f53-4fa7-9582-b18fd68791f7, helloRequestId=bb356c5c-9961-4458-96a5-4dc33d5b0e95}, generation=3, advertised={nodeId=S1, host=127.0.0.1, controlPort=40749, dataPort=40750, role=SERVER}, observedInstance=73c7a898-e561-4fb3-a897-97d2d68f7221, queryStartedNanos=8931118149462, learnedNanos=8931130075190, ttlNanos=60000000000}]}, {nodeId=C2, state=AVAILABLE, endpoint={nodeId=C2, host=127.0.0.4, controlPort=40441, dataPort=40442, role=CLIENT}, sources=[{source={nodeId=R1, instanceId=923b73ee-9250-440b-88c4-e8a276c081ec, connectionId=87904580-0f53-4fa7-9582-b18fd68791f7, helloRequestId=bb356c5c-9961-4458-96a5-4dc33d5b0e95}, generation=3, advertised={nodeId=C2, host=127.0.0.4, controlPort=40441, dataPort=40442, role=CLIENT}, observedInstance=3ccb16f5-fae5-41d6-a020-c55419d71318, queryStartedNanos=8931118149462, learnedNanos=8931130075190, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R1 Owned JVM pid=109482 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=39eb6c95-0abd-442e-a66c-af97f2bc670c, serverEpoch=73c7a898-e561-4fb3-a897-97d2d68f7221, state=SUCCESS, errorCode=null, detail=, visited=[C1, S1], elapsedNanos=13141098}}
+CHECK_PASS bootstrap-running pid=109938
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=109719 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario1/20261123T151225Z-28c6b934/result.json
+EXIT=0
+=== FINAL-HEAD cenario2 run 1 2026-11-23T15:12:52Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151257Z-4b4adbaf
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151257Z-4b4adbaf/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=110225
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=9be4e031-ec9a-446c-9af9-837806284ece, serverEpoch=ff2f4d46-c148-4c1c-b91d-7e10d8adac70, state=SUCCESS, errorCode=null, detail=, visited=[C1, R2, R1, S1], elapsedNanos=95053282}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY R1-R2 120ms/direction
+DELAY R1-R2 4ms/direction
+CHECK_PASS transient-delay-no-oscillation 150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged
+CHECK_PASS post-pulse-restabilized Observed actual snapshots
+CHECK_PASS restabilized-before-sustained-delay Previous path confirmed again and stable for the dwell window after the transient pulse
+DELAY R1-R2 120ms/direction
+CHECK_PASS real-RTT-confirmed-switch Observed actual snapshots
+CHECK_PASS success-after-confirmation-publication At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision
+CHECK_PASS stable-after-quality-switch No additional successful switch in measured stability window
+CHECK_PASS candidate-cache-before-failure [{nodeId=R1, state=AVAILABLE, endpoint={nodeId=R1, host=127.0.0.2, controlPort=33701, dataPort=33702, role=RELAY}, sources=[{source={nodeId=R2, instanceId=7ff9bd1b-ff33-435c-865c-178d8f816292, connectionId=ac0f4aae-3d08-4c12-a5c6-c97919649948, helloRequestId=11e478a1-2184-4138-b621-d0202d5b883f}, generation=12, advertised={nodeId=R1, host=127.0.0.2, controlPort=33701, dataPort=33702, role=RELAY}, observedInstance=909011de-1ac2-4c14-b13b-13906085729d, queryStartedNanos=9010014928215, learnedNanos=9010034790850, ttlNanos=60000000000}]}, {nodeId=R3, state=AVAILABLE, endpoint={nodeId=R3, host=127.0.0.4, controlPort=38345, dataPort=38346, role=RELAY}, sources=[{source={nodeId=R2, instanceId=7ff9bd1b-ff33-435c-865c-178d8f816292, connectionId=ac0f4aae-3d08-4c12-a5c6-c97919649948, helloRequestId=11e478a1-2184-4138-b621-d0202d5b883f}, generation=12, advertised={nodeId=R3, host=127.0.0.4, controlPort=38345, dataPort=38346, role=RELAY}, observedInstance=1423ff15-b593-4cb2-bd75-59cc2ca45807, queryStartedNanos=9010014928215, learnedNanos=9010034790850, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R2 Owned JVM pid=110357 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=6d37c98c-834e-445e-84a4-d5c2328d695b, serverEpoch=ff2f4d46-c148-4c1c-b91d-7e10d8adac70, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=20850835}}
+CHECK_PASS bootstrap-running pid=112545
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=110877 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151257Z-4b4adbaf/result.json
+EXIT=0
+=== FINAL-HEAD cenario2 run 2 2026-11-23T15:14:16Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151421Z-67a5116e
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151421Z-67a5116e/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=113117
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=122e148b-9ec4-4904-86ff-711ffca5b944, serverEpoch=15a5a73c-f19d-421f-91ff-f564a5c9b532, state=SUCCESS, errorCode=null, detail=, visited=[C1, R2, R1, S1], elapsedNanos=84468894}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY R1-R2 120ms/direction
+DELAY R1-R2 4ms/direction
+CHECK_PASS transient-delay-no-oscillation 150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged
+CHECK_PASS post-pulse-restabilized Observed actual snapshots
+CHECK_PASS restabilized-before-sustained-delay Previous path confirmed again and stable for the dwell window after the transient pulse
+DELAY R1-R2 120ms/direction
+CHECK_PASS real-RTT-confirmed-switch Observed actual snapshots
+CHECK_PASS success-after-confirmation-publication At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision
+CHECK_PASS stable-after-quality-switch No additional successful switch in measured stability window
+CHECK_PASS candidate-cache-before-failure [{nodeId=R1, state=AVAILABLE, endpoint={nodeId=R1, host=127.0.0.2, controlPort=44067, dataPort=44068, role=RELAY}, sources=[{source={nodeId=R2, instanceId=516f553c-7871-43bd-b824-05508ff1917f, connectionId=1eca9262-beca-467a-a832-1611485ba418, helloRequestId=34109376-44a6-48ac-9a32-a899a3126ad1}, generation=7, advertised={nodeId=R1, host=127.0.0.2, controlPort=44067, dataPort=44068, role=RELAY}, observedInstance=a53a6b64-1bc3-43f2-b506-8fdfeba57ddb, queryStartedNanos=9069730447102, learnedNanos=9069739724050, ttlNanos=60000000000}]}, {nodeId=R3, state=AVAILABLE, endpoint={nodeId=R3, host=127.0.0.4, controlPort=39825, dataPort=39826, role=RELAY}, sources=[{source={nodeId=R2, instanceId=516f553c-7871-43bd-b824-05508ff1917f, connectionId=1eca9262-beca-467a-a832-1611485ba418, helloRequestId=34109376-44a6-48ac-9a32-a899a3126ad1}, generation=7, advertised={nodeId=R3, host=127.0.0.4, controlPort=39825, dataPort=39826, role=RELAY}, observedInstance=48bb69b3-1b69-47c2-9d50-f87aa2a16b46, queryStartedNanos=9069730447102, learnedNanos=9069739724050, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R2 Owned JVM pid=113244 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=c0da3899-0d0f-4435-9970-e6bfc75c2f6f, serverEpoch=15a5a73c-f19d-421f-91ff-f564a5c9b532, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=20637722}}
+CHECK_PASS bootstrap-running pid=114125
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=113569 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151421Z-67a5116e/result.json
+EXIT=0
+=== FINAL-HEAD cenario2 run 3 2026-11-23T15:15:20Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151525Z-1b1daa64
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151525Z-1b1daa64/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=114425
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from R1
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=9709630a-8786-46fc-b67e-63aa28ee229f, serverEpoch=a938fa61-aba0-48dc-9bd3-41936615d30d, state=SUCCESS, errorCode=null, detail=, visited=[C1, R2, R1, S1], elapsedNanos=92459311}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY R1-R2 120ms/direction
+DELAY R1-R2 4ms/direction
+CHECK_PASS transient-delay-no-oscillation 150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged
+CHECK_PASS post-pulse-restabilized Observed actual snapshots
+CHECK_PASS restabilized-before-sustained-delay Previous path confirmed again and stable for the dwell window after the transient pulse
+DELAY R1-R2 120ms/direction
+CHECK_PASS real-RTT-confirmed-switch Observed actual snapshots
+CHECK_PASS success-after-confirmation-publication At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision
+CHECK_PASS stable-after-quality-switch No additional successful switch in measured stability window
+CHECK_PASS candidate-cache-before-failure [{nodeId=R3, state=AVAILABLE, endpoint={nodeId=R3, host=127.0.0.4, controlPort=43907, dataPort=43908, role=RELAY}, sources=[{source={nodeId=R2, instanceId=1c94a2b2-4078-436e-a17b-86bb06fc283e, connectionId=98059426-8be6-4936-a677-26b43ecad89d, helloRequestId=1ce56484-be96-4601-882e-7f522d750925}, generation=12, advertised={nodeId=R3, host=127.0.0.4, controlPort=43907, dataPort=43908, role=RELAY}, observedInstance=7eddc2c2-21ef-468f-84d1-7b98b37c2919, queryStartedNanos=9158323786937, learnedNanos=9158333972741, ttlNanos=60000000000}]}, {nodeId=R1, state=AVAILABLE, endpoint={nodeId=R1, host=127.0.0.2, controlPort=45685, dataPort=45686, role=RELAY}, sources=[{source={nodeId=R2, instanceId=1c94a2b2-4078-436e-a17b-86bb06fc283e, connectionId=98059426-8be6-4936-a677-26b43ecad89d, helloRequestId=1ce56484-be96-4601-882e-7f522d750925}, generation=12, advertised={nodeId=R1, host=127.0.0.2, controlPort=45685, dataPort=45686, role=RELAY}, observedInstance=f33500f7-2e26-4970-b581-54fd0febd1c6, queryStartedNanos=9158323786937, learnedNanos=9158333972741, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-R2 Owned JVM pid=114570 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=c97f1514-9122-4cc3-9d5b-e8473d34b902, serverEpoch=a938fa61-aba0-48dc-9bd3-41936615d30d, state=SUCCESS, errorCode=null, detail=, visited=[C1, R1, S1], elapsedNanos=20607881}}
+CHECK_PASS bootstrap-running pid=115573
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-C2 Owned JVM pid=114917 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario2/20261123T151525Z-1b1daa64/result.json
+EXIT=0
+=== FINAL-HEAD cenario3 run 1 2026-11-23T15:16:40Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151646Z-73408404
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151646Z-73408404/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=115897
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+CHECK_PASS production-CLI-exit0 OttApplication.main on the same JAR and profile
+CHECK_PASS production-CLI-diagnostics-and-play See logs/production-cli.log; play deliberately NOT_IMPLEMENTED
+CHECK_PASS production-CLI-trace-terminal-recorded TRACE_ERROR preserved; positive multi-hop trace is separately required after ACK, not inferred from this command
+CHECK_PASS CLI-check-returned-to-tool-adapter Observed actual snapshots
+CHECK_PASS routes-ready-before-subscription Observed actual snapshots
+CHECK_PASS clients-ACK-SUCCESS Observed actual snapshots
+CHECK_PASS one-shared-trunk V-018/C2: source has one confirmed downstream for multiple clients
+CHECK_PASS one-initial-ACTIVATE-on-shared-trunk V-018/C2: exactly one initial ACTIVATE for stream A from O2
+CHECK_PASS two-stream-intent-isolation V-018/C1: C1 only A; C2 A+B; catalog selection does not authorize forwarding
+CHECK_PASS trace-before-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=6c91b02b-c8c8-463d-ac61-8288ac8ce26a, serverEpoch=b8e23c58-af3c-4a23-adfd-e0d94096816e, state=SUCCESS, errorCode=null, detail=, visited=[O4, O3, O2, O1], elapsedNanos=85236541}}
+CHECK_PASS lease-renewed-past-original-6s All admitted intents remain confirmed after original grant duration
+CHECK_PASS renewal-on-real-wire SUBSCRIPTION_RENEW (type 14) and ACTIVATE_ACK (type 12) in wire.jsonl
+CHECK_PASS quality-baseline-confirmed Observed actual snapshots
+DELAY O2-O3 120ms/direction
+DELAY O2-O3 4ms/direction
+CHECK_PASS transient-delay-no-oscillation 150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged
+CHECK_PASS post-pulse-restabilized Observed actual snapshots
+CHECK_PASS restabilized-before-sustained-delay Previous path confirmed again and stable for the dwell window after the transient pulse
+DELAY O2-O3 120ms/direction
+CHECK_PASS real-RTT-confirmed-switch Observed actual snapshots
+CHECK_PASS success-after-confirmation-publication At SUCCESS the published forwarding already showed the replacement upstream/path with a higher revision
+CHECK_PASS stable-after-quality-switch No additional successful switch in measured stability window
+CHECK_PASS candidate-cache-before-failure [{nodeId=O2, state=AVAILABLE, endpoint={nodeId=O2, host=127.0.0.2, controlPort=44727, dataPort=44728, role=RELAY}, sources=[{source={nodeId=O3, instanceId=e36d8fa5-27d1-45f9-85f1-94289d69ffa5, connectionId=31f5be57-fd8e-4698-abf4-33393fe99a0b, helloRequestId=939d24b7-8089-42c8-b051-788911e0a450}, generation=17, advertised={nodeId=O2, host=127.0.0.2, controlPort=44727, dataPort=44728, role=RELAY}, observedInstance=2c7e1693-0993-4c97-9735-84c86467a357, queryStartedNanos=9263871024224, learnedNanos=9263879781017, ttlNanos=60000000000}]}, {nodeId=O5, state=AVAILABLE, endpoint={nodeId=O5, host=127.0.0.5, controlPort=33943, dataPort=33944, role=RELAY}, sources=[{source={nodeId=O3, instanceId=e36d8fa5-27d1-45f9-85f1-94289d69ffa5, connectionId=31f5be57-fd8e-4698-abf4-33393fe99a0b, helloRequestId=939d24b7-8089-42c8-b051-788911e0a450}, generation=17, advertised={nodeId=O5, host=127.0.0.5, controlPort=33943, dataPort=33944, role=RELAY}, observedInstance=9377d283-17e9-44cd-95d8-8954058c544b, queryStartedNanos=9263871024224, learnedNanos=9263879781017, ttlNanos=60000000000}]}]
+CHECK_PASS bootstrap-stopped-before-failure No process can answer bootstrap queries during recovery
+CHECK_PASS SIGKILL-O3 Owned JVM pid=116029 exit=137
+CHECK_PASS NeighborDown-after-real-JVM-kill Observed actual snapshots
+CHECK_PASS automatic-tree-recovery-with-bootstrap-stopped Observed actual snapshots
+CHECK_PASS same-client-intent-and-no-bootstrap No new subscription, no client restart; bootstrap process is stopped
+CHECK_PASS trace-after-SUCCESS {trace={streamId=00000000-0000-4000-8000-00000000000a, traceId=a0de9e47-996b-400e-a393-c46806f82595, serverEpoch=b8e23c58-af3c-4a23-adfd-e0d94096816e, state=SUCCESS, errorCode=null, detail=, visited=[O4, O2, O1], elapsedNanos=19262008}}
+CHECK_PASS bootstrap-running pid=117521
+CHECK_PASS restarted-node-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS restart-initial-bootstrap-distinguished Only the new JVM needs initial discovery; survivor repair was observed while BOOT was stopped
+CHECK_PASS one-client-exits-other-preserved V-018/C2 cancel A in C1 preserves C2 A+B
+CHECK_PASS last-A-consumer-prunes-A-only Observed actual snapshots
+CHECK_PASS SIGKILL-O8 Owned JVM pid=116962 exit=137
+CHECK_PASS abandoned-B-demand-removed-after-client-death Observed actual snapshots
+CHECK_PASS prune-on-real-wire DEACTIVATE after last explicit A consumer; B removed after real client death
+RESULT PASS /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151646Z-73408404/result.json
+EXIT=0
+=== FINAL-HEAD cenario3 run 2 2026-11-23T15:18:28Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151834Z-7e5ca65b
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151834Z-7e5ca65b/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=117899
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+DEMO_FAIL java.lang.IllegalStateException: CLI route/catalog/metrics readiness not observed
+java.lang.IllegalStateException: CLI route/catalog/metrics readiness not observed
+	at demo.CheckpointDemo.cliCheck(CheckpointDemo.java:583)
+	at demo.CheckpointDemo.activate(CheckpointDemo.java:393)
+	at demo.CheckpointDemo.next(CheckpointDemo.java:378)
+	at demo.CheckpointDemo.main(CheckpointDemo.java:130)
+RESULT FAIL /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151834Z-7e5ca65b/result.json
+EXIT=1
+=== FINAL-HEAD cenario3 run 3 2026-11-23T15:19:18Z
+RUN /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151923Z-1ae53dad
+DASHBOARD file:///home/goncalom/Documents/Uni/4.%C2%BA%20ano/1.%C2%BA%20semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151923Z-1ae53dad/dashboard.html
+CHECK_PASS configuration-valid ConfigurationLoader.loadDeployment
+CHECK_PASS bootstrap-running pid=119120
+CHECK_PASS all-configured-edges-ACTIVE Observed actual snapshots
+CHECK_PASS real-RTT-and-catalog Observed actual snapshots
+CHECK_PASS TCP-v2-discovery-observed Raw decoded frames in wire.jsonl
+READY. next=guião; snapshot; raw NODE COMMAND; delay A-B MS; kill NODE; restart NODE; quit
+DEMO_FAIL java.lang.IllegalStateException: CLI route/catalog/metrics readiness not observed
+java.lang.IllegalStateException: CLI route/catalog/metrics readiness not observed
+	at demo.CheckpointDemo.cliCheck(CheckpointDemo.java:583)
+	at demo.CheckpointDemo.activate(CheckpointDemo.java:393)
+	at demo.CheckpointDemo.next(CheckpointDemo.java:378)
+	at demo.CheckpointDemo.main(CheckpointDemo.java:130)
+RESULT FAIL /home/goncalom/Documents/Uni/4.º ano/1.º semestre/ESR/ESR---TP2/experiments/checkpoint-phase04/runs/cenario3/20261123T151923Z-1ae53dad/result.json
+EXIT=1
+FINAL-HEAD DONE 2026-11-23T15:20:19Z

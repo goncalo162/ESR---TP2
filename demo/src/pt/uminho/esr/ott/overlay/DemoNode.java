@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -49,8 +50,11 @@ public final class DemoNode
                         event.routeSwitch().ifPresent(change ->
                         {
                             var current = routing.get().snapshot().forwarding().get(change.streamId());
-                            record("switch", Map.of("change", change, "publishedRevision",
-                                    current == null ? -1L : current.revision()));
+                            record("switch", Map.of("change", change,
+                                    "publishedRevision", current == null ? -1L : current.revision(),
+                                    "publishedUpstream", current == null || current.upstream().isEmpty() ? ""
+                                            : current.upstream().orElseThrow().nodeId(),
+                                    "publishedPath", current == null ? List.<String>of() : current.path()));
                         });
                         if(event.fatal())
                             record("fatal", event);
