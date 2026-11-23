@@ -19,6 +19,16 @@ inicial/final `mvn -B -ntp clean verify` JDK21 **1459/0/0/0, 21 XML**, JAR
   mantidos; a demo aguarda validação externa e não é aprovação docente. [Handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
   · [DEMO.md](../demo/DEMO.md) · [MATRIZ](../demo/MATRIX.md).
 
+**Ferramenta demo→CORE preparada — 2026-11-23T16:10:00Z:** `demo/core/prepare_core.py`
+gera artefactos de deployment no CORE (perfis por nó com IPs de
+`CORE/topologies/cenario{1,2,3}.xml`, bootstrap no servidor, manifesto e
+comandos) a partir de uma run local; guia em `demo/GUIA-DEMO.md`. **PHASE-05–07
+continuam TODO**: PHASE-05 é incremento funcional de vídeo (TASK-019–024, com
+os seus próprios bolts/revisores) e é gate da PHASE-06; a execução CORE precisa
+de sessão coreemu (docker+X11) real; a PHASE-07 depende de informação docente
+(G-ASSESSMENTS) e de submissão externa autorizada. Nada disso foi executado ou
+submetido.
+
 **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
 [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
 separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido

@@ -130,15 +130,17 @@ shutdown hooks: evitar matar a ferramenta dessa forma. Se houver interrupção
 nessa condição, identificar os PIDs pelos perfis da run antes de qualquer
 limpeza manual; nunca usar `pkill java`.
 
-## Caminho para CORE — não executado
+## Caminho para CORE — artefactos preparados, execução pendente
 
 Reutilizar `CORE/topologies/cenario1.xml`, `cenario2.xml` e `cenario3.xml`.
-Os perfis por nó da run são o mapa de configuração; na PHASE-06, copiar para
-os nós correspondentes e trocar bind/advertised/bootstrap e hosts da topologia
-pelos IPs CORE, conservando IDs/roles/grafo/UUIDs. Arrancar a CLI do mesmo JAR
-em cada máquina. Os aliases 127/8 e o proxy localhost não transitam para nós
-CORE separados. `tc/netem` pode ser um caminho futuro privilegiado nessa fase,
-após identificar interfaces; não é pré-requisito da alternativa sem root local.
+Os perfis por nó da run são o mapa de configuração; `demo/core/prepare_core.py`
+gera os artefactos CORE (perfis por nó com os IPs do XML, bootstrap no host do
+servidor, manifesto e comandos por nó) a partir de uma run local — ver o guia
+[demo/GUIA-DEMO.md](GUIA-DEMO.md) §5 e exemplos em `demo/core/out/`. A execução
+em si fica para a PHASE-06 (coreemu com docker+X11 e sessão CORE real, ainda
+não disponível nesta bancada). Arrancar a CLI do mesmo JAR em cada máquina. Os
+aliases 127/8 e o proxy localhost não transitam para nós CORE separados;
+lá os atrasos vêm do próprio emulador (opções do link) ou de `tc/netem`.
 
 ## Fora do âmbito
 
@@ -148,4 +150,4 @@ PHASE-05–07 continuam TODO. R17 histórico permanece sem causa estabelecida;
 V-018 com métricas controladas não explica essa falha. Datas/conteúdo docente
 G-ASSESSMENTS não são declarados resolvidos pela ferramenta.
 
-[Matriz para artigo](MATRIX.md) · [Estado e continuação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
+[Matriz para artigo](MATRIX.md) · [Guia de uso](GUIA-DEMO.md) · [Estado e continuação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).

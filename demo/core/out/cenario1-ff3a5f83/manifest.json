@@ -1,0 +1,45 @@
+{
+ "scenario": "cenario1",
+ "sourceRun": "experiments/checkpoint-phase04/runs/cenario1/20261123T151115Z-ff3a5f83",
+ "xml": "CORE/topologies/cenario1.xml",
+ "deviceMap": {
+  "Servidor": "S1",
+  "Router1": "R1",
+  "Cliente1": "C1",
+  "Cliente2": "C2"
+ },
+ "deviceIp": {
+  "Router1": "10.0.2.1",
+  "Servidor": "10.0.0.20",
+  "Cliente2": "10.0.1.20",
+  "Cliente1": "10.0.2.20"
+ },
+ "coreEdges": [
+  [
+   "Router1",
+   "Servidor"
+  ],
+  [
+   "Cliente2",
+   "Router1"
+  ],
+  [
+   "Router1",
+   "Cliente1"
+  ]
+ ],
+ "server": {
+  "node": "S1",
+  "ip": "10.0.0.20"
+ },
+ "jar": "/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar",
+ "jarSha256": "dc192971c9ba3a7f66df0e20b3851b4c176c8f4d34158267610b4d7eebab920f",
+ "commands": {
+  "BOOT": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role BOOTSTRAP --config BOOT.properties",
+  "S1": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/S1.properties SERVER   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role SERVER --config nodes/S1.properties",
+  "R1": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/R1.properties RELAY   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role RELAY --config nodes/R1.properties",
+  "C1": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/C1.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/C1.properties",
+  "C2": "java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar:/home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/demo/.classes pt.uminho.esr.ott.overlay.DemoNode nodes/C2.properties CLIENT   # ou CLI: java -cp /home/goncalom/Documents/Uni/4.\u00ba ano/1.\u00ba semestre/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar pt.uminho.esr.ott.app.OttApplication --role CLIENT --config nodes/C2.properties"
+ },
+ "note": "Control-plane only. Video/UDP/player is PHASE-05 (TASK-019..024) and not part of this demo. Copy this folder to CORE/volume/ott/<scenario>/ and run the commands on each CORE device."
+}
