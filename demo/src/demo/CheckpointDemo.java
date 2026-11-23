@@ -307,8 +307,12 @@ public final class CheckpointDemo
             launch(node);
         }
         await("all-configured-edges-ACTIVE", () -> configuredActive(), 25);
+        // A propagação de anúncios escala com a profundidade do grafo (5 saltos
+        // no cenário3/Figura1); o prazo de arranque cresce com o número de nós,
+        // sem tocar nos prazos das condições do guião (ex.: switch em 25s).
+        int startupSeconds = csv("nodes").size() > 6 ? 60 : 20;
         await("real-RTT-and-catalog", () -> csv("nodes").stream().allMatch(this::routesReady)
-                && csv("nodes").stream().allMatch(n -> !map(map(views.get(n).get("metrics")).get("links")).isEmpty()), 20);
+                && csv("nodes").stream().allMatch(n -> !map(map(views.get(n).get("metrics")).get("links")).isEmpty()), startupSeconds);
         require(messageCounts.keySet().stream().anyMatch(x -> x.startsWith("HELLO|"))
                 && messageCounts.keySet().stream().anyMatch(x -> x.startsWith("DISCOVERY_QUERY|"))
                 && messageCounts.keySet().stream().anyMatch(x -> x.startsWith("DISCOVERY_SNAPSHOT|")), "TCP-v2-discovery-observed", "Raw decoded frames in wire.jsonl");
