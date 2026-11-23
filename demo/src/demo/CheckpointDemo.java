@@ -462,15 +462,39 @@ public final class CheckpointDemo
         hold(2);
         require(switchCount(node) == successes && previous.equals(upstream(node, STREAM_A)),
                 "transient-delay-no-oscillation", "150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged");
-        // Deixa a árvore re-assentar no caminho anterior (sem ronda ativa e com o
-        // dwell da política cumprido) antes do atraso sustentado, para a ronda de
-        // switch começar de um estado ancorado e a primeira tentativa não ser
-        // rejeitada por PATH_CHANGED durante o churn do pulso. O prazo do switch
-        // (25s) não é alterado.
-        await("post-pulse-restabilized", () -> previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes, 15);
-        hold(6);
-        require(previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes,
-                "restabilized-before-sustained-delay", "Previous path confirmed again and stable for the dwell window after the transient pulse");
+        // Janela de quietude antes do atraso sustentado: o caminho anterior tem de
+        // estar confirmado e a revisão da árvore estável (sem confirms novos) por
+        // mais do que o dwell da política, para a ronda de switch começar ancorada
+        // e o confirm não falhar QUALITY_CHANGED por o dwell ter sido reposto pelo
+        // churn do pulso. O prazo do switch (25s) não é alterado.
+        long quietWindow = TimeUnit.SECONDS.toNanos(7);
+        long quietDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(40);
+        long lastRev = -2;
+        long quietSince = -1;
+        boolean quiet = false;
+        while(System.nanoTime() < quietDeadline)
+        {
+            refresh();
+            var tree = forward(node, STREAM_A);
+            long rev = tree == null ? -1 : number(tree.get("revision"));
+            boolean stable = previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes && rev >= 0;
+            if(stable && rev == lastRev)
+            {
+                if(quietSince < 0)
+                    quietSince = System.nanoTime();
+                if(System.nanoTime() - quietSince >= quietWindow)
+                {
+                    quiet = true;
+                    break;
+                }
+            }else{
+                lastRev = rev;
+                quietSince = -1;
+            }
+            Thread.sleep(200);
+        }
+        require(quiet, "restabilized-before-sustained-delay",
+                "Previous path confirmed with stable forwarding revision for longer than the policy dwell after the transient pulse");
         setDelay(key, 120);
         await("real-RTT-confirmed-switch", () -> replacement.equals(upstream(node, STREAM_A)) && switchCount(node) > successes, 25);
         // Atomicidade confirmação/publicação: no evento SUCCESS, a forwarding já
