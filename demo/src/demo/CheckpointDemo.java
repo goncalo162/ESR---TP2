@@ -568,7 +568,7 @@ public final class CheckpointDemo
         Process cli = spawn(new ProcessBuilder(args).redirectErrorStream(true).redirectOutput(log.toFile()));
         try(var input = new BufferedWriter(new OutputStreamWriter(cli.getOutputStream(), StandardCharsets.UTF_8)))
         {
-            long readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15);
+            long readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15L * scale());
             while(true)
             {
                 input.write("neighbors\nrecovery\nroutes\ncatalog\nmetrics\n");
@@ -584,7 +584,7 @@ public final class CheckpointDemo
             }
             input.write("trace " + STREAM_A + "\nplay " + STREAM_A + "\n");
             input.flush();
-            long traceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4);
+            long traceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4L * scale());
             while(!Files.readString(log).contains("TRACE_RESULT") && !Files.readString(log).contains("TRACE_ERROR")
                     && System.nanoTime() < traceDeadline)
             {
