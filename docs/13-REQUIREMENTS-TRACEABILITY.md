@@ -482,3 +482,11 @@ usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
 Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
 desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
 o resultado de publicação só será declarado após execução e conferência remota.
+
+## IMP-016 — evidência parcial de protocolo,integração72c9f92
+
+[TASK-019 DONE/fecho](../memory-bank/bolts/010-video/closure-walkthrough.md):V-019,
+78 U01–U08,clean verify1537/0/0/0,22 XML,manual Francisco24 e revisão final Denji.
+Codec OTT1/caps/fragmentação validados; não conclui requisitos compostos de
+forwarding,vídeo,latência ou reprodução. TASK-020–024 e unidade005/PHASE-05
+permanecem pendentes/em progresso. Sem alegar emissão,GUI ou CORE neste codec.

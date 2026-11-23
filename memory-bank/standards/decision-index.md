@@ -2,6 +2,14 @@
 
 Fonte normativa: [ADD](../../add.md).
 
+## IMP-016 — concluído e integrado,decisões preservadas
+
+[Fecho](../bolts/010-video/closure-walkthrough.md):main72c9f92,Test1537/0/0/0,
+22 XML,manual Francisco24 e revisão final Denji cumpridos. ADR reutilizadas,
+sem nova decisão normativa ou Q-C global. IMP-016-LOCAL-02:patch de uma linha no
+template previamente autorizado,preservado; IDs locais. Unidade005/PHASE-05 em
+progresso. Sem alterações Java no fecho,push ou início de outro IMP.
+
 ## IMP-014/015 — concluídos; decisões preservadas
 
 Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).

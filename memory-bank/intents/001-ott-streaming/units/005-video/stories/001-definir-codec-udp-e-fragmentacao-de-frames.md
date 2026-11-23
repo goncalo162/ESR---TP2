@@ -2,7 +2,9 @@
 id: "001-definir-codec-udp-e-fragmentacao-de-frames"
 unit: "005-video"
 intent: "001-ott-streaming"
-status: "planned"
+status: "complete"
+implemented: true
+completed: "2026-11-23T16:02:19Z"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-019"]
@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Formato coincide com contrato v1.
-- [ ] Limites são impostos antes de alocar.
-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
-- [ ] Validação V-019 executada e evidência ligada no progresso.
+- [x] Formato coincide com contrato v1.
+- [x] Limites são impostos antes de alocar.
+- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+- [x] Validação V-019 executada e evidência ligada no progresso.
 
 ## Testes
 
@@ -37,3 +39,11 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
 - Bolts anteriores: 009-arvores.
 - Responsável de origem: Waheed; revisor: Denji.
 - Gates: nenhum específico adicional.
+
+## Fecho — complete / implemented=true
+
+Fecho documental autorizado pelo utilizador após integração local em main72c9f92.
+Test1537/0/0/0,22 XML,V-019/U01–U08,manual humano Francisco24 e revisão final Denji
+cumpridos. [Fecho](../../../../../bolts/010-video/closure-walkthrough.md).
+TASK-019 DONE; unidade005/PHASE-05 em progresso. IDs locais,demo e negativos
+preservados; sem alteração Java,push ou início de outro IMP.

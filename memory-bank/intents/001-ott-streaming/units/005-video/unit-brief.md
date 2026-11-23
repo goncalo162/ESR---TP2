@@ -1,11 +1,11 @@
 ---
 unit: "005-video"
 intent: "001-ott-streaming"
-phase: "inception"
+phase: "construction"
 source_phase: "PHASE-05"
-status: "ready"
+status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-03T20:54:11Z"
+updated: "2026-11-23T16:02:19Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
@@ -14,6 +14,14 @@ requires_units: ["004-arvores"]
 # Unidade — 005-video
 
 Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+
+Estado atual: in-progress; IMP-016/010-video/TASK-019 complete/DONE,integrado
+localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrough.md).
+Restantes histórias planned,sem início de outro IMP. PHASE-05 em progresso.
+Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji cumpridos.
+Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
+Somente codec entregue neste incremento; streaming/reprodução continuam futuros.
+Sem push,alterações Java no fecho ou fecho da unidade. IDs locais preservados.
 
 ## Requisitos atribuídos
 
@@ -27,7 +35,7 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 ## Histórias e bolts
 
-- [ ] [001-definir-codec-udp-e-fragmentacao-de-frames](stories/001-definir-codec-udp-e-fragmentacao-de-frames.md) → [010-video](../../../../bolts/010-video/bolt.md); IMP-016 (M).
+- [x] [001-definir-codec-udp-e-fragmentacao-de-frames](stories/001-definir-codec-udp-e-fragmentacao-de-frames.md) → [010-video](../../../../bolts/010-video/bolt.md); IMP-016 (M).
 - [ ] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md) → [011-video](../../../../bolts/011-video/bolt.md); IMP-017 (M).
 - [ ] [007-ler-o-perfil-mjpeg-confirmado](stories/007-ler-o-perfil-mjpeg-confirmado.md) → [025-video](../../../../bolts/025-video/bolt.md); IMP-018 (M).
 - [ ] [008-emitir-fontes-com-pacing-e-procura](stories/008-emitir-fontes-com-pacing-e-procura.md) → [026-video](../../../../bolts/026-video/bolt.md); IMP-019 (M).

@@ -1,0 +1,502 @@
+diff --git a/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java b/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
+index e69de29..d0f2854 100644
+--- a/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
++++ b/Projeto/src/main/java/pt/uminho/esr/ott/streaming/StreamPacket.java
+@@ -0,0 +1,123 @@
++package pt.uminho.esr.ott.streaming;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.UUID;
++import pt.uminho.esr.ott.protocol.ErrorCode;
++import pt.uminho.esr.ott.protocol.ProtocolException;
++
++/** Immutable fragment of an opaque frame, encoded as one UDP OTT1 v1 datagram. */
++public record StreamPacket(UUID streamId, UUID sessionId, long frameSeq,
++        long mediaTimeUs, long frameLength, int fragmentIndex,
++        int fragmentCount, byte[] payload) {
++
++    public static final int MAGIC = 0x4f545431;
++    public static final int VERSION = 1;
++    public static final int HEADER_BYTES = 64;
++    public static final int MAX_DATAGRAM_BYTES = 1200;
++    public static final int MAX_PAYLOAD_BYTES = 1136;
++    public static final int MAX_FRAME_BYTES = 2_097_152;
++    public static final int MAX_FRAGMENTS = 1847;
++
++    public StreamPacket {
++        validateIdentity(streamId, sessionId, frameSeq, mediaTimeUs);
++        if (payload == null) throw new IllegalArgumentException("Missing payload");
++        validateFragment(frameLength, fragmentIndex, fragmentCount, payload.length);
++        payload = payload.clone();
++    }
++
++    @Override
++    public byte[] payload() {
++        return payload.clone();
++    }
++
++    private static void validateIdentity(UUID streamId, UUID sessionId, long seq, long time) {
++        if (streamId == null || sessionId == null || seq < 0 || time < 0)
++            throw new IllegalArgumentException("Invalid identity or counter");
++    }
++
++    private static void validateFragment(long length, int index, int count, int payloadSize) {
++        // Validate bounds before arithmetic, narrowing or any payload-sized allocation.
++        if (length < 1 || length > MAX_FRAME_BYTES)
++            throw new IllegalArgumentException("Frame length outside UDP cap");
++        int expectedCount = 1 + (int) ((length - 1) / MAX_PAYLOAD_BYTES);
++        if (count < 1 || count > MAX_FRAGMENTS || count != expectedCount || index < 0 || index >= count)
++            throw new IllegalArgumentException("Invalid fragment index/count");
++        long offset = (long) index * MAX_PAYLOAD_BYTES;
++        int expectedPayload = (int) Math.min(MAX_PAYLOAD_BYTES, length - offset);
++        if (payloadSize != expectedPayload)
++            throw new IllegalArgumentException("Payload length does not match fragment");
++    }
++
++    /** Produces exactly the application datagram, without transport framing. */
++    public static byte[] encode(StreamPacket packet) throws ProtocolException {
++        if (packet == null) throw invalid("Missing packet");
++        // The validated immutable value owns its payload; avoid an accessor copy.
++        ByteBuffer output = ByteBuffer.allocate(HEADER_BYTES + packet.payload.length).order(ByteOrder.BIG_ENDIAN);
++        output.putInt(MAGIC).put((byte) VERSION).put((byte) 0).putShort((short) HEADER_BYTES);
++        output.putLong(packet.streamId.getMostSignificantBits()).putLong(packet.streamId.getLeastSignificantBits());
++        output.putLong(packet.sessionId.getMostSignificantBits()).putLong(packet.sessionId.getLeastSignificantBits());
++        output.putLong(packet.frameSeq).putLong(packet.mediaTimeUs).putInt((int) packet.frameLength);
++        output.putShort((short) packet.fragmentIndex).putShort((short) packet.fragmentCount).put(packet.payload);
++        return output.array();
++    }
++
++    public static StreamPacket decode(byte[] datagram) throws ProtocolException {
++        if (datagram == null) throw invalid("Missing datagram");
++        return decode(datagram, 0, datagram.length);
++    }
++
++    /** Parses only the declared region; surrounding receive-buffer bytes are ignored. */
++    public static StreamPacket decode(byte[] buffer, int offset, int length) throws ProtocolException {
++        if (buffer == null || offset < 0 || length < HEADER_BYTES + 1 || length > MAX_DATAGRAM_BYTES
++                || offset > buffer.length || length > buffer.length - offset)
++            throw invalid("Invalid datagram region/length");
++        ByteBuffer input = ByteBuffer.wrap(buffer, offset, length).slice().order(ByteOrder.BIG_ENDIAN);
++        if (input.getInt() != MAGIC) throw invalid("Invalid OTT1 magic");
++        if (Byte.toUnsignedInt(input.get()) != VERSION)
++            throw new ProtocolException(ErrorCode.UNSUPPORTED_VERSION, "Unsupported UDP version");
++        if (input.get() != 0 || Short.toUnsignedInt(input.getShort()) != HEADER_BYTES)
++            throw invalid("Invalid flags/header length");
++        UUID stream = new UUID(input.getLong(), input.getLong());
++        UUID session = new UUID(input.getLong(), input.getLong());
++        long seq = input.getLong();
++        long time = input.getLong();
++        long frameLength = Integer.toUnsignedLong(input.getInt());
++        int index = Short.toUnsignedInt(input.getShort());
++        int count = Short.toUnsignedInt(input.getShort());
++        try {
++            validateIdentity(stream, session, seq, time);
++            validateFragment(frameLength, index, count, length - HEADER_BYTES);
++        } catch (IllegalArgumentException ex) {
++            throw new ProtocolException(ErrorCode.INVALID_MESSAGE, ex.getMessage(), ex);
++        }
++        // No untrusted frame-sized allocation: only the fully validated fragment is copied.
++        byte[] payload = new byte[length - HEADER_BYTES];
++        input.get(payload);
++        return new StreamPacket(stream, session, seq, time, frameLength, index, count, payload);
++    }
++
++    /** Splits a bounded frame without retaining its mutable input array. */
++    public static List<StreamPacket> fragment(UUID streamId, UUID sessionId,
++            long frameSeq, long mediaTimeUs, byte[] frame) {
++        validateIdentity(streamId, sessionId, frameSeq, mediaTimeUs);
++        if (frame == null || frame.length < 1 || frame.length > MAX_FRAME_BYTES)
++            throw new IllegalArgumentException("Frame outside UDP cap");
++        int count = 1 + (frame.length - 1) / MAX_PAYLOAD_BYTES;
++        List<StreamPacket> packets = new ArrayList<>(count);
++        for (int index = 0; index < count; index++) {
++            int offset = index * MAX_PAYLOAD_BYTES;
++            int end = Math.min(frame.length, offset + MAX_PAYLOAD_BYTES);
++            packets.add(new StreamPacket(streamId, sessionId, frameSeq, mediaTimeUs,
++                    frame.length, index, count, Arrays.copyOfRange(frame, offset, end)));
++        }
++        return List.copyOf(packets);
++    }
++
++    private static ProtocolException invalid(String message) {
++        return new ProtocolException(ErrorCode.INVALID_MESSAGE, message);
++    }
++}
+diff --git a/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java b/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java
+new file mode 100644
+index 0000000..e871bc9
+--- /dev/null
++++ b/Projeto/src/test/java/pt/uminho/esr/ott/streaming/StreamPacketTest.java
+@@ -0,0 +1,368 @@
++package pt.uminho.esr.ott.streaming;
++
++import org.junit.jupiter.api.Test;
++import org.junit.jupiter.params.ParameterizedTest;
++import org.junit.jupiter.params.provider.Arguments;
++import org.junit.jupiter.params.provider.MethodSource;
++import org.junit.jupiter.params.provider.ValueSource;
++import pt.uminho.esr.ott.protocol.MessageCodec;
++import pt.uminho.esr.ott.protocol.ProtocolException;
++
++import java.nio.ByteBuffer;
++import java.nio.ByteOrder;
++import java.nio.charset.StandardCharsets;
++import java.security.MessageDigest;
++import java.util.*;
++import java.util.stream.Stream;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++/** Expectations come from the reviewed UDP fixtures/literal contract, never the codec. */
++class StreamPacketTest {
++    private static final UUID STREAM = UUID.fromString("00000000-0000-4000-8000-000000000001");
++    private static final UUID SESSION = UUID.fromString("deadbeef-0000-4000-8000-000000000001");
++    private static final Map<String, String> SHA = Map.ofEntries(
++            Map.entry("min", "529f908841a8fa954cf8d897a67c35825038fc4575999ca11982fbe7eae758e7"),
++            Map.entry("small", "240e54e0fa502e1bdaca540a4aedddf397278ffcc66730da47318609deef8dd5"),
++            Map.entry("split-first", "6e33e046c0f3fddfb9405983f063b2f81cba273f6adc5b51580b861b09b48ac6"),
++            Map.entry("split-last", "08cd13afeb0ef13bb8584500ef3d6c20d6a2fa79842eab9aeb2068b7b7bd05f1"),
++            Map.entry("invalid-short-header", "40d0960372611d87c68417a4f86c9799ab00ec5d9c74947d96364743be3c69dd"),
++            Map.entry("invalid-no-payload", "fd1a09c6f2b4c79f96e6b008056407203b2c15e9bf87340ab7683d557432460f"),
++            Map.entry("invalid-magic", "af011646b162bff90841d3f4810d97037aa0528a1a83ef429bec85daefc7bfe4"),
++            Map.entry("invalid-version", "af99bea7c893efe3a0c4e9ad0cf4a56fcf1dd895776112ab50b616c645b8665c"),
++            Map.entry("invalid-flags", "de4fbdadf40ad20fcbda07820b31d8deec564ac34432ee2cca5364e4910c14a8"),
++            Map.entry("invalid-header-length", "45af6d481162c8adf60491464631274a2f49363522767e5e8b64638387d9a170"),
++            Map.entry("invalid-index", "0704524abdc28afa9920419fe12174c0c2e3ca0235d5b4f6a6a015b8cef6b0ed"),
++            Map.entry("invalid-count", "31579b3668aa7b3e1fb9da5fe2d83a962ea109d981e3a970e288af15406a5340"),
++            Map.entry("invalid-zero-frame", "7693db6bf5adbc536989c6aa80bdc77017ddda0adaca801c69054a81d5375b06"),
++            Map.entry("invalid-large-frame", "7d28459ad8e0e993e13d9c2a748b5a60fedb742290064a4bba62c7221c92559b"),
++            Map.entry("invalid-negative-seq", "205c0369515375b03588724c076d214ecaffd4cf67a2559e31cbaf1aa6464ac1"),
++            Map.entry("invalid-datagram-size", "ea9bbe51a7d3aa91ea1b3848d4d14f128d8f7a303f38cbff024811ca5f65a3d0"));
++
++    private static byte[] resource(String name) throws Exception {
++        try (var input = StreamPacketTest.class.getResourceAsStream("/protocol/udp-" + name)) {
++            assertNotNull(input, "Independent resource must exist: " + name);
++            return input.readAllBytes();
++        }
++    }
++
++    private static byte[] fixture(String name) throws Exception {
++        byte[] bytes = resource(name + ".bin");
++        assertEquals(SHA.get(name), HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)));
++        String hex = new String(resource(name + ".hex"), StandardCharsets.US_ASCII).replaceAll("\\s+", "");
++        assertArrayEquals(bytes, HexFormat.of().parseHex(hex));
++        return bytes;
++    }
++
++    private static byte[] repeated(int length, int value) {
++        byte[] bytes = new byte[length];
++        Arrays.fill(bytes, (byte) value);
++        return bytes;
++    }
++
++    private static StreamPacket packet(long seq, long time, long length, int index, int count, byte[] payload) {
++        return new StreamPacket(STREAM, SESSION, seq, time, length, index, count, payload);
++    }
++
++    static Stream<Arguments> goldenModels() {
++        return Stream.of(
++                Arguments.of("min", packet(0, 0, 1, 0, 1, new byte[]{(byte) 0xaa})),
++                Arguments.of("small", packet(7, 10000, 3, 0, 1, new byte[]{0x41, 0x42, 0x43})),
++                Arguments.of("split-first", packet(8, 40000, 1137, 0, 2, repeated(1136, 0xab))),
++                Arguments.of("split-last", packet(8, 40000, 1137, 1, 2, new byte[]{(byte) 0xcd})));
++    }
++
++    @Test void U01_independentFixtureFilesRemainIntact() throws Exception {
++        assertEquals(16, SHA.size());
++        for (String name : SHA.keySet()) fixture(name);
++    }
++
++    @ParameterizedTest(name = "U01 encode golden {0}") @MethodSource("goldenModels")
++    void U01_encoderMatchesGoldenBytes(String name, StreamPacket expected) throws Exception {
++        assertArrayEquals(fixture(name), assertDoesNotThrow(() -> StreamPacket.encode(expected)),
++                "encode must produce the independent golden bytes");
++    }
++
++    @ParameterizedTest(name = "U01 decode golden {0}") @MethodSource("goldenModels")
++    void U01_decoderMatchesGoldenFields(String name, StreamPacket expected) throws Exception {
++        assertPacket(expected, assertDoesNotThrow(() -> StreamPacket.decode(fixture(name))));
++    }
++
++    private static void assertPacket(StreamPacket expected, StreamPacket actual) {
++        assertNotNull(actual, "decode must return a packet, not an unwired interface placeholder");
++        assertEquals(expected.streamId(), actual.streamId());
++        assertEquals(expected.sessionId(), actual.sessionId());
++        assertEquals(expected.frameSeq(), actual.frameSeq());
++        assertEquals(expected.mediaTimeUs(), actual.mediaTimeUs());
++        assertEquals(expected.frameLength(), actual.frameLength());
++        assertEquals(expected.fragmentIndex(), actual.fragmentIndex());
++        assertEquals(expected.fragmentCount(), actual.fragmentCount());
++        assertArrayEquals(expected.payload(), actual.payload());
++    }
++
++    @ParameterizedTest @ValueSource(strings = {"short-header", "no-payload", "magic", "version", "flags",
++            "header-length", "index", "count", "zero-frame", "large-frame", "negative-seq", "datagram-size"})
++    void U02_decoderRejectsIndependentNegativeFixtures(String name) throws Exception {
++        byte[] bytes = fixture("invalid-" + name);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes));
++    }
++
++    @Test void U03_publicConstantsPreserveUdpAndSeparateTcpVersion() {
++        assertEquals(0x4f545431, StreamPacket.MAGIC);
++        assertEquals(1, StreamPacket.VERSION);
++        assertEquals(64, StreamPacket.HEADER_BYTES);
++        assertEquals(1200, StreamPacket.MAX_DATAGRAM_BYTES);
++        assertEquals(1136, StreamPacket.MAX_PAYLOAD_BYTES);
++        assertEquals(2097152, StreamPacket.MAX_FRAME_BYTES);
++        assertEquals(1847, StreamPacket.MAX_FRAGMENTS);
++        assertEquals(2, MessageCodec.VERSION);
++    }
++
++    // Literal bytes written from the offset table; no production writer is used.
++    private static byte[] literalGolden() {
++        return HexFormat.of().parseHex("4f54543101000040"
++                + "0123456789abcdeffedcba9876543210"
++                + "112233445566778899aabbccddeeff00"
++                + "0102030405060708" + "1112131415161718"
++                + "00000001" + "0000" + "0001" + "7e");
++    }
++
++    private static StreamPacket literalModel() {
++        return new StreamPacket(UUID.fromString("01234567-89ab-cdef-fedc-ba9876543210"),
++                UUID.fromString("11223344-5566-7788-99aa-bbccddeeff00"),
++                0x0102030405060708L, 0x1112131415161718L, 1, 0, 1, new byte[]{0x7e});
++    }
++
++    @Test void U03_encoderPreservesLiteralOffsetsAndUuidBits() throws Exception {
++        assertArrayEquals(literalGolden(), assertDoesNotThrow(() -> StreamPacket.encode(literalModel())));
++    }
++
++    @Test void U03_decoderPreservesLiteralOffsetsAndUuidBits() throws Exception {
++        assertPacket(literalModel(), assertDoesNotThrow(() -> StreamPacket.decode(literalGolden())));
++    }
++
++    @Test void U03_maximumNonnegativeCountersAreRepresentable() throws Exception {
++        byte[] bytes = literalGolden();
++        ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).putLong(40, Long.MAX_VALUE).putLong(48, Long.MAX_VALUE);
++        var packet = assertDoesNotThrow(() -> StreamPacket.decode(bytes));
++        assertNotNull(packet, "decode behavior is required");
++        assertEquals(Long.MAX_VALUE, packet.frameSeq());
++        assertEquals(Long.MAX_VALUE, packet.mediaTimeUs());
++    }
++
++    private static byte[] frame(int length) {
++        byte[] bytes = new byte[length];
++        for (int i = 0; i < length; i++) bytes[i] = (byte) (i * 37 + 11);
++        return bytes;
++    }
++
++    @ParameterizedTest @ValueSource(ints = {1, 1135, 1136, 1137, 2272, 2273, 99999, 2097151, 2097152})
++    void U04_fragmentationHonorsBoundariesAndRecombinesExactly(int length) throws Exception {
++        byte[] original = frame(length);
++        List<StreamPacket> packets = assertDoesNotThrow(() -> StreamPacket.fragment(STREAM, SESSION, 9, 12345, original));
++        assertNotNull(packets);
++        int count = (length + 1135) / 1136;
++        assertEquals(count, packets.size(), "fragment must cover the complete input");
++        assertTrue(packets.size() <= 1847);
++        byte[] reconstructed = new byte[length];
++        int consumed = 0;
++        for (int i = 0; i < packets.size(); i++) {
++            StreamPacket packet = packets.get(i);
++            int bytes = Math.min(1136, length - consumed);
++            assertEquals(STREAM, packet.streamId());
++            assertEquals(SESSION, packet.sessionId());
++            assertEquals(9, packet.frameSeq());
++            assertEquals(12345, packet.mediaTimeUs());
++            assertEquals(length, packet.frameLength());
++            assertEquals(i, packet.fragmentIndex());
++            assertEquals(count, packet.fragmentCount());
++            assertArrayEquals(Arrays.copyOfRange(original, consumed, consumed + bytes), packet.payload());
++            byte[] wire = assertDoesNotThrow(() -> StreamPacket.encode(packet));
++            assertEquals(64 + bytes, wire.length);
++            assertTrue(wire.length <= 1200);
++            ByteBuffer header = ByteBuffer.wrap(wire).order(ByteOrder.BIG_ENDIAN);
++            assertEquals(0x4f545431, header.getInt(0));
++            assertEquals(1, Byte.toUnsignedInt(header.get(4)));
++            assertEquals(0, Byte.toUnsignedInt(header.get(5)));
++            assertEquals(64, Short.toUnsignedInt(header.getShort(6)));
++            assertEquals(STREAM.getMostSignificantBits(), header.getLong(8));
++            assertEquals(STREAM.getLeastSignificantBits(), header.getLong(16));
++            assertEquals(SESSION.getMostSignificantBits(), header.getLong(24));
++            assertEquals(SESSION.getLeastSignificantBits(), header.getLong(32));
++            assertEquals(9, header.getLong(40));
++            assertEquals(12345, header.getLong(48));
++            assertEquals(length, Integer.toUnsignedLong(header.getInt(56)));
++            assertEquals(i, Short.toUnsignedInt(header.getShort(60)));
++            assertEquals(count, Short.toUnsignedInt(header.getShort(62)));
++            System.arraycopy(wire, 64, reconstructed, consumed, bytes);
++            consumed += bytes;
++        }
++        assertEquals(length, consumed);
++        assertArrayEquals(original, reconstructed);
++        if (length == 2097152) assertEquals(96, packets.getLast().payload().length);
++    }
++
++    @ParameterizedTest @ValueSource(ints = {0, 2097153})
++    void U04_fragmentationRejectsFrameOutsideProtocolCap(int length) {
++        byte[] bytes = new byte[length];
++        assertThrows(IllegalArgumentException.class, () -> StreamPacket.fragment(STREAM, SESSION, 0, 0, bytes));
++    }
++
++    @Test void U05_split1137MatchesBothIndependentGoldenDatagrams() throws Exception {
++        byte[] original = repeated(1137, 0xab);
++        original[1136] = (byte) 0xcd;
++        var packets = assertDoesNotThrow(() -> StreamPacket.fragment(STREAM, SESSION, 8, 40000, original));
++        assertEquals(2, packets.size());
++        assertArrayEquals(fixture("split-first"), StreamPacket.encode(packets.getFirst()));
++        assertArrayEquals(fixture("split-last"), StreamPacket.encode(packets.getLast()));
++    }
++
++    static Stream<Arguments> hostileMetadata() {
++        return Stream.of(
++                Arguments.of("u32 high bit", 56, 4, 0x80000000L),
++                Arguments.of("u32 maximum", 56, 4, 0xffffffffL),
++                Arguments.of("u32 signed maximum", 56, 4, 0x7fffffffL),
++                Arguments.of("negative media time", 48, 8, -1L),
++                Arguments.of("minimum negative sequence", 40, 8, Long.MIN_VALUE),
++                Arguments.of("unsigned count maximum", 62, 2, 65535L),
++                Arguments.of("unsigned index maximum", 60, 2, 65535L),
++                Arguments.of("header u16 maximum", 6, 2, 65535L),
++                Arguments.of("high reserved flag", 5, 1, 128L));
++    }
++
++    @ParameterizedTest(name = "U06 {0}") @MethodSource("hostileMetadata")
++    void U06_forgedMetadataIsRejectedWithoutUsingItAsAnAllocationSize(String label, int offset, int width, long value)
++            throws Exception {
++        byte[] bytes = fixture("min");
++        ByteBuffer b = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
++        if (width == 8) b.putLong(offset, value);
++        else if (width == 4) b.putInt(offset, (int) value);
++        else if (width == 2) b.putShort(offset, (short) value);
++        else b.put(offset, (byte) value);
++        assertEquals(65, bytes.length);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes), label);
++    }
++
++    @Test void U06_payloadTrailingByteIsNotIgnored() throws Exception {
++        byte[] bytes = Arrays.copyOf(fixture("min"), 66);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes));
++    }
++
++    static Stream<Arguments> invalidValues() {
++        return Stream.of(
++                Arguments.of(0L, 0, 1, 0L, 0L, 1),
++                Arguments.of(2097153L, 0, 1, 0L, 0L, 1),
++                Arguments.of(4294967295L, 0, 1, 0L, 0L, 1),
++                Arguments.of(Long.MAX_VALUE, 0, 1, 0L, 0L, 1),
++                Arguments.of(1L, 1, 1, 0L, 0L, 1),
++                Arguments.of(1L, 0, 0, 0L, 0L, 1),
++                Arguments.of(1L, 0, 2, 0L, 0L, 1),
++                Arguments.of(1L, 0, 1, -1L, 0L, 1),
++                Arguments.of(1L, 0, 1, 0L, -1L, 1),
++                Arguments.of(1L, 0, 1, 0L, 0L, 0),
++                Arguments.of(1L, 0, 1, 0L, 0L, 1137),
++                Arguments.of(1137L, 0, 2, 0L, 0L, 1135),
++                Arguments.of(1137L, 1, 2, 0L, 0L, 2),
++                Arguments.of(2272L, 1, 2, 0L, 0L, 1135));
++    }
++
++    @ParameterizedTest @MethodSource("invalidValues")
++    void U06_valueRejectsInvalidMetadataBeforeCopy(long length, int index, int count, long seq, long time, int payloadSize) {
++        byte[] payload = new byte[payloadSize];
++        assertThrows(IllegalArgumentException.class, () -> packet(seq, time, length, index, count, payload));
++    }
++
++    @Test void U06_encoderRejectsAbsentValue() {
++        assertThrows(ProtocolException.class, () -> StreamPacket.encode(null));
++    }
++
++    @Test void U07_sliceDecodesOnlyItsRegionWithoutMutatingInput() throws Exception {
++        byte[] wire = fixture("small");
++        byte[] backing = repeated(1400, 0x5a);
++        System.arraycopy(wire, 0, backing, 17, wire.length);
++        byte[] before = backing.clone();
++        var packet = assertDoesNotThrow(() -> StreamPacket.decode(backing, 17, wire.length));
++        assertPacket(packet(7, 10000, 3, 0, 1, new byte[]{0x41, 0x42, 0x43}), packet);
++        assertArrayEquals(before, backing);
++    }
++
++    static Stream<Arguments> invalidRegions() {
++        return Stream.of(Arguments.of(-1, 65), Arguments.of(0, -1), Arguments.of(65, 1),
++                Arguments.of(1, 65), Arguments.of(Integer.MAX_VALUE, 1),
++                Arguments.of(1, Integer.MAX_VALUE), Arguments.of(Integer.MIN_VALUE, 65), Arguments.of(0, 64));
++    }
++
++    @ParameterizedTest @MethodSource("invalidRegions")
++    void U07_invalidRegionCannotOverflowIntoAValidRange(int offset, int length) throws Exception {
++        byte[] bytes = fixture("min");
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(bytes, offset, length));
++    }
++
++    @Test void U07_absentDatagramIsAFormatError() {
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(null));
++    }
++
++    @Test void U08_valueCopiesInputPayload() {
++        byte[] input = {(byte) 0xaa};
++        StreamPacket value = packet(0, 0, 1, 0, 1, input);
++        input[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, value.payload());
++    }
++
++    @Test void U08_valueDoesNotExposeMutablePayload() {
++        StreamPacket value = packet(0, 0, 1, 0, 1, new byte[]{(byte) 0xaa});
++        value.payload()[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, value.payload());
++    }
++
++    @Test void U08_decoderOwnsPayloadAfterReceiveBufferReuse() throws Exception {
++        byte[] input = fixture("small");
++        StreamPacket packet = assertDoesNotThrow(() -> StreamPacket.decode(input));
++        assertNotNull(packet, "decode behavior is required before ownership can be verified");
++        input[64] = 0;
++        assertArrayEquals(new byte[]{0x41, 0x42, 0x43}, packet.payload());
++    }
++
++    @Test void U08_fragmentationOwnsPayloadAndReturnsImmutableList() {
++        byte[] original = {(byte) 0xaa};
++        List<StreamPacket> packets = StreamPacket.fragment(STREAM, SESSION, 0, 0, original);
++        assertEquals(1, packets.size());
++        original[0] = 0;
++        assertArrayEquals(new byte[]{(byte) 0xaa}, packets.getFirst().payload());
++        assertThrows(UnsupportedOperationException.class, () -> packets.add(packets.getFirst()));
++    }
++
++    @Test void U06_absentIdsAndPayloadAreRejectedExplicitly() {
++        assertThrows(IllegalArgumentException.class,
++                () -> new StreamPacket(null, SESSION, 0, 0, 1, 0, 1, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> new StreamPacket(STREAM, null, 0, 0, 1, 0, 1, new byte[1]));
++        assertThrows(IllegalArgumentException.class, () -> packet(0, 0, 1, 0, 1, null));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, 0, 0, null));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(null, SESSION, 0, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, null, 0, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, -1, 0, new byte[1]));
++        assertThrows(IllegalArgumentException.class,
++                () -> StreamPacket.fragment(STREAM, SESSION, 0, -1, new byte[1]));
++    }
++
++    @Test void U07_fullArrayCannotHideTrailingBytesButExactMaxRegionIsValid() throws Exception {
++        byte[] wire = fixture("split-first");
++        byte[] backing = new byte[1219];
++        System.arraycopy(wire, 0, backing, 19, 1200);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(backing));
++        assertEquals(1136, StreamPacket.decode(backing, 19, 1200).payload().length);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(backing, 18, 1201));
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(null, 0, 65));
++        byte[] small = fixture("small");
++        byte[] extra = Arrays.copyOf(small, small.length + 1);
++        assertThrows(ProtocolException.class, () -> StreamPacket.decode(extra));
++        assertArrayEquals(new byte[]{0x41, 0x42, 0x43},
++                StreamPacket.decode(extra, 0, small.length).payload());
++    }
++
++}

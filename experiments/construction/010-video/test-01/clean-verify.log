@@ -1,0 +1,95 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< pt.uminho.esr:ott-streaming >---------------------
+[INFO] Building ESR - Servi?o OTT de Streaming 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ ott-streaming ---
+[INFO] Deleting /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ott-streaming ---
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 42 source files with javac [debug release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ott-streaming ---
+[INFO] Copying 161 resources from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ott-streaming ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 23 source files with javac [debug release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ ott-streaming ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running pt.uminho.esr.ott.transport.TransportTest
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.330 s -- in pt.uminho.esr.ott.transport.TransportTest
+[INFO] Running pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+Bootstrap control processing failed; stopping bounded service
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.426 s -- in pt.uminho.esr.ott.bootstrap.BootstrapServerTest
+[INFO] Running pt.uminho.esr.ott.app.OttApplicationTest
+[INFO] Tests run: 48, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.84 s -- in pt.uminho.esr.ott.app.OttApplicationTest
+[INFO] Running pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Tests run: 741, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.348 s -- in pt.uminho.esr.ott.config.ConfigurationLoaderTest
+[INFO] Running pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.080 s -- in pt.uminho.esr.ott.protocol.DiscoveryCodecTest
+[INFO] Running pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Tests run: 94, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.319 s -- in pt.uminho.esr.ott.protocol.MessageCodecTest
+[INFO] Running pt.uminho.esr.ott.streaming.StreamPacketTest
+[INFO] Tests run: 78, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.304 s -- in pt.uminho.esr.ott.streaming.StreamPacketTest
+[INFO] Running pt.uminho.esr.ott.routing.ActivationTest
+M07_BEFORE_CANCEL destinations=[C2]
+M07_AFTER_CANCEL destinations=[C2]
+M07_AFTER_LATE_ACCEPTED destinations=[C2]
+[INFO] Tests run: 31, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.270 s -- in pt.uminho.esr.ott.routing.ActivationTest
+[INFO] Running pt.uminho.esr.ott.routing.RoutingServiceTest
+[INFO] Tests run: 39, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.224 s -- in pt.uminho.esr.ott.routing.RoutingServiceTest
+[INFO] Running pt.uminho.esr.ott.routing.RouteSwitchTest
+APPLICATION_SWITCH_OUTPUT ROUTE_SWITCH node=R instance=f01c8fd9-66d6-4410-821e-f8027b499b26 stream=00000000-0000-0001-0000-000000000001 origin=S epoch=b93222b5-58ef-496a-8dac-216e00ebfeac operation=baae40ad-b2b5-40bb-912a-5a44a9ade4fb phase=STARTED previous=A/0e83ad03-d11e-43b6-b2ac-7b5bda51a583/62259668-547b-4727-b2b0-a5dc35c28df1 replacement=B/241c6e6c-2018-4fa3-93e5-5b04335ef354/e7e4f96e-4cab-443d-b1ea-504174689060 previousRevision=0 replacementRevision=-1 previousCostMicros=20 replacementCostMicros=11 reason=SUSTAINED_IMPROVEMENT elapsedNanos=0 previousPath=[S, A, R] replacementPath=[S, B, R] | ROUTE_SWITCH node=R instance=f01c8fd9-66d6-4410-821e-f8027b499b26 stream=00000000-0000-0001-0000-000000000001 origin=S epoch=b93222b5-58ef-496a-8dac-216e00ebfeac operation=baae40ad-b2b5-40bb-912a-5a44a9ade4fb phase=SUCCESS previous=A/0e83ad03-d11e-43b6-b2ac-7b5bda51a583/62259668-547b-4727-b2b0-a5dc35c28df1 replacement=B/241c6e6c-2018-4fa3-93e5-5b04335ef354/e7e4f96e-4cab-443d-b1ea-504174689060 previousRevision=0 replacementRevision=0 previousCostMicros=20 replacementCostMicros=11 reason=CONFIRMED elapsedNanos=9296657 previousPath=[S, A, R] replacementPath=[S, B, R]
+[INFO] Tests run: 40, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.921 s -- in pt.uminho.esr.ott.routing.RouteSwitchTest
+[INFO] Running pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+[INFO] Tests run: 51, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.937 s -- in pt.uminho.esr.ott.routing.SubscriptionLeaseTest
+[INFO] Running pt.uminho.esr.ott.routing.RoutingTableTest
+[INFO] Tests run: 35, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in pt.uminho.esr.ott.routing.RoutingTableTest
+[INFO] Running pt.uminho.esr.ott.routing.RecoveryTest
+TCP_REPAIR_RECOVERY path=[S, C] session=Session[nodeId=S, instanceId=85c873f8-7a77-4259-bb25-7d3efb87e07b, connectionId=86226559-510b-4f6c-b2aa-420377ba5320, endpoint=Endpoint[nodeId=S, instanceId=85c873f8-7a77-4259-bb25-7d3efb87e07b, host=127.0.0.1, controlPort=52443, dataPort=52444, role=SERVER]] epoch=85c873f8-7a77-4259-bb25-7d3efb87e07b
+TCP_PREFIX_RECOVERY old=Activation[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=862d3a08-e212-4352-aec8-7c3d56501b84, subscriptionId=f32e89bb-39f2-4e11-83c0-fd0a9c109caf, revision=0, leaseMs=3000, expectedPath=[S, A, R, C]] new=Activation[streamId=00000000-0000-0001-0000-000000000001, serverEpoch=862d3a08-e212-4352-aec8-7c3d56501b84, subscriptionId=f32e89bb-39f2-4e11-83c0-fd0a9c109caf, revision=1, leaseMs=3000, expectedPath=[S, B, R, C]] upstream=Session[nodeId=R, instanceId=c1bf6b8f-19a5-4fda-a942-ce5d3630f868, connectionId=169fcf6d-1004-4cb6-a0de-03bfab7faec7, endpoint=Endpoint[nodeId=R, instanceId=c1bf6b8f-19a5-4fda-a942-ce5d3630f868, host=127.0.0.1, controlPort=52486, dataPort=52487, role=RELAY]]
+[INFO] Tests run: 40, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.414 s -- in pt.uminho.esr.ott.routing.RecoveryTest
+[INFO] Running pt.uminho.esr.ott.routing.RouteTraceTest
+[INFO] Tests run: 40, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.681 s -- in pt.uminho.esr.ott.routing.RouteTraceTest
+[INFO] Running pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[INFO] Tests run: 52, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.068 s -- in pt.uminho.esr.ott.monitoring.NetworkMonitorTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.222 s -- in pt.uminho.esr.ott.overlay.OverlayRecoveryTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.277 s -- in pt.uminho.esr.ott.overlay.NeighborDiscoveryTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.447 s -- in pt.uminho.esr.ott.overlay.OverlayNodeMonitoringTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Tests run: 55, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.500 s -- in pt.uminho.esr.ott.overlay.NeighborManagerTest
+[INFO] Running pt.uminho.esr.ott.overlay.CandidateCacheTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in pt.uminho.esr.ott.overlay.CandidateCacheTest
+[INFO] Running pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.186 s -- in pt.uminho.esr.ott.overlay.OverlayNodeRoutingTest
+[INFO] Running pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] Tests run: 34, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.067 s -- in pt.uminho.esr.ott.overlay.NeighborManagerLifecycleTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1537, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ ott-streaming ---
+[INFO] Building jar: /Users/maria/Documentos/Francisco/ESR/ESR---TP2/Projeto/target/ott-streaming-1.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:21 min
+[INFO] Finished at: 2026-11-23T15:13:21Z
+[INFO] ------------------------------------------------------------------------

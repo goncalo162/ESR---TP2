@@ -8,6 +8,12 @@ Entregar vídeo MJPEG fragmentado a clientes, com quatro streams distintas em du
 
 Incremento 5 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
 
+Estado atual: **IN PROGRESS**; TASK-019/IMP-016/010-video DONE/complete após
+integração72c9f92,Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji.
+[Fecho](../../memory-bank/bolts/010-video/closure-walkthrough.md).
+TASK-020–024 permanecem TODO; nenhum outro incremento iniciado. Streaming futuro.
+PHASE-04 DONE/unidade004 complete; DEMO-001 separado,não um gate.
+
 ## 3. Pré-requisitos
 
 PHASE-04 concluída, com evidência do seu entregável; TASK-018 está DONE. Ler os contratos de [07](../07-API-AND-INTERFACES.md), a [arquitetura](../04-ARCHITECTURE.md) e os gates em [12](../12-RISKS-AND-DECISIONS.md). Dependências específicas estão na tabela e em cada tarefa.
@@ -20,7 +26,7 @@ RF-007, RF-010, RF-011, RF-012, RF-013, RF-015, RNF-001, RNF-002, RNF-003, RP-00
 
 | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
 |---|---|---|---|---|
-| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | TODO |
+| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | DONE — V-019/Test/Francisco24/Denji/integração72c9f92 |
 | [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | TODO |
 | [TASK-021](../tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | V-021 | TODO |
 | [TASK-022](../tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | V-022 | TODO |
