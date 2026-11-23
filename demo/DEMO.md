@@ -10,7 +10,9 @@ preservados como corrida residual do sistema. Builds inicial/final 1459/0/0/0,
 `experiments/checkpoint-phase04/runs/`; detalhes e limitações no
 [handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
 e na [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).
-PHASE-05–07 não iniciadas. Não é aprovação docente nem execução CORE.
+PHASE-05–07 não iniciadas. A execução CORE foi feita depois (plano de controlo
+apenas — ver §5 do guia); não é a validação formal PHASE-06 nem aprovação
+docente.
 
 ## Pré-requisitos e arranque
 
@@ -130,22 +132,27 @@ shutdown hooks: evitar matar a ferramenta dessa forma. Se houver interrupção
 nessa condição, identificar os PIDs pelos perfis da run antes de qualquer
 limpeza manual; nunca usar `pkill java`.
 
-## Caminho para CORE — artefactos preparados, execução pendente
+## Execução no CORE — feita (plano de controlo), 2026-11-23
 
-Reutilizar `CORE/topologies/cenario1.xml`, `cenario2.xml` e `cenario3.xml`.
-Os perfis por nó da run são o mapa de configuração; `demo/core/prepare_core.py`
-gera os artefactos CORE (perfis por nó com os IPs do XML, bootstrap no host do
-servidor, manifesto e comandos por nó) a partir de uma run local — ver o guia
-[demo/GUIA-DEMO.md](GUIA-DEMO.md) §5 e exemplos em `demo/core/out/`. A execução
-em si fica para a PHASE-06 (coreemu com docker+X11 e sessão CORE real, ainda
-não disponível nesta bancada). Arrancar a CLI do mesmo JAR em cada máquina. Os
-aliases 127/8 e o proxy localhost não transitam para nós CORE separados;
-lá os atrasos vêm do próprio emulador (opções do link) ou de `tc/netem`.
+Com o contentor `core` (coreemu) a correr, `python3 demo/core/run_core.py
+<cenario>` cria a sessão gRPC a partir de `CORE/topologies/cenario{1,2,3}.xml`
+(devices + switches + links com netem), arranca o bootstrap e uma JVM por nó
+dentro do namespace de cada dispositivo, e corre o mesmo guião de 6 passos —
+incluindo a etapa com a CLI real (`logs/production-cli.log`). A troca por
+qualidade usa `edit_link` (netem) em vez do proxy local; o kill é SIGKILL real
+no JVM do nó. **PASS em cenario1 (2× consecutivos), cenario2 e cenario3** em
+`experiments/core-demo/<cenario>/2026*/` (ver §5 do
+[demo/GUIA-DEMO.md](GUIA-DEMO.md) para o guia completo e
+`demo/core/run_core.py` + `demo/core/driver.py` para o mecanismo). Isto é a
+demo de plano de controlo no CORE, não a validação formal PHASE-06 (que
+aguarda PHASE-05). Os aliases 127/8 e o proxy localhost não existem no CORE;
+os atrasos vêm do netem do emulador e a evidência de frames é o pcap cru
+(`out/wire.pcap`) + snapshots.
 
 ## Fora do âmbito
 
 UDP, fragmentação, leitura MJPEG, encaminhamento/reconstrução de frames, player
-Swing, vídeo real, execução CORE, FPS/QoE, artigo final, pacote e submissão.
+Swing, vídeo real, FPS/QoE, artigo final, pacote e submissão.
 PHASE-05–07 continuam TODO. R17 histórico permanece sem causa estabelecida;
 V-018 com métricas controladas não explica essa falha. Datas/conteúdo docente
 G-ASSESSMENTS não são declarados resolvidos pela ferramenta.

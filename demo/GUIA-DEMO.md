@@ -3,8 +3,8 @@
 A demo mostra o plano de controlo concluído (descoberta, rotas, subscrições,
 renovação, adaptação por qualidade com atraso real, falha/recuperação, poda)
 com **uma JVM real por nó overlay**, bootstrap separado, CLI de produção real e
-proxy TCP de atraso sem root. **Não inclui vídeo/UDP/player** (isso é a
-PHASE-05) nem execução em CORE (PHASE-06) — ver "Limites" no fim.
+proxy TCP de atraso sem root (local) ou netem do CORE (em coreemu). **Não
+inclui vídeo/UDP/player** (isso é a PHASE-05) — ver "Limites" no fim.
 
 ## 1. Pré-requisitos
 
@@ -62,10 +62,61 @@ registado; não atribui runs antigas a esse ficheiro).
   procura abandonada após morte real de cliente.
 - Em todas as runs: processos terminados e portas reutilizáveis.
 
-## 5. Preparar a demo para o CORE (PHASE-06) — sem executar
+## 5. Correr a demo no CORE (coreemu dockerizado, PHASE-06)
 
-O CORE usa `CORE/topologies/cenario{1,2,3}.xml` (Coreemu dockerizado). A demo
-gera os perfis por nó a partir de uma run local; o script de transposição:
+O contentor `core` (Coreemu, `CORE/docker-compose.yml`) expõe o daemon gRPC em
+`localhost:50051` e monta `CORE/volume` em `/volume`. Com o docker do CORE a
+correr:
+
+```sh
+cd CORE && docker compose up -d core        # contentor `core` Up
+cd ..
+python3 demo/core/run_core.py cenario1      # 4 nós (S1,R1,C1,C2)
+python3 demo/core/run_core.py cenario2      # 6 nós + troca por qualidade via netem
+python3 demo/core/run_core.py cenario3      # 11 nós da Figura 1 (O1–O11)
+```
+
+`run_core.py` (host) faz tudo automaticamente:
+
+1. valida pré-requisitos (contentor Up, JDK 21, JAR + sha256, compila
+   `demo/.classes`);
+2. gera os perfis por nó com os IPs do XML (`prepare_core.build_deployment`) e
+   copia JAR + classes + driver para `CORE/volume/ott/<run-id>/`;
+3. arranca `tcpdump` no contentor (pcap cru em `out/wire.pcap`);
+4. executa `demo/core/driver.py` dentro do contentor: cria a sessão gRPC a
+   partir de `CORE/topologies/cenarioN.xml` (devices, switches e links com os
+   atrasos do cenário em netem µs), arranca o bootstrap (`OttApplication
+   --role BOOTSTRAP`) no servidor e uma JVM `DemoNode` por nó overlay dentro do
+   namespace de cada dispositivo (stdin por FIFO em `/volume`, stdout para
+   `logs/`), e corre o guião de 6 passos igual ao local — **incluindo a etapa
+   com a CLI real** `OttApplication` no cliente (neighbors/recovery/routes/
+   catalog/metrics/trace/play/quit em `logs/production-cli.log`);
+5. a troca por qualidade usa `edit_link` (netem, µs) na ligação R1–R2 em vez
+   do proxy local; o kill é um `SIGKILL` real ao JVM no namespace do nó;
+6. copia a evidência para `experiments/core-demo/<cenario>/<run-id>/` e imprime
+   `RESULT PASS|FAIL`.
+
+```sh
+python3 demo/core/run_core.py cenario2 --source-run 20261123T151525Z-1b1daa64
+# --source-run escolhe a run local donde vêm os perfis/portas (há um default
+# PASS por cenário); --out-root muda o destino da evidência
+```
+
+Evidência por run em `experiments/core-demo/<cenario>/<run-id>/`:
+`out/result.json` (verdict + checks), `out/latest.json`, `out/snapshots/`,
+`out/trace-before.json` / `trace-after.json`, `out/actions.jsonl` (mudanças de
+atraso), `out/wire.pcap`, `logs/` (por nó + `production-cli.log`),
+`driver-stdout.log`, `plan.json`, `manifest.json`, `tool-sha256.json`.
+
+Resultados actuais (2026-11-23, JAR `dc192971…`, JDK 21, HEAD `a7c0789`+):
+**PASS em cenario1 (2× consecutivos), cenario2 e cenario3** —
+`experiments/core-demo/cenario{1,2,3}/2026*/`. Ex.: cenário2 com switch
+R1→R3 por atraso sustentado de 120 ms (STARTED→SUCCESS, publicação atómica),
+SIGKILL real do R2, `NeighborDown` e recuperação sem bootstrap; cenário3 com
+trace multi-salto `O4→O3→O2→O1` SUCCESS.
+
+Para deploy manual (sem o runner automático), `prepare_core.py` continua
+disponível:
 
 ```sh
 python3 demo/core/prepare_core.py --scenario cenario2 \
@@ -75,36 +126,23 @@ python3 demo/core/prepare_core.py --scenario cenario2 \
   --out demo/core/out/cenario2-1b1daa64
 ```
 
-Produz em `--out`: `nodes/<N>.properties` (bind/advertised = IP do dispositivo
-CORE), `topology.properties` reescrita, `streams.properties`, `BOOT.properties`
-(bootstrap no host do servidor), `manifest.json` (mapeamento dispositivo→nó,
-IPs, hash do JAR, comandos por nó) e `README.md`. Passos no CORE:
-
-1. Abrir a topologia no core-gui e confirmar os IPs (manifest → `deviceIp`).
-2. Copiar a pasta gerada para `CORE/volume/ott/<cenario>/`.
-3. No host do servidor: comando BOOT do manifest. Em cada nó: o comando do
-   manifest (adaptador `DemoNode` para subscribe/trace/snapshot, ou a CLI real
-   `OttApplication`).
-4. Recolher manifests/logs/capturas em `experiments/` segundo
-   `docs/09-TESTING-STRATEGY.md`.
-
-Notas: os aliases 127/8 e o proxy localhost **não** existem no CORE — no CORE
-os atrasos de ligação vêm do próprio emulador (opções do link no XML ou
-`tc/netem`). O relay pode correr no namespace do router, como admite o
-enunciado. Exemplos já gerados: `demo/core/out/cenario{1,2,3}-*`.
+Notas: os aliases 127/8 e o proxy localhost **não** existem no CORE — os IPs
+são os do XML e os atrasos vêm do netem do próprio emulador. A contagem de
+frames de controlo (HELLO/ACTIVATE/RENEW/DEACTIVATE) não é descodificada no
+CORE: fica preservada como pcap cru e é substituída por estado observado nos
+snapshots + contadores de interface (ver `note` em `result.json`). O JVM da
+CLI pode não terminar sozinho após `quit` no CORE (teardown de rede); nesse
+caso o driver termina-o e regista o método real no check `production-CLI-exit0`.
 
 ## 6. Limites actuais (não simulados)
 
 - Sem UDP, fragmentação, MJPEG, player Swing, vídeo real — PHASE-05 (TASK-019–
   024) continua TODO e é gate da PHASE-06.
-- Execução em CORE ainda não feita nesta bancada (coreemu requer docker + X11 e
-  sessão CORE real) — a PHASE-06 fica pendente até lá; aqui há apenas os
-  artefactos de deployment.
 - PHASE-07 (artigo/empacotamento/defesa) depende de informação docente
   (G-ASSESSMENTS: turno/grupo/datas) e de submissão externa — não é feita sem
   autorização explícita.
-- ~20% das runs do cenário2 podem falhar na 1.ª tentativa do switch por uma
-  corrida do próprio JAR (PATH_CHANGED no alvo); a run fica preservada como
+- ~20% das runs do cenário2 local podem falhar na 1.ª tentativa do switch por
+  uma corrida do próprio JAR (PATH_CHANGED no alvo); a run fica preservada como
   FAIL e basta repetir. R17 histórico continua sem causa establecida.
 
 ## 7. Verificação rápida do estado
