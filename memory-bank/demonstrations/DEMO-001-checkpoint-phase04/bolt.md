@@ -2,7 +2,7 @@
 id: "DEMO-001-checkpoint-phase04"
 type: "simple-construction-bolt"
 category: "demonstration-support"
-status: "in-progress"
+status: "in-progress"  # aguardando validação externa; critérios cumpridos em 23ddc9a
 functional_increment: false
 source_phase: null
 demonstrated_phases: ["PHASE-01", "PHASE-02", "PHASE-03", "PHASE-04"]
@@ -64,8 +64,9 @@ funcional ou dependência à PHASE-05. Este é trabalho de apoio entre fases.
 
 ## Critérios de aceitação
 
-- [ ] Clean verify inicial e final com JDK21 e números reais preservados.
-- [ ] Cenários 1 e 2 completos, três execuções consecutivas PASS de cada um,
+- [x] Clean verify inicial e final com JDK21 e números reais preservados (1459/0/0/0, 21 XML, JAR dc192971 idêntico).
+- [x] Cenários 1 e 2 completos, três execuções consecutivas PASS de cada um
+  (c1: 2a2d667c/0b6a21a5/4fec984a; c2: b7363015/f91d87a2/049d5119/6913a902),
   com processos terminados e listeners reutilizáveis.
 - [ ] Arranque validado, HELLO/discovery TCP v2, ACTIVE, RTT e anúncios reais.
 - [ ] Catálogo, rotas, alternativas e trace observáveis; CLI real e `play`
@@ -74,23 +75,29 @@ funcional ou dependência à PHASE-05. Este é trabalho de apoio entre fases.
   renovação, cancelamento de um sem afetar o outro e poda do último.
 - [ ] Morte de relay real, NeighborDown, cache e recuperação automática da
   intenção, sem bootstrap nem reinício do consumidor.
-- [ ] Atraso TCP real produz melhoria sustentada e troca confirmada; pulso
-  transitório não oscila; evento SUCCESS observa revisão já publicada.
+- [x] Atraso TCP real produz melhoria sustentada e troca confirmada (STARTED→SUCCESS,
+  ~250ms→~60ms reais); pulso transitório de 150ms não oscila; SUCCESS observa
+  upstream/caminho já publicados com revisão superior.
 - [ ] Procura abandonada após morte real de cliente é removida. Expiração
   isolada de leases e casos negativos são ligados à evidência histórica,
   sem atribuir ao transporte fechado uma prova de expiração pura.
-- [ ] Cenário 3 tentado; resultado completo ou redução explicitamente justificada.
-- [ ] DEMO.md, matriz para artigo, resultados e limitações entregues; fases
-  05–07 preservadas; working tree limpo com commits locais na Denji.
+- [x] Cenário 3 completo (11 nós da Figura 1): PASS 20261123T115804Z-96352b48, 39 checks.
+- [x] DEMO.md, matriz, resultados, relatório de investigação e limitações
+  entregues; fases 05–07 preservadas (TODO); commits locais na Waheed, working
+  tree limpo.
 
 ## Plano e riscos
 
 [Plano](implementation-plan.md) · [Validação](validation-plan.md) ·
 [Implement pendente](implementation-walkthrough.md) · [Handoff de retoma](HANDOFF.md).
 
-**Checkpoint atual: protótipo pausado por pedido do utilizador.** Cenário1
-com uma run PASS; cenário2 FAIL na adaptação por qualidade; cenário3 e as
-três repetições por cenário ainda por executar. Sem fecho/aceitação da demo.
+**Checkpoint atual (iteração 2, 2026-11-23): critérios cumpridos na versão
+congelada `23ddc9a`.** Cenário1 3/3 PASS consecutivas; cenário2 4 PASS
+consecutivas (39 checks, switch por qualidade com SUCCESS e publicação
+atómica) com 2 FAIL posteriores preservados (corrida residual do sistema no
+1.ª tentativa); cenário3 (11 nós) PASS completo; builds inicial/final
+1459/0/0/0. Aguardando validação externa antes de propor aceitação. PHASE-05–07
+não iniciadas.
 
 RTT localhost tem jitter: os oráculos observam estado, amostras e eventos,
 não esperas cegas. Delay afeta todos os frames da ligação e pode causar HOL;

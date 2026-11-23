@@ -1,5 +1,24 @@
 # Progresso do projeto
 
+**Retoma do checkpoint — 2026-11-23T14:40:00Z (iteração 2 do DEMO-001):**
+bolt de apoio [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md)
+com critérios cumpridos na versão congelada `23ddc9a` (branch Waheed): builds
+inicial/final `mvn -B -ntp clean verify` JDK21 **1459/0/0/0, 21 XML**, JAR
+`dc192971…` idêntico; cenário1 **3/3 PASS consecutivas** (33 checks), cenário2
+**4 PASS consecutivas** (39 checks, troca por qualidade com STARTED→SUCCESS e
+  publicação atómica, pulso sem oscilação, morte real de relay + recuperação sem
+  bootstrap, reinício, poda e procura abandonada) com 2 FAIL posteriores
+  preservados (corrida residual do sistema na 1.ª tentativa do switch, ~20%
+  das runs); cenário3 (11 nós da Figura 1) **PASS completo** (39 checks).
+  Todas as runs com processos terminados e portas reutilizáveis; runs FAIL
+  antigas e novas preservadas; só a ferramenta em demo/ foi alterada (commits
+  `94300b2`…`23ddc9a`), sem tocar em produção/testes/CORE. Causas dos negativos
+  (NO_ROUTE da CLI = corrida de prontidão; falha do switch = corrida do JAR)
+  estabelecidas em [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).
+  R17 histórico continua sem causa estabelecida. PHASE-01–04 DONE e PHASE-05–07 TODO
+  mantidos; a demo aguarda validação externa e não é aprovação docente. [Handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
+  · [DEMO.md](../demo/DEMO.md) · [MATRIZ](../demo/MATRIX.md).
+
 **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
 [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
 separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido

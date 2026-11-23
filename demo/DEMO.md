@@ -1,10 +1,14 @@
-# Checkpoint OTT — preparação em curso
+# Checkpoint OTT — demonstração validada (versão congelada `23ddc9a`)
 
-**Protótipo, ainda não aceite para apresentação.** Demonstração do plano de
-controlo concluído na PHASE-04. A pedido do utilizador, esta iteração termina
-no checkpoint do protótipo; as três repetições por cenário e o cenário 3 ficam
-para a continuação. Consultar o [handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
-antes de usar perante o docente.
+Demonstração do plano de controlo concluído na PHASE-04, executada e repetida
+em 2026-11-23: cenário1 3/3 PASS consecutivas, cenário2 4 PASS consecutivas
+(mais 2 PASS adicionais; 2 FAIL posteriores preservados como corrida residual
+do sistema), cenário3 (11 nós da Figura 1) PASS completo; builds inicial e
+final 1459/0/0/0. JAR `dc192971…` inalterado. Runs em
+`experiments/checkpoint-phase04/runs/`; detalhes e limitações no
+[handoff](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md)
+e na [investigação](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/investigation-iteration2.md).
+PHASE-05–07 não iniciadas. Não é aprovação docente nem execução CORE.
 
 ## Pré-requisitos e arranque
 
@@ -25,7 +29,7 @@ controlo. O HTML é regenerado a partir de snapshots locais e recarrega a cada
 dois segundos. Nenhum browser ou servidor HTTP é necessário para a validação.
 
 `./demo/run.sh cenario1` seleciona os quatro nós; `cenario3` seleciona os onze
-nós da Figura 1, **ainda não ensaiados**. `--auto` executa o guião automaticamente;
+nós da Figura 1 (ensaiado com PASS em 2026-11-23). `--auto` executa o guião automaticamente;
 `--port-base 24000` escolhe as portas (0/default escolhe portas efémeras).
 `DEMO_JAR=/caminho/ficheiro.jar` seleciona explicitamente outro JAR, com hash
 registado. Não atribuir resultados antigos a esse ficheiro.

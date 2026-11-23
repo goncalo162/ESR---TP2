@@ -43,6 +43,33 @@ As causas do NO_ROUTE da CLI e do PATH_CHANGED da troca por qualidade ainda
 não estão estabelecidas. Não foi feita correção de produção. R17 histórico
 permanece desconhecido, distinto destes negativos.
 
+## Iteração 2 (2026-11-23) — retoma e fecho dos critérios
+
+Builds inicial e final `mvn -B -ntp clean verify` JDK21.0.13.0.3:
+**1459/0/0/0, 21 XML** em ambos; JAR `dc192971…` idêntico
+([início](../../../experiments/checkpoint-phase04/build-start-iteration2/result.json),
+[fim](../../../experiments/checkpoint-phase04/build-end-iteration2/result.json)).
+
+Ajustes só em `demo/` (commits `94300b2`, `91db5ea`, `afeb6b1`, `ec72427`,
+`a416521`, `23ddc9a`): proxy com atraso por frame agendado (sem fila de
+serialização), oráculos de trace com prazo, atomicidade do switch por
+upstream/caminho publicados, restabilização após o pulso e prazo de arranque
+escalado para >6 nós. Detalhes e âmbito em
+[investigation-iteration2.md](investigation-iteration2.md).
+
+Runs na versão congelada `23ddc9a` (JAR `dc192971…`):
+
+- Cenário1: **3/3 PASS consecutivas** (33 checks cada) — série em
+  [series-final2-iteration2.log](../../../experiments/checkpoint-phase04/series-final2-iteration2.log).
+- Cenário2: **4 PASS consecutivas** (39 checks cada) em
+  [reliability2-cenario2-iteration2.log](../../../experiments/checkpoint-phase04/reliability2-cenario2-iteration2.log),
+  mais 2 PASS em séries posteriores; 2 FAIL posteriores preservados
+  (`e63bfcf3`, `32a314b3`) com a corrida residual do 1.ª tentativa — ver
+  handoff. Todas as runs: processos terminados, portas reutilizáveis.
+- Cenário3 (Figura 1, 11 nós): **PASS completo** `20261123T115804Z-96352b48`
+  (39 checks); FAIL de arranque anterior preservado (`9e1b0832`).
+- Runs FAIL nunca apagadas; runs novas com `tool-source/`+`tool-sha256.json`.
+
 ## Ainda obrigatório para aceitar a demonstração
 
 Investigação dos negativos e revisão dos oráculos, cenário2 completo, três
