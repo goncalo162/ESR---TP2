@@ -49,12 +49,13 @@ JVM terminada após wait real do runner; pasta temporária ausente. JAR/código/
 fixtures/auxiliares intactos. Sem repetir build ou manual, pois o código não mudou.
 **Test aprovado pelo utilizador**; revisão final Denji confirmada pelo utilizador,
 sem alterações pendentes. [Confirmação vinculada aos hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
-Integração pendente.
+Integração local72c9f92 comprovada;fecho autorizado conforme closure-walkthrough.
 Sem gates externos adicionais.
 
 ## Estado
 
-Test aprovado, bolt/história/unidade em progresso até integração e fecho autorizados. Negativos/logs anteriores,
+Test aprovado,bolt/história complete e TASK-019 DONE após integração72c9f92 e
+autorização de fecho. Unidade005/PHASE-05 em progresso. Negativos/logs anteriores,
 fixtures, testes históricos e demo preservados por hash; código aprovado intacto.
 V-ADD executado nesta etapa, relatório na evidência. Ramo imp-016-udp,
-IDs locais,main intacto,target/ fora da entrega. Sem staging/commits/push/fecho.
+IDs locais,main intacto,target/ fora da entrega. Sem push;fecho documental/evidência autorizado,sem alterar Java.

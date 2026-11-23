@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,1 in-progress e17 planned; bolts:17 complete,1 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:18 histórias complete,0 in-progress e17 planned; bolts:18 complete,0 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -120,8 +120,10 @@ Implement/Test e revisão final aprovados; V-017 consolidada, integração em ma
 
 ## 005-video/001-definir-codec-udp-e-fragmentacao-de-frames.md ✅ GENERATED
 
-**Tarefa:** IMP-016. **Estado:** in-progress,Test aprovado; revisão Denji confirmada; integração pendente. **Bolt:** 010-video.
-[Plan](bolts/010-video/implementation-plan.md),ramo imp-016-udp/base b6de848; clean verify1537/0/0/0,22 XML;78 casos U01–U08; Implement aprovado, manual Francisco24 cumprido; Test aprovado e Denji confirmado; integração pendente. DEMO-001 separada/não bloqueante.
+**Tarefa:** IMP-016. **Estado:** complete/implemented=true,TASK-019 DONE. **Bolt:** 010-video complete.
+[Fecho](bolts/010-video/closure-walkthrough.md),main72c9f92;clean verify1537/0/0/0,22 XML,
+78 U01–U08,manual Francisco24,Test e revisão final Denji aprovados. Unidade005/PHASE-05
+em progresso,sem outro IMP iniciado,IDs locais/demo preservados,sem push.
 **Ficheiro:** [001-definir-codec-udp-e-fragmentacao-de-frames](intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
 
 ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED

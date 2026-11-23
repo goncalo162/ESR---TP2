@@ -5,7 +5,7 @@
 - ID: TASK-019
 - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
 - Prioridade: P0
-- Estado: IN PROGRESS
+- Estado: DONE
 - Responsável: [Waheed](../../team/WAHEED.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-004](../PHASE-01/TASK-004.md), [TASK-011](../PHASE-03/TASK-011.md), [TASK-018](../PHASE-04/TASK-018.md).
@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Criar parser e encoder com validação antes de alocação.
-- [ ] Fragmentar JPEG opaco sem descodificar imagem.
-- [ ] Criar golden fixtures independentes para offsets e UUID.
-- [ ] Verificar tamanhos 1, 1136, 1137 e máximo permitido.
+- [x] Criar parser e encoder com validação antes de alocação.
+- [x] Fragmentar JPEG opaco sem descodificar imagem.
+- [x] Consumir golden fixtures independentes preservadas e acrescentar literais para offsets e UUID.
+- [x] Verificar tamanhos 1, 1136, 1137 e máximo permitido.
 
 ## 8. Regras e restrições
 
@@ -54,14 +54,14 @@ Frame de zero bytes, maior que 2 MiB, datagrama curto/extra, índice fora da gam
 
 V-019: fixtures de bytes confirmam offsets 0–64; recombinação manual dos payloads recupera exatamente o frame; nenhum datagrama excede 1200 bytes; inputs inválidos são rejeitados.
 
-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial histórico: NÃO EXECUTADO; V-019 posteriormente executado e aprovado, conforme fecho abaixo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
 
 ## 11. Critérios de aceitação
 
-- [ ] Formato coincide com contrato v1.
-- [ ] Limites são impostos antes de alocar.
-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
-- [ ] Validação V-019 executada e evidência ligada no progresso.
+- [x] Formato coincide com contrato v1.
+- [x] Limites são impostos antes de alocar.
+- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+- [x] Validação V-019 executada e evidência ligada no progresso.
 
 ## 12. Definition of Done
 
@@ -77,16 +77,13 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
 
 Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.
 
-## Test aprovado — revisão Denji confirmada, integração pendente
+## Fecho — DONE
 
-Implement aprovado; clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019.
-[Test walkthrough](../../../memory-bank/bolts/010-video/test-walkthrough.md),
-[manual](../../../experiments/construction/010-video/manual-instructions.md).
-Código aprovado/JAR/fixtures/históricos/demo/negativos preservados.
-Manual Francisco24 executado pessoalmente e conferido, oito etapas sem divergências.
-[Prova/hashes/JVM](../../../experiments/construction/010-video/manual-verification-01/README.md).
-TASK in-progress; Test aprovado e revisão final Denji confirmada pelo utilizador,
-sem alterações pendentes. [Hashes/plano](../../../experiments/construction/010-video/final-package-01/README.md).
-Integração/fecho pendentes.
-Ramo imp-016-udp,IDs locais,target/ separado,sem staging/commits/push/fecho.
-Sem gates externos adicionais.
+Fecho documental autorizado após commit/integração local em main72c9f92.
+Test clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019 aprovados.
+Manual pessoal Francisco24,oito etapas sem divergências; revisão final Denji
+confirmada pelo utilizador,sem alterações pendentes. [Fecho](../../../memory-bank/bolts/010-video/closure-walkthrough.md),
+[commit](../../../experiments/construction/010-video/commit-verification-01/README.md),
+[integração](../../../experiments/construction/010-video/integration-verification-01/README.md).
+Unidade005/PHASE-05 em progresso; IDS locais,demo e negativos preservados.
+Sem alterações Java,push,target/ no commit documental ou início de outro IMP.

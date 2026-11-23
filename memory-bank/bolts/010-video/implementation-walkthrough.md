@@ -50,5 +50,6 @@ fixtures, ADD/specs, POM, validador e Q-C global preservados. IDs apenas locais.
 Main/HEAD b6de848, ramo imp-016-udp; target/ separado, sem staging/commits/push.
 Implement aprovado. Clean verify/JAR final e consolidação técnica Test executados
 posteriormente no test-walkthrough. Manual humano Francisco24 cumprido e conferido; Test aprovado e revisão final
-Denji confirmada pelo utilizador. Integração pendente. Sem gates externos
+Denji confirmada pelo utilizador. Integração local72c9f92 e fecho autorizado;
+bolt/história complete,TASK-019 DONE,unidade005/PHASE-05 em progresso. Sem gates externos
 adicionais. Não se alega vídeo, GUI/CORE ou aceitação final por estes testes.

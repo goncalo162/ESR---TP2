@@ -1,19 +1,16 @@
 # Progresso do projeto
 
-**IMP-016 / 010-video — Test aprovado, revisão Denji confirmada; integração pendente:** Implement aprovado;
-clean verify JDK21 **1537/0/0/0,22 XML**, incluindo78 casos U01–U08/V-019.
-[Test walkthrough](../memory-bank/bolts/010-video/test-walkthrough.md),
-[JAR/logs/XML](../experiments/construction/010-video/test-01/README.md) e
-[manual reproduzível](../experiments/construction/010-video/manual-instructions.md).
-Código aprovado intacto; fixtures/históricos/demo/main e negativos preservados.
+**IMP-016 / 010-video / TASK-019 — concluído:** integrado localmente em main72c9f92;
+bolt/história complete,implemented=true,TASK-019 DONE por autorização de fecho.
+[Fecho](../memory-bank/bolts/010-video/closure-walkthrough.md),
+[commit verificado](../experiments/construction/010-video/commit-verification-01/README.md),
+[integração](../experiments/construction/010-video/integration-verification-01/README.md).
+Test clean verify1537/0/0/0,22 XML,78 U01–U08/V-019,manual humano Francisco24 e
+revisão final Denji aprovados. Código/JAR intactos,sem repetir build/manual.
 JAR SHA-256:588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
-[Manual humano Francisco24 conferido](../experiments/construction/010-video/manual-verification-01/README.md):
-oito etapas,24 checks,JAR/auxiliares/origem/JVM conferidos; SHELL_EXIT confirmado pelo utilizador.
-Test aprovado e revisão final Denji confirmada pelo utilizador,sem alterações pendentes.
-[Pacote exato/plano de integração](../experiments/construction/010-video/final-package-01/README.md).
-Integração/fecho pendentes; bolt permanece aberto.
-Ramo imp-016-udp/base b6de848, IDs locais,target/ separado,sem staging/commits/push/fecho.
-17 bolts complete,1 in-progress,17 planned. Sem gates externos adicionais.
+Unidade005-video/PHASE-05 em progresso;nenhum outro IMP iniciado.18 bolts complete,
+0 in-progress,17 planned. IDs locais,demo/negativos preservados,target/ excluído,
+fecho documental sem alterações Java ou push. Bloco datado da demo seguinte histórico.
 
 **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
 [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
@@ -29,7 +26,7 @@ causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
 PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
 
 
-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS no checkpoint Test de TASK-019; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS com TASK-019 DONE e restantes incrementos pendentes; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
 
 **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
 
@@ -126,7 +123,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
 | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
 | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | DONE — TASK-014–018, manual/Test/Waheed, coordenação e integração confirmados; regressão atual 1459/0/0/0 | PHASE-03 DONE |
-| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — Plan IMP-016 por aprovar | PHASE-04 DONE |
+| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — TASK-019 DONE;restantes pendentes | PHASE-04 DONE |
 | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
 | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
 
@@ -155,7 +152,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | DONE | V-016/Test1419,Luis7/28,Fillmore,integração447ae4b; [fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md) |
 | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
 | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
-| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | IN PROGRESS | V-019: NÃO EXECUTADO |
+| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | DONE | V-019:78 U01–U08;Test1537/0/0/0;Francisco24;Denji;main72c9f92 |
 | [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
 | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
 | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |

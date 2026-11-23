@@ -3,13 +3,13 @@ id: "010-video"
 unit: "005-video"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["001-definir-codec-udp-e-fragmentacao-de-frames"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-23T14:41:11Z"
+updated: "2026-11-23T16:02:19Z"
 started: "2026-11-23T14:41:11Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-23T16:02:19Z"
+current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-23T14:54:00.061317+00:00", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-23T15:16:20Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-23T15:39:17Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["009-arvores"]
 enables_bolts: ["011-video", "012-video"]
@@ -41,7 +41,7 @@ Ler [IMP-016](../../../add.md#imp-016) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [001-definir-codec-udp-e-fragmentacao-de-frames](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
+- [x] [001-definir-codec-udp-e-fragmentacao-de-frames](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
 - Dependências: [009-arvores](../009-arvores/bolt.md).
 - Unidade: [005-video](../../intents/001-ott-streaming/units/005-video/unit-brief.md).
 - Gates: nenhum adicional.
@@ -56,10 +56,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 
 ## Critérios de aceitação
 
-- [ ] Formato coincide com contrato v1.
-- [ ] Limites são impostos antes de alocar.
-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
-- [ ] Validação V-019 executada e evidência ligada no progresso.
+- [x] Formato coincide com contrato v1.
+- [x] Limites são impostos antes de alocar.
+- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+- [x] Validação V-019 executada e evidência ligada no progresso.
 
 ## Evidência e fecho
 
@@ -69,13 +69,12 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
 
-## Test e revisão final aprovados — integração pendente
+## Fecho documental autorizado — complete
 
-Utilizador aprovou Test1537/0/0/0,22 XML,V-ADD e manual Francisco24 e confirmou
-revisão final Denji da implementação atual,sem alterações pendentes.
-[Revisão vinculada a hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
-[Resumo/plano/allowlist/manifesto/simulação](../../../experiments/construction/010-video/final-package-01/README.md).
-Bolt/história/unidade permanecem in-progress; implemented=false até fecho autorizado.
-Integração ainda não executada. Ramo imp-016-udp,IDs locais,demo/main preservados,
-target/ e alterações alheias excluídos. Sem staging/commits/push/fecho.
-Sem gates externos adicionais.
+IMP-016/010-video/TASK-019 concluído e integrado localmente em main72c9f92.
+Test1537/0/0/0,22 XML,V-019/U01–U08,manual Francisco24 e revisão final Denji
+aprovados. [Fecho](closure-walkthrough.md),
+[prova commit](../../../experiments/construction/010-video/commit-verification-01/README.md),
+[prova integração](../../../experiments/construction/010-video/integration-verification-01/README.md).
+Unidade005-video e PHASE-05 continuam em progresso; nenhum outro IMP iniciado.
+IDs locais,demo/negativos preservados; sem alterações Java,push ou target/ no fecho.

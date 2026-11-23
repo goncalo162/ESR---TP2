@@ -1,0 +1,538 @@
+diff --git a/docs/13-REQUIREMENTS-TRACEABILITY.md b/docs/13-REQUIREMENTS-TRACEABILITY.md
+index 9c6b975..f258e52 100644
+--- a/docs/13-REQUIREMENTS-TRACEABILITY.md
++++ b/docs/13-REQUIREMENTS-TRACEABILITY.md
+@@ -482,3 +482,11 @@ usa dois streams. Sem alegar vídeo,GUI,CORE ou medição de desempenho.
+ Doze bolts complete,23 planned,nenhum em execução.007-arvores apenas
+ desimpedido; PHASE-04 e restantes fases não iniciadas. Commits e push autorizados;
+ o resultado de publicação só será declarado após execução e conferência remota.
++
++## IMP-016 — evidência parcial de protocolo,integração72c9f92
++
++[TASK-019 DONE/fecho](../memory-bank/bolts/010-video/closure-walkthrough.md):V-019,
++78 U01–U08,clean verify1537/0/0/0,22 XML,manual Francisco24 e revisão final Denji.
++Codec OTT1/caps/fragmentação validados; não conclui requisitos compostos de
++forwarding,vídeo,latência ou reprodução. TASK-020–024 e unidade005/PHASE-05
++permanecem pendentes/em progresso. Sem alegar emissão,GUI ou CORE neste codec.
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index 5b0eef5..f70506a 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,19 +1,16 @@
+ # Progresso do projeto
+ 
+-**IMP-016 / 010-video — Test aprovado, revisão Denji confirmada; integração pendente:** Implement aprovado;
+-clean verify JDK21 **1537/0/0/0,22 XML**, incluindo78 casos U01–U08/V-019.
+-[Test walkthrough](../memory-bank/bolts/010-video/test-walkthrough.md),
+-[JAR/logs/XML](../experiments/construction/010-video/test-01/README.md) e
+-[manual reproduzível](../experiments/construction/010-video/manual-instructions.md).
+-Código aprovado intacto; fixtures/históricos/demo/main e negativos preservados.
++**IMP-016 / 010-video / TASK-019 — concluído:** integrado localmente em main72c9f92;
++bolt/história complete,implemented=true,TASK-019 DONE por autorização de fecho.
++[Fecho](../memory-bank/bolts/010-video/closure-walkthrough.md),
++[commit verificado](../experiments/construction/010-video/commit-verification-01/README.md),
++[integração](../experiments/construction/010-video/integration-verification-01/README.md).
++Test clean verify1537/0/0/0,22 XML,78 U01–U08/V-019,manual humano Francisco24 e
++revisão final Denji aprovados. Código/JAR intactos,sem repetir build/manual.
+ JAR SHA-256:588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
+-[Manual humano Francisco24 conferido](../experiments/construction/010-video/manual-verification-01/README.md):
+-oito etapas,24 checks,JAR/auxiliares/origem/JVM conferidos; SHELL_EXIT confirmado pelo utilizador.
+-Test aprovado e revisão final Denji confirmada pelo utilizador,sem alterações pendentes.
+-[Pacote exato/plano de integração](../experiments/construction/010-video/final-package-01/README.md).
+-Integração/fecho pendentes; bolt permanece aberto.
+-Ramo imp-016-udp/base b6de848, IDs locais,target/ separado,sem staging/commits/push/fecho.
+-17 bolts complete,1 in-progress,17 planned. Sem gates externos adicionais.
++Unidade005-video/PHASE-05 em progresso;nenhum outro IMP iniciado.18 bolts complete,
++0 in-progress,17 planned. IDs locais,demo/negativos preservados,target/ excluído,
++fecho documental sem alterações Java ou push. Bloco datado da demo seguinte histórico.
+ 
+ **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
+ [DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
+@@ -29,7 +26,7 @@ causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
+ PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
+ 
+ 
+-Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS no checkpoint Test de TASK-019; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
++Data de criação do plano: 26-10-2026. Estado global da implementação: IN PROGRESS. PHASE-01 e TASK-001–004 concluídas por pedido explícito do utilizador; TASK-005 concluída; PHASE-02 DONE, incluindo EXTRA-01 de controlo, após aceitação final explícita do utilizador. PHASE-03 DONE: TASK-010–013 DONE; PHASE-04 DONE, TASK-014 e TASK-015 DONE após Test, revisão final e integração; TASK-016 DONE após Test/manual Luis/revisão Fillmore/integração; TASK-017 DONE em 2026-11-22T17:47:01Z (Test com JAR novo + validador PASS + revisão confirmada pelo utilizador) e TASK-018 DONE em 2026-11-22T17:12:18Z após validação validador-bolt PASS e autorização explícita do utilizador; PHASE-05 IN PROGRESS com TASK-019 DONE e restantes incrementos pendentes; PHASE-06–07 e TASK-020–031 continuam TODO. TASK-009 DONE após Test, revisão final e integração. TASK-008 DONE após Test, revisão final e integração; TASK-007 DONE; TASK-006 DONE; TASK-032 DONE, após Test aprovado, revisão final por Luis e integração em main. Estados permitidos: TODO, IN PROGRESS, BLOCKED, DONE.
+ 
+ **Utilizador da distribuição histórica:** [Fillmore](team/FILLMORE.md). Nesta revisão de IMP-002, o utilizador/revisor humano é Luis. TASK-006 está concluída após TASK-032, com revisão atribuída a Waheed confirmada pelo utilizador. TASK-007 está DONE após Test/manual humano, revisão final de Denji aprovada e integração local em main (8db7b78). Na TASK-005, Fillmore é o revisor atribuído e Waheed o responsável previsto na distribuição.
+ 
+@@ -126,7 +123,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [PHASE-02](phases/PHASE-02-OVERLAY.md) | TASK-005–TASK-009, TASK-032 e EXTRA-01/TASK-033–034 | DONE, incluindo EXTRA-01 de controlo. [Fecho](phases/PHASE-02-CLOSURE-REVIEW.md) | PHASE-01 DONE |
+ | [PHASE-03](phases/PHASE-03-ROUTING.md) | TASK-010–TASK-013 | DONE | PHASE-02 DONE |
+ | [PHASE-04](phases/PHASE-04-FLOW-MANAGEMENT.md) | TASK-014–TASK-018 | DONE — TASK-014–018, manual/Test/Waheed, coordenação e integração confirmados; regressão atual 1459/0/0/0 | PHASE-03 DONE |
+-| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — Plan IMP-016 por aprovar | PHASE-04 DONE |
++| [PHASE-05](phases/PHASE-05-STREAMING.md) | TASK-019–TASK-024 | IN PROGRESS — TASK-019 DONE;restantes pendentes | PHASE-04 DONE |
+ | [PHASE-06](phases/PHASE-06-CORE-VALIDATION.md) | TASK-025–TASK-028 | TODO | PHASE-05 DONE |
+ | [PHASE-07](phases/PHASE-07-DELIVERY.md) | TASK-029–TASK-031 | TODO | PHASE-06 DONE |
+ 
+@@ -155,7 +152,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-016](tasks/PHASE-04/TASK-016.md) | Recuperar árvores após falha de upstream | TASK-012, TASK-014, TASK-015 | DONE | V-016/Test1419,Luis7/28,Fillmore,integração447ae4b; [fecho](../memory-bank/bolts/008-arvores/closure-walkthrough.md) |
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
+-| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | IN PROGRESS | V-019: NÃO EXECUTADO |
++| [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | DONE | V-019:78 U01–U08;Test1537/0/0/0;Francisco24;Denji;main72c9f92 |
+ | [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
+ | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
+ | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |
+diff --git a/docs/phases/PHASE-05-STREAMING.md b/docs/phases/PHASE-05-STREAMING.md
+index 8fb434a..b087d70 100644
+--- a/docs/phases/PHASE-05-STREAMING.md
++++ b/docs/phases/PHASE-05-STREAMING.md
+@@ -8,10 +8,11 @@ Entregar vídeo MJPEG fragmentado a clientes, com quatro streams distintas em du
+ 
+ Incremento 5 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O resultado é verificável antes da fase seguinte. Estado inicial: TODO. A fase descreve trabalho futuro; não atesta execução.
+ 
+-Estado atual: **IN PROGRESS no checkpoint Test do IMP-016/TASK-019**,
+-[Plan aprovado](../../memory-bank/bolts/010-video/implementation-plan.md).
+-PHASE-04 DONE e unidade004 complete; DEMO-001 é apoio separado,não um gate.
+-TASK-020–024 permanecem TODO; Implement aprovado; clean verify1537/0/0/0,22 XML. Manual Francisco24/Test aprovados,Denji confirmado; integração pendente,streaming futuro.
++Estado atual: **IN PROGRESS**; TASK-019/IMP-016/010-video DONE/complete após
++integração72c9f92,Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji.
++[Fecho](../../memory-bank/bolts/010-video/closure-walkthrough.md).
++TASK-020–024 permanecem TODO; nenhum outro incremento iniciado. Streaming futuro.
++PHASE-04 DONE/unidade004 complete; DEMO-001 separado,não um gate.
+ 
+ ## 3. Pré-requisitos
+ 
+@@ -25,7 +26,7 @@ RF-007, RF-010, RF-011, RF-012, RF-013, RF-015, RNF-001, RNF-002, RNF-003, RP-00
+ 
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+-| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | IN PROGRESS — Test/Denji aprovados; integração pendente |
++| [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | DONE — V-019/Test/Francisco24/Denji/integração72c9f92 |
+ | [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | TODO |
+ | [TASK-021](../tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | V-021 | TODO |
+ | [TASK-022](../tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | V-022 | TODO |
+diff --git a/docs/tasks/PHASE-05/TASK-019.md b/docs/tasks/PHASE-05/TASK-019.md
+index ff3b24e..c054671 100644
+--- a/docs/tasks/PHASE-05/TASK-019.md
++++ b/docs/tasks/PHASE-05/TASK-019.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-019
+ - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
+ - Prioridade: P0
+-- Estado: IN PROGRESS
++- Estado: DONE
+ - Responsável: [Waheed](../../team/WAHEED.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-004](../PHASE-01/TASK-004.md), [TASK-011](../PHASE-03/TASK-011.md), [TASK-018](../PHASE-04/TASK-018.md).
+@@ -37,10 +37,10 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
+ 
+ ## 7. Passos de implementação
+ 
+-- [ ] Criar parser e encoder com validação antes de alocação.
+-- [ ] Fragmentar JPEG opaco sem descodificar imagem.
+-- [ ] Criar golden fixtures independentes para offsets e UUID.
+-- [ ] Verificar tamanhos 1, 1136, 1137 e máximo permitido.
++- [x] Criar parser e encoder com validação antes de alocação.
++- [x] Fragmentar JPEG opaco sem descodificar imagem.
++- [x] Consumir golden fixtures independentes preservadas e acrescentar literais para offsets e UUID.
++- [x] Verificar tamanhos 1, 1136, 1137 e máximo permitido.
+ 
+ ## 8. Regras e restrições
+ 
+@@ -54,14 +54,14 @@ Frame de zero bytes, maior que 2 MiB, datagrama curto/extra, índice fora da gam
+ 
+ V-019: fixtures de bytes confirmam offsets 0–64; recombinação manual dos payloads recupera exatamente o frame; nenhum datagrama excede 1200 bytes; inputs inválidos são rejeitados.
+ 
+-Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial da validação: NÃO EXECUTADO. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
++Detalhes gerais em [09](../../09-TESTING-STRATEGY.md). Estado inicial histórico: NÃO EXECUTADO; V-019 posteriormente executado e aprovado, conforme fecho abaixo. Guardar comandos, ambiente e resultado; verificações manuais devem identificar operador e evidência.
+ 
+ ## 11. Critérios de aceitação
+ 
+-- [ ] Formato coincide com contrato v1.
+-- [ ] Limites são impostos antes de alocar.
+-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+-- [ ] Validação V-019 executada e evidência ligada no progresso.
++- [x] Formato coincide com contrato v1.
++- [x] Limites são impostos antes de alocar.
++- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
++- [x] Validação V-019 executada e evidência ligada no progresso.
+ 
+ ## 12. Definition of Done
+ 
+@@ -77,16 +77,13 @@ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houv
+ 
+ Consumir [as fixtures UDP existentes](../../../Projeto/src/test/resources/protocol/README.md) e o manifesto, incluindo fronteira de 1137 bytes, metadados e casos inválidos. Os payloads são sintéticos e validam formato, não descodificação JPEG. Não atualizar bytes esperados a partir do encoder sob teste. Esta nota não inicia a TASK-019.
+ 
+-## Test aprovado — revisão Denji confirmada, integração pendente
+-
+-Implement aprovado; clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019.
+-[Test walkthrough](../../../memory-bank/bolts/010-video/test-walkthrough.md),
+-[manual](../../../experiments/construction/010-video/manual-instructions.md).
+-Código aprovado/JAR/fixtures/históricos/demo/negativos preservados.
+-Manual Francisco24 executado pessoalmente e conferido, oito etapas sem divergências.
+-[Prova/hashes/JVM](../../../experiments/construction/010-video/manual-verification-01/README.md).
+-TASK in-progress; Test aprovado e revisão final Denji confirmada pelo utilizador,
+-sem alterações pendentes. [Hashes/plano](../../../experiments/construction/010-video/final-package-01/README.md).
+-Integração/fecho pendentes.
+-Ramo imp-016-udp,IDs locais,target/ separado,sem staging/commits/push/fecho.
+-Sem gates externos adicionais.
++## Fecho — DONE
++
++Fecho documental autorizado após commit/integração local em main72c9f92.
++Test clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019 aprovados.
++Manual pessoal Francisco24,oito etapas sem divergências; revisão final Denji
++confirmada pelo utilizador,sem alterações pendentes. [Fecho](../../../memory-bank/bolts/010-video/closure-walkthrough.md),
++[commit](../../../experiments/construction/010-video/commit-verification-01/README.md),
++[integração](../../../experiments/construction/010-video/integration-verification-01/README.md).
++Unidade005/PHASE-05 em progresso; IDS locais,demo e negativos preservados.
++Sem alterações Java,push,target/ no commit documental ou início de outro IMP.
+diff --git a/memory-bank/bolts/010-video/bolt.md b/memory-bank/bolts/010-video/bolt.md
+index c3ff6f0..40a9e74 100644
+--- a/memory-bank/bolts/010-video/bolt.md
++++ b/memory-bank/bolts/010-video/bolt.md
+@@ -3,13 +3,13 @@ id: "010-video"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "in-progress"
++status: "complete"
+ stories: ["001-definir-codec-udp-e-fragmentacao-de-frames"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-23T14:41:11Z"
++updated: "2026-11-23T16:02:19Z"
+ started: "2026-11-23T14:41:11Z"
+-completed: null
+-current_stage: "test"
++completed: "2026-11-23T16:02:19Z"
++current_stage: null
+ stages_completed: [{"name": "plan", "completed": "2026-11-23T14:54:00.061317+00:00", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-23T15:16:20Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-23T15:39:17Z", "artifact": "test-walkthrough.md"}]
+ requires_bolts: ["009-arvores"]
+ enables_bolts: ["011-video", "012-video"]
+@@ -41,7 +41,7 @@ Ler [IMP-016](../../../add.md#imp-016) e as ADR aí indicadas antes de qualquer
+ 
+ ## História, dependências e gates
+ 
+-- [ ] [001-definir-codec-udp-e-fragmentacao-de-frames](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
++- [x] [001-definir-codec-udp-e-fragmentacao-de-frames](../../intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
+ - Dependências: [009-arvores](../009-arvores/bolt.md).
+ - Unidade: [005-video](../../intents/001-ott-streaming/units/005-video/unit-brief.md).
+ - Gates: nenhum adicional.
+@@ -56,10 +56,10 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Formato coincide com contrato v1.
+-- [ ] Limites são impostos antes de alocar.
+-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+-- [ ] Validação V-019 executada e evidência ligada no progresso.
++- [x] Formato coincide com contrato v1.
++- [x] Limites são impostos antes de alocar.
++- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
++- [x] Validação V-019 executada e evidência ligada no progresso.
+ 
+ ## Evidência e fecho
+ 
+@@ -69,13 +69,12 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
+ 
+-## Test e revisão final aprovados — integração pendente
++## Fecho documental autorizado — complete
+ 
+-Utilizador aprovou Test1537/0/0/0,22 XML,V-ADD e manual Francisco24 e confirmou
+-revisão final Denji da implementação atual,sem alterações pendentes.
+-[Revisão vinculada a hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
+-[Resumo/plano/allowlist/manifesto/simulação](../../../experiments/construction/010-video/final-package-01/README.md).
+-Bolt/história/unidade permanecem in-progress; implemented=false até fecho autorizado.
+-Integração ainda não executada. Ramo imp-016-udp,IDs locais,demo/main preservados,
+-target/ e alterações alheias excluídos. Sem staging/commits/push/fecho.
+-Sem gates externos adicionais.
++IMP-016/010-video/TASK-019 concluído e integrado localmente em main72c9f92.
++Test1537/0/0/0,22 XML,V-019/U01–U08,manual Francisco24 e revisão final Denji
++aprovados. [Fecho](closure-walkthrough.md),
++[prova commit](../../../experiments/construction/010-video/commit-verification-01/README.md),
++[prova integração](../../../experiments/construction/010-video/integration-verification-01/README.md).
++Unidade005-video e PHASE-05 continuam em progresso; nenhum outro IMP iniciado.
++IDs locais,demo/negativos preservados; sem alterações Java,push ou target/ no fecho.
+diff --git a/memory-bank/bolts/010-video/implementation-walkthrough.md b/memory-bank/bolts/010-video/implementation-walkthrough.md
+index cb3e99c..c592783 100644
+--- a/memory-bank/bolts/010-video/implementation-walkthrough.md
++++ b/memory-bank/bolts/010-video/implementation-walkthrough.md
+@@ -50,5 +50,6 @@ fixtures, ADD/specs, POM, validador e Q-C global preservados. IDs apenas locais.
+ Main/HEAD b6de848, ramo imp-016-udp; target/ separado, sem staging/commits/push.
+ Implement aprovado. Clean verify/JAR final e consolidação técnica Test executados
+ posteriormente no test-walkthrough. Manual humano Francisco24 cumprido e conferido; Test aprovado e revisão final
+-Denji confirmada pelo utilizador. Integração pendente. Sem gates externos
++Denji confirmada pelo utilizador. Integração local72c9f92 e fecho autorizado;
++bolt/história complete,TASK-019 DONE,unidade005/PHASE-05 em progresso. Sem gates externos
+ adicionais. Não se alega vídeo, GUI/CORE ou aceitação final por estes testes.
+diff --git a/memory-bank/bolts/010-video/test-walkthrough.md b/memory-bank/bolts/010-video/test-walkthrough.md
+index a3e627e..d053114 100644
+--- a/memory-bank/bolts/010-video/test-walkthrough.md
++++ b/memory-bank/bolts/010-video/test-walkthrough.md
+@@ -49,12 +49,13 @@ JVM terminada após wait real do runner; pasta temporária ausente. JAR/código/
+ fixtures/auxiliares intactos. Sem repetir build ou manual, pois o código não mudou.
+ **Test aprovado pelo utilizador**; revisão final Denji confirmada pelo utilizador,
+ sem alterações pendentes. [Confirmação vinculada aos hashes](../../../experiments/construction/010-video/final-package-01/final-review.json).
+-Integração pendente.
++Integração local72c9f92 comprovada;fecho autorizado conforme closure-walkthrough.
+ Sem gates externos adicionais.
+ 
+ ## Estado
+ 
+-Test aprovado, bolt/história/unidade em progresso até integração e fecho autorizados. Negativos/logs anteriores,
++Test aprovado,bolt/história complete e TASK-019 DONE após integração72c9f92 e
++autorização de fecho. Unidade005/PHASE-05 em progresso. Negativos/logs anteriores,
+ fixtures, testes históricos e demo preservados por hash; código aprovado intacto.
+ V-ADD executado nesta etapa, relatório na evidência. Ramo imp-016-udp,
+-IDs locais,main intacto,target/ fora da entrega. Sem staging/commits/push/fecho.
++IDs locais,main intacto,target/ fora da entrega. Sem push;fecho documental/evidência autorizado,sem alterar Java.
+diff --git a/memory-bank/bolts/011-video/bolt.md b/memory-bank/bolts/011-video/bolt.md
+index c62248d..afb83c9 100644
+--- a/memory-bank/bolts/011-video/bolt.md
++++ b/memory-bank/bolts/011-video/bolt.md
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["009-arvores", "010-video"]
+ enables_bolts: ["025-video"]
+ requires_units: ["004-arvores"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 2
+   avg_uncertainty: 2
+diff --git a/memory-bank/bolts/012-video/bolt.md b/memory-bank/bolts/012-video/bolt.md
+index 733da47..ff05ba2 100644
+--- a/memory-bank/bolts/012-video/bolt.md
++++ b/memory-bank/bolts/012-video/bolt.md
+@@ -14,7 +14,7 @@ stages_completed: []
+ requires_bolts: ["009-arvores", "010-video"]
+ enables_bolts: ["027-video"]
+ requires_units: ["004-arvores"]
+-blocks: true
++blocks: false
+ complexity:
+   avg_complexity: 3
+   avg_uncertainty: 1
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+index 1f4ed68..d882599 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+@@ -61,3 +61,15 @@ sem alterações pendentes. [Confirmação e hashes código/JAR](../../../../../
+ Main local continua b6de848,sem divergência entre ramos; remotos não consultados.
+ Sem repetir build/manual; integração e fecho pendentes. Bolt/história/unidade abertos,
+ IDs locais,demo preservada,target/ excluído,sem staging/commits/push/fecho.
++
++## 2026-11-23T16:02:19Z — Fecho documental autorizado / IMP-016 concluído
++
++Utilizador autorizou complete/implemented=true/TASK-019 DONE após commit e
++fast-forward local em main72c9f92. Test1537/0/0/0,22 XML,V-019/U01–U08,
++manual pessoal Francisco24 e revisão final Denji cumpridos/aprovados.
++[Fecho](../../../../bolts/010-video/closure-walkthrough.md),
++[commit](../../../../../experiments/construction/010-video/commit-verification-01/README.md),
++[integração](../../../../../experiments/construction/010-video/integration-verification-01/README.md).
++Unidade005/PHASE-05 em progresso;18 histórias/bolts complete,0 in-progress,17 planned.
++Sem novo IMP,alterações Java,push ou target/ no commit. IDs locais,demo/negativos/
++logs pessoais preservados; documentação/evidência apenas. V-ADD no fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+index 18ccae7..02d205b 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md
+@@ -2,7 +2,9 @@
+ id: "001-definir-codec-udp-e-fragmentacao-de-frames"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-status: "in-progress"
++status: "complete"
++implemented: true
++completed: "2026-11-23T16:02:19Z"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-019"]
+@@ -22,10 +24,10 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
+ 
+ ## Critérios de aceitação
+ 
+-- [ ] Formato coincide com contrato v1.
+-- [ ] Limites são impostos antes de alocar.
+-- [ ] Fragmentação cobre todas as fronteiras sem bytes perdidos.
+-- [ ] Validação V-019 executada e evidência ligada no progresso.
++- [x] Formato coincide com contrato v1.
++- [x] Limites são impostos antes de alocar.
++- [x] Fragmentação cobre todas as fronteiras sem bytes perdidos.
++- [x] Validação V-019 executada e evidência ligada no progresso.
+ 
+ ## Testes
+ 
+@@ -38,11 +40,10 @@ A tarefa normativa é [IMP-016](../../../../../../add.md#imp-016); o bolt só or
+ - Responsável de origem: Waheed; revisor: Denji.
+ - Gates: nenhum específico adicional.
+ 
+-## Test aprovado — revisão Denji confirmada, integração pendente
++## Fecho — complete / implemented=true
+ 
+-Implement aprovado e Test autorizado. Clean verify1537/0/0/0,22 XML;78 U01–U08/V-019.
+-Código aprovado/fixtures/históricos/demo/negativos intactos. JAR preservado.
+-Manual humano Francisco24 cumprido e conferido, oito etapas sem divergências.
+-História in-progress/implemented=false; Test aprovado e revisão final Denji
+-confirmada pelo utilizador,sem alterações pendentes. Integração pendente. Ramo imp-016-udp,IDs locais,
+-main preservado,target/ separado. Sem staging/commits/push/fecho.
++Fecho documental autorizado pelo utilizador após integração local em main72c9f92.
++Test1537/0/0/0,22 XML,V-019/U01–U08,manual humano Francisco24 e revisão final Denji
++cumpridos. [Fecho](../../../../../bolts/010-video/closure-walkthrough.md).
++TASK-019 DONE; unidade005/PHASE-05 em progresso. IDs locais,demo e negativos
++preservados; sem alteração Java,push ou início de outro IMP.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+index 83b1fd9..00e201f 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+@@ -5,7 +5,7 @@ phase: "construction"
+ source_phase: "PHASE-05"
+ status: "in-progress"
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-23T14:41:11Z"
++updated: "2026-11-23T16:02:19Z"
+ unit_type: "backend"
+ default_bolt_type: "ddd-construction-bolt"
+ owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
+@@ -15,12 +15,13 @@ requires_units: ["004-arvores"]
+ 
+ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidade agrupa trabalho do mesmo projeto Java e não cria um deployable.
+ 
+-Estado atual: in-progress apenas pelo [Plan do IMP-016/010-video](../../../../bolts/010-video/implementation-plan.md)
+-aprovado; Implement aprovado,Test/manual Francisco24 aprovados e revisão Denji confirmada; integração pendente. Dependência004-arvores/PHASE-04 complete/DONE.
+-Restantes histórias planned,sem execução. DEMO-001 é apoio separado e não bloqueia
+-esta unidade. Codec em validação Test, streaming futuro; clean verify1537/0/0/0,22 XML. Sem
+-staging/commits/push. Fecho da unidade não é antecipado.
+-
++Estado atual: in-progress; IMP-016/010-video/TASK-019 complete/DONE,integrado
++localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrough.md).
++Restantes histórias planned,sem início de outro IMP. PHASE-05 em progresso.
++Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji cumpridos.
++Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
++Somente codec entregue neste incremento; streaming/reprodução continuam futuros.
++Sem push,alterações Java no fecho ou fecho da unidade. IDs locais preservados.
+ 
+ ## Requisitos atribuídos
+ 
+@@ -34,7 +35,7 @@ staging/commits/push. Fecho da unidade não é antecipado.
+ 
+ ## Histórias e bolts
+ 
+-- [ ] [001-definir-codec-udp-e-fragmentacao-de-frames](stories/001-definir-codec-udp-e-fragmentacao-de-frames.md) → [010-video](../../../../bolts/010-video/bolt.md); IMP-016 (M).
++- [x] [001-definir-codec-udp-e-fragmentacao-de-frames](stories/001-definir-codec-udp-e-fragmentacao-de-frames.md) → [010-video](../../../../bolts/010-video/bolt.md); IMP-016 (M).
+ - [ ] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md) → [011-video](../../../../bolts/011-video/bolt.md); IMP-017 (M).
+ - [ ] [007-ler-o-perfil-mjpeg-confirmado](stories/007-ler-o-perfil-mjpeg-confirmado.md) → [025-video](../../../../bolts/025-video/bolt.md); IMP-018 (M).
+ - [ ] [008-emitir-fontes-com-pacing-e-procura](stories/008-emitir-fontes-com-pacing-e-procura.md) → [026-video](../../../../bolts/026-video/bolt.md); IMP-019 (M).
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index d19e9a7..8556f27 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,16 +17,18 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: "010-video"
+-current_stage: "test"
+-next_bolt: "010-video (Test aprovado e revisao Denji confirmada; integracao pendente)"
++current_bolt: null
++current_stage: null
++next_bolt: null
+ phase_04_status: "complete"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+-last_completed_bolt: "024-arvores"
+-last_integrated_commit: "1ee8db6be28c9c9f091cb8fd90cbfb6c9bda5bc4"
++last_completed_bolt: "010-video"
++last_integrated_commit: "72c9f926cea697c439fc1d1b398a348a1662d032"
+ phase_03_status: "complete"
+ phase_03_completed_at: 2026-11-15T16:36:52Z
+ phase_04_completed_at: 2026-11-22T23:10:04Z
+ closure_reconciliation: "experiments/construction/024-arvores/closure-reconciliation-01/README.md"
+ phase_05_status: "in-progress"
++
++imp_016_closure: "memory-bank/bolts/010-video/closure-walkthrough.md"
+diff --git a/memory-bank/standards/decision-index.md b/memory-bank/standards/decision-index.md
+index e17997a..fab1c59 100644
+--- a/memory-bank/standards/decision-index.md
++++ b/memory-bank/standards/decision-index.md
+@@ -2,6 +2,14 @@
+ 
+ Fonte normativa: [ADD](../../add.md).
+ 
++## IMP-016 — concluído e integrado,decisões preservadas
++
++[Fecho](../bolts/010-video/closure-walkthrough.md):main72c9f92,Test1537/0/0/0,
++22 XML,manual Francisco24 e revisão final Denji cumpridos. ADR reutilizadas,
++sem nova decisão normativa ou Q-C global. IMP-016-LOCAL-02:patch de uma linha no
++template previamente autorizado,preservado; IDs locais. Unidade005/PHASE-05 em
++progresso. Sem alterações Java no fecho,push ou início de outro IMP.
++
+ ## IMP-014/015 — concluídos; decisões preservadas
+ 
+ Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores/IMP-015 complete; TASK-017/018 DONE**, com V-017/S01–S18 e V-018 executadas. Manual humano e Test aprovados; revisão final de Waheed das duas versões confirmada pelo utilizador. Integração em main comprovada pelos PRs #5 (ce76726) e #6 (1ee8db6). Regressão atual JDK21: **1459/0/0/0, 21 XML**. PHASE-04/unidade004 **DONE/complete**, com coordenação de Fillmore e revisão dos três membros confirmadas pelo utilizador. Total: **17 bolts complete, 0 in-progress, 18 planned**; nenhum novo IMP iniciado. Negativos e hashes preservados. R17 inicial continua sem causa estabelecida; a integração com métricas controladas não demonstra a sua causa. G-ASSESSMENTS mantém a pendência de informação docente sobre data/conteúdo; o marco técnico concluído não prova avaliação ou submissão externa. [Evidência e proveniência das confirmações](../../experiments/construction/024-arvores/closure-reconciliation-01/README.md).
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index 018581f..fbd3ede 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:17 histórias complete,1 in-progress e17 planned; bolts:17 complete,1 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:18 histórias complete,0 in-progress e17 planned; bolts:18 complete,0 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -120,8 +120,10 @@ Implement/Test e revisão final aprovados; V-017 consolidada, integração em ma
+ 
+ ## 005-video/001-definir-codec-udp-e-fragmentacao-de-frames.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-016. **Estado:** in-progress,Test aprovado; revisão Denji confirmada; integração pendente. **Bolt:** 010-video.
+-[Plan](bolts/010-video/implementation-plan.md),ramo imp-016-udp/base b6de848; clean verify1537/0/0/0,22 XML;78 casos U01–U08; Implement aprovado, manual Francisco24 cumprido; Test aprovado e Denji confirmado; integração pendente. DEMO-001 separada/não bloqueante.
++**Tarefa:** IMP-016. **Estado:** complete/implemented=true,TASK-019 DONE. **Bolt:** 010-video complete.
++[Fecho](bolts/010-video/closure-walkthrough.md),main72c9f92;clean verify1537/0/0/0,22 XML,
++78 U01–U08,manual Francisco24,Test e revisão final Denji aprovados. Unidade005/PHASE-05
++em progresso,sem outro IMP iniciado,IDs locais/demo preservados,sem push.
+ **Ficheiro:** [001-definir-codec-udp-e-fragmentacao-de-frames](intents/001-ott-streaming/units/005-video/stories/001-definir-codec-udp-e-fragmentacao-de-frames.md).
+ 
+ ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED
+diff --git a/memory-bank/bolts/010-video/closure-walkthrough.md b/memory-bank/bolts/010-video/closure-walkthrough.md
+new file mode 100644
+index 0000000..93827f3
+--- /dev/null
++++ b/memory-bank/bolts/010-video/closure-walkthrough.md
+@@ -0,0 +1,41 @@
++---
++stage: closure
++bolt: "010-video"
++completed: "2026-11-23T16:02:19Z"
++---
++# IMP-016 / 010-video / TASK-019 — Fecho documental
++
++Fecho autorizado explicitamente pelo utilizador após integração local comprovada
++em main72c9f926cea697c439fc1d1b398a348a1662d032. Bolt/história complete,
++implemented=true,TASK-019 DONE. Unidade005-video e PHASE-05 em progresso.
++Nenhum incremento posterior iniciado. Total:18 bolts/histórias complete,0 in-progress,
++17 planned; unidades podem continuar em progresso com histórias pendentes.
++
++## Critérios e evidência
++
++- [x] Codec UDP OTT1 v1,headers/caps e cópias defensivas; validação antes de alocar.
++- [x] Fragmentação/recombinação e fronteiras1..2MiB; sem emissão de vídeo presumida.
++- [x] Clean verify1537/0/0/0,22 XML,78 casos U01–U08/V-019; Test aprovado.
++- [x] Manual humano Francisco24,oito etapas sem divergências observadas; aprovado.
++- [x] Revisão final Denji da implementação atual confirmada pelo utilizador,sem pendências.
++- [x] Commit208 caminhos e integração fast-forward comprovados em main72c9f92.
++
++[Test](test-walkthrough.md),[JAR/logs/XML](../../../experiments/construction/010-video/test-01/README.md),
++[manual conferido](../../../experiments/construction/010-video/manual-verification-01/README.md),
++[revisão/hash](../../../experiments/construction/010-video/final-package-01/final-review.json),
++[commit verificado](../../../experiments/construction/010-video/commit-verification-01/README.md),
++[integração](../../../experiments/construction/010-video/integration-verification-01/README.md),
++[evidência documental/V-ADD](../../../experiments/construction/010-video/closure-01/README.md).
++JAR SHA-256:588bd8e5f85c880666beab1a2033c8f100f3bd37e79d2d83ed4d15ec322ac3a2.
++Código/JAR aprovados intactos; build/manual não repetidos por não existir mudança.
++
++## Preservação e limites
++
++Fecho apenas documental/evidência. Fontes Java,testes históricos,fixtures,
++negativos,logs pessoais,target/ gerado e demo preservados. target/ e alterações
++alheias fora do commit. IDs IMP-016-LOCAL; nenhum Q-C global reservado.
++Patch template LOCAL-02 continua exatamente uma linha previamente autorizada.
++Documentos/snapshots anteriores que diziam pendente refletem os checkpoints históricos.
++Sem novo transporte,vídeo,GUI/CORE,dependência runtime ou gate externo adicional.
++Sem push; não se alega atualização do remoto. Prova pós-commit/integração é incluída
++no commit documental autorizado,sem alterar os originais nem reescrever72c9f92.

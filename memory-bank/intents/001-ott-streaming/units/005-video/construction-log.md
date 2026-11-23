@@ -61,3 +61,15 @@ sem alterações pendentes. [Confirmação e hashes código/JAR](../../../../../
 Main local continua b6de848,sem divergência entre ramos; remotos não consultados.
 Sem repetir build/manual; integração e fecho pendentes. Bolt/história/unidade abertos,
 IDs locais,demo preservada,target/ excluído,sem staging/commits/push/fecho.
+
+## 2026-11-23T16:02:19Z — Fecho documental autorizado / IMP-016 concluído
+
+Utilizador autorizou complete/implemented=true/TASK-019 DONE após commit e
+fast-forward local em main72c9f92. Test1537/0/0/0,22 XML,V-019/U01–U08,
+manual pessoal Francisco24 e revisão final Denji cumpridos/aprovados.
+[Fecho](../../../../bolts/010-video/closure-walkthrough.md),
+[commit](../../../../../experiments/construction/010-video/commit-verification-01/README.md),
+[integração](../../../../../experiments/construction/010-video/integration-verification-01/README.md).
+Unidade005/PHASE-05 em progresso;18 histórias/bolts complete,0 in-progress,17 planned.
+Sem novo IMP,alterações Java,push ou target/ no commit. IDs locais,demo/negativos/
+logs pessoais preservados; documentação/evidência apenas. V-ADD no fecho.
