@@ -458,6 +458,15 @@ public final class CheckpointDemo
         hold(2);
         require(switchCount(node) == successes && previous.equals(upstream(node, STREAM_A)),
                 "transient-delay-no-oscillation", "150ms pulse; policy P=20%, K=3 distinct real samples, D=5s unchanged");
+        // Deixa a árvore re-assentar no caminho anterior (sem ronda ativa e com o
+        // dwell da política cumprido) antes do atraso sustentado, para a ronda de
+        // switch começar de um estado ancorado e a primeira tentativa não ser
+        // rejeitada por PATH_CHANGED durante o churn do pulso. O prazo do switch
+        // (25s) não é alterado.
+        await("post-pulse-restabilized", () -> previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes, 15);
+        hold(6);
+        require(previous.equals(upstream(node, STREAM_A)) && switchCount(node) == successes,
+                "restabilized-before-sustained-delay", "Previous path confirmed again and stable for the dwell window after the transient pulse");
         setDelay(key, 120);
         await("real-RTT-confirmed-switch", () -> replacement.equals(upstream(node, STREAM_A)) && switchCount(node) > successes, 25);
         // Atomicidade confirmação/publicação: no evento SUCCESS, a forwarding já
