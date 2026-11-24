@@ -151,3 +151,22 @@ Quota/budget por confirmar pelo proprietário antes de publicar,não se assume c
 zero. Billing/settings não alterados. LOCAL-04/distribuição/revisão final/integração
 pendentes,LOCAL-03 não instalada,sem Java/perfis/POM/fixtures/demo alterados,
 staging/commits/uploads/push/fecho ou início de outro IMP.
+
+## 2026-11-24T20:49:09Z — IMP-017/011-video complete;apenas TASK-020 parte A
+
+Fecho documental autorizado após integração local em main8a91d9fbf0bd1de60f1d29e5576625c9b8320c81.
+Test/G-MEDIA técnicos,22687 JPEGs/16 fronteiras,manual Francisco13 e revisão
+final Denji cumpridos. 598 caminhos/blobs/modos e quatro ponteiros LFS conferidos;
+extração e materialização apenas do cache local,V-ADD0 erros comprovados.
+[Integração](../../../../../experiments/construction/011-video/integration-proof-01/integration-summary.md),
+[fecho](../../../../bolts/011-video/closure-walkthrough.md).
+Quinze entradas CRLF preservadas por override de comando sem alterar configuração;
+avisos de whitespace e primeira extração falhada preservados como evidência real.
+Bolt/história complete,implemented=true,parte A concluída. TASK-020 inteira,
+unidade005-video e PHASE-05 em progresso. Total19 complete,0 in-progress,16 planned.
+LOCAL-03 não instalou Projeto/media;LOCAL-04/G-MEDIA-DISTRIBUTION abertos,
+créditos B ilegíveis;sem atribuição adequada/legibilidade/redistribuição/publicação
+aprovadas. Quota/orçamento antes de publicar continuam pendentes.
+Homebrew separado,sem intervenção. Sem Java/media/perfis/POM/fixtures/demo
+alterados,uploads,push ou início de outro IMP. Prova e documentos são o único
+âmbito do commit de fecho autorizado;fecho não altera resultados históricos.

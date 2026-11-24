@@ -2,7 +2,8 @@
 id: "002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao"
 unit: "005-video"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
+implemented: true
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-020"]
@@ -22,9 +23,9 @@ A tarefa normativa é [IMP-017](../../../../../../add.md#imp-017); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Quatro conteúdos identificáveis, dois por origem, preparados no perfil de cinco dígitos/JPEG.
-- [ ] Proveniência, parâmetros de preparação, hashes e FPS registados; cópias idênticas não contam como vídeos distintos.
-- [ ] Cada JPEG respeita o limite e é descodificável; condições de redistribuição ainda pendentes ficam explícitas para TASK-030.
+- [x] Quatro conteúdos identificáveis, dois por origem, preparados no perfil de cinco dígitos/JPEG.
+- [x] Proveniência, parâmetros de preparação, hashes e FPS registados; cópias idênticas não contam como vídeos distintos.
+- [x] Cada JPEG respeita o limite e é descodificável; condições de redistribuição ainda pendentes ficam explícitas para TASK-030.
 
 ## Testes
 
@@ -37,7 +38,7 @@ A tarefa normativa é [IMP-017](../../../../../../add.md#imp-017); o bolt só or
 - Responsável de origem: Fillmore; revisor: Denji.
 - Gates: G-MEDIA.
 
-## Estado — Test/G-MEDIA técnicos aprovados,revisão final pendente
+## Histórico — checkpoint Test antes da revisão/integração
 
 Implement aprovado;Test técnico consolidado sobre os quatro ficheiros finais,
 manifesto/binários intactos:22687 JPEGs headless/sem avisos e16 fronteiras/negativos.
@@ -56,3 +57,14 @@ sem alteração de conteúdo,Java/perfis/POM/fixtures/demo. Validação local ma
 4/4 objetos com hashes aprovados;sem index/commits/uploads/push. Pacote distingue
 ponteiros Git de binários reais. Efeitos da tentativa Homebrew registados.
 Revisão final/integração/fecho e distribuição continuam pendentes.
+
+## Estado final — complete / implemented=true
+
+Preparação dos quatro conteúdos (IMP-017/TASK-020 parte A) concluída e integrada
+localmente em main8a91d9f. Test/G-MEDIA técnicos e manual Francisco13 aprovados;
+revisão final Denji confirmada explicitamente pelo utilizador,sem pendências.
+[Fecho](../../../../../bolts/011-video/closure-walkthrough.md).
+TASK-020 inteira,unidade005 e PHASE-05 permanecem em progresso. Leitor/pacing/
+emissão não são entregues por esta parte. LOCAL-03 não instalou Projeto/media;
+LOCAL-04 e G-MEDIA-DISTRIBUTION abertos. B com créditos ilegíveis,sem aprovação
+de atribuição/legibilidade/redistribuição/publicação. Sem push ou novo IMP.

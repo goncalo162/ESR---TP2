@@ -37,7 +37,7 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 
 ## 7. Passos de implementação
 
-- [ ] Revalidar recurso docente pelo perfil/hash confirmado, preparar conteúdos distintos identificados e registar proveniência/créditos/condições pendentes em H-02.
+- [x] Parte A/IMP-017:recurso docente preservado por hash,quatro conteúdos preparados,proveniência/créditos/condições pendentes registados no manifesto.
 - [ ] Implementar leitura de um frame com EOF e truncatura explícitos.
 - [ ] Configurar dois vídeos distintos por cada servidor e registar hashes.
 - [ ] Agendar emissão ao FPS sem catch-up ilimitado e só com procura confirmada.
@@ -96,3 +96,18 @@ Estratégia Git LFS foi posteriormente aprovada e aplicada só aos quatro media:
 Nenhum conteúdo/Java/perfil alterado,index/histórico intactos,sem upload/push/billing.
 Revisão final/integração/LOCAL-04/G-MEDIA-DISTRIBUTION pendentes;proprietário deve
 confirmar quota/budget antes de publicar,não é pressuposto custo zero.
+
+## Fecho de IMP-017 — parte A concluída;TASK-020 IN PROGRESS
+
+IMP-017/011-video complete,história implemented=true por autorização explícita.
+Integração local em main8a91d9fbf0bd1de60f1d29e5576625c9b8320c81 comprovada:
+598 caminhos/hashes/modos,quatro ponteiros LFS e vídeos reais materializados
+exclusivamente do cache local,V-ADD extraído0 erros. Test/G-MEDIA técnicos,
+22687 JPEGs/16 fronteiras,manual Francisco13 e revisão final Denji cumpridos.
+[Fecho](../../../memory-bank/bolts/011-video/closure-walkthrough.md).
+Só preparação de conteúdos concluída;partes B/C (IMP-018/019),leitura/pacing/emissão
+pendentes. Não se marca o pai DONE nem a configuração de entrega instalada.
+LOCAL-03 permanece sem cópia para Projeto/media;LOCAL-04 e G-MEDIA-DISTRIBUTION
+abertos para TASK-030. Limitação B ilegível aceite só tecnicamente,não aprova
+atribuição adequada,legibilidade,redistribuição/publicação ou licença de A.
+Unidade005/PHASE-05 em progresso;Homebrew separado,sem intervenção;sem push.

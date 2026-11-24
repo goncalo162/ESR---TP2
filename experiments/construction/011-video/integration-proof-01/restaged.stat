@@ -1,0 +1,599 @@
+ .gitattributes                                     |     4 +
+ Projeto/src/main/resources/media/a.Mjpeg           |     3 +
+ Projeto/src/main/resources/media/b.Mjpeg           |     3 +
+ Projeto/src/main/resources/media/c.Mjpeg           |     3 +
+ Projeto/src/main/resources/media/d.Mjpeg           |     3 +
+ docs/15-PROJECT-PROGRESS.md                        |    27 +-
+ docs/phases/PHASE-05-STREAMING.md                  |     7 +-
+ docs/tasks/PHASE-05/TASK-020.md                    |    28 +-
+ .../011-video/final-integration-plan-01/README.md  |    30 +
+ .../final-integration-plan-01/allowlist.txt        |   598 +
+ .../final-integration-plan-01/integration-plan.md  |    45 +
+ .../final-integration-plan-01/manifest.json        |  6013 +++
+ .../final-integration-plan-01/preflight.json       |    12 +
+ .../final-integration-plan-01/review-approval.json |    28 +
+ .../011-video/final-integration-plan-01/v-add.md   |    22 +
+ .../011-video/implement-01/A-audit-command.json    |    15 +
+ .../011-video/implement-01/A-audit.log             |     1 +
+ .../011-video/implement-01/A-download.headers.txt  |    10 +
+ .../011-video/implement-01/A-download.json         |    31 +
+ .../011-video/implement-01/A-download.log          |     1 +
+ .../011-video/implement-01/A-frames.jsonl          |   500 +
+ .../011-video/implement-01/A-preservation.json     |    11 +
+ .../011-video/implement-01/AuditMjpeg.java.txt     |    77 +
+ .../011-video/implement-01/B-audit-command.json    |    16 +
+ .../011-video/implement-01/B-audit.log             |     1 +
+ .../011-video/implement-01/B-download.headers.txt  |    16 +
+ .../011-video/implement-01/B-download.json         |    31 +
+ .../011-video/implement-01/B-download.log          |     1 +
+ .../011-video/implement-01/B-ffmpeg-progress.log   |   312 +
+ .../011-video/implement-01/B-ffmpeg.log            |    42 +
+ .../011-video/implement-01/B-frames.jsonl          |  5965 +++
+ .../011-video/implement-01/B-preparation.json      |    94 +
+ .../011-video/implement-01/C-audit-command.json    |    16 +
+ .../011-video/implement-01/C-audit.log             |     1 +
+ .../011-video/implement-01/C-download.headers.txt  |    16 +
+ .../011-video/implement-01/C-download.json         |    31 +
+ .../011-video/implement-01/C-download.log          |     1 +
+ .../011-video/implement-01/C-ffmpeg-progress.log   |   720 +
+ .../011-video/implement-01/C-ffmpeg.log            |    82 +
+ .../011-video/implement-01/C-frames.jsonl          |  8880 ++++
+ .../011-video/implement-01/C-preparation.json      |    94 +
+ .../011-video/implement-01/D-audit-command.json    |    16 +
+ .../011-video/implement-01/D-audit.log             |     1 +
+ .../011-video/implement-01/D-download.headers.txt  |    16 +
+ .../011-video/implement-01/D-download.json         |    31 +
+ .../011-video/implement-01/D-download.log          |     1 +
+ .../011-video/implement-01/D-ffmpeg-progress.log   |   420 +
+ .../011-video/implement-01/D-ffmpeg.log            |    34 +
+ .../011-video/implement-01/D-frames.jsonl          |  7342 +++
+ .../011-video/implement-01/D-preparation.json      |    94 +
+ .../construction/011-video/implement-01/README.md  |    55 +
+ .../implement-01/acquisition-initial-error.json    |     7 +
+ .../011-video/implement-01/audit-compile.log       |     0
+ .../011-video/implement-01/audit-negatives.py      |    20 +
+ .../011-video/implement-01/checkpoint-status.json  |    24 +
+ .../011-video/implement-01/cumulative.diff         |  1146 +
+ .../011-video/implement-01/cumulative.numstat      |    16 +
+ .../011-video/implement-01/distinctness.json       |   119 +
+ .../011-video/implement-01/download-summary.json   |   140 +
+ .../construction/011-video/implement-01/entry.json |    40 +
+ .../011-video/implement-01/ffmpeg-version.txt      |    12 +
+ .../011-video/implement-01/full-audit-results.json |    50 +
+ .../011-video/implement-01/manifest.json           |   107 +
+ .../011-video/implement-01/negative-results.json   |   360 +
+ .../011-video/implement-01/obtain-sources.py       |    32 +
+ .../implement-01/preparation-results.json          |   284 +
+ .../011-video/implement-01/prepare-media.py        |    41 +
+ .../011-video/implement-01/preservation.json       |    31 +
+ .../011-video/implement-01/run-audits.py           |     8 +
+ .../construction/011-video/implement-01/tool.json  |    12 +
+ .../construction/011-video/implement-01/v-add.md   |    22 +
+ .../011-video/lfs-implementation-01/A-clean.log    |    16 +
+ .../011-video/lfs-implementation-01/A-smudge.log   |    20 +
+ .../011-video/lfs-implementation-01/A.pointer      |     3 +
+ .../011-video/lfs-implementation-01/B-clean.log    |    16 +
+ .../011-video/lfs-implementation-01/B-smudge.log   |    20 +
+ .../011-video/lfs-implementation-01/B.pointer      |     3 +
+ .../011-video/lfs-implementation-01/C-clean.log    |    16 +
+ .../011-video/lfs-implementation-01/C-smudge.log   |    20 +
+ .../011-video/lfs-implementation-01/C.pointer      |     3 +
+ .../011-video/lfs-implementation-01/D-clean.log    |    16 +
+ .../011-video/lfs-implementation-01/D-smudge.log   |    20 +
+ .../011-video/lfs-implementation-01/D.pointer      |     3 +
+ .../011-video/lfs-implementation-01/README.md      |    46 +
+ .../lfs-implementation-01/attributes-check.txt     |    16 +
+ .../lfs-implementation-01/brew-install.log         |   232 +
+ .../brew-side-effects-inventory.txt                |     4 +
+ .../lfs-implementation-01/brew-side-effects.json   |    19 +
+ .../011-video/lfs-implementation-01/brew-stop.json |    29 +
+ .../lfs-implementation-01/configuration-proof.json |    31 +
+ .../011-video/lfs-implementation-01/entry.json     |   593 +
+ .../lfs-implementation-01/git-lfs-env.txt          |    32 +
+ .../lfs-implementation-01/local-config.txt         |     5 +
+ .../lfs-implementation-01/local-install.log        |     2 +
+ .../lfs-implementation-01/materialization.json     |   152 +
+ .../materialized-tree-check.json                   |    41 +
+ .../materialized-zip-check.json                    |    41 +
+ .../lfs-implementation-01/native-install.json      |    18 +
+ .../lfs-implementation-01/native-version.txt       |     1 +
+ .../lfs-implementation-01/validate-local.py        |    41 +
+ .../011-video/lfs-proposal-01/README.md            |   173 +
+ .../lfs-proposal-01/approved-hashes-check.json     |    41 +
+ .../011-video/lfs-proposal-01/build-codigo.py      |   119 +
+ .../011-video/lfs-proposal-01/entry.json           |   524 +
+ .../lfs-proposal-01/gitattributes-proposed.patch   |     9 +
+ .../011-video/lfs-proposal-01/manifest.json        |    17 +
+ .../011-video/lfs-proposal-01/preservation.json    |    23 +
+ .../011-video/lfs-proposal-01/quota-estimate.json  |    29 +
+ .../011-video/lfs-proposal-01/sources.json         |    13 +
+ .../lfs-proposal-01/tool-availability.txt          |     4 +
+ .../011-video/lfs-proposal-01/v-add.md             |    22 +
+ .../011-video/lfs-proposal-01/verify-media.py      |    78 +
+ .../lfs-proposal-01/zip-verifier-check.json        |    17 +
+ .../011-video/lfs-review-package-01/README.md      |    60 +
+ .../011-video/lfs-review-package-01/allowlist.txt  |   578 +
+ .../011-video/lfs-review-package-01/content.diff   |  1356 +
+ .../lfs-review-package-01/content.numstat          |    14 +
+ .../lfs-review-package-01/execution-summary.json   |    19 +
+ .../011-video/lfs-review-package-01/groups.json    |    14 +
+ .../lfs-review-package-01/integration-plan.md      |    42 +
+ .../011-video/lfs-review-package-01/manifest.json  |  5796 +++
+ .../media-representation.json                      |    60 +
+ .../lfs-review-package-01/preservation.json        |    28 +
+ .../011-video/lfs-review-package-01/refs.json      |     7 +
+ .../011-video/lfs-review-package-01/v-add.md       |    22 +
+ .../construction/011-video/manual-instructions.md  |    76 +
+ .../B-readability-assessment.md                    |    62 +
+ .../011-video/manual-verification-01/README.md     |    27 +
+ .../manual-verification-01/checkpoint-status.json  |    23 +
+ .../manual-verification-01/documentation.diff      |   698 +
+ .../manual-verification-01/documentation.numstat   |    12 +
+ .../011-video/manual-verification-01/manifest.json |   274 +
+ .../011-video/manual-verification-01/v-add.md      |    22 +
+ .../manual-verification-01/verification.json       |   426 +
+ .../construction/011-video/plan-01/A.curl.txt      |     1 +
+ .../construction/011-video/plan-01/A.headers.txt   |    10 +
+ .../011-video/plan-01/B-rights.curl.txt            |     1 +
+ .../011-video/plan-01/B-rights.headers.txt         |    10 +
+ .../construction/011-video/plan-01/B-rights.html   |   204 +
+ .../construction/011-video/plan-01/B.curl.txt      |     1 +
+ .../construction/011-video/plan-01/B.headers.txt   |    16 +
+ .../011-video/plan-01/C-rights.curl.txt            |     1 +
+ .../011-video/plan-01/C-rights.headers.txt         |    10 +
+ .../construction/011-video/plan-01/C-rights.html   |   125 +
+ .../construction/011-video/plan-01/C.curl.txt      |     1 +
+ .../construction/011-video/plan-01/C.headers.txt   |    16 +
+ .../011-video/plan-01/D-rights.curl.txt            |     1 +
+ .../011-video/plan-01/D-rights.headers.txt         |    10 +
+ .../construction/011-video/plan-01/D-rights.html   |   244 +
+ .../construction/011-video/plan-01/D.curl.txt      |     1 +
+ .../construction/011-video/plan-01/D.headers.txt   |    16 +
+ .../construction/011-video/plan-01/README.md       |    28 +
+ .../011-video/plan-01/checkpoint-status.json       |    22 +
+ .../construction/011-video/plan-01/cumulative.diff |   437 +
+ .../011-video/plan-01/cumulative.numstat           |    10 +
+ .../construction/011-video/plan-01/entry.json      |  8138 ++++
+ .../011-video/plan-01/local-availability.json      |    29 +
+ .../011-video/plan-01/local-questions.json         |    16 +
+ .../construction/011-video/plan-01/manifest.json   |    45 +
+ .../011-video/plan-01/preservation.json            |    22 +
+ .../011-video/plan-01/remote-availability.json     |    77 +
+ .../011-video/plan-01/rights-inspection.json       |    17 +
+ .../construction/011-video/plan-01/sources.json    |    25 +
+ .../construction/011-video/plan-01/v-add.md        |    22 +
+ .../011-video/review-handoff-01/README.md          |    90 +
+ .../011-video/review-handoff-01/allowlist.txt      |   591 +
+ .../review-handoff-01/approved-package-check.json  |    15 +
+ .../011-video/review-handoff-01/brew-versions.txt  |     5 +
+ .../review-handoff-01/dry-run-failure.txt          |     6 +
+ .../review-handoff-01/dynamic-dependencies.txt     |    17 +
+ .../review-handoff-01/homebrew-proposal.md         |    63 +
+ .../011-video/review-handoff-01/manifest.json      |  5954 +++
+ .../review-handoff-01/openssl-links-observed.json  | 33612 ++++++++++++++
+ .../openssl3-prefix-comparison.json                | 45484 +++++++++++++++++++
+ .../review-handoff-01/openssl3-version.txt         |     3 +
+ .../review-handoff-01/openssl4-version.txt         |     3 +
+ .../011-video/review-handoff-01/v-add.md           |    22 +
+ .../011-video/review-package-01/README.md          |    67 +
+ .../review-package-01/allowlist-groups.json        |   550 +
+ .../011-video/review-package-01/allowlist.txt      |   523 +
+ .../011-video/review-package-01/branch-state.json  |     9 +
+ .../011-video/review-package-01/content.diff       |  1301 +
+ .../011-video/review-package-01/content.numstat    |    17 +
+ .../011-video/review-package-01/entry.json         |   548 +
+ .../review-package-01/integration-plan.md          |    41 +
+ .../011-video/review-package-01/manifest.json      |  2102 +
+ .../011-video/review-package-01/preservation.json  |    30 +
+ .../review-package-01/technical-approval.json      |    29 +
+ .../011-video/review-package-01/v-add.md           |    22 +
+ .../review-package-01/volume-constraint.json       |    36 +
+ .../construction/011-video/test-01/A-audit.log     |     1 +
+ .../construction/011-video/test-01/A-command.json  |    17 +
+ .../construction/011-video/test-01/A-frames.jsonl  |   500 +
+ .../construction/011-video/test-01/B-audit.log     |     1 +
+ .../construction/011-video/test-01/B-command.json  |    17 +
+ .../construction/011-video/test-01/B-frames.jsonl  |  5965 +++
+ .../construction/011-video/test-01/C-audit.log     |     1 +
+ .../construction/011-video/test-01/C-command.json  |    17 +
+ .../construction/011-video/test-01/C-frames.jsonl  |  8880 ++++
+ .../construction/011-video/test-01/D-audit.log     |     1 +
+ .../construction/011-video/test-01/D-command.json  |    17 +
+ .../construction/011-video/test-01/D-frames.jsonl  |  7342 +++
+ .../construction/011-video/test-01/README.md       |    56 +
+ .../011-video/test-01/audit-compile.log            |     0
+ .../011-video/test-01/audit-negatives.py           |    20 +
+ .../construction/011-video/test-01/audit-tool.json |     9 +
+ .../011-video/test-01/checkpoint-status.json       |    35 +
+ .../011-video/test-01/consolidation.json           |    63 +
+ .../construction/011-video/test-01/cumulative.diff |  1599 +
+ .../011-video/test-01/cumulative.numstat           |    20 +
+ .../011-video/test-01/distinctness.json            |    62 +
+ .../construction/011-video/test-01/entry.json      |   102 +
+ .../011-video/test-01/full-audit-results.json      |    50 +
+ .../011-video/test-01/integration-size-plan.md     |    33 +
+ .../construction/011-video/test-01/manifest.json   |   141 +
+ .../011-video/test-01/manual-tools-check.json      |    12 +
+ .../011-video/test-01/negative-results.json        |   360 +
+ .../011-video/test-01/negative-run-provenance.json |     6 +
+ .../011-video/test-01/preservation.json            |    25 +
+ .../construction/011-video/test-01/v-add.md        |    22 +
+ .../20261124T151721Z-4c42241b/index.html           |     1 +
+ .../20261124T151721Z-4c42241b/manual.log           |    30 +
+ .../20261124T151721Z-4c42241b/report.json          |    75 +
+ .../20261124T151721Z-4c42241b/samples.json         |  1185 +
+ .../20261124T151721Z-4c42241b/samples/A/0.jpg      |   Bin 0 -> 6014 bytes
+ .../20261124T151721Z-4c42241b/samples/A/125.jpg    |   Bin 0 -> 8108 bytes
+ .../20261124T151721Z-4c42241b/samples/A/250.jpg    |   Bin 0 -> 9570 bytes
+ .../20261124T151721Z-4c42241b/samples/A/375.jpg    |   Bin 0 -> 12880 bytes
+ .../20261124T151721Z-4c42241b/samples/A/450.jpg    |   Bin 0 -> 6742 bytes
+ .../20261124T151721Z-4c42241b/samples/A/499.jpg    |   Bin 0 -> 7287 bytes
+ .../20261124T151721Z-4c42241b/samples/A/50.jpg     |   Bin 0 -> 5980 bytes
+ .../20261124T151721Z-4c42241b/samples/B/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T151721Z-4c42241b/samples/B/1491.jpg   |   Bin 0 -> 22220 bytes
+ .../20261124T151721Z-4c42241b/samples/B/2982.jpg   |   Bin 0 -> 20206 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4465.jpg   |   Bin 0 -> 28398 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4473.jpg   |   Bin 0 -> 28636 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4515.jpg   |   Bin 0 -> 27865 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4565.jpg   |   Bin 0 -> 22333 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4615.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4665.jpg   |   Bin 0 -> 23114 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4715.jpg   |   Bin 0 -> 10838 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4765.jpg   |   Bin 0 -> 22921 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4815.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4865.jpg   |   Bin 0 -> 22400 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4915.jpg   |   Bin 0 -> 17322 bytes
+ .../20261124T151721Z-4c42241b/samples/B/4965.jpg   |   Bin 0 -> 7878 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5015.jpg   |   Bin 0 -> 9321 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5065.jpg   |   Bin 0 -> 10469 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5115.jpg   |   Bin 0 -> 11338 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5165.jpg   |   Bin 0 -> 10187 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5215.jpg   |   Bin 0 -> 9849 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5265.jpg   |   Bin 0 -> 9817 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5315.jpg   |   Bin 0 -> 9124 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5365.jpg   |   Bin 0 -> 21931 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5368.jpg   |   Bin 0 -> 23170 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5415.jpg   |   Bin 0 -> 28517 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5465.jpg   |   Bin 0 -> 28533 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5515.jpg   |   Bin 0 -> 29535 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5565.jpg   |   Bin 0 -> 28602 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5615.jpg   |   Bin 0 -> 22352 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5665.jpg   |   Bin 0 -> 8013 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5715.jpg   |   Bin 0 -> 9421 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5765.jpg   |   Bin 0 -> 7175 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5815.jpg   |   Bin 0 -> 6465 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5865.jpg   |   Bin 0 -> 6516 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5915.jpg   |   Bin 0 -> 9082 bytes
+ .../20261124T151721Z-4c42241b/samples/B/596.jpg    |   Bin 0 -> 12577 bytes
+ .../20261124T151721Z-4c42241b/samples/B/5964.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T151721Z-4c42241b/samples/C/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T151721Z-4c42241b/samples/C/2220.jpg   |   Bin 0 -> 13645 bytes
+ .../20261124T151721Z-4c42241b/samples/C/4440.jpg   |   Bin 0 -> 9646 bytes
+ .../20261124T151721Z-4c42241b/samples/C/6660.jpg   |   Bin 0 -> 14470 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7380.jpg   |   Bin 0 -> 26940 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7430.jpg   |   Bin 0 -> 26733 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7480.jpg   |   Bin 0 -> 4883 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7530.jpg   |   Bin 0 -> 6187 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7580.jpg   |   Bin 0 -> 5480 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7630.jpg   |   Bin 0 -> 6919 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7680.jpg   |   Bin 0 -> 5351 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7730.jpg   |   Bin 0 -> 8181 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7780.jpg   |   Bin 0 -> 3498 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7830.jpg   |   Bin 0 -> 8713 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7880.jpg   |   Bin 0 -> 29059 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7930.jpg   |   Bin 0 -> 38365 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7980.jpg   |   Bin 0 -> 38323 bytes
+ .../20261124T151721Z-4c42241b/samples/C/7992.jpg   |   Bin 0 -> 38924 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8030.jpg   |   Bin 0 -> 41423 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8080.jpg   |   Bin 0 -> 36989 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8130.jpg   |   Bin 0 -> 36859 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8180.jpg   |   Bin 0 -> 37979 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8230.jpg   |   Bin 0 -> 41608 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8280.jpg   |   Bin 0 -> 59817 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8330.jpg   |   Bin 0 -> 64836 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8380.jpg   |   Bin 0 -> 61107 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8430.jpg   |   Bin 0 -> 60293 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8480.jpg   |   Bin 0 -> 62072 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8530.jpg   |   Bin 0 -> 62866 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8580.jpg   |   Bin 0 -> 60951 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8630.jpg   |   Bin 0 -> 61189 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8680.jpg   |   Bin 0 -> 58437 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8730.jpg   |   Bin 0 -> 47233 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8780.jpg   |   Bin 0 -> 33936 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8830.jpg   |   Bin 0 -> 9762 bytes
+ .../20261124T151721Z-4c42241b/samples/C/8879.jpg   |   Bin 0 -> 9055 bytes
+ .../20261124T151721Z-4c42241b/samples/C/888.jpg    |   Bin 0 -> 9332 bytes
+ .../20261124T151721Z-4c42241b/samples/D/0.jpg      |   Bin 0 -> 1938 bytes
+ .../20261124T151721Z-4c42241b/samples/D/1835.jpg   |   Bin 0 -> 34114 bytes
+ .../20261124T151721Z-4c42241b/samples/D/3671.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T151721Z-4c42241b/samples/D/5506.jpg   |   Bin 0 -> 26105 bytes
+ .../20261124T151721Z-4c42241b/samples/D/5842.jpg   |   Bin 0 -> 27313 bytes
+ .../20261124T151721Z-4c42241b/samples/D/5892.jpg   |   Bin 0 -> 29413 bytes
+ .../20261124T151721Z-4c42241b/samples/D/5942.jpg   |   Bin 0 -> 27194 bytes
+ .../20261124T151721Z-4c42241b/samples/D/5992.jpg   |   Bin 0 -> 38786 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6042.jpg   |   Bin 0 -> 26673 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6092.jpg   |   Bin 0 -> 39215 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6142.jpg   |   Bin 0 -> 41849 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6192.jpg   |   Bin 0 -> 28819 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6242.jpg   |   Bin 0 -> 31980 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6292.jpg   |   Bin 0 -> 7987 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6342.jpg   |   Bin 0 -> 23085 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6392.jpg   |   Bin 0 -> 26211 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6442.jpg   |   Bin 0 -> 31177 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6492.jpg   |   Bin 0 -> 29846 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6542.jpg   |   Bin 0 -> 37209 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6592.jpg   |   Bin 0 -> 55494 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6607.jpg   |   Bin 0 -> 52878 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6642.jpg   |   Bin 0 -> 52249 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6692.jpg   |   Bin 0 -> 50144 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6742.jpg   |   Bin 0 -> 53281 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6792.jpg   |   Bin 0 -> 51907 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6842.jpg   |   Bin 0 -> 52607 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6892.jpg   |   Bin 0 -> 52296 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6942.jpg   |   Bin 0 -> 49493 bytes
+ .../20261124T151721Z-4c42241b/samples/D/6992.jpg   |   Bin 0 -> 28372 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7042.jpg   |   Bin 0 -> 9649 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7092.jpg   |   Bin 0 -> 1938 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7142.jpg   |   Bin 0 -> 26982 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7192.jpg   |   Bin 0 -> 33485 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7242.jpg   |   Bin 0 -> 31330 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7292.jpg   |   Bin 0 -> 30996 bytes
+ .../20261124T151721Z-4c42241b/samples/D/734.jpg    |   Bin 0 -> 15454 bytes
+ .../20261124T151721Z-4c42241b/samples/D/7341.jpg   |   Bin 0 -> 1938 bytes
+ .../20261124T152418Z-403a6f63/index.html           |     1 +
+ .../20261124T152418Z-403a6f63/manual.log           |    38 +
+ .../20261124T152418Z-403a6f63/report.json          |    80 +
+ .../20261124T152418Z-403a6f63/samples.json         |  1185 +
+ .../20261124T152418Z-403a6f63/samples/A/0.jpg      |   Bin 0 -> 6014 bytes
+ .../20261124T152418Z-403a6f63/samples/A/125.jpg    |   Bin 0 -> 8108 bytes
+ .../20261124T152418Z-403a6f63/samples/A/250.jpg    |   Bin 0 -> 9570 bytes
+ .../20261124T152418Z-403a6f63/samples/A/375.jpg    |   Bin 0 -> 12880 bytes
+ .../20261124T152418Z-403a6f63/samples/A/450.jpg    |   Bin 0 -> 6742 bytes
+ .../20261124T152418Z-403a6f63/samples/A/499.jpg    |   Bin 0 -> 7287 bytes
+ .../20261124T152418Z-403a6f63/samples/A/50.jpg     |   Bin 0 -> 5980 bytes
+ .../20261124T152418Z-403a6f63/samples/B/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T152418Z-403a6f63/samples/B/1491.jpg   |   Bin 0 -> 22220 bytes
+ .../20261124T152418Z-403a6f63/samples/B/2982.jpg   |   Bin 0 -> 20206 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4465.jpg   |   Bin 0 -> 28398 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4473.jpg   |   Bin 0 -> 28636 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4515.jpg   |   Bin 0 -> 27865 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4565.jpg   |   Bin 0 -> 22333 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4615.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4665.jpg   |   Bin 0 -> 23114 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4715.jpg   |   Bin 0 -> 10838 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4765.jpg   |   Bin 0 -> 22921 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4815.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4865.jpg   |   Bin 0 -> 22400 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4915.jpg   |   Bin 0 -> 17322 bytes
+ .../20261124T152418Z-403a6f63/samples/B/4965.jpg   |   Bin 0 -> 7878 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5015.jpg   |   Bin 0 -> 9321 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5065.jpg   |   Bin 0 -> 10469 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5115.jpg   |   Bin 0 -> 11338 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5165.jpg   |   Bin 0 -> 10187 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5215.jpg   |   Bin 0 -> 9849 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5265.jpg   |   Bin 0 -> 9817 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5315.jpg   |   Bin 0 -> 9124 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5365.jpg   |   Bin 0 -> 21931 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5368.jpg   |   Bin 0 -> 23170 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5415.jpg   |   Bin 0 -> 28517 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5465.jpg   |   Bin 0 -> 28533 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5515.jpg   |   Bin 0 -> 29535 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5565.jpg   |   Bin 0 -> 28602 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5615.jpg   |   Bin 0 -> 22352 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5665.jpg   |   Bin 0 -> 8013 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5715.jpg   |   Bin 0 -> 9421 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5765.jpg   |   Bin 0 -> 7175 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5815.jpg   |   Bin 0 -> 6465 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5865.jpg   |   Bin 0 -> 6516 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5915.jpg   |   Bin 0 -> 9082 bytes
+ .../20261124T152418Z-403a6f63/samples/B/596.jpg    |   Bin 0 -> 12577 bytes
+ .../20261124T152418Z-403a6f63/samples/B/5964.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T152418Z-403a6f63/samples/C/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T152418Z-403a6f63/samples/C/2220.jpg   |   Bin 0 -> 13645 bytes
+ .../20261124T152418Z-403a6f63/samples/C/4440.jpg   |   Bin 0 -> 9646 bytes
+ .../20261124T152418Z-403a6f63/samples/C/6660.jpg   |   Bin 0 -> 14470 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7380.jpg   |   Bin 0 -> 26940 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7430.jpg   |   Bin 0 -> 26733 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7480.jpg   |   Bin 0 -> 4883 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7530.jpg   |   Bin 0 -> 6187 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7580.jpg   |   Bin 0 -> 5480 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7630.jpg   |   Bin 0 -> 6919 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7680.jpg   |   Bin 0 -> 5351 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7730.jpg   |   Bin 0 -> 8181 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7780.jpg   |   Bin 0 -> 3498 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7830.jpg   |   Bin 0 -> 8713 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7880.jpg   |   Bin 0 -> 29059 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7930.jpg   |   Bin 0 -> 38365 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7980.jpg   |   Bin 0 -> 38323 bytes
+ .../20261124T152418Z-403a6f63/samples/C/7992.jpg   |   Bin 0 -> 38924 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8030.jpg   |   Bin 0 -> 41423 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8080.jpg   |   Bin 0 -> 36989 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8130.jpg   |   Bin 0 -> 36859 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8180.jpg   |   Bin 0 -> 37979 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8230.jpg   |   Bin 0 -> 41608 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8280.jpg   |   Bin 0 -> 59817 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8330.jpg   |   Bin 0 -> 64836 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8380.jpg   |   Bin 0 -> 61107 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8430.jpg   |   Bin 0 -> 60293 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8480.jpg   |   Bin 0 -> 62072 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8530.jpg   |   Bin 0 -> 62866 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8580.jpg   |   Bin 0 -> 60951 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8630.jpg   |   Bin 0 -> 61189 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8680.jpg   |   Bin 0 -> 58437 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8730.jpg   |   Bin 0 -> 47233 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8780.jpg   |   Bin 0 -> 33936 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8830.jpg   |   Bin 0 -> 9762 bytes
+ .../20261124T152418Z-403a6f63/samples/C/8879.jpg   |   Bin 0 -> 9055 bytes
+ .../20261124T152418Z-403a6f63/samples/C/888.jpg    |   Bin 0 -> 9332 bytes
+ .../20261124T152418Z-403a6f63/samples/D/0.jpg      |   Bin 0 -> 1938 bytes
+ .../20261124T152418Z-403a6f63/samples/D/1835.jpg   |   Bin 0 -> 34114 bytes
+ .../20261124T152418Z-403a6f63/samples/D/3671.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T152418Z-403a6f63/samples/D/5506.jpg   |   Bin 0 -> 26105 bytes
+ .../20261124T152418Z-403a6f63/samples/D/5842.jpg   |   Bin 0 -> 27313 bytes
+ .../20261124T152418Z-403a6f63/samples/D/5892.jpg   |   Bin 0 -> 29413 bytes
+ .../20261124T152418Z-403a6f63/samples/D/5942.jpg   |   Bin 0 -> 27194 bytes
+ .../20261124T152418Z-403a6f63/samples/D/5992.jpg   |   Bin 0 -> 38786 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6042.jpg   |   Bin 0 -> 26673 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6092.jpg   |   Bin 0 -> 39215 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6142.jpg   |   Bin 0 -> 41849 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6192.jpg   |   Bin 0 -> 28819 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6242.jpg   |   Bin 0 -> 31980 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6292.jpg   |   Bin 0 -> 7987 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6342.jpg   |   Bin 0 -> 23085 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6392.jpg   |   Bin 0 -> 26211 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6442.jpg   |   Bin 0 -> 31177 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6492.jpg   |   Bin 0 -> 29846 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6542.jpg   |   Bin 0 -> 37209 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6592.jpg   |   Bin 0 -> 55494 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6607.jpg   |   Bin 0 -> 52878 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6642.jpg   |   Bin 0 -> 52249 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6692.jpg   |   Bin 0 -> 50144 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6742.jpg   |   Bin 0 -> 53281 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6792.jpg   |   Bin 0 -> 51907 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6842.jpg   |   Bin 0 -> 52607 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6892.jpg   |   Bin 0 -> 52296 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6942.jpg   |   Bin 0 -> 49493 bytes
+ .../20261124T152418Z-403a6f63/samples/D/6992.jpg   |   Bin 0 -> 28372 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7042.jpg   |   Bin 0 -> 9649 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7092.jpg   |   Bin 0 -> 1938 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7142.jpg   |   Bin 0 -> 26982 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7192.jpg   |   Bin 0 -> 33485 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7242.jpg   |   Bin 0 -> 31330 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7292.jpg   |   Bin 0 -> 30996 bytes
+ .../20261124T152418Z-403a6f63/samples/D/734.jpg    |   Bin 0 -> 15454 bytes
+ .../20261124T152418Z-403a6f63/samples/D/7341.jpg   |   Bin 0 -> 1938 bytes
+ .../20261124T153130Z-fdf1c313/index.html           |     1 +
+ .../20261124T153130Z-fdf1c313/manual.log           |    60 +
+ .../20261124T153130Z-fdf1c313/report.json          |    91 +
+ .../20261124T153130Z-fdf1c313/samples.json         |  1185 +
+ .../20261124T153130Z-fdf1c313/samples/A/0.jpg      |   Bin 0 -> 6014 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/125.jpg    |   Bin 0 -> 8108 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/250.jpg    |   Bin 0 -> 9570 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/375.jpg    |   Bin 0 -> 12880 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/450.jpg    |   Bin 0 -> 6742 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/499.jpg    |   Bin 0 -> 7287 bytes
+ .../20261124T153130Z-fdf1c313/samples/A/50.jpg     |   Bin 0 -> 5980 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/1491.jpg   |   Bin 0 -> 22220 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/2982.jpg   |   Bin 0 -> 20206 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4465.jpg   |   Bin 0 -> 28398 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4473.jpg   |   Bin 0 -> 28636 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4515.jpg   |   Bin 0 -> 27865 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4565.jpg   |   Bin 0 -> 22333 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4615.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4665.jpg   |   Bin 0 -> 23114 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4715.jpg   |   Bin 0 -> 10838 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4765.jpg   |   Bin 0 -> 22921 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4815.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4865.jpg   |   Bin 0 -> 22400 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4915.jpg   |   Bin 0 -> 17322 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/4965.jpg   |   Bin 0 -> 7878 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5015.jpg   |   Bin 0 -> 9321 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5065.jpg   |   Bin 0 -> 10469 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5115.jpg   |   Bin 0 -> 11338 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5165.jpg   |   Bin 0 -> 10187 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5215.jpg   |   Bin 0 -> 9849 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5265.jpg   |   Bin 0 -> 9817 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5315.jpg   |   Bin 0 -> 9124 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5365.jpg   |   Bin 0 -> 21931 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5368.jpg   |   Bin 0 -> 23170 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5415.jpg   |   Bin 0 -> 28517 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5465.jpg   |   Bin 0 -> 28533 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5515.jpg   |   Bin 0 -> 29535 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5565.jpg   |   Bin 0 -> 28602 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5615.jpg   |   Bin 0 -> 22352 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5665.jpg   |   Bin 0 -> 8013 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5715.jpg   |   Bin 0 -> 9421 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5765.jpg   |   Bin 0 -> 7175 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5815.jpg   |   Bin 0 -> 6465 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5865.jpg   |   Bin 0 -> 6516 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5915.jpg   |   Bin 0 -> 9082 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/596.jpg    |   Bin 0 -> 12577 bytes
+ .../20261124T153130Z-fdf1c313/samples/B/5964.jpg   |   Bin 0 -> 1602 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/0.jpg      |   Bin 0 -> 1602 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/2220.jpg   |   Bin 0 -> 13645 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/4440.jpg   |   Bin 0 -> 9646 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/6660.jpg   |   Bin 0 -> 14470 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7380.jpg   |   Bin 0 -> 26940 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7430.jpg   |   Bin 0 -> 26733 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7480.jpg   |   Bin 0 -> 4883 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7530.jpg   |   Bin 0 -> 6187 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7580.jpg   |   Bin 0 -> 5480 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7630.jpg   |   Bin 0 -> 6919 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7680.jpg   |   Bin 0 -> 5351 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7730.jpg   |   Bin 0 -> 8181 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7780.jpg   |   Bin 0 -> 3498 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7830.jpg   |   Bin 0 -> 8713 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7880.jpg   |   Bin 0 -> 29059 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7930.jpg   |   Bin 0 -> 38365 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7980.jpg   |   Bin 0 -> 38323 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/7992.jpg   |   Bin 0 -> 38924 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8030.jpg   |   Bin 0 -> 41423 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8080.jpg   |   Bin 0 -> 36989 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8130.jpg   |   Bin 0 -> 36859 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8180.jpg   |   Bin 0 -> 37979 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8230.jpg   |   Bin 0 -> 41608 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8280.jpg   |   Bin 0 -> 59817 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8330.jpg   |   Bin 0 -> 64836 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8380.jpg   |   Bin 0 -> 61107 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8430.jpg   |   Bin 0 -> 60293 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8480.jpg   |   Bin 0 -> 62072 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8530.jpg   |   Bin 0 -> 62866 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8580.jpg   |   Bin 0 -> 60951 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8630.jpg   |   Bin 0 -> 61189 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8680.jpg   |   Bin 0 -> 58437 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8730.jpg   |   Bin 0 -> 47233 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8780.jpg   |   Bin 0 -> 33936 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8830.jpg   |   Bin 0 -> 9762 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/8879.jpg   |   Bin 0 -> 9055 bytes
+ .../20261124T153130Z-fdf1c313/samples/C/888.jpg    |   Bin 0 -> 9332 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/0.jpg      |   Bin 0 -> 1938 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/1835.jpg   |   Bin 0 -> 34114 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/3671.jpg   |   Bin 0 -> 14148 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/5506.jpg   |   Bin 0 -> 26105 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/5842.jpg   |   Bin 0 -> 27313 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/5892.jpg   |   Bin 0 -> 29413 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/5942.jpg   |   Bin 0 -> 27194 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/5992.jpg   |   Bin 0 -> 38786 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6042.jpg   |   Bin 0 -> 26673 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6092.jpg   |   Bin 0 -> 39215 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6142.jpg   |   Bin 0 -> 41849 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6192.jpg   |   Bin 0 -> 28819 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6242.jpg   |   Bin 0 -> 31980 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6292.jpg   |   Bin 0 -> 7987 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6342.jpg   |   Bin 0 -> 23085 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6392.jpg   |   Bin 0 -> 26211 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6442.jpg   |   Bin 0 -> 31177 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6492.jpg   |   Bin 0 -> 29846 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6542.jpg   |   Bin 0 -> 37209 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6592.jpg   |   Bin 0 -> 55494 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6607.jpg   |   Bin 0 -> 52878 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6642.jpg   |   Bin 0 -> 52249 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6692.jpg   |   Bin 0 -> 50144 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6742.jpg   |   Bin 0 -> 53281 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6792.jpg   |   Bin 0 -> 51907 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6842.jpg   |   Bin 0 -> 52607 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6892.jpg   |   Bin 0 -> 52296 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6942.jpg   |   Bin 0 -> 49493 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/6992.jpg   |   Bin 0 -> 28372 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7042.jpg   |   Bin 0 -> 9649 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7092.jpg   |   Bin 0 -> 1938 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7142.jpg   |   Bin 0 -> 26982 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7192.jpg   |   Bin 0 -> 33485 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7242.jpg   |   Bin 0 -> 31330 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7292.jpg   |   Bin 0 -> 30996 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/734.jpg    |   Bin 0 -> 15454 bytes
+ .../20261124T153130Z-fdf1c313/samples/D/7341.jpg   |   Bin 0 -> 1938 bytes
+ .../test-manual-tools/approved-media.json          |    52 +
+ .../011-video/test-manual-tools/run-manual.py      |   212 +
+ experiments/media/manifest.json                    |   558 +
+ memory-bank/bolts/011-video/bolt.md                |    40 +-
+ memory-bank/bolts/011-video/implementation-plan.md |   224 +
+ .../bolts/011-video/implementation-walkthrough.md  |    72 +
+ memory-bank/bolts/011-video/test-walkthrough.md    |   101 +
+ .../units/005-video/construction-log.md            |    78 +
+ ...fontes-mjpeg-e-controlar-ritmo-de-publicacao.md |    22 +-
+ .../units/005-video/unit-brief.md                  |     5 +-
+ memory-bank/project.yaml                           |     6 +-
+ memory-bank/story-index.md                         |     9 +-
+ 598 files changed, 177777 insertions(+), 20 deletions(-)

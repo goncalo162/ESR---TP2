@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-05"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-23T16:02:19Z"
+updated: "2026-11-24T20:49:09Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
@@ -17,13 +17,14 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 Estado atual: in-progress; IMP-016/010-video/TASK-019 complete/DONE,integrado
 localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrough.md).
-IMP-017/011-video em Test,Implement aprovado,quatro media finais auditados;
-Test/G-MEDIA técnicos aprovados,manual Francisco13 cumprido com B ilegível,
-C/D legíveis nas amostras;distribuição aberta,restantes histórias planned.
-PHASE-05 em progresso,revisão final/integração pendentes,LOCAL-04/distribuição abertos.
-Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji cumpridos.
+IMP-017/011-video complete,parte A/TASK-020 concluída e integrada em main8a91d9f;
+Test/V-020-A,manual Francisco13 e revisão final Denji cumpridos.
+[Fecho](../../../../bolts/011-video/closure-walkthrough.md).
+TASK-020 inteira IN PROGRESS e PHASE-05 em progresso,restantes histórias planned.
+LOCAL-03 sem cópia runtime;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030.
+Créditos B ilegíveis,sem aprovação de atribuição/redistribuição/publicação.
 Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
-Somente codec entregue neste incremento; streaming/reprodução continuam futuros.
+Codec e preparação dos quatro conteúdos entregues;leitura/pacing,streaming/reprodução futuros.
 Sem push,alterações Java no fecho ou fecho da unidade. IDs locais preservados.
 
 ## Requisitos atribuídos
@@ -39,7 +40,7 @@ Sem push,alterações Java no fecho ou fecho da unidade. IDs locais preservados.
 ## Histórias e bolts
 
 - [x] [001-definir-codec-udp-e-fragmentacao-de-frames](stories/001-definir-codec-udp-e-fragmentacao-de-frames.md) → [010-video](../../../../bolts/010-video/bolt.md); IMP-016 (M).
-- [ ] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md) → [011-video](../../../../bolts/011-video/bolt.md); IMP-017 (M).
+- [x] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md) → [011-video](../../../../bolts/011-video/bolt.md); IMP-017 (M).
 - [ ] [007-ler-o-perfil-mjpeg-confirmado](stories/007-ler-o-perfil-mjpeg-confirmado.md) → [025-video](../../../../bolts/025-video/bolt.md); IMP-018 (M).
 - [ ] [008-emitir-fontes-com-pacing-e-procura](stories/008-emitir-fontes-com-pacing-e-procura.md) → [026-video](../../../../bolts/026-video/bolt.md); IMP-019 (M).
 - [ ] [003-reencaminhar-e-replicar-datagramas-pela-arvore-ativa](stories/003-reencaminhar-e-replicar-datagramas-pela-arvore-ativa.md) → [012-video](../../../../bolts/012-video/bolt.md); IMP-020 (M).

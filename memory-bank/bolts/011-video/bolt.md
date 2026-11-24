@@ -3,13 +3,13 @@ id: "011-video"
 unit: "005-video"
 intent: "001-ott-streaming"
 type: "simple-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao"]
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-24T15:43:59Z"
+updated: "2026-11-24T20:49:09Z"
 started: "2026-11-24T14:23:59Z"
-completed: null
-current_stage: "test"
+completed: "2026-11-24T20:49:09Z"
+current_stage: null
 stages_completed: [{"name": "plan", "completed": "2026-11-24T14:37:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-24T14:48:45Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-24T15:43:59Z", "artifact": "test-walkthrough.md"}]
 requires_bolts: ["009-arvores", "010-video"]
 enables_bolts: ["025-video"]
@@ -41,7 +41,7 @@ Ler [IMP-017](../../../add.md#imp-017) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](../../intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md).
+- [x] [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](../../intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md).
 - Dependências: [009-arvores](../009-arvores/bolt.md), [010-video](../010-video/bolt.md).
 - Unidade: [005-video](../../intents/001-ott-streaming/units/005-video/unit-brief.md).
 - Gates: G-MEDIA.
@@ -56,9 +56,9 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 
 ## Critérios de aceitação
 
-- [ ] Quatro conteúdos identificáveis, dois por origem, preparados no perfil de cinco dígitos/JPEG.
-- [ ] Proveniência, parâmetros de preparação, hashes e FPS registados; cópias idênticas não contam como vídeos distintos.
-- [ ] Cada JPEG respeita o limite e é descodificável; condições de redistribuição ainda pendentes ficam explícitas para TASK-030.
+- [x] Quatro conteúdos identificáveis, dois por origem, preparados no perfil de cinco dígitos/JPEG.
+- [x] Proveniência, parâmetros de preparação, hashes e FPS registados; cópias idênticas não contam como vídeos distintos.
+- [x] Cada JPEG respeita o limite e é descodificável; condições de redistribuição ainda pendentes ficam explícitas para TASK-030.
 
 ## Evidência e fecho
 
@@ -68,7 +68,7 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
 - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
 - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
 
-## Test/G-MEDIA técnicos aprovados — revisão final/integração pendentes
+## Histórico — Test/G-MEDIA técnicos aprovados antes da revisão/integração
 
 Utilizador aprovou22687 JPEGs,16 fronteiras,quatro conteúdos distintos e manual
 Francisco13. Aceitou B com créditos presentes mas ilegíveis só para Test técnico:
@@ -80,7 +80,7 @@ Revisão final e integração pendentes;bolt/história/pai/unidade em progresso.
 LOCAL-03:cópia/hash runtime não instalada. Volume459820128 bytes,sem LFS/externo
 ou conteúdo alterado por inferência. Sem staging/commits/push/fecho.
 
-## Git LFS aplicado por autorização — revisão final pendente
+## Histórico — Git LFS aplicado antes da revisão final
 
 Git LFS3.8.1 oficial instalado;local --skip-smudge,13 hooks anteriores preservados,
 quatro hooks LFS novos. .gitattributes exatamente4 regras aprovadas,sem staging.
@@ -91,3 +91,15 @@ de dados validado,não Codigo.zip final. Sem rede LFS/upload/push/index/históri
 Manifesto distingue binários no disco de ponteiros Git esperados. Antes de publicar,
 proprietário confirma quota/budget;sem custo zero presumido ou billing alterado.
 LOCAL-04/distribuição/revisão final/integração pendentes,LOCAL-03 não instalada.
+
+## Estado final — complete,apenas TASK-020 parte A
+
+Fecho documental autorizado após Test/manual Francisco13,revisão final Denji e
+integração local comprovada em main8a91d9f. [Fecho](closure-walkthrough.md).
+V-020-A:22687 JPEGs,16 fronteiras,quatro conteúdos distintos. História complete/
+implemented=true. TASK-020 inteira,unidade005 e PHASE-05 continuam em progresso.
+LOCAL-03:cópia para Projeto/media não instalada. LOCAL-04 e
+G-MEDIA-DISTRIBUTION abertos para TASK-030;créditos B presentes mas ilegíveis.
+Sem atribuição adequada,legibilidade,redistribuição ou publicação aprovadas.
+Quota/orçamento pendentes antes de publicar;Homebrew separado,sem intervenção.
+Os checkpoints acima são históricos;nenhum novo IMP iniciado. Sem push.

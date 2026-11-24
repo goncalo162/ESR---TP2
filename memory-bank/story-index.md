@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:18 histórias complete,1 in-progress e16 planned; bolts:18 complete,1 in-progress,16 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:19 histórias complete,0 in-progress e16 planned; bolts:19 complete,0 in-progress,16 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -128,12 +128,12 @@ em progresso,sem outro IMP iniciado,IDs locais/demo preservados,sem push.
 
 ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED
 
-**Tarefa:** IMP-017. **Estado:** in-progress,Test/G-MEDIA técnicos aprovados com B ilegível aceite;LOCAL-04/distribuição abertos. **Bolt:** 011-video.
-[Test](bolts/011-video/test-walkthrough.md):base e3d122a,quatro ficheiros finais/manifesto intactos,
-22687 JPEGs auditados+16 fronteiras/negativos;manual13 cumprido,B ilegível/C-D legíveis nas amostras;revisão final/integração pendentes.
-LOCAL-03 opção1 aprovada,distribuição aberta,sem alterações Java/perfis/demo.
-Git LFS autorizado/configurado só no repo,4 objetos materializados e hashes reais
-conferidos;sem staging/commits/uploads/push. [Pacote](../experiments/construction/011-video/lfs-review-package-01/README.md).
+**Tarefa:** IMP-017. **Estado:** complete/implemented=true,apenas TASK-020 parte A. **Bolt:** 011-video complete.
+[Fecho](bolts/011-video/closure-walkthrough.md),integração local8a91d9f comprovada,
+V-020-A22687 JPEGs/16 fronteiras,manual Francisco13 e revisão final Denji cumpridos.
+TASK-020 inteira,unidade005/PHASE-05 em progresso;LOCAL-03 não instalada,
+LOCAL-04/G-MEDIA-DISTRIBUTION abertos. B ilegível,sem aprovação de redistribuição.
+Sem Java/media/demo alterados no fecho,uploads,push ou novo IMP.
 **Ficheiro:** [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md).
 
 ## 005-video/007-ler-o-perfil-mjpeg-confirmado.md ✅ GENERATED
