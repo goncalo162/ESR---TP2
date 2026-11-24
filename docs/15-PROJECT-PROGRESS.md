@@ -1,5 +1,30 @@
 # Progresso do projeto
 
+**IMP-017 / 011-video — Test/G-MEDIA técnicos aprovados,B ilegível aceite:**Implement aprovado;
+auditoria final22687/22687 JPEGs headless/sem avisos,16/16 fronteiras/negativos,
+6 pares de conteúdos/hash de pixels distintos. Binários/manifesto intactos.
+[Test](../memory-bank/bolts/011-video/test-walkthrough.md),
+[evidência](../experiments/construction/011-video/test-01/README.md),
+[manual](../experiments/construction/011-video/manual-instructions.md).
+[Manual pessoal Francisco13/7 etapas conferido](../experiments/construction/011-video/manual-verification-01/README.md):
+quatro conteúdos distintos,créditos B observados mas ilegíveis («nao dava para ler as letras»),
+C/D legíveis nas amostras. Tentativa parcial anterior preservada,não aprovada.
+Test/G-MEDIA técnicos aprovados pelo utilizador com limitação conhecida B,sem
+aprovar atribuição adequada,legibilidade/redistribuição ou licença de A.
+LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030.
+[Pacote para revisão final](../experiments/construction/011-video/review-package-01/README.md). LOCAL-03 cópia/hash posterior
+para Projeto/media,perfis não alterados nem anunciados prontos. Volume459820128
+bytes considerados:estratégia Git LFS aprovada posteriormente,sem alterar conteúdo.
+manual cumprido com limitação,revisão final/integração pendentes. TASK-020 inteira aberta,18 complete,
+1 in-progress,16 planned. Sem Java/perfis/POM/fixtures/demo alterados ou staging/
+commits/push/fecho. Git LFS3.8.1 oficial instalado,local --skip-smudge,.gitattributes4 regras,
+13 hooks anteriores preservados;4 objetos clean/cache/smudge e ZIP temporário de
+validação conferidos,sem rede LFS/staging/commits/uploads/push ou histórico alterado.
+[Efeitos Homebrew e prova](../experiments/construction/011-video/lfs-implementation-01/README.md),
+[pacote LFS atualizado](../experiments/construction/011-video/lfs-review-package-01/README.md).
+Quota/budget do proprietário por confirmar antes de publicação;billing não alterado.
+Registo de fecho anterior:
+
 **IMP-016 / 010-video / TASK-019 — concluído:** integrado localmente em main72c9f92;
 bolt/história complete,implemented=true,TASK-019 DONE por autorização de fecho.
 [Fecho](../memory-bank/bolts/010-video/closure-walkthrough.md),
@@ -153,7 +178,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
 | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
 | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
 | [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | DONE | V-019:78 U01–U08;Test1537/0/0/0;Francisco24;Denji;main72c9f92 |
-| [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
+| [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | IN PROGRESS — parte A/Test | Auditoria final22687 JPEGs+16 casos;Test/G-MEDIA aprovados tecnicamente;B ilegível aceite;LOCAL-04/distribuição abertos |
 | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
 | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |
 | [TASK-023](tasks/PHASE-05/TASK-023.md) | Apresentar catálogo e vídeo numa janela Swing | TASK-012, TASK-022 | TODO | V-023: NÃO EXECUTADO |

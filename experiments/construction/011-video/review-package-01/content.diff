@@ -1,0 +1,1301 @@
+diff --git a/docs/15-PROJECT-PROGRESS.md b/docs/15-PROJECT-PROGRESS.md
+index f70506a..ef4db5a 100644
+--- a/docs/15-PROJECT-PROGRESS.md
++++ b/docs/15-PROJECT-PROGRESS.md
+@@ -1,5 +1,24 @@
+ # Progresso do projeto
+ 
++**IMP-017 / 011-video — Test/G-MEDIA técnicos aprovados,B ilegível aceite:**Implement aprovado;
++auditoria final22687/22687 JPEGs headless/sem avisos,16/16 fronteiras/negativos,
++6 pares de conteúdos/hash de pixels distintos. Binários/manifesto intactos.
++[Test](../memory-bank/bolts/011-video/test-walkthrough.md),
++[evidência](../experiments/construction/011-video/test-01/README.md),
++[manual](../experiments/construction/011-video/manual-instructions.md).
++[Manual pessoal Francisco13/7 etapas conferido](../experiments/construction/011-video/manual-verification-01/README.md):
++quatro conteúdos distintos,créditos B observados mas ilegíveis («nao dava para ler as letras»),
++C/D legíveis nas amostras. Tentativa parcial anterior preservada,não aprovada.
++Test/G-MEDIA técnicos aprovados pelo utilizador com limitação conhecida B,sem
++aprovar atribuição adequada,legibilidade/redistribuição ou licença de A.
++LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030.
++[Pacote para revisão final](../experiments/construction/011-video/review-package-01/README.md). LOCAL-03 cópia/hash posterior
++para Projeto/media,perfis não alterados nem anunciados prontos. Volume459820128
++bytes considerado,sem decidir LFS/externo/alterar conteúdo.
++manual cumprido com limitação,revisão final/integração pendentes. TASK-020 inteira aberta,18 complete,
++1 in-progress,16 planned. Sem Java/perfis/POM/fixtures/demo alterados ou staging/
++commits/push/fecho. Registo de fecho anterior:
++
+ **IMP-016 / 010-video / TASK-019 — concluído:** integrado localmente em main72c9f92;
+ bolt/história complete,implemented=true,TASK-019 DONE por autorização de fecho.
+ [Fecho](../memory-bank/bolts/010-video/closure-walkthrough.md),
+@@ -153,7 +172,7 @@ DoD preservada; sem GUI/CORE, deploy ou upload presumidos.
+ | [TASK-017](tasks/PHASE-04/TASK-017.md) | Adaptar rota por RTT com histerese e troca confirmada | TASK-010, TASK-016 | DONE em 2026-11-22T17:47:01Z — Test com JAR novo (clean verify 1459/0/0/0, 21 XML, JAR dc192971…ab920f; V-017 S01–S18 34/34 + 6 compat), validador PASS, revisão confirmada pelo utilizador | V-017: EXECUTADA com sucesso — [relatório](../memory-bank/bolts/024-arvores/ddd-03-test-report.md) |
+ | [TASK-018](tasks/PHASE-04/TASK-018.md) | Preparar o segundo marco com árvores e adaptação | TASK-009, TASK-013, TASK-015, TASK-016, TASK-017 | DONE em 2026-11-22T17:12:18Z — bolt 009-arvores/IMP-015 complete; V-018 run 20261122T164428Z-f6n15e PASS 44/44, mvn test 1459/0/0/0, validador-bolt PASS (reexecução 20261122T165306Z-2hy8eu 44/44); DONE autorizado pelo utilizador | V-018: EXECUTADA com sucesso — [evidência](../memory-bank/bolts/009-arvores/test-walkthrough.md), [fecho](../memory-bank/bolts/009-arvores/closure-walkthrough.md) |
+ | [TASK-019](tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | DONE | V-019:78 U01–U08;Test1537/0/0/0;Francisco24;Denji;main72c9f92 |
+-| [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | TODO | V-020: NÃO EXECUTADO |
++| [TASK-020](tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | IN PROGRESS — parte A/Test | Auditoria final22687 JPEGs+16 casos;Test/G-MEDIA aprovados tecnicamente;B ilegível aceite;LOCAL-04/distribuição abertos |
+ | [TASK-021](tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | TODO | V-021: NÃO EXECUTADO |
+ | [TASK-022](tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | TODO | V-022: NÃO EXECUTADO |
+ | [TASK-023](tasks/PHASE-05/TASK-023.md) | Apresentar catálogo e vídeo numa janela Swing | TASK-012, TASK-022 | TODO | V-023: NÃO EXECUTADO |
+diff --git a/docs/phases/PHASE-05-STREAMING.md b/docs/phases/PHASE-05-STREAMING.md
+index b087d70..849611a 100644
+--- a/docs/phases/PHASE-05-STREAMING.md
++++ b/docs/phases/PHASE-05-STREAMING.md
+@@ -11,7 +11,10 @@ Incremento 5 de sete, segundo [o roadmap](../08-IMPLEMENTATION-ROADMAP.md). O re
+ Estado atual: **IN PROGRESS**; TASK-019/IMP-016/010-video DONE/complete após
+ integração72c9f92,Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji.
+ [Fecho](../../memory-bank/bolts/010-video/closure-walkthrough.md).
+-TASK-020–024 permanecem TODO; nenhum outro incremento iniciado. Streaming futuro.
++TASK-020 parte A em Test do IMP-017/011-video,quatro conteúdos finais auditados;
++Manual Francisco13 cumprido com B ilegível,C/D legíveis nas amostras;
++Test/G-MEDIA técnicos aprovados,LOCAL-04/distribuição abertos;TASK-021–024 TODO.
++Revisão final/integração pendentes;streaming futuro.
+ PHASE-04 DONE/unidade004 complete; DEMO-001 separado,não um gate.
+ 
+ ## 3. Pré-requisitos
+@@ -27,7 +30,7 @@ RF-007, RF-010, RF-011, RF-012, RF-013, RF-015, RNF-001, RNF-002, RNF-003, RP-00
+ | Tarefa | Objetivo concreto | Dependências | Validação | Estado |
+ |---|---|---|---|---|
+ | [TASK-019](../tasks/PHASE-05/TASK-019.md) | Definir codec UDP e fragmentação de frames | TASK-002, TASK-004, TASK-011, TASK-018 | V-019 | DONE — V-019/Test/Francisco24/Denji/integração72c9f92 |
+-| [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | TODO |
++| [TASK-020](../tasks/PHASE-05/TASK-020.md) | Ler fontes MJPEG e controlar ritmo de publicação | TASK-002, TASK-003, TASK-019 | V-020 | IN PROGRESS — parte A/Test aprovado;B ilegível aceite,LOCAL-04/distribuição abertos |
+ | [TASK-021](../tasks/PHASE-05/TASK-021.md) | Reencaminhar e replicar datagramas pela árvore ativa | TASK-014, TASK-015, TASK-016, TASK-017, TASK-019 | V-021 | TODO |
+ | [TASK-022](../tasks/PHASE-05/TASK-022.md) | Reconstituir frames com buffers e prazo limitados | TASK-019, TASK-021 | V-022 | TODO |
+ | [TASK-023](../tasks/PHASE-05/TASK-023.md) | Apresentar catálogo e vídeo numa janela Swing | TASK-012, TASK-022 | V-023 | TODO |
+diff --git a/docs/tasks/PHASE-05/TASK-020.md b/docs/tasks/PHASE-05/TASK-020.md
+index 35958fc..e5ee55d 100644
+--- a/docs/tasks/PHASE-05/TASK-020.md
++++ b/docs/tasks/PHASE-05/TASK-020.md
+@@ -5,7 +5,7 @@
+ - ID: TASK-020
+ - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
+ - Prioridade: P0
+-- Estado: TODO
++- Estado: IN PROGRESS
+ - Responsável: [Fillmore](../../team/FILLMORE.md).
+ - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
+ - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-003](../PHASE-01/TASK-003.md), [TASK-019](../PHASE-05/TASK-019.md).
+@@ -25,7 +25,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
+ 
+ ## 5. Especificação técnica
+ 
+-A TASK-002 confirmou o perfil docente: cinco bytes de dígitos decimais ASCII com L, seguidos de L bytes JPEG, limite de 99999 bytes por frame; ver secção 7 de [07](../../07-API-AND-INTERFACES.md) e [revisão V-002](../../../experiments/task-002-contract-review.md). Reobter o recurso por URL/hash se a cópia transitória de /tmp não existir. Preparar os conteúdos A/B e C/D identificados nessa revisão; B/C/D ainda são fontes MP4/MKV/MOV por descarregar/converter, não ficheiros MJPEG prontos. Não basta alterar a extensão. Registar parâmetros da preparação offline, créditos e hashes; sem acesso ao conteúdo ou formato compatível, o gate continua por resolver. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
++A TASK-002 confirmou o perfil docente: cinco bytes de dígitos decimais ASCII com L, seguidos de L bytes JPEG, limite de 99999 bytes por frame; ver secção 7 de [07](../../07-API-AND-INTERFACES.md) e [revisão V-002](../../../experiments/task-002-contract-review.md). Reobter o recurso por URL/hash se a cópia transitória de /tmp não existir. Preparar os conteúdos A/B e C/D identificados nessa revisão; Na revisão histórica,B/C/D eram fontes MP4/MKV/MOV por descarregar/converter;preparação atual está documentada no checkpoint abaixo. Não basta alterar a extensão. Registar parâmetros da preparação offline, créditos e hashes; sem acesso ao conteúdo ou formato compatível, o gate continua por resolver. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
+ 
+ Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
+ 
+@@ -72,3 +72,20 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
+ Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
+ 
+ Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
++
++## IMP-017 — parte A com Test/G-MEDIA técnicos aprovados,limitação B aceite
++
++Implement aprovado. Nova auditoria final:22687 JPEGs headless/sem avisos,
++16 fronteiras/negativos e6 pares distintos. Binários/manifesto aprovados intactos.
++[Test](../../../memory-bank/bolts/011-video/test-walkthrough.md),
++[manual](../../../experiments/construction/011-video/manual-instructions.md).
++Manual pessoal Francisco13/7 etapas conferido;quatro conteúdos distintos. Créditos
++B observados mas ilegíveis,C/D legíveis nas amostras. Test/G-MEDIA técnicos aprovados
++pelo utilizador com limitação B aceite;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para
++TASK-030,sem aprovação de atribuição adequada,legibilidade/redistribuição ou licença inventada de A.
++[Avaliação LOCAL-04](../../../experiments/construction/011-video/manual-verification-01/B-readability-assessment.md).
++LOCAL-03:cópia/hash para Projeto/media posterior,perfis inalterados/não prontos.
++459820128 bytes considerados no plano posterior,sem escolha de LFS/externo/conteúdo
++por inferência. Revisão final/integração pendentes. Parte A não fecha
++pai nem leitor/emissão/pacing B/C. Sem staging/commits/push/fecho ou alteração
++Java/perfis/POM/fixtures/demo.
+diff --git a/memory-bank/bolts/011-video/bolt.md b/memory-bank/bolts/011-video/bolt.md
+index afb83c9..462d980 100644
+--- a/memory-bank/bolts/011-video/bolt.md
++++ b/memory-bank/bolts/011-video/bolt.md
+@@ -3,14 +3,14 @@ id: "011-video"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+ type: "simple-construction-bolt"
+-status: "planned"
++status: "in-progress"
+ stories: ["002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao"]
+ created: "2026-11-02T15:02:08Z"
+-updated: "2026-11-02T15:36:48Z"
+-started: null
++updated: "2026-11-24T15:43:59Z"
++started: "2026-11-24T14:23:59Z"
+ completed: null
+-current_stage: null
+-stages_completed: []
++current_stage: "test"
++stages_completed: [{"name": "plan", "completed": "2026-11-24T14:37:54Z", "artifact": "implementation-plan.md"}, {"name": "implement", "completed": "2026-11-24T14:48:45Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-24T15:43:59Z", "artifact": "test-walkthrough.md"}]
+ requires_bolts: ["009-arvores", "010-video"]
+ enables_bolts: ["025-video"]
+ requires_units: ["004-arvores"]
+@@ -48,9 +48,9 @@ Ler [IMP-017](../../../add.md#imp-017) e as ADR aí indicadas antes de qualquer
+ 
+ ## Etapas e validação
+ 
+-1. [ ] **plan** → `implementation-plan.md`; validar a etapa contra IMP-017 e as ADR do ADD.
+-2. [ ] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-017 e as ADR do ADD.
+-3. [ ] **test** → `test-walkthrough.md`; validar a etapa contra IMP-017 e as ADR do ADD.
++1. [x] **plan** → `implementation-plan.md`; validar a etapa contra IMP-017 e as ADR do ADD.
++2. [x] **implement** → `implementation-walkthrough.md`; validar a etapa contra IMP-017 e as ADR do ADD.
++3. [x] **test** → `test-walkthrough.md`; validar a etapa contra IMP-017 e as ADR do ADD.
+ 
+ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/bolt-types/simple-construction-bolt.md). Não gerar relatórios de execução só por criar este ficheiro. Testes são incrementais e a etapa Test consolida a prova.
+ 
+@@ -67,3 +67,15 @@ Tipo: [simple-construction-bolt](../../../.specsmd/aidlc/templates/construction/
+ - Prova futura: `experiments/construction/011-video/` e relatório local do bolt.
+ - Rever/atualizar história, TASK pai, docs/13–15 e construction-log; uma parte não conclui o pai.
+ - A revisão humana atribuída não é presumida. Antes de declarar decisão inviável ou alterar âmbito, aplicar ADD secção 11.
++
++## Test/G-MEDIA técnicos aprovados — revisão final/integração pendentes
++
++Utilizador aprovou22687 JPEGs,16 fronteiras,quatro conteúdos distintos e manual
++Francisco13. Aceitou B com créditos presentes mas ilegíveis só para Test técnico:
++nenhuma aprovação de atribuição adequada,legibilidade ou redistribuição.
++LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030;originais e parcial preservados.
++[Confirmação ligada a hashes](../../../experiments/construction/011-video/review-package-01/technical-approval.json),
++[pacote para revisão](../../../experiments/construction/011-video/review-package-01/README.md).
++Revisão final e integração pendentes;bolt/história/pai/unidade em progresso.
++LOCAL-03:cópia/hash runtime não instalada. Volume459820128 bytes,sem LFS/externo
++ou conteúdo alterado por inferência. Sem staging/commits/push/fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+index d882599..4aea6a4 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/construction-log.md
+@@ -73,3 +73,64 @@ manual pessoal Francisco24 e revisão final Denji cumpridos/aprovados.
+ Unidade005/PHASE-05 em progresso;18 histórias/bolts complete,0 in-progress,17 planned.
+ Sem novo IMP,alterações Java,push ou target/ no commit. IDs locais,demo/negativos/
+ logs pessoais preservados; documentação/evidência apenas. V-ADD no fecho.
++
++## 2026-11-24T14:23:59Z — IMP-017 / 011-video,Plan por aprovar
++
++Base e3d122a/main,estado inicial limpo,dependências009/010 complete.
++[Plan](../../../../bolts/011-video/implementation-plan.md):quatro obras diferentes,
++duas por origem,perfil cinco dígitos/JPEG,FPS10 existente;V-020-A planeado.
++G-MEDIA aberto por ausência local/preparação/validação. HEAD200 das quatro fontes,
++GET só das páginas de condições oficiais;sem download de media. IDs locais01–03,
++sem Q-C global;paths configuração versus recursos por decidir. Sem conversão,
++alterações Java,testes Java,Implement/Test/staging/commits/push. Parte A não fecha
++TASK-020;unidade/fase em progresso,demo e incrementos fechados intactos.
++
++## 2026-11-24T14:37:54Z — IMP-017,Plan aprovado/Implement executado por aceitar
++
++Utilizador aprovou LOCAL-03 opção1,seleção/parâmetros e obtenção/preparação das
++fontes. A coincide com histórico,sem reencodar. B/C/D completos com créditos,
++10fps/640×360/q5;manifesto real nos cinco caminhos aprovados. Auditoria independente
++22687 JPEGs descodificados headless e16 fronteiras/negativos passaram.
++[Implement](../../../../bolts/011-video/implementation-walkthrough.md).
++G-MEDIA:evidência técnica completa para checkpoint;distribuição aberta,licença A
++não inferida. Ferramenta offline isolada com aprovação própria,não runtime.
++Perfis/Java/POM/fixtures/demo intactos. Test/manual/revisão humana/integração
++pendentes,parte A não fecha TASK-020. Sem staging/commits/push ou avanço Test.
++
++## 2026-11-24T14:48:45Z — IMP-017,Implement aprovado/Test técnico consolidado
++
++Utilizador aprovou Implement e autorizou Test. Quatro ficheiros finais e manifesto
++intactos,auditoria nova22687/22687 JPEGs headless/sem avisos,16/16 fronteiras/negativos
++com expectativas preservadas,6 pares distintos. [Test](../../../../bolts/011-video/test-walkthrough.md).
++Manual humano preparado,sem execução/observação humana presumida. Legibilidade e
++redistribuição não inferidas;G-MEDIA/validação final aguarda manual/aceitação,
++G-MEDIA-DISTRIBUTION aberto,LOCAL-03/cópia posterior explícita.459820128 bytes no
++plano posterior,sem escolha LFS/externo ou alteração de conteúdos. Test/revisão final/
++integração pendentes,parte A não fecha TASK-020. Sem Java/perfis/POM/fixtures/demo
++alterados,staging/commits/push/fecho. Apenas IDs locais.
++
++## 2026-11-24T15:39:07Z — Manual humano Francisco13 conferido,limitação B preservada
++
++Execução pessoal confirmada pelo utilizador,13 checks/7 etapas,PASSED=true,
++WRAPPER_EXIT=0;SHELL_EXIT=0 por confirmação do utilizador,não log. Quatro conteúdos
++distintos;B créditos presentes mas ilegíveis,nota «nao dava para ler as letras»;
++C/D legíveis nas amostras. Tentativa anterior9 checks/3 etapas,nota vazia/exit1,
++originais preservados. [Conferência e avaliação LOCAL-04](../../../../../experiments/construction/011-video/manual-verification-01/README.md).
++Test/G-MEDIA por aprovar com limitação explícita. G-MEDIA-DISTRIBUTION aberto,
++legibilidade B/redistribuição não aprovadas;recomendação manter versão e tratar
++créditos finais na TASK-030,ou propor mudança explícita se exigida,sem aplicar.
++Hashes de media/manifesto/auxiliares/amostras íntegros,sem repetir auditoria/manual.
++LOCAL-03 não instalou Projeto/media;revisão/integração pendentes,TASK-020 aberta,
++sem staging/commits/push/fecho ou mudança de conteúdo/armazenamento por inferência.
++
++## 2026-11-24T15:43:59Z — Test/G-MEDIA técnicos aprovados,revisão final/integração pendentes
++
++Utilizador aprovou22687 JPEGs,16 fronteiras,quatro conteúdos distintos e manual
++Francisco13;aceitou B com créditos presentes mas ilegíveis apenas no âmbito técnico.
++Não aprova atribuição adequada,legibilidade/redistribuição;LOCAL-04 e
++G-MEDIA-DISTRIBUTION abertos para TASK-030,originais/parcial preservados.
++[Confirmação vinculada a hashes](../../../../../experiments/construction/011-video/review-package-01/technical-approval.json).
++[Pacote para revisão](../../../../../experiments/construction/011-video/review-package-01/README.md).
++Quatro binários459820128 bytes intactos;sem escolher LFS/externo ou alterar conteúdos.
++Revisão final não confirmada,integração pendente;bolt/história/pai abertos.
++LOCAL-03 não instalou runtime;sem staging/commits/push/fecho,IDs locais.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md b/memory-bank/intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md
+index 682f438..65e3aca 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md
+@@ -2,7 +2,7 @@
+ id: "002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao"
+ unit: "005-video"
+ intent: "001-ott-streaming"
+-status: "planned"
++status: "in-progress"
+ priority: "Must"
+ created: "2026-11-02T15:36:48Z"
+ source_tasks: ["TASK-020"]
+@@ -36,3 +36,17 @@ A tarefa normativa é [IMP-017](../../../../../../add.md#imp-017); o bolt só or
+ - Bolts anteriores: 009-arvores, 010-video.
+ - Responsável de origem: Fillmore; revisor: Denji.
+ - Gates: G-MEDIA.
++
++## Estado — Test/G-MEDIA técnicos aprovados,revisão final pendente
++
++Implement aprovado;Test técnico consolidado sobre os quatro ficheiros finais,
++manifesto/binários intactos:22687 JPEGs headless/sem avisos e16 fronteiras/negativos.
++[Test](../../../../../bolts/011-video/test-walkthrough.md).
++Manual Francisco13/7 etapas conferido,quatro conteúdos distintos;créditos B ilegíveis,
++C/D legíveis nas amostras. Test/G-MEDIA técnicos aprovados pelo utilizador com
++limitação B aceite;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030,
++sem presumir legibilidade ou licença de A. LOCAL-03/cópia posterior explícita.
++459820128 bytes de media considerados,sem escolha inferida de armazenamento.
++Revisão final/integração pendentes,história/pai/unidade em progresso;limitação B explícita.
++Não aprova atribuição adequada,legibilidade ou redistribuição.
++Sem Java/perfis/POM/fixtures/demo alterados,staging/commits/push/fecho.
+diff --git a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+index 00e201f..0653693 100644
+--- a/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
++++ b/memory-bank/intents/001-ott-streaming/units/005-video/unit-brief.md
+@@ -17,7 +17,10 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
+ 
+ Estado atual: in-progress; IMP-016/010-video/TASK-019 complete/DONE,integrado
+ localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrough.md).
+-Restantes histórias planned,sem início de outro IMP. PHASE-05 em progresso.
++IMP-017/011-video em Test,Implement aprovado,quatro media finais auditados;
++Test/G-MEDIA técnicos aprovados,manual Francisco13 cumprido com B ilegível,
++C/D legíveis nas amostras;distribuição aberta,restantes histórias planned.
++PHASE-05 em progresso,revisão final/integração pendentes,LOCAL-04/distribuição abertos.
+ Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji cumpridos.
+ Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
+ Somente codec entregue neste incremento; streaming/reprodução continuam futuros.
+diff --git a/memory-bank/project.yaml b/memory-bank/project.yaml
+index 8556f27..39102b0 100644
+--- a/memory-bank/project.yaml
++++ b/memory-bank/project.yaml
+@@ -17,9 +17,9 @@ architecture_source: add.md
+ specification_source: specs.md
+ 
+ phase_02_completed_at: 2026-11-12T10:46:24Z
+-current_bolt: null
+-current_stage: null
+-next_bolt: null
++current_bolt: "011-video"
++current_stage: "test"
++next_bolt: "011-video (Test/G-MEDIA tecnicos aprovados; revisao final e integracao pendentes)"
+ phase_04_status: "complete"
+ phase_04_started_at: 2026-11-17T15:29:06Z
+ 
+diff --git a/memory-bank/story-index.md b/memory-bank/story-index.md
+index fbd3ede..ee28921 100644
+--- a/memory-bank/story-index.md
++++ b/memory-bank/story-index.md
+@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
+ com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
+ registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
+ pelo utilizador e integração da versão revista em main;
+-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:18 histórias complete,0 in-progress e17 planned; bolts:18 complete,0 in-progress,17 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
++003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:18 histórias complete,1 in-progress e16 planned; bolts:18 complete,1 in-progress,16 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+ Intent ainda em construção.
+ 
+ ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
+@@ -128,7 +128,10 @@ em progresso,sem outro IMP iniciado,IDs locais/demo preservados,sem push.
+ 
+ ## 005-video/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md ✅ GENERATED
+ 
+-**Tarefa:** IMP-017. **Estado:** planned. **Bolt:** 011-video.
++**Tarefa:** IMP-017. **Estado:** in-progress,Test/G-MEDIA técnicos aprovados com B ilegível aceite;LOCAL-04/distribuição abertos. **Bolt:** 011-video.
++[Test](bolts/011-video/test-walkthrough.md):base e3d122a,quatro ficheiros finais/manifesto intactos,
++22687 JPEGs auditados+16 fronteiras/negativos;manual13 cumprido,B ilegível/C-D legíveis nas amostras;revisão final/integração pendentes.
++LOCAL-03 opção1 aprovada,distribuição aberta,sem alterações Java/perfis/demo.
+ **Ficheiro:** [002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao](intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md).
+ 
+ ## 005-video/007-ler-o-perfil-mjpeg-confirmado.md ✅ GENERATED
+diff --git a/memory-bank/bolts/011-video/implementation-plan.md b/memory-bank/bolts/011-video/implementation-plan.md
+new file mode 100644
+index 0000000..7360187
+--- /dev/null
++++ b/memory-bank/bolts/011-video/implementation-plan.md
+@@ -0,0 +1,224 @@
++---
++unit: "005-video"
++bolt: "011-video"
++stage: "plan"
++status: "complete"
++---
++# IMP-017 — Plan: preparar quatro conteúdos distintos
++
++Plan aprovado pelo utilizador,incluindo seleção/parâmetros e LOCAL-03 opção1.
++Implement autorizado para obtenção/preparação dos quatro conteúdos e manifesto real;
++Implement aprovado e Test autorizado posteriormente. Sem alterações Java/perfis/POM/fixtures/demo,staging/commits/push.
++Base e HEAD e3d122a77257bf3c5c7489de06a34bad7af31fba,ramo main,estado inicial limpo.
++IDs apenas IMP-017-LOCAL; nenhum Q-C global reservado. DEMO-001 é apoio separado.
++
++## 1. Fontes,dependências e fronteira
++
++[ADD](../../../add.md),secções2/5/6/8–12/IMP-017; [specs](../../../specs.md),
++[intent](../../intents/001-ott-streaming/requirements.md),
++[unidade](../../intents/001-ott-streaming/units/005-video/unit-brief.md),
++[história](../../intents/001-ott-streaming/units/005-video/stories/002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao.md),
++[TASK-020 parte A](../../../docs/tasks/PHASE-05/TASK-020.md),
++[contrato7/perfis](../../../docs/07-API-AND-INTERFACES.md),
++[testes](../../../docs/09-TESTING-STRATEGY.md),[DoD](../../../docs/14-DEFINITION-OF-DONE.md),
++[revisão histórica V-002](../../../experiments/task-002-contract-review.md).
++
++IMP-015/009-arvores e IMP-016/010-video complete; histórias implemented=true,
++TASK-018/019 DONE,integrados na base. IMP-016 tem integração72c9f92 e fecho f283a98.
++Os1537 testes daquele incremento são históricos,não resultados desta etapa.
++Unidade004/PHASE-04 complete; unidade005/PHASE-05 em progresso.
++
++Reutilizar ADR-006/009/021/024; preservar ADR-026,sem nova ADR/dependência runtime.
++IMP-017 entrega dados/proveniência,**não** VideoSource,StreamingServer,pacing,
++procura,UDP,Swing ou leitor da parte B. TASK-020 composta só fecha após A/B/C,
++critérios do pai,revisão e integração. VideoSource.java/StreamingServer.java reais
++continuam placeholders de0 bytes; não os preencher neste bolt.
++
++## 2. Inspeção real e G-MEDIA
++
++[Inventário local](../../../experiments/construction/011-video/plan-01/local-availability.json):
++media/ e experiments/media/manifest.json ausentes. Busca no repositório,incluindo
++ficheiros ignorados,não encontrou vídeos; só três PNG documentais do enunciado,
++que não são conteúdos substitutos. /private/tmp/esr-task002* ausente. FFmpeg e
++ffprobe não encontrados no PATH; JDK21/java.desktop disponível no ambiente.
++Não se presume ferramenta offline instalada por existir o plano.
++
++[Consultas atuais](../../../experiments/construction/011-video/plan-01/remote-availability.json):
++HEAD200 para A/B/C/D,zero bytes de corpo de media descarregados. Não confirma
++integridade,formato,hash,JPEGs ou licença do objeto remoto. GET200 apenas nas três
++páginas textuais oficiais de condições. Falha DNS da sandbox/web reader402
++registadas; consulta autorizada fora da sandbox teve êxito.
++
++**G-MEDIA aberto:** quatro ficheiros compatíveis ainda não preparados/validados.
++A disponibilidade remota permite planear obtenção futura,mas não fecha o gate.
++Não pedir ao utilizador ficheiros que continuam acessíveis remotamente sem primeiro
++usar esta evidência. Se uma fonte falhar posteriormente,preservar negativo e
++manter o gate aberto; continuar trabalho independente autorizado,sem fingir media.
++G-MEDIA-DISTRIBUTION pertence à TASK-030: pendência de redistribuição explicitada,
++não confundida com teste de formato ou licença automaticamente atribuída a A.
++
++## 3. Seleção proposta: quatro obras distintas,duas por origem
++
++Usar UUID/associações já presentes em streams-s1.properties/streams-s2.properties;
++nenhuma mudança de configuração autorizada aqui. FPS10 abaixo é configuração
++existente/proposta de preparação,não FPS medido nem obrigação do PDF.
++
++| Alias/origem/UUID | Conteúdo/proveniência | Saída proposta | FPS de configuração |
++|---|---|---|---:|
++| A/S1/00000000-0000-4000-8000-000000000001 | movie.Mjpeg,arquivo docente ProgEx,entrada ProgEx/Java/movie.Mjpeg | a.Mjpeg |10|
++| B/S1/00000000-0000-4000-8000-000000000002 | Big Buck Bunny,Blender Foundation/Peach | b.Mjpeg |10|
++| C/S2/00000000-0000-4000-8000-000000000003 | Sintel,Blender Foundation/Durian | c.Mjpeg |10|
++| D/S2/00000000-0000-4000-8000-000000000004 | Tears of Steel,Blender Institute/Mango | d.Mjpeg |10|
++
++Fontes atuais para obtenção futura,sem obtenção de media nesta etapa:
++
++- A:[ProgEx.zip](https://www.di.uminho.pt/~flavio/ESR/ProgEx.zip).
++- B:[arquivo MP4](https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4.zip).
++- C:[arquivo MKV](https://download.blender.org/durian/movies/Sintel.2010.720p.mkv.zip).
++- D:[MOV](https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov).
++
++A tem referências **históricas** da V-002: ZIP SHA-256
++fbee4b0a654cbc98b7350e41fbb6bddb1a043d5ac31caea7d2667a47b689be0d;
++movie.Mjpeg SHA-256 ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca,
++500 registos,384×288 na primeira imagem inspecionada. Reobtenção futura tem de
++comparar os bytes; hash diferente exige registar versão/impacto e revisão,
++sem substituir o expected histórico. Todas as cópias idênticas do ZIP contam só A.
++A autoria/licença audiovisual específica de A não foi indicada no ZIP histórico;
++não inventar autorização de redistribuição. Obter/confirmar condições ou discutir
++substituição explícita antes da entrega; nenhuma substituição aplicada neste Plan.
++
++[B:condições oficiais](https://peach.blender.org/about/),
++[C:condições oficiais](https://durian.blender.org/sharing/),
++[D:condições oficiais](https://mango.blender.org/about/) declaram CC BY3.0 e exigem
++atribuição; há exclusões referidas nos sites,como marcas/logótipos. Preservar
++créditos completos das obras e registar atribuição/links/transformações; não
++atribuir a mesma licença ao ZIP docente. Para C/D,não remover o credit scroll.
++O plano usa filmes completos B/C/D,incluindo créditos,em vez de excertos que
++percam essa condição. A suficiência dos créditos da versão efetivamente preparada
++será verificada; a preparação não resolve por si só G-MEDIA-DISTRIBUTION.
++Páginas/headers datados e hashes da inspeção preservados em plan-01.
++
++## 4. Allowlist de implementação e preparação proposta
++
++Somente após autorização Implement:
++
++1 - Projeto/src/main/resources/media/a.Mjpeg.
++2 - Projeto/src/main/resources/media/b.Mjpeg.
++3 - Projeto/src/main/resources/media/c.Mjpeg.
++4 - Projeto/src/main/resources/media/d.Mjpeg.
++5 - experiments/media/manifest.json.
++
++Documentação/evidência do bolt é suporte de Construction. Não criar já media/,
++manifesto de recursos fictícios ou conteúdos sintéticos no lugar das quatro obras.
++Não alterar perfis,.java,POM,fixtures ou demo/. Ferramentas de auditoria offline
++poderão ser temporárias,com comandos/fontes/versões preservados como evidência;
++não são leitor de produção nem nova dependência runtime da aplicação.
++
++[PRESSUPOSTO proposto] A:preservar integralmente movie.Mjpeg se o hash histórico
++coincidir,sem reencodar. B/C/D:preservar toda a duração/créditos; preparar offline
++com FPS10,aspect ratio conservado em canvas640×360,padding e SAR1,sem áudio no
++perfil JPEG. Configurar JPEG q5/yuvj420p como ponto de partida,registando versão e
++comando exatos. Não se garante à partida que os JPEG cabem em99999. Se excederem,
++parar a versão candidata e documentar parâmetros ajustados/revalidar tudo; nunca
++truncar JPEG,renomear MP4/MKV/MOV ou ampliar o prefixo silenciosamente.
++Formato de saída de ffmpeg MJPEG sem prefixos **não** serve como ficheiro final:
++empacotar cada JPEG com cinco dígitos ASCII de L,sem newline nem delimitador extra.
++Ferramenta offline/versão e parâmetros finais dependem de disponibilização futura,
++sem instalar ou executar conversão nesta etapa. Não há hash ou duração preparados.
++
++## 5. Contrato de manifesto proposto
++
++Manifesto deve separar valores históricos,solicitados e medidos; valores ainda
++não obtidos ficam null/com estado pending,nunca hashes ou métricas plausíveis.
++Campos por entrada:
++
++- alias,streamId,serverId,title;destinationPath e runtimePathStatus (LOCAL-03).
++- source URL,publicador/autoria,container/entrada ZIP,versão,data real de obtenção,
++  SHA-256 do download e da fonte extraída;expectedHistoricalHash separado.
++- licença declarada/URL,página consultada/data/hash,atribuição,créditos preservados,
++  transformações,restrições/incertezas e redistributionStatus/G-MEDIA-DISTRIBUTION.
++- ferramenta/versão,comando,segmento completo,scale/pad/SAR/pixel format/qualidade,
++  fps solicitado e de configuração;fps original apenas se inspecionado.
++- saída SHA-256,tamanho,registos/dimensões,min/max JPEG;FPS de reprodução medido
++  fica ausente/pending,pois ficheiro sem timestamps não o prova.
++- inventário por registo:index,offset do prefixo,prefixo,L,hash JPEG,dimensões,
++  resultado de decode e digest de pixels se usado;resumos de duplicação/comparação.
++- audit command,JDK21/headless,exit/logs/limites,estado V-020-A e G-MEDIA;
++  timestamp só da execução real. Ficheiros/relatórios referidos devem existir.
++
++Não alterar streams-s1/s2 para afirmar associação entregue: manifest liga A/B a
++S1 e C/D a S2; execução real dessas origens pertence à integração posterior.
++
++## 6. V-020-A — oráculos planeados,não executados
++
++1 - Inventário:quatro caminhos/UUID/títulos e associação2+2;ficheiros legíveis e
++    não vazios;origem/hash/condições/preparação/FPS registados sem placeholders de sucesso.
++2 - Varredura completa de **todos** os registos:EOF limpo só antes do próximo
++    prefixo;ler cinco bytes exatos,ASCII0..9;validar1≤L≤99999 antes de reservar
++    payload;ler exatamente L;próximo prefixo logo a seguir. Proibir bytes sobrantes.
++3 - Auditor independente do futuro VideoSource:offsets/aritmética/hash prefixos
++    e SOI/EOI;ImageIO/JDK21 com java.awt.headless=true em cada JPEG,sem GUI.
++    Ler dimensões via ImageReader antes de alocar imagem e comparar aos limites
++    declarados por ativo (A:reconfirmar384×288;B/C/D:canvas proposto640×360).
++    Descodificar um frame de cada vez,imagem não nula/dimensões consistentes,
++    dispose/close dos readers/streams;sem carregar o filme inteiro em memória.
++4 - Fronteiras/negativos em buffers temporários:prefixo de1..4 bytes,truncatura
++    de payload,não decimal,sinal/espaço/newline,L00000,99999 permitido **quanto
++    ao framing** apenas se JPEG válido,100000 não representável no perfil,
++    JPEG inválido/EOI ausente/lixo final,EOF entre registos versus truncatura.
++    Limite de formato não promete que qualquer JPEG sintético de99999 seja válido.
++    Não modificar recursos reais para fabricar negativos;guardar evidência temporária.
++5 - Limites físicos:payload de auditor≤99999,um registo/imagem de cada vez;
++    dimensões validadas antes do decode. Os testes UDP de2MiB/1847 pertencem ao
++    codec fechado;não alargar o perfil cinco-dígitos para caber nesses testes.
++6 - Distinção:comparar hashes dos quatro ficheiros/fontes/sequências de JPEG;
++    cópias byte-idênticas falham. Hash diferente não prova conteúdo distinto:
++    combinar proveniência das quatro obras e inspeção de frames representativos
++    (início/meio/fim/ação/créditos),pixels/sequências para detetar mera reencodificação
++    ou corte da mesma obra. Não aceitar quatro aliases/UUID do mesmo vídeo.
++    Repetição de frames dentro de uma obra não é por si um erro (cenas estáticas).
++7 - Conferir créditos/identificação visual em revisão humana,sem declarar reprodução
++    Swing/CORE;headless comprova decode, não apresentação ou metas de FPS.
++8 - Recalcular manifesto/hashes e ligar logs/inventário completo. Só fechar G-MEDIA
++    após quatro conteúdos preparados,distintos e integralmente validados. Test/revisão
++    Denji/integração/DoD necessários ao fecho;parte A não fecha TASK-020 nem a fase.
++
++Sem executar Java,JUnit,Maven,ffmpeg,decode de media,V-020-A ou manual neste Plan.
++A única validação executável prevista aqui é V-ADD/documentos/preservação.
++
++## 7. Dúvidas locais e decisões pendentes
++
++- IMP-017-LOCAL-01 — disponibilidade:ausência local confirmada,HEAD200 dos quatro
++  endpoints não é media pronta. G-MEDIA aberto;obtenção/preparação só após aprovação
++  Implement. Se acesso falhar,reusar cache legitimamente disponível ou pedir fonte
++  equivalente/autorização após identificar a falha,nunca substituir silenciosamente.
++- IMP-017-LOCAL-02 — condições/versão: A sem licença audiovisual específica conhecida;
++  B/C/D declarações oficiais e créditos a preservar. G-MEDIA-DISTRIBUTION continua
++  na TASK-030,com condições da versão efetivamente usada por verificar. Não inventar
++  permissões,nem impor novo gate global de Plan por isso.
++- IMP-017-LOCAL-03 — composição de paths:ConfigurationLoader resolve media.base
++  relativo ao ficheiro de perfil. Os dois server-*.properties atuais usam
++  ../../../../media,que aponta para Projeto/media;allowlist pede resources/media.
++  **Nenhuma configuração/Java alterada.** Opções para decisão:
++  1. Recomendada:manter os cinco caminhos de outputs deste IMP;documentar instalação
++     por cópia com hash em Projeto/media na composição/validação posterior. Não
++     anunciar disponibilidade automática dos perfis atuais neste IMP de preparação.
++  2. Autorizar futuramente exceção mínima de dois perfis server-1/2.properties,
++     mudando media.base para ../media,e respetiva validação;exige scope explícito,
++     fora deste Plan autorizado. Não aplicar por inferência.
++- [PRESSUPOSTO menor] FPS10 é reaproveitado da configuração;canvas/qualidade propostos
++  são parâmetros offline revistos pela validação,não regras do enunciado ou wire.
++
++## 8. Checkpoint
++
++Apresentar Plan,estado G-MEDIA,dúvidas/diffs/preservação e parar para aprovação.
++Plan não marcado complete,stages_completed=[];Implement/Test não autorizados.
++Sem media preparado/download/conversão,sem alterações Java/staging/commits/push.
++Preservar demo e incrementos fechados,sem reabrir TASK-001–005 ou IMP-016.
++
++## Aprovação e execução posterior
++
++Utilizador aprovou Plan e LOCAL-03 opção1;manter cinco outputs,com cópia/hashes para
++Projeto/media só em composição posterior. Configurações não alteradas,nem perfis
++anunciados prontos. Implement executado;ver implementation-walkthrough e manifesto.
++Este Plan mantém inspeções/propostas originais como histórico do checkpoint.
+diff --git a/memory-bank/bolts/011-video/implementation-walkthrough.md b/memory-bank/bolts/011-video/implementation-walkthrough.md
+new file mode 100644
+index 0000000..56dfc34
+--- /dev/null
++++ b/memory-bank/bolts/011-video/implementation-walkthrough.md
+@@ -0,0 +1,72 @@
++---
++unit: "005-video"
++bolt: "011-video"
++stage: "implement"
++status: "complete"
++---
++# IMP-017 — Implement: quatro conteúdos e manifesto real
++
++## Resumo e estrutura
++
++Plan aprovado,LOCAL-03 opção1 e parâmetros autorizados. Quatro obras preparadas,
++duas por origem,nos cinco outputs previstos. Implement aprovado pelo utilizador;Test autorizado posteriormente.
++
++- [x] media/a.Mjpeg:movie.Mjpeg docente,4269893 bytes/500 frames,hash histórico preservado;sem reencodar.
++- [x] media/b.Mjpeg:Big Buck Bunny,111255866 bytes/5965 frames,filme completo/resampling10fps.
++- [x] media/c.Mjpeg:Sintel,167319819 bytes/8880 frames,filme completo/resampling10fps.
++- [x] media/d.Mjpeg:Tears of Steel,176974550 bytes/7342 frames,filme completo/resampling10fps.
++- [x] experiments/media/manifest.json:proveniência,condições,parâmetros,hashes,associações e auditorias reais.
++
++Os caminhos media/ acima são relativos a Projeto/src/main/resources/.
++Não houve alteração de código de produção/testes Java,perfis,POM,fixtures ou demo.
++Ferramenta FFmpeg isolada em pasta temporária,não instalação runtime/sistema.
++O auditor é independente e temporário;fonte textual preservada como evidência,
++sem implementar VideoSource ou criar classes sob Projeto/src.
++
++## Decisões,proveniência e limites
++
++A/ZIP e membro coincidem com hashes históricos; nenhuma divergência aceite.
++B/C/D completos e créditos presentes,aspect ratio preservado em640×360,SAR1,
++JPEG q5/yuvj420p,FPS10 do filtro/configuração. Sem início/fim aparado;resampling
++não preserva cada frame original. Sem áudio neste perfil de vídeo.
++Framing cinco dígitos ASCII+JPEG,sem separadores. Nenhum JPEG acima de99999;
++cap UDP2MiB não altera este perfil. Não houve truncagem ou ajuste de qualidade.
++Fontes originais/ferramenta mantidas no cache temporário e hashes de proveniência
++registados. Fontes/URLs e comandos exatos no manifesto/evidência.
++
++G-MEDIA:evidência técnica cumprida para revisão de Implement. Não é aprovação
++Test/manual/revisão final humana. G-MEDIA-DISTRIBUTION aberto:A sem licença
++audiovisual específica conhecida;B/C/D páginas oficiais declaram CC BY3.0,
++créditos/transformações registados,versão final ainda sujeita a revisão na TASK-030.
++Texto dos créditos é pequeno na edição320×180 original de B;upscale não cria
++detalhe perdido. Não se afirma aprovação humana de legibilidade ou redistribuição.
++
++LOCAL-03 opção1 mantida:outputs em resources/media;perfis continuam a resolver
++Projeto/media. Cópia futura deve comparar hashes. Não instalada a pasta runtime
++nem anunciados os perfis atuais como disponíveis. Parte A não fecha TASK-020.
++
++## Resultados reais e evidência
++
++22687/22687 JPEGs descodificados com ImageIO/JDK21 headless,sem avisos. Inventário
++por registo com offset/prefixo/tamanho/hash JPEG/hash pixels/dimensões/decoder.
++16/16 casos independentes de fronteira/erro do auditor passaram,incluindo JPEG
++válido de99999 bytes e EOF limpo/truncaturas;recursos reais não foram alterados.
++Hashes de ficheiros e sequências de pixels distintos em seis pares. Amostras
++visuais de conteúdo e créditos inspecionadas pelo agente;não substitui manual/revisão humana.
++[Manifesto](../../../experiments/media/manifest.json),
++[evidência/hashes/comandos](../../../experiments/construction/011-video/implement-01/README.md).
++
++Falha inicial de obtenção da ferramenta por urllib/certificado registada;
++recuperação via curl sem desativar TLS,com SHA do wheel verificado no PyPI.
++Todos os downloads de media terminaram com exit0;sem executar programas do ZIP docente.
++V-ADD documental executado;sem Maven ou regressão Java nova por não haver mudança
++Java.1537 testes anteriores são históricos,não resultado deste incremento de dados.
++Sem desvio funcional do Plan ou dependências runtime novas.
++
++## Pendências
++
++Implement aprovado;Test com auditoria técnica consolidada no test-walkthrough.
++Manual humano Francisco13/7 etapas cumprido e conferido,com créditos B ilegíveis
++e C/D legíveis nas amostras. Test/G-MEDIA técnicos aprovados com limitação B aceite;LOCAL-04/distribuição abertos.
++Revisão final e integração pendentes. Unidade/fase/pai em progresso. IDS locais,demo e incrementos
++fechados preservados. Sem staging,commits,push ou fecho.
+diff --git a/memory-bank/bolts/011-video/test-walkthrough.md b/memory-bank/bolts/011-video/test-walkthrough.md
+new file mode 100644
+index 0000000..30f957e
+--- /dev/null
++++ b/memory-bank/bolts/011-video/test-walkthrough.md
+@@ -0,0 +1,90 @@
++---
++unit: "005-video"
++bolt: "011-video"
++stage: "test"
++status: "complete"
++---
++# IMP-017 — Checkpoint Test: Test/G-MEDIA técnicos aprovados,LOCAL-04 aberto
++
++## Construção fixada e resultados reais
++
++Implement aprovado;Test autorizado. Reexecução sobre os quatro ficheiros finais,
++sem reobtenção/conversão/alteração de binários ou do manifesto de media.
++**22687/22687 JPEGs** descodificados com ImageIO/JDK21 headless,sem avisos;
++**16/16** casos de fronteira/erro passaram;6 pares de ficheiros/sequências de pixels
++distintos. Inventários Test coincidem byte a byte com os de Implement.
++[Consolidação/logs/inventários](../../../experiments/construction/011-video/test-01/README.md),
++[manifesto aprovado preservado](../../../experiments/media/manifest.json).
++
++| Alias/origem | Registos | Bytes | JPEG min..max |
++|---|---:|---:|---:|
++| A/S1 |500|4269893|4970..13967|
++| B/S1 |5965|111255866|1602..41769|
++| C/S2 |8880|167319819|1602..66091|
++| D/S2 |7342|176974550|1938..56322|
++
++Total459820128 bytes. A coincide com hash histórico,sem reencodar. B/C/D completos,
++créditos retidos,640×360/FPS10/q5 da preparação;nenhum FPS de reprodução medido.
++Manifesto é o snapshot aprovado em Implement e fica byte-idêntico;os campos de
++estado históricos nele não são reescritos para aparentar aprovações posteriores.
++O estado corrente é documentado aqui e na consolidação Test.
++
++## V-020-A
++
++- [x] Associação A/B→S1,C/D→S2,quatro outputs e hashes/manifesto/proveniência conferidos.
++- [x] Todos os prefixos de cinco bytes ASCII,L1..99999,payloads/offsets/EOF/bytes totais conferidos.
++- [x] JPEGs com estrutura integral,dimensões limitadas antes de ImageIO,descodificação um frame de cada vez,readers/streams libertados.
++- [x] Fronteiras:JPEG válido99999,EOF limpo entre registos,truncaturas,não decimal,zero,corrupto,bytes extra e seis dígitos rejeitados.
++- [x] Seis comparações de hash de ficheiro e sequência de pixels,proveniência distinta e amostras visuais do agente em Implement.
++- [x] Confirmação visual humana de quatro conteúdos e créditos;B ilegível,C/D legíveis nas amostras,limitação registada.
++- [x] Test/G-MEDIA aprovados no âmbito técnico pelo utilizador,aceitando a limitação conhecida B sem aprovar legibilidade/atribuição/redistribuição.
++
++99999 é limite do perfil de ficheiro,não o cap UDP2MiB do codec fechado.
++Testes/inventários independentes do futuro VideoSource;sem alterar/implementar Java
++sob Projeto/src. Classes do auditor compiladas apenas em pasta temporária.
++Não executar Maven por inferência para dados sem alteração Java;1537 testes de
++IMP-016 são históricos,não contagem atual de V-020-A ou nova regressão.
++
++## Manual humano e gates
++
++[Manual humano conferido](../../../experiments/construction/011-video/manual-verification-01/README.md):
++Francisco confirmou execução pessoal,13 checks/7 etapas,quatro conteúdos distintos,
++WRAPPER_EXIT=0/PASSED=true. SHELL_EXIT=0 confirmado pelo utilizador,não pelo log.
++Tentativa completa20261124T153130Z-fdf1c313 e parcial20261124T152418Z-403a6f63
++preservadas com HTML/imagens/logs originais. Parcial:9 checks/3 etapas,nota vazia,
++WRAPPER_EXIT=1/PASSED=false;não equivale a aprovação nem foi apagada.
++
++**B:créditos presentes mas ilegíveis**,nota «nao dava para ler as letras».
++C/D legíveis nas amostras,sem inferir legibilidade de todo o texto/filme.
++MANUAL_PASS conclui o guião de inspeção,não aprova legibilidade ou redistribuição.
++[Avaliação LOCAL-04 e opções não aplicadas](../../../experiments/construction/011-video/manual-verification-01/B-readability-assessment.md):
++V-020-A técnico e distinção dos conteúdos demonstrados;ADD não fixa limiar de letras
++para esse oráculo,mas a limitação de créditos fica explícita para decisão humana
++e G-MEDIA-DISTRIBUTION/TASK-030. Não se presume atribuição adequada por mera presença.
++Recomendado manter a versão/hashes para aprovação técnica com limitação conhecida,
++tratando créditos/condições finais na TASK-030. Se for exigida correção no vídeo,
++propor edição de B adequada e nova validação/manual/revisão,sem alterar por inferência.
++
++**Test e G-MEDIA aprovados no âmbito técnico**,com limitação B explicitamente aceite pelo utilizador.
++[Confirmação/hash](../../../experiments/construction/011-video/review-package-01/technical-approval.json).
++LOCAL-04 permanece aberto para TASK-030;legibilidade/atribuição/redistribuição não aprovadas.
++G-MEDIA-DISTRIBUTION aberto,A sem licença audiovisual específica conhecida;
++revisão final/integração pendentes. Sem novo build/auditoria/manual:media e manifesto
++não mudaram. LOCAL-03 opção1:cópia/hash para Projeto/media posterior,não instalada;
++perfis atuais não são anunciados como prontos.
++
++## Volume e integração posterior
++
++[Plano do volume real](../../../experiments/construction/011-video/test-01/integration-size-plan.md):
++considerar459820128 bytes de media mais documentação/evidência. Nenhuma escolha
++Git LFS,armazenamento externo,ponteiros ou alteração de conteúdos por inferência.
++Revisão final e integração pendentes;nenhum staging/commit/push/fecho.
++Parte A não fecha TASK-020 inteira nem as partes B/C. Unidade/fase em progresso.
++V-ADD/documentos e preservação ligados na evidência. IDs locais,demo e incrementos
++fechados intactos;sem alterações de binários,manifesto,Java,perfis,POM ou fixtures.
++
++## Pacote para revisão final e integração
++
++[Resumo/diffs/allowlist/plano](../../../experiments/construction/011-video/review-package-01/README.md).
++Revisão final ainda não confirmada,integração pendente;bolt e TASK-020 pai abertos.
++Limites de publicação dos binários registados,sem escolher LFS/externo/modificar dados.
+diff --git a/experiments/media/manifest.json b/experiments/media/manifest.json
+new file mode 100644
+index 0000000..9a240fc
+--- /dev/null
++++ b/experiments/media/manifest.json
+@@ -0,0 +1,558 @@
++{
++  "schema_version": 1,
++  "recorded_at": "2026-11-24T14:36:20.586774+00:00",
++  "IMP": "IMP-017",
++  "bolt": "011-video",
++  "unit": "005-video",
++  "base": "e3d122a77257bf3c5c7489de06a34bad7af31fba",
++  "stage": "Implement;pending acceptance,Test not authorized",
++  "profile": {
++    "prefix": "exactly5 ASCII decimal digits,zero padded,no delimiters",
++    "length_range": [
++      1,
++      99999
++    ],
++    "payload": "exactlyL JPEG bytes",
++    "EOF": "clean only between records",
++    "FPS": "external configuration,not stored in file",
++    "UDP_cap_bytes": 2097152,
++    "UDP_cap_note": "Separate immutable OTT1 protocol cap;does not enlarge the file profile"
++  },
++  "G_MEDIA": {
++    "technical_evidence": "complete:4 prepared distinct files,all22687 JPEGs decoded and16 boundary/negative cases passed",
++    "checkpoint_acceptance": "pending Implement review"
++  },
++  "G_MEDIA_DISTRIBUTION": {
++    "status": "open",
++    "reason": "No final redistribution clearance inferred;A license unknown,all final credits/conditions reserved TASK-030"
++  },
++  "runtime_copy_plan": "LOCAL03 option1 approved:later copy to Projeto/media and compare SHA256 with this manifest;profiles unchanged,no runtime availability claimed",
++  "distinctness_evidence": "experiments/construction/011-video/implement-01/distinctness.json",
++  "negative_evidence": "experiments/construction/011-video/implement-01/negative-results.json",
++  "entries": [
++    {
++      "alias": "A",
++      "server_id": "S1",
++      "stream_id": "00000000-0000-4000-8000-000000000001",
++      "title": "movie.Mjpeg (teaching resource)",
++      "destination_path": "Projeto/src/main/resources/media/a.Mjpeg",
++      "configured_runtime_path": "Projeto/media/a.Mjpeg",
++      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
++      "source": {
++        "url": "https://www.di.uminho.pt/~flavio/ESR/ProgEx.zip",
++        "download_sha256": "fbee4b0a654cbc98b7350e41fbb6bddb1a043d5ac31caea7d2667a47b689be0d",
++        "download_bytes": 10403290,
++        "obtained_at": "2026-11-24T14:28:36.400456+00:00",
++        "download_evidence": "experiments/construction/011-video/implement-01/A-download.json",
++        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/A.zip",
++        "zip_member": "ProgEx/Java/movie.Mjpeg",
++        "extracted_source_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
++        "expected_historical_archive_sha256": "fbee4b0a654cbc98b7350e41fbb6bddb1a043d5ac31caea7d2667a47b689be0d",
++        "expected_historical_member_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
++        "historical_hashes_match": true
++      },
++      "rights": {
++        "author_or_publisher": null,
++        "declared_license": null,
++        "declaration_page": null,
++        "declaration_snapshot": null,
++        "declaration_sha256": null,
++        "credits_policy": "No audiovisual author/license specified in historical archive; no license or redistribution permission inferred.",
++        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
++        "G_MEDIA_DISTRIBUTION": "open/not approved"
++      },
++      "preparation": {
++        "reencoded": false,
++        "parameters": {
++          "method": "byte-preserving extraction of confirmed ZIP member",
++          "no_reencode": true
++        },
++        "command": null,
++        "evidence": "experiments/construction/011-video/implement-01/A-preservation.json",
++        "tool": "Python zipfile;no example archive program executed"
++      },
++      "fps": {
++        "configuration": 10,
++        "preparation_requested": null,
++        "original_media_metadata": null,
++        "playback_measured": null
++      },
++      "output": {
++        "sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
++        "bytes": 4269893,
++        "frames": 500,
++        "dimensions": [
++          384,
++          288
++        ],
++        "min_jpeg": 4970,
++        "max_jpeg": 13967,
++        "duration_at_configured_fps_seconds": 50.0,
++        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
++      },
++      "audit": {
++        "status": "passed independent incremental audit in Implement;not Test approval",
++        "headless": true,
++        "JDK": "21",
++        "records": "experiments/construction/011-video/implement-01/A-frames.jsonl",
++        "records_sha256": "de8ee400ba251c009d63c67ebe86d3596cfb69f9803513e52458a31bd26421a3",
++        "result": {
++          "file": "Projeto/src/main/resources/media/a.Mjpeg",
++          "frames": 500,
++          "bytes": 4269893,
++          "min_jpeg": 4970,
++          "max_jpeg": 13967,
++          "sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
++          "jpeg_sequence_sha256": "5024de32480d9f4f5916f877cda30d9e61522d9dd6e4434029670d4016c20e15",
++          "pixels_sequence_sha256": "c8be5fd73333969cab2da64e897310b1f3210bf8ea61f7262f40f0d792f78783",
++          "headless": true,
++          "status": "passed"
++        },
++        "command_evidence": "experiments/construction/011-video/implement-01/A-audit-command.json"
++      },
++      "visual_witnesses": [
++        {
++          "alias": "A",
++          "kind": "content",
++          "frame_index": 250,
++          "jpeg_sha256": "f963713aaca3cabf1c1b812c904501545e284d31e5a2285acaf6a526cb4b054c",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/A-preview.jpg",
++          "observation": "Live-action interior with people; no audiovisual authorship inferred.",
++          "reviewer": "agent visual inspection; not final human review"
++        }
++      ]
++    },
++    {
++      "alias": "B",
++      "server_id": "S1",
++      "stream_id": "00000000-0000-4000-8000-000000000002",
++      "title": "Big Buck Bunny",
++      "destination_path": "Projeto/src/main/resources/media/b.Mjpeg",
++      "configured_runtime_path": "Projeto/media/b.Mjpeg",
++      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
++      "source": {
++        "url": "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4.zip",
++        "download_sha256": "109e3ede8790bd633f374ca311d9cc61dce8d7f98f5b0797ca98199c9fbceedf",
++        "download_bytes": 64657225,
++        "obtained_at": "2026-11-24T14:29:07.732509+00:00",
++        "download_evidence": "experiments/construction/011-video/implement-01/B-download.json",
++        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B.zip",
++        "zip_member": "BigBuckBunny_320x180.mp4",
++        "extracted_source_sha256": "f78f39603e6774907f2faafabf26a667f4a6fc31769ec304a8a8f7c62d280508"
++      },
++      "rights": {
++        "author_or_publisher": "Blender Foundation / Peach",
++        "declared_license": "CC-BY-3.0",
++        "declaration_page": "https://peach.blender.org/about/",
++        "declaration_snapshot": "experiments/construction/011-video/plan-01/B-rights.html",
++        "declaration_sha256": "bd9eb73ddec647bbb486c47316163042a9655a8483358c093121341d0dc080cf",
++        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
++        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
++        "G_MEDIA_DISTRIBUTION": "open/not approved"
++      },
++      "preparation": {
++        "reencoded": true,
++        "parameters": {
++          "full_video": true,
++          "credits_not_trimmed": true,
++          "fps_requested": 10,
++          "canvas": [
++            640,
++            360
++          ],
++          "aspect_ratio_preserved": true,
++          "SAR": "1:1",
++          "jpeg_q": 5,
++          "pixel_format": "yuvj420p",
++          "audio_in_profile": false
++        },
++        "command": [
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
++          "-nostdin",
++          "-hide_banner",
++          "-loglevel",
++          "info",
++          "-i",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B.mp4",
++          "-map",
++          "0:v:0",
++          "-vf",
++          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
++          "-an",
++          "-sn",
++          "-dn",
++          "-c:v",
++          "mjpeg",
++          "-q:v",
++          "5",
++          "-pix_fmt",
++          "yuvj420p",
++          "-threads",
++          "1",
++          "-progress",
++          "pipe:1",
++          "-nostats",
++          "-f",
++          "image2",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/%08d.jpg"
++        ],
++        "evidence": "experiments/construction/011-video/implement-01/B-preparation.json",
++        "tool": "experiments/construction/011-video/implement-01/tool.json"
++      },
++      "fps": {
++        "configuration": 10,
++        "preparation_requested": 10,
++        "original_media_metadata": {
++          "container_duration_line": "Duration: 00:09:56.46, start: 0.000000, bitrate: 867 kb/s",
++          "source_video_stream_line": "Stream #0:0[0x1](und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(progressive), 320x180 [SAR 1:1 DAR 16:9], 702 kb/s, 24 fps, 24 tbr, 24 tbn (default)",
++          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
++        },
++        "playback_measured": null
++      },
++      "output": {
++        "sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
++        "bytes": 111255866,
++        "frames": 5965,
++        "dimensions": [
++          640,
++          360
++        ],
++        "min_jpeg": 1602,
++        "max_jpeg": 41769,
++        "duration_at_configured_fps_seconds": 596.5,
++        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
++      },
++      "audit": {
++        "status": "passed independent incremental audit in Implement;not Test approval",
++        "headless": true,
++        "JDK": "21",
++        "records": "experiments/construction/011-video/implement-01/B-frames.jsonl",
++        "records_sha256": "edbb378392c7e73c878c176e672fa159a476d10f11a09f825d69fe565b26b265",
++        "result": {
++          "file": "Projeto/src/main/resources/media/b.Mjpeg",
++          "frames": 5965,
++          "bytes": 111255866,
++          "min_jpeg": 1602,
++          "max_jpeg": 41769,
++          "sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
++          "jpeg_sequence_sha256": "c9523812dba8431b0aec54e4d5157b9c406de921021f21e6a38ee3a1d94aa427",
++          "pixels_sequence_sha256": "b6bf0fd55c87493a483a35ab499295d75bfdfe189a74e2563c29649daa085685",
++          "headless": true,
++          "status": "passed"
++        },
++        "command_evidence": "experiments/construction/011-video/implement-01/B-audit-command.json"
++      },
++      "visual_witnesses": [
++        {
++          "alias": "B",
++          "kind": "content",
++          "frame_index": 2385,
++          "jpeg_sha256": "83777b776cb6f39257ad6ea623bce3219c1f1cfc75c6f6083360b712c18952cb",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/00002386.jpg",
++          "observation": "Animated rabbit in wooded scene; Big Buck Bunny source.",
++          "reviewer": "agent visual inspection; not final human review"
++        },
++        {
++          "alias": "B",
++          "kind": "credits",
++          "frame_index": 5606,
++          "jpeg_sha256": "e5e3802b784c4ff848b62aeb7f020ca8d8f33841e845942361429e377814d661",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/00005607.jpg",
++          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
++          "reviewer": "agent visual inspection; not human approval"
++        }
++      ]
++    },
++    {
++      "alias": "C",
++      "server_id": "S2",
++      "stream_id": "00000000-0000-4000-8000-000000000003",
++      "title": "Sintel",
++      "destination_path": "Projeto/src/main/resources/media/c.Mjpeg",
++      "configured_runtime_path": "Projeto/media/c.Mjpeg",
++      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
++      "source": {
++        "url": "https://download.blender.org/durian/movies/Sintel.2010.720p.mkv.zip",
++        "download_sha256": "d252f898641b20f51c64206f31063e659c28b152a9d988936736d1b56e6e4db3",
++        "download_bytes": 681285470,
++        "obtained_at": "2026-11-24T14:32:34.968212+00:00",
++        "download_evidence": "experiments/construction/011-video/implement-01/C-download.json",
++        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C.zip",
++        "zip_member": "Sintel.2010.720p.mkv",
++        "extracted_source_sha256": "f12c070e295b38cfc94ebd61ac3357c3bac82d1015985f1e8da93a4c6496c46d"
++      },
++      "rights": {
++        "author_or_publisher": "Blender Foundation / Durian",
++        "declared_license": "CC-BY-3.0",
++        "declaration_page": "https://durian.blender.org/sharing/",
++        "declaration_snapshot": "experiments/construction/011-video/plan-01/C-rights.html",
++        "declaration_sha256": "67f30f30c55022c6f7de66beb997f04117b24f7aca928a912286a53edaa4b627",
++        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
++        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
++        "G_MEDIA_DISTRIBUTION": "open/not approved"
++      },
++      "preparation": {
++        "reencoded": true,
++        "parameters": {
++          "full_video": true,
++          "credits_not_trimmed": true,
++          "fps_requested": 10,
++          "canvas": [
++            640,
++            360
++          ],
++          "aspect_ratio_preserved": true,
++          "SAR": "1:1",
++          "jpeg_q": 5,
++          "pixel_format": "yuvj420p",
++          "audio_in_profile": false
++        },
++        "command": [
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
++          "-nostdin",
++          "-hide_banner",
++          "-loglevel",
++          "info",
++          "-i",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C.mkv",
++          "-map",
++          "0:v:0",
++          "-vf",
++          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
++          "-an",
++          "-sn",
++          "-dn",
++          "-c:v",
++          "mjpeg",
++          "-q:v",
++          "5",
++          "-pix_fmt",
++          "yuvj420p",
++          "-threads",
++          "1",
++          "-progress",
++          "pipe:1",
++          "-nostats",
++          "-f",
++          "image2",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/%08d.jpg"
++        ],
++        "evidence": "experiments/construction/011-video/implement-01/C-preparation.json",
++        "tool": "experiments/construction/011-video/implement-01/tool.json"
++      },
++      "fps": {
++        "configuration": 10,
++        "preparation_requested": 10,
++        "original_media_metadata": {
++          "container_duration_line": "Duration: 00:14:48.03, start: 0.000000, bitrate: 6137 kb/s",
++          "source_video_stream_line": "Stream #0:0(eng): Video: h264 (High), yuv420p(tv, bt709/unknown/unknown, progressive), 1280x544, SAR 1:1 DAR 40:17, 24 fps, 24 tbr, 1k tbn",
++          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
++        },
++        "playback_measured": null
++      },
++      "output": {
++        "sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
++        "bytes": 167319819,
++        "frames": 8880,
++        "dimensions": [
++          640,
++          360
++        ],
++        "min_jpeg": 1602,
++        "max_jpeg": 66091,
++        "duration_at_configured_fps_seconds": 888.0,
++        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
++      },
++      "audit": {
++        "status": "passed independent incremental audit in Implement;not Test approval",
++        "headless": true,
++        "JDK": "21",
++        "records": "experiments/construction/011-video/implement-01/C-frames.jsonl",
++        "records_sha256": "9e337cc094b0b9842058d9e3088971b32fed70adc7ec99038b561b29f627a148",
++        "result": {
++          "file": "Projeto/src/main/resources/media/c.Mjpeg",
++          "frames": 8880,
++          "bytes": 167319819,
++          "min_jpeg": 1602,
++          "max_jpeg": 66091,
++          "sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
++          "jpeg_sequence_sha256": "5432d12849b3e018f7e8426d8173cbfc3ce3e85429ad9a8fd63fad0d3f054c67",
++          "pixels_sequence_sha256": "ed034324d0e4391de1d17ec8b050faac9a83c2c3ec900716c6fb9ed3a0fca407",
++          "headless": true,
++          "status": "passed"
++        },
++        "command_evidence": "experiments/construction/011-video/implement-01/C-audit-command.json"
++      },
++      "visual_witnesses": [
++        {
++          "alias": "C",
++          "kind": "content",
++          "frame_index": 3551,
++          "jpeg_sha256": "8dedb9a5651f77a3260a880bcfcbc92e92406dc33c6770d468f8e5975d84232e",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/00003552.jpg",
++          "observation": "Animated landscape/settlement; Sintel source.",
++          "reviewer": "agent visual inspection; not final human review"
++        },
++        {
++          "alias": "C",
++          "kind": "credits",
++          "frame_index": 8346,
++          "jpeg_sha256": "90c15ba3455f5fa370206e03547594d4fe37d21b3b7339c4cf9aefce1722a8ee",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/00008347.jpg",
++          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
++          "reviewer": "agent visual inspection; not human approval"
++        }
++      ]
++    },
++    {
++      "alias": "D",
++      "server_id": "S2",
++      "stream_id": "00000000-0000-4000-8000-000000000004",
++      "title": "Tears of Steel",
++      "destination_path": "Projeto/src/main/resources/media/d.Mjpeg",
++      "configured_runtime_path": "Projeto/media/d.Mjpeg",
++      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
++      "source": {
++        "url": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
++        "download_sha256": "efa9062d9cdb7a338e40ad530dfdf234806743f29ae6a1a136b97ece4e588e8f",
++        "download_bytes": 372178639,
++        "obtained_at": "2026-11-24T14:31:17.353469+00:00",
++        "download_evidence": "experiments/construction/011-video/implement-01/D-download.json",
++        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D.mov",
++        "zip_member": null,
++        "extracted_source_sha256": "efa9062d9cdb7a338e40ad530dfdf234806743f29ae6a1a136b97ece4e588e8f"
++      },
++      "rights": {
++        "author_or_publisher": "Blender Institute / Mango",
++        "declared_license": "CC-BY-3.0",
++        "declaration_page": "https://mango.blender.org/about/",
++        "declaration_snapshot": "experiments/construction/011-video/plan-01/D-rights.html",
++        "declaration_sha256": "1013fce4ca435c9a4f5c0cadb3d007a6c99b4ff665f2726099e439d967e956ae",
++        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
++        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
++        "G_MEDIA_DISTRIBUTION": "open/not approved"
++      },
++      "preparation": {
++        "reencoded": true,
++        "parameters": {
++          "full_video": true,
++          "credits_not_trimmed": true,
++          "fps_requested": 10,
++          "canvas": [
++            640,
++            360
++          ],
++          "aspect_ratio_preserved": true,
++          "SAR": "1:1",
++          "jpeg_q": 5,
++          "pixel_format": "yuvj420p",
++          "audio_in_profile": false
++        },
++        "command": [
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
++          "-nostdin",
++          "-hide_banner",
++          "-loglevel",
++          "info",
++          "-i",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D.mov",
++          "-map",
++          "0:v:0",
++          "-vf",
++          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
++          "-an",
++          "-sn",
++          "-dn",
++          "-c:v",
++          "mjpeg",
++          "-q:v",
++          "5",
++          "-pix_fmt",
++          "yuvj420p",
++          "-threads",
++          "1",
++          "-progress",
++          "pipe:1",
++          "-nostats",
++          "-f",
++          "image2",
++          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/%08d.jpg"
++        ],
++        "evidence": "experiments/construction/011-video/implement-01/D-preparation.json",
++        "tool": "experiments/construction/011-video/implement-01/tool.json"
++      },
++      "fps": {
++        "configuration": 10,
++        "preparation_requested": 10,
++        "original_media_metadata": {
++          "container_duration_line": "Duration: 00:12:14.17, start: 0.000000, bitrate: 4055 kb/s",
++          "source_video_stream_line": "Stream #0:0[0x1](eng): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 1280x534 [SAR 1:1 DAR 640:267], 3857 kb/s, 24 fps, 24 tbr, 24 tbn (default)",
++          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
++        },
++        "playback_measured": null
++      },
++      "output": {
++        "sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
++        "bytes": 176974550,
++        "frames": 7342,
++        "dimensions": [
++          640,
++          360
++        ],
++        "min_jpeg": 1938,
++        "max_jpeg": 56322,
++        "duration_at_configured_fps_seconds": 734.2,
++        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
++      },
++      "audit": {
++        "status": "passed independent incremental audit in Implement;not Test approval",
++        "headless": true,
++        "JDK": "21",
++        "records": "experiments/construction/011-video/implement-01/D-frames.jsonl",
++        "records_sha256": "381dcbff4d8fea38dce50af4058ca509de0142ba9da2355056669ede308fa343",
++        "result": {
++          "file": "Projeto/src/main/resources/media/d.Mjpeg",
++          "frames": 7342,
++          "bytes": 176974550,
++          "min_jpeg": 1938,
++          "max_jpeg": 56322,
++          "sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
++          "jpeg_sequence_sha256": "aa1623b8a1c74e9e8fb7d6c2033b0ce371180294795a8a1e76a7e8bc12182abf",
++          "pixels_sequence_sha256": "dcbb265ff3fc8668e660f227bbed38b3eb1aa64f366236c9188fa203cdb41ddf",
++          "headless": true,
++          "status": "passed"
++        },
++        "command_evidence": "experiments/construction/011-video/implement-01/D-audit-command.json"
++      },
++      "visual_witnesses": [
++        {
++          "alias": "D",
++          "kind": "content",
++          "frame_index": 2935,
++          "jpeg_sha256": "dfc6c71ce1d91818231caf6550eeef2afd743e402bf8d4fc4203c925fdda0af6",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/00002936.jpg",
++          "observation": "Live-action science-fiction characters/interior; Tears of Steel source.",
++          "reviewer": "agent visual inspection; not final human review"
++        },
++        {
++          "alias": "D",
++          "kind": "credits",
++          "frame_index": 6900,
++          "jpeg_sha256": "ff57e20fa34c0929c6d24bd359fe92a0c371aa635a3cc139f8851cb732693c7c",
++          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/00006901.jpg",
++          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
++          "reviewer": "agent visual inspection; not human approval"
++        }
++      ]
++    }
++  ],
++  "pending": [
++    "Implement checkpoint acceptance",
++    "Test authorization/consolidation",
++    "human manual/final review",
++    "integration"
++  ],
++  "TASK_020_parent": "not closed;partsB/C remain pending",
++  "files_ready_for_local_data_validation": true,
++  "application_streaming_ready": false
++}
+diff --git a/Projeto/src/main/resources/media/a.Mjpeg b/Projeto/src/main/resources/media/a.Mjpeg
+new file mode 100644
+index 0000000..f9ba2f7
+Binary files /dev/null and b/Projeto/src/main/resources/media/a.Mjpeg differ
+diff --git a/Projeto/src/main/resources/media/b.Mjpeg b/Projeto/src/main/resources/media/b.Mjpeg
+new file mode 100644
+index 0000000..f638214
+Binary files /dev/null and b/Projeto/src/main/resources/media/b.Mjpeg differ
+diff --git a/Projeto/src/main/resources/media/c.Mjpeg b/Projeto/src/main/resources/media/c.Mjpeg
+new file mode 100644
+index 0000000..dcff345
+Binary files /dev/null and b/Projeto/src/main/resources/media/c.Mjpeg differ
+diff --git a/Projeto/src/main/resources/media/d.Mjpeg b/Projeto/src/main/resources/media/d.Mjpeg
+new file mode 100644
+index 0000000..e51efc2
+Binary files /dev/null and b/Projeto/src/main/resources/media/d.Mjpeg differ

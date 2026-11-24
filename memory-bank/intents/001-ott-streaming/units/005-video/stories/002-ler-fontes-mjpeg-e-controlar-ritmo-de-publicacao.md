@@ -2,7 +2,7 @@
 id: "002-ler-fontes-mjpeg-e-controlar-ritmo-de-publicacao"
 unit: "005-video"
 intent: "001-ott-streaming"
-status: "planned"
+status: "in-progress"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-020"]
@@ -36,3 +36,23 @@ A tarefa normativa é [IMP-017](../../../../../../add.md#imp-017); o bolt só or
 - Bolts anteriores: 009-arvores, 010-video.
 - Responsável de origem: Fillmore; revisor: Denji.
 - Gates: G-MEDIA.
+
+## Estado — Test/G-MEDIA técnicos aprovados,revisão final pendente
+
+Implement aprovado;Test técnico consolidado sobre os quatro ficheiros finais,
+manifesto/binários intactos:22687 JPEGs headless/sem avisos e16 fronteiras/negativos.
+[Test](../../../../../bolts/011-video/test-walkthrough.md).
+Manual Francisco13/7 etapas conferido,quatro conteúdos distintos;créditos B ilegíveis,
+C/D legíveis nas amostras. Test/G-MEDIA técnicos aprovados pelo utilizador com
+limitação B aceite;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030,
+sem presumir legibilidade ou licença de A. LOCAL-03/cópia posterior explícita.
+459820128 bytes de media considerados,sem escolha inferida de armazenamento.
+Revisão final/integração pendentes,história/pai/unidade em progresso;limitação B explícita.
+Não aprova atribuição adequada,legibilidade ou redistribuição.
+Sem Java/perfis/POM/fixtures/demo alterados,staging/commits/push/fecho.
+
+Git LFS/exceção .gitattributes aprovados e aplicados apenas aos quatro media,
+sem alteração de conteúdo,Java/perfis/POM/fixtures/demo. Validação local materializa
+4/4 objetos com hashes aprovados;sem index/commits/uploads/push. Pacote distingue
+ponteiros Git de binários reais. Efeitos da tentativa Homebrew registados.
+Revisão final/integração/fecho e distribuição continuam pendentes.

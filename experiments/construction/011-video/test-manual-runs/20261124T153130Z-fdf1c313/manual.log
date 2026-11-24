@@ -1,0 +1,60 @@
+KIND=human OPERATOR=Francisco
+CHECK_PASS 1 manifesto aprovado intacto
+CHECK_PASS 2 hash A intacto
+CHECK_PASS 3 hash B intacto
+CHECK_PASS 4 hash C intacto
+CHECK_PASS 5 hash D intacto
+CHECK_PASS 6 amostras são bytes JPEG auditados,sem edição
+Abra no navegador,sem iniciar a aplicação OTT:
+open /Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/011-video/test-manual-runs/20261124T153130Z-fdf1c313/index.html
+Pode clicar nas imagens para inspeção à escala nativa. Browser é aberto pelo operador,não pelo runner.
+Inspecione conteúdo A/B. São identificáveis e diferentes? [sim/nao]
+ANSWER pair-A/B=sim
+Descreva brevemente o que observou em cada conteúdo:
+ANSWER description-A/B=no a vi uma mulher e no b um coelho
+OPERATOR_CONFIRM_STAGE=1
+CHECK_PASS 7 par A/B visualmente distinto por confirmação do operador
+Inspecione conteúdo C/D. São identificáveis e diferentes? [sim/nao]
+ANSWER pair-C/D=sim
+Descreva brevemente o que observou em cada conteúdo:
+ANSWER description-C/D=no c vi umamontanha e creditos no d vi uma construção e creditos
+OPERATOR_CONFIRM_STAGE=2
+CHECK_PASS 8 par C/D visualmente distinto por confirmação do operador
+Comparando A/B/C/D,há quatro conteúdos distintos,não aliases/cópias da mesma obra? [sim/nao]
+ANSWER four-distinct=sim
+OPERATOR_CONFIRM_STAGE=3
+CHECK_PASS 9 quatro conteúdos distintos confirmados pelo operador
+Inspecione a secção créditos B. Observou o credit scroll? [sim/nao]
+ANSWER credits-B=sim
+Legibilidade observada dos créditos B: [legivel/parcial/ilegivel]
+ANSWER readability-B=ilegivel
+Registe limites/divergências/detalhes observados (obrigatório;use sem divergencias se aplicável):
+ANSWER notes-B=nao dava para ler as letras
+OPERATOR_CONFIRM_STAGE=4
+CHECK_PASS 10 créditos B inspecionados;legibilidade registada ilegivel
+Inspecione a secção créditos C. Observou o credit scroll? [sim/nao]
+ANSWER credits-C=sim
+Legibilidade observada dos créditos C: [legivel/parcial/ilegivel]
+ANSWER readability-C=legivel
+Registe limites/divergências/detalhes observados (obrigatório;use sem divergencias se aplicável):
+ANSWER notes-C=normal
+OPERATOR_CONFIRM_STAGE=5
+CHECK_PASS 11 créditos C inspecionados;legibilidade registada legivel
+Inspecione a secção créditos D. Observou o credit scroll? [sim/nao]
+ANSWER credits-D=sim
+Legibilidade observada dos créditos D: [legivel/parcial/ilegivel]
+ANSWER readability-D=legivel
+Registe limites/divergências/detalhes observados (obrigatório;use sem divergencias se aplicável):
+ANSWER notes-D=normal
+OPERATOR_CONFIRM_STAGE=6
+CHECK_PASS 12 créditos D inspecionados;legibilidade registada legivel
+Confirma que A tem licença audiovisual por verificar,G-MEDIA-DISTRIBUTION continua aberto e LOCAL-03 não instalou Projeto/media? [confirmo]
+ANSWER limits=confirmo
+OPERATOR_CONFIRM_STAGE=7
+CHECK_PASS 13 limites/gates reconhecidos,sem aprovação de redistribuição
+MANUAL_PASS CHECKS=13
+PASSED=true
+WRAPPER_EXIT=0
+NO_APP_PROCESSES_STARTED=true
+LEGIBILITY_AND_REDISTRIBUTION_NOT_APPROVED_BY_AUTOMATION
+REPORT=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/011-video/test-manual-runs/20261124T153130Z-fdf1c313/report.json

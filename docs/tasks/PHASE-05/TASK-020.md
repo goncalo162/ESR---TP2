@@ -5,7 +5,7 @@
 - ID: TASK-020
 - Fase: [PHASE-05 — Vídeo, replicação e reprodução](../../phases/PHASE-05-STREAMING.md)
 - Prioridade: P0
-- Estado: TODO
+- Estado: IN PROGRESS
 - Responsável: [Fillmore](../../team/FILLMORE.md).
 - Revisor: [Denji](../../team/DENJI.md), antes de integrar e marcar DONE.
 - Dependências: [TASK-002](../PHASE-01/TASK-002.md), [TASK-003](../PHASE-01/TASK-003.md), [TASK-019](../PHASE-05/TASK-019.md).
@@ -25,7 +25,7 @@ Concluir e verificar evidências das dependências acima. Confirmar o estado rea
 
 ## 5. Especificação técnica
 
-A TASK-002 confirmou o perfil docente: cinco bytes de dígitos decimais ASCII com L, seguidos de L bytes JPEG, limite de 99999 bytes por frame; ver secção 7 de [07](../../07-API-AND-INTERFACES.md) e [revisão V-002](../../../experiments/task-002-contract-review.md). Reobter o recurso por URL/hash se a cópia transitória de /tmp não existir. Preparar os conteúdos A/B e C/D identificados nessa revisão; B/C/D ainda são fontes MP4/MKV/MOV por descarregar/converter, não ficheiros MJPEG prontos. Não basta alterar a extensão. Registar parâmetros da preparação offline, créditos e hashes; sem acesso ao conteúdo ou formato compatível, o gate continua por resolver. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
+A TASK-002 confirmou o perfil docente: cinco bytes de dígitos decimais ASCII com L, seguidos de L bytes JPEG, limite de 99999 bytes por frame; ver secção 7 de [07](../../07-API-AND-INTERFACES.md) e [revisão V-002](../../../experiments/task-002-contract-review.md). Reobter o recurso por URL/hash se a cópia transitória de /tmp não existir. Preparar os conteúdos A/B e C/D identificados nessa revisão; Na revisão histórica,B/C/D eram fontes MP4/MKV/MOV por descarregar/converter;preparação atual está documentada no checkpoint abaixo. Não basta alterar a extensão. Registar parâmetros da preparação offline, créditos e hashes; sem acesso ao conteúdo ou formato compatível, o gate continua por resolver. Validar ficheiros e JPEG com limites antes de anunciar disponibilidade. Cada stream tem scheduler, sequência e posição independentes. Sem procura, parar leitura/envio; em loop manter seq e timeline; loop=false termina apenas essa stream.
 
 Contrato normativo e limites: [07 — Interfaces](../../07-API-AND-INTERFACES.md). Modelo e invariantes: [06](../../06-DATA-MODEL.md). Aplicar apenas as partes relacionadas com esta tarefa, sem implementar funcionalidades posteriores.
 
@@ -72,3 +72,27 @@ Todos os critérios acima satisfeitos, dependências verificadas, falhas relevan
 Executar esta tarefa numa unidade de trabalho; se surgir decisão que afete tarefas seguintes, registá-la antes de avançar. Não alargar o objetivo para compensar uma dependência incompleta.
 
 Na retoma de sessão, seguir [o guia](../../AI-IMPLEMENTATION-GUIDE.md). Se houver bloqueio real, registar causa, condição de desbloqueio e próxima ação; não inventar comportamento para contornar obrigação do enunciado.
+
+## IMP-017 — parte A com Test/G-MEDIA técnicos aprovados,limitação B aceite
+
+Implement aprovado. Nova auditoria final:22687 JPEGs headless/sem avisos,
+16 fronteiras/negativos e6 pares distintos. Binários/manifesto aprovados intactos.
+[Test](../../../memory-bank/bolts/011-video/test-walkthrough.md),
+[manual](../../../experiments/construction/011-video/manual-instructions.md).
+Manual pessoal Francisco13/7 etapas conferido;quatro conteúdos distintos. Créditos
+B observados mas ilegíveis,C/D legíveis nas amostras. Test/G-MEDIA técnicos aprovados
+pelo utilizador com limitação B aceite;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para
+TASK-030,sem aprovação de atribuição adequada,legibilidade/redistribuição ou licença inventada de A.
+[Avaliação LOCAL-04](../../../experiments/construction/011-video/manual-verification-01/B-readability-assessment.md).
+LOCAL-03:cópia/hash para Projeto/media posterior,perfis inalterados/não prontos.
+459820128 bytes considerados no plano posterior,sem escolha de LFS/externo/conteúdo
+por inferência. Revisão final/integração pendentes. Parte A não fecha
+pai nem leitor/emissão/pacing B/C. Sem staging/commits/push/fecho ou alteração
+Java/perfis/POM/fixtures/demo.
+
+Estratégia Git LFS foi posteriormente aprovada e aplicada só aos quatro media:
+.gitattributes4 regras,configuração local,materialização real4/4 com hashes aprovados.
+[Execução/efeitos de instalação](../../../experiments/construction/011-video/lfs-implementation-01/README.md).
+Nenhum conteúdo/Java/perfil alterado,index/histórico intactos,sem upload/push/billing.
+Revisão final/integração/LOCAL-04/G-MEDIA-DISTRIBUTION pendentes;proprietário deve
+confirmar quota/budget antes de publicar,não é pressuposto custo zero.

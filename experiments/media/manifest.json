@@ -1,0 +1,558 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-24T14:36:20.586774+00:00",
+  "IMP": "IMP-017",
+  "bolt": "011-video",
+  "unit": "005-video",
+  "base": "e3d122a77257bf3c5c7489de06a34bad7af31fba",
+  "stage": "Implement;pending acceptance,Test not authorized",
+  "profile": {
+    "prefix": "exactly5 ASCII decimal digits,zero padded,no delimiters",
+    "length_range": [
+      1,
+      99999
+    ],
+    "payload": "exactlyL JPEG bytes",
+    "EOF": "clean only between records",
+    "FPS": "external configuration,not stored in file",
+    "UDP_cap_bytes": 2097152,
+    "UDP_cap_note": "Separate immutable OTT1 protocol cap;does not enlarge the file profile"
+  },
+  "G_MEDIA": {
+    "technical_evidence": "complete:4 prepared distinct files,all22687 JPEGs decoded and16 boundary/negative cases passed",
+    "checkpoint_acceptance": "pending Implement review"
+  },
+  "G_MEDIA_DISTRIBUTION": {
+    "status": "open",
+    "reason": "No final redistribution clearance inferred;A license unknown,all final credits/conditions reserved TASK-030"
+  },
+  "runtime_copy_plan": "LOCAL03 option1 approved:later copy to Projeto/media and compare SHA256 with this manifest;profiles unchanged,no runtime availability claimed",
+  "distinctness_evidence": "experiments/construction/011-video/implement-01/distinctness.json",
+  "negative_evidence": "experiments/construction/011-video/implement-01/negative-results.json",
+  "entries": [
+    {
+      "alias": "A",
+      "server_id": "S1",
+      "stream_id": "00000000-0000-4000-8000-000000000001",
+      "title": "movie.Mjpeg (teaching resource)",
+      "destination_path": "Projeto/src/main/resources/media/a.Mjpeg",
+      "configured_runtime_path": "Projeto/media/a.Mjpeg",
+      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
+      "source": {
+        "url": "https://www.di.uminho.pt/~flavio/ESR/ProgEx.zip",
+        "download_sha256": "fbee4b0a654cbc98b7350e41fbb6bddb1a043d5ac31caea7d2667a47b689be0d",
+        "download_bytes": 10403290,
+        "obtained_at": "2026-11-24T14:28:36.400456+00:00",
+        "download_evidence": "experiments/construction/011-video/implement-01/A-download.json",
+        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/A.zip",
+        "zip_member": "ProgEx/Java/movie.Mjpeg",
+        "extracted_source_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+        "expected_historical_archive_sha256": "fbee4b0a654cbc98b7350e41fbb6bddb1a043d5ac31caea7d2667a47b689be0d",
+        "expected_historical_member_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+        "historical_hashes_match": true
+      },
+      "rights": {
+        "author_or_publisher": null,
+        "declared_license": null,
+        "declaration_page": null,
+        "declaration_snapshot": null,
+        "declaration_sha256": null,
+        "credits_policy": "No audiovisual author/license specified in historical archive; no license or redistribution permission inferred.",
+        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
+        "G_MEDIA_DISTRIBUTION": "open/not approved"
+      },
+      "preparation": {
+        "reencoded": false,
+        "parameters": {
+          "method": "byte-preserving extraction of confirmed ZIP member",
+          "no_reencode": true
+        },
+        "command": null,
+        "evidence": "experiments/construction/011-video/implement-01/A-preservation.json",
+        "tool": "Python zipfile;no example archive program executed"
+      },
+      "fps": {
+        "configuration": 10,
+        "preparation_requested": null,
+        "original_media_metadata": null,
+        "playback_measured": null
+      },
+      "output": {
+        "sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+        "bytes": 4269893,
+        "frames": 500,
+        "dimensions": [
+          384,
+          288
+        ],
+        "min_jpeg": 4970,
+        "max_jpeg": 13967,
+        "duration_at_configured_fps_seconds": 50.0,
+        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
+      },
+      "audit": {
+        "status": "passed independent incremental audit in Implement;not Test approval",
+        "headless": true,
+        "JDK": "21",
+        "records": "experiments/construction/011-video/implement-01/A-frames.jsonl",
+        "records_sha256": "de8ee400ba251c009d63c67ebe86d3596cfb69f9803513e52458a31bd26421a3",
+        "result": {
+          "file": "Projeto/src/main/resources/media/a.Mjpeg",
+          "frames": 500,
+          "bytes": 4269893,
+          "min_jpeg": 4970,
+          "max_jpeg": 13967,
+          "sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+          "jpeg_sequence_sha256": "5024de32480d9f4f5916f877cda30d9e61522d9dd6e4434029670d4016c20e15",
+          "pixels_sequence_sha256": "c8be5fd73333969cab2da64e897310b1f3210bf8ea61f7262f40f0d792f78783",
+          "headless": true,
+          "status": "passed"
+        },
+        "command_evidence": "experiments/construction/011-video/implement-01/A-audit-command.json"
+      },
+      "visual_witnesses": [
+        {
+          "alias": "A",
+          "kind": "content",
+          "frame_index": 250,
+          "jpeg_sha256": "f963713aaca3cabf1c1b812c904501545e284d31e5a2285acaf6a526cb4b054c",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/A-preview.jpg",
+          "observation": "Live-action interior with people; no audiovisual authorship inferred.",
+          "reviewer": "agent visual inspection; not final human review"
+        }
+      ]
+    },
+    {
+      "alias": "B",
+      "server_id": "S1",
+      "stream_id": "00000000-0000-4000-8000-000000000002",
+      "title": "Big Buck Bunny",
+      "destination_path": "Projeto/src/main/resources/media/b.Mjpeg",
+      "configured_runtime_path": "Projeto/media/b.Mjpeg",
+      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
+      "source": {
+        "url": "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4.zip",
+        "download_sha256": "109e3ede8790bd633f374ca311d9cc61dce8d7f98f5b0797ca98199c9fbceedf",
+        "download_bytes": 64657225,
+        "obtained_at": "2026-11-24T14:29:07.732509+00:00",
+        "download_evidence": "experiments/construction/011-video/implement-01/B-download.json",
+        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B.zip",
+        "zip_member": "BigBuckBunny_320x180.mp4",
+        "extracted_source_sha256": "f78f39603e6774907f2faafabf26a667f4a6fc31769ec304a8a8f7c62d280508"
+      },
+      "rights": {
+        "author_or_publisher": "Blender Foundation / Peach",
+        "declared_license": "CC-BY-3.0",
+        "declaration_page": "https://peach.blender.org/about/",
+        "declaration_snapshot": "experiments/construction/011-video/plan-01/B-rights.html",
+        "declaration_sha256": "bd9eb73ddec647bbb486c47316163042a9655a8483358c093121341d0dc080cf",
+        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
+        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
+        "G_MEDIA_DISTRIBUTION": "open/not approved"
+      },
+      "preparation": {
+        "reencoded": true,
+        "parameters": {
+          "full_video": true,
+          "credits_not_trimmed": true,
+          "fps_requested": 10,
+          "canvas": [
+            640,
+            360
+          ],
+          "aspect_ratio_preserved": true,
+          "SAR": "1:1",
+          "jpeg_q": 5,
+          "pixel_format": "yuvj420p",
+          "audio_in_profile": false
+        },
+        "command": [
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "info",
+          "-i",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B.mp4",
+          "-map",
+          "0:v:0",
+          "-vf",
+          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
+          "-an",
+          "-sn",
+          "-dn",
+          "-c:v",
+          "mjpeg",
+          "-q:v",
+          "5",
+          "-pix_fmt",
+          "yuvj420p",
+          "-threads",
+          "1",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "image2",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/%08d.jpg"
+        ],
+        "evidence": "experiments/construction/011-video/implement-01/B-preparation.json",
+        "tool": "experiments/construction/011-video/implement-01/tool.json"
+      },
+      "fps": {
+        "configuration": 10,
+        "preparation_requested": 10,
+        "original_media_metadata": {
+          "container_duration_line": "Duration: 00:09:56.46, start: 0.000000, bitrate: 867 kb/s",
+          "source_video_stream_line": "Stream #0:0[0x1](und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p(progressive), 320x180 [SAR 1:1 DAR 16:9], 702 kb/s, 24 fps, 24 tbr, 24 tbn (default)",
+          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
+        },
+        "playback_measured": null
+      },
+      "output": {
+        "sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
+        "bytes": 111255866,
+        "frames": 5965,
+        "dimensions": [
+          640,
+          360
+        ],
+        "min_jpeg": 1602,
+        "max_jpeg": 41769,
+        "duration_at_configured_fps_seconds": 596.5,
+        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
+      },
+      "audit": {
+        "status": "passed independent incremental audit in Implement;not Test approval",
+        "headless": true,
+        "JDK": "21",
+        "records": "experiments/construction/011-video/implement-01/B-frames.jsonl",
+        "records_sha256": "edbb378392c7e73c878c176e672fa159a476d10f11a09f825d69fe565b26b265",
+        "result": {
+          "file": "Projeto/src/main/resources/media/b.Mjpeg",
+          "frames": 5965,
+          "bytes": 111255866,
+          "min_jpeg": 1602,
+          "max_jpeg": 41769,
+          "sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
+          "jpeg_sequence_sha256": "c9523812dba8431b0aec54e4d5157b9c406de921021f21e6a38ee3a1d94aa427",
+          "pixels_sequence_sha256": "b6bf0fd55c87493a483a35ab499295d75bfdfe189a74e2563c29649daa085685",
+          "headless": true,
+          "status": "passed"
+        },
+        "command_evidence": "experiments/construction/011-video/implement-01/B-audit-command.json"
+      },
+      "visual_witnesses": [
+        {
+          "alias": "B",
+          "kind": "content",
+          "frame_index": 2385,
+          "jpeg_sha256": "83777b776cb6f39257ad6ea623bce3219c1f1cfc75c6f6083360b712c18952cb",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/00002386.jpg",
+          "observation": "Animated rabbit in wooded scene; Big Buck Bunny source.",
+          "reviewer": "agent visual inspection; not final human review"
+        },
+        {
+          "alias": "B",
+          "kind": "credits",
+          "frame_index": 5606,
+          "jpeg_sha256": "e5e3802b784c4ff848b62aeb7f020ca8d8f33841e845942361429e377814d661",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/B-frames/00005607.jpg",
+          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
+          "reviewer": "agent visual inspection; not human approval"
+        }
+      ]
+    },
+    {
+      "alias": "C",
+      "server_id": "S2",
+      "stream_id": "00000000-0000-4000-8000-000000000003",
+      "title": "Sintel",
+      "destination_path": "Projeto/src/main/resources/media/c.Mjpeg",
+      "configured_runtime_path": "Projeto/media/c.Mjpeg",
+      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
+      "source": {
+        "url": "https://download.blender.org/durian/movies/Sintel.2010.720p.mkv.zip",
+        "download_sha256": "d252f898641b20f51c64206f31063e659c28b152a9d988936736d1b56e6e4db3",
+        "download_bytes": 681285470,
+        "obtained_at": "2026-11-24T14:32:34.968212+00:00",
+        "download_evidence": "experiments/construction/011-video/implement-01/C-download.json",
+        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C.zip",
+        "zip_member": "Sintel.2010.720p.mkv",
+        "extracted_source_sha256": "f12c070e295b38cfc94ebd61ac3357c3bac82d1015985f1e8da93a4c6496c46d"
+      },
+      "rights": {
+        "author_or_publisher": "Blender Foundation / Durian",
+        "declared_license": "CC-BY-3.0",
+        "declaration_page": "https://durian.blender.org/sharing/",
+        "declaration_snapshot": "experiments/construction/011-video/plan-01/C-rights.html",
+        "declaration_sha256": "67f30f30c55022c6f7de66beb997f04117b24f7aca928a912286a53edaa4b627",
+        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
+        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
+        "G_MEDIA_DISTRIBUTION": "open/not approved"
+      },
+      "preparation": {
+        "reencoded": true,
+        "parameters": {
+          "full_video": true,
+          "credits_not_trimmed": true,
+          "fps_requested": 10,
+          "canvas": [
+            640,
+            360
+          ],
+          "aspect_ratio_preserved": true,
+          "SAR": "1:1",
+          "jpeg_q": 5,
+          "pixel_format": "yuvj420p",
+          "audio_in_profile": false
+        },
+        "command": [
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "info",
+          "-i",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C.mkv",
+          "-map",
+          "0:v:0",
+          "-vf",
+          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
+          "-an",
+          "-sn",
+          "-dn",
+          "-c:v",
+          "mjpeg",
+          "-q:v",
+          "5",
+          "-pix_fmt",
+          "yuvj420p",
+          "-threads",
+          "1",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "image2",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/%08d.jpg"
+        ],
+        "evidence": "experiments/construction/011-video/implement-01/C-preparation.json",
+        "tool": "experiments/construction/011-video/implement-01/tool.json"
+      },
+      "fps": {
+        "configuration": 10,
+        "preparation_requested": 10,
+        "original_media_metadata": {
+          "container_duration_line": "Duration: 00:14:48.03, start: 0.000000, bitrate: 6137 kb/s",
+          "source_video_stream_line": "Stream #0:0(eng): Video: h264 (High), yuv420p(tv, bt709/unknown/unknown, progressive), 1280x544, SAR 1:1 DAR 40:17, 24 fps, 24 tbr, 1k tbn",
+          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
+        },
+        "playback_measured": null
+      },
+      "output": {
+        "sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
+        "bytes": 167319819,
+        "frames": 8880,
+        "dimensions": [
+          640,
+          360
+        ],
+        "min_jpeg": 1602,
+        "max_jpeg": 66091,
+        "duration_at_configured_fps_seconds": 888.0,
+        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
+      },
+      "audit": {
+        "status": "passed independent incremental audit in Implement;not Test approval",
+        "headless": true,
+        "JDK": "21",
+        "records": "experiments/construction/011-video/implement-01/C-frames.jsonl",
+        "records_sha256": "9e337cc094b0b9842058d9e3088971b32fed70adc7ec99038b561b29f627a148",
+        "result": {
+          "file": "Projeto/src/main/resources/media/c.Mjpeg",
+          "frames": 8880,
+          "bytes": 167319819,
+          "min_jpeg": 1602,
+          "max_jpeg": 66091,
+          "sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
+          "jpeg_sequence_sha256": "5432d12849b3e018f7e8426d8173cbfc3ce3e85429ad9a8fd63fad0d3f054c67",
+          "pixels_sequence_sha256": "ed034324d0e4391de1d17ec8b050faac9a83c2c3ec900716c6fb9ed3a0fca407",
+          "headless": true,
+          "status": "passed"
+        },
+        "command_evidence": "experiments/construction/011-video/implement-01/C-audit-command.json"
+      },
+      "visual_witnesses": [
+        {
+          "alias": "C",
+          "kind": "content",
+          "frame_index": 3551,
+          "jpeg_sha256": "8dedb9a5651f77a3260a880bcfcbc92e92406dc33c6770d468f8e5975d84232e",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/00003552.jpg",
+          "observation": "Animated landscape/settlement; Sintel source.",
+          "reviewer": "agent visual inspection; not final human review"
+        },
+        {
+          "alias": "C",
+          "kind": "credits",
+          "frame_index": 8346,
+          "jpeg_sha256": "90c15ba3455f5fa370206e03547594d4fe37d21b3b7339c4cf9aefce1722a8ee",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/C-frames/00008347.jpg",
+          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
+          "reviewer": "agent visual inspection; not human approval"
+        }
+      ]
+    },
+    {
+      "alias": "D",
+      "server_id": "S2",
+      "stream_id": "00000000-0000-4000-8000-000000000004",
+      "title": "Tears of Steel",
+      "destination_path": "Projeto/src/main/resources/media/d.Mjpeg",
+      "configured_runtime_path": "Projeto/media/d.Mjpeg",
+      "runtime_installation": "not performed;approved LOCAL03 option1 defers copy/hash verification to later composition",
+      "source": {
+        "url": "https://download.blender.org/demo/movies/ToS/tears_of_steel_720p.mov",
+        "download_sha256": "efa9062d9cdb7a338e40ad530dfdf234806743f29ae6a1a136b97ece4e588e8f",
+        "download_bytes": 372178639,
+        "obtained_at": "2026-11-24T14:31:17.353469+00:00",
+        "download_evidence": "experiments/construction/011-video/implement-01/D-download.json",
+        "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D.mov",
+        "zip_member": null,
+        "extracted_source_sha256": "efa9062d9cdb7a338e40ad530dfdf234806743f29ae6a1a136b97ece4e588e8f"
+      },
+      "rights": {
+        "author_or_publisher": "Blender Institute / Mango",
+        "declared_license": "CC-BY-3.0",
+        "declaration_page": "https://mango.blender.org/about/",
+        "declaration_snapshot": "experiments/construction/011-video/plan-01/D-rights.html",
+        "declaration_sha256": "1013fce4ca435c9a4f5c0cadb3d007a6c99b4ff665f2726099e439d967e956ae",
+        "credits_policy": "Full video,no trim;credit scroll retained. Attribute title/creator/source/license and disclose fps/resolution/JPEG adaptation.",
+        "redistribution_status": "pending final-version credits/conditions review at TASK-030",
+        "G_MEDIA_DISTRIBUTION": "open/not approved"
+      },
+      "preparation": {
+        "reencoded": true,
+        "parameters": {
+          "full_video": true,
+          "credits_not_trimmed": true,
+          "fps_requested": 10,
+          "canvas": [
+            640,
+            360
+          ],
+          "aspect_ratio_preserved": true,
+          "SAR": "1:1",
+          "jpeg_q": 5,
+          "pixel_format": "yuvj420p",
+          "audio_in_profile": false
+        },
+        "command": [
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/tools/ffmpeg",
+          "-nostdin",
+          "-hide_banner",
+          "-loglevel",
+          "info",
+          "-i",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D.mov",
+          "-map",
+          "0:v:0",
+          "-vf",
+          "fps=10,scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1",
+          "-an",
+          "-sn",
+          "-dn",
+          "-c:v",
+          "mjpeg",
+          "-q:v",
+          "5",
+          "-pix_fmt",
+          "yuvj420p",
+          "-threads",
+          "1",
+          "-progress",
+          "pipe:1",
+          "-nostats",
+          "-f",
+          "image2",
+          "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/%08d.jpg"
+        ],
+        "evidence": "experiments/construction/011-video/implement-01/D-preparation.json",
+        "tool": "experiments/construction/011-video/implement-01/tool.json"
+      },
+      "fps": {
+        "configuration": 10,
+        "preparation_requested": 10,
+        "original_media_metadata": {
+          "container_duration_line": "Duration: 00:12:14.17, start: 0.000000, bitrate: 4055 kb/s",
+          "source_video_stream_line": "Stream #0:0[0x1](eng): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 1280x534 [SAR 1:1 DAR 640:267], 3857 kb/s, 24 fps, 24 tbr, 24 tbn (default)",
+          "note": "Source metadata reported by offline ffmpeg,not application playback measurement"
+        },
+        "playback_measured": null
+      },
+      "output": {
+        "sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
+        "bytes": 176974550,
+        "frames": 7342,
+        "dimensions": [
+          640,
+          360
+        ],
+        "min_jpeg": 1938,
+        "max_jpeg": 56322,
+        "duration_at_configured_fps_seconds": 734.2,
+        "duration_note": "Derived frame count/configuredFPS,not measured delivered/reproducedFPS"
+      },
+      "audit": {
+        "status": "passed independent incremental audit in Implement;not Test approval",
+        "headless": true,
+        "JDK": "21",
+        "records": "experiments/construction/011-video/implement-01/D-frames.jsonl",
+        "records_sha256": "381dcbff4d8fea38dce50af4058ca509de0142ba9da2355056669ede308fa343",
+        "result": {
+          "file": "Projeto/src/main/resources/media/d.Mjpeg",
+          "frames": 7342,
+          "bytes": 176974550,
+          "min_jpeg": 1938,
+          "max_jpeg": 56322,
+          "sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
+          "jpeg_sequence_sha256": "aa1623b8a1c74e9e8fb7d6c2033b0ce371180294795a8a1e76a7e8bc12182abf",
+          "pixels_sequence_sha256": "dcbb265ff3fc8668e660f227bbed38b3eb1aa64f366236c9188fa203cdb41ddf",
+          "headless": true,
+          "status": "passed"
+        },
+        "command_evidence": "experiments/construction/011-video/implement-01/D-audit-command.json"
+      },
+      "visual_witnesses": [
+        {
+          "alias": "D",
+          "kind": "content",
+          "frame_index": 2935,
+          "jpeg_sha256": "dfc6c71ce1d91818231caf6550eeef2afd743e402bf8d4fc4203c925fdda0af6",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/00002936.jpg",
+          "observation": "Live-action science-fiction characters/interior; Tears of Steel source.",
+          "reviewer": "agent visual inspection; not final human review"
+        },
+        {
+          "alias": "D",
+          "kind": "credits",
+          "frame_index": 6900,
+          "jpeg_sha256": "ff57e20fa34c0929c6d24bd359fe92a0c371aa635a3cc139f8851cb732693c7c",
+          "cache_path": "/var/folders/bd/62p21jv1333_497krp1g7nk00000gn/T/ott-imp017-sources-sh54_yak/D-frames/00006901.jpg",
+          "observation": "Credit scroll visible in preserved full video; text small in source B low-resolution edition. No final redistribution clearance inferred.",
+          "reviewer": "agent visual inspection; not human approval"
+        }
+      ]
+    }
+  ],
+  "pending": [
+    "Implement checkpoint acceptance",
+    "Test authorization/consolidation",
+    "human manual/final review",
+    "integration"
+  ],
+  "TASK_020_parent": "not closed;partsB/C remain pending",
+  "files_ready_for_local_data_validation": true,
+  "application_streaming_ready": false
+}

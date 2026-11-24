@@ -73,3 +73,81 @@ manual pessoal Francisco24 e revisão final Denji cumpridos/aprovados.
 Unidade005/PHASE-05 em progresso;18 histórias/bolts complete,0 in-progress,17 planned.
 Sem novo IMP,alterações Java,push ou target/ no commit. IDs locais,demo/negativos/
 logs pessoais preservados; documentação/evidência apenas. V-ADD no fecho.
+
+## 2026-11-24T14:23:59Z — IMP-017 / 011-video,Plan por aprovar
+
+Base e3d122a/main,estado inicial limpo,dependências009/010 complete.
+[Plan](../../../../bolts/011-video/implementation-plan.md):quatro obras diferentes,
+duas por origem,perfil cinco dígitos/JPEG,FPS10 existente;V-020-A planeado.
+G-MEDIA aberto por ausência local/preparação/validação. HEAD200 das quatro fontes,
+GET só das páginas de condições oficiais;sem download de media. IDs locais01–03,
+sem Q-C global;paths configuração versus recursos por decidir. Sem conversão,
+alterações Java,testes Java,Implement/Test/staging/commits/push. Parte A não fecha
+TASK-020;unidade/fase em progresso,demo e incrementos fechados intactos.
+
+## 2026-11-24T14:37:54Z — IMP-017,Plan aprovado/Implement executado por aceitar
+
+Utilizador aprovou LOCAL-03 opção1,seleção/parâmetros e obtenção/preparação das
+fontes. A coincide com histórico,sem reencodar. B/C/D completos com créditos,
+10fps/640×360/q5;manifesto real nos cinco caminhos aprovados. Auditoria independente
+22687 JPEGs descodificados headless e16 fronteiras/negativos passaram.
+[Implement](../../../../bolts/011-video/implementation-walkthrough.md).
+G-MEDIA:evidência técnica completa para checkpoint;distribuição aberta,licença A
+não inferida. Ferramenta offline isolada com aprovação própria,não runtime.
+Perfis/Java/POM/fixtures/demo intactos. Test/manual/revisão humana/integração
+pendentes,parte A não fecha TASK-020. Sem staging/commits/push ou avanço Test.
+
+## 2026-11-24T14:48:45Z — IMP-017,Implement aprovado/Test técnico consolidado
+
+Utilizador aprovou Implement e autorizou Test. Quatro ficheiros finais e manifesto
+intactos,auditoria nova22687/22687 JPEGs headless/sem avisos,16/16 fronteiras/negativos
+com expectativas preservadas,6 pares distintos. [Test](../../../../bolts/011-video/test-walkthrough.md).
+Manual humano preparado,sem execução/observação humana presumida. Legibilidade e
+redistribuição não inferidas;G-MEDIA/validação final aguarda manual/aceitação,
+G-MEDIA-DISTRIBUTION aberto,LOCAL-03/cópia posterior explícita.459820128 bytes no
+plano posterior,sem escolha LFS/externo ou alteração de conteúdos. Test/revisão final/
+integração pendentes,parte A não fecha TASK-020. Sem Java/perfis/POM/fixtures/demo
+alterados,staging/commits/push/fecho. Apenas IDs locais.
+
+## 2026-11-24T15:39:07Z — Manual humano Francisco13 conferido,limitação B preservada
+
+Execução pessoal confirmada pelo utilizador,13 checks/7 etapas,PASSED=true,
+WRAPPER_EXIT=0;SHELL_EXIT=0 por confirmação do utilizador,não log. Quatro conteúdos
+distintos;B créditos presentes mas ilegíveis,nota «nao dava para ler as letras»;
+C/D legíveis nas amostras. Tentativa anterior9 checks/3 etapas,nota vazia/exit1,
+originais preservados. [Conferência e avaliação LOCAL-04](../../../../../experiments/construction/011-video/manual-verification-01/README.md).
+Test/G-MEDIA por aprovar com limitação explícita. G-MEDIA-DISTRIBUTION aberto,
+legibilidade B/redistribuição não aprovadas;recomendação manter versão e tratar
+créditos finais na TASK-030,ou propor mudança explícita se exigida,sem aplicar.
+Hashes de media/manifesto/auxiliares/amostras íntegros,sem repetir auditoria/manual.
+LOCAL-03 não instalou Projeto/media;revisão/integração pendentes,TASK-020 aberta,
+sem staging/commits/push/fecho ou mudança de conteúdo/armazenamento por inferência.
+
+## 2026-11-24T15:43:59Z — Test/G-MEDIA técnicos aprovados,revisão final/integração pendentes
+
+Utilizador aprovou22687 JPEGs,16 fronteiras,quatro conteúdos distintos e manual
+Francisco13;aceitou B com créditos presentes mas ilegíveis apenas no âmbito técnico.
+Não aprova atribuição adequada,legibilidade/redistribuição;LOCAL-04 e
+G-MEDIA-DISTRIBUTION abertos para TASK-030,originais/parcial preservados.
+[Confirmação vinculada a hashes](../../../../../experiments/construction/011-video/review-package-01/technical-approval.json).
+[Pacote para revisão](../../../../../experiments/construction/011-video/review-package-01/README.md).
+Quatro binários459820128 bytes intactos;sem escolher LFS/externo ou alterar conteúdos.
+Revisão final não confirmada,integração pendente;bolt/história/pai abertos.
+LOCAL-03 não instalou runtime;sem staging/commits/push/fecho,IDs locais.
+
+## 2026-11-24T20:14:33Z — Git LFS autorizado/instalado/local validado,sem index/histórico
+
+Estratégia limitada aos quatro media e exceção .gitattributes aprovadas. Instalação
+Homebrew interrompida por expansão para13 dependências/2 upgrades,com efeitos
+reais registados:openssl@4/libssh2 instalados,links openssl@3 desligados;não revertidos
+por inferência. Binário oficial3.8.1 com checksum validado instalado em alternativa.
+Git LFS --local --skip-smudge,13 hooks anteriores intactos,4 hooks LFS novos;
+Git global/index/HEAD preservados. Exatamente4 regras em .gitattributes,não staged.
+Clean/cache/smudge e ZIP temporário de dados materializam4 ficheiros com os hashes
+aprovados;fallback só file://,sem rede LFS ou uploads. Nenhum Codigo.zip final criado.
+[Prova e efeitos](../../../../../experiments/construction/011-video/lfs-implementation-01/README.md),
+[pacote atualizado](../../../../../experiments/construction/011-video/lfs-review-package-01/README.md).
+Quota/budget por confirmar pelo proprietário antes de publicar,não se assume custo
+zero. Billing/settings não alterados. LOCAL-04/distribuição/revisão final/integração
+pendentes,LOCAL-03 não instalada,sem Java/perfis/POM/fixtures/demo alterados,
+staging/commits/uploads/push/fecho ou início de outro IMP.

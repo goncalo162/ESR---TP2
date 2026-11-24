@@ -17,7 +17,10 @@ Arquitetura e critérios normativos no [ADD](../../../../../add.md). Esta unidad
 
 Estado atual: in-progress; IMP-016/010-video/TASK-019 complete/DONE,integrado
 localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrough.md).
-Restantes histórias planned,sem início de outro IMP. PHASE-05 em progresso.
+IMP-017/011-video em Test,Implement aprovado,quatro media finais auditados;
+Test/G-MEDIA técnicos aprovados,manual Francisco13 cumprido com B ilegível,
+C/D legíveis nas amostras;distribuição aberta,restantes histórias planned.
+PHASE-05 em progresso,revisão final/integração pendentes,LOCAL-04/distribuição abertos.
 Test1537/0/0/0,22 XML,manual Francisco24 e revisão Denji cumpridos.
 Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
 Somente codec entregue neste incremento; streaming/reprodução continuam futuros.

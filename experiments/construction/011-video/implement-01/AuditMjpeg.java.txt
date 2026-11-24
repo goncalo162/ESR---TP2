@@ -1,0 +1,77 @@
+import java.io.*;
+import java.nio.file.*;
+import java.security.*;
+import java.util.*;
+import javax.imageio.*;
+import javax.imageio.stream.*;
+
+/** Offline independent audit, never added to Projeto/src or runtime. */
+class AuditMjpeg {
+    static String hex(byte[] a) { return HexFormat.of().formatHex(a); }
+    static MessageDigest digest() throws Exception { return MessageDigest.getInstance("SHA-256"); }
+    static void need(boolean ok,String message) throws IOException { if(!ok)throw new IOException(message); }
+    static void jpegStructure(byte[] a) throws Exception {
+        need(a.length>=4 && (a[0]&255)==255 && (a[1]&255)==216,"missing SOI");
+        int p=2;
+        while(p<a.length) {
+            need((a[p++]&255)==255,"expected JPEG marker");
+            while(p<a.length && (a[p]&255)==255)p++;
+            need(p<a.length,"truncated marker");int code=a[p++]&255;
+            if(code==217){need(p==a.length,"bytes after JPEG EOI");return;}
+            need(code!=216 && code!=0,"invalid marker");
+            if(code==1 || code>=208 && code<=215)continue;
+            need(p+2<=a.length,"truncated segment");int size=((a[p]&255)<<8)|(a[p+1]&255);
+            need(size>=2 && size<=a.length-p,"bad JPEG segment length");p+=size;
+            if(code==218) {
+                while(p<a.length) {
+                    if((a[p]&255)!=255){p++;continue;}
+                    int marker=p;while(p<a.length && (a[p]&255)==255)p++;
+                    need(p<a.length,"truncated entropy marker");int next=a[p]&255;
+                    if(next==0 || next>=208 && next<=215){p++;continue;}
+                    p=marker;break;
+                }
+            }
+        }
+        throw new IOException("missing EOI");
+    }
+    static void audit(Path file,Path records,int width,int height) throws Exception {
+        MessageDigest source=digest(),sequence=digest(),pixelsSequence=digest();long offset=0,count=0,min=99999,max=0;
+        try(var in=new BufferedInputStream(Files.newInputStream(file));var report=Files.newBufferedWriter(records)) {
+            while(true) {
+                int first=in.read();if(first<0)break;byte[] prefix=new byte[5];prefix[0]=(byte)first;
+                need(in.readNBytes(prefix,1,4)==4,"partial prefix at "+offset);int length=0;
+                for(byte value:prefix){need(value>=48 && value<=57,"nondecimal prefix at "+offset);length=length*10+value-48;}
+                need(length>=1 && length<=99999,"invalid length at "+offset);
+                byte[] jpeg=in.readNBytes(length);need(jpeg.length==length,"truncated JPEG at "+offset);
+                jpegStructure(jpeg);source.update(prefix);source.update(jpeg);
+                String jpgHash=hex(digest().digest(jpeg));sequence.update(jpgHash.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+                MessageDigest pixels=digest();String decoder;
+                try(var input=new MemoryCacheImageInputStream(new ByteArrayInputStream(jpeg))) {
+                    var readers=ImageIO.getImageReaders(input);need(readers.hasNext(),"no decoder");var reader=readers.next();
+                    try {
+                        decoder=reader.getClass().getName();var warnings=new ArrayList<String>();
+                        reader.addIIOReadWarningListener((r,text)->warnings.add(text));reader.setInput(input,false,false);
+                        need(reader.getWidth(0)==width && reader.getHeight(0)==height,"unexpected/unsafe dimensions");
+                        var image=reader.read(0);need(image!=null && image.getWidth()==width && image.getHeight()==height,"decode failed");
+                        need(warnings.isEmpty(),"decoder warnings: "+warnings);
+                        int[] row=new int[width];byte[] rgb=new byte[width*3];
+                        for(int y=0;y<height;y++) {
+                            image.getRGB(0,y,width,1,row,0,width);
+                            for(int x=0;x<width;x++){int pixel=row[x];rgb[3*x]=(byte)(pixel>>16);rgb[3*x+1]=(byte)(pixel>>8);rgb[3*x+2]=(byte)pixel;}
+                            pixels.update(rgb);
+                        }
+                        image.flush();
+                    } finally {reader.dispose();}
+                }
+                String pixelHash=hex(pixels.digest());pixelsSequence.update(pixelHash.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+                report.write("{\"index\":"+count+",\"offset\":"+offset+",\"prefix\":\""+new String(prefix,java.nio.charset.StandardCharsets.US_ASCII)+"\",\"length\":"+length+",\"jpeg_sha256\":\""+jpgHash+"\",\"pixel_sha256\":\""+pixelHash+"\",\"width\":"+width+",\"height\":"+height+",\"decoder\":\""+decoder+"\",\"decode\":\"passed\"}\n");
+                offset+=5L+length;count++;min=Math.min(min,length);max=Math.max(max,length);
+            }
+        }
+        need(count>0,"empty file");need(offset==Files.size(file),"unconsumed bytes");
+        System.out.println("{\"file\":\""+file+"\",\"frames\":"+count+",\"bytes\":"+offset+",\"min_jpeg\":"+min+",\"max_jpeg\":"+max+",\"sha256\":\""+hex(source.digest())+"\",\"jpeg_sequence_sha256\":\""+hex(sequence.digest())+"\",\"pixels_sequence_sha256\":\""+hex(pixelsSequence.digest())+"\",\"headless\":"+java.awt.GraphicsEnvironment.isHeadless()+",\"status\":\"passed\"}");
+    }
+    public static void main(String[] args)throws Exception {
+        need(args.length==4,"file records width height");audit(Path.of(args[0]),Path.of(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]));
+    }
+}

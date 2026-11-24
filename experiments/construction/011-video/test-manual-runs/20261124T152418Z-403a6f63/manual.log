@@ -1,0 +1,38 @@
+KIND=human OPERATOR=Francisco
+CHECK_PASS 1 manifesto aprovado intacto
+CHECK_PASS 2 hash A intacto
+CHECK_PASS 3 hash B intacto
+CHECK_PASS 4 hash C intacto
+CHECK_PASS 5 hash D intacto
+CHECK_PASS 6 amostras são bytes JPEG auditados,sem edição
+Abra no navegador,sem iniciar a aplicação OTT:
+open /Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/011-video/test-manual-runs/20261124T152418Z-403a6f63/index.html
+Pode clicar nas imagens para inspeção à escala nativa. Browser é aberto pelo operador,não pelo runner.
+Inspecione conteúdo A/B. São identificáveis e diferentes? [sim/nao]
+ANSWER pair-A/B=sim
+Descreva brevemente o que observou em cada conteúdo:
+ANSWER description-A/B=no A vejo uma mulher no B vejo um coelho
+OPERATOR_CONFIRM_STAGE=1
+CHECK_PASS 7 par A/B visualmente distinto por confirmação do operador
+Inspecione conteúdo C/D. São identificáveis e diferentes? [sim/nao]
+ANSWER pair-C/D=sim
+Descreva brevemente o que observou em cada conteúdo:
+ANSWER description-C/D=No c vejo uma montanha, no D vejo uma construção
+OPERATOR_CONFIRM_STAGE=2
+CHECK_PASS 8 par C/D visualmente distinto por confirmação do operador
+Comparando A/B/C/D,há quatro conteúdos distintos,não aliases/cópias da mesma obra? [sim/nao]
+ANSWER four-distinct=sim
+OPERATOR_CONFIRM_STAGE=3
+CHECK_PASS 9 quatro conteúdos distintos confirmados pelo operador
+Inspecione a secção créditos B. Observou o credit scroll? [sim/nao]
+ANSWER credits-B=sim
+Legibilidade observada dos créditos B: [legivel/parcial/ilegivel]
+ANSWER readability-B=ilegivel
+Registe limites/divergências/detalhes observados (obrigatório;use sem divergencias se aplicável):
+ANSWER notes-B=
+MANUAL_ERROR=RuntimeError: Resposta vazia/inválida;manual incompleto
+PASSED=false
+WRAPPER_EXIT=1
+NO_APP_PROCESSES_STARTED=true
+LEGIBILITY_AND_REDISTRIBUTION_NOT_APPROVED_BY_AUTOMATION
+REPORT=/Users/maria/Documentos/Francisco/ESR/ESR---TP2/experiments/construction/011-video/test-manual-runs/20261124T152418Z-403a6f63/report.json

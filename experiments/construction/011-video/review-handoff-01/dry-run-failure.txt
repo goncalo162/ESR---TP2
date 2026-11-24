@@ -1,0 +1,6 @@
+COMMAND: HOMEBREW_NO_AUTO_UPDATE=1 brew link --force --overwrite --dry-run openssl@3
+EXIT: 1
+Error: Operation not permitted @ rb_file_s_symlink - (../../Cellar/openssl@4/4.1.0/include/openssl/aes.h, /usr/local/include/openssl/aes.h)
+Would remove:
+/usr/local/bin/openssl -> /usr/local/Cellar/openssl@4/4.1.0/bin/openssl
+Not retried outside sandbox. Local keg.rb resolve_any_conflicts calls keg.link_dir with dry_run:false when expanding a conflicting directory symlink. No package-changing command executed. Generic executable and directory symlinks remain pointed to openssl@4. No pre-attempt inventory of every system path exists;do not claim full-system byte comparison.
