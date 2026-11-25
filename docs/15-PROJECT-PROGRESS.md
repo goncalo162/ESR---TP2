@@ -1,5 +1,117 @@
 # Progresso do projeto
 
+**IMP-018 — Test aceite por condição expressa; integração local a concluir (2026-11-25T17:06:50Z):**
+Quatro binários completos com hashes aprovados,500/5965/8880/7342 frames,
+cada Frame comparado, EOF/END e fecho único da entrada. [Prova nova](../experiments/construction/025-video/test-02/full-content-consolidation.json).
+Sem rebuild: clean verify1582/0/0/0, JAR fixado e V-ADD conferidos pelo utilizador.
+Negativo humano preservado (path sem /media, resposta sisim). O utilizador delegou
+nova execução em Codex e autorizou commit/fecho se correto; run automática
+saída0 satisfaz a condição. Não se afirma manual humano concluído. Denji reviu
+e aprovou esta versão, confirmado explicitamente pelo utilizador.
+[Autorização](../experiments/construction/025-video/test-02/acceptance-and-review.json).
+Código/negativos/remoções da demo preservados; sem push ou IMP-019.
+TASK-020 permanece IN PROGRESS atéA/B/C; integração local antes de marcar025 DONE.
+
+**Checkpoint anterior de Test (histórico):**
+
+
+**IMP-018 / 025-video — Test em curso, prova integral/manual pendentes (2026-11-25T16:50:39Z):**
+Implement aprovado; apenas Test autorizado. [Relatório](../memory-bank/bolts/025-video/ddd-03-test-report.md).
+Clean verify JDK21: **1582/0/0/0,23 XML,saída0**; novo JAR preservado com
+SHA-256 `f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f`.
+45 testes locais M01–M14 passam; V-020-B continua pendente da leitura dos
+quatro conteúdos completos pelo novo VideoSource e do manual humano aplicável.
+Ponteiros LFS/cache ausente: sem novos resultados integrais de hash/count/EOF/
+cleanup; fixtures equivalentes não os substituem. [Manual preparado](../experiments/construction/025-video/manual-instructions.md),
+ensaio técnico pendente por media ausente, sem execução humana presumida.
+
+Os seis problemas V-ADD foram resolvidos pelo patch de3 paths explicitamente
+autorizado: fences dos dois templates e referências históricas removidas da
+demo. [Validação atual](../experiments/construction/025-video/test-01/v-add-after-patch.md):
+**zero erros**, sem alterar/enfraquecer o validador nem repor a demo.
+Código aprovado, históricos/negativos e limitação R17 preservados;16MiB
+apenas raster. Sem pedido de aprovação Test, fecho, commits/push ou IMP-019.
+Revisão final Denji e integração pendentes; TASK-020 só apósA/B/C. Sem gates
+externos adicionais; PHASE-05 IN PROGRESS, PHASE-06/07 TODO mantidas.
+
+**Checkpoint anterior de Implement (histórico):**
+
+
+**IMP-018 / 025-video — Implement pendente de revisão (2026-11-25T16:28:55Z):**
+ADR e A05/A06 aprovados; implementados apenas VideoSource.java e
+VideoSourceTest.java. [Walkthrough](../memory-bank/bolts/025-video/implementation-walkthrough.md): leitura pull de5ASCII+LJPEG,
+paths admitidos, JPEG validado, Frame imutável, guardas antes de decode,
+cleanup de cada recurso distinto e erro primário preservado. Raster destino
+≤16MiB; não é limite da memória total do decoder/JVM.
+
+Verificações de Implement JDK21: **45 novos testes e regressão incremental
+1582/0/0/0, 23 XML (1537 históricos +45 novos)**. Negativo inicial de compilação
+preservado e corrigido só no teste. M01–M14 exercitados; V-020-B consolidado
+e etapa Test pendentes. Os quatro vídeos estão como ponteiros LFS nesta
+checkout: não se executou a leitura integral dos22687 JPEGs com o novo leitor.
+Dimensões aprovadas verificadas com fixtures independentes e decoder real.
+
+Seis problemas V-ADD continuam pendentes antes do fecho, sem validação
+aprovada; remoções da demo preservadas. Sem Test, fecho, commits/push,
+configuração/protocolo, pacing/loop/emissão ou outro IMP. Manual humano
+aplicável, revisão final Denji e integração continuam por cumprir;
+TASK-020 apenas fecha com A/B/C. Sem gates externos adicionais.
+19 bolts complete,1 in-progress,15 planned; histórias19 complete,1 in-progress,
+15 planned. R17 inicial continua sem causa estabelecida.
+
+**Checkpoint anterior de ADR (histórico):**
+
+
+**IMP-018 / 025-video — revisão ADR para aprovação (2026-11-25T16:00:22Z):**
+Model eDesign/guardas aprovados; apenas revisão ADR autorizada.
+[Revisão](../memory-bank/bolts/025-video/adr-review.md) confere fontes e APIs
+JDK21 reais:paths,ownership,ImageReader/ImageReadParam,destino ecleanup.
+Sem impedimento de API/ampliação identificado;A01–A08 concretizam o Design.
+A05/A06 apresentam duas precisões antes de código:retorno nulo/distinto de
+ImageReader com destino explícito é falha inesperada,e imagem extra também
+exige cleanup (teto conservador6,no ramo anormal). Sem Implement/aprovaçãoADR.
+16MiB limitam raster,não heap total;M01–M14/V-020-B continuam por executar.
+Seis problemas V-ADD pendentes antes do fecho,validação não aprovada;remoção
+da demo preservada. Dois caminhos VideoSource.java/VideoSourceTest.java.
+Sem alteração Java,configuração/protocolo,pacing/loop/emissão,commits ou push.
+Fecho:regressãoJDK21,manual aplicável,Denji e integração;TASK-020 só apósA/B/C.
+19 bolts complete,1 in-progress,15 planned;nenhum novo gate externo.
+
+**Checkpoint anterior de Design (histórico):**
+
+
+**IMP-018 / 025-video — Design para revisão (2026-11-25T15:46:47Z):**
+Model eIMP-018-LOCAL-01/02 aprovados; apenas Design autorizado.
+[Design](../memory-bank/bolts/025-video/ddd-02-technical-design.md): API pull/síncrona,ownership/fecho/erro primário,
+zero progresso com falha imediata e limites4096×4096/4194304pixels antes
+de decode. Raster de destino≤16MiB;compatível com os22687 registos da
+auditoria anterior (A384×288,B/C/D640×360),sem novo decode ou teste.
+M01–M14/V-020-B continuam por executar. Dois caminhos VideoSource.java/
+VideoSourceTest.java,sem configuração/protocolo,pacing,loop ou emissão.
+[Seis pendências V-ADD](../experiments/construction/025-video/design-01/v-add-pendencias.md)
+a resolver antes do fecho;validação não aprovada. Remoções da demo preservadas.
+19 bolts complete,1 in-progress,15 planned;apenas Model concluído.
+Sem leitura/análise/alteração de fontes,Implement,Java/Maven,commits ou push.
+Fecho exige testes/regressãoJDK21,manual humano aplicável,Denji e integração.
+TASK-020 só fecha apósA/B/C;sem gates externos adicionais.
+
+**Checkpoint anterior de Model (histórico):**
+
+
+**IMP-018 / 025-video — Model para revisão (2026-11-25T15:32:21Z):**
+iniciado por instrução do utilizador após009-arvores/011-video complete.
+[Modelo](../memory-bank/bolts/025-video/ddd-01-domain-model.md): leitor sequencial
+5ASCII+LJPEG,limites,EOF/erro terminal,fecho e isolamento; propostas locais01/02
+por aprovar. M01–M14/V-020-B por executar. Nenhuma etapa aprovada;sem leitura/
+análise de fontes,Java,Maven,Design/ADR/Implement/Test,commits ou push.
+Totais atuais:19 bolts complete,1 in-progress,15 planned;histórias19 complete/
+16 planned. TASK-020 pai e PHASE-05 continuam IN PROGRESS,PHASE-06/07 TODO.
+LOCAL-03 sem cópia runtime,LOCAL-04/G-MEDIA-DISTRIBUTION permanecem pendentes
+como antes;sem gates externos adicionais. Remoções locais da demo preservadas.
+
+**Registos de fecho anteriores (históricos):**
+
+
 **IMP-017 / 011-video — complete;TASK-020 parte A concluída:**integração local
 main8a91d9fbf0bd1de60f1d29e5576625c9b8320c81 comprovada,598 caminhos/hashes/modos,
 quatro ponteiros LFS e459820128 bytes reais materializados do cache local;
@@ -32,7 +144,7 @@ Unidade005-video/PHASE-05 em progresso;nenhum outro IMP iniciado.18 bolts comple
 fecho documental sem alterações Java ou push. Bloco datado da demo seguinte histórico.
 
 **Preparação do checkpoint — 2026-11-22T23:40:32Z:** bolt de apoio
-[DEMO-001-checkpoint-phase04](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md),
+`DEMO-001-checkpoint-phase04` (`memory-bank/demonstrations/DEMO-001-checkpoint-phase04/bolt.md`, removido),
 separado dos35 incrementos funcionais. Protótipo **em curso/pausado por pedido
 do utilizador**, para continuar noutra iteração. Código da ferramenta em demo/,
 sem alteração a produção/testes/CORE. Cenário1: uma run PASS31/31; cenário2:
@@ -40,8 +152,8 @@ sem alteração a produção/testes/CORE. Cenário1: uma run PASS31/31; cenário
 com cleanup completo; cenário3 não executado. Não há três runs consecutivas
 da versão final nem aceitação da demo. Negativo NO_ROUTE da CLI preservado,
 causa não estabelecida; R17 histórico igualmente sem causa, sem os confundir.
-[Guião preliminar](../demo/DEMO.md) · [Matriz](../demo/MATRIX.md) ·
-[Retoma e evidência](../memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md).
+Guião preliminar: `demo/DEMO.md` (removido) · Matriz: `demo/MATRIX.md` (removido) ·
+Retoma e evidência: `memory-bank/demonstrations/DEMO-001-checkpoint-phase04/HANDOFF.md` (removido).
 PHASE-01–04 DONE e PHASE-05–07 TODO mantidos.
 
 

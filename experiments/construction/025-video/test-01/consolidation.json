@@ -1,0 +1,280 @@
+{
+  "recorded_at": "2026-11-25T16:47:26.436229+00:00",
+  "validation": "V-020-B",
+  "status": "pending full approved media and applicable human manual; not submitted for Test approval",
+  "stage": "test",
+  "Implement_approval": "explicit user approval",
+  "clean_verify": {
+    "exit_code": 0,
+    "totals": {
+      "tests": 1582,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "suites": 23,
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "java_version": "openjdk version \"21.0.13.1\" 2026-11-17\nOpenJDK Runtime Environment (build 21.0.13.1+2-1-22.04.1-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-22.04.1-Ubuntu, mixed mode, sharing)\n",
+    "command": [
+      "mvn",
+      "-o",
+      "-B",
+      "-ntp",
+      "-DargLine=-Djava.awt.headless=true",
+      "clean",
+      "verify"
+    ]
+  },
+  "jar": {
+    "build_path": "Projeto/target/ott-streaming-1.0-SNAPSHOT.jar",
+    "evidence_path": "experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+    "bytes": 543438,
+    "sha256": "f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f"
+  },
+  "approved_code_sha256": {
+    "Projeto/src/main/java/pt/uminho/esr/ott/server/VideoSource.java": "e76420087decb4cde5ce01f997b2a418c77f1c33214915065f82c817ea85547d",
+    "Projeto/src/test/java/pt/uminho/esr/ott/server/VideoSourceTest.java": "12a1490a8894a62fdb48cb13ecad0cfc440918dc394ca9f6b6c93c746fc9d0c4"
+  },
+  "groups": {
+    "M01": {
+      "local_automated": "passed",
+      "tests": [
+        "M01ReadsIndependentPayloadsWithExactPositions"
+      ]
+    },
+    "M02": {
+      "local_automated": "passed",
+      "tests": [
+        "M02PositiveShortReadsPreserveBytesAndBoundaries"
+      ]
+    },
+    "M03": {
+      "local_automated": "passed",
+      "tests": [
+        "M03EmptyAndRecordBoundaryEofAreIdempotent"
+      ]
+    },
+    "M04": {
+      "local_automated": "passed",
+      "tests": [
+        "M04EveryPartialPrefixFailsAtFirstOrSecondRecord"
+      ]
+    },
+    "M05": {
+      "local_automated": "passed",
+      "tests": [
+        "M05RejectsEveryNonDecimalPositionWithoutReadingAgain"
+      ]
+    },
+    "M06": {
+      "local_automated": "passed",
+      "tests": [
+        "M06AcceptsBMinusOneAndBAndValidJpegAt99999",
+        "M06RejectsZeroAndOversizeBeforeBodyOrDecoder"
+      ]
+    },
+    "M07": {
+      "local_automated": "passed",
+      "tests": [
+        "M07EveryBodyTruncationFailsWithoutPartialPublication"
+      ]
+    },
+    "M08": {
+      "local_automated": "passed",
+      "tests": [
+        "M08ScannerRecognizesStuffingRestartsAndMultipleScans",
+        "M08NullAndDistinctImagesAreUnexpectedAndBothAreCleaned",
+        "M08RealDecoderAcceptsProgressiveAndEmbeddedMarkerComments",
+        "M08MissingProviderAndCheckedFactoryFailureAreUnavailable",
+        "M08CheckedDecodeFailureAndAnyWarningRejectPublication",
+        "M08RejectsMalformedJpegBoundariesBeforeProviderCreation",
+        "M08RealDecoderRejectsStructurallyFramedButInvalidEntropy"
+      ]
+    },
+    "M09": {
+      "local_automated": "passed",
+      "tests": [
+        "M09ReadFailuresPreserveCauseAtPrefixAndBody",
+        "M09DiagnosticsAreBoundedAndDoNotIncludePayload",
+        "M09DistinctReturnedImageCleanupFailureNeverMasksPostcondition",
+        "M09CheckedPrimarySurvivesUncheckedCleanupAndTryWithResources",
+        "M09DuplicateSecondaryIdentityIsRecordedOnce",
+        "M09CheckedProviderQueriesRemainFormatErrorsWithOriginalCause",
+        "M09CleanupDoesNotIntroduceCauseCyclesOrSelfSuppression",
+        "M09SameIdentityReadAndCloseDoesNotSelfSuppress",
+        "M09UncheckedReadAndProviderFailuresKeepIdentity",
+        "M09PathAdmissionRetainsIoCauseAndRejectsEscapesAndNonFiles"
+      ]
+    },
+    "M10": {
+      "local_automated": "passed",
+      "tests": [
+        "M10CloseBeforeReadAndAfterFrameIsIdempotent",
+        "M10BorrowedCacheClosesAfterUncheckedFactoryFailure",
+        "M10CloseAsFirstFailureKeepsCheckedOrUncheckedCategory",
+        "M10ReaderOwnershipPrecedesEveryProviderOperation",
+        "M10InvalidArgumentsDoNotAcquireOrTouchCallerInput",
+        "M10FiveTransientAndOneSessionCleanupFailureStayBounded",
+        "M10TransientCleanupAsFirstFailurePreventsFramePublication",
+        "M10CleanupAttemptsAllDistinctResourcesOnceInReverseOrder"
+      ]
+    },
+    "M11": {
+      "local_automated": "passed",
+      "tests": [
+        "M11FramesOwnCopiesEvenWhenInputRetainsReadBuffer"
+      ]
+    },
+    "M12": {
+      "local_automated": "passed",
+      "tests": [
+        "M12TwoSourcesCanOpenSameFileIndependently",
+        "M12InterleavedSessionsDoNotSharePositionFailureOrClose"
+      ]
+    },
+    "M13": {
+      "local_automated": "passed",
+      "tests": [
+        "M13RechecksDecoderDimensionsBeforeReadOrDestinationAllocation",
+        "M13InvalidProviderContractsStayUnexpected",
+        "M13RejectsDimensionsBeforeCreatingProviderIncludingLongProduct",
+        "M13DestinationUsesCanonicalTypeAndFullDecodeParametersAtBoundaries",
+        "M13RealDecoderAcceptsIndependentFixturesAtApprovedMediaDimensions",
+        "M13AllCanonicalDestinationTypesAreAcceptedAndOthersRejected"
+      ],
+      "full_approved_contents": "pending: complete binaries unavailable; same-dimension fixtures and LFS pointers do not satisfy this proof"
+    },
+    "M14": {
+      "local_automated": "passed",
+      "tests": [
+        "M14InvalidReadCountsFailWithoutFallbackOrFurtherRead",
+        "M14PositionArithmeticDoesNotWrap",
+        "M14ZeroProgressFailsOnceAtAnyReadStage"
+      ]
+    }
+  },
+  "body_truncation_cases": 1032,
+  "prefix_truncation_cases": 8,
+  "non_decimal_cases": 50,
+  "full_approved_media": {
+    "recorded_at": "2026-11-25T16:42:53.457885+00:00",
+    "assets": [
+      {
+        "alias": "A",
+        "path": "Projeto/src/main/resources/media/a.Mjpeg",
+        "checkout_bytes": 132,
+        "checkout_sha256": "fb56c261d064ee126a1e5311cb0159daed444154eecad4abdfb0eeab1a0bc283",
+        "is_lfs_pointer": true,
+        "approved_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+        "expected_bytes": 4269893,
+        "expected_frames": 500,
+        "local_lfs_object": ".git/lfs/objects/ca/46/ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+        "local_lfs_object_exists": false,
+        "full_content_verified": false,
+        "EOF_verified_on_full_content": false,
+        "cleanup_verified_on_full_content": false,
+        "status": "pending: full binary unavailable"
+      },
+      {
+        "alias": "B",
+        "path": "Projeto/src/main/resources/media/b.Mjpeg",
+        "checkout_bytes": 134,
+        "checkout_sha256": "7db01f9e908c45aa7817da7dec8951fbc1dec8114814b77002e9e2e42e03bcd3",
+        "is_lfs_pointer": true,
+        "approved_sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
+        "expected_bytes": 111255866,
+        "expected_frames": 5965,
+        "local_lfs_object": ".git/lfs/objects/ce/b6/ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
+        "local_lfs_object_exists": false,
+        "full_content_verified": false,
+        "EOF_verified_on_full_content": false,
+        "cleanup_verified_on_full_content": false,
+        "status": "pending: full binary unavailable"
+      },
+      {
+        "alias": "C",
+        "path": "Projeto/src/main/resources/media/c.Mjpeg",
+        "checkout_bytes": 134,
+        "checkout_sha256": "f4807d3a89f444ebb2ef85c5d5cc4efa3b677fbee99e31f3adf5006aca91ac15",
+        "is_lfs_pointer": true,
+        "approved_sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
+        "expected_bytes": 167319819,
+        "expected_frames": 8880,
+        "local_lfs_object": ".git/lfs/objects/d2/a0/d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
+        "local_lfs_object_exists": false,
+        "full_content_verified": false,
+        "EOF_verified_on_full_content": false,
+        "cleanup_verified_on_full_content": false,
+        "status": "pending: full binary unavailable"
+      },
+      {
+        "alias": "D",
+        "path": "Projeto/src/main/resources/media/d.Mjpeg",
+        "checkout_bytes": 134,
+        "checkout_sha256": "81783783cb5ca3a5d461d2cc7521625f4f0861d43470c7d684d58023d6040890",
+        "is_lfs_pointer": true,
+        "approved_sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
+        "expected_bytes": 176974550,
+        "expected_frames": 7342,
+        "local_lfs_object": ".git/lfs/objects/c4/7e/c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
+        "local_lfs_object_exists": false,
+        "full_content_verified": false,
+        "EOF_verified_on_full_content": false,
+        "cleanup_verified_on_full_content": false,
+        "status": "pending: full binary unavailable"
+      }
+    ],
+    "custom_lfs_storage_configured": false,
+    "materialization_fetch_download_performed": false,
+    "expected_total_frames": 22687,
+    "status": "pending; LFS pointers and same-dimension fixtures do not satisfy full-content proof"
+  },
+  "manual": {
+    "status": "prepared; human not executed",
+    "runs": [
+      {
+        "path": "experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/report.json",
+        "kind": "rehearsal",
+        "exit_code": 1,
+        "result": "failed",
+        "technical_complete": false,
+        "manual_human_complete": false
+      },
+      {
+        "path": "experiments/construction/025-video/test-manual-runs/20261125T164607Z-a961bb8c/report.json",
+        "kind": "rehearsal",
+        "exit_code": 2,
+        "result": "pending_full_media",
+        "technical_complete": false,
+        "manual_human_complete": false
+      }
+    ],
+    "current_rehearsal": "experiments/construction/025-video/test-manual-runs/20261125T164607Z-a961bb8c/report.json",
+    "first_rehearsal_negative": "JShell local launcher classpath missing nested class at runtime; preserved original command/log/snapshots and controlled successful JVM-classpath variant; approved application/JAR unchanged"
+  },
+  "V_ADD": {
+    "status": "passed after exclusively authorized three-file documentation patch",
+    "errors": 0,
+    "report": "v-add-after-patch.md",
+    "patch": "v-add-proposal/resolution.patch",
+    "application": "v-add-proposal/application.json",
+    "validator_weakened": false,
+    "demo_restored": false,
+    "final_report": "v-add-final.md",
+    "final_errors": 0
+  },
+  "limitations": [
+    "16MiB bounds only destination raster, not total decoder/JVM memory",
+    "no four-content full-binary validation yet",
+    "full-file harness counts actual input close once; transient disposal is verified in M10 unit tests, not separately instrumented per frame in full-file run",
+    "R17 original cause remains unknown; controlled-metrics integration does not establish it",
+    "No streaming integration, pacing, loop, emission or player in IMP-018"
+  ],
+  "Test_approval": "not requested; pending required evidence and human execution",
+  "closure": "not authorized",
+  "final_Denji_review": "pending",
+  "integration": "pending",
+  "TASK_020": "remains IN PROGRESS; closes only after A/B/C",
+  "scope_check": "scope-check.json",
+  "diff_check_exit_code": 0
+}

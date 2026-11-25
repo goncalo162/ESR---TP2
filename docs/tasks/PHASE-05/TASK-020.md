@@ -111,3 +111,71 @@ LOCAL-03 permanece sem cópia para Projeto/media;LOCAL-04 e G-MEDIA-DISTRIBUTION
 abertos para TASK-030. Limitação B ilegível aceite só tecnicamente,não aprova
 atribuição adequada,legibilidade,redistribuição/publicação ou licença de A.
 Unidade005/PHASE-05 em progresso;Homebrew separado,sem intervenção;sem push.
+
+## IMP-018 — parte B iniciada apenas em Model
+
+Registo 2026-11-25T15:32:21Z: [Model de025-video](../../../memory-bank/bolts/025-video/ddd-01-domain-model.md)
+preparado para revisão,LOCAL-01/02 propostos. Leitor com validação de registo/
+JPEG,EOF/erros/ownership e M01–M14/V-020-B planeados;nenhuma execução nova.
+Sem leitura/análise de fontes,Java/Design/ADR/Implement/Test,Maven,commit ou
+push. Parte A permanece concluída;parte B não implementada;parte C não iniciada.
+Estado pai IN PROGRESS,sem ampliar dois caminhos do ADD ou gates externos.
+
+## IMP-018 — Model aprovado, Design apenas para revisão
+
+Registo 2026-11-25T15:46:47Z: Model/LOCAL-01/02 aprovados; [Design](../../../memory-bank/bolts/025-video/ddd-02-technical-design.md)
+concretiza API,ownership/erro/fecho,sem progresso e caps compatíveis com os
+quatro conteúdos antes do decode. Não é leitor implementado ou V-020-B
+executado. Seis problemas V-ADD pendentes antes do fecho,validação não aprovada.
+Parte A concluída,B apenasDesign,C não iniciada;TASK-020 pai IN PROGRESS.
+Sem Java/Implement/commits/push,config/protocolo ou gates externos adicionais.
+
+## IMP-018 — Design aprovado; apenas revisão ADR
+
+Registo 2026-11-25T16:00:22Z: [revisão sobre APIs reais](../../../memory-bank/bolts/025-video/adr-review.md)
+para aprovação,sem impedimento de âmbito identificado. A05/A06 apresentam
+precisões de falha inesperada ecleanup antes de Implement. B não implementada,
+A concluída,C não iniciada;TASK-020 IN PROGRESS atéA/B/C. M01–M14/V-020-B
+por executar;seis problemas V-ADD pendentes,sem validação aprovada.
+Sem alteraçãoJava,config/protocolo,commits/push ou gates externos adicionais.
+
+## IMP-018 — Implement pendente de revisão, 2026-11-25T16:28:55Z
+
+[Leitor e walkthrough](../../../memory-bank/bolts/025-video/implementation-walkthrough.md) apenas nos dois caminhos autorizados.
+ADR/A05/A06 aprovados.45 testes novos M01–M14 passam; regressão incremental
+JDK21 com1582/0/0/0,23 XML. Negativo de compilação preservado; testes históricos
+inalterados. Guardas/erro primário/cleanup mantidos,16MiB apenas raster.
+
+Quatro vídeos como ponteiros LFS nesta checkout: sem materialização e sem
+nova leitura integral dos22687 JPEGs pelo VideoSource. Fixtures independentes
+nas dimensões aprovadas passam no decoder real; não substituem os conteúdos.
+Seis problemas V-ADD ainda pendentes antes do fecho; demo não reposta.
+ParteA concluída; B/Implement para revisão, C não iniciada; pai IN PROGRESS.
+Sem Test, fecho, commits/push. V-020-B consolidado, manual humano aplicável,
+regressão de aceitação JDK21, revisão final Denji e integração pendentes;
+fecho do pai só apósA/B/C, sem gates externos adicionais. R17 preservado.
+
+## IMP-018 — Implement aprovado, Test em curso (2026-11-25T16:50:39Z)
+
+[Relatório](../../../memory-bank/bolts/025-video/ddd-03-test-report.md), clean verify JDK21 com1582/0/0/0,23 XML,
+JAR novo e SHA-256 `f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f`.
+M01–M14 locais consolidados; V-020-B integral pendente por falta dos quatro
+binários completos (paths são LFS; objetos ausentes), sem falsos resultados
+de hash/count/EOF/cleanup ou substituição por fixtures. Manual preparado,
+ainda não executado por humano. Sem pedir aprovação Test nesta condição.
+
+Seis problemas V-ADD resolvidos pelo patch de3 paths explicitamente autorizado;
+validação0 erros, sem alterar o validador/restaurar demo. Código aprovado e
+históricos/negativos preservados. ParteA concluída; B emTest não aprovado,
+C não iniciada. Pai IN PROGRESS; só fecha apósA/B/C, manual aplicável, Denji
+e integração; sem gates externos adicionais. Sem fecho/commits/push/IMP-019.
+
+## Test aceite por condição expressa; revisão confirmada — 2026-11-25T17:06:50Z
+
+[Relatório](../../../memory-bank/bolts/025-video/ddd-03-test-report.md):22687 frames reais, hashes aprovados, comparação de cada
+Frame,500/5965/8880/7342, EOF/END e fecho único. Sem rebuild ou alteração Java.
+Negativo pessoal preservado; posterior delegação de execução em Codex e
+commit/fecho condicional ao resultado correto. Nova run automática saída0;
+Test aceite por essa condição, sem afirmar manual humano concluído. Denji
+reviu e aprovou a versão, confirmado pelo utilizador. Integrar localmente antes
+de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preservado.

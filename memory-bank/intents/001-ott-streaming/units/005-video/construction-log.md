@@ -170,3 +170,107 @@ aprovadas. Quota/orçamento antes de publicar continuam pendentes.
 Homebrew separado,sem intervenção. Sem Java/media/perfis/POM/fixtures/demo
 alterados,uploads,push ou início de outro IMP. Prova e documentos são o único
 âmbito do commit de fecho autorizado;fecho não altera resultados históricos.
+
+## 2026-11-25T15:28:08Z — IMP-018 / 025-video iniciado apenas em Model
+
+Seleção explícita do próximo bolt pelo utilizador; ordem do ADD após IMP-017.
+Dependências009-arvores/011-video complete; unidade005/PHASE-05 em progresso.
+Apenas domínio/documentação autorizados nesta etapa, sem leitura/análise de fontes,
+Design/ADR/Implement/Test, Java, Maven, commits ou push. Estado do Model por aprovar.
+As remoções locais preexistentes de demo/ e memory-bank/demonstrations são
+preservadas; não são corrigidas nem usadas como gate do bolt funcional.
+
+## 2026-11-25T15:32:21Z — Model deIMP-018 preparado para aprovação
+
+[Modelo](../../../../bolts/025-video/ddd-01-domain-model.md) com entidades,objetos
+de valor,agregado/estados,erros,porto de entrada e M01–M14. Propostas locais01/02:
+EOF do cursor distinto da rejeição de conteúdo vazio,ownership/erro terminal e
+validação JPEG integral/headless,sem antecipar o player. Sem etapas aprovadas.
+Sem fontes lidos/analisados/alterados ou execução Java/Maven/V-020-B.
+Design só após aprovação;sem commits/push/outro IMP ou gates externos novos.
+
+## 2026-11-25T15:40:54Z — IMP-018 Model/LOCAL-01/02 aprovados; apenas Design
+
+Utilizador aprovou o domínio e autorizou API/ownership/fecho/erros/sem progresso
+e caps de dimensões/pixels compatíveis com os quatro conteúdos,apenas em Design.
+Dois caminhos futuros VideoSource.java/VideoSourceTest.java mantidos,sem Java,
+Implement,pacing,loop,emissão,configuração/protocolo,commits ou push.
+Seis problemas V-ADD permanecem pendência obrigatória antes do fecho,não
+aprovados. Remoções da demo preservadas;M01–M14/V-020-B não executados.
+
+## 2026-11-25T15:46:47Z — Design deIMP-018 preparado para aprovação
+
+[Artefacto](../../../../bolts/025-video/ddd-02-technical-design.md): assinaturas
+propostas sem leitura de fontes,ownership/cleanup com erro primário estável,
+readbulk=0 terminal e guardas de dimensões/pixels/raster antes de decode.
+A compatibilidade usa os hashes/registos da auditoriaIMP-017,sem reabrir vídeos.
+Seis pendências V-ADD antes do fecho explicitadas,não aprovadas. Model é a
+única etapa concluída;Design por aprovar;M01–M14/V-020-B por executar.
+Sem Java/Maven/Implement,config/protocolo,pacing,loop,emissão,commits ou push.
+
+## 2026-11-25T15:52:32Z — IMP-018 Design aprovado; apenas revisão ADR
+
+Utilizador aprovou guardas/API/ownership do Design;autorizada inspeção das
+APIs reais de paths,ImageReader/ImageReadParam,destino,scanner e cleanup.
+Só documentação de revisão,sem Implement,alteração Java,commits ou push.
+Dois caminhos preservados;M01–M14/V-020-B não executados. Seis problemas
+V-ADD continuam pendentes antes do fecho,sem validação aprovada ou reposição
+da demo. Fecho exige regressãoJDK21,manual aplicável,Denji e integração.
+
+## 2026-11-25T16:00:22Z — Revisão ADR deIMP-018 preparada
+
+[Revisão](../../../../bolts/025-video/adr-review.md) sobre fonte vazio/consumidores
+e configuração real;assinaturas e bytecode JDK21 viajavap,sem executar leitor
+ou testes. Sem impedimento de API/âmbito identificado;reutilizar ADR existentes.
+A05/A06 apresentam classificação de retorno inesperado deImageReader ecleanup
+da imagem extra antes de Implement. Model/Design concluídos;ADR por aprovar.
+Seis erros V-ADD pendentes antes do fecho,não aprovados;remoção demo preservada.
+Sem alteraçãoJava/config/protocolo,Implement,commits/push ou novo gate externo.
+
+## 2026-11-25T16:10:17Z — ADR/A05/A06 aprovados; apenas Implement deIMP-018
+
+Utilizador autorizou apenas VideoSource.java/VideoSourceTest.java,com
+verificações pertinentesJDK21 e negativos preservados. Sem avanço aTest,
+fecho,commits ou push. Caps/erroprimário/cleanup distintos eM01–M14 mantidos.
+Seis problemasV-ADD continuam pendentes antes do fecho;demo não reposta.
+
+## 2026-11-25T16:28:55Z — IMP-018 Implement para revisão
+
+ADR/A05/A06 aprovados. Implementados apenas VideoSource.java e
+VideoSourceTest.java; [walkthrough](../../../../bolts/025-video/implementation-walkthrough.md).
+45 novos testes M01–M14 e regressão incremental JDK21 com1582/0/0/0,23 XML.
+Negativo inicial de compilação e fontes preservados separadamente; corrigidas
+apenas declarações de tipo no teste, sem enfraquecer expectativas.
+Sem teste histórico removido ou alterado. Dois caminhos, caps e contratos
+aprovados mantidos. Guardas compatíveis;16MiB não é teto total de JVM/decoder.
+Quatro recursos só LFS: sem leitura integral nova dos22687 JPEGs. Fixture real
+nas dimensões aprovadas não substitui essa verificação.
+current_stage=implement, história007 in-progress; Implement sem aceitação,
+V-020-B consolidado/Test/fecho pendentes. Seis erros V-ADD pendentes, demo não
+reposta; sem commits/push/outro IMP. Manual aplicável, Denji e integração
+mantidos; TASK-020 só fecha apósA/B/C; R17 inicial sem causa estabelecida.
+
+## 2026-11-25T16:50:39Z — IMP-018 Implement aprovado; Test técnico executado
+
+Aprovação explícita registada; current_stage=test, Implement emstages_completed,
+completed=null. [Relatório](../../../../bolts/025-video/ddd-03-test-report.md).
+Clean verify JDK21:1582/0/0/0,23 XML, saída0; JAR/SHA-256 preservados.
+M01–M14 locais consolidados, V-020-B integral pendente: quatro ponteiros LFS,
+nenhum binário/cache local, sem fetch/materialização. Não se pede aprovação
+Test; manual humano preparado, ainda não executado. Ensaio técnico parcial
+saída2/pending_full_media; negativo inicial de classpath e controlo preservados.
+Patch documental V-ADD de3 paths apresentado e autorizado exclusivamente pelo
+utilizador, aplicado byte a byte; V-ADD0 erros, validador/demo preservados.
+Nenhuma alteração de código/testes aprovados. Sem fecho/commits/push/IMP-019.
+R17 original sem causa;16MiB apenas raster; Denji/integração obrigatórios;
+TASK-020 só fecha apósA/B/C, nenhum gate externo adicional.
+
+## Test aceite por condição expressa; revisão confirmada — 2026-11-25T17:06:50Z
+
+[Relatório](../../../../bolts/025-video/ddd-03-test-report.md):22687 frames reais, hashes aprovados, comparação de cada
+Frame,500/5965/8880/7342, EOF/END e fecho único. Sem rebuild ou alteração Java.
+Negativo pessoal preservado; posterior delegação de execução em Codex e
+commit/fecho condicional ao resultado correto. Nova run automática saída0;
+Test aceite por essa condição, sem afirmar manual humano concluído. Denji
+reviu e aprovou a versão, confirmado pelo utilizador. Integrar localmente antes
+de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preservado.

@@ -1,0 +1,144 @@
+Compiled from "UnixChannelFactory.java"
+public class sun.nio.fs.UnixChannelFactory$Flags {
+  boolean read;
+
+  boolean write;
+
+  boolean append;
+
+  boolean truncateExisting;
+
+  boolean noFollowLinks;
+
+  boolean create;
+
+  boolean createNew;
+
+  boolean deleteOnClose;
+
+  boolean sync;
+
+  boolean dsync;
+
+  boolean direct;
+
+  protected sun.nio.fs.UnixChannelFactory$Flags();
+    Code:
+       0: aload_0
+       1: invokespecial #3                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  static sun.nio.fs.UnixChannelFactory$Flags toFlags(java.util.Set<? extends java.nio.file.OpenOption>);
+    Code:
+       0: new           #9                  // class sun/nio/fs/UnixChannelFactory$Flags
+       3: dup
+       4: invokespecial #11                 // Method "<init>":()V
+       7: astore_1
+       8: aload_0
+       9: invokeinterface #12,  1           // InterfaceMethod java/util/Set.iterator:()Ljava/util/Iterator;
+      14: astore_2
+      15: aload_2
+      16: invokeinterface #18,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      21: ifeq          263
+      24: aload_2
+      25: invokeinterface #24,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      30: checkcast     #28                 // class java/nio/file/OpenOption
+      33: astore_3
+      34: aload_3
+      35: instanceof    #30                 // class java/nio/file/StandardOpenOption
+      38: ifeq          191
+      41: getstatic     #32                 // Field sun/nio/fs/UnixChannelFactory$1.$SwitchMap$java$nio$file$StandardOpenOption:[I
+      44: aload_3
+      45: checkcast     #30                 // class java/nio/file/StandardOpenOption
+      48: invokevirtual #38                 // Method java/nio/file/StandardOpenOption.ordinal:()I
+      51: iaload
+      52: tableswitch   { // 1 to 10
+                     1: 108
+                     2: 116
+                     3: 124
+                     4: 132
+                     5: 140
+                     6: 148
+                     7: 156
+                     8: 164
+                     9: 167
+                    10: 175
+               default: 183
+          }
+     108: aload_1
+     109: iconst_1
+     110: putfield      #42                 // Field read:Z
+     113: goto          15
+     116: aload_1
+     117: iconst_1
+     118: putfield      #46                 // Field write:Z
+     121: goto          15
+     124: aload_1
+     125: iconst_1
+     126: putfield      #49                 // Field append:Z
+     129: goto          15
+     132: aload_1
+     133: iconst_1
+     134: putfield      #52                 // Field truncateExisting:Z
+     137: goto          15
+     140: aload_1
+     141: iconst_1
+     142: putfield      #55                 // Field create:Z
+     145: goto          15
+     148: aload_1
+     149: iconst_1
+     150: putfield      #58                 // Field createNew:Z
+     153: goto          15
+     156: aload_1
+     157: iconst_1
+     158: putfield      #61                 // Field deleteOnClose:Z
+     161: goto          15
+     164: goto          15
+     167: aload_1
+     168: iconst_1
+     169: putfield      #64                 // Field sync:Z
+     172: goto          15
+     175: aload_1
+     176: iconst_1
+     177: putfield      #67                 // Field dsync:Z
+     180: goto          15
+     183: new           #70                 // class java/lang/UnsupportedOperationException
+     186: dup
+     187: invokespecial #72                 // Method java/lang/UnsupportedOperationException."<init>":()V
+     190: athrow
+     191: aload_3
+     192: getstatic     #73                 // Field java/nio/file/LinkOption.NOFOLLOW_LINKS:Ljava/nio/file/LinkOption;
+     195: if_acmpne     206
+     198: aload_1
+     199: iconst_1
+     200: putfield      #79                 // Field noFollowLinks:Z
+     203: goto          15
+     206: getstatic     #82                 // Field sun/nio/fs/ExtendedOptions.DIRECT:Lsun/nio/fs/ExtendedOptions$InternalOption;
+     209: aload_3
+     210: invokevirtual #88                 // Method sun/nio/fs/ExtendedOptions$InternalOption.matches:(Ljava/lang/Object;)Z
+     213: ifeq          224
+     216: aload_1
+     217: iconst_1
+     218: putfield      #94                 // Field direct:Z
+     221: goto          15
+     224: aload_3
+     225: ifnonnull     236
+     228: new           #97                 // class java/lang/NullPointerException
+     231: dup
+     232: invokespecial #99                 // Method java/lang/NullPointerException."<init>":()V
+     235: athrow
+     236: new           #70                 // class java/lang/UnsupportedOperationException
+     239: dup
+     240: new           #100                // class java/lang/StringBuilder
+     243: dup
+     244: invokespecial #102                // Method java/lang/StringBuilder."<init>":()V
+     247: aload_3
+     248: invokevirtual #103                // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+     251: ldc           #106                // String  not supported
+     253: invokevirtual #108                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     256: invokevirtual #111                // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     259: invokespecial #115                // Method java/lang/UnsupportedOperationException."<init>":(Ljava/lang/String;)V
+     262: athrow
+     263: aload_1
+     264: areturn
+}

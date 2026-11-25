@@ -1,0 +1,23 @@
+STAGE 1: JDK/JAR fixados
+openjdk version "21.0.13.1" 2026-11-17
+OpenJDK Runtime Environment (build 21.0.13.1+2-1-22.04.1-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-22.04.1-Ubuntu, mixed mode, sharing)
+JAR_SHA256=f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f
+Nov 25, 2026 4:44:45 PM java.util.prefs.FileSystemPreferences$1 run
+INFO: Created user preferences directory.
+java.lang.NoClassDefFoundError: pt/uminho/esr/ott/server/VideoSource$SourceException
+	at REPL.$JShell$14.do_it$($JShell$14.java:11)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at jdk.jshell/jdk.jshell.execution.LocalExecutionControl.lambda$invoke$8(LocalExecutionControl.java:139)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.lang.ClassNotFoundException: pt.uminho.esr.ott.server.VideoSource$SourceException
+	at java.base/java.net.URLClassLoader.findClass(URLClassLoader.java:445)
+	at jdk.jshell/jdk.jshell.execution.DefaultLoaderDelegate$RemoteClassLoader.findClass(DefaultLoaderDelegate.java:154)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:593)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526)
+	... 5 more
+VS_SCRIPT_EXIT=1
+CHECK_FAILED JAR check 02-frames failed; actual exit=1; see /home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/02-frames.log
+REPORT=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/report.json
+WRAPPER_EXIT=1

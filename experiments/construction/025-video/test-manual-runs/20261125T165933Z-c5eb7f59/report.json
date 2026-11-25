@@ -1,0 +1,223 @@
+{
+  "run_id": "20261125T165933Z-c5eb7f59",
+  "kind": "human",
+  "operator": "Luis",
+  "started_at": "2026-11-25T16:59:33.923026+00:00",
+  "jar": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+  "expected_jar_sha256": "f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f",
+  "stages": [
+    {
+      "stage": 1,
+      "title": "JDK/JAR fixados",
+      "technical": "passed",
+      "operator_confirmed": true,
+      "operator_response": "sim"
+    },
+    {
+      "stage": 2,
+      "title": "Dois frames e EOF",
+      "technical": "passed",
+      "operator_confirmed": true,
+      "operator_response": "sim"
+    },
+    {
+      "stage": 3,
+      "title": "Negativos e erro estável",
+      "technical": "passed",
+      "operator_confirmed": true,
+      "operator_response": "sim"
+    },
+    {
+      "stage": 4,
+      "title": "Imutabilidade e isolamento",
+      "technical": "passed",
+      "operator_confirmed": true,
+      "operator_response": "sim"
+    },
+    {
+      "stage": 5,
+      "title": "Quatro conteúdos completos",
+      "technical": "pending",
+      "operator_confirmed": false
+    },
+    {
+      "stage": 6,
+      "title": "Fecho e controlo do verificador",
+      "technical": "passed",
+      "operator_confirmed": false,
+      "operator_response": "sisim"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/prefs",
+        "-J-Xmx256m",
+        "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "frames",
+      "inputs": {},
+      "exit_code": 0,
+      "log": "02-frames.log"
+    },
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/prefs",
+        "-J-Xmx256m",
+        "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "errors",
+      "inputs": {},
+      "exit_code": 0,
+      "log": "03-errors.log"
+    },
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/prefs",
+        "-J-Xmx256m",
+        "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "isolation",
+      "inputs": {},
+      "exit_code": 0,
+      "log": "04-isolation.log"
+    },
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/prefs",
+        "-J-Xmx256m",
+        "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "lifecycle",
+      "inputs": {},
+      "exit_code": 0,
+      "log": "06-lifecycle.log"
+    },
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/prefs",
+        "-J-Xmx256m",
+        "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "full",
+      "inputs": {
+        "VS_MEDIA": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/fixtures/two.Mjpeg",
+        "VS_AUDIT": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T165933Z-c5eb7f59/fixtures/independent-audit.jsonl",
+        "VS_FRAMES": "2",
+        "VS_BYTES": "1042",
+        "VS_SHA256": "e119744c085a9b663e5a5a2b1a1b343ea783f24db628b843bec1e3440caecff7"
+      },
+      "exit_code": 0,
+      "log": "06-checker-selftest.log"
+    }
+  ],
+  "media": [
+    {
+      "alias": "A",
+      "path": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-02/a.Mjpeg",
+      "expected_sha256": "ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca",
+      "expected_frames": 500,
+      "expected_bytes": 4269893,
+      "actual_frames": null,
+      "EOF_verified": false,
+      "input_close_attempts": null,
+      "input_closed": false,
+      "status": "pending: complete binary unavailable"
+    },
+    {
+      "alias": "B",
+      "path": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-02/b.Mjpeg",
+      "expected_sha256": "ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f",
+      "expected_frames": 5965,
+      "expected_bytes": 111255866,
+      "actual_frames": null,
+      "EOF_verified": false,
+      "input_close_attempts": null,
+      "input_closed": false,
+      "status": "pending: complete binary unavailable"
+    },
+    {
+      "alias": "C",
+      "path": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-02/c.Mjpeg",
+      "expected_sha256": "d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab",
+      "expected_frames": 8880,
+      "expected_bytes": 167319819,
+      "actual_frames": null,
+      "EOF_verified": false,
+      "input_close_attempts": null,
+      "input_closed": false,
+      "status": "pending: complete binary unavailable"
+    },
+    {
+      "alias": "D",
+      "path": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-02/d.Mjpeg",
+      "expected_sha256": "c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc",
+      "expected_frames": 7342,
+      "expected_bytes": 176974550,
+      "actual_frames": null,
+      "EOF_verified": false,
+      "input_close_attempts": null,
+      "input_closed": false,
+      "status": "pending: complete binary unavailable"
+    }
+  ],
+  "technical_complete": false,
+  "manual_human_complete": false,
+  "Test_approval": "pending",
+  "wrapper_exit": 1,
+  "tools_sha256": {
+    "run-checks.py": "ffc7ef1d0642b8b87a3db3b75cc61809d6cb5a02fe4d1ab06fa124a73b295f9c",
+    "check-source.jsh": "3d90224f71f4cae2ebab899a47c4705068a0456b587dab6ddfc3c2ae4ad810c5",
+    "approved-build.json": "a680df20922558f87f50ed6c63304a29119a5eddfa35a9f2a00ede63444fce60"
+  },
+  "java_version": "openjdk version \"21.0.13.1\" 2026-11-17\nOpenJDK Runtime Environment (build 21.0.13.1+2-1-22.04.1-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-22.04.1-Ubuntu, mixed mode, sharing)\n",
+  "actual_jar_sha256": "f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f",
+  "result": "failed",
+  "error": "Operator did not confirm stage 6",
+  "ended_at": "2026-11-25T16:59:46.905771+00:00"
+}

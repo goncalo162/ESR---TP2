@@ -5,7 +5,7 @@ phase: "construction"
 source_phase: "PHASE-05"
 status: "in-progress"
 created: "2026-11-02T15:02:08Z"
-updated: "2026-11-24T20:49:09Z"
+updated: "2026-11-25T16:50:39Z"
 unit_type: "backend"
 default_bolt_type: "ddd-construction-bolt"
 owned_requirements: ["REQ-010", "REQ-012", "REQ-013", "REQ-015", "NFR-001", "REQ-016", "REQ-018"]
@@ -20,12 +20,24 @@ localmente em main72c9f92. [Fecho](../../../../bolts/010-video/closure-walkthrou
 IMP-017/011-video complete,parte A/TASK-020 concluída e integrada em main8a91d9f;
 Test/V-020-A,manual Francisco13 e revisão final Denji cumpridos.
 [Fecho](../../../../bolts/011-video/closure-walkthrough.md).
-TASK-020 inteira IN PROGRESS e PHASE-05 em progresso,restantes histórias planned.
+TASK-020 inteira IN PROGRESS e PHASE-05 em progresso; história007 in-progress,
+restantes histórias da unidade planned.
 LOCAL-03 sem cópia runtime;LOCAL-04/G-MEDIA-DISTRIBUTION abertos para TASK-030.
 Créditos B ilegíveis,sem aprovação de atribuição/redistribuição/publicação.
 Dependência004-arvores/PHASE-04 complete/DONE; DEMO-001 separado/não bloqueante.
-Codec e preparação dos quatro conteúdos entregues;leitura/pacing,streaming/reprodução futuros.
+Codec e preparação dos quatro conteúdos entregues; leitor local para revisão,
+pacing, streaming e reprodução futuros.
 Sem push,alterações Java no fecho ou fecho da unidade. IDs locais preservados.
+
+IMP-018/025-video com Test aceite por condição expressa e revisão Denji
+confirmada pelo utilizador. [Relatório](../../../../bolts/025-video/ddd-03-test-report.md):
+1582/0/0/0 e JAR fixado, sem rebuild; prova nova dos22687 frames completos,
+hashes/contagens/EOF/cleanup e comparação por frame. Negativo humano preservado;
+execução pessoal substituída por delegação em Codex para este fecho, sem
+inventar manual humano concluído. V-ADD0 erros; código/demo preservados.
+Integração local pendente antes de concluir025. Sem push/IMP-019; TASK-020
+só fecha apósA/B/C. R17 original continua sem causa estabelecida.
+19 bolts complete,1 in-progress,15 planned; nenhum gate externo adicional.
 
 ## Requisitos atribuídos
 

@@ -1347,6 +1347,52 @@ Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores
   - [ ] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
   - [ ] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
 
+Checkpoint documental 2026-11-25T15:32:21Z: IMP-018/025-video iniciado apenas em Model.
+[Model para revisão](memory-bank/bolts/025-video/ddd-01-domain-model.md),
+LOCAL-01/02 propostos,sem alteração normativa. M01–M14/V-020-B por executar;
+sem Design/ADR/Java/Implement/Test/Maven,commits/push ou novo gate externo.
+Dois caminhos acima preservados;TASK-020 parte A concluída eB/C pendentes.
+
+Checkpoint documental 2026-11-25T15:46:47Z: Model/IMP-018-LOCAL-01/02 aprovados,
+[Design de025-video para revisão](memory-bank/bolts/025-video/ddd-02-technical-design.md),sem contrato/API implementado.
+Dois caminhos preservados;sem pacing/loop/emissão/configuração/protocolo.
+M01–M14/V-020-B não executados;seis problemas V-ADD pendentes antes do fecho,
+validação não aprovada. Sem Java/Implement,commits/push ou gate externo novo.
+
+Checkpoint documental 2026-11-25T16:00:22Z: Design/guardas aprovados,apenas
+[revisão ADR de025-video](memory-bank/bolts/025-video/adr-review.md) para
+aprovação. APIs reais conferidas,sem impedimento de âmbito identificado;
+A05/A06 propõem precisões de propagação/cleanup antes de código.
+Dois caminhos e limites aprovados mantidos;sem Implement,alteração de
+config/protocolo,commits/push. M01–M14/V-020-B por executar;seis erros V-ADD
+pendentes antes do fecho,não aprovados. Sem gate externo adicional.
+
+Checkpoint documental 2026-11-25T16:28:55Z: ADR/A05/A06 aprovados;
+[Implement de025-video para revisão](memory-bank/bolts/025-video/implementation-walkthrough.md), apenas dois caminhos.
+45 testes novos M01–M14 e regressão incremental JDK21 de1582/0/0/0,23 XML.
+V-020-B consolidado/Test pendentes. Sem leitura integral dos quatro vídeos
+pelo novo leitor (checkout contém ponteiros LFS, sem materialização).
+Guardas aprovadas mantidas;16MiB apenas raster, não JVM/decoder total.
+Negativo inicial de compilação, históricos e remoções da demo preservados;
+seis problemas V-ADD pendentes antes do fecho, sem validação aprovada.
+Sem Test, fecho, commits/push, IMP-019 ou gate externo adicional.
+
+Checkpoint documental 2026-11-25T16:50:39Z: Implement aprovado; [Test em curso](memory-bank/bolts/025-video/ddd-03-test-report.md).
+Clean verify JDK21 com1582/0/0/0,23 XML e JAR novo/SHA-256. M01–M14 locais
+passam; V-020-B pendente de prova dos quatro conteúdos completos pelo novo
+leitor e manual humano aplicável. Binários ausentes (LFS/cache), sem aprovação
+Test pedida. Patch documental V-ADD de3 paths apresentado/autorizado/aplicado,
+validação0 erros; código aprovado, validador, negativos e remoções preservados.
+Sem fecho, commits/push ou IMP-019; Denji/integração e A/B/C mantidos.
+
+Checkpoint 2026-11-25T17:06:50Z: quatro binários completos recuperados/verificados,
+[prova nova](experiments/construction/025-video/test-02/full-content-consolidation.json)
+com22687 frames, hashes/EOF/cleanup. Negativo pessoal preservado; o utilizador
+delegou execução em Codex e autorizou commit/fecho condicional, satisfeito pela
+nova run automática saída0. Não se declara manual humano concluído. Denji
+aprovou a versão, confirmado pelo utilizador; integrar localmente antes de025 DONE.
+Sem rebuild/push/IMP-019; TASK-020 só fecha apósA/B/C.
+
 <a id="imp-019"></a>
 ### IMP-019 — Emitir fontes com pacing e procura
 

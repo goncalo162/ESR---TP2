@@ -1,0 +1,68 @@
+STAGE 1: JDK/JAR fixados
+openjdk version "21.0.13.1" 2026-11-17
+OpenJDK Runtime Environment (build 21.0.13.1+2-1-22.04.1-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-22.04.1-Ubuntu, mixed mode, sharing)
+JAR_SHA256=f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f
+Nov 25, 2026 5:02:46 PM java.util.prefs.FileSystemPreferences$1 run
+INFO: Created user preferences directory.
+VS_CHECK_PASS frames=2 originalBytes=true EOF=true state=END
+VS_SCRIPT_EXIT=0
+STAGE 2: Dois frames e EOF
+Bytes/offsets originais, END e EOF repetido conferidos no novo JAR.
+VS_EXPECTED_NEGATIVE case=bad-prefix reason=INVALID_PREFIX primaryStable=true detail=BYTE_INDEX=0
+VS_EXPECTED_NEGATIVE case=short-prefix reason=TRUNCATED_PREFIX primaryStable=true detail=PREFIX_EOF
+VS_EXPECTED_NEGATIVE case=short-body reason=TRUNCATED_BODY primaryStable=true detail=BODY_EOF
+VS_EXPECTED_NEGATIVE case=oversize reason=FRAME_LIMIT primaryStable=true detail=COMPRESSED_BYTES
+VS_EXPECTED_NEGATIVE case=bad-jpeg reason=INVALID_JPEG primaryStable=true detail=MISSING_SOI
+VS_SCRIPT_EXIT=0
+STAGE 3: Negativos e erro estável
+Cinco erros tipados rejeitados; FAILED e identidade primária preservados.
+VS_CHECK_PASS isolation=true immutableFrame=true
+VS_SCRIPT_EXIT=0
+STAGE 4: Imutabilidade e isolamento
+Mutar a cópia e fechar a primeira sessão preserva a segunda.
+VS_FULL_PASS frames=500 bytes=4269893 hash=ca461cb1edce18efb355794ffb7d52f73dc7ce4c03422224894eb0fc550b0cca EOF=true state=END inputCloseAttempts=1 inputClosed=true perFrameAudit=true
+VS_CLEANUP_RECORDED frames=500 bytes=4269893 inputCloseAttempts=1 inputClosed=true
+VS_SCRIPT_EXIT=0
+VS_PROGRESS frames=1000 bytes=18907360
+VS_PROGRESS frames=2000 bytes=38330969
+VS_PROGRESS frames=3000 bytes=57402936
+VS_PROGRESS frames=4000 bytes=78850855
+VS_PROGRESS frames=5000 bytes=97218877
+VS_FULL_PASS frames=5965 bytes=111255866 hash=ceb6497674bde7210bff2162b07e4305a74b33ed2b5a381b3e973d30fc837c5f EOF=true state=END inputCloseAttempts=1 inputClosed=true perFrameAudit=true
+VS_CLEANUP_RECORDED frames=5965 bytes=111255866 inputCloseAttempts=1 inputClosed=true
+VS_SCRIPT_EXIT=0
+VS_PROGRESS frames=1000 bytes=10919844
+VS_PROGRESS frames=2000 bytes=30082732
+VS_PROGRESS frames=3000 bytes=51881410
+VS_PROGRESS frames=4000 bytes=68432945
+VS_PROGRESS frames=5000 bytes=78925663
+VS_PROGRESS frames=6000 bytes=92419743
+VS_PROGRESS frames=7000 bytes=104685455
+VS_PROGRESS frames=8000 bytes=124527325
+VS_FULL_PASS frames=8880 bytes=167319819 hash=d2a050894ced76969b2bafae669532141dccf770fa2352e9ac4d0a4374bed3ab EOF=true state=END inputCloseAttempts=1 inputClosed=true perFrameAudit=true
+VS_CLEANUP_RECORDED frames=8880 bytes=167319819 inputCloseAttempts=1 inputClosed=true
+VS_SCRIPT_EXIT=0
+VS_PROGRESS frames=1000 bytes=18857549
+VS_PROGRESS frames=2000 bytes=37864656
+VS_PROGRESS frames=3000 bytes=64336652
+VS_PROGRESS frames=4000 bytes=83905909
+VS_PROGRESS frames=5000 bytes=104741266
+VS_PROGRESS frames=6000 bytes=131107598
+VS_PROGRESS frames=7000 bytes=169542308
+VS_FULL_PASS frames=7342 bytes=176974550 hash=c47ef9b41f05904e1bb6657424e2d88fe504e0925c0dffbdee85c58bf8c8e4cc EOF=true state=END inputCloseAttempts=1 inputClosed=true perFrameAudit=true
+VS_CLEANUP_RECORDED frames=7342 bytes=176974550 inputCloseAttempts=1 inputClosed=true
+VS_SCRIPT_EXIT=0
+STAGE 5: Quatro conteúdos completos
+Inspecionar cada MEDIA e os logs de hash/count/EOF/cleanup; ponteiros não contam.
+VS_CHECK_PASS explicitClose=true CLOSED_USE=true emptyBoundary=true
+VS_SCRIPT_EXIT=0
+VS_FULL_PASS frames=2 bytes=1042 hash=e119744c085a9b663e5a5a2b1a1b343ea783f24db628b843bec1e3440caecff7 EOF=true state=END inputCloseAttempts=1 inputClosed=true perFrameAudit=true
+VS_CLEANUP_RECORDED frames=2 bytes=1042 inputCloseAttempts=1 inputClosed=true
+VS_SCRIPT_EXIT=0
+STAGE 6: Fecho e controlo do verificador
+CLOSED_USE e EOF vazio; verificador de hash/count/close-once exercitado com duas fixtures, sem o confundir com A/B/C/D.
+STAGE 7: Fronteira da entrega
+Leitor local sem player, pacing, loop, emissão ou streaming integrado.16MiB limita raster, não memória total. R17 inicial sem causa estabelecida. Test/Denji/integração não são aprovados por este guião.
+REPORT=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T170246Z-17a25dc1/report.json
+WRAPPER_EXIT=0

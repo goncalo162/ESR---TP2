@@ -959,3 +959,38 @@ S13-transfer4vs5 reproduzido/corrigido no âmbito e preservado; R17 histórico s
 causa estabelecida, não explicada pela integração controlada. V-017 formal,
 clean verify/JAR de entrega, regressão aprovada, manual humano antes de aprovar
 Test, Waheed e integração pendentes; sem gate externo adicional.
+
+## IMP-018 — API proposta em Design, ainda não implementada/aprovada
+
+Registo 2026-11-25T15:46:47Z: Model/LOCAL-01/02 aprovados; apenas Design. A API está
+no [Design para revisão](../memory-bank/bolts/025-video/ddd-02-technical-design.md): open(mediaBase,file,maxFrameBytes),
+nextFrame→frame/EOF/falha,estado eclose. Frame imutável por cópia defensiva,
+primeiro erro preservado e sem retry após leitura bulk sem progresso.
+Caps propostos4096 por dimensão/4194304pixels/raster≤16MiB antes do decode,
+compatíveis com os registos dos quatro conteúdos. Sem nova configuração,
+protocolo,pacing,loop ou emissão;assinaturas do projeto por conferir emADR.
+Esta proposta não substitui o perfil aprovado da secção7. M01–M14/V-020-B
+por executar;seis problemas V-ADD pendentes antes do fecho,não aprovados.
+
+## IMP-018 — Design aprovado e conferência ADR para revisão
+
+Registo 2026-11-25T16:00:22Z. [Revisão ADR](../memory-bank/bolts/025-video/adr-review.md)
+confere os acessores reais deconfig e APIs públicas deJDK21,sem alteração
+das assinaturas implementadas. VideoSource ainda vazio,sem consumidores;
+VideoSourceTest inexistente. ReaderFactory usa entrada emprestada e
+transfere posse do reader no retorno;validador possui antes de configurar.
+A05/A06 propõem classificação de retorno inválido deImageReader ecleanup
+de imagem distinta antes de código. Mantêm-se caps aprovados;16MiB são só
+raster de destino,não consumo total deJVM. Dois caminhos,sem Implement/testes.
+Seis erros V-ADD pendentes antes do fecho;não declarados aprovados.
+
+## IMP-018 — API local implementada, pendente de aceitação (2026-11-25T16:28:55Z)
+
+[Walkthrough](../memory-bank/bolts/025-video/implementation-walkthrough.md) e Java nos dois caminhos aprovados concretizam as
+assinaturas locais do Design, com ADR/A05/A06 aprovados. Nenhuma alteração
+wire/configuração ou integração de streaming. Retorno nulo/distinto de
+ImageReader.read é falha inesperada; imagem extra também pertence ao cleanup.
+Erro checked tem diagnóstico e causa; falha unchecked mantém identidade.
+16MiB limitam só o raster destino.45 testes novos, regressão incremental
+JDK21 com1582/0/0/0; quatro conteúdos integrais não relidos nesta checkout LFS.
+Implement para revisão; V-020-B consolidado/Test ainda pendentes.

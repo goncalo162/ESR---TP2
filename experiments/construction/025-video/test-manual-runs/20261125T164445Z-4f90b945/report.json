@@ -1,0 +1,52 @@
+{
+  "run_id": "20261125T164445Z-4f90b945",
+  "kind": "rehearsal",
+  "operator": "Codex",
+  "started_at": "2026-11-25T16:44:45.541538+00:00",
+  "jar": "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+  "expected_jar_sha256": "f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f",
+  "stages": [
+    {
+      "stage": 1,
+      "title": "JDK/JAR fixados",
+      "technical": "passed",
+      "operator_confirmed": false
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+        "-J-Djava.awt.headless=true",
+        "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/prefs",
+        "-J-Xmx256m",
+        "--execution",
+        "local",
+        "--feedback",
+        "silent",
+        "--class-path",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+        "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+      ],
+      "mode": "frames",
+      "inputs": {},
+      "exit_code": 1,
+      "log": "02-frames.log"
+    }
+  ],
+  "media": [],
+  "technical_complete": false,
+  "manual_human_complete": false,
+  "Test_approval": "pending",
+  "wrapper_exit": 1,
+  "tools_sha256": {
+    "run-checks.py": "775ab761e1e7c76879664124b01234dee6671c265ee4861cd9625dc5c7d1f805",
+    "check-source.jsh": "3d90224f71f4cae2ebab899a47c4705068a0456b587dab6ddfc3c2ae4ad810c5",
+    "approved-build.json": "a680df20922558f87f50ed6c63304a29119a5eddfa35a9f2a00ede63444fce60"
+  },
+  "java_version": "openjdk version \"21.0.13.1\" 2026-11-17\nOpenJDK Runtime Environment (build 21.0.13.1+2-1-22.04.1-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.13.1+2-1-22.04.1-Ubuntu, mixed mode, sharing)\n",
+  "actual_jar_sha256": "f9a3cb9cad6166d13e244a772398179731952fd8eb8ff0efe7b16a6f67b9787f",
+  "result": "failed",
+  "error": "JAR check 02-frames failed; actual exit=1; see /home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/02-frames.log",
+  "ended_at": "2026-11-25T16:44:46.709281+00:00"
+}

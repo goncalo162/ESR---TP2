@@ -1,5 +1,62 @@
 # Índice derivado de decisões
 
+## IMP-018 — Implement aprovado, Test pendente dos conteúdos/manual
+
+Registo 2026-11-25T16:50:39Z; [Test](../bolts/025-video/ddd-03-test-report.md) com clean verify
+JDK21 de1582/0/0/0 e JAR novo/SHA-256. Sem mudança de decisão, contrato ou
+código aprovado. M01–M14 locais passam; quatro conteúdos integrais ainda
+indisponíveis nesta checkout LFS; manual humano preparado, não executado.
+V-ADD0 erros após patch documental de3 paths explicitamente autorizado,
+validador/demo preservados. Sem pedido de aprovação Test, fecho/commits/push
+ou IMP-019. Denji/integração obrigatórios; TASK-020 só fecha com A/B/C.
+
+**Checkpoint anterior de Implement (histórico):**
+
+
+## IMP-018 — ADR/A05/A06 aprovados; Implement para revisão
+
+Registo 2026-11-25T16:28:55Z. [Walkthrough](../bolts/025-video/implementation-walkthrough.md)
+concretiza A01–A08 sem nova ADR nem ampliação dos dois caminhos.45 testes
+novos e regressão incremental JDK21 com1582/0/0/0,23 XML. Erro primário,
+recursos distintos e falhas de provider cobertos;16MiB apenas raster.
+Sem leitura integral nova dos quatro conteúdos, disponíveis apenas como
+ponteiros LFS; limitação explícita. Seis erros V-ADD continuam pendentes antes
+do fecho, sem aprovação. Sem Test, fecho, commits/push ou outro IMP.
+
+**Checkpoint anterior de ADR (histórico):**
+
+
+## IMP-018 — Design aprovado; revisão ADR para aprovação
+
+Registo 2026-11-25T16:00:22Z. [Revisão](../bolts/025-video/adr-review.md) sobre APIs reais
+reutiliza ADR-006/009/021/024,sem nova ADR. A01–A08 concretizam admissão,
+ImageReader/destino,scanner ecleanup;A05/A06 apresentam precisões para
+aprovação antes de código. Sem impedimento de âmbito identificado;somente
+VideoSource.java/VideoSourceTest.java. Seis erros V-ADD pendentes,não
+aprovados. Sem Implement,alteração Java/testes,Maven,commits ou push.
+
+**Checkpoint anterior de Design (histórico):**
+
+
+## IMP-018 — Model/LOCAL-01/02 aprovados; Design para revisão
+
+Registo 2026-11-25T15:46:47Z. [Design](../bolts/025-video/ddd-02-technical-design.md) propõe
+API/ownership/fecho e caps finitos antes do decode;compatibilidade dimensional
+derivada apenas de auditoria aprovada anterior. Reutiliza ADR-006/009/021/024,
+sem nova ADR ou mudança de wire/configuração. Seis problemas V-ADD pendentes
+antes do fecho;validação não aprovada. Sem fontes/Java/Implement/testes novos.
+
+**Entrada anterior de Model (histórica):**
+
+
+## IMP-018 — Model proposto; sem nova ADR
+
+Registo 2026-11-25T15:32:21Z. [Modelo](../bolts/025-video/ddd-01-domain-model.md) para revisão:
+reutiliza ADR-006/009/021/024 e perfil5ASCII+LJPEG. LOCAL-01/02 propõem EOF/
+ownership e validação JPEG; não alteram ADR ou contrato aceito. Nenhum Q-C
+global reservado. Apenas Model,sem fontes/Java/Design/Implement/Test/Maven.
+
+
 Fonte normativa: [ADD](../../add.md).
 
 ## IMP-016 — concluído e integrado,decisões preservadas

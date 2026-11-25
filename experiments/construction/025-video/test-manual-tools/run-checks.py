@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""Black-box checks/manual for the pinned IMP-018 JAR, without runtime integration."""
+
+import argparse
+import base64
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import uuid
+
+
+TOOLS = Path(__file__).resolve().parent
+ROOT = TOOLS.parents[3]
+APPROVED = json.loads((TOOLS / "approved-build.json").read_text())
+
+
+def sha256(path):
+    result = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            result.update(chunk)
+    return result.hexdigest()
+
+
+def record_bytes(payload):
+    return f"{len(payload):05d}".encode("ascii") + payload
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--kind", choices=("human", "rehearsal", "automated"), required=True)
+    parser.add_argument("--operator", required=True)
+    parser.add_argument("--media-dir", type=Path, default=ROOT / "Projeto/src/main/resources/media")
+    parser.add_argument("--media", action="append", default=[], metavar="ALIAS=PATH")
+    parser.add_argument("--jdk-home", type=Path, default=Path(os.environ.get("JAVA_HOME", "/usr/lib/jvm/java-21-openjdk-amd64")))
+    parser.add_argument("--jar", type=Path, default=ROOT / APPROVED["jar"]["evidence_path"])
+    args = parser.parse_args()
+    if args.kind == "human" and not sys.stdin.isatty():
+        parser.error("human requires a real interactive terminal; do not pipe confirmations")
+    overrides = {}
+    for item in args.media:
+        alias, separator, path = item.partition("=")
+        if not separator or alias not in "ABCD" or len(alias) != 1 or alias in overrides:
+            parser.error("--media requires one distinct A/B/C/D=PATH")
+        overrides[alias] = Path(path).expanduser().resolve()
+
+    run_id = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
+    run = ROOT / "experiments/construction/025-video/test-manual-runs" / run_id
+    run.mkdir(parents=True, exist_ok=False)
+    report = {"run_id": run_id, "kind": args.kind, "operator": args.operator,
+              "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "jar": str(args.jar.resolve()), "expected_jar_sha256": APPROVED["jar"]["sha256"],
+              "stages": [], "commands": [], "media": [], "technical_complete": False,
+              "manual_human_complete": False, "Test_approval": "pending", "wrapper_exit": None,
+              "tools_sha256": {p.name: sha256(p) for p in [Path(__file__), TOOLS / "check-source.jsh", TOOLS / "approved-build.json"]}}
+    logfile = (run / "manual.log").open("w", encoding="utf-8")
+
+    def emit(message):
+        print(message, flush=True)
+        logfile.write(message + "\n")
+        logfile.flush()
+
+    def stage(number, title, details, pending=False):
+        emit(f"STAGE {number}: {title}\n{details}")
+        item = {"stage": number, "title": title, "technical": "pending" if pending else "passed",
+                "operator_confirmed": False}
+        report["stages"].append(item)
+        if args.kind == "human" and not pending:
+            answer = input("Inspecionaste o resultado e confirmas este passo? [sim/nao] ").strip()
+            logfile.write("OPERATOR_RESPONSE=" + answer + "\n")
+            item["operator_response"] = answer
+            item["operator_confirmed"] = answer.casefold() == "sim"
+            if not item["operator_confirmed"]:
+                raise RuntimeError("Operator did not confirm stage " + str(number))
+
+    fixtures = run / "fixtures"
+    fixtures.mkdir()
+    values = {}
+    for name, item in APPROVED["fixtures"].items():
+        data = base64.b64decode(item["base64"], validate=True)
+        if hashlib.sha256(data).hexdigest() != item["sha256"]:
+            raise RuntimeError("Pinned fixture hash mismatch " + name)
+        values[name] = data
+        (fixtures / (name + ".jpg")).write_bytes(data)
+    combined = record_bytes(values["RGB"]) + record_bytes(values["GRAY"])
+    (fixtures / "two.Mjpeg").write_bytes(combined)
+    cases = {"bad-prefix": b"bad!!", "short-prefix": b"12", "short-body": record_bytes(values["RGB"])[:-1],
+             "oversize": b"99999", "bad-jpeg": b"00004\x00\x01\x02\x03", "empty": b""}
+    for name, data in cases.items():
+        (fixtures / (name + ".Mjpeg")).write_bytes(data)
+    offset = 0
+    with (fixtures / "independent-audit.jsonl").open("w") as lines:
+        for index, name in enumerate(("RGB", "GRAY")):
+            data = values[name]
+            lines.write(json.dumps({"index": index, "offset": offset, "length": len(data),
+                                    "jpeg_sha256": APPROVED["fixtures"][name]["sha256"]}) + "\n")
+            offset += 5 + len(data)
+
+    env = os.environ.copy()
+    env["JAVA_HOME"] = str(args.jdk_home.resolve())
+    env["PATH"] = str(args.jdk_home.resolve() / "bin") + os.pathsep + env.get("PATH", "")
+    env["VS_FIXTURES"] = str(fixtures)
+
+    def jshell(mode, label, extra=None):
+        current = env.copy()
+        current["VS_MODE"] = mode
+        current.update(extra or {})
+        command = [str(args.jdk_home / "bin/jshell"), "-J-Djava.awt.headless=true",
+                   "-J-Djava.util.prefs.userRoot=" + str(run / "prefs"), "-J-Xmx256m",
+                   "-J--class-path=" + str(args.jar.resolve()),
+                   "--execution", "local", "--feedback", "silent", "--class-path",
+                   str(args.jar.resolve()), str(TOOLS / "check-source.jsh")]
+        output = run / (label + ".log")
+        process = subprocess.run(command, env=current, cwd=ROOT, text=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output.write_text(process.stdout)
+        report["commands"].append({"command": command, "mode": mode, "inputs": extra or {},
+                                   "exit_code": process.returncode, "log": output.name})
+        emit(process.stdout.rstrip())
+        if process.returncode != 0 or "VS_SCRIPT_EXIT=0" not in process.stdout:
+            raise RuntimeError(f"JAR check {label} failed; actual exit={process.returncode}; see {output}")
+        return output.name
+
+    exit_code = 1
+    try:
+        actual_hash = sha256(args.jar)
+        if actual_hash != APPROVED["jar"]["sha256"]:
+            raise RuntimeError("JAR differs from the clean-verify build")
+        version = subprocess.run([str(args.jdk_home / "bin/java"), "-version"], env=env, text=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=True).stdout
+        report["java_version"] = version
+        report["actual_jar_sha256"] = actual_hash
+        if 'version "21.' not in version:
+            raise RuntimeError("JDK21 is required")
+        stage(1, "JDK/JAR fixados", version.strip() + "\nJAR_SHA256=" + actual_hash)
+        jshell("frames", "02-frames")
+        stage(2, "Dois frames e EOF", "Bytes/offsets originais, END e EOF repetido conferidos no novo JAR.")
+        jshell("errors", "03-errors")
+        stage(3, "Negativos e erro estável", "Cinco erros tipados rejeitados; FAILED e identidade primária preservados.")
+        jshell("isolation", "04-isolation")
+        stage(4, "Imutabilidade e isolamento", "Mutar a cópia e fechar a primeira sessão preserva a segunda.")
+        pending = False
+        for asset in APPROVED["media"]:
+            alias = asset["alias"]
+            path = overrides.get(alias, args.media_dir / Path(asset["path"]).name).resolve()
+            item = {"alias": alias, "path": str(path), "expected_sha256": asset["sha256"],
+                    "expected_frames": asset["frames"], "expected_bytes": asset["bytes"],
+                    "actual_frames": None, "EOF_verified": False, "input_close_attempts": None,
+                    "input_closed": False}
+            report["media"].append(item)
+            if not path.is_file():
+                item["status"] = "pending: complete binary unavailable"
+                pending = True
+                emit("MEDIA_PENDING " + alias + " " + str(path))
+                continue
+            with path.open("rb") as stream:
+                pointer = stream.read(80).startswith(b"version https://git-lfs.github.com/spec/v1\n")
+            if pointer:
+                item["status"] = "pending: LFS pointer does not supply full-content proof"
+                pending = True
+                emit("MEDIA_PENDING " + alias + " LFS_POINTER")
+                continue
+            item["actual_sha256"] = sha256(path)
+            item["actual_bytes"] = path.stat().st_size
+            if item["actual_sha256"] != asset["sha256"] or item["actual_bytes"] != asset["bytes"]:
+                item["status"] = "failed: complete binary differs from approved hash/size"
+                raise RuntimeError("Unapproved complete media " + alias)
+            audit = ROOT / asset["records"]
+            if sha256(audit) != asset["records_sha256"]:
+                raise RuntimeError("Historical approved frame audit differs " + alias)
+            item["log"] = jshell("full", "05-media-" + alias, {"VS_MEDIA": str(path), "VS_AUDIT": str(audit),
+                         "VS_FRAMES": str(asset["frames"]), "VS_BYTES": str(asset["bytes"]), "VS_SHA256": asset["sha256"]})
+            summary = next(line.split("VS_FULL_PASS ", 1)[1] for line in (run / item["log"]).read_text().splitlines()
+                           if "VS_FULL_PASS " in line)
+            observed = dict(field.split("=", 1) for field in summary.split())
+            item.update({"actual_frames": int(observed["frames"]), "consumed_bytes": int(observed["bytes"]),
+                         "consumed_sha256": observed["hash"], "EOF_verified": observed["EOF"] == "true",
+                         "input_close_attempts": int(observed["inputCloseAttempts"]),
+                         "input_closed": observed["inputClosed"] == "true",
+                         "per_frame_audit": observed["perFrameAudit"] == "true"})
+            item["status"] = "passed: approved consumed hash/count/EOF/close-once/per-frame audit"
+        stage(5, "Quatro conteúdos completos", "Inspecionar cada MEDIA e os logs de hash/count/EOF/cleanup; ponteiros não contam.", pending)
+        jshell("lifecycle", "06-lifecycle")
+        jshell("full", "06-checker-selftest", {"VS_MEDIA": str(fixtures / "two.Mjpeg"),
+              "VS_AUDIT": str(fixtures / "independent-audit.jsonl"), "VS_FRAMES": "2",
+              "VS_BYTES": str(len(combined)), "VS_SHA256": hashlib.sha256(combined).hexdigest()})
+        stage(6, "Fecho e controlo do verificador", "CLOSED_USE e EOF vazio; verificador de hash/count/close-once exercitado com duas fixtures, sem o confundir com A/B/C/D.")
+        stage(7, "Fronteira da entrega", "Leitor local sem player, pacing, loop, emissão ou streaming integrado.16MiB limita raster, não memória total. R17 inicial sem causa estabelecida. Test/Denji/integração não são aprovados por este guião.")
+        report["technical_complete"] = not pending
+        report["manual_human_complete"] = args.kind == "human" and not pending and all(s["operator_confirmed"] for s in report["stages"])
+        exit_code = 2 if pending else 0
+        report["result"] = "pending_full_media" if pending else "checks_passed"
+    except KeyboardInterrupt:
+        report["result"] = "interrupted"
+        emit("INTERRUPTED; no manual or Test approval")
+        exit_code = 130
+    except Exception as failure:
+        report["result"] = "failed"
+        report["error"] = str(failure)
+        emit("CHECK_FAILED " + str(failure))
+        exit_code = 1
+    finally:
+        report["ended_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        report["wrapper_exit"] = exit_code
+        (run / "report.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+        emit("REPORT=" + str(run / "report.json"))
+        emit("WRAPPER_EXIT=" + str(exit_code))
+        logfile.close()
+    return exit_code
+
+
+if __name__ == "__main__":
+    sys.exit(main())

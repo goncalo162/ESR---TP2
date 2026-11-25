@@ -1949,3 +1949,101 @@ uma quinta ACTIVATE sem ANN novo. Crédito agora consumido só quando existe
 ronda ainda válida e prova elegível; perda após prazo conserva incidente fresco.
 Negativo/fonte anterior, teste dos dois lados da fronteira e regressão preservados.
 Nenhuma decisão de contrato/âmbito por inferência nesta correcção interna.
+
+## IMP-018-LOCAL-01/02 — propostas do Model de025-video
+
+Registo 2026-11-25T15:32:21Z. IDs locais ao IMP,sem reservar ou renumerar Q-C globais.
+**Aprovados explicitamente pelo utilizador,registo 2026-11-25T15:46:47Z.** [Model](../memory-bank/bolts/025-video/ddd-01-domain-model.md). Apenas Design autorizado.
+
+- **LOCAL-01:** cursor admite ownership do recurso,fecha emEOF/falha/close,
+  preserva primeiro erro e não tenta resync. EOF entre registos é limpo,
+  incluindo zero registos;isso não aprova um vídeo vazio nem altera o negativo
+  empty da auditoriaIMP-017. Ler após close é erro explícito.
+- **LOCAL-02:** validar JPEG integral/headless,um registo/imagem de cada vez,
+  SOI/EOI e ausência de bytes extra,erro/aviso de corrupção localizado antes
+  de entregar bytes originais imutáveis. Orçamento de dimensões/pixels e
+  gestão do decoder a concretizar emDesign,sem novo player/dependência.
+
+Sem alteração do contrato aceito,Java/Design/ADR/Implement/Test,Maven,commits ou
+push. M01–M14/V-020-B por executar. Não se ampliam os dois caminhos do ADD;
+LOCAL-03/04 e G-MEDIA-DISTRIBUTION continuam nas responsabilidades anteriores.
+
+## IMP-018-LOCAL-01/02 — concretização em Design, 2026-11-25T15:46:47Z
+
+Decisões do Model aprovadas. [Design proposto](../memory-bank/bolts/025-video/ddd-02-technical-design.md) concretiza
+API/ownership,fecho de cada recurso uma vez,erro primário sem autosupressão
+e ausência de retry após readbulk=0. Caps4096 por dimensão/4194304pixels e
+raster≤16MiB são propostas de Design,compatíveis com os22687 registos
+aprovados A384×288/B-C-D640×360. Sem alteração de configuração/protocolo.
+Seis problemas V-ADD permanecem pendência interna antes do fecho,sem
+validação aprovada. M01–M14/V-020-B não executados;sem Java/Implement/Maven,
+commits ou push. Remoções da demo preservadas;somente dois caminhos futuros.
+
+## IMP-018 — revisão ADR; precisões A05/A06 para aprovação
+
+Registo 2026-11-25T16:00:22Z. Design/guardas aprovados; [revisão](../memory-bank/bolts/025-video/adr-review.md)
+apenas documental,sobre APIs reais. Sem impedimento de API/ampliação identificado.
+
+- **A05:** não confundirnull deImageIO.read semprovider comnull/objeto distinto
+  deImageReader.read comdestino explícito. A última situação é falha inesperada
+  do provider,rejeitada sem a mascarar como corrupção JPEG checked.
+- **A06:** primeiro erro determina a propagação;cleanupIOException primeiro
+  corresponde aCLOSE_IO,Runtime/Error primeiro permanece o mesmo objeto.
+  Cleanup posterior nunca substitui o primário;close emFAILED não relança
+  erro guardado nem provoca autosupressão. Imagem distinta devolvida por
+  provider defeituoso também se limpa:teto conservador6 recursos/suprimidas
+  nesse ramo,emvez dos5 do fluxo conforme. Caps do raster/âmbito inalterados.
+
+Precisões para aprovação nesta revisão,não aplicadas em Java. Nenhum novo
+Q-C global ou ADR arquitetural reservado. M01–M14/V-020-B não executados;
+seis problemas V-ADD pendentes antes do fecho,sem validação aprovada.
+
+## IMP-018 — A05/A06 aprovados e aplicados em Implement, 2026-11-25T16:28:55Z
+
+Autorização explícita: revisão ADR incluindo A05/A06 aprovada; apenas
+VideoSource.java/VideoSourceTest.java. [Implement para revisão](../memory-bank/bolts/025-video/implementation-walkthrough.md).
+Retorno nulo/distinto é falha inesperada; cada imagem distinta é limpa uma
+vez, sem substituir o primeiro erro nem autosupressão.45 novos testes e
+regressão incremental JDK21 com1582/0/0/0,23 XML. Negativo inicial de compilação
+preservado. Não há Q-C global ou ADR nova nem alteração de âmbito.
+
+Limitação factual: quatro recursos são ponteiros LFS, com OIDs dos conteúdos
+aprovados. Não materializados; leitura dos22687 JPEGs pelo novo leitor não
+executada. Não se recusa nem se considera inviável a decisão aprovada: guardas
+mantidas, decoder real exercitado com fixtures independentes. V-020-B
+consolidado e aceitação pertinentes continuam pendentes.
+Seis problemas V-ADD permanecem pendentes antes do fecho; validação não
+aprovada, remoções da demo preservadas. Sem Test/fecho/commits/push.
+
+## IMP-018 — exceção documental V-ADD autorizada e aplicada (2026-11-25T16:50:39Z)
+
+O utilizador autorizou exclusivamente o [patch apresentado](../experiments/construction/025-video/test-01/v-add-proposal/resolution.patch).
+Três caminhos adicionais documentais: `.specsmd/aidlc/skills/inception/bolt-plan.md`,
+`.specsmd/aidlc/skills/operations/deploy.md` e `docs/15-PROJECT-PROGRESS.md`.
+Ajuste de fences exteriores/fecho em dois exemplos; quatro links da demo
+removida convertidos em paths históricos marcados removidos. Resultados e
+negativos históricos não apagados. [Aplicação exata e hashes](../experiments/construction/025-video/test-01/v-add-proposal/application.json).
+[V-ADD após patch](../experiments/construction/025-video/test-01/v-add-after-patch.md):0 erros;
+seis pendências resolvidas, sem enfraquecer validador ou restaurar18 paths da demo.
+
+Implement aprovado; Test apenas, clean verify JDK21 com1582/0/0/0,23 XML,
+JAR/SHA-256 novos preservados. Código aprovado inalterado. Prova dos quatro
+conteúdos completos continua pendente: checkout LFS/cache local ausente.
+Manual preparado, não executado pessoalmente; ensaio técnico saída2 mantém
+pendência de media. Negativo do primeiro lançador JShell preservado, controlo
+sustenta correção apenas do classpath da ferramenta, sem correção de Java.
+Sem aprovação Test, fecho/commits/push/IMP-019; Denji e integração pendentes.
+
+## IMP-018 — delegação de execução e autorização de fecho (2026-11-25T17:05:33Z)
+
+Quatro binários completos recuperados do Git LFS remoto para test-02/media,
+hashes aprovados; prova nova pelo JAR fixado22687 frames, comparação por frame,
+EOF/END/fecho único. Negativo pessoal de Luis preservado: diretório sem /media,
+etapa6 recebeu sisim; não concluído. Não se atribui outra causa por inferência.
+O utilizador instruiu «faz tu o teste e se der correto dá commit das alterações
+e fecha o bolt». Nova run Codex kind=automated saída0 satisfaz a condição;
+execução pessoal substituída por delegação para este fecho, nunca registada
+como manual humano concluído. Denji reviu/aprovou a versão, confirmado pelo
+utilizador. [Autorização/prova](../experiments/construction/025-video/test-02/acceptance-and-review.json).
+Sem rebuild ou alteração Java; commit/integração local/fecho autorizados,
+sem push ou IMP-019. TASK-020 só apósA/B/C; R17 continua sem causa estabelecida.

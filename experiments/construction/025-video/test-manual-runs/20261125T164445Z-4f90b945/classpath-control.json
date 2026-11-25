@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/usr/lib/jvm/java-21-openjdk-amd64/bin/jshell",
+    "-J-Djava.awt.headless=true",
+    "-J-Djava.util.prefs.userRoot=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-runs/20261125T164445Z-4f90b945/control-prefs",
+    "-J-Xmx256m",
+    "-J--class-path=/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+    "--execution",
+    "local",
+    "--feedback",
+    "silent",
+    "--class-path",
+    "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-01/clean-verify/ott-streaming-1.0-SNAPSHOT.jar",
+    "/home/luis/ESR/ESR---TP2/experiments/construction/025-video/test-manual-tools/check-source.jsh"
+  ],
+  "exit_code": 0,
+  "jar_members": [
+    "pt/uminho/esr/ott/server/VideoSource$SourceException.class",
+    "pt/uminho/esr/ott/server/VideoSource$Cleanup.class",
+    "pt/uminho/esr/ott/server/VideoSource$Frame.class",
+    "pt/uminho/esr/ott/server/VideoSource$CleanupScope.class",
+    "pt/uminho/esr/ott/server/VideoSource$State.class",
+    "pt/uminho/esr/ott/server/VideoSource.class",
+    "pt/uminho/esr/ott/server/VideoSource$Warning.class",
+    "pt/uminho/esr/ott/server/VideoSource$Dimensions.class",
+    "pt/uminho/esr/ott/server/VideoSource$Stage.class",
+    "pt/uminho/esr/ott/server/VideoSource$Reason.class",
+    "pt/uminho/esr/ott/server/VideoSource$Diagnostic.class",
+    "pt/uminho/esr/ott/server/VideoSource$ReaderFactory.class"
+  ],
+  "only_difference": "also expose pinned JAR on JShell JVM classpath; application and script unchanged"
+}
