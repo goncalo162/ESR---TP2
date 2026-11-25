@@ -994,3 +994,11 @@ Erro checked tem diagnóstico e causa; falha unchecked mantém identidade.
 16MiB limitam só o raster destino.45 testes novos, regressão incremental
 JDK21 com1582/0/0/0; quatro conteúdos integrais não relidos nesta checkout LFS.
 Implement para revisão; V-020-B consolidado/Test ainda pendentes.
+
+## IMP-018 aceite e integrado (2026-11-25T17:11:45Z)
+
+[Fecho](../memory-bank/bolts/025-video/closure-walkthrough.md): API local aprovada
+e integrada em main, sem mudança de contratos desde Implement. Test aceite
+após delegação expressa em Codex, Denji confirmado e22687 frames completos
+conferidos. Não se declara manual humano concluído. Sem pacing/loop/emissão
+ou integração de streaming;16MiB continua a limitar apenas o raster destino.

@@ -15,8 +15,8 @@ Depois do negativo pessoal preservado, o utilizador delegou a repetição em Cod
 e autorizou commit/fecho se correto. Run delegada saída0; condição satisfeita.
 Não se declara manual humano concluído. Denji reviu/aprovou esta versão, confirmado
 pelo utilizador. [Registo](../../../experiments/construction/025-video/test-02/acceptance-and-review.json).
-Nenhum build repetido, código/JAR inalterados. Integração local por concluir antes
-do fecho; sem push ou IMP-019. TASK-020 só fecha apósA/B/C.
+Nenhum build repetido, código/JAR inalterados. Integrado localmente em maine896643; [fecho](closure-walkthrough.md)
+concluído por autorização. Sem push ou IMP-019. TASK-020 só fecha apósA/B/C.
 
 **Relatório do checkpoint anterior, histórico (quatro binários então ausentes):**
 

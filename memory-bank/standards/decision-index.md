@@ -1,5 +1,17 @@
 # Índice derivado de decisões
 
+## IMP-018 concluído — 2026-11-25T17:11:45Z
+
+[Fecho](../bolts/025-video/closure-walkthrough.md): Test aceite por condição
+expressa após execução delegada correta, revisão Denji confirmada e integração
+local real. Sem nova ADR nem alteração de código/JAR após aprovação. Negativo
+humano permanece negativo; não se declara execução humana concluída. Exceção
+pessoal específica deste fecho, sem alteração dos outros bolts. TASK-020 apenasA/B,
+C/IMP-019 não iniciada;16MiB apenas raster, R17 inicial sem causa estabelecida.
+
+**Checkpoint anterior, histórico:**
+
+
 ## IMP-018 — Implement aprovado, Test pendente dos conteúdos/manual
 
 Registo 2026-11-25T16:50:39Z; [Test](../bolts/025-video/ddd-03-test-report.md) com clean verify

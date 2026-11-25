@@ -490,3 +490,11 @@ o resultado de publicação só será declarado após execução e conferência 
 Codec OTT1/caps/fragmentação validados; não conclui requisitos compostos de
 forwarding,vídeo,latência ou reprodução. TASK-020–024 e unidade005/PHASE-05
 permanecem pendentes/em progresso. Sem alegar emissão,GUI ou CORE neste codec.
+
+## IMP-018 / TASK-020-B concluído — 2026-11-25T17:11:00Z
+
+[Fecho](../memory-bank/bolts/025-video/closure-walkthrough.md):leitura local com45 oráculos novos M01–M14 e22687
+frames completos dos quatro conteúdos (hashes/contagens/EOF/cleanup). Test
+aceite pela condição expressa após execução delegada em Codex e Denji aprovado;
+integrado localmente em maine896643. Não conclui requisitos de pacing/emissão,
+transporte/reprodução ou TASK-020 inteira; C/IMP-019 não iniciada.

@@ -38,7 +38,7 @@ Os caminhos de pacotes Java acima são relativos a Projeto/src/main/java/pt/umin
 ## 7. Passos de implementação
 
 - [x] Parte A/IMP-017:recurso docente preservado por hash,quatro conteúdos preparados,proveniência/créditos/condições pendentes registados no manifesto.
-- [ ] Implementar leitura de um frame com EOF e truncatura explícitos.
+- [x] Parte B/IMP-018:leitura de um frame com EOF e truncatura explícitos.
 - [ ] Configurar dois vídeos distintos por cada servidor e registar hashes.
 - [ ] Agendar emissão ao FPS sem catch-up ilimitado e só com procura confirmada.
 
@@ -179,3 +179,11 @@ commit/fecho condicional ao resultado correto. Nova run automática saída0;
 Test aceite por essa condição, sem afirmar manual humano concluído. Denji
 reviu e aprovou a versão, confirmado pelo utilizador. Integrar localmente antes
 de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preservado.
+
+## Parte B concluída — 2026-11-25T17:11:00Z
+
+[Fecho](../../../memory-bank/bolts/025-video/closure-walkthrough.md):025-video complete, leitor e prova integral
+22687 frames; Test aceite após delegação expressa em Codex, negativo humano
+preservado sem afirmar manual pessoal concluído. Denji aprovado e integração
+local maine896643. Sem rebuild/push/IMP-019. PartesA/B concluídas; parteC
+pendente, TASK-020 continua IN PROGRESS e só fecha comA/B/C.

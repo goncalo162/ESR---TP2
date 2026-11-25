@@ -6,7 +6,7 @@ type: "ddd-construction-bolt"
 status: "planned"
 stories: ["008-emitir-fontes-com-pacing-e-procura"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-02T15:36:48Z"
+updated: "2026-11-25T17:11:45Z"
 started: null
 completed: null
 current_stage: null
@@ -14,7 +14,7 @@ stages_completed: []
 requires_bolts: ["009-arvores", "025-video"]
 enables_bolts: ["028-video"]
 requires_units: ["004-arvores"]
-blocks: true
+blocks: false
 complexity:
   avg_complexity: 3
   avg_uncertainty: 1

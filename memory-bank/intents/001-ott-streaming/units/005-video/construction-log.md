@@ -274,3 +274,12 @@ commit/fecho condicional ao resultado correto. Nova run automática saída0;
 Test aceite por essa condição, sem afirmar manual humano concluído. Denji
 reviu e aprovou a versão, confirmado pelo utilizador. Integrar localmente antes
 de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preservado.
+
+## 2026-11-25T17:11:00Z — IMP-018 fechado após integração local
+
+[Fecho](../../../../bolts/025-video/closure-walkthrough.md). Código integrado
+em maine896643 antes de statuscomplete.20 bolts/histórias complete,0 in-progress,
+15 planned. Cinco etapas/critério concluídos; Test aceite pela condição expressa
+posterior à delegação em Codex. Manual humano não concluído, negativo preservado;
+exceção de delegação apenas para este fecho. Denji aprovado, confirmado pelo
+utilizador. TASK-020/PHASE-05 emprogresso; sem rebuild/push/IMP-019.

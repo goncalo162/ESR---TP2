@@ -1343,9 +1343,9 @@ Estado reconciliado em 2026-11-22T23:10:04Z: **024-arvores/IMP-014 e 009-arvores
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
-  - [ ] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
-  - [ ] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
+  - [x] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
+  - [x] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
+  - [x] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
 
 Checkpoint documental 2026-11-25T15:32:21Z: IMP-018/025-video iniciado apenas em Model.
 [Model para revisão](memory-bank/bolts/025-video/ddd-01-domain-model.md),
@@ -1392,6 +1392,11 @@ delegou execução em Codex e autorizou commit/fecho condicional, satisfeito pel
 nova run automática saída0. Não se declara manual humano concluído. Denji
 aprovou a versão, confirmado pelo utilizador; integrar localmente antes de025 DONE.
 Sem rebuild/push/IMP-019; TASK-020 só fecha apósA/B/C.
+
+Fecho 2026-11-25T17:11:00Z: IMP-018/025-video complete, [prova e fecho](memory-bank/bolts/025-video/closure-walkthrough.md).
+Test aceite por condição expressa após delegação em Codex, sem manual humano
+fictício; Denji aprovado e código integrado localmente maine896643.
+Sem rebuild/push/IMP-019; TASK-020 apenasA/B concluídas, C pendente.
 
 <a id="imp-019"></a>
 ### IMP-019 — Emitir fontes com pacing e procura

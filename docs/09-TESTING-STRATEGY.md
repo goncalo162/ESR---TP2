@@ -205,7 +205,7 @@ Responsável: [TASK-019](tasks/PHASE-05/TASK-019.md). Requisitos: RF-010, RF-015
 
 V-020: fixture confirmada com dois frames produz bytes esperados; ficheiro truncado falha de forma localizada; relógio falso confirma pacing/ausência de envio sem procura; quatro conteúdos são identificáveis.
 
-Responsável: [TASK-020](tasks/PHASE-05/TASK-020.md). Requisitos: RF-012, RF-013, RF-015, RNF-001, RP-003. Estado: NÃO EXECUTADO.
+Responsável: [TASK-020](tasks/PHASE-05/TASK-020.md). Requisitos: RF-012, RF-013, RF-015, RNF-001, RP-003. Estado: PARCIAL — V-020-A/B executados e aceites; V-020-C pendente. [V-020-B/fecho](../memory-bank/bolts/025-video/closure-walkthrough.md).
 
 ### V-021 — Reencaminhar e replicar datagramas pela árvore ativa
 

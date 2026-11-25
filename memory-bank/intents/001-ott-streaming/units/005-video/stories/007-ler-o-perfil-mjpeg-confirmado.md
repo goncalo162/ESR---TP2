@@ -2,7 +2,7 @@
 id: "007-ler-o-perfil-mjpeg-confirmado"
 unit: "005-video"
 intent: "001-ott-streaming"
-status: "in-progress"
+status: "complete"
 priority: "Must"
 created: "2026-11-02T15:36:48Z"
 source_tasks: ["TASK-020"]
@@ -11,7 +11,9 @@ requirements: ["INT-001", "INT-002", "NFR-001", "REQ-012", "REQ-013", "REQ-015",
 adr_ids: ["ADR-006", "ADR-009", "ADR-021", "ADR-024"]
 bolt: "025-video"
 size: "M"
-updated: "2026-11-25T16:50:39Z"
+implemented: true
+completed: "2026-11-25T17:11:00Z"
+updated: "2026-11-25T17:11:45Z"
 ---
 # História — Ler o perfil MJPEG confirmado
 
@@ -23,9 +25,9 @@ A tarefa normativa é [IMP-018](../../../../../../add.md#imp-018); o bolt só or
 
 ## Critérios de aceitação
 
-- [ ] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
-- [ ] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
-- [ ] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
+- [x] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
+- [x] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
+- [x] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
 
 ## Testes
 
@@ -65,3 +67,10 @@ commit/fecho condicional ao resultado correto. Nova run automática saída0;
 Test aceite por essa condição, sem afirmar manual humano concluído. Denji
 reviu e aprovou a versão, confirmado pelo utilizador. Integrar localmente antes
 de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preservado.
+
+## Concluída — 2026-11-25T17:11:00Z
+
+[Fecho](../../../../../../memory-bank/bolts/025-video/closure-walkthrough.md): Test aceite pela condição expressa
+do utilizador, nova execução delegada correta; negativo humano preservado sem
+atribuir sucesso pessoal. Denji aprovado, integração local maine896643.
+História complete/implemented=true; TASK-020 apenasA/B, sem iniciarC/IMP-019.

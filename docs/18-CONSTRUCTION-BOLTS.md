@@ -1,5 +1,20 @@
 # Bolts Construction alinhados com o ADD
 
+**IMP-018 / 025-video — concluído (2026-11-25T17:11:00Z):**
+Leitor local MJPEG entregue e integrado em maine896643; [fecho](../memory-bank/bolts/025-video/closure-walkthrough.md).
+1582/0/0/0 conferido, sem rebuild. JAR fixado e22687 frames completos verificados
+(hashes,500/5965/8880/7342, comparação por frame, EOF e fecho único da entrada).
+Negativo humano preservado; por instrução posterior do utilizador a execução
+pessoal foi substituída por delegação em Codex neste fecho, nova run saída0.
+Test aceite por essa condição; Denji reviu/aprovou a versão, confirmado pelo
+utilizador. V-ADD0 erros, validador/demo/código aprovados preservados.
+20 bolts/histórias complete,0 in-progress,15 planned. TASK-020 apenasA/B,
+parteC/IMP-019 não iniciada; pai e PHASE-05 IN PROGRESS, PHASE-06/07 TODO.
+Sem push;16MiB apenas raster e R17 original sem causa estabelecida.
+
+**Checkpoint anterior, histórico:**
+
+
 **IMP-018 — Test aceite por condição expressa; integração local a concluir (2026-11-25T17:06:50Z):**
 Quatro binários completos com hashes aprovados,500/5965/8880/7342 frames,
 cada Frame comparado, EOF/END e fecho único da entrada. [Prova nova](../experiments/construction/025-video/test-02/full-content-consolidation.json).

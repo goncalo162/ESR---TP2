@@ -3,12 +3,12 @@ id: "025-video"
 unit: "005-video"
 intent: "001-ott-streaming"
 type: "ddd-construction-bolt"
-status: "in-progress"
+status: "complete"
 stories: ["007-ler-o-perfil-mjpeg-confirmado"]
 created: "2026-11-02T15:36:48Z"
-updated: "2026-11-25T17:05:33Z"
+updated: "2026-11-25T17:11:45Z"
 started: "2026-11-25T15:28:08Z"
-completed: null
+completed: "2026-11-25T17:11:00Z"
 current_stage: "test"
 stages_completed: [{"name": "model", "completed": "2026-11-25T15:40:54Z", "artifact": "ddd-01-domain-model.md"}, {"name": "design", "completed": "2026-11-25T15:52:32Z", "artifact": "ddd-02-technical-design.md"}, {"name": "adr", "completed": "2026-11-25T16:10:17Z", "artifact": "adr-review.md"}, {"name": "implement", "completed": "2026-11-25T16:37:27Z", "artifact": "implementation-walkthrough.md"}, {"name": "test", "completed": "2026-11-25T17:05:33Z", "artifact": "ddd-03-test-report.md"}]
 requires_bolts: ["009-arvores", "011-video"]
@@ -41,7 +41,7 @@ Ler [IMP-018](../../../add.md#imp-018) e as ADR aí indicadas antes de qualquer 
 
 ## História, dependências e gates
 
-- [ ] [007-ler-o-perfil-mjpeg-confirmado](../../intents/001-ott-streaming/units/005-video/stories/007-ler-o-perfil-mjpeg-confirmado.md).
+- [x] [007-ler-o-perfil-mjpeg-confirmado](../../intents/001-ott-streaming/units/005-video/stories/007-ler-o-perfil-mjpeg-confirmado.md).
 - Dependências: [009-arvores](../009-arvores/bolt.md), [011-video](../011-video/bolt.md).
 - Unidade: [005-video](../../intents/001-ott-streaming/units/005-video/unit-brief.md).
 - Gates: nenhum adicional.
@@ -58,9 +58,9 @@ Tipo: [ddd-construction-bolt](../../../.specsmd/aidlc/templates/construction/bol
 
 ## Critérios de aceitação
 
-- [ ] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
-- [ ] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
-- [ ] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
+- [x] Ler L bytes após cinco dígitos ASCII; EOF só é limpo entre registos.
+- [x] Prefixo inválido/parcial, zero, excesso de tamanho, truncatura e JPEG inválido têm erro localizado antes de publicação.
+- [x] Fixtures independentes produzem os bytes esperados e o leitor fecha recursos.
 
 ## Evidência e fecho
 
@@ -154,3 +154,11 @@ em Codex e autoriza commit/fecho se correto. Nova run automática saída0,
 sem declarar manual humano concluído. Denji reviu e aprovou esta versão,
 confirmado pelo utilizador. Test emstages_completed, bolt ainda in-progress
 até integração local real. Sem rebuild, alteração Java, push ou IMP-019.
+
+## Fecho efetivo — 2026-11-25T17:11:00Z
+
+[Fecho](closure-walkthrough.md): cinco etapas concluídas, Test aceite por
+condição expressa após execução delegada, revisão Denji confirmada e código
+integrado localmente em maine896643. Bolt complete, completed definido,
+história007 complete/implemented=true. TASK-020 apenasA/B; C não iniciada.
+Sem rebuild, push ou outro IMP. Negativos e R17 preservados.
