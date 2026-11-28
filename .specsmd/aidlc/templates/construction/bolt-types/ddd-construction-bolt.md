@@ -548,7 +548,7 @@ status: in-progress
 ## Relevant Prior Decisions
 
 Found {n} ADR(s) that may apply to this bolt:
-- ADR-001: Use JWT for Authentication → `bolts/001-auth-service/adr-001-jwt-auth.md`
+- ADR-001: Use JWT for Authentication → [View](bolts/001-auth-service/adr-001-jwt-auth.md)
 
 These decisions may constrain or guide your approach. Proceed? (y/n)
 ```
