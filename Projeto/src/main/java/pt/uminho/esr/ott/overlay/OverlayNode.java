@@ -16,6 +16,18 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class OverlayNode implements AutoCloseable
 {
 
+    public interface OwnerAccess
+    {
+        boolean isOwnerThread();
+        boolean offer(Runnable task);
+        void fail(Throwable cause);
+    }
+
+    public interface LocalSourceBinding
+    {
+        RoutingService.LocalSourceListener bindOnOwner(RoutingService.LocalSourceAccess access, OwnerAccess ownerAccess);
+    }
+
     //* === Atributos e Variáveis === *
 
     private final NodeConfiguration configuration;
@@ -25,6 +37,7 @@ public final class OverlayNode implements AutoCloseable
     private volatile NetworkMonitor monitor;
     private final RoutingService.Factory routingFactory;
     private final RoutingService.Observer routingObserver;
+    private final LocalSourceBinding localSourceBinding;
     private volatile RoutingService routing;
     private final AtomicReference<Throwable> failure = new AtomicReference<>();
     private final CompletableFuture<Void> started = new CompletableFuture<>();
@@ -62,6 +75,14 @@ public final class OverlayNode implements AutoCloseable
             NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory,
             RoutingService.Observer routingObserver)
     {
+        this(configuration, instanceId, observer, monitorFactory, routingFactory, routingObserver, null);
+    }
+
+    private OverlayNode(NodeConfiguration configuration, UUID instanceId, NeighborManager.Observer observer,
+            NetworkMonitor.Factory monitorFactory, RoutingService.Factory routingFactory,
+            RoutingService.Observer routingObserver, LocalSourceBinding localSourceBinding)
+    {
+        this.localSourceBinding = localSourceBinding;
         this.routingObserver = Objects.requireNonNull(routingObserver);
         this.configuration = Objects.requireNonNull(configuration);
         instance = Objects.requireNonNull(instanceId);
@@ -81,6 +102,23 @@ public final class OverlayNode implements AutoCloseable
     {
         return new OverlayNode(configuration, instanceId, observer, NetworkMonitor::new,
                 RoutingService::new, routingObserver);
+    }
+
+    public static OverlayNode withLocalSources(NodeConfiguration configuration, UUID instanceId,
+            NeighborManager.Observer observer, RoutingService.Observer routingObserver,
+            LocalSourceBinding localSourceBinding)
+    {
+        return new OverlayNode(configuration, instanceId, observer, NetworkMonitor::new,
+                RoutingService::new, routingObserver, Objects.requireNonNull(localSourceBinding));
+    }
+
+    static OverlayNode withLocalSources(NodeConfiguration configuration, UUID instanceId,
+            NeighborManager.Observer observer, NetworkMonitor.Factory monitorFactory,
+            RoutingService.Factory routingFactory, RoutingService.Observer routingObserver,
+            LocalSourceBinding localSourceBinding)
+    {
+        return new OverlayNode(configuration, instanceId, observer, monitorFactory,
+                routingFactory, routingObserver, Objects.requireNonNull(localSourceBinding));
     }
 
 
@@ -169,8 +207,10 @@ public final class OverlayNode implements AutoCloseable
                     {
                         monitor.start();
                         routing.start();
+                        if(localSourceBinding != null)
+                            bindLocalSources();
                     }
-                    catch(RuntimeException e)
+                    catch(RuntimeException | Error e)
                     {
                         failMonitoring(e);
                     }
@@ -249,6 +289,68 @@ public final class OverlayNode implements AutoCloseable
         {
             observer.onEvent(event);
         }
+    }
+
+    private void bindLocalSources()
+    {
+        var delegate = new AtomicReference<RoutingService.LocalSourceListener>();
+        var ownerAccess = new OwnerAccess()
+        {
+            @Override
+            public boolean isOwnerThread()
+            {
+                return owner.isOwnerThread();
+            }
+
+            @Override
+            public boolean offer(Runnable task)
+            {
+                Objects.requireNonNull(task);
+                if(owner.offer(task))
+                    return true;
+                failMonitoring(new RejectedExecutionException("Local source owner rejected"));
+                return false;
+            }
+
+            @Override
+            public void fail(Throwable cause)
+            {
+                Objects.requireNonNull(cause);
+                failMonitoring(cause);
+                owner.fail(cause);
+            }
+        };
+        var access = routing.bindLocalSourcesOnOwner(new RoutingService.LocalSourceListener()
+        {
+            @Override
+            public void onDemandChangedOnOwner(UUID streamId)
+            {
+                var target = delegate.get();
+                if(target != null)
+                    target.onDemandChangedOnOwner(streamId);
+            }
+
+            @Override
+            public void onStoppedOnOwner()
+            {
+                var target = delegate.get();
+                if(target != null)
+                    target.onStoppedOnOwner();
+            }
+        });
+        var listener = Objects.requireNonNull(localSourceBinding.bindOnOwner(access, ownerAccess));
+        delegate.set(listener);
+        owner.onStop(() ->
+        {
+            try
+            {
+                listener.onStoppedOnOwner();
+            }
+            catch(RuntimeException | Error ignored)
+            {
+                // Preserve primary stop reason.
+            }
+        });
     }
 
     private void failMonitoring(Throwable error)

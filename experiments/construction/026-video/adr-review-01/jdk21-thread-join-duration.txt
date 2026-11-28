@@ -1,0 +1,66 @@
+Command: /usr/lib/jvm/java-21-openjdk-amd64/bin/javap -c -p java.lang.Thread
+Excerpt only: join(Duration), no application executed.
+
+  public final boolean join(java.time.Duration) throws java.lang.InterruptedException;
+    Code:
+       0: getstatic     #115                // Field java/util/concurrent/TimeUnit.NANOSECONDS:Ljava/util/concurrent/TimeUnit;
+       3: aload_1
+       4: invokevirtual #118                // Method java/util/concurrent/TimeUnit.convert:(Ljava/time/Duration;)J
+       7: lstore_2
+       8: aload_0
+       9: invokevirtual #498                // Method threadState:()Ljava/lang/Thread$State;
+      12: astore        4
+      14: aload         4
+      16: getstatic     #502                // Field java/lang/Thread$State.NEW:Ljava/lang/Thread$State;
+      19: if_acmpne     33
+      22: new           #332                // class java/lang/IllegalThreadStateException
+      25: dup
+      26: ldc_w         #508                // String Thread not started
+      29: invokespecial #510                // Method java/lang/IllegalThreadStateException."<init>":(Ljava/lang/String;)V
+      32: athrow
+      33: aload         4
+      35: getstatic     #511                // Field java/lang/Thread$State.TERMINATED:Ljava/lang/Thread$State;
+      38: if_acmpne     43
+      41: iconst_1
+      42: ireturn
+      43: lload_2
+      44: lconst_0
+      45: lcmp
+      46: ifgt          51
+      49: iconst_0
+      50: ireturn
+      51: aload_0
+      52: astore        6
+      54: aload         6
+      56: instanceof    #43                 // class java/lang/VirtualThread
+      59: ifeq          76
+      62: aload         6
+      64: checkcast     #43                 // class java/lang/VirtualThread
+      67: astore        5
+      69: aload         5
+      71: lload_2
+      72: invokevirtual #482                // Method java/lang/VirtualThread.joinNanos:(J)Z
+      75: ireturn
+      76: getstatic     #77                 // Field java/util/concurrent/TimeUnit.MILLISECONDS:Ljava/util/concurrent/TimeUnit;
+      79: lload_2
+      80: getstatic     #115                // Field java/util/concurrent/TimeUnit.NANOSECONDS:Ljava/util/concurrent/TimeUnit;
+      83: invokevirtual #514                // Method java/util/concurrent/TimeUnit.convert:(JLjava/util/concurrent/TimeUnit;)J
+      86: lstore        5
+      88: lload_2
+      89: getstatic     #115                // Field java/util/concurrent/TimeUnit.NANOSECONDS:Ljava/util/concurrent/TimeUnit;
+      92: lload         5
+      94: getstatic     #77                 // Field java/util/concurrent/TimeUnit.MILLISECONDS:Ljava/util/concurrent/TimeUnit;
+      97: invokevirtual #514                // Method java/util/concurrent/TimeUnit.convert:(JLjava/util/concurrent/TimeUnit;)J
+     100: lcmp
+     101: ifle          110
+     104: lload         5
+     106: lconst_1
+     107: ladd
+     108: lstore        5
+     110: aload_0
+     111: lload         5
+     113: invokevirtual #495                // Method join:(J)V
+     116: aload_0
+     117: invokevirtual #466                // Method isTerminated:()Z
+     120: ireturn
+

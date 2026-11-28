@@ -4,6 +4,7 @@ import pt.uminho.esr.ott.bootstrap.BootstrapServer;
 import pt.uminho.esr.ott.config.*;
 import pt.uminho.esr.ott.overlay.*;
 import pt.uminho.esr.ott.routing.*;
+import pt.uminho.esr.ott.server.StreamingServer;
 
 import java.io.*;
 import java.nio.channels.*;
@@ -43,6 +44,20 @@ public final class OttApplication
 
 
     //* === Interfaces === *
+
+    interface ServerNodeFactory
+    {
+        RunningService open(NodeConfiguration configuration, UUID instance,
+                StreamingServer.PreparedSources prepared, ConsoleAccess console) throws IOException;
+    }
+
+    interface ConsoleAccess
+    {
+        void log(String text, boolean error);
+        void stop(boolean fatal);
+        Duration left();
+        AtomicBoolean prepareCancelled();
+    }
 
     interface ServiceFactory
     {
@@ -215,6 +230,14 @@ public final class OttApplication
     static ExecutionResult execute(String[] arguments, InputStream input, PrintStream output, PrintStream error,
                                ServiceFactory factory, LongSupplier clock, Runnable closeInput, Runnable closeOutput)
     {
+        return execute(arguments, input, output, error, factory, null, null, clock, closeInput, closeOutput);
+    }
+
+    static ExecutionResult execute(String[] arguments, InputStream input, PrintStream output, PrintStream error,
+                               ServiceFactory factory, StreamingServer.SourceOpener sourceOpener,
+                               ServerNodeFactory serverNodeFactory, LongSupplier clock,
+                               Runnable closeInput, Runnable closeOutput)
+    {
         final Invocation invocation;
         final NodeConfiguration config;
 
@@ -263,7 +286,7 @@ public final class OttApplication
         {
             Runtime.getRuntime().addShutdownHook(hook);
             console.writer.start();
-            service = factory == null ? open(config, console) : factory.open(config);
+            service = factory == null ? open(config, console, sourceOpener, serverNodeFactory, clock) : factory.open(config);
             console.log("STARTED node=" + config.nodeId() + " role=" + config.role() + " pid=" + ProcessHandle.current().pid(), false);
             console.reader.start();
 
@@ -421,6 +444,13 @@ public final class OttApplication
 
     private static RunningService open(NodeConfiguration config, Console console) throws IOException
     {
+        return open(config, console, null, null, System::nanoTime);
+    }
+
+    private static RunningService open(NodeConfiguration config, Console console,
+            StreamingServer.SourceOpener sourceOpener, ServerNodeFactory serverNodeFactory,
+            LongSupplier clock) throws IOException
+    {
         if(config.role() == NodeRole.BOOTSTRAP)
         {
             var bootstrap = new BootstrapServer(config);
@@ -469,32 +499,151 @@ public final class OttApplication
         }
 
         UUID instance = UUID.randomUUID();
-        var reference = new AtomicReference<OverlayNode>();
-
-        var node = OverlayNode.withRoutingObserver(config, instance, event ->
+        if(config.role() == NodeRole.SERVER)
         {
-            console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
-                    event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
+            var plans = StreamingServer.SourcePlan.fromConfiguration(config);
+            StreamingServer.SourceOpener opener = sourceOpener != null ? sourceOpener : StreamingServer.SourceHandle::open;
+            var prepared = StreamingServer.prepare(plans, opener, console.prepareCancelled(),
+                    () -> console.stopped.get() ? console.left().toNanos() : Long.MAX_VALUE, clock);
 
-            if(event instanceof NeighborManager.Received received)
+            if(serverNodeFactory != null)
             {
-                var m = received.message();
-                UUID stream = m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.Trace t ? t.streamId()
-                        : m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.TraceResult t ? t.streamId() : null;
-                var n = reference.get();
-
-                if(stream != null && n != null)
+                try
                 {
-                    var snapshot = n.routingSnapshot();
-                    var route = snapshot.routes().get(stream);
-                    console.log("TRACE_HOP node=" + config.nodeId() + " instance=" + instance + " stream=" + stream
-                            + " request=" + m.requestId() + " direction=" + (m.type() == pt.uminho.esr.ott.protocol.MessageType.ROUTE_TRACE ? "request" : "response")
-                            + " session=" + received.session() + " capturedAt=" + snapshot.capturedAtNanos() + " costMicros="
-                            + (route == null ? "UNAVAILABLE" : route.selectedMetric().map(x -> Long.toString(x.costMicros())).orElse("UNAVAILABLE")), false);
+                    return serverNodeFactory.open(config, instance, prepared, console);
+                }
+                catch(RuntimeException | Error | IOException e)
+                {
+                    prepared.close();
+                    throw e;
                 }
             }
-        }, event -> event.routeSwitch().ifPresent(change ->
-                console.log(switchLog(config.nodeId(), instance, change), false)));
+
+            var fatalRef = new AtomicReference<Throwable>();
+            var serverRef = new AtomicReference<StreamingServer>();
+            var nodeRef = new AtomicReference<OverlayNode>();
+            var server = new StreamingServer(prepared, StreamingServer.FramePort.UNWIRED, cause ->
+            {
+                fatalRef.compareAndSet(null, cause);
+                console.stop(true);
+            }, clock);
+            serverRef.set(server);
+
+            try
+            {
+                var node = OverlayNode.withLocalSources(config, instance,
+                        neighborObserver(config, console, instance, nodeRef),
+                        event -> event.routeSwitch().ifPresent(change ->
+                                console.log(switchLog(config.nodeId(), instance, change), false)),
+                        server.localSourceBinding());
+                nodeRef.set(node);
+                node.start().whenComplete((v, error) ->
+                {
+                    if(error == null)
+                        console.log("READY node=" + config.nodeId() + " instance=" + instance, false);
+                    else
+                    {
+                        fatalRef.compareAndSet(null, error);
+                        console.stop(true);
+                    }
+                });
+
+                var sharedBudget = new AtomicReference<StreamingServer.ShutdownBudget>();
+                return new RunningService()
+                {
+                    public Map<String, Neighbor> neighbors()
+                    {
+                        return node.diagnostics();
+                    }
+
+                    public RoutingService.Snapshot routingSnapshot()
+                    {
+                        return node.routingSnapshot();
+                    }
+
+                    public Optional<pt.uminho.esr.ott.monitoring.NetworkMonitor.Snapshot> monitoringSnapshot()
+                    {
+                        return Optional.of(node.monitoringSnapshot());
+                    }
+
+                    public RoutingService.TraceTicket requestTrace(UUID streamId)
+                    {
+                        return node.requestTrace(streamId);
+                    }
+
+                    public Optional<OverlayRecovery.RecoveryStatus> recoveryStatus()
+                    {
+                        return Optional.of(node.recoveryStatus());
+                    }
+
+                    public void requestShutdown(int reason, Duration budget)
+                    {
+                        var sb = sharedBudget.updateAndGet(existing -> existing != null ? existing
+                                : console.stopped.get()
+                                        ? console.shutdownBudget()
+                                        : StreamingServer.ShutdownBudget.start(clock.getAsLong(), budget));
+                        server.requestShutdown(sb);
+                        node.requestShutdown(reason, Duration.ofNanos(sb.remainingNanos(clock.getAsLong())));
+                    }
+
+                    public boolean awaitTermination(Duration budget)
+                    {
+                        var sb = sharedBudget.updateAndGet(existing -> existing != null ? existing
+                                : console.stopped.get()
+                                        ? console.shutdownBudget()
+                                        : StreamingServer.ShutdownBudget.start(clock.getAsLong(), budget));
+                        Duration remaining = Duration.ofNanos(sb.remainingNanos(clock.getAsLong()));
+                        boolean nodeDone = node.awaitTermination(remaining);
+                        var serverDone = server.awaitTermination(sb);
+                        return nodeDone && serverDone.complete();
+                    }
+
+                    public Optional<Throwable> failure()
+                    {
+                        return Optional.ofNullable(fatalRef.get())
+                                .or(node::failure)
+                                .or(server::failure);
+                    }
+
+                    public void close()
+                    {
+                        var sb = sharedBudget.updateAndGet(existing -> existing != null ? existing
+                                : console.stopped.get()
+                                        ? console.shutdownBudget()
+                                        : StreamingServer.ShutdownBudget.start(clock.getAsLong(),
+                                                config.runtime().control().shutdownTimeout()));
+                        server.requestShutdown(sb);
+                        long remNanos = sb.remainingNanos(clock.getAsLong());
+                        try
+                        {
+                            if(remNanos > 0L)
+                                node.close();
+                            else
+                            {
+                                node.requestShutdown(1, Duration.ZERO);
+                                node.awaitTermination(Duration.ZERO);
+                            }
+                        }
+                        finally
+                        {
+                            server.awaitTermination(sb);
+                        }
+                    }
+                };
+            }
+            catch(RuntimeException | Error e)
+            {
+                server.requestShutdown(StreamingServer.ShutdownBudget.start(clock.getAsLong(), Duration.ZERO));
+                server.close();
+                throw e;
+            }
+        }
+
+        var reference = new AtomicReference<OverlayNode>();
+
+        var node = OverlayNode.withRoutingObserver(config, instance, neighborObserver(config, console, instance, reference),
+                event -> event.routeSwitch().ifPresent(change ->
+                        console.log(switchLog(config.nodeId(), instance, change), false)));
 
         reference.set(node);
 
@@ -554,6 +703,34 @@ public final class OttApplication
     }
 
 
+
+    private static NeighborManager.Observer neighborObserver(NodeConfiguration config, Console console,
+            UUID instance, AtomicReference<OverlayNode> reference)
+    {
+        return event ->
+        {
+            console.log("EVENT node=" + config.nodeId() + " instance=" + instance + " " + event,
+                    event instanceof NeighborManager.Received r && r.message().type() == pt.uminho.esr.ott.protocol.MessageType.ERROR);
+
+            if(event instanceof NeighborManager.Received received)
+            {
+                var m = received.message();
+                UUID stream = m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.Trace t ? t.streamId()
+                        : m.payload() instanceof pt.uminho.esr.ott.protocol.ControlMessage.TraceResult t ? t.streamId() : null;
+                var n = reference.get();
+
+                if(stream != null && n != null)
+                {
+                    var snapshot = n.routingSnapshot();
+                    var route = snapshot.routes().get(stream);
+                    console.log("TRACE_HOP node=" + config.nodeId() + " instance=" + instance + " stream=" + stream
+                            + " request=" + m.requestId() + " direction=" + (m.type() == pt.uminho.esr.ott.protocol.MessageType.ROUTE_TRACE ? "request" : "response")
+                            + " session=" + received.session() + " capturedAt=" + snapshot.capturedAtNanos() + " costMicros="
+                            + (route == null ? "UNAVAILABLE" : route.selectedMetric().map(x -> Long.toString(x.costMicros())).orElse("UNAVAILABLE")), false);
+                }
+            }
+        };
+    }
 
     private static String switchLog(String node, UUID instance, RoutingService.SwitchEvent change)
     {
@@ -864,7 +1041,7 @@ public final class OttApplication
 
     //* === Console === *
 
-    private static final class Console
+    private static final class Console implements ConsoleAccess
     {
 
         //* === Atributos e Variáveis === *
@@ -873,6 +1050,7 @@ public final class OttApplication
         final ArrayBlockingQueue<OutputEvent> outputs;
         final AtomicBoolean stopped = new AtomicBoolean();
         final AtomicBoolean failed = new AtomicBoolean();
+        final AtomicBoolean prepareCancelled = new AtomicBoolean();
         final AtomicBoolean outputStopping = new AtomicBoolean();
         final CountDownLatch finished = new CountDownLatch(1);
         final Thread reader;
@@ -900,8 +1078,10 @@ public final class OttApplication
 
         //* === Métodos === *
 
-        synchronized void stop(boolean fatal)
+        @Override
+        public synchronized void stop(boolean fatal)
         {
+            prepareCancelled.set(true);
             if(fatal)
                 failed.set(true);
 
@@ -909,12 +1089,25 @@ public final class OttApplication
                 stopAt = clock.getAsLong();
         }
 
-        Duration left()
+        @Override
+        public AtomicBoolean prepareCancelled()
+        {
+            return prepareCancelled;
+        }
+
+        @Override
+        public Duration left()
         {
             return Duration.ofNanos(Math.max(0, budget - (clock.getAsLong() - stopAt)));
         }
 
-        void log(String text, boolean error)
+        StreamingServer.ShutdownBudget shutdownBudget()
+        {
+            return new StreamingServer.ShutdownBudget(stopAt, budget);
+        }
+
+        @Override
+        public void log(String text, boolean error)
         {
             if(!outputs.offer(new OutputEvent(oneLine(text), error)))
                 stop(true);

@@ -4,6 +4,11 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 import pt.uminho.esr.ott.config.NodeConfiguration;
 import pt.uminho.esr.ott.overlay.*;
+import pt.uminho.esr.ott.server.StreamingServer;
+import pt.uminho.esr.ott.server.VideoSource;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -99,6 +104,225 @@ class OttApplicationTest {
         assertEquals(1, h.service.snapshots); assertEquals(1, h.service.stops);
         assertFalse(h.text().isBlank());
     }
+    @Test void m17TraceAndSnapshotDiagnosticsAreBoundedAndKeepCliUsable() {
+        var h = new Harness();
+        UUID stream = UUID.randomUUID();
+        assertEquals(0, h.run("trace " + stream + "\ntrace bad\nroutes\ncatalog\nmetrics\nquit\n",
+                "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
+        String text = h.text();
+        assertTrue(text.contains("TRACE_STARTED stream=" + stream), text);
+        assertTrue(text.contains("TRACE_ERROR stream=" + stream), text);
+        assertTrue(text.contains("COMMAND_ERROR trace requires one canonical UUID"), text);
+        assertTrue(text.contains("ROUTES_END"), text);
+        assertTrue(text.contains("CATALOG_END"), text);
+        assertTrue(text.contains("METRICS_END"), text);
+        assertEquals(1, h.service.stops);
+    }
+    @Test void m18ServerQualificationUsesMjpegAndHandsPreparedSourcesToCompositionFactory() throws Exception {
+        UUID streamA = UUID.randomUUID();
+        UUID streamB = UUID.randomUUID();
+        Path media = temporary.resolve("media");
+        Files.createDirectories(media);
+        var image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
+        var jpeg = new ByteArrayOutputStream();
+        assertTrue(ImageIO.write(image, "jpg", jpeg));
+        byte[] frame = jpeg.toByteArray();
+        String prefix = String.format(Locale.ROOT, "%05d", frame.length);
+        byte[] record = ByteBuffer.allocate(5 + frame.length)
+                .put(prefix.getBytes(StandardCharsets.US_ASCII)).put(frame).array();
+        Files.write(media.resolve("sample-a.Mjpeg"), record);
+        Files.write(media.resolve("sample-b.Mjpeg"), record);
+
+        Path streams = temporary.resolve("streams.properties");
+        Files.writeString(streams, "stream.ids=" + streamA + "," + streamB + "\n"
+                + "stream." + streamA + ".title=fixture A\n"
+                + "stream." + streamA + ".file=sample-a.Mjpeg\n"
+                + "stream." + streamA + ".fps=25\n"
+                + "stream." + streamA + ".loop=false\n"
+                + "stream." + streamB + ".title=fixture B\n"
+                + "stream." + streamB + ".file=sample-b.Mjpeg\n"
+                + "stream." + streamB + ".fps=25\n"
+                + "stream." + streamB + ".loop=false\n");
+        int controlPort;
+        int dataPort;
+        int bootstrapPort;
+        try (var socket = new java.net.ServerSocket(0)) { controlPort = socket.getLocalPort(); }
+        try (var socket = new java.net.ServerSocket(0)) { dataPort = socket.getLocalPort(); }
+        try (var socket = new java.net.ServerSocket(0)) { bootstrapPort = socket.getLocalPort(); }
+        Path profile = temporary.resolve("server.properties");
+        Files.writeString(profile, "node.id=S1\nnode.role=SERVER\n"
+                + "bind.host=127.0.0.1\nadvertised.host=127.0.0.1\n"
+                + "control.port=" + controlPort + "\ndata.port=" + dataPort + "\n"
+                + "bootstrap.host=127.0.0.1\nbootstrap.port=" + bootstrapPort + "\n"
+                + "control.shutdown.timeout.ms=1000\n"
+                + "streams.file=" + streams + "\nmedia.base=" + media + "\n");
+
+        var closed = new AtomicBoolean();
+        var h = new Harness();
+        StreamingServer.SourceOpener opener = plan -> {
+            var source = StreamingServer.SourceHandle.open(plan);
+            return new StreamingServer.SourceHandle() {
+                @Override public Optional<VideoSource.Frame> nextFrame() throws VideoSource.SourceException {
+                    return source.nextFrame();
+                }
+                @Override public VideoSource.State state() { return source.state(); }
+                @Override public void close() throws VideoSource.SourceException {
+                    closed.set(true);
+                    source.close();
+                }
+            };
+        };
+        var output = new ByteArrayOutputStream();
+        var errors = new ByteArrayOutputStream();
+        var result = OttApplication.execute(new String[]{"--role", "SERVER", "--config", profile.toString()},
+                new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)),
+                new PrintStream(output, true, StandardCharsets.UTF_8),
+                new PrintStream(errors, true, StandardCharsets.UTF_8), null, opener,
+                (configuration, instance, prepared, console) -> {
+                    assertEquals(NodeRole.SERVER, configuration.role());
+                    assertEquals(2, prepared.size());
+                    prepared.close();
+                    return h.service;
+                }, h.clock::get, () -> {}, () -> {});
+        assertEquals(0, result.exitCode(), output.toString(StandardCharsets.UTF_8)
+                + errors.toString(StandardCharsets.UTF_8));
+        assertTrue(result.serviceTerminated());
+        assertTrue(closed.get(), "Shutdown must close qualified source handles");
+        assertEquals(1, h.service.stops);
+    }
+    @Test @Timeout(25) void m19ServerCompositionRunsDiagnosticsAndClosesQualifiedSources() throws Exception {
+        try (var deployment = new LiveDeployment();
+             var bootstrap = new pt.uminho.esr.ott.bootstrap.BootstrapServer(
+                     pt.uminho.esr.ott.config.ConfigurationLoader.load(
+                             deployment.profiles.getFirst(), NodeRole.BOOTSTRAP));
+             var input = new PipedInputStream();
+             var commands = new PipedOutputStream(input);
+             var relayInput = new PipedInputStream();
+             var relayCommands = new PipedOutputStream(relayInput)) {
+            var output = new ByteArrayOutputStream();
+            var error = new ByteArrayOutputStream();
+            var result = new AtomicReference<OttApplication.ExecutionResult>();
+            var coordinator = Thread.ofVirtual().start(() -> result.set(OttApplication.execute(
+                    new String[]{"--role", "SERVER", "--config", deployment.profiles.get(1).toString()},
+                    input,
+                    new PrintStream(output, true, StandardCharsets.UTF_8),
+                    new PrintStream(error, true, StandardCharsets.UTF_8),
+                    null, null, null, System::nanoTime, () -> {}, () -> {})));
+
+            long readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            while (!output.toString(StandardCharsets.UTF_8).contains("READY node=N0")) {
+                assertTrue(coordinator.isAlive(), output + error.toString(StandardCharsets.UTF_8));
+                assertTrue(System.nanoTime() < readyDeadline, "server composition readiness deadline");
+                Thread.sleep(5);
+            }
+
+            var relayOutput = new ByteArrayOutputStream();
+            var relayError = new ByteArrayOutputStream();
+            var relayResult = new AtomicReference<OttApplication.ExecutionResult>();
+            var relayCoordinator = Thread.ofVirtual().start(() -> relayResult.set(OttApplication.execute(
+                    new String[]{"--role", "RELAY", "--config", deployment.profiles.get(2).toString()},
+                    relayInput,
+                    new PrintStream(relayOutput, true, StandardCharsets.UTF_8),
+                    new PrintStream(relayError, true, StandardCharsets.UTF_8),
+                    null, null, null, System::nanoTime, () -> {}, () -> {})));
+            long relayReadyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            while (!relayOutput.toString(StandardCharsets.UTF_8).contains("READY node=N1")) {
+                assertTrue(relayCoordinator.isAlive(), relayOutput + relayError.toString(StandardCharsets.UTF_8));
+                assertTrue(System.nanoTime() < relayReadyDeadline, "relay composition readiness deadline");
+                Thread.sleep(5);
+            }
+
+            UUID stream = UUID.fromString("00000000-0000-4000-8000-000000000001");
+            long routeDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(8);
+            while (!relayOutput.toString(StandardCharsets.UTF_8).contains(
+                    "ROUTE stream=" + stream + " origin=N0") || !relayOutput.toString(StandardCharsets.UTF_8)
+                    .contains("selected=Optional[")) {
+                relayCommands.write("routes\n".getBytes(StandardCharsets.UTF_8));
+                relayCommands.flush();
+                assertTrue(relayCoordinator.isAlive(), relayOutput + relayError.toString(StandardCharsets.UTF_8));
+                assertTrue(System.nanoTime() < routeDeadline, "relay route convergence deadline");
+                Thread.sleep(75);
+            }
+            relayCommands.write(("trace " + stream + "\n").getBytes(StandardCharsets.UTF_8));
+            relayCommands.flush();
+            long relayTraceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (!relayOutput.toString(StandardCharsets.UTF_8).contains("TRACE_RESULT stream=")
+                    && !relayOutput.toString(StandardCharsets.UTF_8).contains("TRACE_ERROR stream=")) {
+                assertTrue(relayCoordinator.isAlive(), relayOutput + relayError.toString(StandardCharsets.UTF_8));
+                assertTrue(System.nanoTime() < relayTraceDeadline, "remote trace result deadline");
+                Thread.sleep(5);
+            }
+
+            commands.write(("trace " + stream + "\n").getBytes(StandardCharsets.UTF_8));
+            commands.flush();
+            long traceDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(4);
+            while (!output.toString(StandardCharsets.UTF_8).contains("TRACE_RESULT stream=")
+                    && !output.toString(StandardCharsets.UTF_8).contains("TRACE_ERROR stream=")) {
+                assertTrue(coordinator.isAlive(), output + error.toString(StandardCharsets.UTF_8));
+                assertTrue(System.nanoTime() < traceDeadline, "local trace result deadline");
+                Thread.sleep(5);
+            }
+
+            commands.write("routes\ncatalog\nmetrics\nneighbors\nrecovery\nquit\n"
+                    .getBytes(StandardCharsets.UTF_8));
+            commands.flush();
+            relayCommands.write("quit\n".getBytes(StandardCharsets.UTF_8));
+            relayCommands.flush();
+            coordinator.join(Duration.ofSeconds(8));
+            relayCoordinator.join(Duration.ofSeconds(8));
+            assertFalse(coordinator.isAlive(), "server composition and both owners must terminate");
+            assertFalse(relayCoordinator.isAlive(), "relay composition and owner must terminate");
+            assertNotNull(result.get());
+            assertNotNull(relayResult.get());
+            assertEquals(0, result.get().exitCode(), output + error.toString(StandardCharsets.UTF_8));
+            assertEquals(0, relayResult.get().exitCode(), relayOutput + relayError.toString(StandardCharsets.UTF_8));
+            String text = output.toString(StandardCharsets.UTF_8);
+            String relayText = relayOutput.toString(StandardCharsets.UTF_8);
+            assertTrue(text.contains("TRACE_RESULT stream=" + stream), text);
+            assertTrue(text.contains("TRACE_HOP node=N0"), text);
+            assertTrue(relayText.contains("TRACE_RESULT stream=" + stream), relayText);
+            assertTrue(text.contains("ROUTES_END"), text);
+            assertTrue(text.contains("CATALOG_END"), text);
+            assertTrue(text.contains("METRICS_END"), text);
+            assertTrue(text.contains("NEIGHBORS"), text);
+            assertTrue(text.contains("RECOVERY"), text);
+        }
+    }
+    @Test void m20ServerCompositionFactoryFailureClosesEveryQualifiedSource() throws Exception {
+        try (var deployment = new LiveDeployment()) {
+            var closed = new java.util.concurrent.ConcurrentHashMap<UUID, AtomicBoolean>();
+            StreamingServer.SourceOpener opener = plan -> {
+                var source = StreamingServer.SourceHandle.open(plan);
+                var wasClosed = new AtomicBoolean();
+                closed.put(plan.streamId(), wasClosed);
+                return new StreamingServer.SourceHandle() {
+                    public Optional<VideoSource.Frame> nextFrame() throws VideoSource.SourceException {
+                        return source.nextFrame();
+                    }
+                    public VideoSource.State state() { return source.state(); }
+                    public void close() throws VideoSource.SourceException {
+                        wasClosed.set(true);
+                        source.close();
+                    }
+                };
+            };
+            var output = new ByteArrayOutputStream();
+            var error = new ByteArrayOutputStream();
+            var result = OttApplication.execute(
+                    new String[]{"--role", "SERVER", "--config", deployment.profiles.get(1).toString()},
+                    new ByteArrayInputStream(new byte[0]),
+                    new PrintStream(output, true, StandardCharsets.UTF_8),
+                    new PrintStream(error, true, StandardCharsets.UTF_8),
+                    null, opener, (configuration, instance, prepared, console) -> {
+                        assertEquals(2, prepared.size());
+                        throw new IOException("controlled composition failure");
+                    }, System::nanoTime, () -> {}, () -> {});
+            assertEquals(3, result.exitCode(), output + error.toString(StandardCharsets.UTF_8));
+            assertEquals(2, closed.size());
+            assertTrue(closed.values().stream().allMatch(AtomicBoolean::get));
+            assertTrue(error.toString(StandardCharsets.UTF_8).contains("controlled composition failure"));
+        }
+    }
     @Test void m14OverlongLineIsReportedAndDoesNotBecomeACommand() {
         var h = new Harness(); assertEquals(0, h.run("x".repeat(4097) + "\nneighbors\nquit\n", "--role", "RELAY", "--config", "src/main/resources/config/relay.properties"));
         assertEquals(1, h.service.snapshots); assertFalse(h.error.toString(StandardCharsets.UTF_8).isBlank());
@@ -193,6 +417,17 @@ class OttApplicationTest {
                     + ports[0] + "\ntopology.file=topology.properties\ncontrol.shutdown.timeout.ms=1500\n"); profiles.add(boot);
                 for (int n = 0; n < 3; n++) {
                     Path file = directory.resolve("N" + n + ".properties");
+                    if (n == 0) {
+                        var img = new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB);
+                        var baos = new ByteArrayOutputStream();
+                        assertTrue(javax.imageio.ImageIO.write(img, "jpg", baos));
+                        byte[] jpeg = baos.toByteArray();
+                        String prefix = String.format(Locale.ROOT, "%05d", jpeg.length);
+                        byte[] payload = java.nio.ByteBuffer.allocate(5 + jpeg.length)
+                                .put(prefix.getBytes(StandardCharsets.US_ASCII)).put(jpeg).array();
+                        Files.write(directory.resolve("a.Mjpeg"), payload);
+                        Files.write(directory.resolve("b.Mjpeg"), payload);
+                    }
                     String media = n == 0 ? "streams.file=" + Path.of("src/main/resources/config/streams-s1.properties").toAbsolutePath()
                         + "\nmedia.base=" + directory + "\n" : "";
                     Files.writeString(file, "node.id=N" + n + "\nnode.role=" + role(n) + "\nbind.host=127.0.0.1\nadvertised.host=127.0.0.1\ncontrol.port="
@@ -581,5 +816,105 @@ class OttApplicationTest {
         var h=new Harness();assertEquals(0,h.run("recovery\nquit\n","--role","RELAY","--config","src/main/resources/config/relay.properties"));
         assertTrue(h.text().contains("RECOVERY node="));assertFalse(h.text().contains("unknown command"));
         assertTrue(h.text().lines().filter(line->line.contains("RECOVERY ")).allMatch(line->line.length()<=OttApplication.MAX_LOG_CHARS));
+    }
+
+    @Test void qC50ServerQualifiesAllSourcesBeforeNodeFactoryAndSharesShutdownBudget(@TempDir Path tempDir) throws Exception {
+        byte[] jpeg;
+        {
+            var img = new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            var baos = new java.io.ByteArrayOutputStream();
+            assertTrue(javax.imageio.ImageIO.write(img, "jpg", baos));
+            jpeg = baos.toByteArray();
+        }
+        Path good = tempDir.resolve("good.mjpeg");
+        String prefix = String.format(Locale.ROOT, "%05d", jpeg.length);
+        Files.write(good, java.nio.ByteBuffer.allocate(5 + jpeg.length)
+                .put(prefix.getBytes(StandardCharsets.US_ASCII)).put(jpeg).array());
+
+        Path badCfg = tempDir.resolve("server-bad.properties");
+        Files.writeString(badCfg, String.join("\n",
+                "node.id=S0",
+                "node.role=SERVER",
+                "bind.host=127.0.0.1",
+                "advertised.host=127.0.0.1",
+                "control.port=19101",
+                "data.port=19102",
+                "bootstrap.host=127.0.0.1",
+                "bootstrap.port=19000",
+                "streams.file=" + tempDir.resolve("streams-bad.properties"),
+                "media.base=" + tempDir), StandardCharsets.UTF_8);
+        Files.writeString(tempDir.resolve("streams-bad.properties"), String.join("\n",
+                "stream.ids=11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",
+                "stream.11111111-1111-1111-1111-111111111111.title=Title A",
+                "stream.11111111-1111-1111-1111-111111111111.file=good.mjpeg",
+                "stream.11111111-1111-1111-1111-111111111111.fps=25",
+                "stream.11111111-1111-1111-1111-111111111111.loop=false",
+                "stream.22222222-2222-2222-2222-222222222222.title=Title B",
+                "stream.22222222-2222-2222-2222-222222222222.file=missing.mjpeg",
+                "stream.22222222-2222-2222-2222-222222222222.fps=25",
+                "stream.22222222-2222-2222-2222-222222222222.loop=false"), StandardCharsets.UTF_8);
+
+        var nodeFactoryCalled = new AtomicBoolean();
+        var out = new ByteArrayOutputStream();
+        var err = new ByteArrayOutputStream();
+        var failRes = OttApplication.execute(
+                new String[]{"--role", "SERVER", "--config", badCfg.toString()},
+                new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)),
+                new PrintStream(out, true, StandardCharsets.UTF_8),
+                new PrintStream(err, true, StandardCharsets.UTF_8),
+                null,
+                pt.uminho.esr.ott.server.StreamingServer.SourceHandle::open,
+                (cfg, inst, prep, con) -> { nodeFactoryCalled.set(true); throw new AssertionError("must not be called"); },
+                System::nanoTime, () -> {}, () -> {});
+        assertEquals(3, failRes.exitCode(), () -> err.toString(StandardCharsets.UTF_8));
+        assertFalse(nodeFactoryCalled.get(), "Node factory must not be called when source qualification fails");
+
+        Path good2 = tempDir.resolve("good2.mjpeg");
+        Files.write(good2, java.nio.ByteBuffer.allocate(5 + jpeg.length)
+                .put(prefix.getBytes(StandardCharsets.US_ASCII)).put(jpeg).array());
+        Path goodCfg = tempDir.resolve("server-good.properties");
+        Files.writeString(goodCfg, String.join("\n",
+                "node.id=S0",
+                "node.role=SERVER",
+                "bind.host=127.0.0.1",
+                "advertised.host=127.0.0.1",
+                "control.port=19103",
+                "data.port=19104",
+                "bootstrap.host=127.0.0.1",
+                "bootstrap.port=19000",
+                "streams.file=" + tempDir.resolve("streams-good.properties"),
+                "media.base=" + tempDir), StandardCharsets.UTF_8);
+        Files.writeString(tempDir.resolve("streams-good.properties"), String.join("\n",
+                "stream.ids=11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222",
+                "stream.11111111-1111-1111-1111-111111111111.title=Title A",
+                "stream.11111111-1111-1111-1111-111111111111.file=good.mjpeg",
+                "stream.11111111-1111-1111-1111-111111111111.fps=25",
+                "stream.11111111-1111-1111-1111-111111111111.loop=false",
+                "stream.22222222-2222-2222-2222-222222222222.title=Title B",
+                "stream.22222222-2222-2222-2222-222222222222.file=good2.mjpeg",
+                "stream.22222222-2222-2222-2222-222222222222.fps=25",
+                "stream.22222222-2222-2222-2222-222222222222.loop=false"), StandardCharsets.UTF_8);
+
+        var preparedSize = new AtomicInteger();
+        var okRes = OttApplication.execute(
+                new String[]{"--role", "SERVER", "--config", goodCfg.toString()},
+                new ByteArrayInputStream("quit\n".getBytes(StandardCharsets.UTF_8)),
+                new PrintStream(new ByteArrayOutputStream(), true, StandardCharsets.UTF_8),
+                new PrintStream(new ByteArrayOutputStream(), true, StandardCharsets.UTF_8),
+                null,
+                pt.uminho.esr.ott.server.StreamingServer.SourceHandle::open,
+                (cfg, inst, prep, con) -> {
+                    preparedSize.set(prep.size());
+                    prep.close();
+                    return new OttApplication.RunningService() {
+                        @Override public Map<String, pt.uminho.esr.ott.overlay.Neighbor> neighbors() { return Map.of(); }
+                        @Override public void requestShutdown(int reason, Duration remainingBudget) { }
+                        @Override public boolean awaitTermination(Duration remainingBudget) { return true; }
+                        @Override public void close() { }
+                    };
+                },
+                System::nanoTime, () -> {}, () -> {});
+        assertEquals(0, okRes.exitCode());
+        assertEquals(2, preparedSize.get());
     }
 }

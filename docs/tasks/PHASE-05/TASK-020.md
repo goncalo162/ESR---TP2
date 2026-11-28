@@ -187,3 +187,46 @@ de concluir025; sem push/IMP-019. TASK-020 apenas fecha apósA/B/C; R17 preserva
 preservado sem afirmar manual pessoal concluído. Denji aprovado e integração
 local maine896643. Sem rebuild/push/IMP-019. PartesA/B concluídas; parteC
 pendente, TASK-020 continua IN PROGRESS e só fecha comA/B/C.
+
+## Parte C/IMP-019 — Model para revisão (2026-11-28T14:54:27Z)
+
+[026-video/Model](../../../memory-bank/bolts/026-video/ddd-01-domain-model.md) iniciado por seleção do utilizador.
+Q-C-48/49 propostas: cadência/retoma/timeline e qualificação/ownership/fecho.
+P01–P20/V-020-C não executados. Sem fontes/Java, Design/Implement, Maven,
+commits/push. Três caminhos futuros do ADD, sem configurar/instalar media
+ou antecipar reencaminhamento/playback. A/B concluídas, C apenasModel;
+TASK-020 pai IN PROGRESS e só fecha apósA/B/C, revisão e integração.
+Manual aplicável de019 não dispensado pela exceção de025. R17 preservado.
+
+## Parte C/IMP-019 — Design para revisão (2026-11-28T15:18:50Z)
+
+Model/Q-C-48/49 aprovados; [Design](../../../memory-bank/bolts/026-video/ddd-02-technical-design.md) apenas documental.
+Cadência exata, procura, pausa/retoma, W2+coordenador1, fairness/filas finitas,
+reservas físicas e prazo global. Qualificar antes do nó/routing publicar;
+integração real por conferir emADR, sem presumir API ou ampliar âmbito.
+P01–P20/V-020-C não executados. Sem fontes/Java/Implement/Maven, commits/push.
+A/B concluídas, C apenasDesign, pai IN PROGRESS; fecho só apósA/B/C,
+regressãoJDK21, manual humano aplicável, Denji e integração. Sem novos gates.
+
+## Parte C/IMP-019 — revisão ADR com impedimento (2026-11-28T15:37:32Z)
+
+Design aprovado; [A01–A08](../../../memory-bank/bolts/026-video/adr-review.md) conferidos nos fontes reais.
+Faltam pontes públicas de owner/procura/revogação/disponibilidade. Q-C-50 propõe
+8 caminhos, sem ampliar os3 do ADD até autorização. Qualificação antes do nó
+cabe no App; UNWIRED recusado e prazo/cleanup honestos. Sem código alterado,
+Maven/testes/aplicações/Implement/commits/push. P01–P20/V-020-C por executar;
+ADR por aprovar, apenas Model/Design aceites. A/B concluídas, C pendente;
+manual humano aplicável/regressão JDK21/Denji/integração mantidos, sem novos gates.
+
+## Parte C/IMP-019 — Test aceite e bolt 026-video fechado (2026-11-28T19:55:07Z)
+
+O utilizador aprovou explicitamente a validação/fecho de Test e do bolt. Em
+OpenJDK 21.0.13.1/Maven 3.6.3, a seleção focal passou 5/5, a suíte pertinente
+150/150 e a suíte Maven completa 1599/1599, sem falhas/erros/skips. JaCoCo 0.8.12:
+bundle 7573/8252 (91,77%) e linhas executáveis novas 673/825 (81,58%), ambos >80%.
+[Relatório](../../../memory-bank/bolts/026-video/ddd-03-test-report.md).
+
+`026-video` complete e história 008 complete/implemented=true. Isto conclui o
+bolt da parte C, **não** a TASK-020: A/B/C, revisão/integração e restantes
+critérios do pai permanecem sujeitos ao fluxo próprio. Não se marca TASK-020
+DONE, PHASE-05 concluída ou unidade 005-video completa.

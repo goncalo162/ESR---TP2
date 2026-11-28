@@ -11,7 +11,7 @@ final por Luis e integração em main. G-REVIEW-032 cumprido. 002-overlay/IMP-00
 com cinco etapas concluídas e [Test aprovado](bolts/002-overlay/ddd-03-test-report.md),
 registado em 2026-11-04T14:05:14Z; fechado em 2026-11-04T14:18:23Z, após revisão confirmada
 pelo utilizador e integração da versão revista em main;
-003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:20 histórias complete,0 in-progress e15 planned; bolts:20 complete,0 in-progress,15 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
+003-overlay/IMP-004 complete, história implemented=true, TASK-007 DONE após revisão Denji e integração local 8db7b78. 020-overlay/IMP-005 complete após revisão final confirmada pelo utilizador e integração da versão revista em main. 004-overlay/IMP-006 complete após Test, revisão confirmada e integração. Total atual:21 histórias complete,0 in-progress e14 planned; bolts:21 complete,0 in-progress,14 planned. Unidade003-rotas complete e PHASE-03 DONE; unidade002-overlay complete, PHASE-02 DONE incluindo EXTRA-01 de controlo. Unidade004-arvores complete/PHASE-04 DONE em 2026-11-22T23:10:04Z; as cinco histórias complete/implemented=true.
 Intent ainda em construção.
 
 ## 001-base-validada/001-verificar-base.md ✅ GENERATED — COMPLETE
@@ -144,7 +144,8 @@ Sem Java/media/demo alterados no fecho,uploads,push ou novo IMP.
 
 ## 005-video/008-emitir-fontes-com-pacing-e-procura.md ✅ GENERATED
 
-**Tarefa:** IMP-019. **Estado:** planned. **Bolt:** 026-video.
+**Tarefa:** IMP-019. **Estado:** complete; Test aceite. **Bolt:** [026-video](bolts/026-video/bolt.md) complete.
+[Test](bolts/026-video/ddd-03-test-report.md): JDK 21, 1599/1599; JaCoCo 91,77% bundle e 81,58% em linhas executáveis adicionadas. História 008 `complete`/`implemented=true`; TASK-020 continua IN PROGRESS até fecho das partes A/B/C e gates do pai.
 **Ficheiro:** [008-emitir-fontes-com-pacing-e-procura](intents/001-ott-streaming/units/005-video/stories/008-emitir-fontes-com-pacing-e-procura.md).
 
 ## 005-video/003-reencaminhar-e-replicar-datagramas-pela-arvore-ativa.md ✅ GENERATED

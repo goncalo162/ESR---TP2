@@ -1404,7 +1404,7 @@ Sem rebuild/push/IMP-019; TASK-020 apenasA/B concluídas, C pendente.
 - **Descrição/entrega:** Emitir fontes com pacing e procura. Produzir este incremento e a sua prova, preservando os restantes componentes.
 - **Fase/unidade/tamanho:** PHASE-05 / 005-video / M.
 - **Bolt/origem:** [026-video](memory-bank/bolts/026-video/bolt.md); TASK-020 parte C.
-- **Ficheiros:** `server/StreamingServer.java`, `server/StreamingServerTest.java`, `app/OttApplication.java`.
+- **Ficheiros:** `server/StreamingServer.java`, `server/StreamingServerTest.java`, `app/OttApplication.java`, `overlay/OverlayNode.java`, `routing/RoutingService.java`, `overlay/OverlayNodeRoutingTest.java`, `routing/RoutingServiceTest.java`, `app/OttApplicationTest.java`, `routing/RouteTraceTest.java`.
 - **Dependências:** IMP-015 (009-arvores), IMP-018 (025-video).
 - **ADR:** ADR-006, ADR-009, ADR-021, ADR-024.
 - **REQ/NFR/CON/INT:** INT-001, INT-002, NFR-001, REQ-012, REQ-013, REQ-015, REQ-018.
@@ -1412,9 +1412,49 @@ Sem rebuild/push/IMP-019; TASK-020 apenasA/B concluídas, C pendente.
 - **Gates:** nenhum externo adicional.
 - **Critérios de aceitação:**
 
-  - [ ] Emitir só com procura confirmada, ao FPS configurado, sem catch-up ilimitado.
-  - [ ] Streams mantêm posição/seq/timeline independentes; loop preserva monotonia e EOF sem loop retira só essa stream.
-  - [ ] Stop e shutdown cancelam emissão e fecham fontes sem afetar a outra origem.
+  - [x] Emitir só com procura confirmada, ao FPS configurado, sem catch-up ilimitado.
+  - [x] Streams mantêm posição/seq/timeline independentes; loop preserva monotonia e EOF sem loop retira só essa stream.
+  - [x] Stop e shutdown cancelam emissão e fecham fontes sem afetar a outra origem.
+
+Checkpoint documental 2026-11-28T14:54:27Z: 026-video iniciado apenas em Model por seleção
+explícita do utilizador. [Model proposto](memory-bank/bolts/026-video/ddd-01-domain-model.md), Q-C-48/49 para aprovação,
+sem alteração normativa ou de código. P01–P20/V-020-C planeados/não executados;
+três caminhos acima preservados. Sem leitura de fontes, Design/Implement/Maven,
+commits/push ou novo gate externo;TASK-020 C apenasModel, pai IN PROGRESS.
+
+Checkpoint 2026-11-28T15:18:50Z: Model eQ-C-48/49 aprovados; [Design proposto](memory-bank/bolts/026-video/ddd-02-technical-design.md).
+Políticas aprovadas mantidas, com cadência/timeline exatas, fronteiras de procura,
+qualificação, W/filas/fairness/reservas e shutdown global detalhados para revisão.
+APIs de integração não presumidas; A01–A08 para futura conferência emADR.
+Três caminhos acima preservados;sem fontes/Java/Implement/Maven, commits/push.
+P01–P20/V-020-C continuam por executar, sem gates externos adicionais.
+
+Checkpoint 2026-11-28T15:33:45Z: Design aprovado; [revisão ADR](memory-bank/bolts/026-video/adr-review.md)
+A01–A08 conferida nos fontes reais. Impedimento: faltam acesso ao owner,
+notificações de procura/revogação e delegação de disponibilidade local.
+**Q-C-50 é proposta pendente**, de três para oito caminhos, não ampliação aplicada:
+acrescentar OverlayNode.java, RoutingService.java e os testes existentes
+OverlayNodeRoutingTest.java, RoutingServiceTest.java, OttApplicationTest.java.
+Âmbito normativo acima continua nos três caminhos; sem código/Implement,
+commits/push ou outro IMP. UNWIRED recusado, sem alegar UDP; P01–P20 por executar.
+
+Checkpoint 2026-11-28T15:48:00Z: Revisão ADR e Q-C-50 aprovadas pelo utilizador;
+âmbito normativo ampliado para os 8 caminhos acima antes de iniciar Implement.
+current_stage=implement; P01–P20/V-020-C por executar na etapa Implement.
+
+Checkpoint 2026-11-28T19:55:07Z: utilizador aprovou Test, fecho do bolt e commit.
+OpenJDK 21.0.13.1/Maven 3.6.3: foco t14–t16 5/5, suíte pertinente 150/150,
+completa 1599/1599. JaCoCo 0.8.12: bundle 7573/8252 (91,77%), linhas
+executáveis adicionadas 673/825 (81,58%), ambos acima de 80%.
+[Relatório](memory-bank/bolts/026-video/ddd-03-test-report.md);
+026-video complete e história 008 complete/implemented=true. TASK-020 continua
+IN PROGRESS: este checkpoint conclui somente o bolt da parte C, sem marcar
+DONE o pai ou PHASE-05 e sem alegar manual humano, revisão Denji ou integração.
+
+Adenda 2026-11-28T16:15:00Z: `routing/RouteTraceTest.java` autorizado como 9.º caminho,
+estritamente para dotar os fixtures de `CliGraph` com ficheiros `.Mjpeg` mínimos
+válidos para `t14`–`t16`; sem alteração de produção fora dos oito caminhos e sem
+validar `implement`.
 
 <a id="imp-020"></a>
 ### IMP-020 — Encaminhar datagramas pela árvore

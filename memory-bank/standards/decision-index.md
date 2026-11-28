@@ -1,5 +1,43 @@
 # Índice derivado de decisões
 
+## IMP-019 — ADR/Q-C-50 aprovadas; 026-video concluído
+
+Registo 2026-11-28T19:55:07Z. Revisão A01–A08 e Q-C-50 aprovadas; `RouteTraceTest.java`
+foi autorizado como 9.º caminho para fixtures `.Mjpeg`. Sem nova ADR nem
+alteração de decisões globais. Test aceite e bolt fechado após validação JDK 21:
+5/5 focados, 150/150 pertinentes e 1599/1599 totais. JaCoCo 0.8.12: bundle
+7573/8252 (91,77%); linhas executáveis adicionadas 673/825 (81,58%).
+[Relatório](../bolts/026-video/ddd-03-test-report.md). TASK-020 e a unidade
+permanecem em progresso; não se afirma revisão Denji, manual humano ou integração.
+
+**Checkpoint anterior de Design, histórico:**
+
+## IMP-019 — Model/Q-C-48/49 aprovados; Design para revisão
+
+Registo 2026-11-28T15:18:50Z. [Design](../bolts/026-video/ddd-02-technical-design.md): aritmética
+exata, procura revogável e consulta no owner, qualificação antes do nó/routing,
+W2+coordenador1, filas/reservas/fairness e orçamento global. A01–A08 são obrigações
+de conferência emADR, não APIs já verificadas. Reutiliza ADR-006/009/021/024,
+com017/018/020, sem nova ADR aprovada ou ampliação dos três caminhos.
+P01–P20/V-020-C por executar;sem fontes/Java/Implement/Maven, commits/push.
+Fecho exige manual aplicável/regressãoJDK21/Denji/integração;sem novos gates.
+
+**Checkpoint anterior de Model, histórico:**
+
+
+## IMP-019 — Model proposto, Q-C-48/49 por aprovar
+
+Registo 2026-11-28T14:54:27Z. [Modelo](../bolts/026-video/ddd-01-domain-model.md) de cadência
+sob procura, cursor/seq/timeline e lifecycle; reutiliza ADR-006/009/021/024 e
+as regras de owner/época/fatal de017/018/020, sem propor nova ADR nesta etapa.
+Q-C-48/49 são propostas de política, não contrato aprovado. Conferir emDesign/ADR
+as APIs reais, só quando autorizadas; nenhum fonte foi lido nesta etapa.
+Três caminhos do ADD, sem antecipar forwarding/UDP/player. P01–P20/V-020-C
+por executar;sem Design/Implement/Java/Maven, commits/push ou gate externo novo.
+
+**Checkpoint anterior, histórico:**
+
+
 ## IMP-018 concluído — 2026-11-25T17:11:45Z
 
 [Fecho](../bolts/025-video/closure-walkthrough.md): Test aceite por condição

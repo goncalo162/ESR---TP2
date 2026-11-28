@@ -1,0 +1,168 @@
+Compiled from "Thread.java"
+public interface java.lang.Thread$Builder$OfPlatform extends java.lang.Thread$Builder {
+  public abstract java.lang.Thread$Builder$OfPlatform name(java.lang.String);
+  public abstract java.lang.Thread$Builder$OfPlatform name(java.lang.String, long);
+  public abstract java.lang.Thread$Builder$OfPlatform inheritInheritableThreadLocals(boolean);
+  public abstract java.lang.Thread$Builder$OfPlatform uncaughtExceptionHandler(java.lang.Thread$UncaughtExceptionHandler);
+  public abstract java.lang.Thread$Builder$OfPlatform group(java.lang.ThreadGroup);
+  public abstract java.lang.Thread$Builder$OfPlatform daemon(boolean);
+  public default java.lang.Thread$Builder$OfPlatform daemon();
+  public abstract java.lang.Thread$Builder$OfPlatform priority(int);
+  public abstract java.lang.Thread$Builder$OfPlatform stackSize(long);
+  public default java.lang.Thread$Builder uncaughtExceptionHandler(java.lang.Thread$UncaughtExceptionHandler);
+  public default java.lang.Thread$Builder inheritInheritableThreadLocals(boolean);
+  public default java.lang.Thread$Builder name(java.lang.String, long);
+  public default java.lang.Thread$Builder name(java.lang.String);
+}
+Compiled from "Thread.java"
+public class java.lang.Thread implements java.lang.Runnable {
+  public static final int MIN_PRIORITY;
+  public static final int NORM_PRIORITY;
+  public static final int MAX_PRIORITY;
+  public static native java.lang.Thread currentThread();
+  public static void yield();
+  public static void sleep(long) throws java.lang.InterruptedException;
+  public static void sleep(long, int) throws java.lang.InterruptedException;
+  public static void sleep(java.time.Duration) throws java.lang.InterruptedException;
+  public static void onSpinWait();
+  public static java.lang.Thread$Builder$OfPlatform ofPlatform();
+  public static java.lang.Thread$Builder$OfVirtual ofVirtual();
+  public java.lang.Thread();
+  public java.lang.Thread(java.lang.Runnable);
+  public java.lang.Thread(java.lang.ThreadGroup, java.lang.Runnable);
+  public java.lang.Thread(java.lang.String);
+  public java.lang.Thread(java.lang.ThreadGroup, java.lang.String);
+  public java.lang.Thread(java.lang.Runnable, java.lang.String);
+  public java.lang.Thread(java.lang.ThreadGroup, java.lang.Runnable, java.lang.String);
+  public java.lang.Thread(java.lang.ThreadGroup, java.lang.Runnable, java.lang.String, long);
+  public java.lang.Thread(java.lang.ThreadGroup, java.lang.Runnable, java.lang.String, long, boolean);
+  public static java.lang.Thread startVirtualThread(java.lang.Runnable);
+  public final boolean isVirtual();
+  public void start();
+  public void run();
+  public final void stop();
+  public void interrupt();
+  public static boolean interrupted();
+  public boolean isInterrupted();
+  public final boolean isAlive();
+  public final void suspend();
+  public final void resume();
+  public final void setPriority(int);
+  public final int getPriority();
+  public final synchronized void setName(java.lang.String);
+  public final java.lang.String getName();
+  public final java.lang.ThreadGroup getThreadGroup();
+  public static int activeCount();
+  public static int enumerate(java.lang.Thread[]);
+  public int countStackFrames();
+  public final void join(long) throws java.lang.InterruptedException;
+  public final void join(long, int) throws java.lang.InterruptedException;
+  public final void join() throws java.lang.InterruptedException;
+  public final boolean join(java.time.Duration) throws java.lang.InterruptedException;
+  public static void dumpStack();
+  public final void setDaemon(boolean);
+  public final boolean isDaemon();
+  public final void checkAccess();
+  public java.lang.String toString();
+  public java.lang.ClassLoader getContextClassLoader();
+  public void setContextClassLoader(java.lang.ClassLoader);
+  public static native boolean holdsLock(java.lang.Object);
+  public java.lang.StackTraceElement[] getStackTrace();
+  public static java.util.Map<java.lang.Thread, java.lang.StackTraceElement[]> getAllStackTraces();
+  public long getId();
+  public final long threadId();
+  public java.lang.Thread$State getState();
+  public static void setDefaultUncaughtExceptionHandler(java.lang.Thread$UncaughtExceptionHandler);
+  public static java.lang.Thread$UncaughtExceptionHandler getDefaultUncaughtExceptionHandler();
+  public java.lang.Thread$UncaughtExceptionHandler getUncaughtExceptionHandler();
+  public void setUncaughtExceptionHandler(java.lang.Thread$UncaughtExceptionHandler);
+}
+Compiled from "ArrayBlockingQueue.java"
+public class java.util.concurrent.ArrayBlockingQueue<E> extends java.util.AbstractQueue<E> implements java.util.concurrent.BlockingQueue<E>, java.io.Serializable {
+  public java.util.concurrent.ArrayBlockingQueue(int);
+  public java.util.concurrent.ArrayBlockingQueue(int, boolean);
+  public java.util.concurrent.ArrayBlockingQueue(int, boolean, java.util.Collection<? extends E>);
+  public boolean add(E);
+  public boolean offer(E);
+  public void put(E) throws java.lang.InterruptedException;
+  public boolean offer(E, long, java.util.concurrent.TimeUnit) throws java.lang.InterruptedException;
+  public E poll();
+  public E take() throws java.lang.InterruptedException;
+  public E poll(long, java.util.concurrent.TimeUnit) throws java.lang.InterruptedException;
+  public E peek();
+  public int size();
+  public int remainingCapacity();
+  public boolean remove(java.lang.Object);
+  public boolean contains(java.lang.Object);
+  public java.lang.Object[] toArray();
+  public <T> T[] toArray(T[]);
+  public java.lang.String toString();
+  public void clear();
+  public int drainTo(java.util.Collection<? super E>);
+  public int drainTo(java.util.Collection<? super E>, int);
+  public java.util.Iterator<E> iterator();
+  public java.util.Spliterator<E> spliterator();
+  public void forEach(java.util.function.Consumer<? super E>);
+  public boolean removeIf(java.util.function.Predicate<? super E>);
+  public boolean removeAll(java.util.Collection<?>);
+  public boolean retainAll(java.util.Collection<?>);
+}
+Compiled from "Semaphore.java"
+public class java.util.concurrent.Semaphore implements java.io.Serializable {
+  public java.util.concurrent.Semaphore(int);
+  public java.util.concurrent.Semaphore(int, boolean);
+  public void acquire() throws java.lang.InterruptedException;
+  public void acquireUninterruptibly();
+  public boolean tryAcquire();
+  public boolean tryAcquire(long, java.util.concurrent.TimeUnit) throws java.lang.InterruptedException;
+  public void release();
+  public void acquire(int) throws java.lang.InterruptedException;
+  public void acquireUninterruptibly(int);
+  public boolean tryAcquire(int);
+  public boolean tryAcquire(int, long, java.util.concurrent.TimeUnit) throws java.lang.InterruptedException;
+  public void release(int);
+  public int availablePermits();
+  public int drainPermits();
+  public boolean isFair();
+  public final boolean hasQueuedThreads();
+  public final int getQueueLength();
+  public java.lang.String toString();
+}
+Compiled from "LockSupport.java"
+public class java.util.concurrent.locks.LockSupport {
+  public static void setCurrentBlocker(java.lang.Object);
+  public static void unpark(java.lang.Thread);
+  public static void park(java.lang.Object);
+  public static void parkNanos(java.lang.Object, long);
+  public static void parkUntil(java.lang.Object, long);
+  public static java.lang.Object getBlocker(java.lang.Thread);
+  public static void park();
+  public static void parkNanos(long);
+  public static void parkUntil(long);
+}
+Compiled from "TimeUnit.java"
+public final class java.util.concurrent.TimeUnit extends java.lang.Enum<java.util.concurrent.TimeUnit> {
+  public static final java.util.concurrent.TimeUnit NANOSECONDS;
+  public static final java.util.concurrent.TimeUnit MICROSECONDS;
+  public static final java.util.concurrent.TimeUnit MILLISECONDS;
+  public static final java.util.concurrent.TimeUnit SECONDS;
+  public static final java.util.concurrent.TimeUnit MINUTES;
+  public static final java.util.concurrent.TimeUnit HOURS;
+  public static final java.util.concurrent.TimeUnit DAYS;
+  public static java.util.concurrent.TimeUnit[] values();
+  public static java.util.concurrent.TimeUnit valueOf(java.lang.String);
+  public long convert(long, java.util.concurrent.TimeUnit);
+  public long convert(java.time.Duration);
+  public long toNanos(long);
+  public long toMicros(long);
+  public long toMillis(long);
+  public long toSeconds(long);
+  public long toMinutes(long);
+  public long toHours(long);
+  public long toDays(long);
+  public void timedWait(java.lang.Object, long) throws java.lang.InterruptedException;
+  public void timedJoin(java.lang.Thread, long) throws java.lang.InterruptedException;
+  public void sleep(long) throws java.lang.InterruptedException;
+  public java.time.temporal.ChronoUnit toChronoUnit();
+  public static java.util.concurrent.TimeUnit of(java.time.temporal.ChronoUnit);
+}

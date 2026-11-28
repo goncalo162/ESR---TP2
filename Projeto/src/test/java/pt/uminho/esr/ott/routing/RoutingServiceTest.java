@@ -155,6 +155,59 @@ class RoutingServiceTest {
         var s=new StreamInfo(STREAM,"S","😀".repeat(128),1,60,EPOCH);assertEquals(s,StreamInfo.fromWire(s.toWire()));
         assertThrows(IllegalArgumentException.class,()->new StreamInfo(STREAM,"S","\ud800",1,25,EPOCH));assertThrows(IllegalArgumentException.class,()->new StreamInfo(STREAM,"S","a\0b",1,25,EPOCH));assertThrows(IllegalArgumentException.class,()->new StreamInfo(STREAM,"S","x",2,25,EPOCH));
     }
+    @Test void qC50LocalSourceAccessIsOwnerBoundVersionedAndRejectsStaleUpdates(){
+        try(var r=new Rig("S",true,4096,4096,10,new RoutingTable.Limits(64,256,63,8))){
+            var listener=new RoutingService.LocalSourceListener(){
+                public void onDemandChangedOnOwner(UUID streamId){}
+                public void onStoppedOnOwner(){}
+            };
+            var access=new java.util.concurrent.atomic.AtomicReference<RoutingService.LocalSourceAccess>();
+            r.act(()->access.set(r.router.bindLocalSourcesOnOwner(listener)));
+            assertThrows(IllegalStateException.class,()->r.act(()->r.router.bindLocalSourcesOnOwner(listener)));
+            var first=new java.util.concurrent.atomic.AtomicReference<RoutingService.SourceDemand>();
+            r.act(()->{
+                assertEquals(LOCAL,access.get().serverEpoch());
+                first.set(access.get().observeOnOwner(STREAM));
+                assertThrows(IllegalArgumentException.class,()->access.get().observeOnOwner(UUID.randomUUID()));
+                assertEquals(RoutingService.AvailabilityOutcome.ALREADY_APPLIED,
+                        access.get().setAvailableOnOwner(STREAM,LOCAL,true));
+                assertEquals(RoutingService.AvailabilityOutcome.STALE,
+                        access.get().setAvailableOnOwner(STREAM,UUID.randomUUID(),false));
+            });
+            assertTrue(first.get().localAvailable());
+            var child=session("C1");
+            r.up(child);
+            UUID subscription=UUID.randomUUID();
+            var activation=new ControlMessage(MessageType.ACTIVATE,UUID.randomUUID(),child.nodeId(),
+                    child.instanceId(),new ControlMessage.Activation(STREAM,LOCAL,subscription,0,6000,
+                    List.of("S",child.nodeId())));
+            r.act(()->r.router.onNeighborEvent(new NeighborManager.Received(child,activation)));
+            var localToken=UUID.randomUUID();
+            r.act(()->r.router.requestSubscription(STREAM,localToken));
+            var confirmed=new java.util.concurrent.atomic.AtomicReference<RoutingService.SourceDemand>();
+            r.act(()->confirmed.set(access.get().observeOnOwner(STREAM)));
+            assertTrue(confirmed.get().confirmation().isPresent());
+            assertEquals(Set.of("C1"),confirmed.get().confirmation().orElseThrow().downstreams().keySet());
+            assertTrue(confirmed.get().confirmation().orElseThrow().localConsumers().contains(localToken));
+            var changed=new java.util.concurrent.atomic.AtomicReference<RoutingService.SourceDemand>();
+            r.act(()->{
+                assertEquals(RoutingService.AvailabilityOutcome.APPLIED,
+                        access.get().setAvailableOnOwner(STREAM,LOCAL,false));
+                changed.set(access.get().observeOnOwner(STREAM));
+                assertThrows(IllegalArgumentException.class,()->access.get().setAvailableOnOwner(
+                        UUID.randomUUID(),LOCAL,false));
+            });
+            assertFalse(changed.get().localAvailable());
+            assertTrue(changed.get().version()>first.get().version());
+            r.act(r.router::requestClose);
+            assertEquals(RoutingService.AvailabilityOutcome.STOPPED,
+                    assertDoesNotThrow(()->{
+                        var result=new java.util.concurrent.atomic.AtomicReference<RoutingService.AvailabilityOutcome>();
+                        r.act(()->result.set(access.get().setAvailableOnOwner(STREAM,LOCAL,true)));
+                        return result.get();
+                    }));
+        }
+    }
     @Test void d04CyclicDiamondConvergesAndFixedGenerationStopsFlooding(){
         try(var net=new Network()){
             net.add("S",true);net.add("A",false);net.add("B",false);net.add("C",false);
@@ -295,5 +348,51 @@ class RoutingServiceTest {
         assertEquals(500_000_000L,later.visibleAt(8_500_000_000L).entries().get(STREAM).remainingNanos().orElseThrow());assertTrue(later.visibleAt(9_000_000_000L).entries().isEmpty());
         assertSame(old,r.router.snapshot());assertEquals(110,entry.metric().orElseThrow().costMicros());assertEquals("A",old.routes().get(STREAM).knownUpstream().orElseThrow().nodeId());assertEquals(1_000_000_000L,r.clock.get());
     }}
+
+    @Test void qC50LocalSourceBridgeNotifiesDemandChangesAndValidatesEpochOnWithdraw() {
+        var clock = new AtomicLong(1_000_000_000L);
+        var owner = new Owner(10);
+        var timers = new Timers(clock);
+        try {
+            var config = config("S", true, 10, 10, 10);
+            var router = new RoutingService(config, LOCAL, owner,
+                    (p, m) -> CompletableFuture.completedFuture(Connection.SendResult.ACCEPTED),
+                    e -> {}, clock::get, timers);
+            var changes = new ArrayList<UUID>();
+            var stopped = new java.util.concurrent.atomic.AtomicBoolean();
+            owner.run(() -> {
+                router.start();
+                var access = router.bindLocalSourcesOnOwner(new RoutingService.LocalSourceListener() {
+                    @Override public void onDemandChangedOnOwner(UUID streamId) { changes.add(streamId); }
+                    @Override public void onStoppedOnOwner() { stopped.set(true); }
+                });
+                var initial = access.observeOnOwner(STREAM);
+                assertTrue(initial.localAvailable());
+                assertTrue(initial.confirmation().isEmpty());
+                long v1 = initial.version();
+                // Clock read alone must not bump version.
+                clock.addAndGet(1_000_000L);
+                assertEquals(v1, access.observeOnOwner(STREAM).version());
+
+                // Stale epoch must be rejected.
+                assertEquals(RoutingService.AvailabilityOutcome.STALE,
+                        access.setAvailableOnOwner(STREAM, UUID.randomUUID(), false));
+                assertEquals(RoutingService.AvailabilityOutcome.APPLIED,
+                        access.setAvailableOnOwner(STREAM, LOCAL, false));
+                assertEquals(RoutingService.AvailabilityOutcome.ALREADY_APPLIED,
+                        access.setAvailableOnOwner(STREAM, LOCAL, false));
+                assertFalse(access.observeOnOwner(STREAM).localAvailable());
+                assertTrue(changes.contains(STREAM));
+
+                router.requestClose();
+                assertEquals(RoutingService.AvailabilityOutcome.STOPPED,
+                        access.setAvailableOnOwner(STREAM, LOCAL, true));
+                assertTrue(stopped.get());
+            });
+        } finally {
+            timers.requestClose();
+            owner.close();
+        }
+    }
 
 }

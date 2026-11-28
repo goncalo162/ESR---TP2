@@ -1,5 +1,73 @@
 # Progresso do projeto
 
+**IMP-019 / 026-video — Test aceite; bolt fechado (2026-11-28T19:55:07Z):**
+Utilizador aprovou explicitamente Test, fecho do bolt e commit. Revalidação
+OpenJDK 21.0.13.1/Maven 3.6.3: foco t14–t16 5/5, suíte pertinente 150/150,
+completa 1599/1599, sem falhas/erros/skips. JaCoCo 0.8.12: 91,77% bundle
+(7573/8252) e 81,58% linhas executáveis adicionadas (673/825), ambos >80%.
+[Relatório](../memory-bank/bolts/026-video/ddd-03-test-report.md); bolt complete,
+história 008 complete/implemented=true. Unidade 005-video permanece em progresso
+e TASK-020 continua IN PROGRESS; este checkpoint não afirma manual humano,
+revisão Denji ou integração. Total: 21 bolts complete, 0 in-progress, 14 planned.
+
+**IMP-019 / 026-video — revisão ADR com impedimento (2026-11-28T15:37:32Z):**
+Model/Design e Q-C-48/49 aprovados; A01–A08 conferidos nas APIs reais.
+[Revisão](../memory-bank/bolts/026-video/adr-review.md): qualificação anterior ao nó
+cabe na composição, mas faltam acesso ao owner, notificações de procura/revogação
+e delegação de disponibilidade. Q-C-50 propõe oito caminhos (dois fontes e três
+testes adicionais), sem ampliação aplicada. Os três caminhos do ADD mantêm-se.
+UNWIRED recusado, sem alegar UDP; cleanup FAILED conservador, prazo global.
+
+current_stage=adr, apenas Model/Design em stages_completed, história008 planned.
+20 bolts complete,1 in-progress,14 planned; TASK-020 A/B concluídas, C ADR;
+pai/PHASE-05 IN PROGRESS e PHASE-06/07 TODO. Sem Java alterado, aplicações,
+Maven ou testes executados; javap apenas para assinaturas locais JDK21.
+P01–P20/V-020-C por executar. Sem Implement/commits/push/outro IMP. Regressão
+JDK21, manual humano aplicável antes de aprovar Test, Denji e integração para
+fecho; nenhum gate externo novo. Negativos/remoção da demo/R17 inicial sem
+causa estabelecida preservados;16MiB apenas raster.
+
+**Checkpoint anterior de Design, histórico:**
+
+**IMP-019 / 026-video — Design para revisão (2026-11-28T15:18:50Z):**
+Model eQ-C-48/49 aprovados; apenas Design autorizado. [Design](../memory-bank/bolts/026-video/ddd-02-technical-design.md)
+com aritmética exata de seq/timeline/cadência, deadlines relativos, retoma sem
+burst e revalidação no owner e antes da leitura. W2, coordenador1, filas/heap
+limitados, fairness e reservas partilhadas até conclusão física, shutdown global.
+Todas as fontes qualificam antes de criar/start com routing; disponibilidade
+publicada/retirada no owner real. Contratos de ligação propostos, não APIs
+existentes presumidas: conferência A01–A08 emADR antes de qualquer código.
+
+Só três caminhos do ADD. Sem leitura/análise de fontes, Java/testes/Maven,
+Implement, commits/push ou outroIMP. P01–P20/V-020-C por executar;current_stage=design,
+apenas Model concluído, história008 planned.20 bolts complete,1 in-progress,
+14 planned; TASK-020 apenasA/B, C Design; pai/PHASE-05 IN PROGRESS.
+Fecho exige regressãoJDK21, manual humano aplicável antes deTest, Denji e
+integração;sem gates externos adicionais.16MiB apenas raster; negativos/demo
+removida/R17 (causa original desconhecida) e limitações de media preservados.
+
+**Checkpoint anterior de Model, histórico:**
+
+
+**IMP-019 / 026-video — Model para revisão (2026-11-28T14:54:27Z):**
+Iniciado por seleção explícita da opção1. [Modelo](../memory-bank/bolts/026-video/ddd-01-domain-model.md) preparado:
+um produtor por stream, procura confirmada, posição/seq/timeline independentes,
+cadência sem catch-up, pausa/retoma e EOF/loop, recursos físicos limitados.
+Q-C-48/49 propostas de cadência/retoma e qualificação/ownership, por aprovar.
+P01–P20/V-020-C não executados; baseline1582 e prova22687 JPEGs são de025,
+não resultados deste produtor. current_stage=model, stages_completed=[],
+história008 planned;20 bolts complete,1 in-progress,14 planned.
+
+Somente Model/documentação: sem ler/analisar fontes, Java, Maven/testes,
+Design/ADR/Implement, commits/push ou outro IMP. Três caminhos futuros do ADD;
+sem antecipar UDP/forwarder/player. TASK-020 partesA/B concluídas, C apenasModel;
+pai/PHASE-05 IN PROGRESS, PHASE-06/07 TODO. Fecho exige testes/regressãoJDK21,
+manual humano aplicável, revisão Denji e integração, sem gates externos novos.
+Exceção de delegação de025 não transferida; demo/negativos/R17 preservados.
+
+**Checkpoint anterior, histórico:**
+
+
 **IMP-018 / 025-video — concluído (2026-11-25T17:11:00Z):**
 Leitor local MJPEG entregue e integrado em maine896643; [fecho](../memory-bank/bolts/025-video/closure-walkthrough.md).
 1582/0/0/0 conferido, sem rebuild. JAR fixado e22687 frames completos verificados

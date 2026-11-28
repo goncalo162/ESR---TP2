@@ -110,4 +110,43 @@ class OverlayNodeRoutingTest {
         var malformed=new NodeConfiguration(c.sourceFile(),c.nodeId(),c.role(),c.bindHost(),c.advertisedHost(),c.controlPort(),c.dataPort(),c.bootstrap(),c.topologyFile(),c.streamsFile(),c.mediaBase(),c.topology(),List.of(bad),c.runtime());
         var called=new AtomicBoolean();assertThrows(IllegalArgumentException.class,()->new OverlayNode(malformed,UUID.randomUUID(),e->{},(cfg,id,o,p,v)->{called.set(true);return new NetworkMonitor(cfg,id,o,p,v);}));assertFalse(called.get());
     }
+    @Test void qC50WithLocalSourcesBindsOnOwnerReceivesDemandAndHandlesStop() throws Exception {
+        var config = source(NeighborManagerTest.config("S0", 19001));
+        var instance = UUID.randomUUID();
+        var boundOnOwner = new AtomicBoolean();
+        var initialObserved = new AtomicReference<RoutingService.SourceDemand>();
+        var stoppedOnOwner = new CountDownLatch(1);
+        var boundLatch = new CountDownLatch(1);
+
+        try(var node = OverlayNode.withLocalSources(config, instance, e -> {},
+                NetworkMonitor::new, RoutingService::new, e -> {}, (access, ownerAccess) ->
+        {
+            boundOnOwner.set(ownerAccess.isOwnerThread());
+            assertTrue(ownerAccess.offer(() -> {}));
+            initialObserved.set(access.observeOnOwner(STREAM));
+            boundLatch.countDown();
+            return new RoutingService.LocalSourceListener()
+            {
+                @Override public void onDemandChangedOnOwner(UUID streamId) { }
+                @Override public void onStoppedOnOwner()
+                {
+                    stoppedOnOwner.countDown();
+                    throw new IllegalStateException("cleanup observer fixture");
+                }
+            };
+        }))
+        {
+            node.start();
+            assertTrue(boundLatch.await(2, TimeUnit.SECONDS));
+            assertTrue(boundOnOwner.get(), "LocalSourceBinding must run on real owner thread");
+            assertNotNull(initialObserved.get());
+            assertEquals(instance, initialObserved.get().serverEpoch());
+            assertTrue(initialObserved.get().localAvailable());
+            assertTrue(initialObserved.get().confirmation().isEmpty());
+
+            node.requestShutdown(0, Duration.ofSeconds(2)).toCompletableFuture().get(2, TimeUnit.SECONDS);
+            assertTrue(node.awaitTermination(Duration.ofSeconds(2)));
+            assertTrue(stoppedOnOwner.await(2, TimeUnit.SECONDS), "onStoppedOnOwner must fire on node shutdown");
+        }
+    }
 }

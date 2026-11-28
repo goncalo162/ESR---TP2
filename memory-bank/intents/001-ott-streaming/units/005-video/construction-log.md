@@ -283,3 +283,130 @@ em maine896643 antes de statuscomplete.20 bolts/histórias complete,0 in-progres
 posterior à delegação em Codex. Manual humano não concluído, negativo preservado;
 exceção de delegação apenas para este fecho. Denji aprovado, confirmado pelo
 utilizador. TASK-020/PHASE-05 emprogresso; sem rebuild/push/IMP-019.
+
+## 2026-11-28T14:47:06Z — 026-video / IMP-019 iniciado, apenas Model
+
+Utilizador selecionou opção1 do menu Construction. statusin-progress,
+current_stage=model, stages_completed=[], completed=null. Preparar modelo
+a partir do ADD/contratos documentais, sem ler/analisar/alterar fontes,
+Java, testes, Maven, Design/ADR/Implement, commits ou push. Dependências
+009-arvores/025-video complete; TASK-020 pai IN PROGRESS.
+
+## 2026-11-28T14:54:27Z — IMP-019 Model preparado, sem aprovação
+
+[Model](../../../../bolts/026-video/ddd-01-domain-model.md) para revisão.
+Q-C-48/49 propostas registadas; P01–P20/V-020-C não executados. Apenas documentação,
+sem fontes/Java/Maven, Design/ADR/Implement, commits/push ou outro IMP.
+current_stage=model, stages_completed=[], completed=null; história008 planned.
+20 complete,1 in-progress,14 planned; TASK-020 pai IN PROGRESS.
+
+## 2026-11-28T15:06:27Z — Model/Q-C-48/49 aprovados, apenas Design
+
+Aprovação explícita do utilizador. current_stage=design, apenas Model em
+stages_completed; Implement/ADR, commits/push e outro IMP não autorizados.
+Concretizar aritmética, procura, W/filas/ownership/fecho e portos propostos
+sem leitura/análise de fontes ou pressuposição de APIs reais existentes.
+
+## 2026-11-28T15:18:50Z — IMP-019 Design preparado para revisão
+
+[Design](../../../../bolts/026-video/ddd-02-technical-design.md) após aprovação
+Model/Q-C-48/49. APIs/valores/integração são propostas; A01–A08 conferem fontes
+reais emADR se autorizado. Nenhum fonte lido/analisado/alterado. W2+coordenador1,
+filas/heap limitados, cadência exata, procura e orçamento global concretizados.
+Apenas Model emstages_completed, current_stage=design, completed=null;
+história008 planned. P01–P20/V-020-C não executados. Sem Implement/Maven,
+commits/push/outroIMP ou gates externos adicionais. TASK-020 pai IN PROGRESS.
+
+## 2026-11-28T15:28:10Z — Design aprovado, apenas revisão ADR
+
+Utilizador aprovou W=min(2,S), coordenador único e limites; conferir A01–A08
+nas APIs reais, sem substituir ligação ausente por polling/owner paralelo/
+reflexão emprodução/sucesso fictício. Apenas Model/Design emstages_completed,
+current_stage=adr, completed=null. P01–P20/V-020-C não executados; sem
+Implement, alterações Java, commits/push ou outroIMP.
+
+## 2026-11-28T15:37:32Z — revisão ADR de IMP-019 preparada; Q-C-50 pendente
+
+[Conferência](../../../../bolts/026-video/adr-review.md) A01–A08 sobre APIs reais.
+Faltam ponte do owner, procura/revogação e disponibilidade; proposta8 caminhos
+antes de código, sem ampliação aplicada. Qualificação anterior ao nó cabe no
+App. Orçamento global adapta APIs existentes; cleanup FAILED incerto, UNWIRED
+recusado. Só Model/Design concluídos; current_stage=adr, ADR por aprovar,
+P01–P20/V-020-C não executados. Fonte/testes/POM inalterados; javap só assinaturas
+JDK21. Sem Implement/Maven/aplicação/commits/push/outro IMP. Negativos/R17/demo
+preservados; manual humano aplicável/regressão JDK21/Denji/integração obrigatórios.
+
+## 2026-11-28T19:04:54Z — IMP-019 retomado; prova focalizada de Implement
+
+Implementação previamente preparada reexaminada, sem alteração de código nesta
+retoma. `mvn -f Projeto/pom.xml test -Dtest=StreamingServerTest`: 7 testes,
+0 falhas/erros/ignorados; BUILD SUCCESS em OpenJDK 25.0.5.1, `--release 21`.
+Prova limitada à suíte focalizada, não substitui V-020-C. `current_stage=implement`,
+apenas Model/Design/ADR em `stages_completed`, `completed=null`; aguarda aprovação
+no checkpoint de Implement antes de avançar para Test. Sem alterações fora do
+âmbito IMP-019 nesta retoma.
+
+## 2026-11-28T19:11:45Z — Implement aprovado; Test iniciado
+
+O utilizador aprovou explicitamente: “Aprovo implement e avança para Test”.
+Checkpoint de Implement aceite; `026-video/bolt.md` agora regista
+`implement` em `stages_completed` e `current_stage=test`. Iniciada a validação
+V-020-C, incluindo `RouteTraceTest.t14`–`t16` e a suíte Maven mínima pertinente.
+Ainda sem declarar Test concluído nem fechar a história.
+
+## 2026-11-28T19:21:16Z — Test executado; bloqueio de cobertura
+
+JDK 21.0.13.1 / Maven 3.6.3, `--release 21`. `RouteTraceTest.t14`–`t16`:
+5/5; suíte mínima relevante (`StreamingServerTest`, `OverlayNodeRoutingTest`,
+`RoutingServiceTest`, `OttApplicationTest`, `RouteTraceTest`): 143/143,
+sem falhas/erros/skips, BUILD SUCCESS. V-020-C cobre procura/pacing/retoma,
+loop/EOF isolado, cancelamento e limites de cleanup. Sem correção Java
+necessária pelos testes funcionais.
+
+O gate genérico de cobertura >80% não foi atingido: relatório JaCoCo local
+60,7% de linhas no bundle e 69,1% nas linhas executáveis adicionadas pelos
+quatro ficheiros de produção; a suite não instrumenta os processos JVM filhos.
+Uma tentativa de propagar o agente via `JAVA_TOOL_OPTIONS` alterou
+`m13ClosedStdoutTerminatesInsteadOfBlockingOwner` (exit 141), pelo que foi
+descartada e não conta como resultado do código. Sem configuração de coverage
+adicionada ao POM. `current_stage=test`, bolt `blocked`; aguarda decisão para
+cumprir a cobertura ou aprovar formalmente a não aplicabilidade do limiar.
+
+## 2026-11-28T19:32:07Z — IMP-019 Test ampliado; gate continua bloqueado
+
+Adicionados três testes focados: late trace reply após timeout, diagnósticos
+CLI trace/routes/catalog/metrics e qualificação/transferência de dois fixtures
+`.Mjpeg`. Em OpenJDK 21.0.13.1/Maven 3.6.3, a suíte pertinente passou
+146/146, sem falhas/erros/skips. Medição JaCoCo 0.8.12 (fork Surefire somente):
+bundle 5035/8252 linhas (61,0%); executáveis adicionados em App/Overlay/
+Routing/StreamingServer 569/825 (69,0%). Os dois limiares >80% continuam
+pendentes; `current_stage=test`, bolt `blocked`, história008 aberta, sem
+aceitação/fecho/avanço. Relatório: `ddd-03-test-report.md`.
+
+## 2026-11-28T19:45:47Z — IMP-019 Test validado; gates atingidos
+
+Em OpenJDK 21.0.13.1/Maven 3.6.3, a suíte pertinente passou 150/150 e a suíte
+Maven completa 1599/1599, sem falhas/erros/skips. A cobertura JaCoCo 0.8.12,
+gerada após a suíte completa, mediu bundle 7569/8252 linhas (91,72%) e
+executáveis adicionados em App/Overlay/Routing/StreamingServer 673/825
+(81,58%); ambos acima de >80%. Testes adicionados para composição Server/Relay
+com readiness e trace remoto, falha/cleanup da factory, acesso e confirmação de
+fontes locais, e limites dos value objects/preparação. Sem correção de produção
+necessária. `current_stage=test`, `completed=null`, bolt `in-progress`; evidência
+aguarda checkpoint/aprovação humana, sem marcar Test aceite ou avançar para DONE.
+Relatório: `memory-bank/bolts/026-video/ddd-03-test-report.md`.
+
+## 2026-11-28T19:55:07Z — IMP-019 Test aceite; 026-video fechado
+
+O utilizador aprovou explicitamente validar/fechar Test, fechar o bolt e fazer
+commit. Revalidação JDK 21: seleção `RouteTraceTest#t14*`, `#t15*`, `#t16*` 5/5,
+suíte pertinente 150/150 e completa 1599/1599, sem falhas/erros/skips;
+JaCoCo 0.8.12: bundle 7573/8252 (91,77%), executáveis adicionados em App,
+Overlay, Routing e StreamingServer 673/825 (81,58%). Ambos os gates são >80%.
+
+O script oficial `bolt-complete.cjs 026-video` concluiu com saída de sucesso,
+marcou o bolt complete e atualizou a história 008 para `complete`/
+`implemented=true`. Unidade 005-video permanece `in-progress` devido a quatro
+bolts incompletos; TASK-020 permanece aberta (partes A/B/C, revisão e integração
+não foram encerradas por este checkpoint). Não se alega execução de manual
+humano, revisão Denji ou integração. Relatório: [Test](../../../../bolts/026-video/ddd-03-test-report.md).

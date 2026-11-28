@@ -130,6 +130,25 @@ public final class RoutingService implements AutoCloseable {
     }
     // End IMP-012 types.
 
+    public enum AvailabilityOutcome { APPLIED, ALREADY_APPLIED, STALE, STOPPED }
+    public record SourceDemand(UUID streamId, UUID serverEpoch, long observedAtNanos, long version,
+            boolean localAvailable, Optional<Route.Confirmation> confirmation) {
+        public SourceDemand {
+            Objects.requireNonNull(streamId); Objects.requireNonNull(serverEpoch);
+            Objects.requireNonNull(confirmation);
+            if (version < 0) throw new IllegalArgumentException("Negative demand version");
+        }
+    }
+    public interface LocalSourceListener {
+        void onDemandChangedOnOwner(UUID streamId);
+        void onStoppedOnOwner();
+    }
+    public interface LocalSourceAccess {
+        UUID serverEpoch();
+        SourceDemand observeOnOwner(UUID streamId);
+        AvailabilityOutcome setAvailableOnOwner(UUID streamId, UUID expectedEpoch, boolean available);
+    }
+
     public enum Phase { NEW, RUNNING, STOPPED }
     public enum Reason { NONE, INVALID_INPUT, METADATA_CONFLICT, CAPACITY, CLOSED, OUTPUT_OVERFLOW,
         INVALID_LOCAL_MESSAGE, OWNER_REJECTED, CLOCK_ERROR, SEQUENCE_EXHAUSTED, STOPPED }
@@ -539,6 +558,112 @@ public final class RoutingService implements AutoCloseable {
             row.version=Math.incrementExact(row.version);dirty();drive();
         }catch(ArithmeticException e){note(Reason.SEQUENCE_EXHAUSTED,true);}
     }
+
+    private LocalSourceListener localSourceListener;
+    private final Map<UUID, DemandSignature> localDemandVersions = new HashMap<>();
+    private record ChildSignature(Neighbor.Session session, UUID subscriptionId, long revision, long expiresAtNanos) { }
+    private record DemandSignature(long version, UUID epoch, boolean available, List<ChildSignature> children, Set<UUID> locals) { }
+
+    public LocalSourceAccess bindLocalSourcesOnOwner(LocalSourceListener listener) {
+        requireOwner();
+        Objects.requireNonNull(listener);
+        if (localSourceListener != null)
+            throw new IllegalStateException("Local sources already bound");
+        localSourceListener = listener;
+        return new LocalSourceAccess() {
+            @Override public UUID serverEpoch() { return instance; }
+            @Override public SourceDemand observeOnOwner(UUID streamId) {
+                requireOwner();
+                Objects.requireNonNull(streamId);
+                return computeSourceDemand(streamId, now(), false);
+            }
+            @Override public AvailabilityOutcome setAvailableOnOwner(UUID streamId, UUID expectedEpoch, boolean available) {
+                requireOwner();
+                Objects.requireNonNull(streamId);
+                Objects.requireNonNull(expectedEpoch);
+                if (stopping.get() || phase != Phase.RUNNING) return AvailabilityOutcome.STOPPED;
+                var row = rows.get(streamId);
+                if (row == null || !row.local) throw new IllegalArgumentException("Configured local stream required");
+                var currentEpoch = row.route == null ? null : row.route.serverEpoch().orElse(null);
+                if (!expectedEpoch.equals(currentEpoch) || !instance.equals(currentEpoch))
+                    return AvailabilityOutcome.STALE;
+                if (row.offered == available) return AvailabilityOutcome.ALREADY_APPLIED;
+                setLocalAvailable(streamId, available);
+                return stopping.get() ? AvailabilityOutcome.STOPPED : AvailabilityOutcome.APPLIED;
+            }
+        };
+    }
+
+    private SourceDemand computeSourceDemand(UUID streamId, long at, boolean notifyIfChanged) {
+        var row = rows.get(streamId);
+        if (row == null || !row.local)
+            throw new IllegalArgumentException("Configured local stream required");
+        UUID epoch = row.route != null ? row.route.serverEpoch().orElse(instance) : instance;
+        boolean localAvailable = phase == Phase.RUNNING && !stopping.get() && row.offered && instance.equals(epoch);
+        Optional<Route.Confirmation> confirmation = Optional.empty();
+        List<ChildSignature> childSigs = List.of();
+        Set<UUID> localTokens = Set.of();
+
+        if (localAvailable) {
+            var t = activation.existing(streamId);
+            if (t != null && activation.healthy(t, at)) {
+                var children = new LinkedHashMap<String, Subscription>();
+                var sigs = new ArrayList<ChildSignature>();
+                for (var child : t.children.values()) {
+                    if (child.active != null && current(child.line.key.session)) {
+                        var lease = child.active.validity().orElseThrow();
+                        if (lease.remainingNanos(at) > 0) {
+                            children.put(child.line.key.session.nodeId(), child.active);
+                            sigs.add(new ChildSignature(child.line.key.session, child.active.subscriptionId(),
+                                    child.active.revision(), lease.beganNanos() + lease.durationNanos()));
+                        }
+                    }
+                }
+                var locals = new HashSet<UUID>();
+                for (var token : t.confirmedLocals) {
+                    var l = t.locals.get(token);
+                    if (l != null && !l.cancelled.get()) locals.add(token);
+                }
+                if (!children.isEmpty() || !locals.isEmpty()) {
+                    confirmation = Optional.of(new Route.Confirmation(t.id, t.origin, t.epoch, t.confirmed.source,
+                            Optional.ofNullable(t.confirmed.parent), t.confirmed.path, children, locals,
+                            Optional.ofNullable(t.confirmed.lease), t.version));
+                    childSigs = List.copyOf(sigs);
+                    localTokens = Set.copyOf(locals);
+                }
+            }
+        }
+
+        var prev = localDemandVersions.get(streamId);
+        long version;
+        boolean changed;
+        if (prev == null) {
+            version = 1L;
+            changed = true;
+        } else if (!prev.epoch().equals(epoch) || prev.available() != localAvailable
+                || !prev.children().equals(childSigs) || !prev.locals().equals(localTokens)) {
+            version = prev.version() + 1L;
+            changed = true;
+        } else {
+            version = prev.version();
+            changed = false;
+        }
+        if (changed) {
+            localDemandVersions.put(streamId, new DemandSignature(version, epoch, localAvailable, childSigs, localTokens));
+            if (notifyIfChanged && localSourceListener != null) {
+                try { localSourceListener.onDemandChangedOnOwner(streamId); }
+                catch (RuntimeException | Error e) { note(Reason.INVALID_LOCAL_MESSAGE, true); }
+            }
+        }
+        return new SourceDemand(streamId, epoch, at, version, localAvailable, confirmation);
+    }
+
+    private void notifyLocalSourcesIfChanged(long at) {
+        if (localSourceListener == null || stopping.get() || phase != Phase.RUNNING) return;
+        for (var row : rows.values()) {
+            if (row.local) computeSourceDemand(row.id, at, true);
+        }
+    }
     private void peersChanged(){peerIndex.clear();peerIndex.addAll(sessions.values());peerCursor=0;dirty();}
     private void retire(Neighbor.Session s){
         metricStamps.remove(s);
@@ -712,6 +837,7 @@ public final class RoutingService implements AutoCloseable {
             publish(t); traceDrive(); activation.drive(); int swept=sweepQuotas(t);scan(64-swept);
             // A slow/control-port callback may also advance time during this turn.
             long finished=now();applied(root.expire());publish(finished);
+            notifyLocalSourcesIfChanged(finished);
             if(scanRemaining>0)wake();
             schedule(finished);
         }catch(RuntimeException e){note(Reason.CLOCK_ERROR,true);}
@@ -1013,6 +1139,8 @@ public final class RoutingService implements AutoCloseable {
         rows.clear();streamIndex.clear();originCounts.clear();epochs.clear();sessions.clear();peerIndex.clear();costs.clear();metricStamps.clear();ledgers.clear();cache.clear();quotas.clear();quotaSweep.clear();pending=0;scanRemaining=0;phase=Phase.STOPPED;
         synchronized(resources){for(var a:List.copyOf(admissions)){a.continuationDone=true;release(a);}}
         publish(clock.getAsLong());cleaned.complete(null);
+        if(localSourceListener!=null){try{localSourceListener.onStoppedOnOwner();}catch(RuntimeException|Error ignored){}localSourceListener=null;}
+        localDemandVersions.clear();
         if(registration!=null){registration.remove();registration=null;}
     }
     private static long nanos(Duration d){Objects.requireNonNull(d);if(d.isNegative())throw new IllegalArgumentException("Negative budget");try{return d.toNanos();}catch(ArithmeticException e){throw new IllegalArgumentException("Budget overflow",e);}}

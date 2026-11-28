@@ -2047,3 +2047,132 @@ como manual humano concluído. Denji reviu/aprovou a versão, confirmado pelo
 utilizador. [Autorização/prova](../experiments/construction/025-video/test-02/acceptance-and-review.json).
 Sem rebuild ou alteração Java; commit/integração local/fecho autorizados,
 sem push ou IMP-019. TASK-020 só apósA/B/C; R17 continua sem causa estabelecida.
+
+## Q-C-48 — IMP-019: cadência, retoma, timeline e pressão
+
+**Proposta do Model, não aprovada.** Registo 2026-11-28T14:54:27Z.
+[Modelo](../memory-bank/bolts/026-video/ddd-01-domain-model.md#5-q-c-48--proposta-cadência-pausas-timeline-e-pressão).
+O ADD exige FPS configurado, pausa sem procura, loop monotónico e ausência de
+catch-up ilimitado; falta concretizar como o atraso e a retoma afetam o cursor.
+
+Proposta: k/frameSeq começa em0 por stream/época, mediaTimeUs=floor(k×1000000/F),
+com aritmética sem wrap. Uma entrega tentada de frame válido consome um ordinal,
+inclusive recusa por pressão; ticks vazios/qualificação/pausa não o consomem.
+Cadência monotónica1/F com resto racional, próxima elegibilidade ancorada no
+instante real da tentativa. Após atraso, no máximo um frame, novo período futuro;
+sem bursts nem fast-forward. Suspender mantém cursor e no máximo um frame pronto,
+sem novas leituras/entregas; retoma reancora relógio e preserva seq/timeline.
+Recusa finita no porto descarta aquele frame e não faz retry fora da cadência.
+Esgotamento de contadores termina só a publicação; não resetar sob a mesma
+época nem girar automaticamente a época comum das outras fontes.
+
+Rejeição implica ajustar esta semântica no Model antes de Design/Implement,
+sem inventar pausar/seek do cliente ou protocolo novo. Portos/APIs reais serão
+conferidos emADR; nenhum fonte lido, Java/teste/Maven executado ou wire alterado.
+
+## Q-C-49 — IMP-019: qualificação, ownership e fecho físico
+
+**Proposta do Model, não aprovada.** Registo 2026-11-28T14:54:27Z.
+[Modelo](../memory-bank/bolts/026-video/ddd-01-domain-model.md#6-q-c-49--proposta-qualificação-e-ownership-físico).
+A TASK-020 pede validar ficheiro/JPEG antes da oferta e parar leitura/envio
+sem procura. Propõe-se uma exceção inicial limitada de qualificação: admitir
+path e validar um primeiro frame por fonte antes da disponibilidade; reter
+esse frame para primeira emissão, sem avançar sequência/timeline. Sem procura,
+não ler o seguinte. Vazio inicialmente não é uma fonte publicável, preservando
+a semântica EOF limpo de VideoSource/M03. Falha inicial impede arranque parcial
+apresentado como integral; cleanup conserva o primário. Não é auditoria integral.
+
+Por stream: um recurso/leitor sequencial, uma leitura física, um frame preparado
+e um vencimento lógico; orçamento global W finito a concretizar emDesign.
+I/O/decode/fecho fora do owner, sem libertação física antecipada por cancelamento.
+Em runtime, erro checked/EOF sem loop retira só a oferta afetada. Loop fecha
+antes de reabrir, mantém seq/timeline e não repete vazio; callback antigo não
+ressuscita stop. Fatal inesperado continua pelo tratamento existente.
+Shutdown partilha o prazo global existente; prazo esgotado não é CLOSED falso.
+16MiB continuam só raster destino, não memória total do decoder/JVM.
+
+Somente os três caminhos do ADD. Design/ADR devem conferir projeção confirmada,
+possibilidade de adiar disponibilidade, retirada local, owner e lifecycle reais.
+Qualquer necessidade fora de âmbito será apresentada antes de código. Sem
+Design/ADR/Implement ou aprovação presumida destas duas propostas.
+
+## Q-C-48/49 — Model aprovado; concretização proposta em Design (2026-11-28T15:18:50Z)
+
+Utilizador aprovou explicitamente Model/Q-C-48/49; apenas Design autorizado.
+[Design para revisão](../memory-bank/bolts/026-video/ddd-02-technical-design.md). Sem código/Maven ou leitura/análise de fontes.
+
+- Q-C-48: media(k)=q×1000000+floor(r×1000000/F), com q=k divF/r=k modF,
+  somas/produtos verificados; cadência divide1000000000 porF e conserva resto.
+  Tentativa tardia não acumula dívida. Retoma usa novo token/stamp e respeita
+  intervalo mínimo desde lastAttempt, para flapping não excederFPS. Pausa não
+  avança k/phase nem autoriza novo READ; claim revogável e view temporal atual
+  antes de nextFrame, nova consulta no owner antes do porto de frame.
+- Q-C-49: W=min(2,S), um coordenador incluindo timers, sem thread por fonte/frame;
+  S células/índices únicos, mailboxes de1 por worker, resultado/frame≤1 porfonte,
+  heap≤S, wakeup≤1 pendente+1 emexecução, pump16 fontes/turno. FIFO/round-robin,
+  reservas só libertadas após retorno físico, partilhadas entre gerações.
+  Shutdown usa uma âncora/orçamento global existente, não D por componente.
+- Qualificação total antes de criar/iniciar nó/factory com routing: elimina
+  oferta prematura mesmo que construção/start publique logo. Handover único
+  ao owner real só após todos os primeiros frames e jobs terminarem.
+- DemandPort/AvailabilityPort/OwnerPort são contratos propostos, não APIs
+  presumidas. A01–A08 deADR conferirão as ligações e getters/fecho reais.
+  close emFAILED não prova cleanup anterior; incerteza não é CLOSED.
+
+Números/assinaturas/precisões são proposta de Design para aprovação, sem nova
+ADR ou ampliação do ADD. Se ligação não couber nos três caminhos, apresentar
+impedimento/patch antes de código; sem API fictícia, polling de substituição
+ou owner paralelo. P01–P20/V-020-C continuam por executar. Manual humano
+aplicável/regressãoJDK21/Denji/integração mantidos; sem gates externos adicionais.
+
+## Q-C-50 — IMP-019: pontes reais de owner/procura/disponibilidade
+
+**Aprovada (2026-11-28T15:48:00Z) para Implement nos 8 caminhos** (ampliada em
+2026-11-28T16:15:00Z com `RouteTraceTest.java` como 9.º caminho estritamente para
+fixtures `.Mjpeg` mínimos em `CliGraph`). Registo anterior:
+2026-11-28T15:33:45Z. Design e revisão ADR aprovados.
+[Revisão A01–A08 e proposta concreta](../memory-bank/bolts/026-video/adr-review.md).
+
+Os fontes reais confirmam: OverlayNode guarda owner/routing privados e não
+expõe binding do produtor; RoutingService.Observer só tem diagnóstico/trocas,
+não alterações gerais de procura. setLocalAvailable existe apenas no router,
+owner-only/void, sem época esperada nem delegação pelo nó. Não é possível
+completar a integração nos três caminhos, sem recorrer aos substitutos que
+o utilizador recusou. Qualificação antes do nó cabe no App; a ponte não.
+
+**Proposta recomendada:** conservar os três caminhos atuais e acrescentar
+OverlayNode.java, RoutingService.java, OverlayNodeRoutingTest.java,
+RoutingServiceTest.java e OttApplicationTest.java, nos pacotes existentes:
+**oito caminhos totais**, enumerados integralmente na revisão. Os dois fontes
+adicionais implementariam uma ligação única SERVER, no owner existente,
+com SourceDemand atual, versão/identidades/validade, notificação de revogação
+no mesmo turno, observação inicial e retirada local por binding/época com
+resultado explícito. Os três testes adicionais cobrem a ponte real, retirada,
+compatibilidade, startup/fatal e o orçamento de saída da aplicação.
+
+Sem segundo owner, polling de procura, reflexão em produção, fila/thread
+adicional à proposta aprovada ou alteração de wire/config/VideoSource. Preservar
+factories/constructores/Observer/Snapshot históricos, testes e tratamento fatal.
+Fecho usa o scope global antes de prepare e não chama fallback bloqueante com
+novo prazo. FAILED de VideoSource mantém CLEANUP_UNCERTAIN quando não há prova;
+close quieto não transforma isso em sucesso. UNWIRED continua REFUSED/UNAVAILABLE,
+sem UDP enviado ou entregue. A proposta não declara nenhuma destas APIs existente.
+
+**Alternativa:** conservar estritamente três caminhos e suspender a ligação;
+apenas produtor isolado não satisfaz A02/A03/A04 ou V-020-C integral. Não usar
+essa alternativa para aceitar Implement/fechar. Se aprovada a ampliação,
+registar primeiro no ADD/Design/contratos/bolt, antes de qualquer Java.
+
+Q-C-48/49 e Design continuam aprovados; ADR/Q-C-50 por aprovar. P01–P20/V-020-C
+não executados. Sem Implement/commits/push/outro IMP. Manual humano aplicável,
+regressão JDK21, Denji e integração mantidos; TASK-020 só após A/B/C, sem novos
+gates externos. Negativos e remoção da demo preservados; R17 inicial sem causa.
+
+## IMP-019 / 026-video — Test aceite e bolt fechado (2026-11-28T19:55:07Z)
+
+O utilizador aprovou o fecho de Test e do bolt. Validação JDK 21: foco t14–t16
+5/5, suíte pertinente 150/150, completa 1599/1599. JaCoCo 0.8.12:
+7573/8252 linhas no bundle (91,77%) e 673/825 linhas executáveis adicionadas
+(81,58%). A ampliação Q-C-50 foi implementada nos caminhos autorizados.
+O bolt 026-video está complete; TASK-020 permanece IN PROGRESS e o seu fecho
+não é inferido. Não se afirma manual humano, revisão Denji ou integração.

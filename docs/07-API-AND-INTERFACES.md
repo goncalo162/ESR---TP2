@@ -1002,3 +1002,53 @@ e integrada em main, sem mudança de contratos desde Implement. Test aceite
 após delegação expressa em Codex, Denji confirmado e22687 frames completos
 conferidos. Não se declara manual humano concluído. Sem pacing/loop/emissão
 ou integração de streaming;16MiB continua a limitar apenas o raster destino.
+
+## IMP-019 — contratos propostos em Design (2026-11-28T15:18:50Z)
+
+Model/Q-C-48/49 aprovados; [Design para revisão](../memory-bank/bolts/026-video/ddd-02-technical-design.md). Sem APIs reais
+inspecionadas nesta etapa e sem fonte Java alterado. OwnerPort/DemandPort/
+AvailabilityPort/FramePort e prepare/bind/fecho são propostas nos três caminhos,
+a conferir emADR antes de Implement; não se declara que existam ou sejam ligáveis.
+Qualificação total antes de criar/start com routing, entrega só no owner após
+revalidação atual, ReadPermit revogável e limite temporal antes de nextFrame.
+W2+coordenador1, filas/células/heap finitos, orçamento global com adaptação de
+remaining às APIs existentes a conferir. CLOSED nunca é inferido de cancelamento
+ou close inócuo após FAILED. Sem wire/config novo ou antecipação UDP/player.
+P01–P20/V-020-C continuam por executar; sem Implement, commits/push.
+
+## IMP-019 — conferência ADR e contrato de ponte proposto
+
+Registo 2026-11-28T15:33:45Z. Design aprovado; [revisão ADR](../memory-bank/bolts/026-video/adr-review.md)
+A01–A08 sobre fontes reais. Qualificação antes da factory/start cabe no App;
+as APIs de owner/procura/revogação não existem na composição pública atual.
+setLocalAvailable é interno ao router, owner-only/void; falta delegação e
+confirmação local por época/binding. Observer de routing não é listener de procura.
+
+**Q-C-50 pendente:** ponte única de fontes SERVER aninhada em OverlayNode/
+RoutingService, sem dependência desses pacotes para server. Propõe factory
+withLocalSources, bind no owner real, OwnerAccess limitado, SourceDemand atual
+com versão/identidades/leases, listener de procura/stop e setAvailableOnOwner
+com APPLIED/ALREADY_APPLIED/STALE/STOPPED. Assinaturas e caminhos integrais na
+revisão; são propostas, não APIs existentes nem contrato já alterado.
+Notificação revoga permits no mesmo turno, antes do pump coalescido; observar
+inicialmente após routing.start. APPLIED confirma estado local, não receção de
+WITHDRAW pelo peer. Preservar as factories/Observer e Snapshot de4/5/6 argumentos.
+
+Shutdown adapta Duration restante a um scope comum anterior a prepare, sem
+close bloqueante de prazo próprio no composto novo. VideoSource não muda:
+FAILED+close inócuo conserva CLEANUP_UNCERTAIN. FramePort de produção UNWIRED
+recusa explicitamente; não abre UDP nem simula sucesso. Três caminhos do ADD
+mantidos enquanto a proposta de oito não for aprovada. P01–P20/V-020-C não
+executados; sem Implement/commits/push, manual/Denji/integração não dispensados.
+
+**Aprovação ADR / Q-C-50 (2026-11-28T15:48:00Z):** revisão ADR e Q-C-50
+aprovadas pelo utilizador. O contrato de ponte única `SERVER` aninhado em
+`OverlayNode` / `RoutingService` e os 8 caminhos ficam autorizados para
+implementação em `IMP-019` / `026-video`, mantendo `UNWIRED` em produção,
+preservação de factories/observers/snapshots históricos e `CLEANUP_UNCERTAIN`
+após `FAILED` de `VideoSource`.
+
+**Fecho técnico de IMP-019 (2026-11-28T19:55:07Z):** Test aceite pelo utilizador;
+JDK 21 completo 1599/1599, JaCoCo 91,77% bundle e 81,58% de linhas executáveis
+adicionadas. [Relatório de Test](../memory-bank/bolts/026-video/ddd-03-test-report.md).
+O bolt está complete; TASK-020 e o restante trabalho de PHASE-05 continuam abertos.

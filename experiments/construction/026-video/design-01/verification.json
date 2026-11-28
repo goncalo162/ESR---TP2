@@ -1,0 +1,57 @@
+{
+  "recorded_at": "2026-11-28T15:20:23.568126+00:00",
+  "stage": "design",
+  "status": "proposed for review; no ADR/Implement",
+  "Model_and_QC48_49": "explicit user approval recorded",
+  "source_read_analyzed_modified": false,
+  "Projeto_changes": [],
+  "IMP018_changes": [],
+  "prior_Model_evidence_changes": [],
+  "Maven_Java_decoder_P01_P20_executed": false,
+  "arithmetic_examples": "document-only exact integer calculations; not StreamingServer tests",
+  "proposed_W": 2,
+  "proposed_threads_per_SERVER": {
+    "IO_workers": 2,
+    "coordinator_timer": 1,
+    "extra_timer": 0
+  },
+  "queue_bounds": {
+    "unique_source_intents": 256,
+    "per_worker_command": 1,
+    "per_worker_returned_result": 1,
+    "per_source_frame_result_or_ready": 1,
+    "heap": 256,
+    "owner_wakeup_pending": 1,
+    "owner_wakeup_executing": 1,
+    "owner_pump_sources_per_turn": 16
+  },
+  "integration": "A01-A08 require real source/API check in ADR; no APIs assumed to exist; extension before code if necessary",
+  "Design_sha256": "55cd98e0f16624c510253724c05d4c0c821c509a996426fa3c3c5466440b60bd",
+  "diff_check_exit_code": 0,
+  "source_scope": [
+    "server/StreamingServer.java",
+    "server/StreamingServerTest.java",
+    "app/OttApplication.java"
+  ],
+  "stages_completed": [
+    "model"
+  ],
+  "P01_P20_V020C": "all not executed",
+  "commits_push": false,
+  "head_unchanged": true,
+  "external_gates_added": false,
+  "closure_requirements": [
+    "JDK21 regression",
+    "applicable personal human manual before Test approval",
+    "final Denji review",
+    "integration",
+    "TASK020 only closes after A/B/C"
+  ],
+  "limitations_preserved": [
+    "16MiB destination raster only",
+    "R17 initial cause unknown",
+    "old negatives and removed demo",
+    "LOCAL03/04 and distribution conditions",
+    "no UDP/StreamForwarder/player integration implied"
+  ]
+}
